@@ -111,6 +111,48 @@ brew install --cask komi-store
 
 ---
 
+### Team
+
+<table align="center">
+  <tr>
+    <td align="center" width="150">
+      <a href="https://github.com/rainxchzed">
+        <img src="https://github.com/rainxchzed.png?size=100" width="80" height="80" alt="rainxchzed" /><br />
+        <sub><b>rainxchzed</b></sub>
+      </a><br />
+      <sub>Creator</sub>
+    </td>
+    <td align="center" width="150">
+      <a href="https://github.com/illumiat">
+        <img src="https://github.com/illumiat.png?size=100" width="80" height="80" alt="illumiat" /><br />
+        <sub><b>illumiat</b></sub>
+      </a><br />
+      <sub>Maintainer</sub>
+    </td>
+    <td align="center" width="150">
+      <a href="https://github.com/YumeYuka">
+        <img src="https://github.com/YumeYuka.png?size=100" width="80" height="80" alt="YumeYuka" /><br />
+        <sub><b>YumeYuka</b></sub>
+      </a><br />
+      <sub>Maintainer</sub>
+    </td>
+    <td align="center" width="150">
+      <a href="https://github.com/KelvinCrag">
+        <img src="https://github.com/KelvinCrag.png?size=100" width="80" height="80" alt="KelvinCrag" /><br />
+        <sub><b>KelvinCrag</b></sub>
+      </a><br />
+      <sub>Maintainer</sub>
+    </td>
+  </tr>
+</table>
+
+<p align="center">
+  Komi Store is built by everyone who sends a patch, a translation, or a bug report.
+  See the full list of <a href="https://github.com/komi-store/komi-store/graphs/contributors">contributors</a>.
+</p>
+
+---
+
 ### Join Community
 
 <p align="center">
