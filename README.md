@@ -115,40 +115,53 @@ brew install --cask komi-store
 
 <table align="center">
   <tr>
-    <td align="center" width="150">
+    <td align="center" width="170">
       <a href="https://github.com/rainxchzed">
-        <img src="https://github.com/rainxchzed.png?size=100" width="80" height="80" alt="rainxchzed" /><br />
-        <sub><b>rainxchzed</b></sub>
-      </a><br />
-      <sub>Creator</sub>
+        <img src="https://wsrv.nl/?url=github.com/rainxchzed.png&w=180&h=180&fit=cover&mask=circle&maxage=7d" width="92" height="92" alt="rainxchzed" />
+      </a>
+      <br />
+      <a href="https://github.com/rainxchzed"><b>rainxchzed</b></a>
+      <br />
+      <img src="https://img.shields.io/badge/Creator-3D4654?style=flat-square" alt="Creator" />
     </td>
-    <td align="center" width="150">
+    <td align="center" width="170">
       <a href="https://github.com/illumiat">
-        <img src="https://github.com/illumiat.png?size=100" width="80" height="80" alt="illumiat" /><br />
-        <sub><b>illumiat</b></sub>
-      </a><br />
-      <sub>Maintainer</sub>
+        <img src="https://wsrv.nl/?url=github.com/illumiat.png&w=180&h=180&fit=cover&mask=circle&maxage=7d" width="92" height="92" alt="illumiat" />
+      </a>
+      <br />
+      <a href="https://github.com/illumiat"><b>illumiat</b></a>
+      <br />
+      <img src="https://img.shields.io/badge/Maintainer-3D4654?style=flat-square" alt="Maintainer" />
     </td>
-    <td align="center" width="150">
+    <td align="center" width="170">
       <a href="https://github.com/YumeYuka">
-        <img src="https://github.com/YumeYuka.png?size=100" width="80" height="80" alt="YumeYuka" /><br />
-        <sub><b>YumeYuka</b></sub>
-      </a><br />
-      <sub>Maintainer</sub>
+        <img src="https://wsrv.nl/?url=github.com/YumeYuka.png&w=180&h=180&fit=cover&mask=circle&maxage=7d" width="92" height="92" alt="YumeYuka" />
+      </a>
+      <br />
+      <a href="https://github.com/YumeYuka"><b>YumeYuka</b></a>
+      <br />
+      <img src="https://img.shields.io/badge/Maintainer-3D4654?style=flat-square" alt="Maintainer" />
     </td>
-    <td align="center" width="150">
+    <td align="center" width="170">
       <a href="https://github.com/KelvinCrag">
-        <img src="https://github.com/KelvinCrag.png?size=100" width="80" height="80" alt="KelvinCrag" /><br />
-        <sub><b>KelvinCrag</b></sub>
-      </a><br />
-      <sub>Maintainer</sub>
+        <img src="https://wsrv.nl/?url=github.com/KelvinCrag.png&w=180&h=180&fit=cover&mask=circle&maxage=7d" width="92" height="92" alt="KelvinCrag" />
+      </a>
+      <br />
+      <a href="https://github.com/KelvinCrag"><b>KelvinCrag</b></a>
+      <br />
+      <img src="https://img.shields.io/badge/Maintainer-3D4654?style=flat-square" alt="Maintainer" />
     </td>
   </tr>
 </table>
 
 <p align="center">
-  Komi Store is built by everyone who sends a patch, a translation, or a bug report.
-  See the full list of <a href="https://github.com/komi-store/komi-store/graphs/contributors">contributors</a>.
+  <sub>Komi Store is also built by everyone who sends a patch, a translation, or a bug report.</sub>
+</p>
+
+<p align="center">
+  <a href="https://github.com/komi-store/komi-store/graphs/contributors">
+    <img src="https://contrib.rocks/image?repo=komi-store/komi-store" alt="Contributors" />
+  </a>
 </p>
 
 ---
