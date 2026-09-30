@@ -115,11 +115,11 @@ brew install --cask komi-store
 
 <table align="center">
   <tr>
-    <td align="center" width="185">
+    <td align="center">
       <a href="https://github.com/rainxchzed">
         <picture>
           <source media="(prefers-color-scheme: dark)" srcset="https://wsrv.nl/?url=github.com%2Frainxchzed.png%3Fsize%3D400&precrop=true&cx=32&cy=32&cw=336&ch=336&w=220&h=220&fit=cover&mask=circle&mbg=0d1117&maxage=7d" />
-          <img src="https://wsrv.nl/?url=github.com%2Frainxchzed.png%3Fsize%3D400&precrop=true&cx=32&cy=32&cw=336&ch=336&w=220&h=220&fit=cover&mask=circle&mbg=ffffff&maxage=7d" width="110" height="110" alt="rainxchzed" />
+          <img src="https://wsrv.nl/?url=github.com%2Frainxchzed.png%3Fsize%3D400&precrop=true&cx=32&cy=32&cw=336&ch=336&w=220&h=220&fit=cover&mask=circle&mbg=ffffff&maxage=7d" width="110" alt="rainxchzed" />
         </picture>
       </a>
       <br />
@@ -127,11 +127,11 @@ brew install --cask komi-store
       <br />
       <img src="https://img.shields.io/badge/Creator-3D4654?style=flat-square" alt="Creator" />
     </td>
-    <td align="center" width="185">
+    <td align="center">
       <a href="https://github.com/illumiat">
         <picture>
           <source media="(prefers-color-scheme: dark)" srcset="https://wsrv.nl/?url=github.com%2Fillumiat.png%3Fsize%3D400&precrop=true&cx=32&cy=32&cw=336&ch=336&w=220&h=220&fit=cover&mask=circle&mbg=0d1117&maxage=7d" />
-          <img src="https://wsrv.nl/?url=github.com%2Fillumiat.png%3Fsize%3D400&precrop=true&cx=32&cy=32&cw=336&ch=336&w=220&h=220&fit=cover&mask=circle&mbg=ffffff&maxage=7d" width="110" height="110" alt="illumiat" />
+          <img src="https://wsrv.nl/?url=github.com%2Fillumiat.png%3Fsize%3D400&precrop=true&cx=32&cy=32&cw=336&ch=336&w=220&h=220&fit=cover&mask=circle&mbg=ffffff&maxage=7d" width="110" alt="illumiat" />
         </picture>
       </a>
       <br />
@@ -139,11 +139,11 @@ brew install --cask komi-store
       <br />
       <img src="https://img.shields.io/badge/Maintainer-3D4654?style=flat-square" alt="Maintainer" />
     </td>
-    <td align="center" width="185">
+    <td align="center">
       <a href="https://github.com/KelvinCrag">
         <picture>
           <source media="(prefers-color-scheme: dark)" srcset="https://wsrv.nl/?url=github.com%2FKelvinCrag.png%3Fsize%3D400&precrop=true&cx=32&cy=32&cw=336&ch=336&w=220&h=220&fit=cover&mask=circle&mbg=0d1117&maxage=7d" />
-          <img src="https://wsrv.nl/?url=github.com%2FKelvinCrag.png%3Fsize%3D400&precrop=true&cx=32&cy=32&cw=336&ch=336&w=220&h=220&fit=cover&mask=circle&mbg=ffffff&maxage=7d" width="110" height="110" alt="KelvinCrag" />
+          <img src="https://wsrv.nl/?url=github.com%2FKelvinCrag.png%3Fsize%3D400&precrop=true&cx=32&cy=32&cw=336&ch=336&w=220&h=220&fit=cover&mask=circle&mbg=ffffff&maxage=7d" width="110" alt="KelvinCrag" />
         </picture>
       </a>
       <br />
@@ -151,11 +151,11 @@ brew install --cask komi-store
       <br />
       <img src="https://img.shields.io/badge/Maintainer-3D4654?style=flat-square" alt="Maintainer" />
     </td>
-    <td align="center" width="185">
+    <td align="center">
       <a href="https://github.com/YumeYuka">
         <picture>
           <source media="(prefers-color-scheme: dark)" srcset="https://wsrv.nl/?url=github.com%2FYumeYuka.png%3Fsize%3D400&precrop=true&cx=32&cy=32&cw=336&ch=336&w=220&h=220&fit=cover&mask=circle&mbg=0d1117&maxage=7d" />
-          <img src="https://wsrv.nl/?url=github.com%2FYumeYuka.png%3Fsize%3D400&precrop=true&cx=32&cy=32&cw=336&ch=336&w=220&h=220&fit=cover&mask=circle&mbg=ffffff&maxage=7d" width="110" height="110" alt="YumeYuka" />
+          <img src="https://wsrv.nl/?url=github.com%2FYumeYuka.png%3Fsize%3D400&precrop=true&cx=32&cy=32&cw=336&ch=336&w=220&h=220&fit=cover&mask=circle&mbg=ffffff&maxage=7d" width="110" alt="YumeYuka" />
         </picture>
       </a>
       <br />
