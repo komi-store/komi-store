@@ -159,6 +159,10 @@ private fun MainDetailPane(
             append(args.repo.orEmpty())
             append('|')
             append(args.sourceHost.orEmpty())
+            append('|')
+            append(args.initialAssetName.orEmpty())
+            append('|')
+            append(args.packageName.orEmpty())
         }
     val viewModel: DetailsViewModel =
         koinViewModel(key = vmKey) {
@@ -168,6 +172,8 @@ private fun MainDetailPane(
                 args.repo.orEmpty(),
                 args.isComingFromUpdate,
                 args.sourceHost,
+                args.initialAssetName,
+                args.packageName,
             )
         }
     DetailsRoot(

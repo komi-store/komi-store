@@ -89,7 +89,7 @@ import kotlin.time.ExperimentalTime
 @Composable
 fun AppsRoot(
     onNavigateBack: () -> Unit,
-    onNavigateToRepo: (repoId: Long, sourceHost: String?, owner: String?, repo: String?) -> Unit,
+    onNavigateToRepo: (repoId: Long, sourceHost: String?, owner: String?, repo: String?, initialAssetName: String?, packageName: String?) -> Unit,
     onNavigateToExternalImport: () -> Unit,
     onNavigateToStarredPicker: () -> Unit,
     viewModel: AppsViewModel = koinViewModel(),
@@ -113,7 +113,7 @@ fun AppsRoot(
     ObserveAsEvents(viewModel.events) { event ->
         when (event) {
             is AppsEvent.NavigateToRepo -> {
-                onNavigateToRepo(event.repoId, event.sourceHost, event.owner, event.repo)
+                onNavigateToRepo(event.repoId, event.sourceHost, event.owner, event.repo, event.initialAssetName, event.packageName)
             }
 
             is AppsEvent.ShowError -> {
@@ -321,6 +321,8 @@ fun AppsScreen(
                                             sourceHost = app.sourceHost,
                                             owner = app.repoOwner,
                                             repo = app.repoName,
+                                            initialAssetName = app.installedAssetName ?: app.latestAssetName ?: app.pendingInstallAssetName,
+                                            packageName = app.packageName,
                                         ),
                                     )
                                 }

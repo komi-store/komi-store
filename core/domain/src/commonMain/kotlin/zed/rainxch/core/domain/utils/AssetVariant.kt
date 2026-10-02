@@ -1,6 +1,7 @@
 package zed.rainxch.core.domain.utils
 
 import zed.rainxch.core.domain.model.account.github.GithubAsset
+import zed.rainxch.core.domain.model.installation.InstalledApp
 
 object AssetVariant {
 
@@ -295,5 +296,62 @@ object AssetVariant {
             }
             unflavoured.ifEmpty { assets }
         }
+    }
+
+    fun findMatchingInstalledApp(
+        apps: List<InstalledApp>,
+        assetName: String?,
+    ): InstalledApp? {
+        if (apps.isEmpty()) return null
+        if (assetName == null) {
+            return apps.firstOrNull { !it.isUpdateAvailable } ?: apps.first()
+        }
+
+        val filterMatch = apps.firstOrNull { existing ->
+            val filter = existing.assetFilterRegex
+            filter != null && runCatching { Regex(filter).containsMatchIn(assetName) }
+                .getOrDefault(false)
+        }
+        if (filterMatch != null) return filterMatch
+
+        if (apps.size == 1) {
+            val sole = apps.first()
+            if (sole.assetFilterRegex != null) {
+                return null
+            }
+            if (sole.installedAssetName != null) {
+                val installedName = sole.installedAssetName
+                val soleStem = extractBaseStem(installedName)
+                val primaryStem = extractBaseStem(assetName)
+                if (soleStem.isNotEmpty() && primaryStem.isNotEmpty() && soleStem != primaryStem) {
+                    return null
+                }
+                val soleGlob = deriveGlob(installedName)
+                val primaryGlob = deriveGlob(assetName)
+                if (soleGlob != null && primaryGlob != null && soleGlob != primaryGlob && soleStem.isEmpty()) {
+                    return null
+                }
+            }
+            return sole
+        }
+
+        val primaryGlob = deriveGlob(assetName)
+        val globMatch = apps.firstOrNull { existing ->
+            val installedAsset = existing.installedAssetName ?: return@firstOrNull false
+            val existingGlob = deriveGlob(installedAsset)
+            existingGlob != null && primaryGlob != null && existingGlob == primaryGlob
+        }
+        if (globMatch != null) return globMatch
+
+        val primaryStem = extractBaseStem(assetName)
+        if (primaryStem.isNotEmpty()) {
+            val stemMatch = apps.firstOrNull { existing ->
+                val name = existing.installedAssetName ?: return@firstOrNull false
+                val existingStem = extractBaseStem(name)
+                existingStem.isNotEmpty() && existingStem == primaryStem
+            }
+            if (stemMatch != null) return stemMatch
+        }
+        return null
     }
 }

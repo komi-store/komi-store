@@ -811,6 +811,9 @@
     <!-- Multi-layer variant fingerprint UX additions -->
     <string name="variant_picker_unpin">Unpin</string>
     <string name="variant_picker_pinned_badge">Pinned</string>
+    <string name="variant_picker_installed_badge">Installed</string>
+    <string name="assets_section_installed">Installed</string>
+    <string name="assets_section_available">Available</string>
     <string name="variant_picker_open">Pick variant</string>
     <string name="variant_picker_open_filter">Adjust filter</string>
     <string name="variant_first_pin_toast">Future updates will prefer the %1$s variant. Change this anytime in app settings.</string>

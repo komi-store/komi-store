@@ -475,13 +475,17 @@ fun AppNavigation(
                                             )
                                         },
                                         viewModel =
-                                            koinViewModel {
+                                            koinViewModel(
+                                                key = "details_${args.repositoryId}_${args.owner}_${args.repo}_${args.initialAssetName}_${args.packageName}",
+                                            ) {
                                                 parametersOf(
                                                     args.repositoryId,
                                                     args.owner,
                                                     args.repo,
                                                     args.isComingFromUpdate,
                                                     args.sourceHost,
+                                                    args.initialAssetName,
+                                                    args.packageName,
                                                 )
                                             },
                                     )
@@ -918,7 +922,7 @@ fun AppNavigation(
                                             onNavigateBack = {
                                                 navController.navigateUp()
                                             },
-                                            onNavigateToRepo = { repoId, sourceHost, owner, repo ->
+                                            onNavigateToRepo = { repoId, sourceHost, owner, repo, initialAssetName, packageName ->
                                                 if (isExpanded) {
                                                     listDetailState.select(
                                                         AdaptiveDetailArgs(
@@ -927,6 +931,8 @@ fun AppNavigation(
                                                             sourceHost = sourceHost,
                                                             owner = owner,
                                                             repo = repo,
+                                                            initialAssetName = initialAssetName,
+                                                            packageName = packageName,
                                                         ),
                                                     )
                                                 } else {
@@ -937,6 +943,8 @@ fun AppNavigation(
                                                             sourceHost = sourceHost,
                                                             owner = owner.orEmpty(),
                                                             repo = repo.orEmpty(),
+                                                            initialAssetName = initialAssetName,
+                                                            packageName = packageName,
                                                         ),
                                                     )
                                                 }
