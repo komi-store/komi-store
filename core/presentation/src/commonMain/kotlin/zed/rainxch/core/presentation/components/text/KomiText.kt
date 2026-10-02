@@ -2,6 +2,7 @@ package zed.rainxch.core.presentation.components.text
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -43,6 +44,7 @@ fun KomiText(
     fontWeight: FontWeight? = null,
     letterSpacing: TextUnit = TextUnit.Unspecified,
     lineHeight: TextUnit = TextUnit.Unspecified,
+    autoSize: TextAutoSize? = null,
     onTextLayout: ((TextLayoutResult) -> Unit)? = null,
 ) {
     val personality = LocalPersonality.current
@@ -52,6 +54,7 @@ fun KomiText(
         text = if (resolvedUppercase) text.uppercase() else text,
         modifier = modifier,
         color = if (color != Color.Unspecified) color else personality.colors.onSurface,
+        autoSize = autoSize,
         maxLines = maxLines,
         overflow = overflow,
         textAlign = textAlign,

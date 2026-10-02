@@ -2,8 +2,10 @@ package zed.rainxch.details.presentation.components.sections
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -46,43 +48,43 @@ fun LazyListScope.stats(
         }
 
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.height(IntrinsicSize.Min),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(10.dp),
         ) {
             StatItem(
                 label = stringResource(Res.string.forks),
                 stat = repoStats.forks,
-                modifier = Modifier.weight(1.5f),
+                modifier = Modifier.weight(1f).fillMaxHeight(),
             )
             StatItem(
                 label = stringResource(Res.string.stars),
                 stat = repoStats.stars,
-                modifier = Modifier.weight(2f),
+                modifier = Modifier.weight(1f).fillMaxHeight(),
             )
             StatItem(
                 label = stringResource(Res.string.issues),
                 stat = repoStats.openIssues,
-                modifier = Modifier.weight(1f),
+                modifier = Modifier.weight(1f).fillMaxHeight(),
             )
         }
 
         Spacer(Modifier.height(10.dp))
 
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.height(IntrinsicSize.Min),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(10.dp),
         ) {
             StatItem(
                 label = stringResource(Res.string.downloads),
                 stat = repoStats.totalDownloads,
-                modifier = Modifier.weight(1f),
+                modifier = Modifier.weight(1f).fillMaxHeight(),
             )
             TextStatItem(
                 label = stringResource(Res.string.license),
                 value = repoStats.license ?: stringResource(Res.string.license_none),
-                modifier = Modifier.weight(1f),
+                modifier = Modifier.weight(1f).fillMaxHeight(),
             )
         }
     }
