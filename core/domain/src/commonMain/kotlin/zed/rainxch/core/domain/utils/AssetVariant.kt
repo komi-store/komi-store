@@ -141,11 +141,23 @@ object AssetVariant {
         }
 
         val out = StringBuilder()
+        var previousWasVersion = false
         for (i in tokens.indices) {
             if (consumed[i]) continue
             val t = tokens[i]
-            if (t in VOCABULARY) continue
-            if (isVersionLikeToken(t)) continue
+            if (t in VOCABULARY) {
+                previousWasVersion = false
+                continue
+            }
+            if (isVersionLikeToken(t)) {
+                previousWasVersion = true
+                continue
+            }
+            // A build id glued to the version belongs to it: "26.09.8ede272" is the same
+            // app as "26.09", but keeping the hash in the stem makes the two look like
+            // different apps and the release is then treated as someone else's.
+            if (previousWasVersion && isBuildIdToken(t)) continue
+            previousWasVersion = false
             out.append(t)
         }
         return out.toString()
@@ -158,11 +170,22 @@ object AssetVariant {
         return false
     }
 
+    // A short commit hash: hex, at least four characters, with both digits and letters.
+    private fun isBuildIdToken(token: String): Boolean =
+        token.length >= 4 &&
+            BUILD_ID.matches(token) &&
+            token.any { it.isDigit() } &&
+            token.any { it.isLetter() }
+
+    private val BUILD_ID = Regex("""[0-9a-f]+""", RegexOption.IGNORE_CASE)
+
     fun deriveGlob(assetName: String): String? {
         val lower = assetName.lowercase()
 
+        // The trailing hex group is a build id glued onto the version ("26.09.8ede272"):
+        // it has to be replaced too, or two releases of one app produce different globs.
         val versionPattern =
-            Regex("""v?\d+(?:\.\d+)+|(?<![A-Za-z\d])\d{2,}(?![A-Za-z\d])""")
+            Regex("""v?\d+(?:\.\d+)+(?:[0-9a-f]{4,})?|(?<![A-Za-z\d])\d{2,}(?![A-Za-z\d])""", RegexOption.IGNORE_CASE)
         if (!versionPattern.containsMatchIn(lower)) return null
         return versionPattern.replace(lower, "*")
     }
