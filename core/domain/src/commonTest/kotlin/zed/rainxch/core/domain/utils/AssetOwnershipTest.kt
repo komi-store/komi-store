@@ -153,6 +153,18 @@ class AssetOwnershipTest {
     }
 
     @Test
+    fun aMonoreposNewAppIsNotARenameOfTheInstalledOne() {
+        val auth = app("io.ente.auth.independent", "ente-auth-v4.4.25.apk")
+        val locker = listOf(asset("ente-locker-v1.0.0.apk"))
+        val history = listOf(
+            release("locker-v1.0.0", locker),
+            release("auth-v4.4.25", listOf(asset("ente-auth-v4.4.25.apk"))),
+            release("auth-v4.4.24", listOf(asset("ente-auth-v4.4.24.apk"))),
+        )
+        assertNull(AssetOwnership.ownerOf("ente-locker-v1.0.0.apk", listOf(auth), locker, history))
+    }
+
+    @Test
     fun otherAppsInTheSameReleaseAreNotOwned() {
         val instagram = app("com.instagram", "instagram-arm64-v8a-piko-patches-v439.0.0.37.89.apk")
         val youtube = app("com.youtube", "youtube-universal-morphe-patches-v19.9.9.apk")
