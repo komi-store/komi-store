@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
@@ -23,6 +24,8 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -290,6 +293,15 @@ fun AppsScreen(
                     }
 
                     val listState = rememberLazyGridState()
+                    KeepAtTopWhenSectionsChange(
+                        gridState = listState,
+                        sections = listOf(
+                            state.showImportProposalBanner,
+                            state.showKaoBanner,
+                            state.pendingApps.isNotEmpty(),
+                            state.updateApps.isNotEmpty() || state.isUpdatingAll,
+                        ),
+                    )
 
                     when {
                         state.isLoading -> {
@@ -526,6 +538,21 @@ fun AppsScreen(
                 }
             }
         }
+    }
+}
+
+// A lazy grid keeps its first visible item in place, so a section that appears above it while
+// the user is at the top (an update check finding updates) would land offscreen.
+@Composable
+private fun KeepAtTopWhenSectionsChange(
+    gridState: LazyGridState,
+    sections: List<Boolean>,
+) {
+    val previous = remember { arrayOf(sections) }
+    SideEffect {
+        val atTop = gridState.firstVisibleItemIndex == 0 && gridState.firstVisibleItemScrollOffset == 0
+        if (previous[0] != sections && atTop) gridState.requestScrollToItem(0)
+        previous[0] = sections
     }
 }
 
