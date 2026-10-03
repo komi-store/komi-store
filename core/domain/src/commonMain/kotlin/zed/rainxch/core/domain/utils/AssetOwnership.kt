@@ -69,7 +69,12 @@ object AssetOwnership {
         val oldestWithNew = releaseHistory.indexOfLast { release ->
             release.assets.any { isSameApp(it.name, toAssetName) }
         }
-        return oldestWithNew <= newestWithOld
+        if (oldestWithNew > newestWithOld) return false
+        if (oldestWithNew < 0) return true
+        // A monorepo's brand-new app also starts after the installed one's last release;
+        // its tags (locker-v1.0.0 vs auth-v4.4.25) still say it is another app.
+        return ReleaseLines.of(releaseHistory[oldestWithNew].tagName) ==
+            ReleaseLines.of(releaseHistory[newestWithOld].tagName)
     }
 
     // A package that names its major version (org.godotengine.editor.v4) can't be updated by
