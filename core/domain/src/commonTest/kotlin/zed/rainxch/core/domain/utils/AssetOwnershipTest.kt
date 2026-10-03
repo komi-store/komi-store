@@ -183,6 +183,16 @@ class AssetOwnershipTest {
     }
 
     @Test
+    fun packagesThatNameTheirMajorNeverOwnAnotherMajor() {
+        assertNull(ownerOf(godot363.single().name, listOf(godotV4), godot363))
+        assertEquals(godotV4, ownerOf("Godot_v4.7.2-stable_android_editor.apk", listOf(godotV4), godot472))
+
+        val ordinary = app("com.app", "app-1.9.0.apk", installedVersion = "1.9.0")
+        val major2 = listOf(asset("app-2.0.0.apk"))
+        assertEquals(ordinary, ownerOf("app-2.0.0.apk", listOf(ordinary), major2))
+    }
+
+    @Test
     fun linkedAppsFallBackToTheirInstalledVersionLine() {
         val linkedV3 = godotV3.copy(installedAssetName = null, assetGlobPattern = "godot_*-stable_android_editor.apk")
         val linkedV4 = godotV4.copy(installedAssetName = null)

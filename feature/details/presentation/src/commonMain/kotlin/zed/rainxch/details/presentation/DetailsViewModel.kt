@@ -267,9 +267,9 @@ class DetailsViewModel(
             }
 
             DetailsAction.OnConfirmDowngradeUninstall -> {
-                _state.value.downgradeWarning ?: return
+                val warning = _state.value.downgradeWarning ?: return
                 dismissDowngradeWarning()
-                uninstallApp()
+                uninstallPackage(warning.packageName)
             }
 
             DetailsAction.OnDismissSigningKeyWarning -> {
@@ -1536,17 +1536,21 @@ class DetailsViewModel(
 
     private fun uninstallApp() {
         val installedApp = _state.value.installedApp ?: return
-        logger.debug("Uninstalling app: ${installedApp.packageName}")
+        uninstallPackage(installedApp.packageName)
+    }
+
+    private fun uninstallPackage(packageName: String) {
+        logger.debug("Uninstalling app: $packageName")
         viewModelScope.launch {
             try {
-                installer.uninstall(installedApp.packageName)
+                installer.uninstall(packageName)
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
-                logger.error("Failed to request uninstall for ${installedApp.packageName}: ${e.message}")
+                logger.error("Failed to request uninstall for $packageName: ${e.message}")
                 _events.send(
                     DetailsEvent.OnMessage(
-                        getString(Res.string.failed_to_uninstall, installedApp.packageName),
+                        getString(Res.string.failed_to_uninstall, packageName),
                     ),
                 )
             }

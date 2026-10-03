@@ -29,9 +29,11 @@ object AssetOwnership {
         }
         if (byFilter.isNotEmpty()) return byFilter.closestVersionLine(assetName)
 
+        val candidates = apps.filter { canOwn(it, assetName) }
+
         val glob = AssetVariant.deriveGlob(assetName)
         if (glob != null) {
-            val byGlob = apps.filter { app ->
+            val byGlob = candidates.filter { app ->
                 val appGlob =
                     app.installedAssetName?.let(AssetVariant::deriveGlob) ?: app.assetGlobPattern
                 appGlob == glob
@@ -39,12 +41,12 @@ object AssetOwnership {
             if (byGlob.isNotEmpty()) return byGlob.closestVersionLine(assetName)
         }
 
-        val byStem = apps.filter { app ->
+        val byStem = candidates.filter { app ->
             app.installedAssetName?.let { isSameApp(it, assetName) } == true
         }
         if (byStem.isNotEmpty()) return byStem.closestVersionLine(assetName)
 
-        val sole = apps.singleOrNull() ?: return null
+        val sole = apps.singleOrNull()?.takeIf { canOwn(it, assetName) } ?: return null
         val soleAsset = sole.installedAssetName ?: return sole
         if (releaseAssets.any { isSameApp(it.name, soleAsset) }) return null
         return sole.takeIf { isRename(soleAsset, assetName, releaseHistory) }
@@ -66,6 +68,18 @@ object AssetOwnership {
         }
         return oldestWithNew <= newestWithOld
     }
+
+    // A package that names its major version (org.godotengine.editor.v4) can't be updated by
+    // another major's APK; that APK is a different app installed side by side.
+    fun canOwn(app: InstalledApp, assetName: String): Boolean {
+        val packageMajor = app.packageName.split('.').firstNotNullOfOrNull { segment ->
+            PACKAGE_MAJOR.matchEntire(segment)?.groupValues?.get(1)?.toIntOrNull()
+        } ?: return true
+        val assetMajor = AssetVariant.versionMajor(assetName) ?: return true
+        return packageMajor == assetMajor
+    }
+
+    private val PACKAGE_MAJOR = Regex("""v(\d+)""", RegexOption.IGNORE_CASE)
 
     // Apps named alike except the version (Godot editor.v3 / .v4) tie on glob and stem.
     private fun List<InstalledApp>.closestVersionLine(assetName: String): InstalledApp {
