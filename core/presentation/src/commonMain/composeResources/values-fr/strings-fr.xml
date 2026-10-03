@@ -1420,4 +1420,10 @@
     <string name="sidebar_browse">Parcourir</string>
     <string name="sidebar_categories">Catégories</string>
     <string name="sidebar_platform">Plateforme</string>
+    <string name="no_build_for_this_device">Aucune version pour cet appareil</string>
+    <string name="newer_releases_no_build_for_device">Les versions plus récentes n'ont rien pour cet appareil</string>
+    <string name="latest_for_platform">Dernière pour %1$s</string>
+    <string name="go_to_version">Aller à %1$s</string>
+    <string name="get_it_on_platform">Obtenir pour %1$s</string>
+    <string name="share_link">Partager le lien</string>
 </resources>

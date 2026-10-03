@@ -65,7 +65,6 @@ import org.koin.compose.viewmodel.koinViewModel
 import zed.rainxch.core.domain.isDesktop
 import zed.rainxch.core.domain.model.error.RefreshError
 import zed.rainxch.core.domain.model.installation.InstallSource
-import zed.rainxch.core.domain.model.repository.DiscoveryPlatform
 import zed.rainxch.core.presentation.components.ScrollbarContainer
 import zed.rainxch.core.presentation.components.bars.KomiTopBar
 import zed.rainxch.core.presentation.components.buttons.KomiActionRow
@@ -90,6 +89,7 @@ import zed.rainxch.core.presentation.utils.arrowKeyScroll
 import zed.rainxch.core.presentation.utils.contentWidthCap
 import zed.rainxch.core.presentation.utils.isPullToRefreshSupported
 import zed.rainxch.details.presentation.components.ApkInspectSheet
+import zed.rainxch.details.presentation.components.PlatformHandoffSheet
 import zed.rainxch.details.presentation.components.sections.about
 import zed.rainxch.details.presentation.components.sections.header
 import zed.rainxch.details.presentation.components.sections.logs
@@ -107,7 +107,6 @@ fun DetailsRoot(
     onNavigateBack: () -> Unit,
     onNavigateToDeveloperProfile: (username: String) -> Unit,
     onOpenRepositoryInApp: (repoId: Long) -> Unit,
-    onNavigateToSearchByPlatform: (DiscoveryPlatform) -> Unit,
     onNavigateToAbout: (repoId: Long, owner: String, repo: String, sourceHost: String?, translateTo: String?) -> Unit,
     onNavigateToWhatsNew: (repoId: Long, owner: String, repo: String, sourceHost: String?) -> Unit,
     onNavigateToIssues: (owner: String, repo: String) -> Unit,
@@ -169,10 +168,6 @@ fun DetailsRoot(
                     onNavigateToDeveloperProfile(action.username)
                 }
 
-                is DetailsAction.OnPlatformChipClick -> {
-                    onNavigateToSearchByPlatform(action.platform)
-                }
-
                 is DetailsAction.OnMessage -> {
                     coroutineScope.launch {
                         toastState.show(getString(action.messageText))
@@ -212,6 +207,10 @@ fun DetailsRoot(
             { onNavigateToSecurity(repo.owner.login, repo.name) }
         },
     )
+
+    state.handoff?.let { handoff ->
+        PlatformHandoffSheet(handoff = handoff, onAction = viewModel::onAction)
+    }
 
     state.downgradeWarning?.let { warning ->
         KomiDialog(

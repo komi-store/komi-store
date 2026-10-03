@@ -4,6 +4,7 @@ import kotlinx.collections.immutable.toImmutableList
 import zed.rainxch.core.domain.model.account.github.GithubRelease
 import zed.rainxch.core.domain.model.account.github.isEffectivelyPreRelease
 import zed.rainxch.core.domain.utils.VersionMath
+import zed.rainxch.core.domain.utils.newestReleasePerPlatform
 import zed.rainxch.details.domain.model.ReleaseCategory
 
 internal fun RawDetailsState.toView(): DetailsState {
@@ -17,6 +18,26 @@ internal fun RawDetailsState.toView(): DetailsState {
         .maxByOrNull { it.publishedAt }
     val canSwitchToStable = computeCanSwitchToStable(latestStableRelease)
     val isPendingInstallReady = computeIsPendingInstallReady()
+    val platformReleases = newestReleasePerPlatform(
+        releases = filteredReleases,
+        releasePlatforms = { releasePlatforms[it.id].orEmpty() },
+        devicePlatform = devicePlatform,
+    ).toImmutableList()
+    val selectedHasDeviceBuild = selectedRelease?.let { it.id in deviceBuildReleaseIds } ?: true
+    val selectedIndex = selectedRelease?.let { selected ->
+        filteredReleases.indexOfFirst { it.id == selected.id }
+    } ?: -1
+    val newerReleasesLackDeviceBuild =
+        selectedHasDeviceBuild &&
+            selectedIndex > 0 &&
+            filteredReleases.subList(0, selectedIndex).none { it.id in deviceBuildReleaseIds }
+    val deviceBuildTarget =
+        if (selectedHasDeviceBuild) {
+            null
+        } else {
+            filteredReleases.firstOrNull { it.id in deviceBuildReleaseIds }
+                ?: allReleases.firstOrNull { it.id in deviceBuildReleaseIds }
+        }
 
     return DetailsState(
         isLoading = isLoading,
@@ -89,6 +110,14 @@ internal fun RawDetailsState.toView(): DetailsState {
         latestStableRelease = latestStableRelease,
         canSwitchToStable = canSwitchToStable,
         isPendingInstallReady = isPendingInstallReady,
+        devicePlatform = devicePlatform,
+        platformReleases = platformReleases,
+        releasePlatforms = releasePlatforms,
+        deviceBuildReleaseIds = deviceBuildReleaseIds,
+        selectedHasDeviceBuild = selectedHasDeviceBuild,
+        newerReleasesLackDeviceBuild = newerReleasesLackDeviceBuild,
+        deviceBuildTarget = deviceBuildTarget,
+        handoff = handoffPlatform?.let { platform -> platformReleases.firstOrNull { it.platform == platform } },
     )
 }
 

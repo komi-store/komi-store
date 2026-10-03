@@ -183,13 +183,6 @@ private fun MainDetailPane(
                 GithubStoreGraph.DeveloperProfileScreen(username = username),
             )
         },
-        onNavigateToSearchByPlatform = { platform ->
-            navController.navigate(
-                GithubStoreGraph.SearchScreen(
-                    initialPlatform = platform.name,
-                ),
-            )
-        },
         onNavigateToAbout = onOpenAbout,
         onNavigateToWhatsNew = onOpenWhatsNew,
         onNavigateToIssues = { owner, repo ->

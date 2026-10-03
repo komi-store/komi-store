@@ -9,16 +9,20 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.automirrored.filled.OpenInNew
 import androidx.compose.material.icons.filled.Security
 import androidx.compose.material.icons.filled.Update
 import androidx.compose.foundation.layout.Column
+import androidx.compose.material.icons.outlined.Info
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
@@ -54,7 +58,9 @@ import zed.rainxch.details.presentation.model.DownloadStage
 import zed.rainxch.githubstore.core.presentation.res.Res
 import zed.rainxch.githubstore.core.presentation.res.appmanager_description
 import zed.rainxch.githubstore.core.presentation.res.external_installer_description
+import zed.rainxch.githubstore.core.presentation.res.go_to_version
 import zed.rainxch.githubstore.core.presentation.res.inspect_with_appmanager
+import zed.rainxch.githubstore.core.presentation.res.newer_releases_no_build_for_device
 import zed.rainxch.githubstore.core.presentation.res.obtainium_description
 import zed.rainxch.githubstore.core.presentation.res.open_in_obtainium
 import zed.rainxch.githubstore.core.presentation.res.open_with_external_installer
@@ -81,6 +87,8 @@ fun LazyListScope.header(
                     onPlatformClick = { platform ->
                         onAction(DetailsAction.OnPlatformChipClick(platform))
                     },
+                    platformReleases = state.platformReleases,
+                    devicePlatform = state.devicePlatform,
                     onOwnerClick = {
                         onAction(
                             DetailsAction.OpenDeveloperProfile(
@@ -174,8 +182,20 @@ fun LazyListScope.header(
                         isPickerVisible = state.isVersionPickerVisible,
                         onAction = onAction,
                         modifier = Modifier.weight(.35f),
+                        devicePlatform = state.devicePlatform,
+                        releasePlatforms = state.releasePlatforms,
+                        deviceBuildReleaseIds = state.deviceBuildReleaseIds,
                     )
                 }
+            }
+        }
+
+        if (state.newerReleasesLackDeviceBuild) {
+            item {
+                ReleaseHint(
+                    text = stringResource(Res.string.newer_releases_no_build_for_device),
+                    onClick = { onAction(DetailsAction.ToggleVersionPicker) },
+                )
             }
         }
 
@@ -251,6 +271,51 @@ fun LazyListScope.header(
                 }
             }
         }
+
+        val deviceBuildTarget = state.deviceBuildTarget
+        if (!state.selectedHasDeviceBuild && deviceBuildTarget != null) {
+            item {
+                ReleaseHint(
+                    text = stringResource(Res.string.go_to_version, deviceBuildTarget.tagName),
+                    onClick = { onAction(DetailsAction.OnJumpToDeviceBuild) },
+                    emphasized = true,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun ReleaseHint(
+    text: String,
+    onClick: () -> Unit,
+    emphasized: Boolean = false,
+) {
+    val colors = LocalPersonality.current.colors
+    val tint = if (emphasized) colors.primary else colors.onSurfaceVariant
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(LocalPersonality.current.shape.cornerSmall))
+            .clickable(onClick = onClick)
+            .padding(horizontal = 4.dp, vertical = 6.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
+    ) {
+        KomiIcon(
+            imageVector = if (emphasized) Icons.AutoMirrored.Filled.ArrowForward else Icons.Outlined.Info,
+            contentDescription = null,
+            modifier = Modifier.size(16.dp),
+            tint = tint,
+        )
+        KomiText(
+            text = text,
+            role = KomiTextRole.Body,
+            fontSize = 13.sp,
+            fontWeight = if (emphasized) FontWeight.SemiBold else FontWeight.Normal,
+            color = tint,
+            uppercase = false,
+        )
     }
 }
 

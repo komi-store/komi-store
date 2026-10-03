@@ -432,13 +432,6 @@ fun AppNavigation(
                                                 ),
                                             )
                                         },
-                                        onNavigateToSearchByPlatform = { platform ->
-                                            navController.navigate(
-                                                GithubStoreGraph.SearchScreen(
-                                                    initialPlatform = platform.name,
-                                                ),
-                                            )
-                                        },
                                         onNavigateToAbout = { repoId, owner, repo, sourceHost, translateTo ->
                                             navController.navigate(
                                                 GithubStoreGraph.DetailsAboutScreen(

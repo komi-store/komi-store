@@ -1419,4 +1419,10 @@
     <string name="sidebar_categories">Categorías</string>
     <string name="sidebar_platform">Plataforma</string>
     <string name="tweaks_privacy_usage_data_section">Datos de uso</string>
+    <string name="no_build_for_this_device">No hay versión para este dispositivo</string>
+    <string name="newer_releases_no_build_for_device">Las versiones más recientes no tienen una versión para este dispositivo</string>
+    <string name="latest_for_platform">Última para %1$s</string>
+    <string name="go_to_version">Ir a %1$s</string>
+    <string name="get_it_on_platform">Obtenlo para %1$s</string>
+    <string name="share_link">Compartir enlace</string>
 </resources>

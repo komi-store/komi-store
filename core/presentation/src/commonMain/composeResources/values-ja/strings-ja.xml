@@ -1411,4 +1411,10 @@
     <string name="sidebar_categories">カテゴリ</string>
     <string name="sidebar_platform">プラットフォーム</string>
     <string name="tweaks_privacy_usage_data_section">使用データ</string>
+    <string name="no_build_for_this_device">このデバイス向けのビルドはありません</string>
+    <string name="newer_releases_no_build_for_device">新しいリリースにはこのデバイス向けのビルドがありません</string>
+    <string name="latest_for_platform">%1$s 向けの最新</string>
+    <string name="go_to_version">%1$s に移動</string>
+    <string name="get_it_on_platform">%1$s 版を入手</string>
+    <string name="share_link">リンクを共有</string>
 </resources>

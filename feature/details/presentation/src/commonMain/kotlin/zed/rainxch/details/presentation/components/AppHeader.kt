@@ -54,6 +54,8 @@ import zed.rainxch.core.domain.model.account.github.GithubRelease
 import zed.rainxch.core.domain.model.account.github.GithubRepoSummary
 import zed.rainxch.core.domain.model.account.github.GithubUserProfile
 import zed.rainxch.core.domain.model.installation.InstalledApp
+import zed.rainxch.core.domain.utils.PlatformRelease
+import zed.rainxch.core.domain.utils.VersionMath
 import zed.rainxch.core.presentation.components.GitHubStoreImage
 import zed.rainxch.core.presentation.components.InstalledAppIcon
 import zed.rainxch.core.presentation.components.chips.KomiChip
@@ -64,6 +66,7 @@ import zed.rainxch.core.presentation.components.progress.KomiCircularProgress
 import zed.rainxch.core.presentation.components.text.KomiText
 import zed.rainxch.core.presentation.components.text.KomiTextRole
 import zed.rainxch.core.presentation.locals.LocalPersonality
+import zed.rainxch.core.presentation.utils.daysSinceIso
 import zed.rainxch.core.presentation.utils.formatReleasedAgo
 import zed.rainxch.core.presentation.utils.toIcon
 import zed.rainxch.core.presentation.utils.toLabel
@@ -108,6 +111,8 @@ fun AppHeader(
     downloadProgress: Int? = null,
     isCurrentUserOwner: Boolean = false,
     onPlatformClick: ((DiscoveryPlatform) -> Unit)? = null,
+    platformReleases: List<PlatformRelease> = emptyList(),
+    devicePlatform: DiscoveryPlatform? = null,
     onOwnerClick: () -> Unit = {},
 ) {
     val isDark = isSystemInDarkTheme()
@@ -136,22 +141,6 @@ fun AppHeader(
         animationSpec = tween(durationMillis = 500),
         label = "avatar-progress",
     )
-
-    val supportedPlatforms = remember(release?.assets) {
-        val names = release?.assets?.map { it.name.lowercase() }.orEmpty()
-        buildList {
-            if (names.any { it.endsWith(".apk") }) add(DiscoveryPlatform.Android)
-            if (names.any { it.endsWith(".exe") || it.endsWith(".msi") }) add(DiscoveryPlatform.Windows)
-            if (names.any { it.endsWith(".dmg") || it.endsWith(".pkg") }) add(DiscoveryPlatform.Macos)
-            if (names.any {
-                    it.endsWith(".appimage") ||
-                            it.endsWith(".deb") ||
-                            it.endsWith(".rpm") ||
-                            it.endsWith(".pkg.tar.zst")
-                }
-            ) add(DiscoveryPlatform.Linux)
-        }
-    }
 
     Box(
         modifier = modifier
@@ -364,16 +353,17 @@ fun AppHeader(
                     }
                 }
             }
-            if (supportedPlatforms.isNotEmpty()) {
+            if (platformReleases.isNotEmpty()) {
                 Spacer(Modifier.height(14.dp))
                 FlowRow(
                     horizontalArrangement = Arrangement.spacedBy(6.dp),
                     verticalArrangement = Arrangement.spacedBy(6.dp),
                     modifier = Modifier.padding(horizontal = 20.dp),
                 ) {
-                    supportedPlatforms.forEach { platform ->
+                    platformReleases.forEach { (platform, platformRelease) ->
+                        val isDevice = platform == devicePlatform
                         KomiChip(
-                            label = platform.toLabel(),
+                            label = platformChipLabel(platform.toLabel(), platformRelease),
                             kind = KomiChipKind.Info,
                             size = KomiChipSize.Sm,
                             leadingContent = {
@@ -382,7 +372,7 @@ fun AppHeader(
                                         imageVector = icon,
                                         contentDescription = null,
                                         modifier = Modifier.size(16.dp),
-                                        tint = colors.onSurface,
+                                        tint = if (isDevice) colors.onSurface else colors.onSurfaceVariant,
                                     )
                                 }
                             },
@@ -492,3 +482,16 @@ private fun InstalledStatusPill(installedApp: InstalledApp) {
         )
     }
 }
+
+private fun platformChipLabel(platformLabel: String, release: GithubRelease): String {
+    val version = VersionMath.normalizeVersion(release.tagName).ifBlank { release.tagName }
+    val days = daysSinceIso(release.publishedAt)
+    val year = release.publishedAt.take(4)
+    return if (days != null && days > STALE_PLATFORM_DAYS) {
+        "$platformLabel $version · $year"
+    } else {
+        "$platformLabel $version"
+    }
+}
+
+private const val STALE_PLATFORM_DAYS = 365

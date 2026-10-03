@@ -1451,4 +1451,10 @@
     <string name="sidebar_categories">Kategoriler</string>
     <string name="sidebar_platform">Platform</string>
     <string name="tweaks_privacy_usage_data_section">Kullanım verileri</string>
+    <string name="no_build_for_this_device">Bu cihaz için derleme yok</string>
+    <string name="newer_releases_no_build_for_device">Daha yeni sürümlerde bu cihaz için derleme yok</string>
+    <string name="latest_for_platform">%1$s için en yeni</string>
+    <string name="go_to_version">%1$s sürümüne git</string>
+    <string name="get_it_on_platform">%1$s için edinin</string>
+    <string name="share_link">Bağlantıyı paylaş</string>
 </resources>

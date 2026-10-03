@@ -1497,4 +1497,10 @@
     <string name="feed_category_reading">Reading</string>
     <string name="feed_category_tools">Tools</string>
     <string name="cd_more_actions">More actions</string>
+    <string name="no_build_for_this_device">No build for this device</string>
+    <string name="newer_releases_no_build_for_device">Newer releases have no build for this device</string>
+    <string name="latest_for_platform">Latest for %1$s</string>
+    <string name="go_to_version">Go to %1$s</string>
+    <string name="get_it_on_platform">Get it on %1$s</string>
+    <string name="share_link">Share link</string>
 </resources>

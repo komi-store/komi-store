@@ -1479,4 +1479,10 @@
     <string name="sidebar_categories">الفئات</string>
     <string name="sidebar_platform">المنصة</string>
     <string name="tweaks_privacy_usage_data_section">بيانات الاستخدام</string>
+    <string name="no_build_for_this_device">لا يوجد إصدار لهذا الجهاز</string>
+    <string name="newer_releases_no_build_for_device">الإصدارات الأحدث لا تتضمن نسخة لهذا الجهاز</string>
+    <string name="latest_for_platform">الأحدث لـ %1$s</string>
+    <string name="go_to_version">الانتقال إلى %1$s</string>
+    <string name="get_it_on_platform">احصل عليه لـ %1$s</string>
+    <string name="share_link">مشاركة الرابط</string>
 </resources>

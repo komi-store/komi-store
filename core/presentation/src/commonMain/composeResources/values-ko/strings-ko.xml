@@ -1443,4 +1443,10 @@
     <string name="sidebar_categories">카테고리</string>
     <string name="sidebar_platform">플랫폼</string>
     <string name="tweaks_privacy_usage_data_section">사용 데이터</string>
+    <string name="no_build_for_this_device">이 기기용 빌드가 없습니다</string>
+    <string name="newer_releases_no_build_for_device">최신 릴리스에는 이 기기용 빌드가 없습니다</string>
+    <string name="latest_for_platform">%1$s 최신</string>
+    <string name="go_to_version">%1$s(으)로 이동</string>
+    <string name="get_it_on_platform">%1$s용 받기</string>
+    <string name="share_link">링크 공유</string>
 </resources>

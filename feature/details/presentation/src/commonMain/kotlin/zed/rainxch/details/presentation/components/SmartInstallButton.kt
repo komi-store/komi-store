@@ -67,6 +67,7 @@ import zed.rainxch.githubstore.core.presentation.res.install_latest
 import zed.rainxch.githubstore.core.presentation.res.install_ready
 import zed.rainxch.githubstore.core.presentation.res.install_version
 import zed.rainxch.githubstore.core.presentation.res.installing
+import zed.rainxch.githubstore.core.presentation.res.no_build_for_this_device
 import zed.rainxch.githubstore.core.presentation.res.not_available
 import zed.rainxch.githubstore.core.presentation.res.open_app
 import zed.rainxch.githubstore.core.presentation.res.show_install_options
@@ -144,6 +145,8 @@ fun SmartInstallButton(
     }
 
     val buttonText = when {
+        !enabled && primaryAsset == null && !state.selectedHasDeviceBuild ->
+            stringResource(Res.string.no_build_for_this_device)
         !enabled && primaryAsset == null -> stringResource(Res.string.not_available)
         state.isPendingInstallReady -> stringResource(Res.string.install_ready)
         showUpdateAffordance -> stringResource(

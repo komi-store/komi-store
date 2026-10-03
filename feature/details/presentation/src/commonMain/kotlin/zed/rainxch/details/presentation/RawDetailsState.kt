@@ -1,11 +1,16 @@
 package zed.rainxch.details.presentation
 
+import kotlinx.collections.immutable.ImmutableMap
+import kotlinx.collections.immutable.ImmutableSet
+import kotlinx.collections.immutable.persistentMapOf
+import kotlinx.collections.immutable.persistentSetOf
 import zed.rainxch.core.domain.model.apk.ApkInspection
 import zed.rainxch.core.domain.model.account.github.GithubAsset
 import zed.rainxch.core.domain.model.account.github.GithubRelease
 import zed.rainxch.core.domain.model.account.github.GithubRepoSummary
 import zed.rainxch.core.domain.model.account.github.GithubUserProfile
 import zed.rainxch.core.domain.model.installation.InstalledApp
+import zed.rainxch.core.domain.model.repository.DiscoveryPlatform
 import zed.rainxch.core.domain.model.system.SystemArchitecture
 import zed.rainxch.details.domain.model.ReleaseCategory
 import zed.rainxch.details.domain.model.RepoStats
@@ -84,4 +89,8 @@ internal data class RawDetailsState(
     val isApkInspectCoachmarkPending: Boolean = false,
     val isChannelChipCoachmarkPending: Boolean = false,
     val showAllPlatforms: Boolean = false,
+    val devicePlatform: DiscoveryPlatform = DiscoveryPlatform.Android,
+    val releasePlatforms: ImmutableMap<Long, Set<DiscoveryPlatform>> = persistentMapOf(),
+    val deviceBuildReleaseIds: ImmutableSet<Long> = persistentSetOf(),
+    val handoffPlatform: DiscoveryPlatform? = null,
 )

@@ -1440,4 +1440,10 @@
     <string name="sidebar_categories">বিভাগ</string>
     <string name="sidebar_platform">প্ল্যাটফর্ম</string>
     <string name="tweaks_privacy_usage_data_section">ব্যবহারের ডেটা</string>
+    <string name="no_build_for_this_device">এই ডিভাইসের জন্য কোনো বিল্ড নেই</string>
+    <string name="newer_releases_no_build_for_device">নতুন রিলিজগুলোতে এই ডিভাইসের জন্য কোনো বিল্ড নেই</string>
+    <string name="latest_for_platform">%1$s-এর জন্য সর্বশেষ</string>
+    <string name="go_to_version">%1$s-এ যান</string>
+    <string name="get_it_on_platform">%1$s-এর জন্য নিন</string>
+    <string name="share_link">লিংক শেয়ার করুন</string>
 </resources>

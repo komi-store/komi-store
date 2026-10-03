@@ -1417,4 +1417,10 @@
     <string name="sidebar_categories">分類</string>
     <string name="sidebar_platform">平臺</string>
     <string name="tweaks_privacy_usage_data_section">使用資料</string>
+    <string name="no_build_for_this_device">沒有適用於此裝置的版本</string>
+    <string name="newer_releases_no_build_for_device">較新的版本中沒有適用於此裝置的版本</string>
+    <string name="latest_for_platform">%1$s 最新版</string>
+    <string name="go_to_version">前往 %1$s</string>
+    <string name="get_it_on_platform">取得 %1$s 版</string>
+    <string name="share_link">分享連結</string>
 </resources>

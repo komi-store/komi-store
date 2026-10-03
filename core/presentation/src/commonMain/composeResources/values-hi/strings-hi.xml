@@ -1455,4 +1455,10 @@
     <string name="sidebar_categories">श्रेणियाँ</string>
     <string name="sidebar_platform">प्लेटफ़ॉर्म</string>
     <string name="tweaks_privacy_usage_data_section">उपयोग डेटा</string>
+    <string name="no_build_for_this_device">इस डिवाइस के लिए कोई बिल्ड नहीं</string>
+    <string name="newer_releases_no_build_for_device">नए रिलीज़ में इस डिवाइस के लिए कोई बिल्ड नहीं है</string>
+    <string name="latest_for_platform">%1$s के लिए नवीनतम</string>
+    <string name="go_to_version">%1$s पर जाएँ</string>
+    <string name="get_it_on_platform">%1$s के लिए पाएँ</string>
+    <string name="share_link">लिंक साझा करें</string>
 </resources>

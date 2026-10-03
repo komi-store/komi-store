@@ -12,6 +12,14 @@ sealed interface DetailsAction {
         val platform: DiscoveryPlatform,
     ) : DetailsAction
 
+    data object OnJumpToDeviceBuild : DetailsAction
+
+    data object OnDismissPlatformHandoff : DetailsAction
+
+    data class OnShareAssetLink(
+        val assetUrl: String,
+    ) : DetailsAction
+
     data object Retry : DetailsAction
 
     data object RetryReleases : DetailsAction

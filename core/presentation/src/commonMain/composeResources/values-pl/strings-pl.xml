@@ -1449,4 +1449,10 @@
     <string name="sidebar_categories">Kategorie</string>
     <string name="sidebar_platform">Platforma</string>
     <string name="tweaks_privacy_usage_data_section">Dane użytkowania</string>
+    <string name="no_build_for_this_device">Brak wersji dla tego urządzenia</string>
+    <string name="newer_releases_no_build_for_device">Nowsze wydania nie mają wersji dla tego urządzenia</string>
+    <string name="latest_for_platform">Najnowsza dla %1$s</string>
+    <string name="go_to_version">Przejdź do %1$s</string>
+    <string name="get_it_on_platform">Pobierz na %1$s</string>
+    <string name="share_link">Udostępnij link</string>
 </resources>

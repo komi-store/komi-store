@@ -2,14 +2,20 @@ package zed.rainxch.details.presentation
 
 import androidx.compose.runtime.Immutable
 import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.ImmutableMap
+import kotlinx.collections.immutable.ImmutableSet
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.persistentMapOf
+import kotlinx.collections.immutable.persistentSetOf
 import zed.rainxch.core.domain.model.account.github.GithubAsset
 import zed.rainxch.core.domain.model.account.github.GithubRelease
 import zed.rainxch.core.domain.model.account.github.GithubRepoSummary
 import zed.rainxch.core.domain.model.account.github.GithubUserProfile
 import zed.rainxch.core.domain.model.apk.ApkInspection
 import zed.rainxch.core.domain.model.installation.InstalledApp
+import zed.rainxch.core.domain.model.repository.DiscoveryPlatform
 import zed.rainxch.core.domain.model.system.SystemArchitecture
+import zed.rainxch.core.domain.utils.PlatformRelease
 import zed.rainxch.details.domain.model.ReleaseCategory
 import zed.rainxch.details.domain.model.RepoStats
 import zed.rainxch.details.presentation.model.AttestationStatus
@@ -93,4 +99,12 @@ data class DetailsState(
     val latestStableRelease: GithubRelease? = null,
     val canSwitchToStable: Boolean = false,
     val isPendingInstallReady: Boolean = false,
+    val devicePlatform: DiscoveryPlatform = DiscoveryPlatform.Android,
+    val platformReleases: ImmutableList<PlatformRelease> = persistentListOf(),
+    val releasePlatforms: ImmutableMap<Long, Set<DiscoveryPlatform>> = persistentMapOf(),
+    val deviceBuildReleaseIds: ImmutableSet<Long> = persistentSetOf(),
+    val selectedHasDeviceBuild: Boolean = true,
+    val newerReleasesLackDeviceBuild: Boolean = false,
+    val deviceBuildTarget: GithubRelease? = null,
+    val handoff: PlatformRelease? = null,
 )

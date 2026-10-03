@@ -29,10 +29,15 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.ImmutableMap
+import kotlinx.collections.immutable.ImmutableSet
+import kotlinx.collections.immutable.persistentMapOf
+import kotlinx.collections.immutable.persistentSetOf
 import org.jetbrains.compose.resources.stringResource
 import zed.rainxch.core.domain.model.account.github.GithubRelease
 import zed.rainxch.core.domain.model.account.github.isEffectivelyPreRelease
 import zed.rainxch.core.domain.model.account.github.preReleaseLabel
+import zed.rainxch.core.domain.model.repository.DiscoveryPlatform
 import zed.rainxch.core.presentation.components.dividers.KomiHorizontalDivider
 import zed.rainxch.core.presentation.components.icon.KomiIcon
 import zed.rainxch.core.presentation.components.overlays.KomiSheet
@@ -41,9 +46,13 @@ import zed.rainxch.core.presentation.components.text.KomiText
 import zed.rainxch.core.presentation.components.text.KomiTextRole
 import zed.rainxch.core.presentation.locals.LocalPersonality
 import zed.rainxch.core.presentation.utils.formatIsoDateOrRaw
+import zed.rainxch.core.presentation.utils.toIcon
+import zed.rainxch.core.presentation.utils.toLabel
 import zed.rainxch.details.presentation.DetailsAction
 import zed.rainxch.githubstore.core.presentation.res.Res
 import zed.rainxch.githubstore.core.presentation.res.latest_badge
+import zed.rainxch.githubstore.core.presentation.res.latest_for_platform
+import zed.rainxch.githubstore.core.presentation.res.no_build_for_this_device
 import zed.rainxch.githubstore.core.presentation.res.no_version_selected
 import zed.rainxch.githubstore.core.presentation.res.not_available
 import zed.rainxch.githubstore.core.presentation.res.pre_release_badge
@@ -57,6 +66,9 @@ fun VersionPicker(
     isPickerVisible: Boolean,
     onAction: (DetailsAction) -> Unit,
     modifier: Modifier = Modifier,
+    devicePlatform: DiscoveryPlatform? = null,
+    releasePlatforms: ImmutableMap<Long, Set<DiscoveryPlatform>> = persistentMapOf(),
+    deviceBuildReleaseIds: ImmutableSet<Long> = persistentSetOf(),
 ) {
     val colors = LocalPersonality.current.colors
     val isPickerEnabled = filteredReleases.isNotEmpty()
@@ -149,6 +161,8 @@ fun VersionPicker(
                 )
             } else {
                 val latestReleaseId = filteredReleases.firstOrNull()?.id
+                val latestDeviceBuildId =
+                    filteredReleases.firstOrNull { it.id in deviceBuildReleaseIds }?.id
                 LazyColumn(
                     modifier = Modifier.fillMaxWidth().heightIn(max = 420.dp),
                     contentPadding = PaddingValues(vertical = 8.dp),
@@ -159,6 +173,13 @@ fun VersionPicker(
                             isSelected = release.id == selectedRelease?.id,
                             isLatest = release.id == latestReleaseId,
                             onClick = { onAction(DetailsAction.SelectRelease(release)) },
+                            latestForPlatform = devicePlatform?.takeIf {
+                                release.id == latestDeviceBuildId && latestDeviceBuildId != latestReleaseId
+                            },
+                            hasDeviceBuild =
+                                deviceBuildReleaseIds.isEmpty() || release.id in deviceBuildReleaseIds,
+                            platforms = releasePlatforms[release.id].orEmpty(),
+                            devicePlatform = devicePlatform,
                         )
                         KomiHorizontalDivider(
                             color = colors.outlineVariant.copy(alpha = 0.5f),
@@ -177,6 +198,10 @@ private fun VersionListItem(
     isSelected: Boolean,
     isLatest: Boolean,
     onClick: () -> Unit,
+    latestForPlatform: DiscoveryPlatform? = null,
+    hasDeviceBuild: Boolean = true,
+    platforms: Set<DiscoveryPlatform> = emptySet(),
+    devicePlatform: DiscoveryPlatform? = null,
 ) {
     Row(
         modifier = Modifier
@@ -200,7 +225,11 @@ private fun VersionListItem(
                     text = release.tagName,
                     role = KomiTextRole.Stamp,
                     fontWeight = if (isSelected) FontWeight.Bold else FontWeight.SemiBold,
-                    color = if (isSelected) colors.primary else colors.onSurface,
+                    color = when {
+                        isSelected -> colors.primary
+                        hasDeviceBuild -> colors.onSurface
+                        else -> colors.onSurfaceVariant
+                    },
                     uppercase = false,
                 )
                 if (isLatest) {
@@ -219,6 +248,9 @@ private fun VersionListItem(
                             )
                             .padding(horizontal = 6.dp, vertical = 2.dp),
                     )
+                }
+                latestForPlatform?.let { platform ->
+                    VersionBadge(text = stringResource(Res.string.latest_for_platform, platform.toLabel()))
                 }
                 if (release.isEffectivelyPreRelease()) {
                     val specificLabel = release.preReleaseLabel()
@@ -252,13 +284,21 @@ private fun VersionListItem(
                 }
             }
             KomiText(
-                text = formatIsoDateOrRaw(release.publishedAt),
+                text = if (hasDeviceBuild) {
+                    formatIsoDateOrRaw(release.publishedAt)
+                } else {
+                    "${formatIsoDateOrRaw(release.publishedAt)} · ${stringResource(Res.string.no_build_for_this_device)}"
+                },
                 role = KomiTextRole.Label,
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Medium,
                 color = colors.onSurfaceVariant,
                 uppercase = false,
             )
+        }
+        if (platforms.isNotEmpty()) {
+            Spacer(Modifier.width(8.dp))
+            ReleasePlatformIcons(platforms = platforms, devicePlatform = devicePlatform)
         }
         if (isSelected) {
             Spacer(Modifier.width(8.dp))
@@ -268,6 +308,48 @@ private fun VersionListItem(
                 tint = colors.primary,
                 modifier = Modifier.size(20.dp),
             )
+        }
+    }
+}
+
+@Composable
+private fun VersionBadge(text: String) {
+    val colors = LocalPersonality.current.colors
+    val shape = RoundedCornerShape(LocalPersonality.current.shape.cornerSmall)
+    KomiText(
+        text = text,
+        role = KomiTextRole.Label,
+        fontWeight = FontWeight.Bold,
+        fontSize = 10.sp,
+        color = colors.primary,
+        uppercase = false,
+        modifier = Modifier
+            .clip(shape)
+            .border(width = 1.dp, color = colors.primary, shape = shape)
+            .padding(horizontal = 6.dp, vertical = 2.dp),
+    )
+}
+
+@Composable
+private fun ReleasePlatformIcons(
+    platforms: Set<DiscoveryPlatform>,
+    devicePlatform: DiscoveryPlatform?,
+) {
+    val colors = LocalPersonality.current.colors
+    val ordered = platforms.sortedWith(
+        compareBy<DiscoveryPlatform> { it != devicePlatform }
+            .thenBy { DiscoveryPlatform.selectablePlatforms.indexOf(it) },
+    )
+    Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+        ordered.forEach { platform ->
+            platform.toIcon()?.let { icon ->
+                KomiIcon(
+                    imageVector = icon,
+                    contentDescription = platform.toLabel(),
+                    tint = if (platform == devicePlatform) colors.onSurface else colors.onSurfaceVariant,
+                    modifier = Modifier.size(14.dp),
+                )
+            }
         }
     }
 }
