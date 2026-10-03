@@ -190,7 +190,10 @@ class InstalledAppsRepositoryImpl(
 
         fun belongsElsewhere(asset: GithubAsset, releaseAssets: List<GithubAsset>): Boolean {
             if (self != null && !AssetOwnership.canOwn(self, asset.name)) return true
-            if (repoApps.size < 2) return false
+            if (repoApps.size < 2) {
+                return self != null &&
+                    AssetOwnership.ownerOf(asset.name, repoApps, releaseAssets, releases) == null
+            }
             val owner = AssetOwnership.ownerOf(asset.name, repoApps, releaseAssets, releases)
             return owner != null && owner.packageName != trackedPackageName
         }

@@ -153,6 +153,26 @@ class AssetOwnershipTest {
     }
 
     @Test
+    fun aSoleAppInAMonorepoDoesNotOwnTheOtherAppsReleases() {
+        val auth = app("io.ente.auth.independent", "ente-auth-v4.4.24.apk", installedVersion = "auth-v4.4.24")
+        val photos = listOf(asset("ente-photos-v1.3.64.apk"))
+        val ensu = listOf(asset("ensu-v0.1.20.apk"))
+        val authNewest = listOf(asset("ente-auth-v4.4.25.apk"))
+        val history = listOf(
+            release("photos-v1.3.64", photos),
+            release("ensu-v0.1.20", ensu),
+            release("auth-v4.4.25", authNewest),
+            release("photos-v1.3.59", listOf(asset("ente-photos-v1.3.59.apk"))),
+            release("auth-v4.4.24", listOf(asset("ente-auth-v4.4.24.apk"))),
+            release("photos-v1.3.57", listOf(asset("ente-photos-v1.3.57.apk"))),
+            release("ensu-v0.1.17", listOf(asset("ensu-v0.1.17.apk"))),
+        )
+        assertNull(AssetOwnership.ownerOf("ente-photos-v1.3.64.apk", listOf(auth), photos, history))
+        assertNull(AssetOwnership.ownerOf("ensu-v0.1.20.apk", listOf(auth), ensu, history))
+        assertEquals(auth, AssetOwnership.ownerOf("ente-auth-v4.4.25.apk", listOf(auth), authNewest, history))
+    }
+
+    @Test
     fun otherAppsInTheSameReleaseAreNotOwned() {
         val instagram = app("com.instagram", "instagram-arm64-v8a-piko-patches-v439.0.0.37.89.apk")
         val youtube = app("com.youtube", "youtube-universal-morphe-patches-v19.9.9.apk")
