@@ -13,7 +13,6 @@
     {"name": "kotlinx.datetime", "license": "Apache-2.0", "url": "https://github.com/Kotlin/kotlinx-datetime"},
     {"name": "kotlinx.collections.immutable", "license": "Apache-2.0", "url": "https://github.com/Kotlin/kotlinx.collections.immutable"},
     {"name": "DataStore", "license": "Apache-2.0", "url": "https://developer.android.com/jetpack/androidx/releases/datastore"},
-    {"name": "Landscapist", "license": "Apache-2.0", "url": "https://github.com/skydoves/landscapist"},
     {"name": "Coil", "license": "Apache-2.0", "url": "https://github.com/coil-kt/coil"},
     {"name": "Kermit", "license": "Apache-2.0", "url": "https://github.com/touchlab/Kermit"},
     {"name": "MOKO Permissions", "license": "Apache-2.0", "url": "https://github.com/icerockdev/moko-permissions"},

@@ -13,7 +13,6 @@ kotlin {
                 implementation(projects.core.presentation)
                 implementation(projects.feature.devProfile.domain)
 
-                implementation(libs.bundles.landscapist)
                 implementation(libs.coil3.compose)
                 implementation(libs.coil3.svg)
 

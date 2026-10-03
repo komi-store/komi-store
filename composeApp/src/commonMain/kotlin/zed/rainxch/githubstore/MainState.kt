@@ -19,5 +19,6 @@ data class MainState(
     val isScrollbarEnabled: Boolean = false,
     val contentWidth: ContentWidth = ContentWidth.COMPACT,
     val appLanguageTag: String? = null,
+    val signedInAvatarUrl: String? = null,
     val isAppearanceLoaded: Boolean = false,
 )

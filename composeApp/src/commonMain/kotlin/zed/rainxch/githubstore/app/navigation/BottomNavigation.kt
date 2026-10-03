@@ -49,7 +49,8 @@ fun BottomNavigation(
         items = items,
         selectedId = selectedId,
         onSelect = { id ->
-            allowedScreens.firstOrNull { idOf(it.screen) == id }?.let { onNavigate(it.screen) }
+            val target = allowedScreens.firstOrNull { idOf(it.screen) == id }?.screen
+            if (target != null && target != currentScreen) onNavigate(target)
         },
         modifier = modifier,
     )

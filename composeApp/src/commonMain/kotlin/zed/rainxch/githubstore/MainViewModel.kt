@@ -9,10 +9,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
 import zed.rainxch.core.data.services.LocalizationManager
+import zed.rainxch.core.domain.logging.KomiStoreLogger
 import zed.rainxch.core.domain.model.appearance.AccentId
 import zed.rainxch.core.domain.model.appearance.AppPersonality
 import zed.rainxch.core.domain.model.appearance.MangaPaperId
@@ -30,6 +32,7 @@ class MainViewModel(
     private val userSessionRepository: UserSessionRepository,
     private val rateLimitRepository: RateLimitRepository,
     private val syncUseCase: SyncInstalledAppsUseCase,
+    private val logger: KomiStoreLogger,
     private val localizationManager: LocalizationManager,
 ) : ViewModel() {
     private val _state = MutableStateFlow(MainState())
@@ -37,13 +40,55 @@ class MainViewModel(
 
     init {
         viewModelScope.launch(Dispatchers.IO) {
+            try {
+                userSessionRepository.primeSession()
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                logger.warn("Session prime failed; continuing without it: ${e.message}")
+            }
+            _state.update {
+                it.copy(
+                    signedInAvatarUrl = userSessionRepository.lastKnownSession?.profile?.imageUrl,
+                )
+            }
+        }
+
+        viewModelScope.launch(Dispatchers.IO) {
             userSessionRepository
                 .isUserLoggedIn()
                 .collect { isLoggedIn ->
-                    _state.update { it.copy(isLoggedIn = isLoggedIn) }
+                    val avatarUrl =
+                        if (isLoggedIn) {
+                            userSessionRepository.lastKnownSession
+                                ?.takeIf { it.isLoggedIn }
+                                ?.profile
+                                ?.imageUrl
+                        } else {
+                            null
+                        }
+
+                    _state.update {
+                        it.copy(
+                            isLoggedIn = isLoggedIn,
+                            signedInAvatarUrl = avatarUrl,
+                        )
+                    }
 
                     if (isLoggedIn) {
                         rateLimitRepository.clear()
+                    }
+
+                    if (isLoggedIn && avatarUrl == null) {
+                        launch {
+                            val fetched = userSessionRepository.getUser().first()?.imageUrl
+                            if (fetched != null &&
+                                _state.value.isLoggedIn &&
+                                userSessionRepository.lastKnownSession?.isLoggedIn == true
+                            ) {
+                                _state.update { it.copy(signedInAvatarUrl = fetched) }
+                            }
+                        }
                     }
                 }
         }
@@ -113,7 +158,9 @@ class MainViewModel(
 
         viewModelScope.launch {
             userSessionRepository.sessionExpiredEvent.collect {
-                _state.update { it.copy(showSessionExpiredDialog = true) }
+                _state.update {
+                    it.copy(showSessionExpiredDialog = true, signedInAvatarUrl = null)
+                }
             }
         }
 

@@ -11,7 +11,6 @@ kotlin {
                 implementation(projects.core.domain)
                 implementation(projects.core.presentation)
 
-                implementation(libs.bundles.landscapist)
                 implementation(libs.kotlinx.collections.immutable)
 
                 implementation(libs.androidx.compose.ui.tooling.preview)

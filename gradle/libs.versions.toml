@@ -41,7 +41,6 @@ jetbrains-savedstate = "1.4.0"
 moko = "0.20.1"
 buildkonfig = "0.17.1"
 markdownRenderer = "0.39.2"
-landscapist = "2.9.5"
 coil3 = "3.3.0"
 highlights = "1.0.0"
 shizuku = "13.1.5"
@@ -117,8 +116,6 @@ jna-platform = { module = "net.java.dev.jna:jna-platform", version.ref = "jna" }
 sqlite-bundled = { module = "androidx.sqlite:sqlite-bundled", version.ref = "sqlite" }
 
 # Image loading
-landscapist-image = { module = "com.github.skydoves:landscapist-coil3", version.ref = "landscapist" }
-landscapist-core = { module = "com.github.skydoves:landscapist-core", version.ref = "landscapist" }
 coil3-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coil3" }
 coil3-network-ktor = { module = "io.coil-kt.coil3:coil-network-ktor3", version.ref = "coil3" }
 coil3-svg = { module = "io.coil-kt.coil3:coil-svg", version.ref = "coil3" }
@@ -223,11 +220,4 @@ ktor-common = [
     "ktor-serialization-kotlinx-json",
     "ktor-client-auth",
     "ktor-client-logging"
-]
-
-landscapist = [
-    "landscapist-core",
-    "landscapist-image",
-    "coil3-compose",
-    "coil3-svg",
 ]

@@ -19,8 +19,6 @@ kotlin {
 
                 implementation(libs.ktor.client.core)
 
-                implementation(libs.bundles.landscapist)
-
                 implementation(libs.jetbrains.compose.components.resources)
                 implementation(libs.androidx.compose.ui.tooling.preview)
             }

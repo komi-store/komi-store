@@ -132,11 +132,8 @@
 -dontwarn androidx.datastore.**
 
 # ── Landscapist / Coil3 (Image Loading) ────────────────────────────────────
--keep class com.skydoves.landscapist.** { *; }
--keep interface com.skydoves.landscapist.** { *; }
 -keep class coil3.** { *; }
 -dontwarn coil3.**
--dontwarn com.skydoves.landscapist.**
 
 # ── Multiplatform Markdown Renderer ────────────────────────────────────────
 -keep class com.mikepenz.markdown.** { *; }

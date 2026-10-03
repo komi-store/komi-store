@@ -12,16 +12,31 @@ kotlin {
 
                 implementation(projects.core.domain)
 
-                implementation(libs.bundles.landscapist)
+                implementation(libs.coil3.compose)
+                implementation(libs.coil3.network.ktor)
+                implementation(libs.coil3.svg)
+                api(libs.ktor.client.core)
 
                 implementation(libs.jetbrains.lifecycle.compose)
 
                 implementation(libs.jetbrains.compose.components.resources)
                 implementation(libs.androidx.compose.ui.tooling.preview)
 
-                implementation(libs.markdown.renderer)
+                api(libs.markdown.renderer)
                 implementation(libs.markdown.renderer.coil3)
                 implementation(libs.highlights)
+            }
+        }
+
+        androidMain {
+            dependencies {
+                implementation(libs.ktor.client.okhttp)
+            }
+        }
+
+        jvmMain {
+            dependencies {
+                implementation(libs.ktor.client.okhttp)
             }
         }
 

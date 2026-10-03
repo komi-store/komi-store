@@ -13,8 +13,6 @@ kotlin {
                 implementation(projects.core.presentation)
                 implementation(projects.feature.starred.domain)
 
-                implementation(libs.bundles.landscapist)
-
                 implementation(libs.androidx.compose.ui.tooling.preview)
                 implementation(libs.jetbrains.compose.components.resources)
             }

@@ -15,7 +15,6 @@ kotlin {
 
                 implementation(libs.markdown.renderer)
                 implementation(libs.markdown.renderer.coil3)
-                implementation(libs.bundles.landscapist)
                 implementation(libs.coil3.compose)
                 implementation(libs.coil3.svg)
 

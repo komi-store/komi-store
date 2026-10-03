@@ -6,12 +6,11 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import zed.rainxch.core.domain.model.account.SessionSnapshot
 import zed.rainxch.core.domain.repository.UserSessionRepository
 
 class ProfileViewModel(
@@ -19,33 +18,37 @@ class ProfileViewModel(
 ) : ViewModel() {
     private var userProfileJob: Job? = null
 
-    private var hasLoadedInitialData = false
-
-    private val _state = MutableStateFlow(ProfileState())
-    val state = _state
-        .onStart {
-            if (!hasLoadedInitialData) {
-                observeLoggedInStatus()
-
-                hasLoadedInitialData = true
-            }
-        }.stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5_000L),
-            initialValue = ProfileState(),
+    private val _state =
+        MutableStateFlow(
+            ProfileState(session = sessionFrom(userSessionRepository.lastKnownSession)),
         )
+
+    val state = _state.asStateFlow()
 
     private val _events = Channel<ProfileEvent>(capacity = Channel.BUFFERED)
     val events = _events.receiveAsFlow()
+
+    init {
+        observeLoggedInStatus()
+    }
+
+    private fun setSession(session: ProfileSession) {
+        _state.update { it.copy(session = session) }
+    }
+
     private fun observeLoggedInStatus() {
         viewModelScope.launch {
             userSessionRepository.isUserLoggedIn()
                 .collect { isLoggedIn ->
-                    _state.update { it.copy(isUserLoggedIn = isLoggedIn) }
                     if (isLoggedIn) {
+                        if (_state.value.session !is ProfileSession.SignedIn) {
+                            setSession(ProfileSession.Loading)
+                        }
                         loadUserProfile()
                     } else {
-                        _state.update { it.copy(userProfile = null) }
+                        userProfileJob?.cancel()
+                        userSessionRepository.clearLastKnownSession()
+                        setSession(ProfileSession.SignedOut)
                     }
                 }
         }
@@ -56,7 +59,9 @@ class ProfileViewModel(
 
         userProfileJob = viewModelScope.launch {
             userSessionRepository.getUser().collect { profile ->
-                _state.update { it.copy(userProfile = profile) }
+                if (profile != null) {
+                    setSession(ProfileSession.SignedIn(profile))
+                }
             }
         }
     }
@@ -76,7 +81,8 @@ class ProfileViewModel(
                     runCatching {
                         userSessionRepository.logout()
                     }.onSuccess {
-                        _state.update { it.copy(isLogoutDialogVisible = false, userProfile = null) }
+                        _state.update { it.copy(isLogoutDialogVisible = false) }
+                        setSession(ProfileSession.SignedOut)
                         _events.send(ProfileEvent.OnLogoutSuccessful)
                     }.onFailure { error ->
                         if (error is CancellationException) throw error
@@ -107,4 +113,10 @@ class ProfileViewModel(
             ProfileAction.OnAboutClick -> Unit
         }
     }
+}
+
+private fun sessionFrom(snapshot: SessionSnapshot?): ProfileSession {
+    if (snapshot == null || !snapshot.isLoggedIn) return ProfileSession.SignedOut
+    val profile = snapshot.profile
+    return if (profile != null) ProfileSession.SignedIn(profile) else ProfileSession.Loading
 }

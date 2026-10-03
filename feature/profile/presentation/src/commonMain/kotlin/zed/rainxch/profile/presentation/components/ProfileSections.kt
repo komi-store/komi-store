@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -31,11 +32,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import org.jetbrains.compose.resources.stringResource
+import zed.rainxch.core.presentation.ProfileAvatarSpec
 import zed.rainxch.core.presentation.components.GitHubStoreImage
 import zed.rainxch.core.presentation.components.buttons.KomiButton
 import zed.rainxch.core.presentation.components.buttons.KomiButtonSize
@@ -63,17 +66,17 @@ fun LazyListScope.profileSections(
         HeroIdentityCard(state = state, onAction = onAction)
     }
 
-    if (state.isUserLoggedIn) {
-        item(key = "library_header") {
-            Spacer(Modifier.height(8.dp))
+    item(key = "library_header") {
+        Spacer(Modifier.height(8.dp))
 
+        if (state.isUserLoggedIn) {
             KomiText(
                 text = stringResource(Res.string.profile_section_library),
                 role = KomiTextRole.Title,
             )
-
-            Spacer(Modifier.height(8.dp))
         }
+
+        Spacer(Modifier.height(8.dp))
     }
     item(key = "library_list") {
         KomiList(
@@ -211,10 +214,10 @@ private fun HeroIdentityCard(
                 .padding(20.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            if (state.userProfile == null) {
-                SignedOutContent(onAction = onAction)
-            } else {
+            if (state.isUserLoggedIn) {
                 SignedInContent(state = state, onAction = onAction)
+            } else {
+                SignedOutContent(onAction = onAction)
             }
         }
     }
@@ -277,69 +280,107 @@ private fun SignedInContent(
 ) {
     val colors = LocalPersonality.current.colors
     val shape = LocalPersonality.current.shape
-    val profile = state.userProfile ?: return
+    val profile = state.userProfile
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        GitHubStoreImage(
-            imageModel = { profile.imageUrl },
+        Box(
             modifier = Modifier
-                .size(80.dp)
+                .size(ProfileAvatarSpec.Size)
                 .clip(RoundedCornerShape(shape.cornerSmall))
                 .background(colors.surfaceContainerHigh),
-        )
+            contentAlignment = Alignment.Center,
+        ) {
+            if (profile == null) {
+                KomiIcon(
+                    imageVector = Icons.Filled.AccountCircle,
+                    contentDescription = null,
+                    modifier = Modifier.size(56.dp),
+                    tint = colors.onSurfaceVariant,
+                )
+            } else {
+                GitHubStoreImage(
+                    imageModel = { profile.imageUrl },
+                    modifier = Modifier.fillMaxSize(),
+                    showLoadingIndicator = false,
+                )
+            }
+        }
         Column(
             modifier = Modifier.weight(1f),
             verticalArrangement = Arrangement.spacedBy(2.dp),
         ) {
-            val displayName = profile.name.takeIf { it.isNotBlank() } ?: profile.username
-            KomiText(
-                text = displayName,
-                role = KomiTextRole.Title,
-                fontWeight = FontWeight.SemiBold,
-                color = colors.onSurface,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                uppercase = false,
-            )
-            KomiText(
-                text = "@${profile.username}",
-                role = KomiTextRole.Label,
-                color = colors.onSurfaceVariant,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                uppercase = false,
-            )
-            profile.bio?.takeIf { it.isNotBlank() }?.let { bio ->
+            if (profile == null) {
+                PlaceholderLine(widthFraction = 0.55f, height = 16.dp)
                 Spacer(Modifier.height(2.dp))
+                PlaceholderLine(widthFraction = 0.35f, height = 12.dp)
+            } else {
+                val displayName = profile.name.takeIf { it.isNotBlank() } ?: profile.username
                 KomiText(
-                    text = bio,
-                    role = KomiTextRole.Body,
-                    fontSize = 13.sp,
-                    color = colors.onSurfaceVariant,
-                    maxLines = 3,
+                    text = displayName,
+                    role = KomiTextRole.Title,
+                    fontWeight = FontWeight.SemiBold,
+                    color = colors.onSurface,
+                    maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     uppercase = false,
                 )
+                KomiText(
+                    text = "@${profile.username}",
+                    role = KomiTextRole.Label,
+                    color = colors.onSurfaceVariant,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    uppercase = false,
+                )
+                profile.bio?.takeIf { it.isNotBlank() }?.let { bio ->
+                    Spacer(Modifier.height(2.dp))
+                    KomiText(
+                        text = bio,
+                        role = KomiTextRole.Body,
+                        fontSize = 13.sp,
+                        color = colors.onSurfaceVariant,
+                        maxLines = 3,
+                        overflow = TextOverflow.Ellipsis,
+                        uppercase = false,
+                    )
+                }
             }
         }
     }
     Spacer(Modifier.height(4.dp))
     MetricsStrip(
-        repos = profile.repositoryCount,
-        followers = profile.followers,
-        following = profile.following,
-        onReposClick = { onAction(ProfileAction.OnRepositoriesClick(profile.username)) },
+        repos = profile?.repositoryCount,
+        followers = profile?.followers,
+        following = profile?.following,
+        onReposClick = {
+            profile?.let { onAction(ProfileAction.OnRepositoriesClick(it.username)) }
+        },
+    )
+}
+
+@Composable
+private fun PlaceholderLine(
+    widthFraction: Float,
+    height: Dp,
+) {
+    val colors = LocalPersonality.current.colors
+    Box(
+        modifier = Modifier
+            .fillMaxWidth(widthFraction)
+            .height(height)
+            .clip(RoundedCornerShape(LocalPersonality.current.shape.cornerSmall))
+            .background(colors.surfaceContainerHigh),
     )
 }
 
 @Composable
 private fun MetricsStrip(
-    repos: Int,
-    followers: Int,
-    following: Int,
+    repos: Int?,
+    followers: Int?,
+    following: Int?,
     onReposClick: () -> Unit,
 ) {
     Row(
@@ -348,7 +389,7 @@ private fun MetricsStrip(
         horizontalArrangement = Arrangement.SpaceEvenly,
     ) {
         Metric(
-            value = formatCount(repos),
+            value = repos?.let { formatCount(it) } ?: METRIC_PLACEHOLDER,
             label = stringResource(Res.string.profile_repos),
             modifier = Modifier
                 .weight(1f)
@@ -358,7 +399,7 @@ private fun MetricsStrip(
         )
         MetricDivider()
         Metric(
-            value = formatCount(followers),
+            value = followers?.let { formatCount(it) } ?: METRIC_PLACEHOLDER,
             label = stringResource(Res.string.followers),
             modifier = Modifier
                 .weight(1f)
@@ -366,7 +407,7 @@ private fun MetricsStrip(
         )
         MetricDivider()
         Metric(
-            value = formatCount(following),
+            value = following?.let { formatCount(it) } ?: METRIC_PLACEHOLDER,
             label = stringResource(Res.string.following),
             modifier = Modifier
                 .weight(1f)
@@ -374,6 +415,8 @@ private fun MetricsStrip(
         )
     }
 }
+
+private const val METRIC_PLACEHOLDER = "—"
 
 @Composable
 private fun Metric(
