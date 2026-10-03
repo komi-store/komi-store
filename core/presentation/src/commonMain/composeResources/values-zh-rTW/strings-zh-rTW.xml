@@ -272,6 +272,7 @@
     <string name="released_yesterday">昨天釋出</string>
     <string name="released_days_ago">%1$d 天前釋出</string>
     <string name="released_on_date">釋出於 %1$s</string>
+    <string name="details_last_push">最後推送：%1$s</string>
 
     <string name="bottom_nav_explore_title">發現</string>
     <string name="bottom_nav_search_title">搜尋</string>
@@ -486,6 +487,7 @@
     <string name="hide_repository">隱藏倉庫</string>
 
     <string name="recently_viewed">最近檢視</string>
+    <string name="recently_viewed_remove_cd">從瀏覽記錄中移除</string>
     <string name="profile_recently_viewed_description">你訪問過的倉庫</string>
     <string name="delete_all">全部刪除</string>
     <string name="delete_downloads_confirmation_title">刪除所有下載？</string>
@@ -936,6 +938,9 @@
     <string name="starred_picker_sort_recent">最近加星</string>
     <string name="starred_picker_sort_stars">星數最多</string>
     <string name="starred_picker_star_dedup_tooltip">在 GitHub 上取消星標不會取消應用追蹤。</string>
+    <string name="starred_picker_cd_ships_apk">提供 APK</string>
+    <string name="starred_picker_cd_already_tracked">已在追蹤</string>
+    <string name="starred_picker_cd_latest">最新版本 %1$s</string>
     <string name="import_stars_title">按使用者名稱匯入星標倉庫</string>
     <string name="import_stars_subtitle">輸入任意 GitHub 使用者名稱，瀏覽其公開星標的倉庫並新增到收藏。無需登入。</string>
     <string name="import_stars_hint">GitHub 使用者名稱</string>
