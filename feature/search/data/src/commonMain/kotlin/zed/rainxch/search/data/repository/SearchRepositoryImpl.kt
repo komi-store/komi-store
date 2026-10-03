@@ -260,7 +260,7 @@ class SearchRepositoryImpl(
 
         return result.fold(
             onSuccess = { searchResponse ->
-                val repos = searchResponse.items.map { it.toSummary() }
+                val repos = searchResponse.items.map { it.toSummary(platform) }
                 val hasMore = offset + repos.size < searchResponse.totalHits
                 PaginatedDiscoveryRepositories(
                     repos = repos,

@@ -33,5 +33,6 @@ data class BackendRepoResponse(
     val hasInstallersWindows: Boolean = false,
     val hasInstallersMacos: Boolean = false,
     val hasInstallersLinux: Boolean = false,
+    val platformReleases: Map<String, BackendPlatformRelease>? = null,
     val downloadCount: Long = 0,
 )

@@ -60,19 +60,19 @@ class FeedRepositoryImpl(
         if (!forceRefresh) {
             runCatching { cacheManager.get<BackendFeedResponse>(readKey) }
                 .getOrNull()
-                ?.let { return@withContext Result.success(it.toFeedPage(fromCache = true)) }
+                ?.let { return@withContext Result.success(it.toFeedPage(fromCache = true, platform = platform)) }
         }
 
         backendApiClient.getFeed(slug, page).fold(
             onSuccess = { response ->
                 val writeKey = cacheKey(token, page, response.rotation.ifBlank { today })
                 runCatching { cacheManager.put(writeKey, response, CacheManager.FEED) }
-                Result.success(response.toFeedPage(fromCache = false))
+                Result.success(response.toFeedPage(fromCache = false, platform = platform))
             },
             onFailure = { error ->
                 runCatching { cacheManager.getStale<BackendFeedResponse>(readKey) }
                     .getOrNull()
-                    ?.let { return@withContext Result.success(it.toFeedPage(fromCache = true)) }
+                    ?.let { return@withContext Result.success(it.toFeedPage(fromCache = true, platform = platform)) }
 
                 if (page == 1) {
                     fetchOffline(platform)?.let { return@withContext Result.success(it) }
@@ -96,7 +96,7 @@ class FeedRepositoryImpl(
 
         val merged = responses.flatMap { it.items }.distinctBy { it.id }
         return FeedPage(
-            items = merged.map { it.toSummary() },
+            items = merged.map { it.toSummary(platform) },
             page = 1,
             hasMore = false,
             rotation = responses.firstOrNull()?.rotation.orEmpty(),
@@ -122,9 +122,12 @@ class FeedRepositoryImpl(
             null
         }
 
-    private fun BackendFeedResponse.toFeedPage(fromCache: Boolean): FeedPage =
+    private fun BackendFeedResponse.toFeedPage(
+        fromCache: Boolean,
+        platform: DiscoveryPlatform,
+    ): FeedPage =
         FeedPage(
-            items = items.map { it.toSummary() },
+            items = items.map { it.toSummary(platform) },
             page = page,
             hasMore = hasMore,
             rotation = rotation,

@@ -151,7 +151,7 @@ class CachedRepositoriesDataSourceImpl(
                 platform = platformSlug,
                 lastUpdated = "",
                 totalCount = repos.size,
-                repositories = repos.map { it.toCachedGithubRepoSummary() },
+                repositories = repos.map { it.toCachedGithubRepoSummary(platform) },
             )
         }
     }
@@ -224,7 +224,7 @@ class CachedRepositoriesDataSourceImpl(
                 platform = platformSlug,
                 lastUpdated = "",
                 totalCount = repos.size,
-                repositories = repos.map { it.toCachedGithubRepoSummary() },
+                repositories = repos.map { it.toCachedGithubRepoSummary(platform) },
             )
         }
     }

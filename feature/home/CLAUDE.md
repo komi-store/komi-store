@@ -41,3 +41,4 @@ interface HomeRepository {
 - Long-press on `RepositoryCard` opens `RepositoryActionsBottomSheet` (Share / Open on GitHub / Mark seen / Hide).
 - `DiscoveryRepositoryUi.isCurrentUserOwner` flipped by `observeCurrentUser` (E20).
 - State uses `onStart` + `stateIn(WhileSubscribed)`.
+- Per-platform release date: a list filtered to one platform shows that platform's newest build date (`BackendRepoResponse.platformReleases` via `releaseDateFor(platform)` in `toCachedGithubRepoSummary(platform)`); `All` keeps the newest release overall. Feed and Search do the same through `toSummary(platform)`. Matters for repos that release desktop and mobile separately.
