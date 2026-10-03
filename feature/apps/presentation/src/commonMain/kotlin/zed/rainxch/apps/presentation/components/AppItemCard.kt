@@ -527,7 +527,6 @@ fun AppItemCard(
                                 label = stringResource(Res.string.install),
                                 variant = KomiButtonVariant.Primary,
                                 leadingIcon = Icons.Default.Update,
-                                enabled = !appItem.isBusy,
                                 modifier = Modifier.weight(1f),
                             )
 
