@@ -188,14 +188,14 @@ class InstalledAppsRepositoryImpl(
 
         val self = repoApps.firstOrNull { it.packageName == trackedPackageName }
 
+        // An APK no installed app owns is usually a sibling app the user never installed
+        // (monorepos). Only an app with no asset name or glob to compare can't tell.
         fun belongsElsewhere(asset: GithubAsset, releaseAssets: List<GithubAsset>): Boolean {
-            if (self != null && !AssetOwnership.canOwn(self, asset.name)) return true
-            if (repoApps.size < 2) {
-                return self != null &&
-                    AssetOwnership.ownerOf(asset.name, repoApps, releaseAssets, releases) == null
-            }
+            if (self == null) return false
+            if (!AssetOwnership.canOwn(self, asset.name)) return true
             val owner = AssetOwnership.ownerOf(asset.name, repoApps, releaseAssets, releases)
-            return owner != null && owner.packageName != trackedPackageName
+                ?: return self.installedAssetName != null || !self.assetGlobPattern.isNullOrBlank()
+            return owner.packageName != trackedPackageName
         }
 
         val candidates =

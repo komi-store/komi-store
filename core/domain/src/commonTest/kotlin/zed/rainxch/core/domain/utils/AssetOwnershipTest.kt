@@ -173,6 +173,37 @@ class AssetOwnershipTest {
     }
 
     @Test
+    fun aSiblingNobodyInstalledIsOwnedByNoneOfTheInstalledApps() {
+        val auth = app("io.ente.auth.independent", "ente-auth-v4.4.24.apk")
+        val ensu = app("io.ente.ensu", "ensu-v0.1.19.apk")
+        val photos = listOf(asset("ente-photos-v1.3.64.apk"))
+        val history = listOf(
+            release("photos-v1.3.64", photos),
+            release("ensu-v0.1.20", listOf(asset("ensu-v0.1.20.apk"))),
+            release("auth-v4.4.25", listOf(asset("ente-auth-v4.4.25.apk"))),
+            release("photos-v1.3.63", listOf(asset("ente-photos-v1.3.63.apk"))),
+        )
+        assertNull(AssetOwnership.ownerOf("ente-photos-v1.3.64.apk", listOf(auth, ensu), photos, history))
+        assertEquals(
+            ensu,
+            AssetOwnership.ownerOf("ensu-v0.1.20.apk", listOf(auth, ensu), listOf(asset("ensu-v0.1.20.apk")), history),
+        )
+    }
+
+    @Test
+    fun oneRenamedAppAmongSeveralKeepsItsUpdates() {
+        val renamed = app("com.app", "OldName-1.0.apk")
+        val other = app("com.app.companion", "Companion-1.0.apk")
+        val newest = listOf(asset("NewName-2.0.apk"), asset("Companion-2.0.apk"))
+        val history = listOf(
+            release("2.0", newest),
+            release("1.0", listOf(asset("OldName-1.0.apk"), asset("Companion-1.0.apk"))),
+        )
+        assertEquals(renamed, AssetOwnership.ownerOf("NewName-2.0.apk", listOf(renamed, other), newest, history))
+        assertEquals(other, AssetOwnership.ownerOf("Companion-2.0.apk", listOf(renamed, other), newest, history))
+    }
+
+    @Test
     fun otherAppsInTheSameReleaseAreNotOwned() {
         val instagram = app("com.instagram", "instagram-arm64-v8a-piko-patches-v439.0.0.37.89.apk")
         val youtube = app("com.youtube", "youtube-universal-morphe-patches-v19.9.9.apk")
