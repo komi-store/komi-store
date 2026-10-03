@@ -153,6 +153,57 @@ class AssetOwnershipTest {
     }
 
     @Test
+    fun aSoleAppInAMonorepoDoesNotOwnTheOtherAppsReleases() {
+        val auth = app("io.ente.auth.independent", "ente-auth-v4.4.24.apk", installedVersion = "auth-v4.4.24")
+        val photos = listOf(asset("ente-photos-v1.3.64.apk"))
+        val ensu = listOf(asset("ensu-v0.1.20.apk"))
+        val authNewest = listOf(asset("ente-auth-v4.4.25.apk"))
+        val history = listOf(
+            release("photos-v1.3.64", photos),
+            release("ensu-v0.1.20", ensu),
+            release("auth-v4.4.25", authNewest),
+            release("photos-v1.3.59", listOf(asset("ente-photos-v1.3.59.apk"))),
+            release("auth-v4.4.24", listOf(asset("ente-auth-v4.4.24.apk"))),
+            release("photos-v1.3.57", listOf(asset("ente-photos-v1.3.57.apk"))),
+            release("ensu-v0.1.17", listOf(asset("ensu-v0.1.17.apk"))),
+        )
+        assertNull(AssetOwnership.ownerOf("ente-photos-v1.3.64.apk", listOf(auth), photos, history))
+        assertNull(AssetOwnership.ownerOf("ensu-v0.1.20.apk", listOf(auth), ensu, history))
+        assertEquals(auth, AssetOwnership.ownerOf("ente-auth-v4.4.25.apk", listOf(auth), authNewest, history))
+    }
+
+    @Test
+    fun aSiblingNobodyInstalledIsOwnedByNoneOfTheInstalledApps() {
+        val auth = app("io.ente.auth.independent", "ente-auth-v4.4.24.apk")
+        val ensu = app("io.ente.ensu", "ensu-v0.1.19.apk")
+        val photos = listOf(asset("ente-photos-v1.3.64.apk"))
+        val history = listOf(
+            release("photos-v1.3.64", photos),
+            release("ensu-v0.1.20", listOf(asset("ensu-v0.1.20.apk"))),
+            release("auth-v4.4.25", listOf(asset("ente-auth-v4.4.25.apk"))),
+            release("photos-v1.3.63", listOf(asset("ente-photos-v1.3.63.apk"))),
+        )
+        assertNull(AssetOwnership.ownerOf("ente-photos-v1.3.64.apk", listOf(auth, ensu), photos, history))
+        assertEquals(
+            ensu,
+            AssetOwnership.ownerOf("ensu-v0.1.20.apk", listOf(auth, ensu), listOf(asset("ensu-v0.1.20.apk")), history),
+        )
+    }
+
+    @Test
+    fun oneRenamedAppAmongSeveralKeepsItsUpdates() {
+        val renamed = app("com.app", "OldName-1.0.apk")
+        val other = app("com.app.companion", "Companion-1.0.apk")
+        val newest = listOf(asset("NewName-2.0.apk"), asset("Companion-2.0.apk"))
+        val history = listOf(
+            release("2.0", newest),
+            release("1.0", listOf(asset("OldName-1.0.apk"), asset("Companion-1.0.apk"))),
+        )
+        assertEquals(renamed, AssetOwnership.ownerOf("NewName-2.0.apk", listOf(renamed, other), newest, history))
+        assertEquals(other, AssetOwnership.ownerOf("Companion-2.0.apk", listOf(renamed, other), newest, history))
+    }
+
+    @Test
     fun aMonoreposNewAppIsNotARenameOfTheInstalledOne() {
         val auth = app("io.ente.auth.independent", "ente-auth-v4.4.25.apk")
         val locker = listOf(asset("ente-locker-v1.0.0.apk"))
@@ -229,6 +280,20 @@ class AssetOwnershipTest {
         assertEquals(abiRelease, AssetOwnership.narrowToApp(abiRelease, "app-arm64-v8a-1.2.3.apk"))
         assertEquals(abiRelease, AssetOwnership.narrowToApp(abiRelease, "unrelated-1.0.apk"))
         assertEquals(abiRelease, AssetOwnership.narrowToApp(abiRelease, null))
+    }
+
+    @Test
+    fun pinnedTokensResolveWithinTheAppsOwnFamily() {
+        val pinned = setOf("stable")
+        assertEquals(
+            "Godot_v4.7.2-stable_android_debug.perfetto.apk",
+            AssetVariant.resolvePreferredAsset(godot472, null, pinned)?.name,
+        )
+        val sameApp = AssetOwnership.narrowToApp(godot472, godotV4.installedAssetName)
+        assertEquals(
+            "Godot_v4.7.2-stable_android_editor.apk",
+            AssetVariant.resolvePreferredAsset(sameApp, null, pinned)?.name,
+        )
     }
 
     @Test
