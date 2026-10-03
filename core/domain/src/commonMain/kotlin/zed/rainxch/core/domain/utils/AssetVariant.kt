@@ -167,6 +167,11 @@ object AssetVariant {
         return versionPattern.replace(lower, "*")
     }
 
+    fun versionMajor(name: String): Int? =
+        VERSION_MAJOR.find(name)?.groupValues?.get(1)?.toIntOrNull()
+
+    private val VERSION_MAJOR = Regex("""(?<![A-Za-z\d])v?(\d+)\.\d+""", RegexOption.IGNORE_CASE)
+
     fun extract(assetName: String): String? {
         val withoutExt = assetName.substringBeforeLast('.')
         val match = VERSION_SEGMENT.find(withoutExt) ?: return null
