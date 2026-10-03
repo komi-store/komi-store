@@ -30,6 +30,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.CallSplit
+import androidx.compose.material.icons.filled.UnfoldMore
 import androidx.compose.material.icons.filled.Verified
 import androidx.compose.material.icons.outlined.History
 import androidx.compose.runtime.Composable
@@ -113,6 +114,8 @@ fun AppHeader(
     onPlatformClick: ((DiscoveryPlatform) -> Unit)? = null,
     platformReleases: List<PlatformRelease> = emptyList(),
     devicePlatform: DiscoveryPlatform? = null,
+    appLabel: String? = null,
+    onAppLabelClick: () -> Unit = {},
     onOwnerClick: () -> Unit = {},
 ) {
     val isDark = isSystemInDarkTheme()
@@ -301,13 +304,14 @@ fun AppHeader(
             val showStatusPill =
                 installedApp != null &&
                     (!showAppSwitcher || installedApp.isPendingInstall || installedApp.isUpdateAvailable)
-            if (showStatusPill || showAppSwitcher) {
+            val showAppLabel = appLabel != null && installedApp == null
+            if (showStatusPill || showAppSwitcher || showAppLabel) {
                 Spacer(Modifier.height(12.dp))
                 val switcherApps =
                     remember(installedApps, showAppSwitcher) {
                         if (showAppSwitcher) installedApps.sortedBy { it.appName.lowercase() } else emptyList()
                     }
-                val firstChipIndex = if (showStatusPill) 1 else 0
+                val firstChipIndex = (if (showStatusPill) 1 else 0) + (if (showAppLabel) 1 else 0)
                 val selectedIndex =
                     switcherApps.indexOfFirst { it.packageName == installedApp?.packageName }
                 val rowState = rememberLazyListState()
@@ -332,6 +336,18 @@ fun AppHeader(
                 ) {
                     if (showStatusPill && installedApp != null) {
                         item(key = "status") { InstalledStatusPill(installedApp = installedApp) }
+                    }
+                    if (showAppLabel && appLabel != null) {
+                        item(key = "app") {
+                            KomiChip(
+                                label = appLabel,
+                                kind = KomiChipKind.Filter,
+                                size = KomiChipSize.Sm,
+                                selected = true,
+                                leadingIcon = Icons.Default.UnfoldMore,
+                                onClick = onAppLabelClick,
+                            )
+                        }
                     }
                     items(switcherApps, key = { it.packageName }) { app ->
                         KomiChip(

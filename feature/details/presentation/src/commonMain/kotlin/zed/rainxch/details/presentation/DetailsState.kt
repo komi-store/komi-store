@@ -107,4 +107,6 @@ data class DetailsState(
     val newerReleasesLackDeviceBuild: Boolean = false,
     val deviceBuildTarget: GithubRelease? = null,
     val handoff: PlatformRelease? = null,
+    val releaseLines: ImmutableMap<Long, String> = persistentMapOf(),
+    val selectedAppLabel: String? = null,
 )

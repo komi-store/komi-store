@@ -89,6 +89,8 @@ fun LazyListScope.header(
                     },
                     platformReleases = state.platformReleases,
                     devicePlatform = state.devicePlatform,
+                    appLabel = state.selectedAppLabel,
+                    onAppLabelClick = { onAction(DetailsAction.ToggleVersionPicker) },
                     onOwnerClick = {
                         onAction(
                             DetailsAction.OpenDeveloperProfile(
@@ -185,6 +187,9 @@ fun LazyListScope.header(
                         devicePlatform = state.devicePlatform,
                         releasePlatforms = state.releasePlatforms,
                         deviceBuildReleaseIds = state.deviceBuildReleaseIds,
+                        releaseLines = state.releaseLines,
+                        selectedAppLabel = state.selectedAppLabel,
+                        repoName = state.repository?.name.orEmpty(),
                     )
                 }
             }

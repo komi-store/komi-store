@@ -15,12 +15,17 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.UnfoldMore
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -38,6 +43,10 @@ import zed.rainxch.core.domain.model.account.github.GithubRelease
 import zed.rainxch.core.domain.model.account.github.isEffectivelyPreRelease
 import zed.rainxch.core.domain.model.account.github.preReleaseLabel
 import zed.rainxch.core.domain.model.repository.DiscoveryPlatform
+import zed.rainxch.core.domain.utils.VersionMath
+import zed.rainxch.core.presentation.components.chips.KomiChip
+import zed.rainxch.core.presentation.components.chips.KomiChipKind
+import zed.rainxch.core.presentation.components.chips.KomiChipSize
 import zed.rainxch.core.presentation.components.dividers.KomiHorizontalDivider
 import zed.rainxch.core.presentation.components.icon.KomiIcon
 import zed.rainxch.core.presentation.components.overlays.KomiSheet
@@ -49,7 +58,9 @@ import zed.rainxch.core.presentation.utils.formatIsoDateOrRaw
 import zed.rainxch.core.presentation.utils.toIcon
 import zed.rainxch.core.presentation.utils.toLabel
 import zed.rainxch.details.presentation.DetailsAction
+import zed.rainxch.details.presentation.utils.releaseLineLabel
 import zed.rainxch.githubstore.core.presentation.res.Res
+import zed.rainxch.githubstore.core.presentation.res.category_all
 import zed.rainxch.githubstore.core.presentation.res.latest_badge
 import zed.rainxch.githubstore.core.presentation.res.latest_for_platform
 import zed.rainxch.githubstore.core.presentation.res.no_build_for_this_device
@@ -69,6 +80,9 @@ fun VersionPicker(
     devicePlatform: DiscoveryPlatform? = null,
     releasePlatforms: ImmutableMap<Long, Set<DiscoveryPlatform>> = persistentMapOf(),
     deviceBuildReleaseIds: ImmutableSet<Long> = persistentSetOf(),
+    releaseLines: ImmutableMap<Long, String> = persistentMapOf(),
+    selectedAppLabel: String? = null,
+    repoName: String = "",
 ) {
     val colors = LocalPersonality.current.colors
     val isPickerEnabled = filteredReleases.isNotEmpty()
@@ -106,8 +120,13 @@ fun VersionPicker(
         ) {
             Column(modifier = Modifier.weight(1f)) {
                 KomiText(
-                    text = selectedRelease?.tagName
-                        ?: stringResource(Res.string.no_version_selected),
+                    text = selectedRelease?.let { release ->
+                        if (selectedAppLabel != null) {
+                            VersionMath.normalizeVersion(release.tagName).ifBlank { release.tagName }
+                        } else {
+                            release.tagName
+                        }
+                    } ?: stringResource(Res.string.no_version_selected),
                     role = KomiTextRole.Stamp,
                     fontWeight = FontWeight.SemiBold,
                     color = colors.onSurface,
@@ -115,8 +134,8 @@ fun VersionPicker(
                     maxLines = 1,
                     uppercase = false,
                 )
-                selectedRelease?.name?.let { name ->
-                    if (name != selectedRelease.tagName) {
+                (selectedAppLabel ?: selectedRelease?.name)?.let { name ->
+                    if (name != selectedRelease?.tagName) {
                         KomiText(
                             text = name,
                             role = KomiTextRole.Body,
@@ -138,6 +157,16 @@ fun VersionPicker(
     }
 
     if (isPickerVisible) {
+        val lines = remember(filteredReleases, releaseLines) {
+            filteredReleases.mapNotNull { releaseLines[it.id] }.distinct()
+        }
+        var lineFilter by remember(selectedRelease?.id, lines) {
+            mutableStateOf(selectedRelease?.let { releaseLines[it.id] }?.takeIf { it in lines })
+        }
+        val visibleReleases = remember(filteredReleases, releaseLines, lineFilter) {
+            val line = lineFilter
+            if (line == null) filteredReleases else filteredReleases.filter { releaseLines[it.id] == line }
+        }
         KomiSheet(
             onDismiss = { onAction(DetailsAction.ToggleVersionPicker) },
             placement = KomiSheetPlacement.Bottom,
@@ -152,6 +181,31 @@ fun VersionPicker(
                 uppercase = false,
             )
             Spacer(Modifier.size(8.dp))
+            if (lines.size > 1) {
+                LazyRow(
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                    modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
+                ) {
+                    item(key = "all") {
+                        KomiChip(
+                            label = stringResource(Res.string.category_all),
+                            kind = KomiChipKind.Filter,
+                            size = KomiChipSize.Sm,
+                            selected = lineFilter == null,
+                            onClick = { lineFilter = null },
+                        )
+                    }
+                    items(lines, key = { it }) { line ->
+                        KomiChip(
+                            label = releaseLineLabel(line, repoName),
+                            kind = KomiChipKind.Filter,
+                            size = KomiChipSize.Sm,
+                            selected = lineFilter == line,
+                            onClick = { lineFilter = line },
+                        )
+                    }
+                }
+            }
             if (filteredReleases.isEmpty()) {
                 KomiText(
                     text = stringResource(Res.string.not_available),
@@ -160,14 +214,14 @@ fun VersionPicker(
                     modifier = Modifier.padding(vertical = 16.dp),
                 )
             } else {
-                val latestReleaseId = filteredReleases.firstOrNull()?.id
+                val latestReleaseId = visibleReleases.firstOrNull()?.id
                 val latestDeviceBuildId =
-                    filteredReleases.firstOrNull { it.id in deviceBuildReleaseIds }?.id
+                    visibleReleases.firstOrNull { it.id in deviceBuildReleaseIds }?.id
                 LazyColumn(
                     modifier = Modifier.fillMaxWidth().heightIn(max = 420.dp),
                     contentPadding = PaddingValues(vertical = 8.dp),
                 ) {
-                    items(items = filteredReleases, key = { it.id }) { release ->
+                    items(items = visibleReleases, key = { it.id }) { release ->
                         VersionListItem(
                             release = release,
                             isSelected = release.id == selectedRelease?.id,

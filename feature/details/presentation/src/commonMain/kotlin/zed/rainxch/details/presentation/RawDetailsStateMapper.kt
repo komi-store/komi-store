@@ -6,6 +6,7 @@ import zed.rainxch.core.domain.model.account.github.isEffectivelyPreRelease
 import zed.rainxch.core.domain.utils.VersionMath
 import zed.rainxch.core.domain.utils.newestReleasePerPlatform
 import zed.rainxch.details.domain.model.ReleaseCategory
+import zed.rainxch.details.presentation.utils.releaseLineLabel
 
 internal fun RawDetailsState.toView(): DetailsState {
     val filteredReleases = when (selectedReleaseCategory) {
@@ -123,6 +124,8 @@ internal fun RawDetailsState.toView(): DetailsState {
         newerReleasesLackDeviceBuild = newerReleasesLackDeviceBuild,
         deviceBuildTarget = deviceBuildTarget,
         handoff = handoffPlatform?.let { platform -> platformReleases.firstOrNull { it.platform == platform } },
+        releaseLines = releaseLines,
+        selectedAppLabel = selectedLine?.let { releaseLineLabel(it, repository?.name.orEmpty()) },
     )
 }
 
