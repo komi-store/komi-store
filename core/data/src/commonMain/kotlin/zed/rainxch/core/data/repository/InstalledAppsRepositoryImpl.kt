@@ -186,7 +186,10 @@ class InstalledAppsRepositoryImpl(
     ): ResolvedRelease? {
         if (releases.isEmpty()) return null
 
-        fun ownedBySibling(asset: GithubAsset, releaseAssets: List<GithubAsset>): Boolean {
+        val self = repoApps.firstOrNull { it.packageName == trackedPackageName }
+
+        fun belongsElsewhere(asset: GithubAsset, releaseAssets: List<GithubAsset>): Boolean {
+            if (self != null && !AssetOwnership.canOwn(self, asset.name)) return true
             if (repoApps.size < 2) return false
             val owner = AssetOwnership.ownerOf(asset.name, repoApps, releaseAssets, releases)
             return owner != null && owner.packageName != trackedPackageName
@@ -211,7 +214,7 @@ class InstalledAppsRepositoryImpl(
                 (
                     if (filter == null) installableForPlatform
                     else installableForPlatform.filter { filter.matches(it.name) }
-                ).filterNot { ownedBySibling(it, installableForPlatform) }
+                ).filterNot { belongsElsewhere(it, installableForPlatform) }
 
             if (installableForApp.isEmpty()) continue
 
