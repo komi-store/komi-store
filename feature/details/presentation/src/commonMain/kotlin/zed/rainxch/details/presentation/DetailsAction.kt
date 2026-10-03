@@ -123,6 +123,10 @@ sealed interface DetailsAction {
         val release: GithubAsset,
     ) : DetailsAction
 
+    data class OnSelectInstalledApp(
+        val packageName: String,
+    ) : DetailsAction
+
     data object ToggleReleaseAssetsPicker : DetailsAction
 
     data object UnpinPreferredVariant : DetailsAction

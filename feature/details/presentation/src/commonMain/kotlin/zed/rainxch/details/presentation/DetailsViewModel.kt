@@ -536,6 +536,10 @@ class DetailsViewModel(
                 }
             }
 
+            is DetailsAction.OnSelectInstalledApp -> {
+                switchToInstalledApp(action.packageName)
+            }
+
             DetailsAction.ToggleReleaseAssetsPicker -> {
                 _state.update { state -> state.copy(isReleaseSelectorVisible = !state.isReleaseSelectorVisible) }
             }
@@ -1035,6 +1039,50 @@ class DetailsViewModel(
             return apps.singleOrNull() ?: apps.firstOrNull { !it.isUpdateAvailable } ?: apps.first()
         }
         return AssetOwnership.ownerOf(primaryAssetName, apps, releaseAssets, releaseHistory)
+    }
+
+    private fun switchToInstalledApp(packageName: String) {
+        val current = _state.value
+        val app = current.installedApps.firstOrNull { it.packageName == packageName } ?: return
+        val anchor = app.installedAssetName ?: app.latestAssetName ?: app.pendingInstallAssetName
+        val category = current.selectedReleaseCategory
+        val inCategory =
+            current.allReleases.firstOwnedBy(app, category, current.installedApps, anchor)
+        val release =
+            inCategory
+                ?: current.allReleases.firstOwnedBy(
+                    app,
+                    ReleaseCategory.ALL,
+                    current.installedApps,
+                    anchor,
+                )
+                ?: return
+        val resolvedCategory =
+            when {
+                inCategory != null -> category
+                release.isEffectivelyPreRelease() -> ReleaseCategory.PRE_RELEASE
+                else -> ReleaseCategory.STABLE
+            }
+        val (installable, primary) = recomputeAssetsForRelease(release, app, anchor)
+        val insights = computeReleaseInsights(current.allReleases, app)
+        whatsNewTranslationJob?.cancel()
+
+        _state.update {
+            it.copy(
+                installedApp = app,
+                selectedRelease = release,
+                selectedReleaseCategory = resolvedCategory,
+                installableAssets = installable,
+                primaryAsset = primary,
+                isVersionPickerVisible = false,
+                whatsNewTranslation = TranslationState(),
+                whatsNewMeasuredHeightPx = null,
+                mergedChangelog = insights.mergedChangelog,
+                mergedChangelogBaseTag = insights.mergedChangelogBaseTag,
+                stalledStableSinceDays = insights.stalledStableSinceDays,
+                latestStableHasInstallableAsset = insights.latestStableHasInstallableAsset,
+            )
+        }
     }
 
     private fun List<GithubRelease>.firstOwnedBy(

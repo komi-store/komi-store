@@ -1,5 +1,6 @@
 package zed.rainxch.apps.presentation.components
 
+import zed.rainxch.core.presentation.components.InstalledAppIcon
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box

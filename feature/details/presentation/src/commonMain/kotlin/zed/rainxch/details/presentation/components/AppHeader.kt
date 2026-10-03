@@ -1,5 +1,12 @@
 package zed.rainxch.details.presentation.components
 
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.snapshotFlow
+import androidx.compose.foundation.layout.PaddingValues
+import kotlinx.coroutines.flow.first
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
@@ -48,6 +55,7 @@ import zed.rainxch.core.domain.model.account.github.GithubRepoSummary
 import zed.rainxch.core.domain.model.account.github.GithubUserProfile
 import zed.rainxch.core.domain.model.installation.InstalledApp
 import zed.rainxch.core.presentation.components.GitHubStoreImage
+import zed.rainxch.core.presentation.components.InstalledAppIcon
 import zed.rainxch.core.presentation.components.chips.KomiChip
 import zed.rainxch.core.presentation.components.chips.KomiChipKind
 import zed.rainxch.core.presentation.components.chips.KomiChipSize
@@ -94,6 +102,8 @@ fun AppHeader(
     release: GithubRelease?,
     installedApp: InstalledApp?,
     modifier: Modifier = Modifier,
+    installedApps: List<InstalledApp> = emptyList(),
+    onSelectInstalledApp: (String) -> Unit = {},
     downloadStage: DownloadStage = DownloadStage.IDLE,
     downloadProgress: Int? = null,
     isCurrentUserOwner: Boolean = false,
@@ -297,37 +307,59 @@ fun AppHeader(
                 color = colors.onSurfaceVariant,
                 modifier = Modifier.padding(horizontal = 20.dp),
             )
-            if (installedApp != null) {
+            val showAppSwitcher =
+                installedApps.size > 1 || (installedApps.isNotEmpty() && installedApp == null)
+            val showStatusPill =
+                installedApp != null &&
+                    (!showAppSwitcher || installedApp.isPendingInstall || installedApp.isUpdateAvailable)
+            if (showStatusPill || showAppSwitcher) {
                 Spacer(Modifier.height(12.dp))
-                Box(modifier = Modifier.padding(horizontal = 20.dp)) {
-                    val statusColor = when {
-                        installedApp.isPendingInstall -> colors.primary
-                        installedApp.isUpdateAvailable -> colors.primary
-                        else -> colors.primary
+                val switcherApps =
+                    remember(installedApps, showAppSwitcher) {
+                        if (showAppSwitcher) installedApps.sortedBy { it.appName.lowercase() } else emptyList()
                     }
-                    Row(
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(shape.cornerSmall))
-                            .border(
-                                width = 1.dp,
-                                color = statusColor,
-                                shape = RoundedCornerShape(shape.cornerSmall),
-                            )
-                            .padding(horizontal = 12.dp, vertical = 5.dp),
-                    ) {
-                        KomiText(
-                            text = stringResource(
-                                when {
-                                    installedApp.isPendingInstall -> Res.string.pending_install
-                                    installedApp.isUpdateAvailable -> Res.string.update_available
-                                    else -> Res.string.installed
-                                },
-                            ),
-                            role = KomiTextRole.Label,
-                            fontWeight = FontWeight.SemiBold,
-                            fontSize = 12.sp,
-                            color = statusColor,
-                            uppercase = false,
+                val firstChipIndex = if (showStatusPill) 1 else 0
+                val selectedIndex =
+                    switcherApps.indexOfFirst { it.packageName == installedApp?.packageName }
+                val rowState = rememberLazyListState()
+                LaunchedEffect(selectedIndex) {
+                    if (selectedIndex < 0) return@LaunchedEffect
+                    val target = firstChipIndex + selectedIndex
+                    val layout = snapshotFlow { rowState.layoutInfo }
+                        .first { it.visibleItemsInfo.isNotEmpty() }
+                    val item = layout.visibleItemsInfo.firstOrNull { it.index == target }
+                    val fullyVisible =
+                        item != null &&
+                            item.offset >= layout.viewportStartOffset &&
+                            item.offset + item.size <= layout.viewportEndOffset
+                    if (!fullyVisible) rowState.animateScrollToItem(target)
+                }
+                LazyRow(
+                    state = rowState,
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    contentPadding = PaddingValues(horizontal = 20.dp),
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    if (showStatusPill && installedApp != null) {
+                        item(key = "status") { InstalledStatusPill(installedApp = installedApp) }
+                    }
+                    items(switcherApps, key = { it.packageName }) { app ->
+                        KomiChip(
+                            label = app.appName,
+                            kind = KomiChipKind.Filter,
+                            size = KomiChipSize.Sm,
+                            selected = app.packageName == installedApp?.packageName,
+                            leadingContent = {
+                                InstalledAppIcon(
+                                    packageName = app.packageName,
+                                    appName = app.appName,
+                                    modifier = Modifier
+                                        .size(16.dp)
+                                        .clip(RoundedCornerShape(shape.cornerSmall)),
+                                )
+                            },
+                            onClick = { onSelectInstalledApp(app.packageName) },
                         )
                     }
                 }
@@ -431,5 +463,32 @@ private fun HeaderAvatar(
 
             DownloadStage.IDLE -> { }
         }
+    }
+}
+
+@Composable
+private fun InstalledStatusPill(installedApp: InstalledApp) {
+    val colors = LocalPersonality.current.colors
+    val shape = RoundedCornerShape(LocalPersonality.current.shape.cornerSmall)
+    Row(
+        modifier = Modifier
+            .clip(shape)
+            .border(width = 1.dp, color = colors.primary, shape = shape)
+            .padding(horizontal = 12.dp, vertical = 5.dp),
+    ) {
+        KomiText(
+            text = stringResource(
+                when {
+                    installedApp.isPendingInstall -> Res.string.pending_install
+                    installedApp.isUpdateAvailable -> Res.string.update_available
+                    else -> Res.string.installed
+                },
+            ),
+            role = KomiTextRole.Label,
+            fontWeight = FontWeight.SemiBold,
+            fontSize = 12.sp,
+            color = colors.primary,
+            uppercase = false,
+        )
     }
 }

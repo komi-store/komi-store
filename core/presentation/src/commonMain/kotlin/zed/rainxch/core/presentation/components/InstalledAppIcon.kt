@@ -1,4 +1,4 @@
-package zed.rainxch.apps.presentation.components
+package zed.rainxch.core.presentation.components
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier

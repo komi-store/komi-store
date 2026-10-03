@@ -71,6 +71,10 @@ fun LazyListScope.header(
                     release = state.selectedRelease,
                     repository = state.repository,
                     installedApp = state.installedApp,
+                    installedApps = state.installedApps,
+                    onSelectInstalledApp = { packageName ->
+                        onAction(DetailsAction.OnSelectInstalledApp(packageName))
+                    },
                     downloadStage = state.downloadStage,
                     downloadProgress = state.downloadProgressPercent,
                     isCurrentUserOwner = state.isCurrentUserOwner,

@@ -1,5 +1,11 @@
 package zed.rainxch.details.presentation
 
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.sp
+import zed.rainxch.core.presentation.components.InstalledAppIcon
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
@@ -223,6 +229,41 @@ fun DetailsRoot(
             text = {
                 val personality = LocalPersonality.current
                 Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    val targetName =
+                        state.installedApps.firstOrNull { it.packageName == warning.packageName }
+                            ?.appName
+                            ?: warning.packageName
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    ) {
+                        InstalledAppIcon(
+                            packageName = warning.packageName,
+                            appName = targetName,
+                            modifier = Modifier
+                                .size(36.dp)
+                                .clip(RoundedCornerShape(personality.shape.cornerSmall)),
+                        )
+                        Column {
+                            KomiText(
+                                text = targetName,
+                                role = KomiTextRole.Title,
+                                fontWeight = FontWeight.SemiBold,
+                                fontSize = 15.sp,
+                                uppercase = false,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                            )
+                            KomiText(
+                                text = warning.packageName,
+                                role = KomiTextRole.Body,
+                                fontSize = 12.sp,
+                                color = personality.colors.onSurfaceVariant,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                            )
+                        }
+                    }
                     KomiText(
                         text =
                             stringResource(

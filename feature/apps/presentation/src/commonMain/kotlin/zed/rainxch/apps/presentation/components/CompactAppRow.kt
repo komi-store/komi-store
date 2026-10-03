@@ -2,6 +2,7 @@
 
 package zed.rainxch.apps.presentation.components
 
+import zed.rainxch.core.presentation.components.InstalledAppIcon
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -75,6 +76,7 @@ fun CompactAppRow(
     onUnskipVersionClick: () -> Unit,
     onRowClick: () -> Unit,
     modifier: Modifier = Modifier,
+    framed: Boolean = true,
 ) {
     val app = appItem.installedApp
     val isBusy =
@@ -92,13 +94,20 @@ fun CompactAppRow(
         modifier = modifier
             .fillMaxWidth()
             .defaultMinSize(minHeight = 68.dp)
-            .clip(rowShape)
-            .border(
-                width = 1.dp,
-                color = colors.outline,
-                shape = rowShape,
+            .then(
+                if (framed) {
+                    Modifier
+                        .clip(rowShape)
+                        .border(
+                            width = 1.dp,
+                            color = colors.outline,
+                            shape = rowShape,
+                        )
+                        .background(colors.surface)
+                } else {
+                    Modifier
+                },
             )
-            .background(colors.surface)
             .clickable(onClick = onRowClick)
             .padding(horizontal = 14.dp, vertical = 12.dp)
             .semantics(mergeDescendants = true) {

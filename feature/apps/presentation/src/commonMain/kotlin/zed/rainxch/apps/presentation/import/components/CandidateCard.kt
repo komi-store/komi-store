@@ -38,7 +38,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.collections.immutable.ImmutableList
 import org.jetbrains.compose.resources.stringResource
-import zed.rainxch.apps.presentation.components.InstalledAppIcon
+import zed.rainxch.core.presentation.components.InstalledAppIcon
 import zed.rainxch.apps.presentation.import.model.CandidateUi
 import zed.rainxch.apps.presentation.import.model.RepoSuggestionUi
 import zed.rainxch.apps.presentation.import.util.LocalReducedMotion

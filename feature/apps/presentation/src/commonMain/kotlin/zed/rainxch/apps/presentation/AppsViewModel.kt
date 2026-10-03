@@ -27,6 +27,7 @@ import zed.rainxch.apps.domain.repository.AppsRepository
 import zed.rainxch.apps.presentation.mappers.toDomain
 import zed.rainxch.apps.presentation.mappers.toUi
 import zed.rainxch.apps.presentation.mappers.computeIsBusy
+import zed.rainxch.apps.presentation.mappers.groupedByRepo
 import zed.rainxch.apps.presentation.mappers.toAppItem
 import zed.rainxch.apps.presentation.model.AdvancedPreviewMessage
 import zed.rainxch.apps.presentation.model.AppItem
@@ -159,6 +160,9 @@ class AppsViewModel(
             pendingApps = pending,
             updateApps = updates,
             idleApps = idle,
+            pendingGroups = pending.groupedByRepo(),
+            updateGroups = updates.groupedByRepo(),
+            idleGroups = idle.groupedByRepo(),
         )
     }
 

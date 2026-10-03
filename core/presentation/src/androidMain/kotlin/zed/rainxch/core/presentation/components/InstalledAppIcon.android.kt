@@ -1,4 +1,4 @@
-package zed.rainxch.apps.presentation.components
+package zed.rainxch.core.presentation.components
 
 import android.content.pm.PackageManager
 import android.os.Build

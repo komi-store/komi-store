@@ -6,6 +6,7 @@ import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.persistentSetOf
 import zed.rainxch.apps.domain.model.ImportResult
 import zed.rainxch.apps.presentation.model.AdvancedPreviewMessage
+import zed.rainxch.apps.presentation.model.AppGroup
 import zed.rainxch.apps.presentation.model.AppItem
 import zed.rainxch.apps.presentation.model.AppSortRule
 import zed.rainxch.apps.presentation.model.DeviceAppUi
@@ -97,4 +98,7 @@ data class AppsState(
     val pendingApps: ImmutableList<AppItem> = persistentListOf(),
     val updateApps: ImmutableList<AppItem> = persistentListOf(),
     val idleApps: ImmutableList<AppItem> = persistentListOf(),
+    val pendingGroups: ImmutableList<AppGroup> = persistentListOf(),
+    val updateGroups: ImmutableList<AppGroup> = persistentListOf(),
+    val idleGroups: ImmutableList<AppGroup> = persistentListOf(),
 )
