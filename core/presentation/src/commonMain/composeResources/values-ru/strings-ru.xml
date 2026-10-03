@@ -1032,16 +1032,6 @@
     <string name="adaptive_pick_repo_subtitle">Нажми на любую карточку слева, чтобы увидеть детали здесь.</string>
     <string name="adaptive_pick_repo_title">Выбери репозиторий</string>
     <string name="apps_section_pending_installs">Готово к установке</string>
-    <string name="apps_two_pane_advanced_settings">Расширенные настройки</string>
-    <string name="apps_two_pane_detail_section_actions">Быстрые действия</string>
-    <string name="apps_two_pane_detail_section_settings">Настройки</string>
-    <string name="apps_two_pane_detail_section_status">Статус</string>
-    <string name="apps_two_pane_empty_subtitle">Выбери любое приложение слева, чтобы увидеть его детали и действия.</string>
-    <string name="apps_two_pane_empty_title">Выбери приложение</string>
-    <string name="apps_two_pane_installed_label">Установлено</string>
-    <string name="apps_two_pane_latest_label">Последняя</string>
-    <string name="apps_two_pane_open_repo">Открыть репозиторий</string>
-    <string name="apps_two_pane_pick_variant">Выбрать вариант</string>
     <string name="apps_updates_banner_hide">Скрыть список</string>
     <string name="apps_updates_banner_show">Показать список</string>
     <string name="apps_updates_banner_subtitle">Просмотри или обнови всё сразу.</string>

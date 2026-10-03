@@ -1045,16 +1045,6 @@
     <string name="adaptive_pick_repo_subtitle">Tocca una scheda a sinistra per vederne i dettagli qui.</string>
     <string name="adaptive_pick_repo_title">Scegli un repository</string>
     <string name="apps_section_pending_installs">Pronte da installare</string>
-    <string name="apps_two_pane_advanced_settings">Impostazioni avanzate</string>
-    <string name="apps_two_pane_detail_section_actions">Azioni rapide</string>
-    <string name="apps_two_pane_detail_section_settings">Impostazioni</string>
-    <string name="apps_two_pane_detail_section_status">Stato</string>
-    <string name="apps_two_pane_empty_subtitle">Seleziona un'app a sinistra per vedere dettagli e azioni.</string>
-    <string name="apps_two_pane_empty_title">Scegli un'app</string>
-    <string name="apps_two_pane_installed_label">Installata</string>
-    <string name="apps_two_pane_latest_label">Ultima</string>
-    <string name="apps_two_pane_open_repo">Apri repository</string>
-    <string name="apps_two_pane_pick_variant">Scegli variante</string>
     <string name="apps_updates_banner_hide">Nascondi elenco</string>
     <string name="apps_updates_banner_show">Vedi elenco</string>
     <string name="apps_updates_banner_subtitle">Esamina o aggiorna tutto in una volta.</string>

@@ -1046,16 +1046,6 @@
     <string name="adaptive_pick_repo_subtitle">यहाँ इसके विवरण देखने के लिए बाईं ओर किसी कार्ड पर टैप करें।</string>
     <string name="adaptive_pick_repo_title">एक रिपॉजिटरी चुनें</string>
     <string name="apps_section_pending_installs">इंस्टॉल के लिए तैयार</string>
-    <string name="apps_two_pane_advanced_settings">उन्नत सेटिंग्स</string>
-    <string name="apps_two_pane_detail_section_actions">त्वरित क्रियाएँ</string>
-    <string name="apps_two_pane_detail_section_settings">सेटिंग्स</string>
-    <string name="apps_two_pane_detail_section_status">स्थिति</string>
-    <string name="apps_two_pane_empty_subtitle">इसके विवरण और क्रियाएँ देखने के लिए बाईं ओर किसी ऐप का चयन करें।</string>
-    <string name="apps_two_pane_empty_title">एक ऐप चुनें</string>
-    <string name="apps_two_pane_installed_label">स्थापित</string>
-    <string name="apps_two_pane_latest_label">नवीनतम</string>
-    <string name="apps_two_pane_open_repo">रिपॉजिटरी खोलें</string>
-    <string name="apps_two_pane_pick_variant">वेरिएंट चुनें</string>
     <string name="apps_updates_banner_hide">सूची छिपाएँ</string>
     <string name="apps_updates_banner_show">सूची देखें</string>
     <string name="apps_updates_banner_subtitle">एक साथ सब कुछ देखें या अपडेट करें।</string>

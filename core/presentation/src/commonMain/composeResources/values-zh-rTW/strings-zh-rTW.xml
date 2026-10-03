@@ -1013,16 +1013,6 @@
     <string name="adaptive_pick_repo_subtitle">點按左側任意卡片，在此檢視詳情。</string>
     <string name="adaptive_pick_repo_title">選擇一個倉庫</string>
     <string name="apps_section_pending_installs">可以安裝</string>
-    <string name="apps_two_pane_advanced_settings">高階設定</string>
-    <string name="apps_two_pane_detail_section_actions">快捷操作</string>
-    <string name="apps_two_pane_detail_section_settings">設定</string>
-    <string name="apps_two_pane_detail_section_status">狀態</string>
-    <string name="apps_two_pane_empty_subtitle">在左側選擇任意應用，即可檢視詳情和操作。</string>
-    <string name="apps_two_pane_empty_title">選擇一個應用</string>
-    <string name="apps_two_pane_installed_label">已安裝</string>
-    <string name="apps_two_pane_latest_label">最新</string>
-    <string name="apps_two_pane_open_repo">開啟倉庫</string>
-    <string name="apps_two_pane_pick_variant">選擇變體</string>
     <string name="apps_updates_banner_hide">隱藏列表</string>
     <string name="apps_updates_banner_show">檢視列表</string>
     <string name="apps_updates_banner_subtitle">逐個審查或一鍵全部更新。</string>

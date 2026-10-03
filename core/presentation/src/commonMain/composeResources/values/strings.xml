@@ -1058,7 +1058,6 @@
     <string name="apps_menu_item_active">%1$s  ✓</string>
     <string name="apps_version_update">%1$s → %2$s</string>
     <string name="apps_version_dated">%1$s (%2$s)</string>
-    <string name="apps_latest_version_placeholder">—</string>
     <string name="apps_variant_subtitle">%1$s  ·  %2$s</string>
     <string name="apps_section_header_cd">%1$s, %2$d, %3$s</string>
     <string name="apps_section_header_static_cd">%1$s, %2$d</string>
@@ -1077,16 +1076,6 @@
     <string name="apps_updates_banner_show">See list</string>
     <string name="apps_updates_banner_hide">Hide list</string>
     <string name="apps_section_pending_installs">Ready to install</string>
-    <string name="apps_two_pane_empty_title">Pick an app</string>
-    <string name="apps_two_pane_empty_subtitle">Select any app on the left to see its details and actions.</string>
-    <string name="apps_two_pane_detail_section_status">Status</string>
-    <string name="apps_two_pane_detail_section_actions">Quick actions</string>
-    <string name="apps_two_pane_detail_section_settings">Settings</string>
-    <string name="apps_two_pane_open_repo">Open repository</string>
-    <string name="apps_two_pane_installed_label">Installed</string>
-    <string name="apps_two_pane_latest_label">Latest</string>
-    <string name="apps_two_pane_pick_variant">Pick variant</string>
-    <string name="apps_two_pane_advanced_settings">Advanced settings</string>
     <string name="adaptive_pick_repo_title">Pick a repository</string>
     <string name="adaptive_pick_repo_subtitle">Tap any card on the left to view its details here.</string>
     <string name="translation_card_title">Translate</string>

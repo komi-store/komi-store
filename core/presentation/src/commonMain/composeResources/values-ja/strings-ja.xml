@@ -1005,16 +1005,6 @@
     <string name="adaptive_pick_repo_subtitle">左側のカードをタップすると詳細がここに表示されます。</string>
     <string name="adaptive_pick_repo_title">リポジトリを選択</string>
     <string name="apps_section_pending_installs">インストール待ち</string>
-    <string name="apps_two_pane_advanced_settings">詳細設定</string>
-    <string name="apps_two_pane_detail_section_actions">クイック操作</string>
-    <string name="apps_two_pane_detail_section_settings">設定</string>
-    <string name="apps_two_pane_detail_section_status">ステータス</string>
-    <string name="apps_two_pane_empty_subtitle">左側のアプリを選択すると、詳細と操作が表示されます。</string>
-    <string name="apps_two_pane_empty_title">アプリを選択</string>
-    <string name="apps_two_pane_installed_label">インストール済み</string>
-    <string name="apps_two_pane_latest_label">最新</string>
-    <string name="apps_two_pane_open_repo">リポジトリを開く</string>
-    <string name="apps_two_pane_pick_variant">バリアントを選択</string>
     <string name="apps_updates_banner_hide">リストを隠す</string>
     <string name="apps_updates_banner_show">リストを見る</string>
     <string name="apps_updates_banner_subtitle">すべてをまとめて確認・更新できます。</string>

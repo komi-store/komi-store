@@ -1032,16 +1032,6 @@
     <string name="adaptive_pick_repo_subtitle">Dotknij dowolnej karty po lewej, aby zobaczyć jej szczegóły tutaj.</string>
     <string name="adaptive_pick_repo_title">Wybierz repozytorium</string>
     <string name="apps_section_pending_installs">Gotowe do instalacji</string>
-    <string name="apps_two_pane_advanced_settings">Ustawienia zaawansowane</string>
-    <string name="apps_two_pane_detail_section_actions">Szybkie akcje</string>
-    <string name="apps_two_pane_detail_section_settings">Ustawienia</string>
-    <string name="apps_two_pane_detail_section_status">Status</string>
-    <string name="apps_two_pane_empty_subtitle">Wybierz dowolną aplikację po lewej, aby zobaczyć jej szczegóły i akcje.</string>
-    <string name="apps_two_pane_empty_title">Wybierz aplikację</string>
-    <string name="apps_two_pane_installed_label">Zainstalowana</string>
-    <string name="apps_two_pane_latest_label">Najnowsza</string>
-    <string name="apps_two_pane_open_repo">Otwórz repozytorium</string>
-    <string name="apps_two_pane_pick_variant">Wybierz wariant</string>
     <string name="apps_updates_banner_hide">Ukryj listę</string>
     <string name="apps_updates_banner_show">Zobacz listę</string>
     <string name="apps_updates_banner_subtitle">Przejrzyj lub zaktualizuj wszystko naraz.</string>

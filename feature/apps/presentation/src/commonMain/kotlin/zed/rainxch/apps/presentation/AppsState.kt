@@ -92,8 +92,6 @@ data class AppsState(
     val showKaoBanner: Boolean = false,
     val linkSourceHost: String? = null,
 
-    val twoPaneSelectedPackage: String? = null,
-
     val filteredDeviceApps: ImmutableList<DeviceAppUi> = persistentListOf(),
     val filteredLinkAssets: ImmutableList<GithubAssetUi> = persistentListOf(),
     val pendingApps: ImmutableList<AppItem> = persistentListOf(),
