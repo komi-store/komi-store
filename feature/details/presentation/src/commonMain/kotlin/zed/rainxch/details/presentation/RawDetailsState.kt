@@ -92,5 +92,6 @@ internal data class RawDetailsState(
     val devicePlatform: DiscoveryPlatform = DiscoveryPlatform.Android,
     val releasePlatforms: ImmutableMap<Long, Set<DiscoveryPlatform>> = persistentMapOf(),
     val deviceBuildReleaseIds: ImmutableSet<Long> = persistentSetOf(),
+    val releaseLines: ImmutableMap<Long, String> = persistentMapOf(),
     val handoffPlatform: DiscoveryPlatform? = null,
 )

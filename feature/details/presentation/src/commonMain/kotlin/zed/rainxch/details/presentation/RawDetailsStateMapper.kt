@@ -18,25 +18,30 @@ internal fun RawDetailsState.toView(): DetailsState {
         .maxByOrNull { it.publishedAt }
     val canSwitchToStable = computeCanSwitchToStable(latestStableRelease)
     val isPendingInstallReady = computeIsPendingInstallReady()
+    val selectedLine = selectedRelease?.let { releaseLines[it.id] }
+    val appReleases =
+        if (selectedLine == null) filteredReleases else filteredReleases.filter { releaseLines[it.id] == selectedLine }
     val platformReleases = newestReleasePerPlatform(
-        releases = filteredReleases,
+        releases = appReleases,
         releasePlatforms = { releasePlatforms[it.id].orEmpty() },
         devicePlatform = devicePlatform,
     ).toImmutableList()
     val selectedHasDeviceBuild = selectedRelease?.let { it.id in deviceBuildReleaseIds } ?: true
     val selectedIndex = selectedRelease?.let { selected ->
-        filteredReleases.indexOfFirst { it.id == selected.id }
+        appReleases.indexOfFirst { it.id == selected.id }
     } ?: -1
     val newerReleasesLackDeviceBuild =
         selectedHasDeviceBuild &&
             selectedIndex > 0 &&
-            filteredReleases.subList(0, selectedIndex).none { it.id in deviceBuildReleaseIds }
+            appReleases.subList(0, selectedIndex).none { it.id in deviceBuildReleaseIds }
     val deviceBuildTarget =
         if (selectedHasDeviceBuild) {
             null
         } else {
-            filteredReleases.firstOrNull { it.id in deviceBuildReleaseIds }
-                ?: allReleases.firstOrNull { it.id in deviceBuildReleaseIds }
+            appReleases.firstOrNull { it.id in deviceBuildReleaseIds }
+                ?: allReleases.firstOrNull {
+                    it.id in deviceBuildReleaseIds && (selectedLine == null || releaseLines[it.id] == selectedLine)
+                }
         }
 
     return DetailsState(

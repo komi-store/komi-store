@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.collections.immutable.ImmutableSet
+import kotlinx.collections.immutable.persistentMapOf
 import kotlinx.collections.immutable.toImmutableMap
 import kotlinx.collections.immutable.toImmutableSet
 import kotlinx.coroutines.Job
@@ -65,6 +66,7 @@ import zed.rainxch.core.presentation.utils.daysSinceIso
 import zed.rainxch.core.domain.utils.AssetFilter
 import zed.rainxch.core.domain.utils.AssetOwnership
 import zed.rainxch.core.domain.utils.AssetVariant
+import zed.rainxch.core.domain.utils.ReleaseLines
 import zed.rainxch.core.domain.utils.VersionMath
 import zed.rainxch.core.domain.helpers.BrowserHelper
 import zed.rainxch.core.domain.helpers.ShareManager
@@ -965,6 +967,7 @@ class DetailsViewModel(
                         allReleases = releases,
                         releasePlatforms = platformsByRelease(releases),
                         deviceBuildReleaseIds = deviceBuildIds,
+                        releaseLines = releaseLines(releases),
                         releasesLoadFailed = false,
                         isRetryingReleases = false,
                         selectedRelease = selected,
@@ -1327,16 +1330,26 @@ class DetailsViewModel(
         val current = _state.value
         val deviceBuildIds = current.deviceBuildReleaseIds
         if (current.selectedRelease?.id in deviceBuildIds) return
-        val inCategory =
-            current.allReleases
-                .filter { it.id in deviceBuildIds }
-                .firstInCategory(current.selectedReleaseCategory)
+        val selectedLine = current.selectedRelease?.let { current.releaseLines[it.id] }
+        val targets = current.allReleases.filter {
+            it.id in deviceBuildIds && (selectedLine == null || current.releaseLines[it.id] == selectedLine)
+        }
+        val inCategory = targets.firstInCategory(current.selectedReleaseCategory)
         when {
             inCategory != null -> onAction(DetailsAction.SelectRelease(inCategory))
-            deviceBuildIds.isNotEmpty() ->
+            targets.isNotEmpty() -> {
                 onAction(DetailsAction.SelectReleaseCategory(ReleaseCategory.ALL))
+                onAction(DetailsAction.SelectRelease(targets.first()))
+            }
         }
     }
+
+    private fun releaseLines(releases: List<GithubRelease>): ImmutableMap<Long, String> =
+        if (ReleaseLines.isMultiLine(releases)) {
+            releases.associate { it.id to ReleaseLines.of(it.tagName) }.toImmutableMap()
+        } else {
+            persistentMapOf()
+        }
 
     private fun platformsByRelease(
         releases: List<GithubRelease>,
@@ -2749,6 +2762,7 @@ class DetailsViewModel(
                         allReleases = allReleases,
                         releasePlatforms = platformsByRelease(allReleases),
                         deviceBuildReleaseIds = deviceBuildIds,
+                        releaseLines = releaseLines(allReleases),
                         releasesLoadFailed = releasesFailed,
                         isRetryingReleases = false,
                         selectedRelease = selectedRelease,
@@ -2918,6 +2932,7 @@ class DetailsViewModel(
                         releasePlatforms = freshReleases?.let(::platformsByRelease) ?: it.releasePlatforms,
                         deviceBuildReleaseIds =
                             freshReleases?.let(::deviceBuildReleaseIds) ?: it.deviceBuildReleaseIds,
+                        releaseLines = freshReleases?.let(::releaseLines) ?: it.releaseLines,
                         releasesLoadFailed = freshReleases == null && it.releasesLoadFailed,
                         selectedRelease = selectedRelease,
                         selectedReleaseCategory = resolvedCategory,
