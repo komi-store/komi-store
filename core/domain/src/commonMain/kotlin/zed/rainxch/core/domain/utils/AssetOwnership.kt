@@ -46,10 +46,13 @@ object AssetOwnership {
         }
         if (byStem.isNotEmpty()) return byStem.closestVersionLine(assetName)
 
-        val sole = apps.singleOrNull()?.takeIf { canOwn(it, assetName) } ?: return null
-        val soleAsset = sole.installedAssetName ?: return sole
-        if (releaseAssets.any { isSameApp(it.name, soleAsset) }) return null
-        return sole.takeIf { isRename(soleAsset, assetName, releaseHistory) }
+        val missing = apps.filter { app ->
+            canOwn(app, assetName) &&
+                app.installedAssetName?.let { own -> releaseAssets.none { isSameApp(it.name, own) } } != false
+        }
+        val renamed = missing.singleOrNull() ?: return null
+        val renamedFrom = renamed.installedAssetName ?: return renamed.takeIf { apps.size == 1 }
+        return renamed.takeIf { isRename(renamedFrom, assetName, releaseHistory) }
     }
 
     // Newest first. A rename never goes back: every release with the new name is newer than
