@@ -16,7 +16,6 @@ import zed.rainxch.core.data.dto.ReleaseNetwork
 import zed.rainxch.core.data.local.db.AppDatabase
 import zed.rainxch.core.data.local.db.dao.InstalledAppDao
 import zed.rainxch.core.data.local.db.dao.UpdateHistoryDao
-import zed.rainxch.core.data.local.db.entities.InstalledAppEntity
 import zed.rainxch.core.data.local.db.entities.UpdateHistoryEntity
 import zed.rainxch.core.data.mappers.toDomain
 import zed.rainxch.core.data.mappers.toReleaseWindow
@@ -277,20 +276,6 @@ class InstalledAppsRepositoryImpl(
         installedAppsDao.clearUpdateFlagKeepBaseline(packageName, System.currentTimeMillis())
     }
 
-    private suspend fun adoptMatchedTag(
-        app: InstalledAppEntity,
-        matchedTag: String,
-        isUpdateAvailable: Boolean,
-    ) {
-        installedAppsDao.updateInstalledVersion(
-            packageName = app.packageName,
-            installedVersion = matchedTag,
-            installedVersionName = app.installedVersionName,
-            installedVersionCode = app.installedVersionCode,
-            isUpdateAvailable = isUpdateAvailable,
-        )
-    }
-
     override suspend fun checkForUpdates(packageName: String): Boolean {
         val app = installedAppsDao.getAppByPackage(packageName) ?: return false
 
@@ -411,19 +396,6 @@ class InstalledAppsRepositoryImpl(
                 latestReleasePublishedAt = matchedRelease.publishedAt,
             )
 
-            val shouldRewriteTag =
-                UpdateVerdict.shouldAdoptMatchedTag(
-                    codesAlreadyMatch = verdict.codesAlreadyMatch,
-                    installedTag = app.installedVersion,
-                    matchedTag = matchedRelease.tagName,
-                )
-            if (shouldRewriteTag) {
-                adoptMatchedTag(
-                    app = app,
-                    matchedTag = matchedRelease.tagName,
-                    isUpdateAvailable = isUpdateAvailable,
-                )
-            }
 
             if (variantWasLost != app.preferredVariantStale) {
                 installedAppsDao.updateVariantStaleness(packageName, variantWasLost)
@@ -458,8 +430,11 @@ class InstalledAppsRepositoryImpl(
     override suspend fun updateAppVersion(
         packageName: String,
         newTag: String,
-        newAssetName: String,
-        newAssetUrl: String,
+        newReleaseId: Long?,
+        newAssetId: Long?,
+        newAssetDigest: String?,
+        newAssetName: String?,
+        newAssetUrl: String?,
         newVersionName: String,
         newVersionCode: Long,
         signingFingerprint: String?,
@@ -489,6 +464,9 @@ class InstalledAppsRepositoryImpl(
             app.toDomain()
                 .confirmInstall(
                     tag = newTag,
+                    releaseId = newReleaseId,
+                    assetId = newAssetId,
+                    assetDigest = newAssetDigest,
                     assetName = newAssetName,
                     assetUrl = newAssetUrl,
                     versionName = newVersionName,
@@ -499,6 +477,10 @@ class InstalledAppsRepositoryImpl(
                 )
                 .toEntity(),
         )
+    }
+
+    override suspend fun clearInstallBinding(packageName: String) {
+        installedAppsDao.clearInstallBinding(packageName)
     }
 
     override suspend fun updateApp(app: InstalledApp) {

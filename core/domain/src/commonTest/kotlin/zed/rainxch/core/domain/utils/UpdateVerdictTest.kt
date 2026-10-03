@@ -224,7 +224,7 @@ class UpdateVerdictTest {
     }
 
     @Test
-    fun installerx_matching_codes_and_tag_make_the_rewrite_gate_open() {
+    fun installerx_matching_codes_and_tag_still_report_an_update() {
         val result =
             decide(
                 installedTag = "26.08.21fae85",
@@ -236,7 +236,6 @@ class UpdateVerdictTest {
                 storedPublishedAt = "2026-08-01T00:00:00Z",
                 matchedIsPrerelease = false,
             )
-        assertTrue(result.codesAlreadyMatch)
         assertTrue(result.isUpdateAvailable)
     }
 
@@ -251,7 +250,6 @@ class UpdateVerdictTest {
                 matchedTag = "1.0.0",
             )
         assertFalse(result.isUpdateAvailable)
-        assertTrue(result.codesAlreadyMatch)
     }
 
     @Test
@@ -355,45 +353,6 @@ class UpdateVerdictTest {
     }
 
     @Test
-    fun codes_already_match_requires_positive_codes() {
-        val zeroInstalled =
-            decide(
-                installedTag = "1.0.0",
-                installedVersionCode = 0L,
-                storedLatestTag = "1.0.0",
-                storedLatestVersionCode = 0L,
-                matchedTag = "1.0.0",
-            )
-        assertFalse(zeroInstalled.codesAlreadyMatch)
-
-        val zeroStored =
-            decide(
-                installedTag = "1.0.0",
-                installedVersionCode = 100L,
-                storedLatestTag = "1.0.0",
-                storedLatestVersionCode = 0L,
-                matchedTag = "1.0.0",
-            )
-        assertFalse(zeroStored.codesAlreadyMatch)
-    }
-
-    @Test
-    fun rewrite_gate_rejects_when_codes_or_stored_tag_differ() {
-        val matched = decide(installedTag = "1.0.0", installedVersionCode = 100L)
-        assertFalse(matched.codesAlreadyMatch)
-
-        val tagMismatch =
-            decide(
-                installedTag = "1.0.0",
-                installedVersionCode = 100L,
-                storedLatestTag = "1.0.1",
-                storedLatestVersionCode = 100L,
-                matchedTag = "1.0.0",
-            )
-        assertFalse(tagMismatch.codesAlreadyMatch)
-    }
-
-    @Test
     fun skipped_nightly_same_instant_in_offset_form_is_not_a_rebuild() {
         val result =
             decide(
@@ -437,7 +396,6 @@ class UpdateVerdictTest {
                 matchedPublishedAt = "2026-08-02T00:00:00Z",
                 matchedIsPrerelease = true,
             )
-        assertTrue(result.codesAlreadyMatch)
         assertTrue(result.skipBecameStale)
         assertTrue(result.isUpdateAvailable)
     }
@@ -456,16 +414,8 @@ class UpdateVerdictTest {
                 matchedPublishedAt = "2026-08-01T00:00:00Z",
                 matchedIsPrerelease = true,
             )
-        assertTrue(result.codesAlreadyMatch)
         assertFalse(result.skipBecameStale)
         assertFalse(result.isUpdateAvailable)
-    }
-
-    @Test
-    fun adopt_gate_needs_code_proof() {
-        assertFalse(UpdateVerdict.shouldAdoptMatchedTag(false, "26.09.01", "nightly"))
-        assertFalse(UpdateVerdict.shouldAdoptMatchedTag(false, "2.0.2", "nightly"))
-        assertTrue(UpdateVerdict.shouldAdoptMatchedTag(true, "26.09.01", "nightly"))
     }
 
     @Test
@@ -482,14 +432,6 @@ class UpdateVerdictTest {
                 matchedIsPrerelease = true,
             )
         assertTrue(result.isUpdateAvailable)
-        assertFalse(UpdateVerdict.shouldAdoptMatchedTag(result.codesAlreadyMatch, "2.0.2", "nightly"))
-    }
-
-    @Test
-    fun adopt_gate_keeps_its_other_bounds() {
-        assertFalse(UpdateVerdict.shouldAdoptMatchedTag(true, "2.0.0", "2.0.0"))
-        assertFalse(UpdateVerdict.shouldAdoptMatchedTag(false, "1.0.0", "2.0.0"))
-        assertTrue(UpdateVerdict.shouldAdoptMatchedTag(true, "1.0.0", "2.0.0"))
     }
 
     @Test

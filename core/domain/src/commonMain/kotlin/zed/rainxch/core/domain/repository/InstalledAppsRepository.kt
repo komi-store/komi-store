@@ -34,13 +34,18 @@ interface InstalledAppsRepository {
     suspend fun updateAppVersion(
         packageName: String,
         newTag: String,
-        newAssetName: String,
-        newAssetUrl: String,
+        newReleaseId: Long?,
+        newAssetId: Long?,
+        newAssetDigest: String?,
+        newAssetName: String?,
+        newAssetUrl: String?,
         newVersionName: String,
         newVersionCode: Long,
         signingFingerprint: String?,
         isPendingInstall: Boolean = true,
     )
+
+    suspend fun clearInstallBinding(packageName: String)
 
     suspend fun updateApp(app: InstalledApp)
 

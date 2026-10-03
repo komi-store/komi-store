@@ -11,7 +11,6 @@ import kotlinx.coroutines.withContext
 import zed.rainxch.core.domain.model.installation.DeviceApp
 import zed.rainxch.core.domain.model.installation.SystemPackageInfo
 import zed.rainxch.core.domain.system.PackageMonitor
-import java.security.MessageDigest
 
 class AndroidPackageMonitor(
     context: Context,
@@ -52,30 +51,7 @@ class AndroidPackageMonitor(
                         packageInfo.versionCode.toLong()
                     }
 
-                val signingFingerprint: String? =
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                        val sigInfo = packageInfo.signingInfo
-                        val certs =
-                            if (sigInfo?.hasMultipleSigners() == true) {
-                                sigInfo.apkContentsSigners
-                            } else {
-                                sigInfo?.signingCertificateHistory
-                            }
-                        certs?.firstOrNull()?.toByteArray()?.let { certBytes ->
-                            MessageDigest
-                                .getInstance("SHA-256")
-                                .digest(certBytes)
-                                .joinToString(":") { "%02X".format(it) }
-                        }
-                    } else {
-                        @Suppress("DEPRECATION")
-                        packageInfo.signatures?.firstOrNull()?.toByteArray()?.let { certBytes ->
-                            MessageDigest
-                                .getInstance("SHA-256")
-                                .digest(certBytes)
-                                .joinToString(":") { "%02X".format(it) }
-                        }
-                    }
+                val signingFingerprint = SigningFingerprint.fromPackageInfo(packageInfo)
 
                 SystemPackageInfo(
                     packageName = packageInfo.packageName,

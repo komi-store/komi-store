@@ -160,8 +160,12 @@ class PackageEventReceiver() :
                             repo.updateAppVersion(
                                 packageName = packageName,
                                 newTag = installedTag,
-                                newAssetName = app.latestAssetName ?: "",
-                                newAssetUrl = app.latestAssetUrl ?: "",
+                                // Confirming an install we started: keep the identity saved with it.
+                                newReleaseId = app.installedReleaseId,
+                                newAssetId = app.installedAssetId,
+                                newAssetDigest = app.installedAssetDigest,
+                                newAssetName = app.latestAssetName,
+                                newAssetUrl = app.latestAssetUrl,
                                 newVersionName = systemInfo.versionName,
                                 newVersionCode = systemInfo.versionCode,
                                 signingFingerprint = app.signingFingerprint,
@@ -262,13 +266,16 @@ class PackageEventReceiver() :
                 VersionVerdict.UNKNOWN -> app.isUpdateAvailable
             }
 
-        repo.updateInstalledVersion(
-            packageName = packageName,
-            installedVersion = app.tagForObservedBuild(systemInfo.versionName, systemInfo.versionCode),
-            installedVersionName = systemInfo.versionName,
-            installedVersionCode = systemInfo.versionCode,
-            isUpdateAvailable = newIsUpdateAvailable,
-        )
+        repo.executeInTransaction {
+            repo.updateInstalledVersion(
+                packageName = packageName,
+                installedVersion = app.tagForObservedBuild(systemInfo.versionName, systemInfo.versionCode),
+                installedVersionName = systemInfo.versionName,
+                installedVersionCode = systemInfo.versionCode,
+                isUpdateAvailable = newIsUpdateAvailable,
+            )
+            repo.clearInstallBinding(packageName)
+        }
 
         Logger.i {
             "External version change via broadcast: $packageName " +

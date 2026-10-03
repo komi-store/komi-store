@@ -116,19 +116,11 @@ object UpdateVerdict {
         return Result(
             isUpdateAvailable = isUpdateAvailable,
             skipBecameStale = skipBecameStale,
-            codesAlreadyMatch = codesAlreadyMatch,
         )
     }
-
-    fun shouldAdoptMatchedTag(
-        codesAlreadyMatch: Boolean,
-        installedTag: String?,
-        matchedTag: String,
-    ): Boolean = installedTag != matchedTag && codesAlreadyMatch
 
     data class Result(
         val isUpdateAvailable: Boolean,
         val skipBecameStale: Boolean,
-        val codesAlreadyMatch: Boolean,
     )
 }

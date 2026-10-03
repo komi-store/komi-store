@@ -37,7 +37,7 @@ import zed.rainxch.core.data.local.db.entities.UpdateHistoryEntity
         SigningFingerprintEntity::class,
         HiddenRepoEntity::class,
     ],
-    version = 19,
+    version = 20,
     exportSchema = true,
     autoMigrations = [AutoMigration(from = 18, to = 19)],
 )

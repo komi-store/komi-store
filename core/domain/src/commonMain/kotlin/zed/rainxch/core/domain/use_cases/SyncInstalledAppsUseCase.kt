@@ -5,8 +5,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import zed.rainxch.core.domain.logging.KomiStoreLogger
+import zed.rainxch.core.domain.model.installation.BindingStatus
 import zed.rainxch.core.domain.model.installation.InstalledApp
 import zed.rainxch.core.domain.model.installation.SystemPackageInfo
+import zed.rainxch.core.domain.model.installation.bindingStatusAgainst
 import zed.rainxch.core.domain.model.installation.observeExternalInstall
 import zed.rainxch.core.domain.model.installation.resolvePendingFromSystem
 import zed.rainxch.core.domain.model.installation.withMigratedVersionInfo
@@ -259,12 +261,44 @@ class SyncInstalledAppsUseCase(
 
     private suspend fun syncVersion(app: InstalledApp, systemInfo: SystemPackageInfo?) {
         try {
-            if (systemInfo != null && systemInfo.versionCode != app.installedVersionCode) {
-                val wasDowngrade = systemInfo.versionCode < app.installedVersionCode
+            val local = systemInfo ?: return
 
+            val binding = app.bindingStatusAgainst(local)
+
+            val signerDrifted =
+                !local.signingFingerprint.isNullOrBlank() &&
+                    !app.signingFingerprint.isNullOrBlank() &&
+                    !local.signingFingerprint.equals(app.signingFingerprint, ignoreCase = true)
+            val unchanged =
+                local.versionCode == app.installedVersionCode &&
+                    local.versionName == app.installedVersionName &&
+                    !signerDrifted
+
+            if (binding is BindingStatus.Intact && unchanged) {
+                logger.debug("Binding intact and unchanged for ${app.packageName}; no write")
+                return
+            }
+
+            if (binding is BindingStatus.Broken) {
+                logger.warn(
+                    "Install binding broken for ${app.packageName}: ${binding.reason} " +
+                        "(DB v${app.installedVersionName}(${app.installedVersionCode}) vs " +
+                        "System v${local.versionName}(${local.versionCode}))",
+                )
+                if (app.installedReleaseId != null ||
+                    app.installedAssetId != null ||
+                    app.installedAssetDigest != null
+                ) {
+                    installedAppsRepository.clearInstallBinding(app.packageName)
+                }
+            }
+
+            if (!unchanged) {
+                val wasDowngrade = local.versionCode < app.installedVersionCode
                 val observed = app.observeExternalInstall(
-                    versionName = systemInfo.versionName,
-                    versionCode = systemInfo.versionCode,
+                    versionName = local.versionName,
+                    versionCode = local.versionCode,
+                    signingFingerprint = local.signingFingerprint,
                 )
                 installedAppsRepository.updateApp(observed)
 
@@ -272,8 +306,8 @@ class SyncInstalledAppsUseCase(
                 logger.info(
                     "Detected $action for ${app.packageName}: " +
                         "DB v${app.installedVersionName}(${app.installedVersionCode}) → " +
-                        "System v${systemInfo.versionName}(${systemInfo.versionCode}), " +
-                        "updateAvailable=${observed.isUpdateAvailable}",
+                        "System v${local.versionName}(${local.versionCode}), " +
+                        "binding=${binding::class.simpleName}, updateAvailable=${observed.isUpdateAvailable}",
                 )
             }
         } catch (e: CancellationException) {

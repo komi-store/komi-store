@@ -95,6 +95,9 @@ class InstallationManagerImpl(
                     installedVersion = params.releaseTag,
                     installedAssetName = params.assetName,
                     installedAssetUrl = params.assetUrl,
+                    installedReleaseId = params.releaseId,
+                    installedAssetId = params.assetId,
+                    installedAssetDigest = params.assetDigest,
 
                     latestVersion = null,
                     latestAssetName = null,
@@ -156,6 +159,9 @@ class InstallationManagerImpl(
         installedAppsRepository.updateAppVersion(
             packageName = params.apkInfo.packageName,
             newTag = params.releaseTag,
+            newReleaseId = params.releaseId,
+            newAssetId = params.assetId,
+            newAssetDigest = params.assetDigest,
             newAssetName = params.assetName,
             newAssetUrl = params.assetUrl,
             newVersionName = params.apkInfo.versionName,

@@ -4,6 +4,7 @@ import androidx.room.Room
 import androidx.sqlite.driver.bundled.BundledSQLiteDriver
 import kotlinx.coroutines.Dispatchers
 import zed.rainxch.core.data.local.DesktopAppDataPaths
+import zed.rainxch.core.data.local.db.migrations.MIGRATION_19_20
 import java.io.File
 
 fun initDatabase(): AppDatabase {
@@ -19,5 +20,6 @@ fun initDatabase(): AppDatabase {
         ).setDriver(BundledSQLiteDriver())
         .setQueryCoroutineContext(Dispatchers.IO)
         .fallbackToDestructiveMigration(true)
+        .addMigrations(MIGRATION_19_20)
         .build()
 }

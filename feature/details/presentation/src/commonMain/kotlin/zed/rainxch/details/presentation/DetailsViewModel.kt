@@ -2320,6 +2320,13 @@ class DetailsViewModel(
 
         val pendingPath = parkedFilePath?.takeIf { isPending }
 
+        // The asset of that same release — installableAssets follows the current selection.
+        val sourceRelease =
+            _state.value.selectedRelease?.takeIf { it.tagName == releaseTag }
+                ?: _state.value.allReleases.firstOrNull { it.tagName == releaseTag }
+        val sourceAsset = sourceRelease?.assets?.firstOrNull { it.name == assetName }
+        val identityKnown = sourceRelease != null && sourceAsset != null
+
         if (isUpdate) {
             installationManager.updateInstalledAppVersion(
                 UpdateInstalledAppParams(
@@ -2327,6 +2334,9 @@ class DetailsViewModel(
                     assetName = assetName,
                     assetUrl = assetUrl,
                     releaseTag = releaseTag,
+                    releaseId = sourceRelease?.id.takeIf { identityKnown },
+                    assetId = sourceAsset?.id.takeIf { identityKnown },
+                    assetDigest = sourceAsset?.digest.takeIf { identityKnown },
                     isPendingInstall = isPending,
                 ),
             )
@@ -2358,6 +2368,9 @@ class DetailsViewModel(
                         assetUrl = assetUrl,
                         assetSize = assetSize,
                         releaseTag = releaseTag,
+                        releaseId = sourceRelease?.id.takeIf { identityKnown },
+                        assetId = sourceAsset?.id.takeIf { identityKnown },
+                        assetDigest = sourceAsset?.digest.takeIf { identityKnown },
                         isPendingInstall = isPending,
                         isFavourite = _state.value.isFavourite,
                         siblingAssetCount = installable.size,

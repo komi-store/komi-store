@@ -6,8 +6,12 @@ import zed.rainxch.core.domain.utils.resolveExternalInstallVerdict
 
 fun InstalledApp.confirmInstall(
     tag: String,
-    assetName: String,
-    assetUrl: String,
+    releaseId: Long? = null,
+    assetId: Long? = null,
+    assetDigest: String? = null,
+    // Unknown must be null, never "": "" never equals a real asset name.
+    assetName: String?,
+    assetUrl: String?,
     versionName: String,
     versionCode: Long,
     signingFingerprint: String?,
@@ -39,6 +43,10 @@ fun InstalledApp.confirmInstall(
         installedAssetUrl = assetUrl,
         installedVersionName = versionName,
         installedVersionCode = versionCode,
+        // From the install parameters, never from the latest* snapshot columns.
+        installedReleaseId = releaseId ?: installedReleaseId,
+        installedAssetId = assetId ?: installedAssetId,
+        installedAssetDigest = assetDigest ?: installedAssetDigest,
         isUpdateAvailable =
             when {
                 latestIsSkipped -> false
@@ -76,6 +84,9 @@ fun InstalledApp.resolvePendingFromSystem(
         installedVersion = adoptedTag,
         installedVersionName = versionName,
         installedVersionCode = versionCode,
+        installedReleaseId = installedReleaseId.takeIf { targetCode <= 0L || installReachedTarget },
+        installedAssetId = installedAssetId.takeIf { targetCode <= 0L || installReachedTarget },
+        installedAssetDigest = installedAssetDigest.takeIf { targetCode <= 0L || installReachedTarget },
         isUpdateAvailable = updateFlagAgainstSnapshot(versionCode, versionName ?: adoptedTag),
     )
 }
@@ -136,20 +147,78 @@ fun InstalledApp.tagForObservedBuild(
     return if (codeProvesSnapshot || nameProvesSnapshot) snapshotTag else installedVersion
 }
 
+sealed interface BindingStatus {
+    data object Intact : BindingStatus
+
+    data class Broken(val reason: BreakReason) : BindingStatus
+
+    enum class BreakReason {
+        PACKAGE_NAME,
+
+        VERSION_CODE,
+
+        VERSION_NAME,
+
+        SIGNING_FINGERPRINT,
+    }
+}
+
+fun InstalledApp.bindingStatusAgainst(local: SystemPackageInfo): BindingStatus {
+    if (local.packageName != packageName) {
+        return BindingStatus.Broken(BindingStatus.BreakReason.PACKAGE_NAME)
+    }
+
+    if (local.versionCode > 0L &&
+        installedVersionCode > 0L &&
+        local.versionCode != installedVersionCode
+    ) {
+        return BindingStatus.Broken(BindingStatus.BreakReason.VERSION_CODE)
+    }
+
+    if (local.versionName.isNotBlank() &&
+        !installedVersionName.isNullOrBlank() &&
+        local.versionName != installedVersionName
+    ) {
+        return BindingStatus.Broken(BindingStatus.BreakReason.VERSION_NAME)
+    }
+
+    // The one criterion the version fields cannot express: a different signer is a different build.
+    val localSign = local.signingFingerprint
+    if (!localSign.isNullOrBlank() &&
+        !signingFingerprint.isNullOrBlank() &&
+        !localSign.equals(signingFingerprint, ignoreCase = true)
+    ) {
+        return BindingStatus.Broken(BindingStatus.BreakReason.SIGNING_FINGERPRINT)
+    }
+
+    return BindingStatus.Intact
+}
+
+// Not our release, and which one it is is unknown.
 fun InstalledApp.observeExternalInstall(
     versionName: String?,
     versionCode: Long,
+    signingFingerprint: String? = null,
 ): InstalledApp {
     val adoptedTag = tagForObservedBuild(versionName, versionCode)
     return copy(
         installedVersion = adoptedTag,
         installedVersionName = versionName,
         installedVersionCode = versionCode,
+        signingFingerprint = signingFingerprint ?: this.signingFingerprint,
+        installedReleaseId = null,
+        installedAssetId = null,
+        installedAssetDigest = null,
         isUpdateAvailable = updateFlagAgainstSnapshot(versionCode, versionName ?: adoptedTag),
     )
 }
 
-fun InstalledApp.markPending(): InstalledApp = copy(isPendingInstall = true)
+fun InstalledApp.markPending(): InstalledApp = copy(
+    isPendingInstall = true,
+    installedReleaseId = null,
+    installedAssetId = null,
+    installedAssetDigest = null,
+)
 
 fun InstalledApp.clearPending(): InstalledApp = copy(isPendingInstall = false)
 
