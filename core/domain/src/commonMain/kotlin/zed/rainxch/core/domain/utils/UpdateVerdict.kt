@@ -4,6 +4,7 @@ object UpdateVerdict {
     data class Installed(
         val tag: String?,
         val versionCode: Long,
+        val versionName: String? = null,
     )
 
     data class Stored(
@@ -100,9 +101,16 @@ object UpdateVerdict {
                 false
             }
 
+        // What the device reports as its own version is exact evidence, unlike the stored tag:
+        // an external install leaves the tag stale until the release window is refreshed, and
+        // comparing that stale tag reports an update the device has already taken.
+        val deviceRunsMatchedRelease =
+            VersionMath.isExactSameVersion(installed.versionName, matched.tag)
+
         val isUpdateAvailable =
             when {
                 skipHolds -> false
+                deviceRunsMatchedRelease -> false
                 usedTimestampLogic -> timestampWouldReport
                 codesAlreadyMatch -> false
                 !reconcilable -> false

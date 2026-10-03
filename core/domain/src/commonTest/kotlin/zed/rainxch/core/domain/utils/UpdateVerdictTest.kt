@@ -8,6 +8,7 @@ class UpdateVerdictTest {
     private fun decide(
         installedTag: String = "1.0.0",
         installedVersionCode: Long = 100L,
+        installedVersionName: String? = null,
         storedLatestTag: String? = null,
         storedLatestVersionCode: Long? = null,
         storedPublishedAt: String? = null,
@@ -26,7 +27,7 @@ class UpdateVerdictTest {
         matchedAssetId: Long? = null,
     ): UpdateVerdict.Result =
         UpdateVerdict.decide(
-            installed = UpdateVerdict.Installed(installedTag, installedVersionCode),
+            installed = UpdateVerdict.Installed(installedTag, installedVersionCode, installedVersionName),
             stored =
                 UpdateVerdict.Stored(
                     latestTag = storedLatestTag,
@@ -50,6 +51,98 @@ class UpdateVerdictTest {
                 ),
             skippedTag = skippedTag,
         )
+
+    // com.yunx.app: v1.2.8 was offered, the install was blocked for want of installer
+    // authorisation, and it was installed another way. The device then reported 1.2.8 while the
+    // stored tag stayed at 1.2.6, so the verdict kept comparing that stale tag and reported an
+    // update the device had already taken — until the app was downloaded again through the store.
+    @Test
+    fun a_release_the_device_already_runs_is_not_an_update() {
+        val result =
+            decide(
+                installedTag = "1.2.6",
+                installedVersionCode = 12L,
+                installedVersionName = "1.2.8",
+                storedLatestTag = "v1.2.8",
+                matchedTag = "v1.2.8",
+                matchedPublishedAt = "2026-10-03T11:38:10Z",
+            )
+        assertFalse(result.isUpdateAvailable)
+    }
+
+    @Test
+    fun a_release_the_device_already_runs_is_not_an_update_for_a_prerelease_too() {
+        val result =
+            decide(
+                installedTag = "3.26.16-beta.42",
+                installedVersionCode = 18503L,
+                installedVersionName = "3.26.16-beta.44",
+                storedLatestTag = "3.26.16-beta.44",
+                matchedTag = "3.26.16-beta.44",
+                matchedPublishedAt = "2026-10-02T17:31:28Z",
+                matchedIsPrerelease = true,
+            )
+        assertFalse(result.isUpdateAvailable)
+    }
+
+    @Test
+    fun a_version_the_device_does_not_report_is_still_an_update() {
+        val result =
+            decide(
+                installedTag = "1.2.6",
+                installedVersionCode = 10L,
+                installedVersionName = "1.2.6",
+                storedLatestTag = "v1.2.6",
+                matchedTag = "v1.2.8",
+                matchedPublishedAt = "2026-10-03T11:38:10Z",
+            )
+        assertTrue(result.isUpdateAvailable)
+    }
+
+    // The evidence has to be exact, not merely equal after normalisation: "1.2.8.0" and "1.2.8"
+    // normalise alike, and treating that as proof would swallow a real update.
+    @Test
+    fun a_name_that_only_normalises_to_the_matched_tag_is_not_evidence() {
+        val result =
+            decide(
+                installedTag = "1.2.7",
+                installedVersionCode = 100L,
+                installedVersionName = "1.2.8.0",
+                storedLatestTag = "v1.2.7",
+                matchedTag = "v1.2.8",
+                matchedPublishedAt = "2026-10-03T11:38:10Z",
+            )
+        assertTrue(result.isUpdateAvailable)
+    }
+
+    // A "v" prefix is not a difference, so a device reporting "v1.2.8" is on release "v1.2.8".
+    @Test
+    fun a_leading_v_does_not_hide_that_the_device_runs_the_matched_release() {
+        val result =
+            decide(
+                installedTag = "1.2.6",
+                installedVersionCode = 12L,
+                installedVersionName = "v1.2.8",
+                storedLatestTag = "v1.2.8",
+                matchedTag = "v1.2.8",
+                matchedPublishedAt = "2026-10-03T11:38:10Z",
+            )
+        assertFalse(result.isUpdateAvailable)
+    }
+
+    @Test
+    fun without_a_reported_name_the_tag_is_still_the_baseline() {
+        val result =
+            decide(
+                installedTag = "1.2.6",
+                installedVersionCode = 12L,
+                installedVersionName = null,
+                storedLatestTag = "v1.2.8",
+                matchedTag = "v1.2.8",
+                matchedPublishedAt = "2026-10-03T11:38:10Z",
+            )
+        assertTrue(result.isUpdateAvailable)
+    }
 
     @Test
     fun semver_newer_reports_update() {
