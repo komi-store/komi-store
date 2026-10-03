@@ -35,6 +35,7 @@ import zed.rainxch.core.domain.model.smart_detect.MatchingPreview
 import zed.rainxch.core.domain.repository.InstalledAppsRepository
 import zed.rainxch.core.domain.system.Installer
 import zed.rainxch.core.domain.utils.AssetFilter
+import zed.rainxch.core.domain.utils.AssetOwnership
 import zed.rainxch.core.domain.utils.AssetVariant
 import zed.rainxch.core.domain.utils.UpdateVerdict
 import zed.rainxch.core.domain.utils.VersionMath
@@ -181,8 +182,15 @@ class InstalledAppsRepositoryImpl(
         pickedSiblingCount: Int?,
         trackedPackageName: String,
         installedAssetName: String?,
+        repoApps: List<InstalledApp>,
     ): ResolvedRelease? {
         if (releases.isEmpty()) return null
+
+        fun ownedBySibling(asset: GithubAsset, releaseAssets: List<GithubAsset>): Boolean {
+            if (repoApps.size < 2) return false
+            val owner = AssetOwnership.ownerOf(asset.name, repoApps, releaseAssets, releases)
+            return owner != null && owner.packageName != trackedPackageName
+        }
 
         val candidates =
             if (filter != null && !fallbackToOlderReleases) {
@@ -200,21 +208,24 @@ class InstalledAppsRepositoryImpl(
             val installableForPlatform =
                 release.assets.filter { installer.isAssetInstallable(it.name) }
             val installableForApp =
-                if (filter == null) installableForPlatform
-                else installableForPlatform.filter { filter.matches(it.name) }
+                (
+                    if (filter == null) installableForPlatform
+                    else installableForPlatform.filter { filter.matches(it.name) }
+                ).filterNot { ownedBySibling(it, installableForPlatform) }
 
             if (installableForApp.isEmpty()) continue
 
+            val sameApp = AssetOwnership.narrowToApp(installableForApp, installedAssetName)
             val fingerprintMatch =
                 AssetVariant.resolvePreferredAsset(
-                    assets = installableForApp,
+                    assets = sameApp,
                     pinnedVariant = preferredVariant,
                     pinnedTokens = preferredTokens.takeIf { it.isNotEmpty() },
                     pinnedGlob = preferredGlob,
                 )
 
             val positionMatch =
-                if (fingerprintMatch == null && hasAnyPin) {
+                if (fingerprintMatch == null && hasAnyPin && sameApp.size == installableForApp.size) {
                     AssetVariant.resolveBySamePosition(
                         assets = installableForApp,
                         originalIndex = pickedIndex,
@@ -224,25 +235,11 @@ class InstalledAppsRepositoryImpl(
                     null
                 }
 
-            val installedStem =
-                installedAssetName
-                    ?.let { AssetVariant.extractBaseStem(it) }
-                    ?.takeIf { it.isNotEmpty() }
             val autoPickPool =
-                AssetVariant
-                    .filterByPackageFlavor(installableForApp, trackedPackageName)
-                    .let { pool ->
-                        if (installedStem == null) {
-                            pool
-                        } else {
-                            val matching =
-                                pool.filter {
-                                    AssetVariant.extractBaseStem(it.name) == installedStem
-                                }
-
-                            matching.ifEmpty { pool }
-                        }
-                    }
+                AssetOwnership.narrowToApp(
+                    AssetVariant.filterByPackageFlavor(installableForApp, trackedPackageName),
+                    installedAssetName,
+                )
             val primary = fingerprintMatch
                 ?: positionMatch
                 ?: installer.choosePrimaryAsset(autoPickPool)
@@ -329,6 +326,7 @@ class InstalledAppsRepositoryImpl(
                 pickedSiblingCount = app.pickedAssetSiblingCount,
                 trackedPackageName = app.packageName,
                 installedAssetName = app.installedAssetName,
+                repoApps = installedAppsDao.getAppsByRepoId(app.repoId).map { it.toDomain() },
             )
 
             if (resolved == null) {

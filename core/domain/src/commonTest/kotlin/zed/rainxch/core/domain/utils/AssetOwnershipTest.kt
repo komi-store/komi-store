@@ -220,6 +220,20 @@ class AssetOwnershipTest {
     }
 
     @Test
+    fun pinnedTokensResolveWithinTheAppsOwnFamily() {
+        val pinned = setOf("stable")
+        assertEquals(
+            "Godot_v4.7.2-stable_android_debug.perfetto.apk",
+            AssetVariant.resolvePreferredAsset(godot472, null, pinned)?.name,
+        )
+        val sameApp = AssetOwnership.narrowToApp(godot472, godotV4.installedAssetName)
+        assertEquals(
+            "Godot_v4.7.2-stable_android_editor.apk",
+            AssetVariant.resolvePreferredAsset(sameApp, null, pinned)?.name,
+        )
+    }
+
+    @Test
     fun emptyStemsNeverMatch() {
         assertFalse(AssetOwnership.isSameApp("arm64-v8a.apk", "x86.apk"))
         assertFalse(AssetOwnership.isSameApp("1.2.3.apk", "2.0.0.apk"))
