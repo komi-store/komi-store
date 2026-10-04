@@ -264,19 +264,6 @@ class InstalledAppsRepositoryImpl(
         return null
     }
 
-    private suspend fun recordTransientFailure(
-        installedTag: String?,
-        storedLatestTag: String?,
-        packageName: String,
-    ) {
-        val now = System.currentTimeMillis()
-        if (VersionMath.shouldRetainSnapshotBaseline(installedTag, storedLatestTag)) {
-            installedAppsDao.updateLastChecked(packageName, now)
-        } else {
-            installedAppsDao.clearUpdateMetadata(packageName, now)
-        }
-    }
-
     private suspend fun recordUnmatchedRelease(packageName: String) {
         installedAppsDao.clearUpdateFlagKeepBaseline(packageName, System.currentTimeMillis())
     }
@@ -311,9 +298,12 @@ class InstalledAppsRepositoryImpl(
                     sourceHost = app.sourceHost,
                 )
 
+            // An empty window is a failed fetch (backend error, rate limit, network), not
+            // proof the repo lost its releases. Keep what the last good check found and
+            // leave lastCheckedAt alone so the next check retries.
             if (releases.isEmpty()) {
-                recordTransientFailure(app.installedVersion, app.latestVersion, packageName)
-                return false
+                Logger.d { "No releases for ${app.appName} this time; keeping its stored update state" }
+                return app.isUpdateAvailable
             }
 
             val compiledFilter =

@@ -315,9 +315,14 @@ fun AppHeader(
                 val selectedIndex =
                     switcherApps.indexOfFirst { it.packageName == installedApp?.packageName }
                 val rowState = rememberLazyListState()
-                LaunchedEffect(selectedIndex) {
-                    if (selectedIndex < 0) return@LaunchedEffect
-                    val target = firstChipIndex + selectedIndex
+                val targetIndex = when {
+                    showAppLabel -> 0
+                    selectedIndex >= 0 -> firstChipIndex + selectedIndex
+                    else -> -1
+                }
+                LaunchedEffect(targetIndex) {
+                    if (targetIndex < 0) return@LaunchedEffect
+                    val target = targetIndex
                     val layout = snapshotFlow { rowState.layoutInfo }
                         .first { it.visibleItemsInfo.isNotEmpty() }
                     val item = layout.visibleItemsInfo.firstOrNull { it.index == target }

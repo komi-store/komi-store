@@ -144,14 +144,6 @@ object VersionMath {
         return hasHexTailAfterNumericPrefix(normalizeVersion(version))
     }
 
-    fun shouldRetainSnapshotBaseline(
-        installedTag: String?,
-        storedLatestTag: String?,
-    ): Boolean =
-        isTimestampTrackedTag(storedLatestTag) ||
-            isTimestampTrackedTag(installedTag) ||
-            !versionsReconcilable(installedTag, storedLatestTag)
-
     internal fun parsePublishedAtToInstant(raw: String?): Instant? {
         val trimmed = raw?.trim().orEmpty()
         if (trimmed.isEmpty()) return null

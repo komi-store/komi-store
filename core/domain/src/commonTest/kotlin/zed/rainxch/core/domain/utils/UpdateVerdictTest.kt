@@ -493,29 +493,6 @@ class UpdateVerdictTest {
     }
 
     @Test
-    fun snapshot_baseline_survives_when_only_the_installed_side_is_timestamp_tracked() {
-        assertFalse(VersionMath.isTimestampTrackedTag("1.1.0-beta.2"))
-        assertFalse(VersionMath.isTimestampTrackedTag("1.0.0-abc1234"))
-
-        assertTrue(
-            VersionMath.shouldRetainSnapshotBaseline(
-                installedTag = "1.0.0-abc1234",
-                storedLatestTag = "1.1.0-beta.2",
-            ),
-        )
-    }
-
-    @Test
-    fun snapshot_baseline_is_cleared_for_a_plain_comparable_pair() {
-        assertFalse(
-            VersionMath.shouldRetainSnapshotBaseline(
-                installedTag = "1.0.0",
-                storedLatestTag = "1.1.0",
-            ),
-        )
-    }
-
-    @Test
     fun a_rebuilt_nightly_is_reported_from_its_release_identity_alone() {
         val result =
             decide(
