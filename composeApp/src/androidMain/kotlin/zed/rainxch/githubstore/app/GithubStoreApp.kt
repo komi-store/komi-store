@@ -14,6 +14,7 @@ import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
 import org.koin.android.ext.koin.androidContext
 import zed.rainxch.core.data.local.db.dao.ExternalLinkDao
+import zed.rainxch.core.data.network.BackgroundRequest
 import zed.rainxch.core.data.network.ProxyManager
 import zed.rainxch.core.data.services.DownloadNotificationObserver
 import zed.rainxch.core.data.services.PackageEventReceiver
@@ -97,7 +98,7 @@ class GithubStoreApp : Application() {
     }
 
     private fun scheduleSigningSeedSync() {
-        appScope.launch {
+        appScope.launch(BackgroundRequest()) {
             runCatching {
                 get<ExternalImportRepository>().syncSigningFingerprintSeed()
             }.onFailure {

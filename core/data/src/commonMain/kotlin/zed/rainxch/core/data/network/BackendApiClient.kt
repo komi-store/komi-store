@@ -80,6 +80,7 @@ class BackendApiClient(
                 connectTimeoutMillis = 3_000
                 socketTimeoutMillis = 5_000
             }
+            install(BackgroundRequestMarker)
             install(io.ktor.client.plugins.observer.ResponseObserver) {
                 onResponse { response ->
                     BackendRateLimitTracker.record(response)

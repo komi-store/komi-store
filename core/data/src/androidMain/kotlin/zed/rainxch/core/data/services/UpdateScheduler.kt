@@ -7,7 +7,6 @@ import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.ExistingWorkPolicy
 import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.OutOfQuotaPolicy
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import co.touchlab.kermit.Logger
@@ -46,21 +45,7 @@ object UpdateScheduler {
                 request = request,
             )
 
-        val immediateRequest =
-            OneTimeWorkRequestBuilder<UpdateCheckWorker>()
-                .setConstraints(constraints)
-                .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
-                .build()
-
-        WorkManager
-            .getInstance(context)
-            .enqueueUniqueWork(
-                IMMEDIATE_CHECK_WORK_NAME,
-                ExistingWorkPolicy.REPLACE,
-                immediateRequest,
-            )
-
-        Logger.i { "UpdateScheduler: Scheduled periodic update check every ${intervalHours}h + immediate check" }
+        Logger.i { "UpdateScheduler: Scheduled periodic update check every ${intervalHours}h" }
     }
 
     fun reschedule(

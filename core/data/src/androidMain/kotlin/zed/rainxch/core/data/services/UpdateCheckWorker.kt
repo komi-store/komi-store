@@ -16,9 +16,11 @@ import androidx.work.ForegroundInfo
 import androidx.work.WorkerParameters
 import co.touchlab.kermit.Logger
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import zed.rainxch.core.data.local.db.dao.ExternalLinkDao
+import zed.rainxch.core.data.network.BackgroundRequest
 import zed.rainxch.core.domain.model.installation.InstallerType
 import zed.rainxch.core.domain.repository.ExternalImportRepository
 import zed.rainxch.core.domain.repository.InstalledAppsRepository
@@ -38,7 +40,9 @@ class UpdateCheckWorker(
     private val externalLinkDao: ExternalLinkDao by inject()
     private val packageMonitor: PackageMonitor by inject()
 
-    override suspend fun doWork(): Result =
+    override suspend fun doWork(): Result = withContext(BackgroundRequest()) { runCheck() }
+
+    private suspend fun runCheck(): Result =
         try {
             Logger.i { "UpdateCheckWorker: Starting periodic update check" }
 

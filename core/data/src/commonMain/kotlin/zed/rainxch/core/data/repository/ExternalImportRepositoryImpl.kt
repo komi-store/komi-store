@@ -581,7 +581,10 @@ class ExternalImportRepositoryImpl(
     }
 
     override suspend fun syncSigningFingerprintSeed() {
+        val lastSyncedAt = runCatching { ksafe.safeGet<Long?>(K_SIGNING_SEED_SYNCED_AT, null) }.getOrNull()
+        if (lastSyncedAt != null && nowMillis() - lastSyncedAt < SIGNING_SEED_SYNC_INTERVAL_MS) return
         var rowsAdded = 0
+        var fetched = false
         try {
             val lastObservedAt = runCatching { signingFingerprintDao.lastSyncTimestamp() }
                 .getOrNull()
@@ -598,6 +601,7 @@ class ExternalImportRepositoryImpl(
                     Logger.w(error) { "signing-seeds fetch failed on page $pages; aborting" }
                     break@paging
                 }
+                fetched = true
                 val rows = response.rows.map { row ->
                     SigningFingerprintEntity(
                         fingerprint = row.fingerprint,
@@ -622,6 +626,7 @@ class ExternalImportRepositoryImpl(
         } catch (e: Exception) {
             Logger.w(e) { "signing-seeds sync aborted" }
         }
+        if (fetched) ksafe.safePut(K_SIGNING_SEED_SYNCED_AT, nowMillis())
     }
 
     override suspend fun pruneExpiredSkips() {
@@ -739,6 +744,8 @@ class ExternalImportRepositoryImpl(
 
     companion object {
         private const val K_INITIAL_SCAN_AT = "external_import_initial_scan_at"
+        private const val K_SIGNING_SEED_SYNCED_AT = "signing_seed_synced_at"
+        private const val SIGNING_SEED_SYNC_INTERVAL_MS = 24 * 60 * 60 * 1000L
         private const val SKIP_TTL_MILLIS: Long = 7L * 24 * 60 * 60 * 1000
 
         private const val FORGEJO_SEARCH_MAX_HOSTS = 5

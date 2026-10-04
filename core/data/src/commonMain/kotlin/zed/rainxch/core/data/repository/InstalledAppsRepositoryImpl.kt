@@ -12,6 +12,8 @@ import kotlin.coroutines.cancellation.CancellationException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import zed.rainxch.core.data.dto.ReleaseNetwork
 import zed.rainxch.core.data.local.db.AppDatabase
 import zed.rainxch.core.data.local.db.dao.InstalledAppDao
@@ -49,6 +51,8 @@ class InstalledAppsRepositoryImpl(
     private val backendApiClient: zed.rainxch.core.data.network.BackendApiClient,
     private val forgejoClientRegistry: zed.rainxch.core.data.network.ForgejoClientRegistry,
 ) : InstalledAppsRepository {
+    private val checkAllMutex = Mutex()
+
 
     private val httpClient: HttpClient get() = clientProvider.client
 
@@ -441,15 +445,23 @@ class InstalledAppsRepositoryImpl(
     }
 
     override suspend fun checkAllForUpdates() {
-        val apps = installedAppsDao.getAllInstalledApps().first()
-        apps.forEach { app ->
-            if (app.updateCheckEnabled) {
-                try {
-                    checkForUpdates(app.packageName)
-                } catch (e: CancellationException) {
-                    throw e
-                } catch (e: Exception) {
-                    Logger.w { "Failed to check updates for ${app.packageName}: ${e.message}" }
+        // App start, Library and the background worker can ask at once; a run already in
+        // flight answers all of them.
+        if (checkAllMutex.isLocked) {
+            checkAllMutex.withLock { }
+            return
+        }
+        checkAllMutex.withLock {
+            val apps = installedAppsDao.getAllInstalledApps().first()
+            apps.forEach { app ->
+                if (app.updateCheckEnabled) {
+                    try {
+                        checkForUpdates(app.packageName)
+                    } catch (e: CancellationException) {
+                        throw e
+                    } catch (e: Exception) {
+                        Logger.w { "Failed to check updates for ${app.packageName}: ${e.message}" }
+                    }
                 }
             }
         }

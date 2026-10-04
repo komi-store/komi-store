@@ -16,8 +16,10 @@ import androidx.work.ForegroundInfo
 import androidx.work.WorkerParameters
 import co.touchlab.kermit.Logger
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import zed.rainxch.core.data.network.BackgroundRequest
 import zed.rainxch.core.data.services.dhizuku.DhizukuServiceManager
 import zed.rainxch.core.data.services.dhizuku.model.DhizukuStatus
 import zed.rainxch.core.data.services.root.RootServiceManager
@@ -48,7 +50,9 @@ class AutoUpdateWorker(
     private val rootServiceManager: RootServiceManager by inject()
     private val systemInstallSerializer: SystemInstallSerializer by inject()
 
-    override suspend fun doWork(): Result {
+    override suspend fun doWork(): Result = withContext(BackgroundRequest()) { runAutoUpdate() }
+
+    private suspend fun runAutoUpdate(): Result {
         return try {
             Logger.i { "AutoUpdateWorker: Starting auto-update" }
 

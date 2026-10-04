@@ -262,12 +262,19 @@ class AppsViewModel(
 
     private fun autoCheckForUpdatesIfNeeded() {
         val now = System.currentTimeMillis()
-        if (now - lastAutoCheckTimestamp < UPDATE_CHECK_COOLDOWN_MS) {
-            logger.debug("Skipping auto-check: last check was ${(now - lastAutoCheckTimestamp) / 1000}s ago")
+        val lastCheck = maxOf(lastAutoCheckTimestamp, oldestTrackedCheck())
+        if (now - lastCheck < UPDATE_CHECK_COOLDOWN_MS) {
+            logger.debug("Skipping auto-check: last check was ${(now - lastCheck) / 1000}s ago")
             return
         }
         checkAllForUpdates()
     }
+
+    private fun oldestTrackedCheck(): Long =
+        _state.value.apps
+            .map { it.installedApp }
+            .filter { it.updateCheckEnabled }
+            .minOfOrNull { it.lastCheckedAt } ?: 0L
 
     private fun checkAllForUpdates() {
         viewModelScope.launch {
