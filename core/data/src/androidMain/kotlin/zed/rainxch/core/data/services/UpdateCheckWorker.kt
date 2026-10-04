@@ -46,7 +46,7 @@ class UpdateCheckWorker(
         try {
             Logger.i { "UpdateCheckWorker: Starting periodic update check" }
 
-            setForeground(createForegroundInfo("Checking for updates..."))
+            setForegroundIfAllowed(createForegroundInfo("Checking for updates..."))
 
             val syncResult = syncInstalledAppsUseCase()
             if (syncResult.isFailure) {

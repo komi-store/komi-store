@@ -13,7 +13,7 @@ import co.touchlab.kermit.Logger
 import java.util.concurrent.TimeUnit
 
 object UpdateScheduler {
-    private const val DEFAULT_INTERVAL_HOURS = 6L
+    private const val DEFAULT_INTERVAL_HOURS = 12L
     private const val IMMEDIATE_CHECK_WORK_NAME = "github_store_immediate_update_check"
 
     fun schedule(
@@ -41,7 +41,7 @@ object UpdateScheduler {
             .getInstance(context)
             .enqueueUniquePeriodicWork(
                 uniqueWorkName = UpdateCheckWorker.WORK_NAME,
-                existingPeriodicWorkPolicy = ExistingPeriodicWorkPolicy.KEEP,
+                existingPeriodicWorkPolicy = ExistingPeriodicWorkPolicy.UPDATE,
                 request = request,
             )
 

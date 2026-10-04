@@ -88,13 +88,13 @@ class AutoUpdateWorker(
                 return Result.success()
             }
 
-            setForeground(createForegroundInfo("Updating apps...", 0, appsWithUpdates.size))
+            setForegroundIfAllowed(createForegroundInfo("Updating apps...", 0, appsWithUpdates.size))
 
             val successfulApps = mutableListOf<String>()
             val failedApps = mutableListOf<String>()
 
             appsWithUpdates.forEachIndexed { index, app ->
-                setForeground(
+                setForegroundIfAllowed(
                     createForegroundInfo(
                         "Updating ${app.appName}...",
                         index + 1,

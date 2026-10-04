@@ -25,7 +25,17 @@ class BootReceiver : BroadcastReceiver() {
                 }
             if (enabled) {
                 Logger.i { "BootReceiver: Device booted, scheduling update checks" }
-                UpdateScheduler.schedule(context)
+                val intervalHours =
+                    runCatching {
+                        runBlocking {
+                            GlobalContext.get().get<TweaksRepository>().getUpdateCheckInterval().first()
+                        }
+                    }.getOrNull()
+                if (intervalHours != null) {
+                    UpdateScheduler.schedule(context, intervalHours)
+                } else {
+                    UpdateScheduler.schedule(context)
+                }
             } else {
                 Logger.i { "BootReceiver: Device booted, update check disabled — skipping" }
                 UpdateScheduler.cancel(context)

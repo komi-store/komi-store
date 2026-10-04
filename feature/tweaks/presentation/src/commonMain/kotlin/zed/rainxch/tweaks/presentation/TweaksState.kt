@@ -49,7 +49,7 @@ data class TweaksState(
     val rootAvailability: RootAvailability = RootAvailability.UNAVAILABLE,
     val autoUpdateEnabled: Boolean = false,
     val updateCheckEnabled: Boolean = true,
-    val updateCheckIntervalHours: Long = 6L,
+    val updateCheckIntervalHours: Long = 12L,
     val includePreReleases: Boolean = false,
     val isHideSeenEnabled: Boolean = false,
     val isScrollbarEnabled: Boolean = false,

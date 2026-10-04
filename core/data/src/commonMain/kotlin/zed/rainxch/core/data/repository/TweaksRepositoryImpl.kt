@@ -467,7 +467,7 @@ class TweaksRepositoryImpl(
     }
 
     companion object {
-        private const val DEFAULT_UPDATE_CHECK_INTERVAL_HOURS = 6L
+        private const val DEFAULT_UPDATE_CHECK_INTERVAL_HOURS = 12L
         private const val MIGRATION_MARKER = "__migrated_from_datastore_v1__"
 
         private const val K_THEME = "app_theme"
