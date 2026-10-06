@@ -1032,6 +1032,8 @@
     <string name="adaptive_pick_repo_subtitle">Dotknij dowolnej karty po lewej, aby zobaczyć jej szczegóły tutaj.</string>
     <string name="adaptive_pick_repo_title">Wybierz repozytorium</string>
     <string name="apps_section_pending_installs">Gotowe do instalacji</string>
+    <string name="apps_section_in_progress">W toku</string>
+    <string name="download_failed">Pobieranie nie powiodło się</string>
     <string name="apps_updates_banner_hide">Ukryj listę</string>
     <string name="apps_updates_banner_show">Zobacz listę</string>
     <string name="apps_updates_banner_subtitle">Przejrzyj lub zaktualizuj wszystko naraz.</string>

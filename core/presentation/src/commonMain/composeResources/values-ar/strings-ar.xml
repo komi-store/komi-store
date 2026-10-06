@@ -1054,6 +1054,8 @@
     <string name="adaptive_pick_repo_subtitle">انقر على أي بطاقة على اليسار لعرض تفاصيلها هنا.</string>
     <string name="adaptive_pick_repo_title">اختر مستودعاً</string>
     <string name="apps_section_pending_installs">جاهز للتثبيت</string>
+    <string name="apps_section_in_progress">قيد التنفيذ</string>
+    <string name="download_failed">فشل التنزيل</string>
     <string name="apps_updates_banner_hide">إخفاء القائمة</string>
     <string name="apps_updates_banner_show">عرض القائمة</string>
     <string name="apps_updates_banner_subtitle">راجع أو حدّث كل شيء دفعة واحدة.</string>

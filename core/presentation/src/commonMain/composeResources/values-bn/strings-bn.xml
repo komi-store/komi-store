@@ -1048,6 +1048,8 @@
     <string name="adaptive_pick_repo_subtitle">এখানে এর বিস্তারিত দেখতে বাঁদিকের যেকোনো কার্ডে আলতো চাপুন।</string>
     <string name="adaptive_pick_repo_title">একটি রিপোজিটরি বেছে নিন</string>
     <string name="apps_section_pending_installs">ইনস্টলের জন্য প্রস্তুত</string>
+    <string name="apps_section_in_progress">চলছে</string>
+    <string name="download_failed">ডাউনলোড ব্যর্থ হয়েছে</string>
     <string name="apps_updates_banner_hide">তালিকা লুকান</string>
     <string name="apps_updates_banner_show">তালিকা দেখুন</string>
     <string name="apps_updates_banner_subtitle">পর্যালোচনা করুন বা একসাথে সব আপডেট করুন।</string>

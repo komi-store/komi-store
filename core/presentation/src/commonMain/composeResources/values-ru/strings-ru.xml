@@ -1032,6 +1032,8 @@
     <string name="adaptive_pick_repo_subtitle">Нажми на любую карточку слева, чтобы увидеть детали здесь.</string>
     <string name="adaptive_pick_repo_title">Выбери репозиторий</string>
     <string name="apps_section_pending_installs">Готово к установке</string>
+    <string name="apps_section_in_progress">В процессе</string>
+    <string name="download_failed">Ошибка загрузки</string>
     <string name="apps_updates_banner_hide">Скрыть список</string>
     <string name="apps_updates_banner_show">Показать список</string>
     <string name="apps_updates_banner_subtitle">Просмотри или обнови всё сразу.</string>

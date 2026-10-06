@@ -1046,6 +1046,8 @@
     <string name="adaptive_pick_repo_subtitle">यहाँ इसके विवरण देखने के लिए बाईं ओर किसी कार्ड पर टैप करें।</string>
     <string name="adaptive_pick_repo_title">एक रिपॉजिटरी चुनें</string>
     <string name="apps_section_pending_installs">इंस्टॉल के लिए तैयार</string>
+    <string name="apps_section_in_progress">जारी</string>
+    <string name="download_failed">डाउनलोड विफल रहा</string>
     <string name="apps_updates_banner_hide">सूची छिपाएँ</string>
     <string name="apps_updates_banner_show">सूची देखें</string>
     <string name="apps_updates_banner_subtitle">एक साथ सब कुछ देखें या अपडेट करें।</string>

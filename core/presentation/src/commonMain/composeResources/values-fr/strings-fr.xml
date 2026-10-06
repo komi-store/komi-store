@@ -1011,6 +1011,8 @@
     <string name="adaptive_pick_repo_subtitle">Touchez une carte à gauche pour voir ses détails ici.</string>
     <string name="adaptive_pick_repo_title">Choisissez un dépôt</string>
     <string name="apps_section_pending_installs">Prêt à installer</string>
+    <string name="apps_section_in_progress">En cours</string>
+    <string name="download_failed">Échec du téléchargement</string>
     <string name="apps_updates_banner_hide">Masquer la liste</string>
     <string name="apps_updates_banner_show">Voir la liste</string>
     <string name="apps_updates_banner_subtitle">Examinez ou mettez tout à jour d'un coup.</string>

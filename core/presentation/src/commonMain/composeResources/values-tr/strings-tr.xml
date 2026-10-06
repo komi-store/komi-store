@@ -1058,6 +1058,8 @@
     <string name="adaptive_pick_repo_subtitle">Ayrıntılarını burada görüntülemek için soldaki herhangi bir karta dokunun.</string>
     <string name="adaptive_pick_repo_title">Bir depo seçin</string>
     <string name="apps_section_pending_installs">Kurulmaya hazır</string>
+    <string name="apps_section_in_progress">Devam ediyor</string>
+    <string name="download_failed">İndirme başarısız</string>
     <string name="apps_updates_banner_hide">Listeyi gizle</string>
     <string name="apps_updates_banner_show">Listeyi gör</string>
     <string name="apps_updates_banner_subtitle">Tümünü tek seferde incele veya güncelle.</string>
