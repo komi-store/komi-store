@@ -28,6 +28,7 @@ class SlowDownloadDetectorImpl(
     private val mutex = Mutex()
     private val samples: ArrayDeque<Pair<Long, Long>> = ArrayDeque()
     private val recentSlowEvents: ArrayDeque<Long> = ArrayDeque()
+    private var lastEpisodeAtMs: Long? = null
 
     private val _suggestMirror = MutableSharedFlow<Unit>(
         replay = 0,
@@ -41,6 +42,7 @@ class SlowDownloadDetectorImpl(
         mutex.withLock {
             samples.clear()
             recentSlowEvents.clear()
+            lastEpisodeAtMs = null
         }
     }
 
@@ -66,6 +68,14 @@ class SlowDownloadDetectorImpl(
     }
 
     private suspend fun recordSlowEvent(timestampMs: Long) {
+        // The rolling sample window stays full for as long as a slow download keeps
+        // emitting progress, so onProgress reports the same slow stretch on every
+        // single sample. Count at most one episode per sustainedMs window, otherwise
+        // triggerCount is reached within milliseconds and the debounce does nothing.
+        val previous = lastEpisodeAtMs
+        if (previous != null && timestampMs - previous < sustainedMs) return
+        lastEpisodeAtMs = timestampMs
+
         recentSlowEvents.addLast(timestampMs)
         while (recentSlowEvents.isNotEmpty() && recentSlowEvents.first() < timestampMs - windowMs) {
             recentSlowEvents.removeFirst()
