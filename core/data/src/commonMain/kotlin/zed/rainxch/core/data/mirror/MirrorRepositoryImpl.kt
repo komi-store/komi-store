@@ -32,6 +32,7 @@ import zed.rainxch.core.domain.model.mirror.MirrorPreference
 import zed.rainxch.core.domain.model.mirror.MirrorStatus
 import zed.rainxch.core.domain.model.mirror.MirrorType
 import zed.rainxch.core.domain.model.mirror.TrafficKind
+import zed.rainxch.core.domain.network.MirrorLatencyProbe
 import zed.rainxch.core.domain.repository.MirrorRepository
 import zed.rainxch.core.data.secure.safeDelete
 import zed.rainxch.core.data.secure.safeGet
@@ -43,12 +44,14 @@ class MirrorRepositoryImpl(
     private val ksafe: KSafe,
     private val legacyDataStore: DataStore<Preferences>,
     private val apiClient: MirrorApiClient,
+    private val latencyProbe: MirrorLatencyProbe,
     appScope: CoroutineScope,
 ) : MirrorRepository {
     private val json = Json { ignoreUnknownKeys = true }
     private val cacheTtlMs = 60L * 60 * 1000
 
     private val _catalog = MutableStateFlow<List<MirrorConfig>>(emptyList())
+    private val _measuredLatencies = MutableStateFlow<Map<String, Int>>(emptyMap())
     private val _removedNotices = MutableSharedFlow<MirrorRemoved>(
         replay = 0,
         extraBufferCapacity = 4,
@@ -156,6 +159,15 @@ class MirrorRepositoryImpl(
             }
         }
     }
+
+    override fun observeMeasuredLatencies(): Flow<Map<String, Int>> = _measuredLatencies.asStateFlow()
+
+    override suspend fun measureLatencies(): Result<Map<String, Int>> =
+        runCatching {
+            val measured = latencyProbe.probe(_catalog.value)
+            _measuredLatencies.value = measured
+            measured
+        }
 
     override fun observeRemovedNotices(): Flow<MirrorRemoved> = _removedNotices.asSharedFlow()
 

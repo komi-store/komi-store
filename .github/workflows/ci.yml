@@ -1,0 +1,52 @@
+name: Verify
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  JAVA_VERSION: '21'
+  JAVA_DISTRIBUTION: 'temurin'
+
+jobs:
+  verify:
+    name: Lint + compile + unit tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Validate Gradle wrapper
+        uses: gradle/actions/wrapper-validation@v4
+
+      - name: Set up JDK ${{ env.JAVA_VERSION }}
+        uses: actions/setup-java@v4
+        with:
+          distribution: ${{ env.JAVA_DISTRIBUTION }}
+          java-version: ${{ env.JAVA_VERSION }}
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Install Android SDK 36
+        run: |
+          set -euo pipefail
+          sdkmanager="$(ls -d "$ANDROID_HOME"/cmdline-tools/*/bin/sdkmanager | head -n 1)"
+          yes | "$sdkmanager" --licenses > /dev/null || true
+          "$sdkmanager" "platform-tools" "platforms;android-36" "build-tools;36.0.0"
+
+      - name: Lint (ktlint)
+        run: ./gradlew ktlintCheck --console=plain
+
+      # Android lint is excluded: :composeApp:lintDebug already fails on main with
+      # a MissingClass error for androidx.work.impl.foreground.SystemForegroundService
+      # in composeApp/src/androidMain/AndroidManifest.xml. Re-enable once that is fixed.
+      - name: Compile and run unit tests
+        run: ./gradlew build --console=plain -x lint -x lintDebug -x lintRelease -x lintVitalRelease

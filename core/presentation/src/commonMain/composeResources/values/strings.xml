@@ -1021,6 +1021,15 @@
     <string name="mirror_section_official">Official</string>
     <string name="mirror_section_community">Community</string>
 
+    <!-- Mirror - Device-measured latency -->
+    <string name="mirror_auto_fastest">Auto (fastest)</string>
+    <string name="mirror_auto_fastest_sub">Pick the mirror with the lowest latency from this device</string>
+    <string name="mirror_measure_latency">Measure latency</string>
+    <string name="mirror_latency_local">%1$d ms from you</string>
+    <string name="mirror_fastest_badge">%1$s · fastest</string>
+    <string name="mirror_fastest_chosen">Switched to %1$s (%2$d ms).</string>
+    <string name="mirror_no_mirror_responded">No mirror answered. Check your connection and try again.</string>
+
     <!-- Mirror - Statuses -->
     <string name="mirror_status_ok">%1$dms</string>
     <string name="mirror_status_degraded">%1$dms</string>

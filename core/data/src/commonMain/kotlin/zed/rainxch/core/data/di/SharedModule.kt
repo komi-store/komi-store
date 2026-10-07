@@ -31,6 +31,7 @@ import zed.rainxch.core.data.local.db.dao.SigningFingerprintDao
 import zed.rainxch.core.data.local.db.dao.StarredRepoDao
 import zed.rainxch.core.data.local.db.dao.UpdateHistoryDao
 import zed.rainxch.core.data.logging.KermitLogger
+import zed.rainxch.core.data.mirror.MirrorLatencyProbeImpl
 import zed.rainxch.core.data.mirror.MirrorRepositoryImpl
 import zed.rainxch.core.data.network.BackendApiClient
 import zed.rainxch.core.data.network.BackendExternalMatchApi
@@ -63,6 +64,7 @@ import zed.rainxch.core.domain.logging.KomiStoreLogger
 import zed.rainxch.core.domain.model.system.Platform
 import zed.rainxch.core.domain.model.settings.ProxyConfig
 import zed.rainxch.core.domain.model.settings.ProxyScope
+import zed.rainxch.core.domain.network.MirrorLatencyProbe
 import zed.rainxch.core.domain.network.ProxyTester
 import zed.rainxch.core.domain.network.SlowDownloadDetector
 import zed.rainxch.core.domain.system.AppVersionInfo
@@ -188,12 +190,19 @@ val coreModule =
             )
         }
 
+        single<MirrorLatencyProbe> {
+            MirrorLatencyProbeImpl(
+                client = get(qualifier = named("test")),
+            )
+        }
+
         single<MirrorRepository> {
             val repo =
                 MirrorRepositoryImpl(
                     ksafe = get(qualifier = named("prefs")),
                     legacyDataStore = get(),
                     apiClient = get(),
+                    latencyProbe = get(),
                     appScope = get(),
                 )
             ProxyManager.startMirrorCollector(

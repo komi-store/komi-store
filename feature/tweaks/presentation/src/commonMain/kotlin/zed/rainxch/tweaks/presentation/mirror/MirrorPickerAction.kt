@@ -15,6 +15,10 @@ sealed interface MirrorPickerAction {
 
     data object OnCustomMirrorDismiss : MirrorPickerAction
 
+    data object OnMeasureLatencies : MirrorPickerAction
+
+    data object OnAutoPickFastest : MirrorPickerAction
+
     data object OnTestConnection : MirrorPickerAction
 
     data object OnRefreshCatalog : MirrorPickerAction

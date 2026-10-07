@@ -6,6 +6,8 @@ import zed.rainxch.core.domain.model.mirror.MirrorPreference
 
 data class MirrorPickerState(
     val mirrors: List<MirrorConfig> = emptyList(),
+    val measuredLatencies: Map<String, Int> = emptyMap(),
+    val isMeasuringLatencies: Boolean = false,
     val preference: MirrorPreference = MirrorPreference.Direct,
     val isCustomDialogVisible: Boolean = false,
     val customDraft: String = "",
