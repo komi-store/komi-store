@@ -19,6 +19,7 @@ import zed.rainxch.core.data.services.AndroidLocalizationManager
 import zed.rainxch.core.data.services.AndroidPackageMonitor
 import zed.rainxch.core.data.services.AndroidPendingInstallNotifier
 import zed.rainxch.core.data.services.AndroidUpdateScheduleManager
+import zed.rainxch.core.data.services.DownloadForegroundController
 import zed.rainxch.core.data.services.DownloadNotificationObserver
 import zed.rainxch.core.data.services.FileLocationsProvider
 import zed.rainxch.core.data.services.LocalizationManager
@@ -128,9 +129,16 @@ actual val corePlatformModule =
         }
 
         single {
+            DownloadForegroundController(
+                context = androidContext(),
+            )
+        }
+
+        single {
             DownloadNotificationObserver(
                 orchestrator = get<DownloadOrchestrator>(),
                 notifier = get<DownloadProgressNotifier>(),
+                foreground = get<DownloadForegroundController>(),
             )
         }
 

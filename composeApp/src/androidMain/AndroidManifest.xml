@@ -194,6 +194,17 @@
             </intent-filter>
         </receiver>
 
+        <!--
+            Guards user-initiated downloads against process reclaim (PR-2). Started/stopped by
+            DownloadNotificationObserver from the orchestrator's stage machine; an enhancement
+            only, never a prerequisite for the download itself.
+        -->
+        <service
+            android:name="zed.rainxch.core.data.services.DownloadForegroundService"
+            android:exported="false"
+            android:foregroundServiceType="dataSync"
+            android:stopWithTask="false" />
+
         <!-- WorkManager foreground service declaration for update workers -->
         <service
             android:name="androidx.work.impl.foreground.SystemForegroundService"

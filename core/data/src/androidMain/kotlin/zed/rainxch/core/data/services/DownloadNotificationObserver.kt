@@ -5,6 +5,7 @@ import co.touchlab.kermit.Logger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import zed.rainxch.core.data.download.ForegroundPrimary
 import zed.rainxch.core.domain.system.DownloadOrchestrator
 import zed.rainxch.core.domain.system.DownloadProgressNotifier
 import zed.rainxch.core.domain.system.DownloadStage
@@ -13,12 +14,15 @@ import zed.rainxch.core.domain.system.OrchestratedDownload
 class DownloadNotificationObserver(
     private val orchestrator: DownloadOrchestrator,
     private val notifier: DownloadProgressNotifier,
+    private val foreground: DownloadForegroundController,
 ) {
     @Volatile
     private var job: Job? = null
 
     private val lastStages = mutableMapOf<String, DownloadStage>()
     private val lastNotifiedAt = mutableMapOf<String, Long>()
+
+    private val activeSince = mutableMapOf<String, Long>()
 
     fun start(scope: CoroutineScope) {
         if (job?.isActive == true) return
@@ -46,6 +50,7 @@ class DownloadNotificationObserver(
             clearProgressSafely(pkg)
             lastStages.remove(pkg)
             lastNotifiedAt.remove(pkg)
+            activeSince.remove(pkg)
         }
 
         for ((pkg, entry) in snapshot) {
@@ -53,6 +58,9 @@ class DownloadNotificationObserver(
             val stageChanged = previous != entry.stage
             when (entry.stage) {
                 DownloadStage.Queued, DownloadStage.Downloading -> {
+                    if (previous != DownloadStage.Queued && previous != DownloadStage.Downloading) {
+                        activeSince[pkg] = SystemClock.uptimeMillis()
+                    }
                     val now = SystemClock.uptimeMillis()
                     val last = lastNotifiedAt[pkg] ?: 0L
                     val shouldPost =
@@ -86,10 +94,26 @@ class DownloadNotificationObserver(
                         clearProgressSafely(pkg)
                         lastNotifiedAt.remove(pkg)
                     }
+                    activeSince.remove(pkg)
                 }
             }
             lastStages[pkg] = entry.stage
         }
+
+        reconcileForeground(snapshot)
+    }
+
+    private fun reconcileForeground(snapshot: Map<String, OrchestratedDownload>) {
+        val active =
+            snapshot.filterValues {
+                it.stage == DownloadStage.Queued || it.stage == DownloadStage.Downloading
+            }
+        if (active.isEmpty()) {
+            foreground.stop()
+            return
+        }
+        val primaryPackage = ForegroundPrimary.choose(active.keys, activeSince)
+        foreground.ensureRunning(primary = primaryPackage?.let { active[it] })
     }
 
     private fun clearProgressSafely(pkg: String) {

@@ -16,6 +16,7 @@ import org.koin.android.ext.koin.androidContext
 import zed.rainxch.core.data.local.db.dao.ExternalLinkDao
 import zed.rainxch.core.data.network.BackgroundRequest
 import zed.rainxch.core.data.network.ProxyManager
+import zed.rainxch.core.data.services.DownloadNotificationFactory
 import zed.rainxch.core.data.services.DownloadNotificationObserver
 import zed.rainxch.core.data.services.PackageEventReceiver
 import zed.rainxch.core.data.services.UpdateScheduler
@@ -145,7 +146,9 @@ class GithubStoreApp : Application() {
 
         val downloadsChannel =
             NotificationChannel(
-                DOWNLOADS_CHANNEL_ID,
+                // The id the notifications are built with, so the channel cannot be registered
+                // under one name and posted to under another, which drops every one of them.
+                DownloadNotificationFactory.DOWNLOADS_CHANNEL_ID,
                 "Downloads",
                 NotificationManager.IMPORTANCE_LOW,
             ).apply {
@@ -342,6 +345,5 @@ class GithubStoreApp : Application() {
             "https://raw.githubusercontent.com/komi-store/komi-store/refs/heads/main/media-resources/app_icon.png"
         const val UPDATES_CHANNEL_ID = "app_updates"
         const val UPDATE_SERVICE_CHANNEL_ID = "update_service"
-        const val DOWNLOADS_CHANNEL_ID = "app_downloads"
     }
 }
