@@ -27,9 +27,6 @@ class AndroidDownloadProgressNotifier(
     ) {
         if (!hasNotificationPermission()) return
 
-        // The action and the data URI must both differ: with FLAG_UPDATE_CURRENT a shared
-        // identity collapses the two PendingIntents into one and both buttons do the same.
-        // Pause keeps the partial, delete erases it.
         val pauseIntent =
             Intent(context, DownloadCancelReceiver::class.java).apply {
                 action = DownloadCancelReceiver.ACTION_CANCEL

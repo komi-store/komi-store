@@ -11,8 +11,6 @@ import zed.rainxch.core.domain.system.DownloadOrchestrator
 
 class DownloadCancelReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
-        // Dispatch on the data URI: the two intents share a component and a package extra,
-        // and only the URI separates pause from delete.
         val dispatch =
             when (intent.data?.scheme) {
                 URI_SCHEME_DISCARD -> Dispatch.DELETE
