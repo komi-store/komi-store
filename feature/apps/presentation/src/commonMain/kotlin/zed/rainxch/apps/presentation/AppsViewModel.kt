@@ -1145,46 +1145,12 @@ class AppsViewModel(
                 try {
                     updateAppState(app.packageName, UpdateState.CheckingUpdate)
 
-                    val latestRelease =
-                        try {
-                            appsRepository.getLatestRelease(
-                                owner = app.repoOwner,
-                                repo = app.repoName,
-                                includePreReleases = app.includePreReleases,
-                                sourceHost = app.sourceHost,
-                            )
-                        } catch (e: CancellationException) {
-                            throw e
-                        } catch (e: Exception) {
-                            logger.error("Failed to fetch latest release: ${e.message}")
-                            throw IllegalStateException("Failed to fetch latest release: ${e.message}")
-                        }
+                    val resolution =
+                        installedAppsRepository.resolveTrackedRelease(app.packageName)
+                            ?: throw IllegalStateException("No release found for ${app.appName}")
 
-                    if (latestRelease == null) {
-                        throw IllegalStateException("No release found for ${app.appName}")
-                    }
-
-                    val installableAssets =
-                        latestRelease.assets.filter { asset ->
-                            installer.isAssetInstallable(asset.name)
-                        }
-
-                    if (installableAssets.isEmpty()) {
-                        throw IllegalStateException("No installable assets found for this platform")
-                    }
-
-                    val variantMatch =
-                        AssetVariant.resolvePreferredAsset(
-                            assets = installableAssets,
-                            pinnedVariant = app.preferredAssetVariant,
-                            pinnedTokens = AssetVariant.deserializeTokens(app.preferredAssetTokens),
-                            pinnedGlob = app.assetGlobPattern,
-                            releaseTag = latestRelease.tagName,
-                        )
-                    val primaryAsset =
-                        variantMatch
-                            ?: installer.choosePrimaryAsset(installableAssets)
-                            ?: throw IllegalStateException("Could not determine primary asset")
+                    val latestRelease = resolution.release
+                    val primaryAsset = resolution.primaryAsset
 
                     logger.debug(
                         "Update: ${app.appName} from ${app.installedVersion} to ${latestRelease.tagName}, " +

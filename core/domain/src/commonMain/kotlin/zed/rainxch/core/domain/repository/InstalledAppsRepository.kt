@@ -3,6 +3,7 @@ package zed.rainxch.core.domain.repository
 import kotlinx.coroutines.flow.Flow
 import zed.rainxch.core.domain.model.installation.InstalledApp
 import zed.rainxch.core.domain.model.smart_detect.MatchingPreview
+import zed.rainxch.core.domain.utils.ResolvedRelease
 
 interface InstalledAppsRepository {
     fun getAllInstalledApps(): Flow<List<InstalledApp>>
@@ -28,6 +29,8 @@ interface InstalledAppsRepository {
     suspend fun deleteInstalledApp(packageName: String)
 
     suspend fun checkForUpdates(packageName: String): Boolean
+
+    suspend fun resolveTrackedRelease(packageName: String): ResolvedRelease?
 
     suspend fun checkAllForUpdates()
 
