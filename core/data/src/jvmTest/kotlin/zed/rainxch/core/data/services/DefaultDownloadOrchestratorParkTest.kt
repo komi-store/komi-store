@@ -16,6 +16,7 @@ import zed.rainxch.core.domain.model.account.github.GithubAsset
 import zed.rainxch.core.domain.model.apk.ApkPackageInfo
 import zed.rainxch.core.domain.model.installation.DownloadProgress
 import zed.rainxch.core.domain.model.installation.InstalledApp
+import zed.rainxch.core.domain.model.installation.ParkedInstallDisposal
 import zed.rainxch.core.domain.model.smart_detect.MatchingPreview
 import zed.rainxch.core.domain.model.system.SystemArchitecture
 import zed.rainxch.core.domain.network.AssetIdentity
@@ -99,6 +100,10 @@ class DefaultDownloadOrchestratorParkTest {
             "parking must not go through the path-only write, got " +
                 repository.pendingInstallFilePathWrites,
         )
+        assertTrue(
+            repository.discardedParks.isEmpty(),
+            "parking must not discard the park, got " + repository.discardedParks,
+        )
 
         // InstallWhileForeground parks silently: the user is already looking at the screen.
         assertTrue(
@@ -118,6 +123,10 @@ class DefaultDownloadOrchestratorParkTest {
 
         assertEquals(listOf(parkedPath), repository.awaitingInstallWrites.map { it.path })
         assertTrue(repository.pendingInstallFilePathWrites.isEmpty())
+        assertTrue(
+            repository.discardedParks.isEmpty(),
+            "the download-only policy must not discard the park, got " + repository.discardedParks,
+        )
 
         // The one real difference between the two policies, and the reason the flags cannot be
         // swapped: a deferred park has to tell the user the file is waiting.
@@ -140,6 +149,10 @@ class DefaultDownloadOrchestratorParkTest {
         val pendingInstallFilePathWrites = mutableListOf<String?>()
         val parked = CompletableDeferred<Unit>()
 
+        // A discard is not expected on this path; recorded so a regression that clears the park
+        // this way fails loudly.
+        val discardedParks = mutableListOf<String>()
+
         override suspend fun markAwaitingInstall(
             packageName: String,
             path: String,
@@ -157,6 +170,17 @@ class DefaultDownloadOrchestratorParkTest {
             assetName: String?,
         ) {
             pendingInstallFilePathWrites += path
+        }
+
+        // Stub: this fake covers the park write path, so a discard is not expected here. The
+        // recording keeps both parameters so a path-scoping regression is distinguishable from a
+        // plain spurious call.
+        override suspend fun discardParkedInstall(
+            packageName: String,
+            expectedPath: String?,
+        ): ParkedInstallDisposal {
+            discardedParks += "$packageName (expected=$expectedPath)"
+            return ParkedInstallDisposal.Discarded
         }
 
         override fun getAllInstalledApps(): Flow<List<InstalledApp>> = emptyFlow()

@@ -231,6 +231,26 @@ interface InstalledAppDao {
         assetName: String?,
     )
 
+    // Clears the park only while the row still names the file the caller decided against: a park
+    // written after that decision (a download finishing mid-discard) must survive with its
+    // pointer intact. A null path clears only the rows that name no park at all, which is how a
+    // flag left without a park resolves instead of pinning the row in no group.
+    @Query(
+        """
+        UPDATE installed_apps
+           SET pendingInstallFilePath = NULL,
+               pendingInstallVersion = NULL,
+               pendingInstallAssetName = NULL,
+               isPendingInstall = 0
+         WHERE packageName = :packageName
+           AND pendingInstallFilePath IS :path
+        """,
+    )
+    suspend fun clearPendingInstallIfPathMatches(
+        packageName: String,
+        path: String?,
+    )
+
     // Path and flag land in one statement: the library's "can install" group needs both, so a
     // reader catching one without the other sees the row in no group at all. A narrow column
     // write, not updateApp, which would rewrite every column from an earlier snapshot.

@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import co.touchlab.kermit.Logger
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -12,9 +13,10 @@ import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import zed.rainxch.core.data.local.db.dao.ExternalLinkDao
+import zed.rainxch.core.domain.model.installation.ParkedInstallDisposal
+import zed.rainxch.core.domain.model.installation.PendingInstallResolution
 import zed.rainxch.core.domain.model.installation.externalInstallUpdateFlag
-import zed.rainxch.core.domain.model.installation.resolvePendingFromSystem
-import zed.rainxch.core.domain.model.installation.snapshotStillNamesNewerBuild
+import zed.rainxch.core.domain.model.installation.pendingInstallResolution
 import zed.rainxch.core.domain.model.installation.tagForObservedBuild
 import zed.rainxch.core.domain.model.installation.withSettledInstallIdentity
 import zed.rainxch.core.domain.repository.ExternalImportRepository
@@ -110,24 +112,6 @@ class PackageEventReceiver() :
         }
     }
 
-    private suspend fun clearParkedInstall(
-        repo: InstalledAppsRepository,
-        packageName: String,
-        parkedFilePath: String?,
-    ) {
-        runCatching {
-            repo.setPendingInstallFilePath(packageName = packageName, path = null)
-        }.onFailure {
-            Logger.w(it) { "Failed to clear parked install metadata for $packageName" }
-        }
-        if (parkedFilePath != null) {
-            runCatching { java.io.File(parkedFilePath).takeIf { it.exists() }?.delete() }
-                .onFailure {
-                    Logger.w(it) { "Failed to delete parked APK at $parkedFilePath" }
-                }
-        }
-    }
-
     private suspend fun onPackageInstalled(packageName: String) {
 
         getSystemInstallSerializer().markCompleted(packageName)
@@ -139,76 +123,63 @@ class PackageEventReceiver() :
 
             if (app != null) {
                 if (app.isPendingInstall) {
-                    val systemInfo = monitor.getInstalledPackageInfo(packageName)
-                    if (systemInfo != null) {
-                        val expectedVersionCode = app.latestVersionCode ?: 0L
-                        val versionCodeMatchesTarget =
-                            expectedVersionCode > 0L &&
-                                systemInfo.versionCode >= expectedVersionCode
+                    val resolution =
+                        app.pendingInstallResolution(monitor.getInstalledPackageInfo(packageName))
+                    when (resolution) {
+                        PendingInstallResolution.Keep ->
+                            Logger.i {
+                                "Kept parked install via broadcast (target not proven): $packageName"
+                            }
 
-                        val versionNameChanged =
-                            !systemInfo.versionName.isNullOrBlank() &&
-                                systemInfo.versionName != app.installedVersionName
-                        val wasActuallyUpdated =
-                            versionCodeMatchesTarget ||
-                                (expectedVersionCode <= 0L && versionNameChanged)
-
-                        val installedTag =
-                            app.pendingInstallVersion
-                                ?: app.latestVersion
-                                ?: systemInfo.versionName
-                        if (wasActuallyUpdated) {
-                            val settled = app.withSettledInstallIdentity(systemInfo.versionCode)
+                        is PendingInstallResolution.Reached -> {
+                            val settled = app.withSettledInstallIdentity(resolution.versionCode)
+                            // The flag stays true on purpose: the discard below ends the
+                            // pending state, and a file that survives its delete must leave
+                            // the row pending for the next sync's retry.
                             repo.updateAppVersion(
                                 packageName = packageName,
-                                newTag = installedTag,
+                                newTag = resolution.resolvedTag,
                                 newReleaseId = settled.installedReleaseId,
                                 newAssetId = settled.installedAssetId,
                                 newAssetDigest = settled.installedAssetDigest,
-                                newAssetName = app.latestAssetName,
-                                newAssetUrl = app.latestAssetUrl,
-                                newVersionName = systemInfo.versionName,
-                                newVersionCode = systemInfo.versionCode,
+                                newAssetName = app.latestAssetName ?: "",
+                                newAssetUrl = app.latestAssetUrl ?: "",
+                                newVersionName = resolution.versionName,
+                                newVersionCode = resolution.versionCode,
                                 signingFingerprint = app.signingFingerprint,
+                                isPendingInstall = true,
                             )
-                            repo.updatePendingStatus(packageName, false)
-                            Logger.i { "Update confirmed via broadcast: $packageName (v${systemInfo.versionName}, tag=$installedTag)" }
-                        } else {
-                            val resolved =
-                                app.resolvePendingFromSystem(
-                                    resolvedTag = installedTag,
-                                    versionName = systemInfo.versionName,
-                                    versionCode = systemInfo.versionCode,
-                                )
-                            repo.updateApp(
-                                if (resolved.isUpdateAvailable || app.isUpdateAvailable) {
-                                    resolved
-                                } else {
-                                    resolved.copy(
-                                        isUpdateAvailable =
-                                            app.snapshotStillNamesNewerBuild(
-                                                installedCode = systemInfo.versionCode,
-                                                installedVersion = systemInfo.versionName,
-                                            ),
-                                    )
-                                },
-                            )
+                            // The discard drops the pointer and the file together, scoped to the
+                            // park this broadcast looked at. Its failure is not fatal: the row
+                            // keeps the park and the next sync retries.
+                            try {
+                                val disposal =
+                                    repo.discardParkedInstall(packageName, app.pendingInstallFilePath)
+                                if (disposal == ParkedInstallDisposal.Retained) {
+                                    Logger.w {
+                                        "Parked install not fully discarded for $packageName; " +
+                                            "the next sync will retry"
+                                    }
+                                }
+                            } catch (e: CancellationException) {
+                                throw e
+                            } catch (e: Exception) {
+                                Logger.e(e) {
+                                    "Parked install not discarded for $packageName; the next sync will retry"
+                                }
+                            }
                             Logger.i {
-                                "Package replaced but not updated to target: $packageName " +
-                                    "(system: v${systemInfo.versionName}/${systemInfo.versionCode}, " +
-                                    "target: v${app.latestVersionName}/${app.latestVersionCode})"
+                                "Update confirmed via broadcast: $packageName " +
+                                    "(v${resolution.versionName}, tag=${resolution.resolvedTag})"
                             }
                         }
-                    } else {
-                        repo.updatePendingStatus(packageName, false)
-                        Logger.i { "Resolved pending install via broadcast (no system info): $packageName" }
                     }
-
-                    clearParkedInstall(repo, packageName, app.pendingInstallFilePath)
                 } else {
                     handleExternalInstall(packageName, app, repo, monitor)
                 }
             }
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             Logger.e { "PackageEventReceiver error for $packageName: ${e.message}" }
         }
@@ -318,7 +289,31 @@ class PackageEventReceiver() :
         getSystemInstallSerializer().markCompleted(packageName)
 
         try {
-            getRepository().deleteInstalledApp(packageName)
+            val repo = getRepository()
+            // The row is the only handle to a parked file; if one is named here, it has to go with
+            // the row or become an orphan. A file that survives keeps the row so the next sync's
+            // delete path retries it, the same contract the sync itself follows.
+            val parkedPath = repo.getAppByPackage(packageName)?.pendingInstallFilePath
+            var mayDropRow = parkedPath == null
+            if (parkedPath != null) {
+                val disposal = try {
+                    repo.discardParkedInstall(packageName, parkedPath)
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (e: Exception) {
+                    Logger.e(e) { "Parked file not discarded for $packageName; the row stays for the next sync" }
+                    null
+                }
+                mayDropRow = disposal == ParkedInstallDisposal.Discarded
+                if (disposal == ParkedInstallDisposal.Retained) {
+                    Logger.w {
+                        "Parked file for $packageName survived the uninstall; the row stays for the next sync"
+                    }
+                }
+            }
+            if (mayDropRow) {
+                repo.deleteInstalledApp(packageName)
+            }
             runCatching { getExternalImport().unlink(packageName) }
                 .onFailure { initialError ->
                     Logger.w(initialError) { "External link cleanup failed for $packageName; scheduling retry" }
@@ -345,7 +340,11 @@ class PackageEventReceiver() :
                             }
                     }
                 }
-            Logger.i { "Removed uninstalled app via broadcast: $packageName" }
+            if (mayDropRow) {
+                Logger.i { "Removed uninstalled app via broadcast: $packageName" }
+            }
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             Logger.e { "PackageEventReceiver remove error for $packageName: ${e.message}" }
         }

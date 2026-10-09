@@ -249,9 +249,11 @@ class InstallBindingTest {
         )
 
         val after = parked.resolvePendingFromSystem(
-            resolvedTag = "2.0.0",
-            versionName = "2.0.0",
-            versionCode = 200L,
+            PendingInstallResolution.Reached(
+                resolvedTag = "2.0.0",
+                versionName = "2.0.0",
+                versionCode = 200L,
+            ),
         )
 
         assertEquals(7001L, after.installedReleaseId)
@@ -282,9 +284,11 @@ class InstallBindingTest {
         )
 
         val after = parked.resolvePendingFromSystem(
-            resolvedTag = "1.0.0",
-            versionName = "1.5.0",
-            versionCode = 150L,
+            PendingInstallResolution.Reached(
+                resolvedTag = "1.0.0",
+                versionName = "1.5.0",
+                versionCode = 150L,
+            ),
         )
 
         assertEquals(null, after.installedReleaseId)
@@ -304,9 +308,11 @@ class InstallBindingTest {
         )
 
         val after = parked.resolvePendingFromSystem(
-            resolvedTag = "1.0.0",
-            versionName = "1.0.0",
-            versionCode = 100L,
+            PendingInstallResolution.Reached(
+                resolvedTag = "1.0.0",
+                versionName = "1.0.0",
+                versionCode = 100L,
+            ),
         )
 
         assertEquals(9001L, after.installedReleaseId)
@@ -324,17 +330,21 @@ class InstallBindingTest {
         )
 
         val cancelled = parked.resolvePendingFromSystem(
-            resolvedTag = "1.0.0",
-            versionName = "1.0.0",
-            versionCode = 100L,
+            PendingInstallResolution.Reached(
+                resolvedTag = "1.0.0",
+                versionName = "1.0.0",
+                versionCode = 100L,
+            ),
         )
         assertEquals(9001L, cancelled.installedReleaseId)
         assertEquals(9002L, cancelled.installedAssetId)
 
         val moved = parked.resolvePendingFromSystem(
-            resolvedTag = "1.0.0",
-            versionName = "2.0.0",
-            versionCode = 200L,
+            PendingInstallResolution.Reached(
+                resolvedTag = "1.0.0",
+                versionName = "2.0.0",
+                versionCode = 200L,
+            ),
         )
         assertEquals(null, moved.installedReleaseId)
         assertEquals(null, moved.installedAssetId)
@@ -350,9 +360,11 @@ class InstallBindingTest {
         )
 
         val after = parked.resolvePendingFromSystem(
-            resolvedTag = "2.0.0",
-            versionName = "2.1.0",
-            versionCode = 210L,
+            PendingInstallResolution.Reached(
+                resolvedTag = "2.0.0",
+                versionName = "2.1.0",
+                versionCode = 210L,
+            ),
         )
 
         assertEquals(null, after.installedReleaseId)

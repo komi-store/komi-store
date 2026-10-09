@@ -17,40 +17,17 @@ class InstalledAppUpdatesTest {
         isPendingInstall: Boolean = false,
         pendingFilePath: String? = "/data/parked.apk",
         skippedReleaseTag: String? = null,
-    ): InstalledApp = InstalledApp(
-        packageName = "com.example.app",
-        repoId = 1L,
-        repoName = "app",
-        repoOwner = "owner",
-        repoOwnerAvatarUrl = "https://avatar",
-        repoDescription = null,
-        primaryLanguage = "Kotlin",
-        repoUrl = "https://github.com/owner/app",
+    ): InstalledApp = testInstalledApp(
         installedVersion = installedVersion,
-        installedAssetName = "app-1.0.0.apk",
-        installedAssetUrl = "https://dl/app-1.0.0.apk",
-        latestVersion = latestVersion,
-        latestAssetName = "app-2.0.0.apk",
-        latestAssetUrl = "https://dl/app-2.0.0.apk",
-        latestAssetSize = 1024L,
-        appName = "App",
-        installSource = InstallSource.THIS_APP,
-        installedAt = 1000L,
-        lastCheckedAt = 2000L,
-        lastUpdatedAt = 1500L,
-        isUpdateAvailable = isUpdateAvailable,
-        signingFingerprint = "SHA",
-        systemArchitecture = "arm64-v8a",
-        fileExtension = "apk",
-        isPendingInstall = isPendingInstall,
         installedVersionName = "1.0.0",
         installedVersionCode = installedVersionCode,
+        latestVersion = latestVersion,
         latestVersionName = latestVersionName,
         latestVersionCode = latestVersionCode,
-        latestReleasePublishedAt = "2026-08-01T00:00:00Z",
+        isUpdateAvailable = isUpdateAvailable,
+        isPendingInstall = isPendingInstall,
         pendingInstallFilePath = pendingFilePath,
-        pendingInstallVersion = if (pendingFilePath != null) "2.0.0" else null,
-        pendingInstallAssetName = if (pendingFilePath != null) "app-2.0.0.apk" else null,
+        latestReleasePublishedAt = "2026-08-01T00:00:00Z",
         skippedReleaseTag = skippedReleaseTag,
     )
 
@@ -343,16 +320,22 @@ class InstalledAppUpdatesTest {
 
     @Test
     fun resolvePendingFromSystemAdoptsTagAndClearsPending() {
-        val result = app(isPendingInstall = true).resolvePendingFromSystem(
-            resolvedTag = "2.0.0",
-            versionName = "2.0.0",
-            versionCode = 200L,
-        )
+        val result =
+            app(isPendingInstall = true).resolvePendingFromSystem(
+                PendingInstallResolution.Reached(
+                    resolvedTag = "2.0.0",
+                    versionName = "2.0.0",
+                    versionCode = 200L,
+                ),
+            )
         assertFalse(result.isPendingInstall)
         assertEquals("2.0.0", result.installedVersion)
         assertEquals("2.0.0", result.installedVersionName)
         assertEquals(200L, result.installedVersionCode)
         assertFalse(result.isUpdateAvailable)
+        // The adopt keeps the pointer: the post-commit discard needs it to find the file, and
+        // dropping it here would orphan the APK if that delete then failed.
+        assertEquals("/data/parked.apk", result.pendingInstallFilePath)
     }
 
     @Test
@@ -365,9 +348,11 @@ class InstalledAppUpdatesTest {
                     installedAssetDigest = "sha256:x",
                 )
                 .resolvePendingFromSystem(
-                    resolvedTag = "2.0.0",
-                    versionName = "2.0.0",
-                    versionCode = 200L,
+                    PendingInstallResolution.Reached(
+                        resolvedTag = "2.0.0",
+                        versionName = "2.0.0",
+                        versionCode = 200L,
+                    ),
                 )
         assertEquals(null, result.installedReleaseId)
         assertEquals(null, result.installedAssetId)
@@ -380,9 +365,11 @@ class InstalledAppUpdatesTest {
             app(latestVersionCode = null)
                 .copy(installedReleaseId = 7001L)
                 .resolvePendingFromSystem(
-                    resolvedTag = "1.0.0",
-                    versionName = "1.0.0",
-                    versionCode = 100L,
+                    PendingInstallResolution.Reached(
+                        resolvedTag = "1.0.0",
+                        versionName = "1.0.0",
+                        versionCode = 100L,
+                    ),
                 )
         assertEquals(7001L, result.installedReleaseId)
     }
@@ -397,20 +384,25 @@ class InstalledAppUpdatesTest {
                     installedAssetDigest = "sha256:x",
                 )
                 .resolvePendingFromSystem(
-                    resolvedTag = "2.0.0",
-                    versionName = "2.0.0",
-                    versionCode = 200L,
+                    PendingInstallResolution.Reached(
+                        resolvedTag = "2.0.0",
+                        versionName = "2.0.0",
+                        versionCode = 200L,
+                    ),
                 )
         assertEquals(7001L, result.installedReleaseId)
     }
 
     @Test
     fun resolvePendingFromSystemKeepsUpdateFlagWhenSnapshotNewer() {
-        val result = app(latestVersionCode = 300L).resolvePendingFromSystem(
-            resolvedTag = "2.0.0",
-            versionName = "2.0.0",
-            versionCode = 200L,
-        )
+        val result =
+            app(latestVersionCode = 300L).resolvePendingFromSystem(
+                PendingInstallResolution.Reached(
+                    resolvedTag = "2.0.0",
+                    versionName = "2.0.0",
+                    versionCode = 200L,
+                ),
+            )
         assertTrue(result.isUpdateAvailable)
     }
 
@@ -418,9 +410,11 @@ class InstalledAppUpdatesTest {
     fun updateFlagIsFalseWhenSnapshotCodeIsNull() {
         val result =
             app(latestVersionCode = null).resolvePendingFromSystem(
-                resolvedTag = "2.0.0",
-                versionName = "2.0.0",
-                versionCode = 100L,
+                PendingInstallResolution.Reached(
+                    resolvedTag = "2.0.0",
+                    versionName = "2.0.0",
+                    versionCode = 100L,
+                ),
             )
         assertFalse(result.isUpdateAvailable)
     }
@@ -611,25 +605,10 @@ class InstalledAppUpdatesTest {
     }
 
     @Test
-    fun resolvePendingFromSystemKeepsTheOldTagWhenTheInstallDidNotReachTarget() {
-        val result =
-            app(
-                installedVersion = "1.0.0",
-                latestVersion = "2.0.0",
-                latestVersionCode = 200L,
-                isPendingInstall = true,
-            ).resolvePendingFromSystem(
-                resolvedTag = "2.0.0",
-                versionName = "1.0.0",
-                versionCode = 100L,
-            )
-        assertEquals("1.0.0", result.installedVersion)
-        assertFalse(result.isPendingInstall)
-        assertTrue(result.isUpdateAvailable)
-    }
-
-    @Test
     fun resolvePendingFromSystemAdoptsTheParkedTagWhenTheInstallReachedTarget() {
+        // The gate's own output for this row: the parked version is what the resolution carries,
+        // so the adopt writes it through. Which tag the resolution ends up carrying is pinned in
+        // PendingInstallResolutionTest.
         val result =
             app(
                 installedVersion = "1.0.0",
@@ -637,9 +616,30 @@ class InstalledAppUpdatesTest {
                 latestVersionCode = 300L,
                 isPendingInstall = true,
             ).resolvePendingFromSystem(
-                resolvedTag = "3.0.0",
-                versionName = "1.5.0",
-                versionCode = 300L,
+                PendingInstallResolution.Reached(
+                    resolvedTag = "2.0.0",
+                    versionName = "1.5.0",
+                    versionCode = 300L,
+                ),
+            )
+        assertEquals("2.0.0", result.installedVersion)
+        assertFalse(result.isPendingInstall)
+    }
+
+    @Test
+    fun resolvePendingFromSystemAdoptsTheParkedTagWhenTheNameMovedWithoutACode() {
+        val result =
+            app(
+                installedVersion = "1.0.0",
+                latestVersion = "2.0.0",
+                latestVersionCode = null,
+                isPendingInstall = true,
+            ).resolvePendingFromSystem(
+                PendingInstallResolution.Reached(
+                    resolvedTag = "2.0.0",
+                    versionName = "2.0.0",
+                    versionCode = 100L,
+                ),
             )
         assertEquals("2.0.0", result.installedVersion)
         assertFalse(result.isPendingInstall)
@@ -703,29 +703,6 @@ class InstalledAppUpdatesTest {
                 installedVersion = "3.0.0",
             ),
         )
-    }
-
-    @Test
-    fun parkedUpdateOnAnInstalledAppDoesNotSurviveTheLibrarySync() {
-        // KNOWN LIMITATION, NOT A CONTRACT, and only observable at the sync layer rather than here.
-        // This function clears the flag and keeps the parked path; the path is cleared one layer up,
-        // by SyncInstalledAppsUseCase.reconcileEnumerable via setPendingInstallFilePath(pkg, null).
-        // A change that makes the park survive would land in that layer, so this test could not
-        // detect it: pin the post-sync row state in a SyncInstalledAppsUseCase test instead.
-        val parked = app(isPendingInstall = true, pendingFilePath = "/data/parked.apk")
-
-        val afterResolve =
-            parked.resolvePendingFromSystem(
-                resolvedTag = "2.0.0",
-                versionName = "1.0.0",
-                versionCode = 100L,
-            )
-
-        assertFalse(afterResolve.isPendingInstall)
-
-        // The flag alone decides the can-install group, so the row has already left it even though
-        // the parked path is still on disk.
-        assertEquals("/data/parked.apk", afterResolve.pendingInstallFilePath)
     }
 }
 

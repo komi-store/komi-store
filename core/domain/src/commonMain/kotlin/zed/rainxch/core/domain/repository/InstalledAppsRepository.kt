@@ -2,6 +2,7 @@ package zed.rainxch.core.domain.repository
 
 import kotlinx.coroutines.flow.Flow
 import zed.rainxch.core.domain.model.installation.InstalledApp
+import zed.rainxch.core.domain.model.installation.ParkedInstallDisposal
 import zed.rainxch.core.domain.model.smart_detect.MatchingPreview
 
 interface InstalledAppsRepository {
@@ -112,6 +113,21 @@ interface InstalledAppsRepository {
         version: String?,
         assetName: String?,
     )
+
+    // Clears the park AND deletes the parked file from disk (best-effort: the installer may
+    // already have taken it). [expectedPath] is the path the caller saw when it decided to
+    // discard: only that file is deleted, and only while the row still names it, so a park
+    // written after the decision (a download finishing mid-discard) survives. If the file
+    // cannot be deleted and demonstrably survives, the pointer is kept so a later sync retries.
+    // The result tells a caller that is dropping the row whether it may: Retained means the row
+    // is still the only handle to a live park and must stay. The verdict is a point-in-time
+    // read, and a park written between the verdict and the caller's row drop is accepted, like
+    // the same-path reuse this contract's guard cannot tell apart. For "drop the pointer only"
+    // use setPendingInstallFilePath above.
+    suspend fun discardParkedInstall(
+        packageName: String,
+        expectedPath: String?,
+    ): ParkedInstallDisposal
 
     suspend fun previewMatchingAssets(
         owner: String,

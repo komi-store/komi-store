@@ -67,6 +67,7 @@ import zed.rainxch.core.domain.network.ProxyTester
 import zed.rainxch.core.domain.network.SlowDownloadDetector
 import zed.rainxch.core.domain.system.AppVersionInfo
 import zed.rainxch.core.domain.system.DownloadOrchestrator
+import zed.rainxch.core.domain.system.Installer
 import zed.rainxch.core.domain.system.SystemInstallSerializer
 import zed.rainxch.core.domain.system.ExternalAppScanner
 import zed.rainxch.core.domain.system.MultiSourceDownloader
@@ -235,6 +236,7 @@ val coreModule =
             SyncInstalledAppsUseCase(
                 packageMonitor = get(),
                 installedAppsRepository = get(),
+                apkInfoExtractor = get<Installer>().getApkInfoExtractor(),
                 platform = get(),
                 logger = get(),
             )

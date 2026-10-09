@@ -68,27 +68,17 @@ fun InstalledApp.confirmInstall(
     )
 }
 
-fun InstalledApp.resolvePendingFromSystem(
-    resolvedTag: String,
-    versionName: String?,
-    versionCode: Long,
-): InstalledApp {
-    val targetCode = latestVersionCode ?: 0L
-    val installReachedTarget = targetCode > 0L && versionCode >= targetCode
-    val adoptedTag =
-        if (installReachedTarget) {
-            pendingInstallVersion ?: resolvedTag
-        } else {
-            installedVersion
-        }
-    return withSettledInstallIdentity(versionCode).copy(
+// The adopt write for a park the system has proven: the resolution already carries the tag the
+// row should record and the build the system reported, so nothing here re-derives the gate and
+// no caller can adopt without one. The gate itself lives in pendingInstallResolution.
+fun InstalledApp.resolvePendingFromSystem(reached: PendingInstallResolution.Reached): InstalledApp =
+    withSettledInstallIdentity(reached.versionCode).copy(
         isPendingInstall = false,
-        installedVersion = adoptedTag,
-        installedVersionName = versionName,
-        installedVersionCode = versionCode,
-        isUpdateAvailable = updateFlagAgainstSnapshot(versionCode, versionName ?: adoptedTag),
+        installedVersion = reached.resolvedTag,
+        installedVersionName = reached.versionName,
+        installedVersionCode = reached.versionCode,
+        isUpdateAvailable = updateFlagAgainstSnapshot(reached.versionCode, reached.versionName),
     )
-}
 
 fun InstalledApp.withSettledInstallIdentity(versionCode: Long): InstalledApp {
     val hasParkedIdentity =
@@ -119,6 +109,67 @@ fun InstalledApp.withSettledInstallIdentity(versionCode: Long): InstalledApp {
         pendingInstallAssetId = null,
         pendingInstallAssetDigest = null,
     )
+}
+
+// The keep/adopt decision every pending-install resolver shares: the library sync, the startup
+// self-update check and the package broadcast all resolve the same park, and a park must not be
+// torn down without proof the install landed. Reached carries what the adopt write needs, and its
+// constructor stays module-internal: only the gate below can mint the proof, so the adopt write
+// cannot be driven without one. Test source sets are friends and keep constructing it.
+sealed interface PendingInstallResolution {
+    data object Keep : PendingInstallResolution
+
+    class Reached internal constructor(
+        val resolvedTag: String,
+        val versionName: String,
+        val versionCode: Long,
+    ) : PendingInstallResolution
+}
+
+// A park resolves only when the system reports the target build, or, for a code-less target (a
+// tag-tracked release), when the version name moved off what the row recorded. No answer and no
+// proof both keep the park: the file on disk is still what the user needs.
+fun InstalledApp.pendingInstallResolution(systemInfo: SystemPackageInfo?): PendingInstallResolution {
+    if (systemInfo == null) return PendingInstallResolution.Keep
+    if (!installReachedTarget(systemInfo.versionName, systemInfo.versionCode)) {
+        return PendingInstallResolution.Keep
+    }
+    return PendingInstallResolution.Reached(
+        resolvedTag = pendingInstallVersion ?: latestVersion ?: systemInfo.versionName,
+        versionName = systemInfo.versionName,
+        versionCode = systemInfo.versionCode,
+    )
+}
+
+// The one "did the target land" predicate: a code proves it when the row carries one, and for a
+// code-less (tag-tracked) target a moved version name stands in, the same fallback the package
+// broadcast already used.
+private fun InstalledApp.installReachedTarget(versionName: String, versionCode: Long): Boolean {
+    val targetCode = latestVersionCode ?: 0L
+    return if (targetCode > 0L) {
+        versionCode >= targetCode
+    } else {
+        // A code-less (tag-tracked) target has no code to compare, so the version name carries the
+        // proof. A row that recorded no baseline (a fresh install, or data from before the column)
+        // counts as moved: the package appearing on the system at all is the change to go by. The
+        // boundary's placeholder for "no name reported" is not a name and keeps the park, like a
+        // blank one.
+        versionName.isNotBlank() &&
+            versionName != SystemPackageInfo.UNKNOWN_VERSION_NAME &&
+            (
+                installedVersionName == null ||
+                    versionName != installedVersionName ||
+                    // Or the name is the park's own target: after a confirmed install the baseline
+                    // has already been rewritten to it, so "moved" can no longer be seen and this
+                    // is what keeps the retry of a failed discard reachable.
+                    matchesParkedTargetName(versionName)
+            )
+    }
+}
+
+private fun InstalledApp.matchesParkedTargetName(systemName: String): Boolean {
+    val target = pendingInstallVersion ?: latestVersion ?: return false
+    return VersionMath.isExactSameVersion(systemName, target)
 }
 
 private fun InstalledApp.updateFlagAgainstSnapshot(
