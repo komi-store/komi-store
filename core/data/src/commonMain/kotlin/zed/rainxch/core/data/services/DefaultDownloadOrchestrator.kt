@@ -15,6 +15,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import zed.rainxch.core.data.data_source.TokenStore
+import zed.rainxch.core.data.download.AssetSourceGoneException
+import zed.rainxch.core.data.download.AssetSourceRefetcher
 import zed.rainxch.core.data.network.GithubAssetAuth
 import zed.rainxch.core.domain.model.installation.DownloadProgress
 import zed.rainxch.core.domain.model.installation.markPending
@@ -39,6 +41,7 @@ import kotlin.random.Random
 class DefaultDownloadOrchestrator(
     private val downloader: Downloader,
     private val multiSourceDownloader: MultiSourceDownloader,
+    private val assetSourceRefetcher: AssetSourceRefetcher,
     private val digestVerifier: DigestVerifier,
     private val installer: Installer,
     private val installedAppsRepository: InstalledAppsRepository,
@@ -169,22 +172,69 @@ class DefaultDownloadOrchestrator(
             }
         }
 
-        try {
-            streamProgress(multiSourceDownloader.download(spec.asset.downloadUrl, scopedName))
-        } catch (e: CancellationException) {
-            throw e
-        } catch (e: Throwable) {
-            val apiUrl = authenticatedGithubAssetUrl(spec)
-                ?: throw e
-            Logger.w(e) {
-                "Orchestrator: primary download failed for ${spec.asset.name}, " +
+        var effectiveSpec = spec
+        suspend fun retryViaAuthenticatedAssetApi(failure: Throwable, failedSpec: DownloadSpec) {
+            val apiUrl = authenticatedGithubAssetUrl(failedSpec)
+                ?: throw failure
+            Logger.w(failure) {
+                "Orchestrator: primary download failed for ${failedSpec.asset.name}, " +
                     "retrying via authenticated GitHub asset API"
             }
-            updateEntry(spec.packageName) {
+            updateEntry(failedSpec.packageName) {
                 it.copy(bytesDownloaded = 0L, progressPercent = 0)
             }
             slowDownloadDetector.reset()
             streamProgress(downloader.download(apiUrl, scopedName, bypassMirror = true))
+        }
+
+        try {
+            streamProgress(multiSourceDownloader.download(spec.asset.downloadUrl, scopedName))
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: AssetSourceGoneException) {
+            // The URL this download was handed is gone. That is the shape a stale resolution
+            // leaves behind — an asset re-uploaded, or the release replaced, since the spec was
+            // built — so ask the repository host directly what carries the asset now and repeat
+            // the download there. Only when nothing moved does the failure stand, exactly as it
+            // would have without this branch.
+            val refetched = assetSourceRefetcher.refetch(spec)
+            if (refetched == null) {
+                retryViaAuthenticatedAssetApi(e, spec)
+            } else {
+                Logger.w(e) {
+                    "Orchestrator: ${spec.asset.name} is no longer at ${spec.releaseTag}; " +
+                        "the repository now offers it at ${refetched.releaseTag}, retrying"
+                }
+                // The entry carries the URL every later retry rebuilds from: leaving the dead
+                // one there would make each retry walk into the same 404 before refetching
+                // again. With the replacement recorded, the next retry starts from truth.
+                updateEntry(spec.packageName) {
+                    it.copy(
+                        bytesDownloaded = 0L,
+                        progressPercent = 0,
+                        downloadUrl = refetched.asset.downloadUrl,
+                        assetSize = refetched.asset.size,
+                        releaseTag = refetched.releaseTag,
+                    )
+                }
+                slowDownloadDetector.reset()
+                effectiveSpec = refetched
+                try {
+                    streamProgress(
+                        multiSourceDownloader.download(refetched.asset.downloadUrl, scopedName),
+                    )
+                } catch (retry: CancellationException) {
+                    throw retry
+                } catch (retry: Throwable) {
+                    // The replacement retry deserves the same fallback every other failure on
+                    // this path gets — and only the fresh spec can give it: the authenticated
+                    // asset API it builds from must point at the asset that exists now, not the
+                    // dead one the original spec carries.
+                    retryViaAuthenticatedAssetApi(retry, refetched)
+                }
+            }
+        } catch (e: Throwable) {
+            retryViaAuthenticatedAssetApi(e, spec)
         }
 
         val filePath =
@@ -195,11 +245,11 @@ class DefaultDownloadOrchestrator(
             it.copy(filePath = filePath, progressPercent = 100)
         }
 
-        val expectedDigest = spec.asset.digest
+        val expectedDigest = effectiveSpec.asset.digest
         if (expectedDigest != null) {
             val mismatch = digestVerifier.verify(filePath, expectedDigest)
             if (mismatch != null) {
-                Logger.w { "Orchestrator: digest mismatch for ${spec.asset.name}: $mismatch" }
+                Logger.w { "Orchestrator: digest mismatch for ${effectiveSpec.asset.name}: $mismatch" }
                 runCatching { java.io.File(filePath).delete() }
                 markFailed(
                     spec.packageName,
@@ -208,7 +258,7 @@ class DefaultDownloadOrchestrator(
                 return
             }
         } else {
-            Logger.i { "No digest for ${spec.asset.name}, skipping SHA-256 verification" }
+            Logger.i { "No digest for ${effectiveSpec.asset.name}, skipping SHA-256 verification" }
         }
 
         val effectivePolicy =
@@ -217,11 +267,11 @@ class DefaultDownloadOrchestrator(
             }
 
         when (effectivePolicy) {
-            InstallPolicy.AlwaysInstall -> runInstall(spec, filePath)
+            InstallPolicy.AlwaysInstall -> runInstall(effectiveSpec, filePath)
 
-            InstallPolicy.InstallWhileForeground -> parkForUser(spec, filePath, notify = false)
+            InstallPolicy.InstallWhileForeground -> parkForUser(effectiveSpec, filePath, notify = false)
 
-            InstallPolicy.DeferUntilUserAction -> parkForUser(spec, filePath, notify = true)
+            InstallPolicy.DeferUntilUserAction -> parkForUser(effectiveSpec, filePath, notify = true)
         }
     }
 

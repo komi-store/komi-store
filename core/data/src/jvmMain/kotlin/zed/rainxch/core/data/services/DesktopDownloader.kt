@@ -11,6 +11,7 @@ import okhttp3.Credentials
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import zed.rainxch.core.data.data_source.TokenStore
+import zed.rainxch.core.data.download.AssetSourceGoneException
 import zed.rainxch.core.data.network.GithubAssetAuth
 import zed.rainxch.core.data.network.ProxyManager
 import zed.rainxch.core.domain.model.installation.DownloadProgress
@@ -133,6 +134,9 @@ class DesktopDownloader(
             try {
                 call.execute().use { response ->
                     if (!response.isSuccessful) {
+                        if (AssetSourceGoneException.isGoneCode(response.code)) {
+                            throw AssetSourceGoneException(response.code)
+                        }
                         throw kotlinx.io.IOException("Unexpected code ${response.code}")
                     }
 

@@ -13,6 +13,8 @@ import org.koin.dsl.module
 import zed.rainxch.core.data.network.createPlatformHttpClient
 import zed.rainxch.core.data.cache.CacheManager
 import zed.rainxch.core.data.data_source.TokenStore
+import zed.rainxch.core.data.download.AssetSourceRefetcher
+import zed.rainxch.core.data.download.DefaultAssetSourceRefetcher
 import zed.rainxch.core.data.download.MultiSourceDownloaderImpl
 import zed.rainxch.core.data.download.SlowDownloadDetectorImpl
 import zed.rainxch.core.data.services.BuildKonfigAppVersionInfo
@@ -296,10 +298,18 @@ val coreModule =
             )
         }
 
+        single<AssetSourceRefetcher> {
+            DefaultAssetSourceRefetcher(
+                clientProvider = get(),
+                logger = get(),
+            )
+        }
+
         single<DownloadOrchestrator> {
             DefaultDownloadOrchestrator(
                 downloader = get(),
                 multiSourceDownloader = get(),
+                assetSourceRefetcher = get(),
                 digestVerifier = get(),
                 installer = get(),
                 installedAppsRepository = get(),
