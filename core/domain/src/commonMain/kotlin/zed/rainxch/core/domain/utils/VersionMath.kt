@@ -156,6 +156,31 @@ object VersionMath {
         return candidateInstant > baselineInstant
     }
 
+    fun assetBuildChanged(
+        matchedReleaseId: Long?,
+        matchedAssetId: Long?,
+        matchedDigest: String?,
+        matchedSize: Long?,
+        storedReleaseId: Long?,
+        storedAssetId: Long?,
+        storedDigest: String?,
+        storedSize: Long?,
+    ): Boolean {
+        if (matchedDigest != null && storedDigest != null) return matchedDigest != storedDigest
+        return releaseObjectChanged(
+            matchedReleaseId = matchedReleaseId,
+            matchedAssetId = matchedAssetId,
+            storedReleaseId = storedReleaseId,
+            storedAssetId = storedAssetId,
+        ) ||
+            assetIdentityChanged(
+                matchedDigest = matchedDigest,
+                matchedSize = matchedSize,
+                storedDigest = storedDigest,
+                storedSize = storedSize,
+            )
+    }
+
     fun releaseObjectChanged(
         matchedReleaseId: Long?,
         matchedAssetId: Long?,
@@ -202,21 +227,18 @@ object VersionMath {
             return !isExactSameVersion(matchedTag, installedTag)
         }
         val newerByTimestamp = isPublishedAtAfter(matchedPublishedAt, previousLatestPublishedAt)
-        val newerByObject =
-            releaseObjectChanged(
+        val newerByBuild =
+            assetBuildChanged(
                 matchedReleaseId = matchedReleaseId,
                 matchedAssetId = matchedAssetId,
-                storedReleaseId = previousReleaseId,
-                storedAssetId = previousAssetId,
-            )
-        val newerByAsset =
-            assetIdentityChanged(
                 matchedDigest = matchedAssetDigest,
                 matchedSize = matchedAssetSize,
+                storedReleaseId = previousReleaseId,
+                storedAssetId = previousAssetId,
                 storedDigest = previousAssetDigest,
                 storedSize = previousAssetSize,
             )
-        return newerByTimestamp || newerByObject || newerByAsset ||
+        return newerByTimestamp || newerByBuild ||
             (previousWasUpdateAvailable && isExactSameVersion(matchedTag, previousLatestTag))
     }
 
