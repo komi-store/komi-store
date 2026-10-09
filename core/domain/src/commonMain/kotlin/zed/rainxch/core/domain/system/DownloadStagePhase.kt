@@ -19,6 +19,7 @@ enum class DownloadStagePhase {
 
                 DownloadStage.Installing -> Installing
 
+                DownloadStage.Paused,
                 DownloadStage.AwaitingInstall,
                 DownloadStage.Completed,
                 DownloadStage.Cancelled,

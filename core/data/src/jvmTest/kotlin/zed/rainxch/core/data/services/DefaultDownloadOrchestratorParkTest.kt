@@ -15,6 +15,7 @@ import zed.rainxch.core.data.dto.GithubDeviceTokenSuccessDto
 import zed.rainxch.core.domain.model.account.github.GithubAsset
 import zed.rainxch.core.domain.model.apk.ApkPackageInfo
 import zed.rainxch.core.domain.model.installation.DownloadProgress
+import zed.rainxch.core.domain.model.installation.InstallSource
 import zed.rainxch.core.domain.model.installation.InstalledApp
 import zed.rainxch.core.domain.model.installation.ParkedInstallDisposal
 import zed.rainxch.core.domain.model.smart_detect.MatchingPreview
@@ -25,6 +26,7 @@ import zed.rainxch.core.domain.network.Downloader
 import zed.rainxch.core.domain.network.SlowDownloadDetector
 import zed.rainxch.core.domain.repository.InstalledAppsRepository
 import zed.rainxch.core.domain.system.DownloadSpec
+import zed.rainxch.core.domain.system.DownloadStage
 import zed.rainxch.core.domain.system.InstallOutcome
 import zed.rainxch.core.domain.system.InstallPolicy
 import zed.rainxch.core.domain.system.Installer
@@ -65,16 +67,18 @@ class DefaultDownloadOrchestratorParkTest {
         repository: InstalledAppsRepository,
         scope: CoroutineScope,
         notifier: PendingInstallNotifier = RecordingPendingInstallNotifier(),
+        installer: Installer = FakeInstaller,
+        serializer: SystemInstallSerializer = FakeSystemInstallSerializer,
     ) = DefaultDownloadOrchestrator(
         downloader = FakeDownloader(parkedPath),
         multiSourceDownloader = FakeMultiSourceDownloader,
         digestVerifier = FakeDigestVerifier,
-        installer = FakeInstaller,
+        installer = installer,
         installedAppsRepository = repository,
         pendingInstallNotifier = notifier,
         slowDownloadDetector = FakeSlowDownloadDetector,
         appScope = scope,
-        systemInstallSerializer = FakeSystemInstallSerializer,
+        systemInstallSerializer = serializer,
         tokenStore = FakeTokenStore,
     )
 
@@ -133,6 +137,101 @@ class DefaultDownloadOrchestratorParkTest {
         assertEquals(listOf("net.cozic.joplin"), notifier.notified)
     }
 
+    @Test
+    fun a_delegated_install_settles_the_card_and_adopts_the_untracked_app() = runBlocking {
+        val repository = RecordingInstalledAppsRepository()
+        val orchestrator =
+            orchestrator(
+                repository,
+                scope = this,
+                installer = SettlingInstaller(InstallOutcome.DELEGATED_TO_SYSTEM),
+                serializer = SettledSystemInstallSerializer,
+            )
+
+        orchestrator.enqueue(
+            spec(InstallPolicy.DeferUntilUserAction).copy(repoId = 4242L, sourceHost = "github.com"),
+        )
+        withTimeout(AWAIT_PARK_MS) { repository.parked.await() }
+
+        orchestrator.installPending("net.cozic.joplin")
+
+        // The card is done: a transfer handed to the system settles, instead of spinning on
+        // Installing with no event left to move it.
+        val entry = orchestrator.downloads.value.getValue("net.cozic.joplin")
+        assertEquals(DownloadStage.Completed, entry.stage)
+        assertEquals(InstallOutcome.DELEGATED_TO_SYSTEM, entry.installOutcome)
+
+        // And the untracked download is adopted: a pending row pointing at the parked file,
+        // for the sync to resolve once the system proves the install landed.
+        val adopted = repository.savedApps.single()
+        assertEquals("net.cozic.joplin", adopted.packageName)
+        assertEquals(4242L, adopted.repoId)
+        assertEquals("github.com", adopted.sourceHost)
+        assertTrue(adopted.isPendingInstall)
+        assertEquals(parkedPath, adopted.pendingInstallFilePath)
+        assertEquals("v3.4.1", adopted.installedVersion)
+        assertEquals("joplin-3.4.1.apk", adopted.installedAssetName)
+    }
+
+    @Test
+    fun a_tracked_app_is_not_adopted_again() = runBlocking {
+        val repository = RecordingInstalledAppsRepository()
+        repository.tracked = trackedRow()
+        val orchestrator =
+            orchestrator(
+                repository,
+                scope = this,
+                installer = SettlingInstaller(InstallOutcome.DELEGATED_TO_SYSTEM),
+                serializer = SettledSystemInstallSerializer,
+            )
+
+        orchestrator.enqueue(
+            spec(InstallPolicy.DeferUntilUserAction).copy(repoId = 4242L, sourceHost = "github.com"),
+        )
+        withTimeout(AWAIT_PARK_MS) { repository.parked.await() }
+
+        orchestrator.installPending("net.cozic.joplin")
+
+        // The row already owns this app's bookkeeping; adoption must not duplicate it — while
+        // the entry still settles exactly the same way.
+        assertTrue(
+            repository.savedApps.isEmpty(),
+            "adoption must not run for a tracked app, saved " + repository.savedApps,
+        )
+        assertEquals(
+            DownloadStage.Completed,
+            orchestrator.downloads.value.getValue("net.cozic.joplin").stage,
+        )
+    }
+
+    private fun trackedRow() =
+        InstalledApp(
+            packageName = "net.cozic.joplin",
+            repoId = 4242L,
+            repoName = "joplin",
+            repoOwner = "laurent22",
+            repoOwnerAvatarUrl = "",
+            repoDescription = null,
+            primaryLanguage = null,
+            repoUrl = "https://github.com/laurent22/joplin",
+            installedVersion = "v3.4.1",
+            installedAssetName = "joplin-3.4.1.apk",
+            installedAssetUrl = null,
+            latestVersion = null,
+            latestAssetName = null,
+            latestAssetUrl = null,
+            latestAssetSize = null,
+            appName = "Joplin",
+            installSource = InstallSource.THIS_APP,
+            installedAt = 0L,
+            lastCheckedAt = 0L,
+            lastUpdatedAt = 0L,
+            isUpdateAvailable = false,
+            signingFingerprint = null,
+            systemArchitecture = "UNKNOWN",
+            fileExtension = "apk",
+        )
+
     private companion object {
         const val AWAIT_PARK_MS = 10_000L
     }
@@ -147,6 +246,7 @@ class DefaultDownloadOrchestratorParkTest {
     private class RecordingInstalledAppsRepository : InstalledAppsRepository {
         val awaitingInstallWrites = mutableListOf<ParkWrite>()
         val pendingInstallFilePathWrites = mutableListOf<String?>()
+        val savedApps = mutableListOf<InstalledApp>()
         val parked = CompletableDeferred<Unit>()
 
         // A discard is not expected on this path; recorded so a regression that clears the park
@@ -189,7 +289,11 @@ class DefaultDownloadOrchestratorParkTest {
 
         override fun getUpdateCount(): Flow<Int> = flowOf(0)
 
-        override suspend fun getAppByPackage(packageName: String): InstalledApp? = null
+        // What the library already tracks, when a test says so. The park path never reads it;
+        // adoption does, to leave a tracked app's bookkeeping to its own row.
+        var tracked: InstalledApp? = null
+
+        override suspend fun getAppByPackage(packageName: String): InstalledApp? = tracked
 
         override suspend fun getAppByRepoId(repoId: Long): InstalledApp? = null
 
@@ -201,7 +305,9 @@ class DefaultDownloadOrchestratorParkTest {
 
         override suspend fun isAppInstalled(repoId: Long): Boolean = false
 
-        override suspend fun saveInstalledApp(app: InstalledApp) = Unit
+        override suspend fun saveInstalledApp(app: InstalledApp) {
+            savedApps += app
+        }
 
         override suspend fun deleteInstalledApp(packageName: String) = Unit
 
@@ -344,6 +450,24 @@ class DefaultDownloadOrchestratorParkTest {
         override fun openApp(packageName: String): Boolean = false
 
         override fun openWithExternalInstaller(filePath: String) = Unit
+    }
+
+    // A stand-in for the system installer on a stock device: it always hands the file over,
+    // and everything it does not override delegates to FakeInstaller so the two cannot drift.
+    private class SettlingInstaller(
+        private val outcome: InstallOutcome,
+    ) : Installer by FakeInstaller {
+        override suspend fun ensurePermissionsOrThrow(extOrMime: String) = Unit
+
+        override suspend fun install(filePath: String, extOrMime: String): InstallOutcome = outcome
+    }
+
+    // The install paths do serialize through the gate; this stand-in lets them, while
+    // FakeSystemInstallSerializer keeps guarding the park path against serializing.
+    private object SettledSystemInstallSerializer : SystemInstallSerializer {
+        override suspend fun awaitFreeAndMarkPending(packageName: String, timeoutMs: Long) = Unit
+
+        override fun markCompleted(packageName: String) = Unit
     }
 
     private object NoOpInstallerInfoExtractor : InstallerInfoExtractor {

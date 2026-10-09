@@ -24,9 +24,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.OpenInNew
 import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Download
+import androidx.compose.material.icons.filled.FileDownloadOff
 import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.Pause
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Update
 import androidx.compose.material.icons.filled.VerifiedUser
 import androidx.compose.material.icons.outlined.DeleteOutline
@@ -60,8 +62,8 @@ import zed.rainxch.details.presentation.utils.extractArchitectureFromName
 import zed.rainxch.details.presentation.utils.isExactArchitectureMatch
 import zed.rainxch.githubstore.core.presentation.res.Res
 import zed.rainxch.githubstore.core.presentation.res.architecture_compatible
-import zed.rainxch.githubstore.core.presentation.res.cancel_download
 import zed.rainxch.githubstore.core.presentation.res.checking_attestation
+import zed.rainxch.githubstore.core.presentation.res.delete_task
 import zed.rainxch.githubstore.core.presentation.res.downloading
 import zed.rainxch.githubstore.core.presentation.res.install_latest
 import zed.rainxch.githubstore.core.presentation.res.install_ready
@@ -70,6 +72,9 @@ import zed.rainxch.githubstore.core.presentation.res.installing
 import zed.rainxch.githubstore.core.presentation.res.no_build_for_this_device
 import zed.rainxch.githubstore.core.presentation.res.not_available
 import zed.rainxch.githubstore.core.presentation.res.open_app
+import zed.rainxch.githubstore.core.presentation.res.pause
+import zed.rainxch.githubstore.core.presentation.res.paused
+import zed.rainxch.githubstore.core.presentation.res.resume
 import zed.rainxch.githubstore.core.presentation.res.show_install_options
 import zed.rainxch.githubstore.core.presentation.res.unable_to_verify_attestation
 import zed.rainxch.githubstore.core.presentation.res.uninstall
@@ -168,7 +173,9 @@ fun SmartInstallButton(
         else -> stringResource(Res.string.install_latest)
     }
 
-    val hasTrailing = isActiveDownload || state.isObtainiumEnabled
+    // Only the install-options dropdown tucks under the primary's edge; the download actions are
+    // separate buttons, so the primary keeps a full corner while downloading.
+    val showOptionsPill = state.isObtainiumEnabled && !isActiveDownload
 
     Column(modifier = modifier) {
         Row(
@@ -176,7 +183,7 @@ fun SmartInstallButton(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(6.dp),
         ) {
-            val primaryShape = if (hasTrailing) {
+            val primaryShape = if (showOptionsPill) {
                 RoundedCornerShape(
                     topStart = shape.corner,
                     bottomStart = shape.corner,
@@ -211,12 +218,40 @@ fun SmartInstallButton(
             )
 
             if (isActiveDownload) {
-                TrailingActionPill(
+                // Pause/continue is the live action; verifying and installing are short transients
+                // that carry no pause, and the big box already shows their progress.
+                when (state.downloadStage) {
+                    DownloadStage.DOWNLOADING -> LabeledActionPill(
+                        container = accent,
+                        content = onAccent,
+                        icon = Icons.Default.Pause,
+                        label = stringResource(Res.string.pause),
+                        onClick = { onAction(DetailsAction.PauseDownload) },
+                    )
+
+                    DownloadStage.PAUSED -> LabeledActionPill(
+                        container = accent,
+                        content = onAccent,
+                        icon = Icons.Default.PlayArrow,
+                        label = stringResource(Res.string.resume),
+                        onClick = { onAction(DetailsAction.ResumeDownload) },
+                    )
+
+                    DownloadStage.IDLE,
+                    DownloadStage.VERIFYING,
+                    DownloadStage.INSTALLING,
+                    -> Unit
+                }
+
+                // Disabled while installing: the installer is holding the file, so deleting the
+                // task now would pull it out from under a live install.
+                LabeledActionPill(
                     container = colors.error,
                     content = colors.onError,
-                    icon = Icons.Default.Close,
-                    contentDescription = stringResource(Res.string.cancel_download),
-                    onClick = { onAction(DetailsAction.CancelCurrentDownload) },
+                    icon = Icons.Default.FileDownloadOff,
+                    label = stringResource(Res.string.delete_task),
+                    enabled = state.downloadStage != DownloadStage.INSTALLING,
+                    onClick = { onAction(DetailsAction.DiscardDownload) },
                 )
             } else if (state.isObtainiumEnabled) {
                 TrailingActionPill(
@@ -401,6 +436,7 @@ private fun DownloadingLabel(
             } else {
                 stringResource(Res.string.downloading)
             }
+            DownloadStage.PAUSED -> stringResource(Res.string.paused)
             DownloadStage.VERIFYING -> stringResource(Res.string.verifying)
             DownloadStage.INSTALLING -> if (isUpdateAvailable) {
                 stringResource(Res.string.updating)
@@ -416,8 +452,12 @@ private fun DownloadingLabel(
             color = contentColor,
             fontWeight = FontWeight.SemiBold,
             uppercase = false,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
         )
-        if (state.downloadStage == DownloadStage.DOWNLOADING) {
+        if (state.downloadStage == DownloadStage.DOWNLOADING ||
+            state.downloadStage == DownloadStage.PAUSED
+        ) {
             Spacer(Modifier.height(2.dp))
             val progressText = if (state.totalBytes != null && state.totalBytes > 0) {
                 "${formatFileSize(state.downloadedBytes)} / ${formatFileSize(state.totalBytes)}"
@@ -430,6 +470,8 @@ private fun DownloadingLabel(
                 fontSize = 11.sp,
                 color = contentColor.copy(alpha = 0.78f),
                 uppercase = false,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
             )
         }
     }
@@ -463,6 +505,48 @@ private fun TrailingActionPill(
             contentDescription = contentDescription,
             tint = content,
             modifier = Modifier.size(22.dp),
+        )
+    }
+}
+
+// The two download actions stay labelled: "delete task" never wears the trash glyph (that one
+// belongs to uninstall) and always carries its wording, and pause/continue reads better with it.
+@Composable
+private fun LabeledActionPill(
+    container: Color,
+    content: Color,
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    label: String,
+    onClick: () -> Unit,
+    enabled: Boolean = true,
+) {
+    val shape = LocalPersonality.current.shape
+    val alpha = if (enabled) 1f else 0.45f
+    Row(
+        modifier = Modifier
+            .height(ButtonHeight)
+            .clip(RoundedCornerShape(shape.corner))
+            .background(container.copy(alpha = container.alpha * alpha))
+            .clickable(enabled = enabled, onClick = onClick)
+            .padding(horizontal = 12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
+    ) {
+        KomiIcon(
+            imageVector = icon,
+            contentDescription = null,
+            tint = content.copy(alpha = alpha),
+            modifier = Modifier.size(18.dp),
+        )
+        KomiText(
+            text = label,
+            role = KomiTextRole.Title,
+            color = content.copy(alpha = alpha),
+            fontWeight = FontWeight.SemiBold,
+            fontSize = 13.sp,
+            uppercase = false,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
         )
     }
 }

@@ -20,15 +20,14 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.OpenInNew
-import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.filled.Update
 import androidx.compose.material.icons.outlined.DeleteOutline
+import androidx.compose.material.icons.outlined.FileDownloadOff
 import androidx.compose.material.icons.outlined.MoreVert
 import zed.rainxch.core.presentation.components.buttons.KomiButton
 import zed.rainxch.core.presentation.components.buttons.KomiButtonVariant
 import zed.rainxch.core.presentation.components.buttons.KomiButtonSize
 import zed.rainxch.core.presentation.components.icon.KomiIcon
-import zed.rainxch.core.presentation.components.progress.KomiLinearProgress
 import zed.rainxch.core.presentation.components.overlays.KomiDropdown
 import zed.rainxch.core.presentation.components.overlays.KomiMenuItem
 import zed.rainxch.core.presentation.components.overlays.KomiMenuTone
@@ -56,16 +55,13 @@ import zed.rainxch.githubstore.core.presentation.res.apps_compact_more_actions
 import zed.rainxch.githubstore.core.presentation.res.apps_ignore_updates
 import zed.rainxch.githubstore.core.presentation.res.apps_menu_item_active
 import zed.rainxch.githubstore.core.presentation.res.apps_skip_version_unskip
-import zed.rainxch.githubstore.core.presentation.res.cancel
+import zed.rainxch.githubstore.core.presentation.res.delete_task
 import zed.rainxch.githubstore.core.presentation.res.download_failed
-import zed.rainxch.githubstore.core.presentation.res.downloading
 import zed.rainxch.githubstore.core.presentation.res.error_with_message
 import zed.rainxch.githubstore.core.presentation.res.install
-import zed.rainxch.githubstore.core.presentation.res.installing
 import zed.rainxch.githubstore.core.presentation.res.open
 import zed.rainxch.githubstore.core.presentation.res.pre_release_badge
 import zed.rainxch.githubstore.core.presentation.res.uninstall
-import zed.rainxch.githubstore.core.presentation.res.discard_pending_install
 import zed.rainxch.githubstore.core.presentation.res.variant_picker_open
 import kotlin.time.ExperimentalTime
 
@@ -81,7 +77,6 @@ fun CompactAppRow(
     onTogglePreReleases: (Boolean) -> Unit,
     onToggleUpdateCheck: (Boolean) -> Unit,
     onUnskipVersionClick: () -> Unit,
-    onCancelClick: () -> Unit,
     onRowClick: () -> Unit,
     modifier: Modifier = Modifier,
     framed: Boolean = true,
@@ -97,6 +92,10 @@ fun CompactAppRow(
     val colors = LocalPersonality.current.colors
     val shape = LocalPersonality.current.shape
     val rowShape = RoundedCornerShape(shape.corner)
+
+    // A parked row shows "installed → parked target" so a rollback reads clearly; every other row
+    // keeps its installed version exactly as before.
+    val showVersionMigration = app.isPendingInstall && appItem.versionTargetVersion != null
 
     Row(
         modifier = modifier
@@ -132,6 +131,7 @@ fun CompactAppRow(
                     .size(48.dp)
                     .clip(RoundedCornerShape(shape.corner)),
             apkFilePath = app.pendingInstallFilePath,
+            avatarFallbackUrl = app.repoOwnerAvatarUrl,
         )
 
         Column(modifier = Modifier.weight(1f)) {
@@ -154,50 +154,21 @@ fun CompactAppRow(
                 app.sourceHost?.let { SourceChip(host = it) }
 
                 KomiText(
-                    text = app.installedVersion,
+                    text = if (showVersionMigration) appItem.versionLabel else app.installedVersion,
                     role = KomiTextRole.Body,
                     fontSize = 13.sp,
-                    color = colors.onSurfaceVariant,
+                    color =
+                        if (showVersionMigration && appItem.isVersionDowngrade) {
+                            DowngradeWarningColor
+                        } else {
+                            colors.onSurfaceVariant
+                        },
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.weight(1f, fill = false),
                 )
 
                 StatusDotCluster(flags = flags)
-            }
-
-            if (appItem.updateState is UpdateState.Downloading) {
-                Spacer(Modifier.height(4.dp))
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                ) {
-                    KomiText(
-                        text = stringResource(Res.string.downloading),
-                        role = KomiTextRole.Body,
-                        fontSize = 13.sp,
-                        color = colors.onSurface,
-                    )
-
-                    if (appItem.downloadProgress != null) {
-                        KomiText(
-                            text = "${appItem.downloadProgress}%",
-                            role = KomiTextRole.Body,
-                            fontSize = 13.sp,
-                            uppercase = false,
-                            color = colors.onSurface,
-                        )
-                    }
-                }
-
-                Spacer(Modifier.height(4.dp))
-
-                KomiLinearProgress(
-                    progress = { (appItem.downloadProgress ?: 0) / 100f },
-                    modifier = Modifier.fillMaxWidth(),
-                    color = colors.primary,
-                )
             }
 
             // This row shows nothing for an error otherwise: isBusy is false for it, so the row
@@ -222,29 +193,7 @@ fun CompactAppRow(
             }
         }
 
-        if (appItem.updateState is UpdateState.Downloading) {
-            KomiButton(
-                onClick = onCancelClick,
-                label = stringResource(Res.string.cancel),
-                variant = KomiButtonVariant.Destructive,
-                size = KomiButtonSize.Sm,
-                leadingIcon = Icons.Default.Cancel,
-            )
-
-            Spacer(Modifier.width(4.dp))
-        } else if (appItem.updateState is UpdateState.Installing) {
-            // Without this the row falls through to the install button while the installer is
-            // already running, which reads as "nothing is happening". The other two cards render
-            // this state, and a details-screen install reaches here through the same mirror.
-            KomiText(
-                text = stringResource(Res.string.installing),
-                role = KomiTextRole.Body,
-                fontSize = 13.sp,
-                color = colors.onSurface,
-            )
-
-            Spacer(Modifier.width(4.dp))
-        } else if (app.pendingInstallFilePath != null) {
+        if (app.pendingInstallFilePath != null) {
             KomiButton(
                 onClick = onInstallPendingClick,
                 label = stringResource(Res.string.install),
@@ -318,7 +267,7 @@ private fun CompactRowOverflow(
     val advancedSettingsLabel = stringResource(Res.string.advanced_settings_open)
     val variantPickerLabel = stringResource(Res.string.variant_picker_open)
     val unskipLabel = stringResource(Res.string.apps_skip_version_unskip)
-    val discardLabel = stringResource(Res.string.discard_pending_install)
+    val deleteTaskLabel = stringResource(Res.string.delete_task)
     val uninstallLabel = stringResource(Res.string.uninstall)
     val preReleaseActive = stringResource(Res.string.apps_menu_item_active, preReleaseBase)
     val ignoreUpdatesActive = stringResource(Res.string.apps_menu_item_active, ignoreUpdatesBase)
@@ -345,8 +294,8 @@ private fun CompactRowOverflow(
             add(
                 KomiMenuItem(
                     id = "discard_pending",
-                    label = discardLabel,
-                    icon = Icons.Outlined.DeleteOutline,
+                    label = deleteTaskLabel,
+                    icon = Icons.Outlined.FileDownloadOff,
                     tone = KomiMenuTone.Danger,
                 ),
             )

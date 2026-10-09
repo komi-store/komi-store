@@ -6,6 +6,8 @@ enum class DownloadStage {
 
     Downloading,
 
+    Paused,
+
     Installing,
 
     AwaitingInstall,

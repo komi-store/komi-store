@@ -11,12 +11,13 @@ import zed.rainxch.core.domain.system.DownloadOrchestrator
 
 class DownloadCancelReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
-        // Dispatch on the data URI: the two intents share a component and a package extra,
-        // and only the URI separates pause from delete.
+        // Dispatch on the data URI: the intents share a component and a package extra, and only the
+        // URI separates pause from resume from delete.
         val dispatch =
             when (intent.data?.scheme) {
                 URI_SCHEME_DISCARD -> Dispatch.DELETE
                 URI_SCHEME_PAUSE -> Dispatch.PAUSE
+                URI_SCHEME_RESUME -> Dispatch.RESUME
                 else -> {
                     Logger.w { "DownloadCancelReceiver: unknown data URI ${intent.data}, ignoring" }
                     return
@@ -43,6 +44,7 @@ class DownloadCancelReceiver : BroadcastReceiver() {
             try {
                 when (dispatch) {
                     Dispatch.PAUSE -> orchestrator.cancel(packageName)
+                    Dispatch.RESUME -> orchestrator.resume(packageName)
                     Dispatch.DELETE -> orchestrator.discard(packageName)
                 }
             } catch (t: Throwable) {
@@ -53,14 +55,16 @@ class DownloadCancelReceiver : BroadcastReceiver() {
         }
     }
 
-    private enum class Dispatch { PAUSE, DELETE }
+    private enum class Dispatch { PAUSE, RESUME, DELETE }
 
     companion object {
         const val ACTION_CANCEL = "zed.rainxch.githubstore.action.CANCEL_DOWNLOAD"
         const val ACTION_DISCARD = "zed.rainxch.githubstore.action.DISCARD_DOWNLOAD"
+        const val ACTION_RESUME = "zed.rainxch.githubstore.action.RESUME_DOWNLOAD"
         const val EXTRA_PACKAGE_NAME = "zed.rainxch.githubstore.extra.PACKAGE_NAME"
 
         const val URI_SCHEME_PAUSE = "githubstore-cancel"
         const val URI_SCHEME_DISCARD = "githubstore-discard"
+        const val URI_SCHEME_RESUME = "githubstore-resume"
     }
 }

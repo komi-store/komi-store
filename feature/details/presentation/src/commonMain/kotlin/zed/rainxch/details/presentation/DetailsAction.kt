@@ -53,7 +53,11 @@ sealed interface DetailsAction {
         val sizeBytes: Long,
     ) : DetailsAction
 
-    data object CancelCurrentDownload : DetailsAction
+    data object PauseDownload : DetailsAction
+
+    data object ResumeDownload : DetailsAction
+
+    data object DiscardDownload : DetailsAction
 
     data object OpenRepoInBrowser : DetailsAction
 

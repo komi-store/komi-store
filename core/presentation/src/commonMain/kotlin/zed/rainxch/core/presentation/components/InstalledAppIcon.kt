@@ -9,4 +9,5 @@ expect fun InstalledAppIcon(
     appName: String,
     modifier: Modifier = Modifier,
     apkFilePath: String? = null,
+    avatarFallbackUrl: String? = null,
 )

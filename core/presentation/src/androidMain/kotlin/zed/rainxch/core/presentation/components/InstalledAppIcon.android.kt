@@ -23,6 +23,7 @@ actual fun InstalledAppIcon(
     appName: String,
     modifier: Modifier,
     apkFilePath: String?,
+    avatarFallbackUrl: String?,
 ) {
     val packageManager = LocalContext.current.packageManager
     val iconBitmap =
@@ -31,18 +32,31 @@ actual fun InstalledAppIcon(
                 ?: apkFilePath?.let { resolveApkIcon(packageManager, it) }
         }
 
-    if (iconBitmap != null) {
-        Image(
-            bitmap = iconBitmap,
-            contentDescription = appName,
-            modifier = modifier,
-        )
-    } else {
-        Image(
-            painter = painterResource(Res.drawable.app_icon),
-            contentDescription = appName,
-            modifier = modifier,
-        )
+    when {
+        iconBitmap != null ->
+            Image(
+                bitmap = iconBitmap,
+                contentDescription = appName,
+                modifier = modifier,
+            )
+
+        // Nothing on this device can prove what this app's icon is: it is not installed, and the
+        // file we have is not a readable APK yet. The repository's owner avatar is then the only
+        // image that actually belongs to this repository. Falling through to the bundled app_icon
+        // below would stamp THIS application's logo onto someone else's download, which reads as
+        // "this is Komi Store" — the one thing the icon must not say.
+        avatarFallbackUrl != null ->
+            GitHubStoreImage(
+                imageModel = { avatarFallbackUrl },
+                modifier = modifier,
+            )
+
+        else ->
+            Image(
+                painter = painterResource(Res.drawable.app_icon),
+                contentDescription = appName,
+                modifier = modifier,
+            )
     }
 }
 

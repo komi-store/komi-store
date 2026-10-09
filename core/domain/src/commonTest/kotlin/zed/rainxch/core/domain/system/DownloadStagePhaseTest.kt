@@ -22,6 +22,7 @@ class DownloadStagePhaseTest {
         assertEquals(listOf(DownloadStage.Installing), byClass[DownloadStagePhase.Installing])
         assertEquals(
             listOf(
+                DownloadStage.Paused,
                 DownloadStage.AwaitingInstall,
                 DownloadStage.Completed,
                 DownloadStage.Cancelled,

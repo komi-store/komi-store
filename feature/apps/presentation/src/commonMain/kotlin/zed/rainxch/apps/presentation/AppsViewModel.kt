@@ -158,15 +158,20 @@ class AppsViewModel(
             linkInstallableAssets.filter { regex.containsMatchIn(it.name) }.toImmutableList()
         }
 
-        val pending = filteredApps.filter {
+        // A row whose download is on an "in progress" card is hidden from every group: the app is
+        // already on screen, and showing the row too would draw it twice. Its card carries the
+        // stage, so the row has nothing left to say.
+        val visibleApps = filteredApps.filterNot { it.installedApp.packageName in hiddenRowPackages }
+
+        val pending = visibleApps.filter {
             it.installedApp.isPendingInstall && it.installedApp.pendingInstallFilePath != null
         }.toImmutableList()
-        val updates = filteredApps.filter {
+        val updates = visibleApps.filter {
             it.installedApp.isUpdateAvailable &&
                 it.installedApp.updateCheckEnabled &&
                 !it.installedApp.isPendingInstall
         }.toImmutableList()
-        val idle = filteredApps.filter {
+        val idle = visibleApps.filter {
             (!it.installedApp.isUpdateAvailable || !it.installedApp.updateCheckEnabled) &&
                 !it.installedApp.isPendingInstall
         }.toImmutableList()
@@ -398,12 +403,20 @@ class AppsViewModel(
                 _state.update { it.copy(appPendingDiscard = null) }
             }
 
-            is AppsAction.OnCancelUpdate -> {
-                cancelUpdate(action.packageName)
-            }
-
             is AppsAction.OnCancelInProgressDownload -> {
                 runOrchestratorAction("cancel", action.key) { downloadOrchestrator.cancel(it) }
+            }
+
+            is AppsAction.OnResumeInProgressDownload -> {
+                runOrchestratorAction("resume", action.key) { downloadOrchestrator.resume(it) }
+            }
+
+            is AppsAction.OnRetryInProgressDownload -> {
+                runOrchestratorAction("retry", action.key) { downloadOrchestrator.retry(it) }
+            }
+
+            is AppsAction.OnDiscardInProgressDownload -> {
+                runOrchestratorAction("discard", action.key) { downloadOrchestrator.discard(it) }
             }
 
             is AppsAction.OnInstallInProgressDownload -> {
@@ -1276,6 +1289,10 @@ class AppsViewModel(
                             packageName = app.packageName,
                             repoOwner = app.repoOwner,
                             repoName = app.repoName,
+                            repoId = app.repoId,
+                            sourceHost = app.sourceHost,
+                            repoOwnerAvatarUrl = app.repoOwnerAvatarUrl,
+                            repoDescription = app.repoDescription,
                             asset = primaryAsset,
                             displayAppName = app.appName,
                             installPolicy = policy,
@@ -1482,32 +1499,6 @@ class AppsViewModel(
             }
     }
 
-    private fun cancelUpdate(packageName: String) {
-        activeUpdates[packageName]?.cancel()
-        activeUpdates.remove(packageName)
-
-        val app = _state.value.apps.find { it.installedApp.packageName == packageName }
-        app?.installedApp?.latestAssetName?.let { assetName ->
-            viewModelScope.launch {
-                cleanupUpdate(packageName, assetName)
-            }
-        }
-
-        // A download the details screen started has no [activeUpdates] entry, so the job cancel
-        // above is a no-op for it. Routing through the orchestrator as well stops either kind.
-        viewModelScope.launch {
-            try {
-                downloadOrchestrator.cancel(packageName)
-            } catch (e: CancellationException) {
-                throw e
-            } catch (t: Throwable) {
-                logger.warn("cancelUpdate: orchestrator cancel failed: ${t.message}")
-            }
-        }
-
-        updateAppState(packageName, UpdateState.Idle)
-    }
-
     // Orchestrator work started from the screen runs here rather than on a composition scope, so
     // navigating away cannot abort it, and every failure is contained instead of cancelling
     // viewModelScope.
@@ -1542,8 +1533,8 @@ class AppsViewModel(
                     appItem.installedApp.latestAssetName?.let { assetName ->
                         cleanupUpdate(appItem.installedApp.packageName, assetName)
                     }
-                    // Same reason as [cancelUpdate]: a details-screen download has no
-                    // [activeUpdates] entry and is only stopped by the orchestrator.
+                    // A details-screen download has no [activeUpdates] entry, so cancelling the
+                    // jobs above is a no-op for it; the orchestrator is what stops it.
                     try {
                         downloadOrchestrator.cancel(appItem.installedApp.packageName)
                     } catch (e: CancellationException) {
@@ -1675,16 +1666,21 @@ class AppsViewModel(
             }
         }
 
-        updateInProgressDownloads(snapshot, knownPackages)
+        updateInProgressState(snapshot, knownPackages)
     }
 
-    private fun updateInProgressDownloads(
+    private fun updateInProgressState(
         snapshot: Map<String, OrchestratedDownload>,
         knownPackages: Set<String>,
     ) {
         val transient = transientDownloads(snapshot, knownPackages).toImmutableList()
+        val hidden = hiddenRowPackages(snapshot, knownPackages).toImmutableSet()
         _state.update { current ->
-            if (current.inProgressDownloads == transient) current else current.copy(inProgressDownloads = transient)
+            if (current.inProgressDownloads == transient && current.hiddenRowPackages == hidden) {
+                current
+            } else {
+                current.copy(inProgressDownloads = transient, hiddenRowPackages = hidden)
+            }
         }
     }
 

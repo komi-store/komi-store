@@ -9,6 +9,7 @@ interface DownloadProgressNotifier {
         percent: Int?,
         bytesDownloaded: Long,
         totalBytes: Long?,
+        paused: Boolean = false,
     )
 
     fun clearProgress(packageName: String)

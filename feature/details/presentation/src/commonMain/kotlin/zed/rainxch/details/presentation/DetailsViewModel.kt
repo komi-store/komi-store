@@ -360,8 +360,16 @@ class DetailsViewModel(
                 )
             }
 
-            DetailsAction.CancelCurrentDownload -> {
-                cancelCurrentDownload()
+            DetailsAction.PauseDownload -> {
+                pauseCurrentDownload()
+            }
+
+            DetailsAction.ResumeDownload -> {
+                resumeCurrentDownload()
+            }
+
+            DetailsAction.DiscardDownload -> {
+                discardCurrentDownload()
             }
 
             DetailsAction.OnToggleFavorite -> {
@@ -1681,10 +1689,10 @@ class DetailsViewModel(
         }
     }
 
-    private fun cancelCurrentDownload() {
-        currentDownloadJob?.cancel()
-        currentDownloadJob = null
-
+    // Pause keeps the download on screen: the orchestrator parks it as Paused with its bytes intact,
+    // and the entry observer stays alive across the pause so a resumed run still installs once it
+    // reaches AwaitingInstall. Pausing is not a cancel, so nothing is logged.
+    private fun pauseCurrentDownload() {
         val packageKey = orchestratorKey()
         viewModelScope.launch {
             try {
@@ -1692,7 +1700,38 @@ class DetailsViewModel(
             } catch (e: kotlinx.coroutines.CancellationException) {
                 throw e
             } catch (t: Throwable) {
-                logger.error("Failed to cancel orchestrator download: ${t.message}")
+                logger.error("Failed to pause orchestrator download: ${t.message}")
+            }
+        }
+    }
+
+    private fun resumeCurrentDownload() {
+        val packageKey = orchestratorKey()
+        viewModelScope.launch {
+            try {
+                downloadOrchestrator.resume(packageKey)
+            } catch (e: kotlinx.coroutines.CancellationException) {
+                throw e
+            } catch (t: Throwable) {
+                logger.error("Failed to resume orchestrator download: ${t.message}")
+            }
+        }
+    }
+
+    // "Delete task" drops the bytes and the entry, never the installed app. It is the old ✕'s
+    // successor, so it keeps that action's Cancelled log line.
+    private fun discardCurrentDownload() {
+        currentDownloadJob?.cancel()
+        currentDownloadJob = null
+
+        val packageKey = orchestratorKey()
+        viewModelScope.launch {
+            try {
+                downloadOrchestrator.discard(packageKey)
+            } catch (e: kotlinx.coroutines.CancellationException) {
+                throw e
+            } catch (t: Throwable) {
+                logger.error("Failed to discard orchestrator download: ${t.message}")
             }
         }
 
@@ -1706,7 +1745,7 @@ class DetailsViewModel(
                 size = totalSize,
                 result = LogResult.Cancelled,
             )
-            logger.debug("Download cancelled via orchestrator: $assetName")
+            logger.debug("Download discarded via orchestrator: $assetName")
         }
 
         currentAssetName = null
@@ -1947,6 +1986,10 @@ class DetailsViewModel(
                         packageName = packageKey,
                         repoOwner = repository.owner.login,
                         repoName = repository.name,
+                        repoId = repository.id,
+                        sourceHost = sourceHostParam,
+                        repoOwnerAvatarUrl = repository.owner.avatarUrl,
+                        repoDescription = repository.description,
                         asset = asset,
                         displayAppName = repository.name,
                         installPolicy = policy,
@@ -2041,11 +2084,12 @@ class DetailsViewModel(
 
     private fun mirrorOrchestratorStage(entry: OrchestratedDownload?) {
         _state.update { current ->
-            when (entry?.stage?.phase) {
+            when (entry?.stage) {
                 // A Queued entry carries a null percent on purpose, and it is left null here: the
                 // screen renders that as indeterminate, whereas falling back to the previous value
                 // would show a finished run's percentage over a download that has not started.
-                DownloadStagePhase.Live,
+                OrchestratorStage.Queued,
+                OrchestratorStage.Downloading,
                 -> current.copy(
                     downloadStage = DownloadStage.DOWNLOADING,
                     downloadProgressPercent = entry.progressPercent,
@@ -2053,15 +2097,26 @@ class DetailsViewModel(
                     totalBytes = entry.totalBytes ?: current.totalBytes,
                 )
 
-                DownloadStagePhase.Installing ->
+                // Paused holds the bar where it stopped and the bytes it reached, so the screen
+                // reads as a download waiting to continue rather than a finished one.
+                OrchestratorStage.Paused -> current.copy(
+                    downloadStage = DownloadStage.PAUSED,
+                    downloadProgressPercent = entry.progressPercent,
+                    downloadedBytes = entry.bytesDownloaded,
+                    totalBytes = entry.totalBytes ?: current.totalBytes,
+                )
+
+                OrchestratorStage.Installing ->
                     current.copy(downloadStage = DownloadStage.INSTALLING)
 
                 // Nothing live for this package: it parked, finished or was cancelled while the
                 // screen was gone. A stale progress bar is worse than a resting one, and the byte
                 // counts belong to the run that just ended, so they go with it.
                 null,
-                DownloadStagePhase.Resting,
-                DownloadStagePhase.Failed,
+                OrchestratorStage.AwaitingInstall,
+                OrchestratorStage.Completed,
+                OrchestratorStage.Cancelled,
+                OrchestratorStage.Failed,
                 -> {
                     val isResting =
                         current.downloadStage == DownloadStage.IDLE &&
@@ -2097,12 +2152,14 @@ class DetailsViewModel(
             // The settling entry is emitted and then the flow completes, so this job ends. It
             // matters beyond tidiness: this job is what holds the display mirror down, and an
             // observer that outlives the download would keep the mirror disabled for the rest of
-            // the ViewModel's life.
+            // the ViewModel's life. Paused is the one exception: it keeps collecting so a resumed
+            // run still installs on AwaitingInstall instead of parking silently.
             .transformWhile { entry ->
                 emit(entry)
                 entry == null ||
                     entry.stage.phase == DownloadStagePhase.Live ||
-                    entry.stage.phase == DownloadStagePhase.Installing
+                    entry.stage.phase == DownloadStagePhase.Installing ||
+                    entry.stage == OrchestratorStage.Paused
             }
             .collect { entry ->
             if (entry == null) {
@@ -2240,6 +2297,13 @@ class DetailsViewModel(
                         downloadOrchestrator.dismiss(packageKey)
                     }
                     return@collect
+                }
+
+                // Paused is a first-class state on this screen now: the bar and the bytes stay as
+                // the entry carries them, and the resume button restarts the same run. The observer
+                // above stays alive across the pause, so pausing logs nothing.
+                OrchestratorStage.Paused -> {
+                    _state.value = _state.value.copy(downloadStage = DownloadStage.PAUSED)
                 }
 
                 OrchestratorStage.Cancelled -> {
@@ -2558,6 +2622,10 @@ class DetailsViewModel(
                         packageName = packageKey,
                         repoOwner = repository.owner.login,
                         repoName = repository.name,
+                        repoId = repository.id,
+                        sourceHost = sourceHostParam,
+                        repoOwnerAvatarUrl = repository.owner.avatarUrl,
+                        repoDescription = repository.description,
                         asset = asset,
                         displayAppName = repository.name,
                         installPolicy = InstallPolicy.DeferUntilUserAction,

@@ -13,10 +13,21 @@ actual fun InstalledAppIcon(
     appName: String,
     modifier: Modifier,
     apkFilePath: String?,
+    avatarFallbackUrl: String?,
 ) {
-    Image(
-        painter = painterResource(Res.drawable.app_icon),
-        contentDescription = appName,
-        modifier = modifier,
-    )
+    // The desktop build has no package manager to read an installed icon from. A download that is
+    // not installed yet still belongs to a repository, so show that repository's owner avatar
+    // rather than this application's own logo — the same rule the Android side follows.
+    if (avatarFallbackUrl != null) {
+        GitHubStoreImage(
+            imageModel = { avatarFallbackUrl },
+            modifier = modifier,
+        )
+    } else {
+        Image(
+            painter = painterResource(Res.drawable.app_icon),
+            contentDescription = appName,
+            modifier = modifier,
+        )
+    }
 }

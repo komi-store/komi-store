@@ -293,6 +293,9 @@
     <string name="open_repository">打开仓库</string>
     <string name="open_in_browser">在浏览器中打开</string>
     <string name="cancel_download">取消下载</string>
+    <string name="pause">暂停</string>
+    <string name="resume">继续</string>
+    <string name="paused">已暂停</string>
     <string name="show_install_options">显示安装选项</string>
 
     <!-- Errors & states -->
@@ -882,6 +885,7 @@
     <string name="dhizuku_status_permission_needed">需要权限</string>
     <string name="dhizuku_status_ready">就绪</string>
     <string name="discard_pending_install">放弃</string>
+    <string name="delete_task">删除任务</string>
     <string name="error_state_go_back">返回</string>
     <string name="error_state_subtitle_generic">无法加载该仓库。请使用下方的重试按钮。</string>
     <string name="error_state_subtitle_not_found">仓库可能为私有、已重命名或已删除。</string>

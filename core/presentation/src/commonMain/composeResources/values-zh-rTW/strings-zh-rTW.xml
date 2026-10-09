@@ -882,6 +882,10 @@
     <string name="dhizuku_status_permission_needed">需要許可權</string>
     <string name="dhizuku_status_ready">就緒</string>
     <string name="discard_pending_install">放棄</string>
+    <string name="delete_task">刪除任務</string>
+    <string name="pause">暫停</string>
+    <string name="resume">繼續</string>
+    <string name="paused">已暫停</string>
     <string name="error_state_go_back">返回</string>
     <string name="error_state_subtitle_generic">無法載入該倉庫。請使用下方的重試按鈕。</string>
     <string name="error_state_subtitle_not_found">倉庫可能為私有、已重新命名或已刪除。</string>
