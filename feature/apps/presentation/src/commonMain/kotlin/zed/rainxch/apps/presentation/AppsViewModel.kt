@@ -1304,6 +1304,7 @@ class AppsViewModel(
                     try {
                         systemInstallSerializer.awaitFreeAndMarkPending(app.packageName)
                         installer.install(filePath, ext)
+                        systemInstallSerializer.markCompleted(app.packageName)
                     } catch (e: CancellationException) {
                         throw e
                     } catch (e: Exception) {
