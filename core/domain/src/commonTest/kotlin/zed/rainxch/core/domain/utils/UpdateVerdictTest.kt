@@ -8,6 +8,7 @@ class UpdateVerdictTest {
     private fun decide(
         installedTag: String = "1.0.0",
         installedVersionCode: Long = 100L,
+        installedVersionName: String? = null,
         storedLatestTag: String? = null,
         storedLatestVersionCode: Long? = null,
         storedPublishedAt: String? = null,
@@ -27,7 +28,7 @@ class UpdateVerdictTest {
         bound: UpdateVerdict.Bound? = null,
     ): UpdateVerdict.Result =
         UpdateVerdict.decide(
-            installed = UpdateVerdict.Installed(installedTag, installedVersionCode),
+            installed = UpdateVerdict.Installed(installedTag, installedVersionCode, installedVersionName),
             stored =
                 UpdateVerdict.Stored(
                     latestTag = storedLatestTag,
@@ -52,6 +53,153 @@ class UpdateVerdictTest {
             skippedTag = skippedTag,
             bound = bound,
         )
+
+    // com.yunx.app: v1.2.8 was offered, the install was blocked for want of installer
+    // authorisation, and it was installed another way. The device then reported 1.2.8 while the
+    // stored tag stayed at 1.2.6, so the verdict kept comparing that stale tag and reported an
+    // update the device had already taken — until the app was downloaded again through the store.
+    @Test
+    fun a_release_the_device_already_runs_is_not_an_update() {
+        val result =
+            decide(
+                installedTag = "1.2.6",
+                installedVersionCode = 12L,
+                installedVersionName = "1.2.8",
+                storedLatestTag = "v1.2.8",
+                matchedTag = "v1.2.8",
+                matchedPublishedAt = "2026-10-03T11:38:10Z",
+            )
+        assertFalse(result.isUpdateAvailable)
+    }
+
+    @Test
+    fun a_release_the_device_already_runs_is_not_an_update_for_a_prerelease_too() {
+        val result =
+            decide(
+                installedTag = "3.26.16-beta.42",
+                installedVersionCode = 18503L,
+                installedVersionName = "3.26.16-beta.44",
+                storedLatestTag = "3.26.16-beta.44",
+                matchedTag = "3.26.16-beta.44",
+                matchedPublishedAt = "2026-10-02T17:31:28Z",
+                matchedIsPrerelease = true,
+            )
+        assertFalse(result.isUpdateAvailable)
+    }
+
+    @Test
+    fun a_version_the_device_does_not_report_is_still_an_update() {
+        val result =
+            decide(
+                installedTag = "1.2.6",
+                installedVersionCode = 10L,
+                installedVersionName = "1.2.6",
+                storedLatestTag = "v1.2.6",
+                matchedTag = "v1.2.8",
+                matchedPublishedAt = "2026-10-03T11:38:10Z",
+            )
+        assertTrue(result.isUpdateAvailable)
+    }
+
+    // The evidence has to be exact, not merely equal after normalisation: "1.2.8.0" and "1.2.8"
+    // normalise alike, and treating that as proof would swallow a real update.
+    @Test
+    fun a_name_that_only_normalises_to_the_matched_tag_is_not_evidence() {
+        val result =
+            decide(
+                installedTag = "1.2.7",
+                installedVersionCode = 100L,
+                installedVersionName = "1.2.8.0",
+                storedLatestTag = "v1.2.7",
+                matchedTag = "v1.2.8",
+                matchedPublishedAt = "2026-10-03T11:38:10Z",
+            )
+        assertTrue(result.isUpdateAvailable)
+    }
+
+    // A "v" prefix is not a difference, so a device reporting "v1.2.8" is on release "v1.2.8".
+    @Test
+    fun a_leading_v_does_not_hide_that_the_device_runs_the_matched_release() {
+        val result =
+            decide(
+                installedTag = "1.2.6",
+                installedVersionCode = 12L,
+                installedVersionName = "v1.2.8",
+                storedLatestTag = "v1.2.8",
+                matchedTag = "v1.2.8",
+                matchedPublishedAt = "2026-10-03T11:38:10Z",
+            )
+        assertFalse(result.isUpdateAvailable)
+    }
+
+    @Test
+    fun without_a_reported_name_the_tag_is_still_the_baseline() {
+        val result =
+            decide(
+                installedTag = "1.2.6",
+                installedVersionCode = 12L,
+                installedVersionName = null,
+                storedLatestTag = "v1.2.8",
+                matchedTag = "v1.2.8",
+                matchedPublishedAt = "2026-10-03T11:38:10Z",
+            )
+        assertTrue(result.isUpdateAvailable)
+    }
+
+    @Test
+    fun the_stale_tag_is_adopted_when_the_device_runs_the_matched_release() {
+        val result =
+            decide(
+                installedTag = "1.2.6",
+                installedVersionCode = 12L,
+                installedVersionName = "1.2.8",
+                storedLatestTag = "v1.2.8",
+                matchedTag = "v1.2.8",
+                matchedPublishedAt = "2026-10-03T11:38:10Z",
+            )
+        assertTrue(result.deviceRunsMatchedRelease)
+        assertTrue(
+            UpdateVerdict.shouldAdoptMatchedTag(
+                codesAlreadyMatch = result.codesAlreadyMatch,
+                installedTag = "1.2.6",
+                matchedTag = "v1.2.8",
+                deviceRunsMatchedRelease = result.deviceRunsMatchedRelease,
+            ),
+        )
+    }
+
+    @Test
+    fun a_rolling_tag_rebuild_is_an_update_even_when_the_name_matches_the_tag() {
+        val result =
+            decide(
+                installedTag = "nightly",
+                installedVersionName = "nightly",
+                matchedTag = "nightly",
+                storedLatestTag = "nightly",
+                storedPublishedAt = "2026-08-01T00:00:00Z",
+                matchedPublishedAt = "2026-08-02T00:00:00Z",
+                matchedIsPrerelease = true,
+            )
+        assertTrue(result.isUpdateAvailable)
+        assertFalse(result.deviceRunsMatchedRelease)
+    }
+
+    @Test
+    fun a_rolling_tag_reupload_is_an_update_even_when_the_name_matches_the_tag() {
+        val result =
+            decide(
+                installedTag = "nightly",
+                installedVersionName = "nightly",
+                matchedTag = "nightly",
+                storedLatestTag = "nightly",
+                storedPublishedAt = "2026-08-01T00:00:00Z",
+                matchedPublishedAt = "2026-08-01T00:00:00Z",
+                storedAssetDigest = "sha256:aaa",
+                matchedAssetDigest = "sha256:bbb",
+                matchedIsPrerelease = true,
+            )
+        assertTrue(result.isUpdateAvailable)
+    }
 
     @Test
     fun semver_newer_reports_update() {
@@ -798,5 +946,107 @@ class UpdateVerdictTest {
                     ),
             )
         assertTrue(bound.isUpdateAvailable)
+    }
+
+    @Test
+    fun an_asset_replaced_in_place_with_identical_bytes_is_not_a_new_build() {
+        val result =
+            decide(
+                installedTag = "nightly",
+                installedVersionCode = 500L,
+                storedLatestTag = "nightly",
+                storedLatestVersionCode = 500L,
+                storedPublishedAt = "2026-09-24T11:46:11Z",
+                wasUpdateAvailable = false,
+                matchedTag = "nightly",
+                matchedPublishedAt = "2026-09-24T11:46:11Z",
+                matchedIsPrerelease = true,
+                storedAssetDigest = "sha256:aaaa",
+                storedAssetSize = 70_543_755L,
+                matchedAssetDigest = "sha256:aaaa",
+                matchedAssetSize = 70_543_755L,
+                storedReleaseId = 700L,
+                matchedReleaseId = 700L,
+                storedAssetId = 801L,
+                matchedAssetId = 901L,
+            )
+        assertFalse(result.isUpdateAvailable)
+    }
+
+    @Test
+    fun a_skip_survives_an_in_place_replacement_of_identical_bytes() {
+        val result =
+            decide(
+                installedTag = "nightly",
+                installedVersionCode = 500L,
+                storedLatestTag = "nightly",
+                storedLatestVersionCode = 500L,
+                storedPublishedAt = "2026-09-24T11:46:11Z",
+                wasUpdateAvailable = false,
+                skippedTag = "nightly",
+                matchedTag = "nightly",
+                matchedPublishedAt = "2026-09-24T11:46:11Z",
+                matchedIsPrerelease = true,
+                storedAssetDigest = "sha256:aaaa",
+                storedAssetSize = 70_543_755L,
+                matchedAssetDigest = "sha256:aaaa",
+                matchedAssetSize = 70_543_755L,
+                storedReleaseId = 700L,
+                matchedReleaseId = 700L,
+                storedAssetId = 801L,
+                matchedAssetId = 901L,
+            )
+        assertFalse(result.isUpdateAvailable)
+        assertFalse(result.skipBecameStale)
+    }
+
+    @Test
+    fun a_skip_is_still_released_when_the_bytes_actually_change() {
+        val result =
+            decide(
+                installedTag = "nightly",
+                installedVersionCode = 500L,
+                storedLatestTag = "nightly",
+                storedLatestVersionCode = 500L,
+                storedPublishedAt = "2026-09-24T11:46:11Z",
+                wasUpdateAvailable = false,
+                skippedTag = "nightly",
+                matchedTag = "nightly",
+                matchedPublishedAt = "2026-09-24T11:46:11Z",
+                matchedIsPrerelease = true,
+                storedAssetDigest = "sha256:aaaa",
+                storedAssetSize = 70_543_755L,
+                matchedAssetDigest = "sha256:bbbb",
+                matchedAssetSize = 70_543_755L,
+                storedReleaseId = 700L,
+                matchedReleaseId = 700L,
+                storedAssetId = 801L,
+                matchedAssetId = 801L,
+            )
+        assertTrue(result.isUpdateAvailable)
+        assertTrue(result.skipBecameStale)
+    }
+
+    @Test
+    fun a_one_sided_digest_falls_back_to_object_ids() {
+        val result =
+            decide(
+                installedTag = "nightly",
+                installedVersionCode = 500L,
+                storedLatestTag = "nightly",
+                storedLatestVersionCode = 500L,
+                storedPublishedAt = "2026-09-24T11:46:11Z",
+                wasUpdateAvailable = false,
+                matchedTag = "nightly",
+                matchedPublishedAt = "2026-09-24T11:46:11Z",
+                matchedIsPrerelease = true,
+                storedAssetDigest = null,
+                storedAssetSize = 70_543_755L,
+                matchedAssetDigest = "sha256:aaaa",
+                matchedAssetSize = 70_543_755L,
+                storedAssetId = 801L,
+                matchedAssetId = 901L,
+            )
+        assertTrue(result.isUpdateAvailable)
     }
 }
