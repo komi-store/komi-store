@@ -33,11 +33,6 @@ import zed.rainxch.core.domain.system.MultiSourceDownloader
 import zed.rainxch.core.domain.system.PendingInstallNotifier
 import zed.rainxch.core.domain.system.SystemInstallSerializer
 
-// A mirror that answers 200 with corrupted bytes streams to completion without ever throwing —
-// the fallback inside the multi-source downloader cannot see it, and before this change the
-// download died at the digest check accusing the file of tampering. These tests pin the new
-// behaviour: the check re-fetches straight from the source once, and only a direct re-fetch
-// that still mismatches is an integrity failure.
 class DefaultDownloadOrchestratorDigestRefetchTest {
 
     private val digest =
@@ -98,8 +93,6 @@ class DefaultDownloadOrchestratorDigestRefetchTest {
                     }
                 }["net.cozic.joplin"]!!
 
-            // The first attempt goes through the multi-source (mirror) path; the re-fetch goes
-            // straight to the source, bypassing the mirror, and clears any partial first.
             assertEquals(1, multi.calls.size, "the first attempt goes through the multi-source path")
             assertEquals(1, downloader.calls.size, "exactly one direct attempt")
             assertTrue(downloader.calls.single().bypassMirror, "the re-fetch must bypass the mirror")

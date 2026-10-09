@@ -246,12 +246,6 @@ class DefaultDownloadOrchestrator(
         if (expectedDigest != null) {
             val mismatch = digestVerifier.verify(filePath, expectedDigest)
             if (mismatch != null) {
-                // The bytes did not match, and the mirror is the first suspect — not the
-                // release: a mirror that answers 200 with corrupted bytes streams to the end
-                // without ever throwing, so the fallback above never sees it, and the download
-                // used to die here accusing the file of tampering. Re-fetch straight from the
-                // source and check once more; only bytes that fail the direct fetch too are
-                // treated as an integrity failure.
                 Logger.w {
                     "Orchestrator: digest mismatch for ${spec.asset.name} ($mismatch); " +
                         "re-fetching from the source"

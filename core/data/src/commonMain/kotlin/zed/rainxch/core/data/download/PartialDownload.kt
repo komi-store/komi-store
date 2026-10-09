@@ -193,8 +193,6 @@ object OrphanPolicy {
         if (partExists && !metaExists) return OrphanVerdict.DROP_PART_ONLY
         if (!partExists) return OrphanVerdict.DROP_META_ONLY
 
-        // A complete pair is the only shape that can be resumed, so it survives being
-        // unclaimed. Only half-pairs are swept: they can never be attributed again.
         return OrphanVerdict.KEEP
     }
 }
