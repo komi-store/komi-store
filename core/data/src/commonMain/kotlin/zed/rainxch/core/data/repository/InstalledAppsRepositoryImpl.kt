@@ -34,8 +34,10 @@ import zed.rainxch.core.domain.model.installation.clearPending
 import zed.rainxch.core.domain.model.installation.confirmInstall
 import zed.rainxch.core.domain.model.installation.markPending
 import zed.rainxch.core.domain.model.smart_detect.MatchingPreview
+import zed.rainxch.core.domain.network.DigestVerifier
 import zed.rainxch.core.domain.repository.InstalledAppsRepository
 import zed.rainxch.core.domain.system.Installer
+import zed.rainxch.core.domain.system.PackageMonitor
 import zed.rainxch.core.domain.utils.AssetFilter
 import zed.rainxch.core.domain.utils.AssetOwnership
 import zed.rainxch.core.domain.utils.AssetVariant
@@ -50,6 +52,8 @@ class InstalledAppsRepositoryImpl(
     private val clientProvider: GitHubClientProvider,
     private val backendApiClient: zed.rainxch.core.data.network.BackendApiClient,
     private val forgejoClientRegistry: zed.rainxch.core.data.network.ForgejoClientRegistry,
+    private val packageMonitor: PackageMonitor,
+    private val digestVerifier: DigestVerifier,
 ) : InstalledAppsRepository {
     private val checkAllMutex = Mutex()
 
@@ -358,6 +362,30 @@ class InstalledAppsRepositoryImpl(
                     null
                 }
 
+            // A rolling tag reuses one tag string across builds, and a read that cannot lean on
+            // an install binding has nothing stored that can tell one build from the next. The
+            // installed file itself can: same digest, same build; a different one, a rebuild the
+            // device does not run. True no matter how the build arrived — sideloaded, refreshed
+            // while checking was off, or after the stored identity was cleared. Only asked for
+            // tags version math cannot speak for (unknown schemes, opaque markers).
+            val selfAttestedDigest =
+                if (
+                    bound == null &&
+                    primaryAsset.digest != null &&
+                    VersionMath.isExactSameVersion(matchedRelease.tagName, app.installedVersion) &&
+                    (
+                        VersionMath.isTimestampTrackedTag(matchedRelease.tagName) ||
+                            VersionMath.detectScheme(matchedRelease.tagName) == VersionMath.Scheme.Unknown
+                    )
+                ) {
+                    packageMonitor
+                        .getInstalledPackageInfo(packageName)
+                        ?.apkPath
+                        ?.let { apkPath -> digestVerifier.computeSha256(apkPath) }
+                } else {
+                    null
+                }
+
             val verdict =
                 UpdateVerdict.decide(
                     installed =
@@ -389,6 +417,7 @@ class InstalledAppsRepositoryImpl(
                         ),
                     skippedTag = app.skippedReleaseTag,
                     bound = bound,
+                    selfAttestedDigest = selfAttestedDigest,
                 )
 
             if (verdict.skipBecameStale) {
@@ -403,6 +432,7 @@ class InstalledAppsRepositoryImpl(
                         "storedPublishedAt=${app.latestReleasePublishedAt} " +
                         "matchedPublishedAt=${matchedRelease.publishedAt} " +
                         "bound=${bound != null} " +
+                        "attested=${selfAttestedDigest ?: "-"} " +
                         "isUpdate=$isUpdateAvailable"
             }
 

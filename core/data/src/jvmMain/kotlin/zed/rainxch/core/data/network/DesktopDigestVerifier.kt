@@ -30,4 +30,20 @@ class DesktopDigestVerifier : DigestVerifier {
                 }.getOrElse { return@withContext "Digest computation failed: ${it.message}" }
             if (actual == expected) null else "Digest mismatch (expected $expected, got $actual)"
         }
+
+    override suspend fun computeSha256(filePath: String): String? =
+        withContext(Dispatchers.IO) {
+            runCatching {
+                val digest = MessageDigest.getInstance("SHA-256")
+                File(filePath).inputStream().use { stream ->
+                    val buf = ByteArray(8 * 1024)
+                    while (true) {
+                        val read = stream.read(buf)
+                        if (read <= 0) break
+                        digest.update(buf, 0, read)
+                    }
+                }
+                "sha256:" + digest.digest().joinToString("") { "%02x".format(it) }
+            }.getOrNull()
+        }
 }
