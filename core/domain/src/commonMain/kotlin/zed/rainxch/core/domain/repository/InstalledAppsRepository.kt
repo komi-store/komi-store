@@ -1,6 +1,7 @@
 package zed.rainxch.core.domain.repository
 
 import kotlinx.coroutines.flow.Flow
+import zed.rainxch.core.domain.model.account.github.GithubRelease
 import zed.rainxch.core.domain.model.installation.InstalledApp
 import zed.rainxch.core.domain.model.smart_detect.MatchingPreview
 
@@ -28,6 +29,15 @@ interface InstalledAppsRepository {
     suspend fun deleteInstalledApp(packageName: String)
 
     suspend fun checkForUpdates(packageName: String): Boolean
+
+    // A check that must not fetch: the caller already holds a release list (the details
+    // refresh just read it from the repository host), and it has to settle the same verdict,
+    // written the same way, as the fetch-driven check would — a fresh read that only fed the
+    // screen would leave the library on a stale verdict. An empty window changes nothing.
+    suspend fun checkForUpdatesWithReleases(
+        packageName: String,
+        releases: List<GithubRelease>,
+    ): Boolean
 
     suspend fun checkAllForUpdates()
 

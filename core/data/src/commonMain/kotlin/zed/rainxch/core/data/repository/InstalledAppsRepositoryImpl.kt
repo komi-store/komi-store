@@ -21,8 +21,9 @@ import zed.rainxch.core.data.local.db.dao.UpdateHistoryDao
 import zed.rainxch.core.data.local.db.entities.InstalledAppEntity
 import zed.rainxch.core.data.local.db.entities.UpdateHistoryEntity
 import zed.rainxch.core.data.mappers.toDomain
-import zed.rainxch.core.data.mappers.toReleaseWindow
 import zed.rainxch.core.data.mappers.toEntity
+import zed.rainxch.core.data.mappers.toReleaseWindow
+import zed.rainxch.core.data.mappers.toUpdateCheckWindow
 import zed.rainxch.core.data.network.GitHubClientProvider
 import zed.rainxch.core.data.network.executeRequest
 import zed.rainxch.core.domain.model.account.github.GithubAsset
@@ -39,6 +40,7 @@ import zed.rainxch.core.domain.system.Installer
 import zed.rainxch.core.domain.utils.AssetFilter
 import zed.rainxch.core.domain.utils.AssetOwnership
 import zed.rainxch.core.domain.utils.AssetVariant
+import zed.rainxch.core.domain.utils.UpdateCheckWindow
 import zed.rainxch.core.domain.utils.UpdateVerdict
 import zed.rainxch.core.domain.utils.VersionMath
 
@@ -58,7 +60,7 @@ class InstalledAppsRepositoryImpl(
 
     private companion object {
 
-        const val RELEASE_WINDOW = 50
+        const val RELEASE_WINDOW = UpdateCheckWindow.Size
     }
 
     override suspend fun <R> executeInTransaction(block: suspend () -> R): R =
@@ -302,9 +304,56 @@ class InstalledAppsRepositoryImpl(
                     sourceHost = app.sourceHost,
                 )
 
-            // An empty window is a failed fetch (backend error, rate limit, network), not
-            // proof the repo lost its releases. Keep what the last good check found and
-            // leave lastCheckedAt alone so the next check retries.
+            return checkAgainstWindow(app, releases)
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            Logger.e { "Failed to check updates for $packageName: ${e.message}" }
+            installedAppsDao.updateLastChecked(packageName, System.currentTimeMillis())
+        }
+
+        return false
+    }
+
+    override suspend fun checkForUpdatesWithReleases(
+        packageName: String,
+        releases: List<GithubRelease>,
+    ): Boolean {
+        val app = installedAppsDao.getAppByPackage(packageName) ?: return false
+
+        if (!app.updateCheckEnabled) {
+            return false
+        }
+
+        try {
+            val window =
+                releases.toUpdateCheckWindow(
+                    includePreReleases = app.includePreReleases,
+                    limit = RELEASE_WINDOW,
+                )
+
+            return checkAgainstWindow(app, window)
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            Logger.e { "Failed to check updates for $packageName: ${e.message}" }
+            installedAppsDao.updateLastChecked(packageName, System.currentTimeMillis())
+        }
+
+        return false
+    }
+
+    private suspend fun checkAgainstWindow(
+        app: InstalledAppEntity,
+        releases: List<GithubRelease>,
+    ): Boolean {
+        val packageName = app.packageName
+
+        try {
+            // An empty window is a failed fetch (backend error, rate limit, network) — or a
+            // caller-grown list with nothing this app can judge — not proof the repo lost
+            // its releases. Keep what the last good check found and leave lastCheckedAt
+            // alone so the next check retries.
             if (releases.isEmpty()) {
                 Logger.d { "No releases for ${app.appName} this time; keeping its stored update state" }
                 return app.isUpdateAvailable
