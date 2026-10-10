@@ -11,6 +11,7 @@ import zed.rainxch.core.data.network.MirrorRewriter
 import zed.rainxch.core.data.network.ProxyManager
 import zed.rainxch.core.domain.model.installation.DownloadProgress
 import zed.rainxch.core.domain.model.mirror.TrafficKind
+import zed.rainxch.core.domain.network.AssetIdentity
 import zed.rainxch.core.domain.network.Downloader
 import zed.rainxch.core.domain.system.MultiSourceDownloader
 
@@ -21,25 +22,29 @@ class MultiSourceDownloaderImpl(
     override fun download(
         githubUrl: String,
         suggestedFileName: String?,
+        identity: AssetIdentity?,
     ): Flow<DownloadProgress> {
         val active = ProxyManager.currentMirror()
         if (active == null || TrafficKind.RELEASE_ASSET !in active.trafficKinds) {
-            return downloader.download(githubUrl, suggestedFileName)
+            return downloader.download(githubUrl, suggestedFileName, identity = identity)
         }
         val mirrorUrl =
             MirrorRewriter.applyTemplate(active.template, githubUrl)
-                ?: return downloader.download(githubUrl, suggestedFileName)
-        return mirrorFirstWithFallback(mirrorUrl, githubUrl, suggestedFileName)
+                ?: return downloader.download(githubUrl, suggestedFileName, identity = identity)
+        return mirrorFirstWithFallback(mirrorUrl, githubUrl, suggestedFileName, identity)
     }
 
     private fun mirrorFirstWithFallback(
         mirrorUrl: String,
         directUrl: String,
         suggestedFileName: String?,
+        identity: AssetIdentity?,
     ): Flow<DownloadProgress> =
         channelFlow {
             try {
-                downloader.download(mirrorUrl, suggestedFileName).collect { send(it) }
+                downloader
+                    .download(mirrorUrl, suggestedFileName, identity = identity)
+                    .collect { send(it) }
                 return@channelFlow
             } catch (e: CancellationException) {
                 throw e
@@ -48,7 +53,7 @@ class MultiSourceDownloaderImpl(
             }
             var firstDirectEmit = true
             downloader
-                .download(directUrl, suggestedFileName, bypassMirror = true)
+                .download(directUrl, suggestedFileName, bypassMirror = true, identity = identity)
                 .collect { progress ->
                     if (firstDirectEmit) {
                         firstDirectEmit = false
