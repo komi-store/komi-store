@@ -11,6 +11,7 @@ import okhttp3.Credentials
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import zed.rainxch.core.data.data_source.TokenStore
+import zed.rainxch.core.data.download.ProgressThrottle
 import zed.rainxch.core.data.network.GithubAssetAuth
 import zed.rainxch.core.data.network.ProxyManager
 import zed.rainxch.core.data.network.resolveAndroidSystemProxy
@@ -18,7 +19,9 @@ import zed.rainxch.core.domain.model.installation.DownloadProgress
 import zed.rainxch.core.domain.model.settings.ProxyConfig
 import zed.rainxch.core.domain.model.settings.ProxyScope
 import zed.rainxch.core.domain.network.Downloader
+import java.io.BufferedOutputStream
 import java.io.File
+import java.io.FileOutputStream
 import java.net.Authenticator
 import java.net.InetSocketAddress
 import java.net.PasswordAuthentication
@@ -37,7 +40,27 @@ class AndroidDownloader(
     private val activeDownloads = ConcurrentHashMap<String, Call>()
     private val idsByName = ConcurrentHashMap<String, MutableSet<String>>()
 
-    private fun buildClient(): OkHttpClient {
+    private val clientLock = Any()
+    private var cachedConfig: ProxyConfig? = null
+    private var cachedClient: OkHttpClient? = null
+
+    private fun client(): OkHttpClient {
+        val downloadConfig = ProxyManager.currentConfig(ProxyScope.DOWNLOAD)
+        synchronized(clientLock) {
+            if (downloadConfig !is ProxyConfig.System) {
+                val cached = cachedClient
+                if (cached != null && cachedConfig == downloadConfig) return cached
+            }
+            val client = buildClient(downloadConfig)
+            if (downloadConfig !is ProxyConfig.System) {
+                cachedConfig = downloadConfig
+                cachedClient = client
+            }
+            return client
+        }
+    }
+
+    private fun buildClient(config: ProxyConfig): OkHttpClient {
         Authenticator.setDefault(null)
 
         return OkHttpClient
@@ -46,7 +69,7 @@ class AndroidDownloader(
             .readTimeout(60, TimeUnit.SECONDS)
             .writeTimeout(60, TimeUnit.SECONDS)
             .apply {
-                when (val config = ProxyManager.currentConfig(ProxyScope.DOWNLOAD)) {
+                when (config) {
                     is ProxyConfig.None -> {
                         proxy(Proxy.NO_PROXY)
                     }
@@ -95,7 +118,7 @@ class AndroidDownloader(
     ): Flow<DownloadProgress> =
 
         flow {
-            val client = buildClient()
+            val httpClient = client()
 
             val dirPath = files.appDownloadsDir()
             val dir = File(dirPath)
@@ -135,7 +158,7 @@ class AndroidDownloader(
                             }
                         }
                     }.build()
-            val call = client.newCall(request)
+            val call = httpClient.newCall(request)
 
             activeDownloads[downloadId] = call
             idsByName.computeIfAbsent(safeName) { ConcurrentHashMap.newKeySet() }.add(downloadId)
@@ -151,16 +174,22 @@ class AndroidDownloader(
                     val total = if (contentLength > 0) contentLength else null
 
                     body.byteStream().use { input ->
-                        tempFile.outputStream().use { output ->
-                            val buffer = ByteArray(8192)
+                        BufferedOutputStream(FileOutputStream(tempFile), COPY_BUFFER).use { output ->
+                            val buffer = ByteArray(COPY_BUFFER)
+                            val throttle = ProgressThrottle()
                             var downloaded: Long = 0
-                            var bytesRead: Int
-                            while (input.read(buffer).also { bytesRead = it } != -1) {
+                            while (true) {
+                                val bytesRead = input.read(buffer)
+                                if (bytesRead < 0) break
                                 output.write(buffer, 0, bytesRead)
                                 downloaded += bytesRead
-                                val percent =
-                                    if (total != null) ((downloaded * 100L) / total).toInt() else null
-                                emit(DownloadProgress(downloaded, total, percent))
+                                val progress =
+                                    DownloadProgress(
+                                        downloaded,
+                                        total,
+                                        percentOf(downloaded, total),
+                                    )
+                                if (throttle.shouldEmit(progress)) emit(progress)
                             }
                         }
                     }
@@ -175,8 +204,7 @@ class AndroidDownloader(
 
                     Logger.d { "Download complete: ${destination.absolutePath}" }
                     val finalDownloaded = destination.length()
-                    val finalPercent =
-                        if (total != null) ((finalDownloaded * 100L) / total).toInt() else 100
+                    val finalPercent = percentOf(finalDownloaded, total) ?: 100
                     emit(DownloadProgress(finalDownloaded, total, finalPercent))
                 }
             } catch (e: kotlin.coroutines.cancellation.CancellationException) {
@@ -277,4 +305,13 @@ class AndroidDownloader(
 
             cancelled
         }
+
+    private fun percentOf(
+        downloaded: Long,
+        total: Long?,
+    ): Int? = if (total != null && total > 0) ((downloaded * 100L) / total).toInt() else null
+
+    private companion object {
+        private const val COPY_BUFFER = 64 * 1024
+    }
 }

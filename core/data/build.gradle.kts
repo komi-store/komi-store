@@ -52,5 +52,11 @@ kotlin {
                 implementation(libs.ktor.client.okhttp)
             }
         }
+
+        commonTest {
+            dependencies {
+                implementation(kotlin("test"))
+            }
+        }
     }
 }
