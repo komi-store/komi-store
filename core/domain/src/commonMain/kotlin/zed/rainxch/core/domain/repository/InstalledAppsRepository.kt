@@ -103,6 +103,16 @@ interface InstalledAppsRepository {
         assetName: String? = null,
     )
 
+    // Both metadata parameters are required on purpose: the write binds them unconditionally, so
+    // omitting one would silently erase a parked version or asset name that tag resolution reads
+    // back later. Clearing is what setPendingInstallFilePath above is for.
+    suspend fun markAwaitingInstall(
+        packageName: String,
+        path: String,
+        version: String?,
+        assetName: String?,
+    )
+
     suspend fun previewMatchingAssets(
         owner: String,
         repo: String,

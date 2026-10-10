@@ -106,6 +106,8 @@ class DefaultDownloadOrchestrator(
             _downloads.update { it + (spec.packageName to initial) }
         }
 
+        // Fired after the new entry is registered: a re-enqueue of an interrupted asset is itself
+        // a claim on that asset's partial, and the sweep must not delete bytes about to resume.
         maybeReclaimOrphanedPartials()
 
         val job = appScope.launch {
@@ -413,8 +415,12 @@ class DefaultDownloadOrchestrator(
         filePath: String,
         notify: Boolean,
     ) {
+        // AwaitingInstall is this component's own statement that the file is ready, and
+        // isPendingInstall is its persisted form, so the flag is raised here rather than by the
+        // page coroutine that started the download: that coroutine dies with the screen, and the
+        // park would then be swept as stale. Path and flag go down in one write.
         try {
-            installedAppsRepository.setPendingInstallFilePath(
+            installedAppsRepository.markAwaitingInstall(
                 packageName = spec.packageName,
                 path = filePath,
                 version = spec.releaseTag,

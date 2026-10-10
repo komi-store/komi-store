@@ -697,6 +697,20 @@ class InstalledAppsRepositoryImpl(
         )
     }
 
+    override suspend fun markAwaitingInstall(
+        packageName: String,
+        path: String,
+        version: String?,
+        assetName: String?,
+    ) {
+        installedAppsDao.markAwaitingInstall(
+            packageName = packageName,
+            path = path,
+            version = version,
+            assetName = assetName,
+        )
+    }
+
     override suspend fun previewMatchingAssets(
         owner: String,
         repo: String,

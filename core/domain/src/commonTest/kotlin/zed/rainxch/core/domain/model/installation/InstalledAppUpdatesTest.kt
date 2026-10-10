@@ -704,5 +704,28 @@ class InstalledAppUpdatesTest {
             ),
         )
     }
+
+    @Test
+    fun parkedUpdateOnAnInstalledAppDoesNotSurviveTheLibrarySync() {
+        // KNOWN LIMITATION, NOT A CONTRACT, and only observable at the sync layer rather than here.
+        // This function clears the flag and keeps the parked path; the path is cleared one layer up,
+        // by SyncInstalledAppsUseCase.reconcileEnumerable via setPendingInstallFilePath(pkg, null).
+        // A change that makes the park survive would land in that layer, so this test could not
+        // detect it: pin the post-sync row state in a SyncInstalledAppsUseCase test instead.
+        val parked = app(isPendingInstall = true, pendingFilePath = "/data/parked.apk")
+
+        val afterResolve =
+            parked.resolvePendingFromSystem(
+                resolvedTag = "2.0.0",
+                versionName = "1.0.0",
+                versionCode = 100L,
+            )
+
+        assertFalse(afterResolve.isPendingInstall)
+
+        // The flag alone decides the can-install group, so the row has already left it even though
+        // the parked path is still on disk.
+        assertEquals("/data/parked.apk", afterResolve.pendingInstallFilePath)
+    }
 }
 

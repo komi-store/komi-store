@@ -47,6 +47,7 @@ import zed.rainxch.apps.presentation.components.AppsSectionHeader
 import zed.rainxch.apps.presentation.components.AppsTopbar
 import zed.rainxch.apps.presentation.components.CompactAppRow
 import zed.rainxch.apps.presentation.components.ImportSummarySheet
+import zed.rainxch.apps.presentation.components.InProgressAppCard
 import zed.rainxch.apps.presentation.components.KaoBanner
 import zed.rainxch.apps.presentation.components.LinkAppBottomSheet
 import zed.rainxch.apps.presentation.components.PendingDiscardSheet
@@ -78,6 +79,7 @@ import zed.rainxch.core.presentation.utils.arrowKeyScroll
 import zed.rainxch.core.presentation.utils.formatLastChecked
 import zed.rainxch.githubstore.core.presentation.res.Res
 import zed.rainxch.githubstore.core.presentation.res.add_by_link
+import zed.rainxch.githubstore.core.presentation.res.apps_section_in_progress
 import zed.rainxch.githubstore.core.presentation.res.apps_section_pending_installs
 import zed.rainxch.githubstore.core.presentation.res.apps_section_up_to_date
 import zed.rainxch.githubstore.core.presentation.res.cancel
@@ -208,7 +210,6 @@ fun AppsRoot(
     }
 }
 
-
 @Composable
 fun AppsScreen(
     state: AppsState,
@@ -304,6 +305,10 @@ fun AppsScreen(
                             state.showKaoBanner,
                             state.pendingApps.isNotEmpty(),
                             state.updateApps.isNotEmpty() || state.isUpdatingAll,
+                            // This section is inserted above every other one, so a download that
+                            // starts while the user sits at the top would otherwise push it above
+                            // the viewport, which is the opposite of the point.
+                            state.inProgressDownloads.isNotEmpty(),
                         ),
                     )
 
@@ -317,7 +322,10 @@ fun AppsScreen(
                             }
                         }
 
-                        state.filteredApps.isEmpty() -> {
+                        // The transient download cards live outside `filteredApps` (they have no
+                        // DB row), so emptiness must account for them too: otherwise the screen
+                        // would say "no apps" while a download is plainly running.
+                        state.filteredApps.isEmpty() && state.inProgressDownloads.isEmpty() -> {
                             Box(
                                 modifier = Modifier.fillMaxSize(),
                                 contentAlignment = Alignment.Center,
@@ -370,6 +378,56 @@ fun AppsScreen(
                                     verticalArrangement = Arrangement.spacedBy(CardGridSpec.GridItemSpacing),
                                     horizontalArrangement = CardGridSpec.GridArrangement,
                                 ) {
+                                    // Listed before the library groups: appComparator reads
+                                    // installedApp.*, which a transient card does not have.
+                                    if (state.inProgressDownloads.isNotEmpty()) {
+                                        item(
+                                            key = "header-in-progress",
+                                            span = { GridItemSpan(maxLineSpan) },
+                                        ) {
+                                            AppsSectionHeader(
+                                                title = stringResource(Res.string.apps_section_in_progress),
+                                                count = state.inProgressDownloads.size,
+                                                isExpanded = true,
+                                                collapsible = false,
+                                                onToggle = {},
+                                            )
+                                        }
+
+                                        items(
+                                            state.inProgressDownloads,
+                                            key = { download -> "transient-${download.id}" },
+                                        ) { download ->
+                                            // download.packageName is the orchestrator registry
+                                            // key ("owner/name" for a not-yet-installed app), which
+                                            // is what the three actions are addressed by.
+                                            InProgressAppCard(
+                                                download = download,
+                                                onCancel = {
+                                                    onAction(
+                                                        AppsAction.OnCancelInProgressDownload(
+                                                            download.packageName,
+                                                        ),
+                                                    )
+                                                },
+                                                onInstall = {
+                                                    onAction(
+                                                        AppsAction.OnInstallInProgressDownload(
+                                                            download.packageName,
+                                                        ),
+                                                    )
+                                                },
+                                                onDismiss = {
+                                                    onAction(
+                                                        AppsAction.OnDismissInProgressDownload(
+                                                            download.packageName,
+                                                        ),
+                                                    )
+                                                },
+                                            )
+                                        }
+                                    }
+
                                     if (state.showImportProposalBanner) {
                                         item(key = "external-import-banner", span = { GridItemSpan(maxLineSpan) }) {
                                             ImportProposalBanner(
@@ -658,6 +716,7 @@ private fun CompactAppRowWithActions(
             onAction(AppsAction.OnToggleUpdateCheck(app.packageName, enabled))
         },
         onUnskipVersionClick = { onAction(AppsAction.OnUnskipReleaseTag(app.packageName)) },
+        onCancelClick = { onAction(AppsAction.OnCancelUpdate(app.packageName)) },
         onRowClick = { onRowSelect(app) },
         framed = framed,
     )
