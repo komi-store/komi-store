@@ -58,6 +58,7 @@ actual val corePlatformModule =
             AndroidDownloader(
                 files = get(),
                 tokenStore = get(),
+                digestVerifier = get(),
             )
         }
 

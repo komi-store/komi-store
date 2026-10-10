@@ -19,6 +19,7 @@ import zed.rainxch.core.data.network.GithubAssetAuth
 import zed.rainxch.core.domain.model.installation.DownloadProgress
 import zed.rainxch.core.domain.model.installation.markPending
 import zed.rainxch.core.domain.model.installation.withLatestSnapshot
+import zed.rainxch.core.domain.network.AssetIdentity
 import zed.rainxch.core.domain.network.DigestVerifier
 import zed.rainxch.core.domain.network.Downloader
 import zed.rainxch.core.domain.network.SlowDownloadDetector
@@ -59,6 +60,8 @@ class DefaultDownloadOrchestrator(
     private val stateMutex = Mutex()
 
     private val activeJobs = mutableMapOf<String, Job>()
+
+    private var orphanSweepStarted = false
 
     override fun observe(packageName: String): Flow<OrchestratedDownload?> =
         _downloads
@@ -103,6 +106,8 @@ class DefaultDownloadOrchestrator(
             _downloads.update { it + (spec.packageName to initial) }
         }
 
+        maybeReclaimOrphanedPartials()
+
         val job = appScope.launch {
             try {
                 runDownload(spec)
@@ -126,6 +131,36 @@ class DefaultDownloadOrchestrator(
             activeJobs[spec.packageName] = job
         }
         return id
+    }
+
+    private suspend fun maybeReclaimOrphanedPartials() {
+        val shouldSweep =
+            stateMutex.withLock {
+                if (orphanSweepStarted) {
+                    false
+                } else {
+                    orphanSweepStarted = true
+                    true
+                }
+            }
+        if (!shouldSweep) return
+
+        val claimed =
+            _downloads.value.values
+                .map { AssetFileName.scoped(it.repoOwner, it.repoName, it.assetName) }
+                .toSet()
+        appScope.launch {
+            try {
+                val removed = downloader.reclaimOrphanedPartials(claimed)
+                if (removed > 0) {
+                    Logger.d { "Orchestrator: reclaimed $removed orphaned partial file(s)" }
+                }
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                Logger.w(e) { "Orchestrator: orphan partial reclaim failed" }
+            }
+        }
     }
 
     private suspend fun runDownload(spec: DownloadSpec) {
@@ -169,8 +204,21 @@ class DefaultDownloadOrchestrator(
             }
         }
 
+        val identity =
+            AssetIdentity(
+                assetId = spec.asset.id,
+                digest = spec.asset.digest,
+                size = spec.asset.size,
+            )
+
         try {
-            streamProgress(multiSourceDownloader.download(spec.asset.downloadUrl, scopedName))
+            streamProgress(
+                multiSourceDownloader.download(
+                    spec.asset.downloadUrl,
+                    scopedName,
+                    identity = identity,
+                ),
+            )
         } catch (e: CancellationException) {
             throw e
         } catch (e: Throwable) {
@@ -180,14 +228,13 @@ class DefaultDownloadOrchestrator(
                 "Orchestrator: primary download failed for ${spec.asset.name}, " +
                     "retrying via authenticated GitHub asset API"
             }
-            updateEntry(spec.packageName) {
-                it.copy(bytesDownloaded = 0L, progressPercent = 0)
-            }
             slowDownloadDetector.reset()
-            streamProgress(downloader.download(apiUrl, scopedName, bypassMirror = true))
+            streamProgress(
+                downloader.download(apiUrl, scopedName, bypassMirror = true, identity = identity),
+            )
         }
 
-        val filePath =
+        var filePath =
             downloader.getDownloadedFilePath(scopedName)
                 ?: throw IllegalStateException("Downloaded file missing: $scopedName")
 
@@ -199,13 +246,59 @@ class DefaultDownloadOrchestrator(
         if (expectedDigest != null) {
             val mismatch = digestVerifier.verify(filePath, expectedDigest)
             if (mismatch != null) {
-                Logger.w { "Orchestrator: digest mismatch for ${spec.asset.name}: $mismatch" }
+                // The bytes did not match, and the mirror is the first suspect — not the
+                // release: a mirror that answers 200 with corrupted bytes streams to the end
+                // without ever throwing, so the fallback above never sees it, and the download
+                // used to die here accusing the file of tampering. Re-fetch straight from the
+                // source and check once more; only bytes that fail the direct fetch too are
+                // treated as an integrity failure.
+                Logger.w {
+                    "Orchestrator: digest mismatch for ${spec.asset.name} ($mismatch); " +
+                        "re-fetching from the source"
+                }
                 runCatching { java.io.File(filePath).delete() }
-                markFailed(
-                    spec.packageName,
-                    "Checksum mismatch — file may have been tampered with",
-                )
-                return
+                runCatching { downloader.discardPartial(scopedName) }
+                updateEntry(spec.packageName) {
+                    it.copy(progressPercent = 0, bytesDownloaded = 0L)
+                }
+                val sourceUrl = authenticatedGithubAssetUrl(spec) ?: spec.asset.downloadUrl
+                try {
+                    streamProgress(
+                        downloader.download(
+                            sourceUrl,
+                            scopedName,
+                            bypassMirror = true,
+                            identity = identity,
+                        ),
+                    )
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (t: Throwable) {
+                    Logger.e(t) { "Orchestrator: source re-fetch failed for ${spec.asset.name}" }
+                    markFailed(spec.packageName, t.message)
+                    return
+                }
+                filePath =
+                    downloader.getDownloadedFilePath(scopedName)
+                        ?: throw IllegalStateException(
+                            "Downloaded file missing after re-fetch: $scopedName",
+                        )
+                val stillMismatched = digestVerifier.verify(filePath, expectedDigest)
+                if (stillMismatched != null) {
+                    Logger.w {
+                        "Orchestrator: digest still mismatched after the source re-fetch for " +
+                            "${spec.asset.name}: $stillMismatched"
+                    }
+                    runCatching { java.io.File(filePath).delete() }
+                    markFailed(
+                        spec.packageName,
+                        "Checksum mismatch — file may have been tampered with",
+                    )
+                    return
+                }
+                updateEntry(spec.packageName) {
+                    it.copy(filePath = filePath, progressPercent = 100)
+                }
             }
         } else {
             Logger.i { "No digest for ${spec.asset.name}, skipping SHA-256 verification" }
@@ -457,6 +550,22 @@ class DefaultDownloadOrchestrator(
 
         stateMutex.withLock {
             _downloads.update { it - packageName }
+        }
+    }
+
+    override suspend fun discard(packageName: String) {
+        val entry = _downloads.value[packageName]
+        cancel(packageName)
+        if (entry != null) {
+            val scopedName =
+                AssetFileName.scoped(entry.repoOwner, entry.repoName, entry.assetName)
+            try {
+                downloader.discardPartial(scopedName)
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                Logger.w(e) { "Orchestrator: discardPartial failed for $scopedName" }
+            }
         }
     }
 

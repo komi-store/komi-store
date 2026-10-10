@@ -69,6 +69,14 @@ class GithubStoreApp : Application() {
             }
         }
 
+        // Deliberately no startup sweep of `.part` / `.part.meta` here. Such a sweep would have to
+        // pass an empty claim set (the in-memory registry starts empty), and an empty claim set
+        // means "nothing is claimed", which is exactly the time-based deletion this design removed.
+        // A partial left by a paused or killed download is still *wanted* — dropping the bytes on
+        // launch would make pause/resume impossible across a restart. The one-shot lazy sweep in
+        // DefaultDownloadOrchestrator now owns cleanup: it runs at the first enqueue and counts the
+        // just-enqueued asset as a claim, so it never deletes the partial it is about to resume.
+
         scheduleBackgroundUpdateChecks()
         registerSelfAsInstalledApp()
         scheduleInitialExternalScan()

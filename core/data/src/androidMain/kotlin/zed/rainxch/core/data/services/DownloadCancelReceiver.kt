@@ -11,7 +11,18 @@ import zed.rainxch.core.domain.system.DownloadOrchestrator
 
 class DownloadCancelReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
-        if (intent.action != ACTION_CANCEL) return
+        // Dispatch on the data URI: the two intents share a component and a package extra,
+        // and only the URI separates pause from delete.
+        val dispatch =
+            when (intent.data?.scheme) {
+                URI_SCHEME_DISCARD -> Dispatch.DELETE
+                URI_SCHEME_PAUSE -> Dispatch.PAUSE
+                else -> {
+                    Logger.w { "DownloadCancelReceiver: unknown data URI ${intent.data}, ignoring" }
+                    return
+                }
+            }
+
         val packageName = intent.getStringExtra(EXTRA_PACKAGE_NAME).orEmpty()
         if (packageName.isBlank()) {
             Logger.w { "DownloadCancelReceiver: missing package name extra" }
@@ -21,7 +32,7 @@ class DownloadCancelReceiver : BroadcastReceiver() {
         val pending = goAsync()
         val koin = GlobalContext.getOrNull()
         if (koin == null) {
-            Logger.w { "DownloadCancelReceiver: Koin not initialized, ignoring cancel for $packageName" }
+            Logger.w { "DownloadCancelReceiver: Koin not initialized, ignoring $dispatch for $packageName" }
             pending.finish()
             return
         }
@@ -30,17 +41,26 @@ class DownloadCancelReceiver : BroadcastReceiver() {
         val scope = koin.get<CoroutineScope>()
         scope.launch {
             try {
-                orchestrator.cancel(packageName)
+                when (dispatch) {
+                    Dispatch.PAUSE -> orchestrator.cancel(packageName)
+                    Dispatch.DELETE -> orchestrator.discard(packageName)
+                }
             } catch (t: Throwable) {
-                Logger.e(t) { "DownloadCancelReceiver: cancel failed for $packageName" }
+                Logger.e(t) { "DownloadCancelReceiver: $dispatch failed for $packageName" }
             } finally {
                 pending.finish()
             }
         }
     }
 
+    private enum class Dispatch { PAUSE, DELETE }
+
     companion object {
         const val ACTION_CANCEL = "zed.rainxch.githubstore.action.CANCEL_DOWNLOAD"
+        const val ACTION_DISCARD = "zed.rainxch.githubstore.action.DISCARD_DOWNLOAD"
         const val EXTRA_PACKAGE_NAME = "zed.rainxch.githubstore.extra.PACKAGE_NAME"
+
+        const val URI_SCHEME_PAUSE = "githubstore-cancel"
+        const val URI_SCHEME_DISCARD = "githubstore-discard"
     }
 }

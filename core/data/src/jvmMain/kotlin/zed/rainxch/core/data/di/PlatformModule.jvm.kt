@@ -47,6 +47,7 @@ actual val corePlatformModule = module {
         DesktopDownloader(
             files = get(),
             tokenStore = get(),
+            digestVerifier = get(),
         )
     }
 
