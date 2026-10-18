@@ -69,8 +69,6 @@ import zed.rainxch.core.presentation.utils.formatFileSize
 import zed.rainxch.githubstore.core.presentation.res.*
 import java.io.File
 import kotlin.time.Duration.Companion.milliseconds
-import kotlin.time.Duration.Companion.seconds
-import kotlin.time.TimeSource
 
 class AppsViewModel(
     private val appsRepository: AppsRepository,
@@ -90,12 +88,10 @@ class AppsViewModel(
         private const val BANNER_THRESHOLD = 1
         private const val UPDATE_CHECK_COOLDOWN_MS = 30 * 60 * 1000L
         private const val KAO_OPEN_LETTER_URL = "https://keepandroidopen.org/open-letter/"
-        private val INSTALL_TAP_COOLDOWN = 3.seconds
     }
 
     private var hasLoadedInitialData = false
     private val activeUpdates = mutableMapOf<String, Job>()
-    private val lastInstallTaps = mutableMapOf<String, TimeSource.Monotonic.ValueTimeMark>()
     private var updateAllJob: Job? = null
     private var lastAutoCheckTimestamp: Long = 0L
 
@@ -359,7 +355,6 @@ class AppsViewModel(
             }
 
             is AppsAction.OnUpdateApp -> {
-                if (isRepeatInstallTap(action.app.packageName)) return
 
                 if (action.app.preferredVariantStale) {
                     openVariantPicker(action.app, resumeUpdateAfterPick = true)
@@ -369,7 +364,6 @@ class AppsViewModel(
             }
 
             is AppsAction.OnInstallPendingApp -> {
-                if (isRepeatInstallTap(action.app.packageName)) return
                 installPendingApp(action.app)
             }
 
@@ -1138,13 +1132,6 @@ class AppsViewModel(
                 )
             }
         }
-    }
-
-    private fun isRepeatInstallTap(packageName: String): Boolean {
-        val last = lastInstallTaps[packageName]
-        if (last != null && last.elapsedNow() < INSTALL_TAP_COOLDOWN) return true
-        lastInstallTaps[packageName] = TimeSource.Monotonic.markNow()
-        return false
     }
 
     private fun updateSingleApp(app: InstalledAppUi, waitForInstallGate: Boolean = false) {

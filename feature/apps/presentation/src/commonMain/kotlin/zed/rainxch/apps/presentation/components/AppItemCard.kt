@@ -49,6 +49,7 @@ import zed.rainxch.core.presentation.components.surfaces.KomiSurface
 import zed.rainxch.core.presentation.components.text.KomiText
 import zed.rainxch.core.presentation.components.text.KomiTextRole
 import zed.rainxch.core.presentation.locals.LocalPersonality
+import zed.rainxch.core.presentation.utils.rememberTapCooldown
 import zed.rainxch.githubstore.core.presentation.res.Res
 import zed.rainxch.githubstore.core.presentation.res.advanced_settings_open
 import zed.rainxch.githubstore.core.presentation.res.apps_compact_more_actions
@@ -95,6 +96,7 @@ fun AppItemCard(
     val colors = LocalPersonality.current.colors
     val shape = LocalPersonality.current.shape
     val app = appItem.installedApp
+    val installCooldown = rememberTapCooldown()
 
     KomiSurface(
         onClick = onRepoClick,
@@ -526,10 +528,11 @@ fun AppItemCard(
                     else -> {
                         if (app.pendingInstallFilePath != null) {
                             KomiButton(
-                                onClick = onInstallPendingClick,
+                                onClick = { installCooldown.run(onInstallPendingClick) },
                                 label = stringResource(Res.string.install),
                                 variant = KomiButtonVariant.Primary,
                                 leadingIcon = Icons.Default.Update,
+                                enabled = !installCooldown.active,
                                 modifier = Modifier.weight(1f),
                             )
 
@@ -549,10 +552,11 @@ fun AppItemCard(
                             }
                         } else if (app.isUpdateAvailable && !app.isPendingInstall) {
                             KomiButton(
-                                onClick = onUpdateClick,
+                                onClick = { installCooldown.run(onUpdateClick) },
                                 label = stringResource(Res.string.update),
                                 variant = KomiButtonVariant.Primary,
                                 leadingIcon = Icons.Default.Update,
+                                enabled = !installCooldown.active,
                                 modifier = Modifier.weight(1f),
                             )
                         } else if (app.isPendingInstall) {

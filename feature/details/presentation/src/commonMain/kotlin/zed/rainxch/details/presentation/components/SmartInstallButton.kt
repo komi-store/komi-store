@@ -33,9 +33,7 @@ import androidx.compose.material.icons.outlined.DeleteOutline
 import androidx.compose.material.icons.outlined.Warning
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -54,6 +52,7 @@ import zed.rainxch.core.presentation.components.progress.KomiCircularProgress
 import zed.rainxch.core.presentation.components.text.KomiText
 import zed.rainxch.core.presentation.components.text.KomiTextRole
 import zed.rainxch.core.presentation.locals.LocalPersonality
+import zed.rainxch.core.presentation.utils.rememberTapCooldown
 import zed.rainxch.details.presentation.DetailsAction
 import zed.rainxch.details.presentation.DetailsState
 import zed.rainxch.details.presentation.model.AttestationStatus
@@ -79,12 +78,8 @@ import zed.rainxch.githubstore.core.presentation.res.update_to_version
 import zed.rainxch.githubstore.core.presentation.res.updating
 import zed.rainxch.githubstore.core.presentation.res.verified_build
 import zed.rainxch.githubstore.core.presentation.res.verifying
-import kotlin.time.Duration.Companion.seconds
-import kotlin.time.TimeSource
 
 private val ButtonHeight = 56.dp
-
-private val PrimaryClickCooldown = 3.seconds
 
 @Composable
 fun SmartInstallButton(
@@ -98,7 +93,7 @@ fun SmartInstallButton(
 ) {
     val colors = LocalPersonality.current.colors
     val shape = LocalPersonality.current.shape
-    var lastPrimaryClick by remember { mutableStateOf<TimeSource.Monotonic.ValueTimeMark?>(null) }
+    val primaryCooldown = rememberTapCooldown()
     val installedApp = state.installedApp
     val isInstalled = installedApp != null && !installedApp.isPendingInstall
     val isUpdateAvailable =
@@ -128,7 +123,7 @@ fun SmartInstallButton(
 
     val enabled = remember(primaryAsset, isDownloading, isInstalling) {
         primaryAsset != null && !isDownloading && !isInstalling
-    }
+    } && !primaryCooldown.active
     val isActiveDownload = state.isDownloading || state.downloadStage != DownloadStage.IDLE
 
     if (isSameVersionInstalled && !isActiveDownload) {
@@ -207,16 +202,13 @@ fun SmartInstallButton(
                 state = state,
                 progress = progress,
                 onClick = {
-                    val last = lastPrimaryClick
-                    if (!state.isDownloading &&
-                        state.downloadStage == DownloadStage.IDLE &&
-                        (last == null || last.elapsedNow() >= PrimaryClickCooldown)
-                    ) {
-                        lastPrimaryClick = TimeSource.Monotonic.markNow()
-                        if (showUpdateAffordance) {
-                            onAction(DetailsAction.UpdateApp)
-                        } else {
-                            onAction(DetailsAction.InstallPrimary)
+                    if (!state.isDownloading && state.downloadStage == DownloadStage.IDLE) {
+                        primaryCooldown.run {
+                            if (showUpdateAffordance) {
+                                onAction(DetailsAction.UpdateApp)
+                            } else {
+                                onAction(DetailsAction.InstallPrimary)
+                            }
                         }
                     }
                 },
