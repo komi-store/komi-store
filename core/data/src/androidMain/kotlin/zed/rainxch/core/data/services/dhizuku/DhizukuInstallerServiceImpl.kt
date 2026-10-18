@@ -55,10 +55,14 @@ class DhizukuInstallerServiceImpl() : IDhizukuInstallerService.Stub() {
         }
         if (fileSize > 0) params.setSize(fileSize)
         installerPackageName?.takeIf { it.isNotBlank() }?.let { name ->
-            try {
-                params.setInstallerPackageName(name)
-            } catch (e: Exception) {
-                logW("setInstallerPackageName($name) failed: ${e.message}")
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                try {
+                    params.setInstallerPackageName(name)
+                } catch (e: Exception) {
+                    logW("setInstallerPackageName($name) failed: ${e.message}")
+                }
+            } else {
+                logW("setInstallerPackageName needs Android 14+, installing without attribution $name")
             }
         }
 
