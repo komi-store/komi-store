@@ -165,7 +165,7 @@ class DefaultDownloadOrchestrator(
     }
 
     private fun OrchestratedDownload.lostItsFile(): Boolean =
-        stage == DownloadStage.AwaitingInstall &&
+        (stage == DownloadStage.AwaitingInstall || stage == DownloadStage.Installing) &&
             filePath?.let { !java.io.File(it).exists() } == true
 
     private suspend fun runDownload(spec: DownloadSpec) {

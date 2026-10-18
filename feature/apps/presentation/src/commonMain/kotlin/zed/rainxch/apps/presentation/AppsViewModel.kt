@@ -46,6 +46,8 @@ import zed.rainxch.core.domain.model.installation.InstalledApp
 import zed.rainxch.core.domain.model.installation.InstallerType
 import zed.rainxch.core.domain.model.installation.markPending
 import zed.rainxch.core.domain.model.installation.withLatestSnapshot
+import zed.rainxch.core.domain.model.account.github.GithubAsset
+import zed.rainxch.core.domain.model.account.github.GithubRelease
 import zed.rainxch.core.domain.model.error.RateLimitException
 import zed.rainxch.core.domain.network.Downloader
 import zed.rainxch.core.domain.repository.ExternalImportRepository
@@ -1134,6 +1136,51 @@ class AppsViewModel(
         }
     }
 
+    private suspend fun resolveLatestAsset(app: InstalledAppUi): Pair<GithubRelease, GithubAsset> {
+        val latestRelease =
+            try {
+                appsRepository.getLatestRelease(
+                    owner = app.repoOwner,
+                    repo = app.repoName,
+                    includePreReleases = app.includePreReleases,
+                    sourceHost = app.sourceHost,
+                )
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                logger.error("Failed to fetch latest release: ${e.message}")
+                throw IllegalStateException("Failed to fetch latest release: ${e.message}")
+            }
+
+        if (latestRelease == null) {
+            throw IllegalStateException("No release found for ${app.appName}")
+        }
+
+        val installableAssets =
+            latestRelease.assets.filter { asset ->
+                installer.isAssetInstallable(asset.name)
+            }
+
+        if (installableAssets.isEmpty()) {
+            throw IllegalStateException("No installable assets found for this platform")
+        }
+
+        val variantMatch =
+            AssetVariant.resolvePreferredAsset(
+                assets = installableAssets,
+                pinnedVariant = app.preferredAssetVariant,
+                pinnedTokens = AssetVariant.deserializeTokens(app.preferredAssetTokens),
+                pinnedGlob = app.assetGlobPattern,
+                releaseTag = latestRelease.tagName,
+            )
+        val primaryAsset =
+            variantMatch
+                ?: installer.choosePrimaryAsset(installableAssets)
+                ?: throw IllegalStateException("Could not determine primary asset")
+
+        return latestRelease to primaryAsset
+    }
+
     private fun updateSingleApp(app: InstalledAppUi, waitForInstallGate: Boolean = false) {
         if (activeUpdates.containsKey(app.packageName)) {
             logger.debug("Update already in progress for ${app.packageName}")
@@ -1145,46 +1192,7 @@ class AppsViewModel(
                 try {
                     updateAppState(app.packageName, UpdateState.CheckingUpdate)
 
-                    val latestRelease =
-                        try {
-                            appsRepository.getLatestRelease(
-                                owner = app.repoOwner,
-                                repo = app.repoName,
-                                includePreReleases = app.includePreReleases,
-                                sourceHost = app.sourceHost,
-                            )
-                        } catch (e: CancellationException) {
-                            throw e
-                        } catch (e: Exception) {
-                            logger.error("Failed to fetch latest release: ${e.message}")
-                            throw IllegalStateException("Failed to fetch latest release: ${e.message}")
-                        }
-
-                    if (latestRelease == null) {
-                        throw IllegalStateException("No release found for ${app.appName}")
-                    }
-
-                    val installableAssets =
-                        latestRelease.assets.filter { asset ->
-                            installer.isAssetInstallable(asset.name)
-                        }
-
-                    if (installableAssets.isEmpty()) {
-                        throw IllegalStateException("No installable assets found for this platform")
-                    }
-
-                    val variantMatch =
-                        AssetVariant.resolvePreferredAsset(
-                            assets = installableAssets,
-                            pinnedVariant = app.preferredAssetVariant,
-                            pinnedTokens = AssetVariant.deserializeTokens(app.preferredAssetTokens),
-                            pinnedGlob = app.assetGlobPattern,
-                            releaseTag = latestRelease.tagName,
-                        )
-                    val primaryAsset =
-                        variantMatch
-                            ?: installer.choosePrimaryAsset(installableAssets)
-                            ?: throw IllegalStateException("Could not determine primary asset")
+                    val (latestRelease, primaryAsset) = resolveLatestAsset(app)
 
                     logger.debug(
                         "Update: ${app.appName} from ${app.installedVersion} to ${latestRelease.tagName}, " +
@@ -1602,11 +1610,14 @@ class AppsViewModel(
             logger.debug("Install already in progress for ${app.packageName}")
             return
         }
+        if (app.pendingInstallFilePath?.let { !File(it).exists() } == true) {
+            logger.debug("Parked file for ${app.packageName} is gone, downloading it again")
+            redownloadPendingApp(app)
+            return
+        }
         viewModelScope.launch {
             try {
-                updateAppState(app.packageName, UpdateState.Installing)
-                downloadOrchestrator.installPending(app.packageName)
-                updateAppState(app.packageName, UpdateState.Idle)
+                installParked(app)
             } catch (e: CancellationException) {
                 throw e
             } catch (t: Throwable) {
@@ -1617,6 +1628,65 @@ class AppsViewModel(
                 )
             }
         }
+    }
+
+    private suspend fun installParked(app: InstalledAppUi) {
+        updateAppState(app.packageName, UpdateState.Installing)
+        val outcome = downloadOrchestrator.installPending(app.packageName)
+        updateAppState(
+            app.packageName,
+            if (outcome == null) UpdateState.Error("Install failed") else UpdateState.Idle,
+        )
+    }
+
+    private fun redownloadPendingApp(app: InstalledAppUi) {
+        val job =
+            viewModelScope.launch {
+                try {
+                    updateAppState(app.packageName, UpdateState.CheckingUpdate)
+                    val (release, asset) = resolveLatestAsset(app)
+                    installer.ensurePermissionsOrThrow(asset.name.substringAfterLast('.', "").lowercase())
+
+                    updateAppState(app.packageName, UpdateState.Downloading)
+                    downloadOrchestrator.enqueue(
+                        DownloadSpec(
+                            packageName = app.packageName,
+                            repoOwner = app.repoOwner,
+                            repoName = app.repoName,
+                            asset = asset,
+                            displayAppName = app.appName,
+                            installPolicy = InstallPolicy.InstallWhileForeground,
+                            releaseTag = release.tagName,
+                            releaseId = release.id,
+                        ),
+                    )
+                    val result =
+                        waitForOrchestratorReady(app.packageName) { progress ->
+                            updateAppProgress(app.packageName, progress)
+                        }
+                    when (result) {
+                        is OrchestratorResult.Ready -> installParked(app)
+                        is OrchestratorResult.Failed ->
+                            updateAppState(
+                                app.packageName,
+                                UpdateState.Error(result.message ?: "Download failed"),
+                            )
+                        else -> updateAppState(app.packageName, UpdateState.Idle)
+                    }
+                } catch (e: CancellationException) {
+                    updateAppState(app.packageName, UpdateState.Idle)
+                    throw e
+                } catch (_: RateLimitException) {
+                    updateAppState(app.packageName, UpdateState.Idle)
+                    _events.send(AppsEvent.ShowError(getString(Res.string.rate_limit_exceeded)))
+                } catch (e: Exception) {
+                    logger.error("Downloading ${app.packageName} again failed: ${e.message}")
+                    updateAppState(app.packageName, UpdateState.Error(e.message ?: "Download failed"))
+                } finally {
+                    activeUpdates.remove(app.packageName)
+                }
+            }
+        activeUpdates[app.packageName] = job
     }
 
     private fun discardPendingInstall(app: InstalledAppUi) {
