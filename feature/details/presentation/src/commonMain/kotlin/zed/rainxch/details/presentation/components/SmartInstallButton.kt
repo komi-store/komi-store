@@ -33,7 +33,9 @@ import androidx.compose.material.icons.outlined.DeleteOutline
 import androidx.compose.material.icons.outlined.Warning
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -77,8 +79,12 @@ import zed.rainxch.githubstore.core.presentation.res.update_to_version
 import zed.rainxch.githubstore.core.presentation.res.updating
 import zed.rainxch.githubstore.core.presentation.res.verified_build
 import zed.rainxch.githubstore.core.presentation.res.verifying
+import kotlin.time.Duration.Companion.seconds
+import kotlin.time.TimeSource
 
 private val ButtonHeight = 56.dp
+
+private val PrimaryClickCooldown = 3.seconds
 
 @Composable
 fun SmartInstallButton(
@@ -92,6 +98,7 @@ fun SmartInstallButton(
 ) {
     val colors = LocalPersonality.current.colors
     val shape = LocalPersonality.current.shape
+    var lastPrimaryClick by remember { mutableStateOf<TimeSource.Monotonic.ValueTimeMark?>(null) }
     val installedApp = state.installedApp
     val isInstalled = installedApp != null && !installedApp.isPendingInstall
     val isUpdateAvailable =
@@ -200,7 +207,12 @@ fun SmartInstallButton(
                 state = state,
                 progress = progress,
                 onClick = {
-                    if (!state.isDownloading && state.downloadStage == DownloadStage.IDLE) {
+                    val last = lastPrimaryClick
+                    if (!state.isDownloading &&
+                        state.downloadStage == DownloadStage.IDLE &&
+                        (last == null || last.elapsedNow() >= PrimaryClickCooldown)
+                    ) {
+                        lastPrimaryClick = TimeSource.Monotonic.markNow()
                         if (showUpdateAffordance) {
                             onAction(DetailsAction.UpdateApp)
                         } else {

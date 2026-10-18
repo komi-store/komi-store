@@ -495,7 +495,7 @@ class DefaultDownloadOrchestrator(
         var delegated = false
         return try {
             installer.ensurePermissionsOrThrow(ext)
-            systemInstallSerializer.awaitFreeAndMarkPending(packageName)
+            systemInstallSerializer.awaitFreeAndMarkPending(packageName, timeoutMs = 0L)
             val outcome = installer.install(filePath, ext)
             delegated = outcome == InstallOutcome.DELEGATED_TO_SYSTEM
             if (outcome == InstallOutcome.COMPLETED) {

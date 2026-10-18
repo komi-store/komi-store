@@ -14,6 +14,13 @@ class DefaultSystemInstallSerializer : SystemInstallSerializer {
         timeoutMs: Long,
     ) {
         val initiallyHeldBy = pending.value
+        if (timeoutMs <= 0L) {
+            if (initiallyHeldBy != null) {
+                Logger.i { "SystemInstallSerializer: $packageName claimed the gate from $initiallyHeldBy" }
+            }
+            pending.value = packageName
+            return
+        }
         if (initiallyHeldBy != null) {
             Logger.i {
                 "SystemInstallSerializer: $packageName waiting for $initiallyHeldBy to clear " +
