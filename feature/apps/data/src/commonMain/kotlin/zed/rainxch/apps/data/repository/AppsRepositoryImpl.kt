@@ -9,6 +9,7 @@ import io.ktor.http.HttpHeaders
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.contentOrNull
@@ -43,6 +44,7 @@ import zed.rainxch.core.domain.system.PackageMonitor
 import zed.rainxch.core.domain.utils.AssetVariant
 import zed.rainxch.core.domain.helpers.AppLauncher
 import kotlin.time.Clock
+import kotlin.time.TimeSource
 
 class AppsRepositoryImpl(
     private val appLauncher: AppLauncher,
@@ -86,9 +88,13 @@ class AppsRepositoryImpl(
         if (sourceHost != null) {
             return fetchForgejoLatestRelease(sourceHost, owner, repo, includePreReleases)
         }
+        val backendStart = TimeSource.Monotonic.markNow()
         val backendResult = backendApiClient.getReleases(owner, repo, perPage = 10)
         backendResult.fold(
             onSuccess = { releases ->
+                logger.debug(
+                    "Backend releases for $owner/$repo took ${backendStart.elapsedNow().inWholeMilliseconds} ms",
+                )
                 return releases
                     .asSequence()
                     .filter { it.draft != true }
@@ -98,18 +104,26 @@ class AppsRepositoryImpl(
             },
             onFailure = { error ->
                 if (!shouldFallbackToGithubOrRethrow(error)) return null
+                logger.warn(
+                    "Backend releases for $owner/$repo failed after " +
+                        "${backendStart.elapsedNow().inWholeMilliseconds} ms (${error.message}), asking GitHub directly",
+                )
             },
         )
 
+        val githubStart = TimeSource.Monotonic.markNow()
         return try {
             val releases =
-                httpClient
-                    .executeRequest<List<ReleaseNetwork>> {
-                        get("/repos/$owner/$repo/releases") {
-                            header(HttpHeaders.Accept, "application/vnd.github+json")
-                            parameter("per_page", 10)
-                        }
-                    }.getOrThrow()
+                withTimeoutOrNull(DIRECT_RELEASES_TIMEOUT_MS) {
+                    httpClient
+                        .executeRequest<List<ReleaseNetwork>> {
+                            get("/repos/$owner/$repo/releases") {
+                                header(HttpHeaders.Accept, "application/vnd.github+json")
+                                parameter("per_page", 10)
+                            }
+                        }.getOrThrow()
+                } ?: throw IllegalStateException("GitHub did not answer within ${DIRECT_RELEASES_TIMEOUT_MS / 1000} s")
+            logger.debug("GitHub releases for $owner/$repo took ${githubStart.elapsedNow().inWholeMilliseconds} ms")
 
             releases
                 .asSequence()
@@ -122,7 +136,10 @@ class AppsRepositoryImpl(
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
-            logger.error("Failed to fetch latest release for $owner/$repo: ${e.message}")
+            logger.error(
+                "Failed to fetch latest release for $owner/$repo from GitHub after " +
+                    "${githubStart.elapsedNow().inWholeMilliseconds} ms: ${e.message}",
+            )
             null
         }
     }
@@ -632,5 +649,6 @@ class AppsRepositoryImpl(
     private companion object {
         const val UNKNOWN_PREVIEW_CHARS = 200
         const val OBTAINIUM_EXPORT_FORMAT_VERSION = 1
+        const val DIRECT_RELEASES_TIMEOUT_MS = 20_000L
     }
 }

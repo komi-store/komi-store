@@ -47,7 +47,6 @@ import zed.rainxch.core.domain.model.installation.InstallerType
 import zed.rainxch.core.domain.model.installation.markPending
 import zed.rainxch.core.domain.model.installation.withLatestSnapshot
 import zed.rainxch.core.domain.model.account.github.GithubAsset
-import zed.rainxch.core.domain.model.account.github.GithubRelease
 import zed.rainxch.core.domain.model.error.RateLimitException
 import zed.rainxch.core.domain.network.Downloader
 import zed.rainxch.core.domain.repository.ExternalImportRepository
@@ -94,6 +93,7 @@ class AppsViewModel(
 
     private var hasLoadedInitialData = false
     private val activeUpdates = mutableMapOf<String, Job>()
+    private val storedMatchFailures = mutableSetOf<String>()
     private var updateAllJob: Job? = null
     private var lastAutoCheckTimestamp: Long = 0L
 
@@ -1136,7 +1136,48 @@ class AppsViewModel(
         }
     }
 
-    private suspend fun resolveLatestAsset(app: InstalledAppUi): Pair<GithubRelease, GithubAsset> {
+    private data class UpdateTarget(
+        val tag: String,
+        val releaseId: Long?,
+        val asset: GithubAsset,
+        val fromStoredMatch: Boolean,
+    )
+
+    private suspend fun resolveUpdateTarget(app: InstalledAppUi): UpdateTarget =
+        storedUpdateTarget(app.packageName) ?: lookUpUpdateTarget(app)
+
+    private suspend fun storedUpdateTarget(packageName: String): UpdateTarget? {
+        if (packageName in storedMatchFailures) return null
+        val row =
+            try {
+                installedAppsRepository.getAppByPackage(packageName)
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                logger.warn("Could not read the stored update match for $packageName: ${e.message}")
+                null
+            } ?: return null
+        val tag = row.latestVersion ?: return null
+        val name = row.latestAssetName?.takeIf { installer.isAssetInstallable(it) } ?: return null
+        val url = row.latestAssetUrl?.takeIf { it.isNotBlank() } ?: return null
+        val assetId = row.latestAssetId ?: return null
+        return UpdateTarget(
+            tag = tag,
+            releaseId = row.latestReleaseId,
+            asset =
+                GithubAsset(
+                    id = assetId,
+                    name = name,
+                    contentType = "application/octet-stream",
+                    size = row.latestAssetSize ?: 0L,
+                    downloadUrl = url,
+                    digest = row.latestAssetDigest,
+                ),
+            fromStoredMatch = true,
+        )
+    }
+
+    private suspend fun lookUpUpdateTarget(app: InstalledAppUi): UpdateTarget {
         val latestRelease =
             try {
                 appsRepository.getLatestRelease(
@@ -1178,7 +1219,12 @@ class AppsViewModel(
                 ?: installer.choosePrimaryAsset(installableAssets)
                 ?: throw IllegalStateException("Could not determine primary asset")
 
-        return latestRelease to primaryAsset
+        return UpdateTarget(
+            tag = latestRelease.tagName,
+            releaseId = latestRelease.id,
+            asset = primaryAsset,
+            fromStoredMatch = false,
+        )
     }
 
     private fun updateSingleApp(app: InstalledAppUi, waitForInstallGate: Boolean = false) {
@@ -1192,16 +1238,17 @@ class AppsViewModel(
                 try {
                     updateAppState(app.packageName, UpdateState.CheckingUpdate)
 
-                    val (latestRelease, primaryAsset) = resolveLatestAsset(app)
+                    val target = resolveUpdateTarget(app)
+                    val primaryAsset = target.asset
 
                     logger.debug(
-                        "Update: ${app.appName} from ${app.installedVersion} to ${latestRelease.tagName}, " +
-                            "asset: ${primaryAsset.name}",
+                        "Update: ${app.appName} from ${app.installedVersion} to ${target.tag}, " +
+                            "asset: ${primaryAsset.name}, stored match: ${target.fromStoredMatch}",
                     )
 
                     val latestAssetUrl = primaryAsset.downloadUrl
                     val latestAssetName = primaryAsset.name
-                    val latestVersion = latestRelease.tagName
+                    val latestVersion = target.tag
 
                     val ext = latestAssetName.substringAfterLast('.', "").lowercase()
                     installer.ensurePermissionsOrThrow(ext)
@@ -1255,8 +1302,8 @@ class AppsViewModel(
                             asset = primaryAsset,
                             displayAppName = app.appName,
                             installPolicy = policy,
-                            releaseTag = latestRelease.tagName,
-                            releaseId = latestRelease.id,
+                            releaseTag = latestVersion,
+                            releaseId = target.releaseId,
                         ),
                     )
 
@@ -1275,6 +1322,7 @@ class AppsViewModel(
                             return@launch
                         }
                         is OrchestratorResult.Failed -> {
+                            if (target.fromStoredMatch) storedMatchFailures += app.packageName
                             updateAppState(
                                 app.packageName,
                                 UpdateState.Error(orchestratorResult.message ?: "Download failed"),
@@ -1291,7 +1339,7 @@ class AppsViewModel(
                         installedAppsRepository.updateApp(
                             currentApp
                                 .markPending(
-                                    releaseId = latestRelease.id,
+                                    releaseId = target.releaseId,
                                     assetId = primaryAsset.id,
                                     assetDigest = primaryAsset.digest,
                                 )
@@ -1644,8 +1692,12 @@ class AppsViewModel(
             viewModelScope.launch {
                 try {
                     updateAppState(app.packageName, UpdateState.CheckingUpdate)
-                    val (release, asset) = resolveLatestAsset(app)
-                    installer.ensurePermissionsOrThrow(asset.name.substringAfterLast('.', "").lowercase())
+                    val target = resolveUpdateTarget(app)
+                    logger.debug(
+                        "Downloading ${app.packageName} again: ${target.tag} ${target.asset.name}, " +
+                            "stored match: ${target.fromStoredMatch}",
+                    )
+                    installer.ensurePermissionsOrThrow(target.asset.name.substringAfterLast('.', "").lowercase())
 
                     updateAppState(app.packageName, UpdateState.Downloading)
                     downloadOrchestrator.enqueue(
@@ -1653,11 +1705,11 @@ class AppsViewModel(
                             packageName = app.packageName,
                             repoOwner = app.repoOwner,
                             repoName = app.repoName,
-                            asset = asset,
+                            asset = target.asset,
                             displayAppName = app.appName,
                             installPolicy = InstallPolicy.InstallWhileForeground,
-                            releaseTag = release.tagName,
-                            releaseId = release.id,
+                            releaseTag = target.tag,
+                            releaseId = target.releaseId,
                         ),
                     )
                     val result =
@@ -1666,11 +1718,13 @@ class AppsViewModel(
                         }
                     when (result) {
                         is OrchestratorResult.Ready -> installParked(app)
-                        is OrchestratorResult.Failed ->
+                        is OrchestratorResult.Failed -> {
+                            if (target.fromStoredMatch) storedMatchFailures += app.packageName
                             updateAppState(
                                 app.packageName,
                                 UpdateState.Error(result.message ?: "Download failed"),
                             )
+                        }
                         else -> updateAppState(app.packageName, UpdateState.Idle)
                     }
                 } catch (e: CancellationException) {
