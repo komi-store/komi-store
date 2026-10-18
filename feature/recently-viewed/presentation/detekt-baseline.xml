@@ -2,6 +2,5 @@
 <SmellBaseline>
   <ManuallySuppressedIssues/>
   <CurrentIssues>
-    <ID>WildcardImport:RecentlyViewedRoot.kt$import zed.rainxch.githubstore.core.presentation.res.*</ID>
   </CurrentIssues>
 </SmellBaseline>

@@ -66,8 +66,6 @@
     <ID>MaxLineLength:TweaksSections.kt$if (showHead) SettingsSectionHead(stringResource(Res.string.section_installs_and_updates), TweaksDecorSlot.InstallsUpdates)</ID>
     <ID>MaxLineLength:TweaksViewModel.kt$TweaksViewModel$(attribution as? zed.rainxch.core.domain.model.installation.InstallerAttribution.Custom)?.packageName</ID>
     <ID>NestedBlockDepth:FeedbackComposer.kt$FeedbackComposer$fun composeBody(state: FeedbackState, channel: FeedbackChannel): String</ID>
-    <ID>NewLineAtEndOfFile:Constants.kt$zed.rainxch.tweaks.presentation.utils.Constants.kt</ID>
-    <ID>NewLineAtEndOfFile:TweaksDeepLinkBus.kt$zed.rainxch.tweaks.presentation.utils.TweaksDeepLinkBus.kt</ID>
     <ID>ReturnCount:PasteProxyUrlSheet.kt$fun parseProxyUrl(raw: String): PastedProxy?</ID>
     <ID>ReturnCount:TweaksViewModel.kt$TweaksViewModel$fun onAction(action: TweaksAction)</ID>
     <ID>ReturnCount:TweaksViewModel.kt$TweaksViewModel$private fun buildMasterProxyConfig(): ProxyConfig?</ID>
@@ -82,11 +80,5 @@
     <ID>TooManyFunctions:Installation.kt$zed.rainxch.tweaks.presentation.components.sections.Installation.kt</ID>
     <ID>TooManyFunctions:TweaksViewModel.kt$TweaksViewModel : ViewModel</ID>
     <ID>UnusedParameter:Installation.kt$type: InstallerType</ID>
-    <ID>WildcardImport:AppearanceSectionContent.kt$import zed.rainxch.githubstore.core.presentation.res.*</ID>
-    <ID>WildcardImport:ClearDownloadsDialog.kt$import zed.rainxch.githubstore.core.presentation.res.*</ID>
-    <ID>WildcardImport:CustomForgesDialog.kt$import zed.rainxch.githubstore.core.presentation.res.*</ID>
-    <ID>WildcardImport:Installation.kt$import zed.rainxch.githubstore.core.presentation.res.*</ID>
-    <ID>WildcardImport:Translation.kt$import zed.rainxch.githubstore.core.presentation.res.*</ID>
-    <ID>WildcardImport:TweaksRoot.kt$import zed.rainxch.githubstore.core.presentation.res.*</ID>
   </CurrentIssues>
 </SmellBaseline>

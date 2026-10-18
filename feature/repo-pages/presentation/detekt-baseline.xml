@@ -8,13 +8,5 @@
     <ID>MagicNumber:parseLabelColor.kt$16</ID>
     <ID>MagicNumber:parseLabelColor.kt$6</ID>
     <ID>MaxLineLength:PullsRoot.kt$Row</ID>
-    <ID>NewLineAtEndOfFile:IssueDetailAction.kt$zed.rainxch.repopages.presentation.issuedetail.IssueDetailAction.kt</ID>
-    <ID>NewLineAtEndOfFile:IssueDetailEvent.kt$zed.rainxch.repopages.presentation.issuedetail.IssueDetailEvent.kt</ID>
-    <ID>NewLineAtEndOfFile:IssueDetailViewModel.kt$zed.rainxch.repopages.presentation.issuedetail.IssueDetailViewModel.kt</ID>
-    <ID>NewLineAtEndOfFile:IssuesAction.kt$zed.rainxch.repopages.presentation.issues.IssuesAction.kt</ID>
-    <ID>NewLineAtEndOfFile:IssuesEvent.kt$zed.rainxch.repopages.presentation.issues.IssuesEvent.kt</ID>
-    <ID>NewLineAtEndOfFile:RepoPagesError.kt$zed.rainxch.repopages.presentation.components.RepoPagesError.kt</ID>
-    <ID>NewLineAtEndOfFile:parseLabelColor.kt$zed.rainxch.repopages.presentation.utils.parseLabelColor.kt</ID>
-    <ID>WildcardImport:IssuesRoot.kt$import zed.rainxch.githubstore.core.presentation.res.*</ID>
   </CurrentIssues>
 </SmellBaseline>

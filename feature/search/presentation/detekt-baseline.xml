@@ -25,16 +25,5 @@
     <ID>TooGenericExceptionCaught:SearchViewModel.kt$SearchViewModel$e: Throwable</ID>
     <ID>TooManyFunctions:SearchRoot.kt$zed.rainxch.search.presentation.SearchRoot.kt</ID>
     <ID>TooManyFunctions:SearchViewModel.kt$SearchViewModel : ViewModel</ID>
-    <ID>WildcardImport:LanguageFilterBottomSheet.kt$import zed.rainxch.githubstore.core.presentation.res.*</ID>
-    <ID>WildcardImport:ProgrammingLanguageMapper.kt$import zed.rainxch.githubstore.core.presentation.res.*</ID>
-    <ID>WildcardImport:ProgrammingLanguageMapper.kt$import zed.rainxch.search.presentation.model.ProgrammingLanguageUi.*</ID>
-    <ID>WildcardImport:ProgrammingLanguageMappers.kt$import zed.rainxch.domain.model.ProgrammingLanguage.*</ID>
-    <ID>WildcardImport:SearchHistorySection.kt$import zed.rainxch.githubstore.core.presentation.res.*</ID>
-    <ID>WildcardImport:SortByMapper.kt$import zed.rainxch.githubstore.core.presentation.res.*</ID>
-    <ID>WildcardImport:SortByMapper.kt$import zed.rainxch.search.presentation.model.SortByUi.*</ID>
-    <ID>WildcardImport:SortByMappers.kt$import zed.rainxch.domain.model.SortBy.*</ID>
-    <ID>WildcardImport:SortOrderMapper.kt$import zed.rainxch.domain.model.SortOrder.*</ID>
-    <ID>WildcardImport:SortOrderMapper.kt$import zed.rainxch.githubstore.core.presentation.res.*</ID>
-    <ID>WildcardImport:SortOrderMapper.kt$import zed.rainxch.search.presentation.model.SortOrderUi.*</ID>
   </CurrentIssues>
 </SmellBaseline>

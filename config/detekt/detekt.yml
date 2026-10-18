@@ -17,3 +17,7 @@ style:
     ignoreAnnotated: ['Composable', 'Preview']
   UnusedPrivateMember:
     ignoreAnnotated: ['Preview']
+  WildcardImport:
+    active: false
+  NewLineAtEndOfFile:
+    active: false

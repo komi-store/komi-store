@@ -195,8 +195,6 @@
     <ID>NestedBlockDepth:DhizukuServiceManager.kt$DhizukuServiceManager$private fun computeStatus(): DhizukuStatus</ID>
     <ID>NestedBlockDepth:DownloadNotificationObserver.kt$DownloadNotificationObserver$private fun reconcile(snapshot: Map&lt;String, OrchestratedDownload&gt;)</ID>
     <ID>NestedBlockDepth:PackageEventReceiver.kt$PackageEventReceiver$private suspend fun onPackageInstalled(packageName: String)</ID>
-    <ID>NewLineAtEndOfFile:CacheRepositoryImpl.kt$zed.rainxch.core.data.repository.CacheRepositoryImpl.kt</ID>
-    <ID>NewLineAtEndOfFile:PlatformModule.jvm.kt$zed.rainxch.core.data.di.PlatformModule.jvm.kt</ID>
     <ID>PackageNaming:DefaultTokenStore.kt$package zed.rainxch.core.data.data_source.impl</ID>
     <ID>PackageNaming:TokenStore.kt$package zed.rainxch.core.data.data_source</ID>
     <ID>PackageNaming:announcementsDataStoreFile.kt$package zed.rainxch.core.data.local.data_store</ID>
@@ -366,12 +364,5 @@
     <ID>UseCheckOrError:DesktopInstaller.kt$DesktopInstaller$throw IllegalStateException("Failed to make AppImage executable")</ID>
     <ID>UseCheckOrError:DesktopInstaller.kt$DesktopInstaller$throw IllegalStateException("File not found: $filePath")</ID>
     <ID>UseCheckOrError:DesktopInstaller.kt$DesktopInstaller$throw IllegalStateException("File was moved but doesn't exist at destination")</ID>
-    <ID>WildcardImport:HttpClientFactory.android.kt$import io.ktor.client.*</ID>
-    <ID>WildcardImport:HttpClientFactory.android.kt$import io.ktor.client.engine.okhttp.*</ID>
-    <ID>WildcardImport:HttpClientFactory.kt$import io.ktor.client.*</ID>
-    <ID>WildcardImport:HttpClientFactory.kt$import io.ktor.client.plugins.*</ID>
-    <ID>WildcardImport:HttpClientFactory.kt$import io.ktor.client.plugins.contentnegotiation.*</ID>
-    <ID>WildcardImport:HttpClientFactory.kt$import io.ktor.http.*</ID>
-    <ID>WildcardImport:HttpClientFactory.kt$import io.ktor.serialization.kotlinx.json.*</ID>
   </CurrentIssues>
 </SmellBaseline>

@@ -8,6 +8,5 @@
     <ID>TopLevelPropertyNaming:AnnouncementCard.kt$private const val BODY_COLLAPSED_LINES = 4</ID>
     <ID>TopLevelPropertyNaming:ProfileSections.kt$private const val METRIC_PLACEHOLDER = "—"</ID>
     <ID>UnusedParameter:MuteSettingsBottomSheet.kt$category: AnnouncementCategory</ID>
-    <ID>WildcardImport:ProfileSections.kt$import zed.rainxch.githubstore.core.presentation.res.*</ID>
   </CurrentIssues>
 </SmellBaseline>

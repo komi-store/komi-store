@@ -5,16 +5,6 @@
     <ID>LoopWithTooManyJumpStatements:RepoPagesRepositoryImpl.kt$RepoPagesRepositoryImpl$for</ID>
     <ID>MagicNumber:RepoPagesRepositoryImpl.kt$RepoPagesRepositoryImpl$401</ID>
     <ID>MagicNumber:RepoPagesRepositoryImpl.kt$RepoPagesRepositoryImpl$403</ID>
-    <ID>NewLineAtEndOfFile:CreateCommentRequest.kt$zed.rainxch.repopages.data.dto.CreateCommentRequest.kt</ID>
-    <ID>NewLineAtEndOfFile:CreateIssueRequest.kt$zed.rainxch.repopages.data.dto.CreateIssueRequest.kt</ID>
-    <ID>NewLineAtEndOfFile:CreateReactionRequest.kt$zed.rainxch.repopages.data.dto.CreateReactionRequest.kt</ID>
-    <ID>NewLineAtEndOfFile:GithubUserDto.kt$zed.rainxch.repopages.data.dto.GithubUserDto.kt</ID>
-    <ID>NewLineAtEndOfFile:IssueCommentDto.kt$zed.rainxch.repopages.data.dto.IssueCommentDto.kt</ID>
-    <ID>NewLineAtEndOfFile:IssueDto.kt$zed.rainxch.repopages.data.dto.IssueDto.kt</ID>
-    <ID>NewLineAtEndOfFile:LabelDto.kt$zed.rainxch.repopages.data.dto.LabelDto.kt</ID>
-    <ID>NewLineAtEndOfFile:PullRequestDto.kt$zed.rainxch.repopages.data.dto.PullRequestDto.kt</ID>
-    <ID>NewLineAtEndOfFile:ReactionsDto.kt$zed.rainxch.repopages.data.dto.ReactionsDto.kt</ID>
-    <ID>NewLineAtEndOfFile:RepoContentDto.kt$zed.rainxch.repopages.data.dto.RepoContentDto.kt</ID>
     <ID>TooGenericExceptionCaught:RepoPagesRepositoryImpl.kt$RepoPagesRepositoryImpl$e: Exception</ID>
     <ID>TooManyFunctions:RepoPagesRepositoryImpl.kt$RepoPagesRepositoryImpl : RepoPagesRepository</ID>
   </CurrentIssues>

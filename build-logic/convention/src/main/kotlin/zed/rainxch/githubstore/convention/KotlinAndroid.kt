@@ -32,6 +32,7 @@ internal fun Project.configureKotlinAndroid(commonExtension: CommonExtension<*, 
 
         lint {
             baseline = file("lint-baseline.xml")
+            disable += setOf("NewerVersionAvailable", "GradleDependency", "AndroidGradlePluginVersion")
             abortOnError = true
             checkReleaseBuilds = false
             htmlReport = true

@@ -43,16 +43,6 @@
     <ID>MaxLineLength:InstalledAppUpdatesTest.kt$InstalledAppUpdatesTest$matched = UpdateVerdict.Matched(tag = "2.0.0", publishedAt = "2026-09-01T00:00:00Z", isPrerelease = false)</ID>
     <ID>MaxLineLength:ReleaseVersionMatchingTest.kt$ReleaseVersionMatchingTest$assertFalse(AssetOwnership.isSameApp("ente-auth-v4.4.25.apk", "ente-photos-v1.3.64.apk", "auth-v4.4.25", "photos-v1.3.64"))</ID>
     <ID>MaxLineLength:ReleaseVersionMatchingTest.kt$ReleaseVersionMatchingTest$assertTrue(AssetOwnership.isSameApp("ente-auth-v4.4.25.apk", "ente-auth-v4.4.24.apk", "auth-v4.4.25", "auth-v4.4.24"))</ID>
-    <ID>NewLineAtEndOfFile:AnnouncementIconHint.kt$zed.rainxch.core.domain.model.announcement.AnnouncementIconHint.kt</ID>
-    <ID>NewLineAtEndOfFile:AnnouncementsRepository.kt$zed.rainxch.core.domain.repository.AnnouncementsRepository.kt</ID>
-    <ID>NewLineAtEndOfFile:CacheRepository.kt$zed.rainxch.core.domain.repository.CacheRepository.kt</ID>
-    <ID>NewLineAtEndOfFile:DhizukuAvailability.kt$zed.rainxch.core.domain.model.installation.DhizukuAvailability.kt</ID>
-    <ID>NewLineAtEndOfFile:HostTokenRepository.kt$zed.rainxch.core.domain.repository.HostTokenRepository.kt</ID>
-    <ID>NewLineAtEndOfFile:InstalledAppsRepository.kt$zed.rainxch.core.domain.repository.InstalledAppsRepository.kt</ID>
-    <ID>NewLineAtEndOfFile:MirrorRemoved.kt$zed.rainxch.core.domain.model.mirror.MirrorRemoved.kt</ID>
-    <ID>NewLineAtEndOfFile:RepoMatchSuggestion.kt$zed.rainxch.core.domain.system.RepoMatchSuggestion.kt</ID>
-    <ID>NewLineAtEndOfFile:UserProfile.kt$zed.rainxch.core.domain.model.account.UserProfile.kt</ID>
-    <ID>NewLineAtEndOfFile:executeInTransaction.kt$zed.rainxch.core.domain.utils.executeInTransaction.kt</ID>
     <ID>PackageNaming:MatchingPreview.kt$package zed.rainxch.core.domain.model.smart_detect</ID>
     <ID>PackageNaming:SyncInstalledAppsUseCase.kt$package zed.rainxch.core.domain.use_cases</ID>
     <ID>RethrowCaughtException:executeInTransaction.kt$throw e</ID>

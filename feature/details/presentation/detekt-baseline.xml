@@ -99,13 +99,5 @@
     <ID>UnusedParameter:DetailsRoot.kt$onNavigateToMarkdownViewer: (url: String) -&gt; Unit</ID>
     <ID>UnusedParameter:ReleaseAssetsPicker.kt$isPrimary: Boolean</ID>
     <ID>UseCheckOrError:DetailsViewModel.kt$DetailsViewModel$throw IllegalStateException("Downloaded file not found")</ID>
-    <ID>WildcardImport:About.kt$import zed.rainxch.githubstore.core.presentation.res.*</ID>
-    <ID>WildcardImport:DetailsRoot.kt$import zed.rainxch.githubstore.core.presentation.res.*</ID>
-    <ID>WildcardImport:LanguagePicker.kt$import zed.rainxch.githubstore.core.presentation.res.*</ID>
-    <ID>WildcardImport:LogResultAsText.kt$import zed.rainxch.githubstore.core.presentation.res.*</ID>
-    <ID>WildcardImport:Logs.kt$import zed.rainxch.githubstore.core.presentation.res.*</ID>
-    <ID>WildcardImport:ReleaseAssetsPicker.kt$import zed.rainxch.githubstore.core.presentation.res.*</ID>
-    <ID>WildcardImport:Stats.kt$import zed.rainxch.githubstore.core.presentation.res.*</ID>
-    <ID>WildcardImport:WhatsNew.kt$import zed.rainxch.githubstore.core.presentation.res.*</ID>
   </CurrentIssues>
 </SmellBaseline>

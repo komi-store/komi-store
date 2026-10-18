@@ -23,6 +23,5 @@
     <ID>TooGenericExceptionCaught:AuthenticationViewModel.kt$AuthenticationViewModel$t: Throwable</ID>
     <ID>TooManyFunctions:AuthenticationRoot.kt$zed.rainxch.auth.presentation.AuthenticationRoot.kt</ID>
     <ID>TooManyFunctions:AuthenticationViewModel.kt$AuthenticationViewModel : ViewModel</ID>
-    <ID>WildcardImport:AuthenticationViewModel.kt$import zed.rainxch.githubstore.core.presentation.res.*</ID>
   </CurrentIssues>
 </SmellBaseline>

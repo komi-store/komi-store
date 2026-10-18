@@ -178,9 +178,5 @@
     <ID>TopLevelPropertyNaming:GridColumns.kt$private const val MIN_POSITIVE = 1e-3f</ID>
     <ID>TopLevelPropertyNaming:SyntaxHighlightedCode.kt$private const val MAX_HIGHLIGHTABLE_CHARS = 16_000</ID>
     <ID>UnusedPrivateMember:SyntaxHighlightedCode.kt$@Suppress("UnusedReceiverParameter") private fun MarkdownElementTypes.placeholder(): Nothing</ID>
-    <ID>WildcardImport:AlertBlockQuote.kt$import zed.rainxch.githubstore.core.presentation.res.*</ID>
-    <ID>WildcardImport:CountFormatter.kt$import zed.rainxch.githubstore.core.presentation.res.*</ID>
-    <ID>WildcardImport:DiscoveryPlatformUiResources.kt$import zed.rainxch.githubstore.core.presentation.res.*</ID>
-    <ID>WildcardImport:TimeFormatters.kt$import zed.rainxch.githubstore.core.presentation.res.*</ID>
   </CurrentIssues>
 </SmellBaseline>

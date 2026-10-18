@@ -46,9 +46,6 @@
     <ID>MaxLineLength:StarredPickerRoot.kt$onClick = { onAction(StarredPickerAction.OnSortRuleSelected(StarredPickerSortRule.MostStars)) }</ID>
     <ID>MaxLineLength:StarredPickerRoot.kt$onClick = { onAction(StarredPickerAction.OnSortRuleSelected(StarredPickerSortRule.RecentlyStarred)) }</ID>
     <ID>MaxLineLength:UpdatesBanner.kt$progress = { updateAllProgress.current.toFloat() / updateAllProgress.total.coerceAtLeast(1) }</ID>
-    <ID>NewLineAtEndOfFile:AppsTopbar.kt$zed.rainxch.apps.presentation.components.AppsTopbar.kt</ID>
-    <ID>NewLineAtEndOfFile:PendingDiscardSheet.kt$zed.rainxch.apps.presentation.components.PendingDiscardSheet.kt</ID>
-    <ID>NewLineAtEndOfFile:PendingUninstallSheet.kt$zed.rainxch.apps.presentation.components.PendingUninstallSheet.kt</ID>
     <ID>ReturnCount:AppsViewModel.kt$AppsViewModel$fun tryCandidate(rawToken: String): String?</ID>
     <ID>ReturnCount:AppsViewModel.kt$AppsViewModel$private fun parseGithubUrl(input: String): Pair&lt;String, String&gt;?</ID>
     <ID>ReturnCount:AppsViewModel.kt$AppsViewModel$private fun suggestFilterForLink( deviceAppName: String, packageName: String, firstAssetName: String?, ): String?</ID>
@@ -74,9 +71,5 @@
     <ID>UseCheckOrError:AppsViewModel.kt$AppsViewModel$throw IllegalStateException("Failed to fetch latest release: ${e.message}")</ID>
     <ID>UseCheckOrError:AppsViewModel.kt$AppsViewModel$throw IllegalStateException("No installable assets found for this platform")</ID>
     <ID>UseCheckOrError:AppsViewModel.kt$AppsViewModel$throw IllegalStateException("No release found for ${app.appName}")</ID>
-    <ID>WildcardImport:AdvancedAppSettingsBottomSheet.kt$import zed.rainxch.githubstore.core.presentation.res.*</ID>
-    <ID>WildcardImport:AppsViewModel.kt$import zed.rainxch.githubstore.core.presentation.res.*</ID>
-    <ID>WildcardImport:LinkAppBottomSheet.kt$import zed.rainxch.githubstore.core.presentation.res.*</ID>
-    <ID>WildcardImport:VariantPickerDialog.kt$import zed.rainxch.githubstore.core.presentation.res.*</ID>
   </CurrentIssues>
 </SmellBaseline>

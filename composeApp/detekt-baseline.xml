@@ -60,9 +60,5 @@
     <ID>TopLevelPropertyNaming:WindowsDarkTitleBar.kt$private const val DWMWA_USE_IMMERSIVE_DARK_MODE = 20</ID>
     <ID>TopLevelPropertyNaming:WindowsDarkTitleBar.kt$private const val DWMWA_USE_IMMERSIVE_DARK_MODE_PRE_20H1 = 19</ID>
     <ID>TopLevelPropertyNaming:WindowsDarkTitleBar.kt$private const val S_OK = 0</ID>
-    <ID>WildcardImport:BottomNavigationUtils.kt$import androidx.compose.material.icons.filled.*</ID>
-    <ID>WildcardImport:BottomNavigationUtils.kt$import androidx.compose.material.icons.outlined.*</ID>
-    <ID>WildcardImport:BottomNavigationUtils.kt$import zed.rainxch.githubstore.core.presentation.res.*</ID>
-    <ID>WildcardImport:SessionExpiredDialog.kt$import zed.rainxch.githubstore.core.presentation.res.*</ID>
   </CurrentIssues>
 </SmellBaseline>

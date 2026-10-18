@@ -10,7 +10,6 @@
     <ID>MagicNumber:SearchRepositoryImpl.kt$SearchRepositoryImpl$16</ID>
     <ID>MagicNumber:SearchRepositoryImpl.kt$SearchRepositoryImpl$20</ID>
     <ID>MagicNumber:SearchRepositoryImpl.kt$SearchRepositoryImpl$5</ID>
-    <ID>NewLineAtEndOfFile:SearchHistoryRepositoryImpl.kt$zed.rainxch.search.data.repository.SearchHistoryRepositoryImpl.kt</ID>
     <ID>ReturnCount:SearchRepositoryImpl.kt$SearchRepositoryImpl$private fun PaginatedDiscoveryRepositories.prepend( extra: List&lt;GithubRepoSummary&gt;, ): PaginatedDiscoveryRepositories</ID>
     <ID>ReturnCount:SearchRepositoryImpl.kt$SearchRepositoryImpl$private suspend fun checkRepoHasInstallers( repo: GithubRepoNetworkModel, targetPlatform: DiscoveryPlatform, ): GithubRepoSummary?</ID>
     <ID>ReturnCount:SearchRepositoryImpl.kt$SearchRepositoryImpl$private suspend fun kotlinx.coroutines.channels.ProducerScope&lt;PaginatedDiscoveryRepositories&gt;.fallbackGithubSearch( query: String, platform: DiscoveryPlatform, language: ProgrammingLanguage, sortBy: SortBy, sortOrder: SortOrder, page: Int, cacheKey: String, privateMatches: List&lt;GithubRepoSummary&gt;, )</ID>

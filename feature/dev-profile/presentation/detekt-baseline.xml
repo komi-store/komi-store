@@ -19,8 +19,5 @@
     <ID>MaxLineLength:ProfileInfoCard.kt$Metric(value = formatCount(repos), label = stringResource(Res.string.profile_repos), modifier = Modifier.weight(1f))</ID>
     <ID>ReturnCount:ContributionCalendar.kt$private fun dateToDayOfWeek(iso: String): Int</ID>
     <ID>TooGenericExceptionCaught:DeveloperProfileViewModel.kt$DeveloperProfileViewModel$e: Exception</ID>
-    <ID>WildcardImport:DeveloperProfileRoot.kt$import zed.rainxch.githubstore.core.presentation.res.*</ID>
-    <ID>WildcardImport:DeveloperProfileViewModel.kt$import zed.rainxch.githubstore.core.presentation.res.*</ID>
-    <ID>WildcardImport:DeveloperRepoItem.kt$import zed.rainxch.githubstore.core.presentation.res.*</ID>
   </CurrentIssues>
 </SmellBaseline>

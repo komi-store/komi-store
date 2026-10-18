@@ -3,6 +3,5 @@
   <ManuallySuppressedIssues/>
   <CurrentIssues>
     <ID>LongParameterList:SearchRepository.kt$SearchRepository$( query: String, platform: DiscoveryPlatform, language: ProgrammingLanguage, sortBy: SortBy, sortOrder: SortOrder, page: Int, source: SearchSource = SearchSource.GitHub, )</ID>
-    <ID>NewLineAtEndOfFile:SearchHistoryRepository.kt$zed.rainxch.domain.repository.SearchHistoryRepository.kt</ID>
   </CurrentIssues>
 </SmellBaseline>
