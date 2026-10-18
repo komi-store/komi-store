@@ -69,7 +69,8 @@ class DefaultDownloadOrchestrator(
         stateMutex.withLock {
             val existing = _downloads.value[spec.packageName]
             if (existing != null && existing.stage != DownloadStage.Failed &&
-                existing.stage != DownloadStage.Cancelled
+                existing.stage != DownloadStage.Cancelled &&
+                !existing.lostItsFile()
             ) {
                 if (existing.installPolicy != spec.installPolicy &&
                     existing.installPolicy.priority < spec.installPolicy.priority
@@ -127,6 +128,10 @@ class DefaultDownloadOrchestrator(
         }
         return id
     }
+
+    private fun OrchestratedDownload.lostItsFile(): Boolean =
+        stage == DownloadStage.AwaitingInstall &&
+            filePath?.let { !java.io.File(it).exists() } == true
 
     private suspend fun runDownload(spec: DownloadSpec) {
         while (true) {
