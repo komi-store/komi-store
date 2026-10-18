@@ -1,18 +1,18 @@
 # Apps Feature
 
-Installed-apps manager. Lists apps installed through GHS, launches them, checks updates. Android-only in nav (bottom-nav hidden on Desktop).
+Installed-apps manager. Lists apps tracked by GHS, launches them, checks and installs updates, links apps installed elsewhere to a repo. In the Android bottom nav (label "Library"); on Desktop the sidebar omits it and it opens from the window menu bar (Go > Library, `githubstore://apps`).
 
 ## Structure
 
 ```
 feature/apps/
-├── domain/repository/AppsRepository.kt
-├── data/  AppsRepositoryImpl + di
+├── domain/   # AppsRepository, GithubRepoInfo, ImportResult / ImportFormat
+├── data/     # AppsRepositoryImpl + di
 └── presentation/
     ├── AppsViewModel / State / Action / Event / Root
-    ├── components/  app item cards, update badges, LinkAppBottomSheet, AdvancedAppSettingsBottomSheet, ApkInspectSheet, import banner
-    ├── import/      # ExternalImportRoot/ViewModel — Obtainium import/export + manual-link
-    └── starred/     # StarredPickerRoot/ViewModel — APK-shipping subset of user's GitHub stars
+    ├── components/  app and group cards, LinkAppBottomSheet, AdvancedAppSettingsBottomSheet, VariantPickerDialog, ImportSummarySheet
+    ├── import/      # ExternalImportRoot/ViewModel: scan device for untracked apps, auto-link or review repo matches
+    └── starred/     # StarredPickerRoot/ViewModel: APK-shipping subset of user's GitHub stars
 ```
 
 ## Key interface
@@ -24,7 +24,7 @@ interface AppsRepository {
     suspend fun getLatestRelease(owner, repo, includePreReleases = false, sourceHost: String? = null): GithubRelease?
     suspend fun fetchRepoInfo(owner, repo, sourceHost: String? = null): GithubRepoInfo?
     suspend fun linkAppToRepo(..., sourceHost: String? = null)
-    /* exportApps / exportObtainium / importApps */
+    /* getDeviceApps / getTrackedPackageNames / exportApps / exportObtainium / importApps */
 }
 ```
 
@@ -34,13 +34,15 @@ interface AppsRepository {
 
 ## Notes
 
-- Uses `InstalledAppsRepository` + `SyncInstalledAppsUseCase`. `openApp` via `AppLauncher`. `PackageMonitor` + `Installer` (Android). Data layer injects `ForgejoClientRegistry`; non-null `sourceHost` on `getLatestRelease` / `fetchRepoInfo` / `linkAppToRepo` routes to the Forgejo client (else default GitHub-direct path).
-- **`sourceHost` propagation:** `InstalledApp.sourceHost` persisted on link; `AppsAction.OpenAppDetails` / `OpenRepoDetails` + `AppsEvent.NavigateToRepo` carry `sourceHost`; `AppsRoot.onNavigateToRepo` is `(repoId, sourceHost, owner, repo, packageName) -> Unit` and routes to `GithubStoreGraph.DetailsScreen(sourceHost = …, packageName = …)`.
-- **Multi-source backend match:** `RepoSuggestion` candidates may come from GitHub *or* a Forgejo host; the link sheet displays the source host chip per row so the user picks the right forge variant.
+- `AppsViewModel` is created in `AppNavigation` (not by `AppsRoot`) and its state is collected there for the bottom-nav update badge, so it loads at app start and outlives the screen.
+- Uses `InstalledAppsRepository` + `SyncInstalledAppsUseCase`. `openApp` via `AppLauncher`. `getLatestRelease` / `fetchRepoInfo` go backend first, GitHub direct on fallback; a non-null `sourceHost` routes them to the `ForgejoClientRegistry` client instead. `linkAppToRepo` only persists `sourceHost` on `InstalledApp.sourceHost`.
+- **`sourceHost` propagation:** `AppsAction.OnNavigateToRepo` + `AppsEvent.NavigateToRepo` carry `sourceHost`, owner, repo, packageName; `AppsRoot.onNavigateToRepo` is `(repoId, sourceHost, owner, repo, packageName) -> Unit` and routes to `GithubStoreGraph.DetailsScreen(sourceHost = ..., packageName = ...)`.
+- **Multi-source backend match:** link suggestions (`RepoMatchSuggestion`) may come from GitHub *or* a Forgejo host; the link sheet shows a source host chip per row (GitHub / Codeberg / host) so the user picks the right forge variant.
 - **Grouped by repo:** apps sharing a `repoId` render together inside each section (`AppsState.pendingGroups` / `updateGroups` / `idleGroups` from `groupedByRepo()`, which keeps each group at its first member's sort position). Up-to-date groups are one `AppGroupCard` (owner/repo header + unframed `CompactAppRow`s with `AppGroupDivider`); update and pending groups are an `AppGroupStack` (header above the cards). `InstalledAppIcon` lives in `core/presentation`.
-- Sort + search: `AppSortRule` enum (UpdatesFirst default, AlphabeticalAZ, RecentlyAdded, RecentlyUpdated). Persisted in DataStore. Inline search filters appName / packageName.
-- Per-app actions: Ignore-updates (silence badge), Skip-this-release (per-tag, auto-clear on next release), Advanced filter (regex on asset names + monorepo fallback), Pin variant (token-set + glob fingerprint), Inspect APK (decoded manifest sheet).
-- Link sheet (`LinkAppBottomSheet`) sorts installed apps by `InstallerCategory` (`core/domain`): SIDE_STORE (F-Droid / Obtainium / Aurora / Droid-ify / GHS itself) → SIDELOADED → VENDOR_STORE (Samsung / Huawei / Xiaomi / Oppo / vivo / Honor / Amazon) → PLAY_STORE → SYSTEM_UPDATE. `DeviceApp.installerPackageName` (via `PackageManager.getInstallSourceInfo` / pre-30 fallback) + `isUpdatedSystemApp` (via `FLAG_UPDATED_SYSTEM_APP`) feed the classifier. Each row shows a tonal source chip — F-Droid / Obtainium surfaces first; Samsung Authentication Framework and friends drop to the bottom.
-- Auto-update on resume: `OnLifecycleResume` fires `autoCheckForUpdatesIfNeeded` (30-min cooldown) — catches drift after external install while GHS background-killed.
-- External import (`import/`): Obtainium JSON import/export with pre-import summary buckets (imported / already-tracked / non-GitHub-skipped); manual-link-only path. **Skip-on-slow-scan:** after `~5s` `state.isSkipAvailable` flips true → user can fire `OnSkipLongScan` to abort the in-flight backend lookup and move on without waiting for the remaining candidates.
-- Starred picker (`starred/`): scans signed-in user's GitHub stars, surfaces APK-shipping repos. Resumes mid-scan on rate-limit.
+- Sort + search: `AppSortRule` enum (UpdatesFirst default, RecentlyUpdated, Name), persisted via `TweaksRepository.getAppsSortRule` / `setAppsSortRule`. Inline search filters appName / repoOwner.
+- Per-app actions: Ignore-updates (`updateCheckEnabled`), Skip-this-release (per-tag, cleared by a newer release), per-app pre-releases, Advanced filter (regex on asset names + fallback to older releases), Pin variant (`VariantPickerDialog` saves only the variant string, clearing the token-set + glob fingerprint stored at link time).
+- Link sheet (`LinkAppBottomSheet`) sorts device apps by `InstallerCategory.sortPriority` (`core/domain`): SIDE_STORE -> SIDELOADED -> PLAY_STORE -> VENDOR_STORE -> SYSTEM_UPDATE, then name. `InstallerCategory.classify` uses `DeviceApp.installerPackageName` + `isUpdatedSystemApp`, with a package-name prefix fallback for vendor / system apps. Each row shows a tonal category chip.
+- Auto-check on resume: `AppsRoot` sends `OnLifecycleResume`, which runs `autoCheckForUpdatesIfNeeded` (skipped if the last auto-check, or the oldest tracked app's `lastCheckedAt`, is under 30 min old).
+- Backup import / export (`AppsViewModel` + `AppsRepository`): export native JSON or Obtainium JSON; import auto-detects either format, then `ImportSummarySheet` shows buckets imported / skipped (already tracked) / non-GitHub / failed.
+- External import (`import/`): `ExternalImportRepository.runFullScan` finds untracked device apps; candidates whose top match has confidence >= 0.85 are auto-linked, the rest become review cards (pick suggestion, search override, skip, skip forever, undo). **Skip-on-slow-scan:** after 5s `state.isSkipAvailable` flips true; `OnSkipLongScan` cancels the scan and builds cards from what has resolved so far. "Add manually" returns to Apps and opens the link sheet via the `EXTERNAL_IMPORT_OPEN_LINK_SHEET_KEY` saved-state flag.
+- Starred picker (`starred/`): checks each starred repo's latest release for `.apk` / `.apks` / `.xapk` / `.aab` assets. Stops on `RateLimitException`; `OnResume` rescans only repos with no release tag yet.

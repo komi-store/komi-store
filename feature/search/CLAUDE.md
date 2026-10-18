@@ -1,17 +1,20 @@
 # Search Feature
 
-Repo search with platform / language / sort filters. Paginated results.
+Repo search with source / platform / language / sort filters. Paginated results.
 
 ## Structure
 
-```
+```text
 feature/search/
-├── domain/   # SearchRepository; SearchPlatform (All/Android/Macos/Windows/Linux), ProgrammingLanguage, SortBy
-├── data/     # SearchRepositoryImpl + dto + mappers + di
-└── presentation/
-    ├── SearchViewModel / State / Action / Event / Root
-    └── components/  filter chips, ClipboardLinkBanner, etc.
+  domain/   # package zed.rainxch.domain (not zed.rainxch.search.domain): SearchRepository, SearchHistoryRepository; SearchSource, ProgrammingLanguage, SortBy, SortOrder, ExploreResult
+  data/     # SearchRepositoryImpl, SearchHistoryRepositoryImpl, dto/, di
+  presentation/
+    SearchViewModel / State / Action / Event / Root
+    model/ + mappers/  # UI models (SearchSourceUi, SortByUi, ...) and toDomain()
+    components/        # filters, sort and language sheets, search history
 ```
+
+Platform filter type is `DiscoveryPlatform` (core/domain).
 
 ## Key interface
 
@@ -35,15 +38,15 @@ sealed interface SearchSource { object GitHub; data class Forgejo(host); /* Code
 
 ## Navigation
 
-`GithubStoreGraph.SearchScreen`.
+`GithubStoreGraph.SearchScreen(initialPlatform: String?)`. The name is parsed to `DiscoveryPlatform` and passed to the VM via `parametersOf`.
 
 ## Notes
 
-- Platform filter → GitHub topic search (e.g. `android` topic). Language filter → `language:` qualifier. Debounce/throttle on queries.
-- **Source toggle (`SearchSourceUi`):** UI surfaces `GitHub`, `Codeberg`, and per-user-added `Custom(host)` chips (from `TweaksRepository.customForgeHosts`). `state.selectedSource` → repository's `source: SearchSource` param. Forgejo branch in `SearchRepositoryImpl` hits `ForgejoClientRegistry.clientFor(host)` (`/repos/search`) — no backend mediator.
-- Injects: `SearchRepository`, `InstalledAppsRepository`, `SyncInstalledAppsUseCase`, `FavouritesRepository`, `StarredRepository`, `SeenReposRepository`, `HiddenReposRepository`, `TweaksRepository`, `ProfileRepository`, `TelemetryRepository`, `SearchHistoryRepository`, `ShareManager`, `ClipboardHelper`, `Platform`, `GitHubStoreLogger`. Data layer additionally injects `ForgejoClientRegistry`.
+- No search while typing: a search runs on IME submit, a history tap or a filter change, and needs at least 2 chars.
+- GitHub source order: page cache (`CacheManager`) -> backend search (platform + sort; skipped for `MostForks` and `Ios`) -> direct GitHub `/search/repositories` fallback (`in:name,description archived:false fork:true`, `language:` qualifier). Fallback results are kept only when their latest stable release has an installer for the platform (`verifyBatch`, auto-skips up to 3 empty pages). The backend path does not send the language filter. Signed-in users get matching private repos prepended on page 1.
+- **Source toggle (`SearchSourceUi`):** UI surfaces `GitHub`, `Codeberg`, and per-user-added `CustomForge(host)` chips (from `TweaksRepository.getCustomForgeHosts()`). `state.selectedSource` -> repository's `source: SearchSource` param. Forgejo branch in `SearchRepositoryImpl` hits `ForgejoClientRegistry.clientFor(host)` (`/repos/search`) with query + page only (platform / language / sort ignored), no backend mediator.
 - `computeVisibleRepos` filters `state.repositories` at render time by `hiddenRepoIds` AND (when `isHideSeenEnabled`) `seenRepoIds`. Unhide restores without re-fetch.
-- Empty-grid-after-Hide-seen banner offers one-tap reset (issue #574) → `OnDisableHideSeenForResults`.
-- Long-press card → shared `RepositoryActionsBottomSheet`.
+- Empty-grid-after-Hide-seen banner offers one-tap reset (issue #574) -> `OnDisableHideSeenForResults`, which turns the Hide seen setting off.
+- Long-press card -> `DiscoveryRepoCard`'s own actions sheet (core/presentation): share, open on GitHub, seen toggle, hide.
 - `DiscoveryRepositoryUi.isCurrentUserOwner` flipped by `observeCurrentUser` (E20).
-- Clipboard auto-detect surfaces GitHub URLs from clipboard as a dismissible banner.
+- Clipboard auto-detect (gated by `TweaksRepository.getAutoDetectClipboardLinks()`) surfaces GitHub URLs from clipboard as a dismissible banner.
