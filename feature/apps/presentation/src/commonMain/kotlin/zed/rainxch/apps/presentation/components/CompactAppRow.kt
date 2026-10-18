@@ -33,6 +33,7 @@ import zed.rainxch.core.presentation.components.overlays.KomiMenuTone
 import zed.rainxch.core.presentation.components.text.KomiText
 import zed.rainxch.core.presentation.components.text.KomiTextRole
 import zed.rainxch.core.presentation.locals.LocalPersonality
+import zed.rainxch.core.presentation.utils.rememberTapCooldown
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -85,6 +86,7 @@ fun CompactAppRow(
             appItem.updateState is UpdateState.CheckingUpdate
 
     val flags = rememberCompactStatusFlags(appItem)
+    val installCooldown = rememberTapCooldown()
     val rowSemanticName = buildCompactRowSemantics(app.appName, app.installedVersion, flags)
     val colors = LocalPersonality.current.colors
     val shape = LocalPersonality.current.shape
@@ -161,11 +163,11 @@ fun CompactAppRow(
 
         if (app.pendingInstallFilePath != null) {
             KomiButton(
-                onClick = onInstallPendingClick,
+                onClick = { installCooldown.run(onInstallPendingClick) },
                 label = stringResource(Res.string.install),
                 variant = KomiButtonVariant.Primary,
                 size = KomiButtonSize.Sm,
-                enabled = !isBusy,
+                enabled = !isBusy && !installCooldown.active,
                 leadingIcon = Icons.Default.Update,
             )
 

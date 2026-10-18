@@ -594,11 +594,12 @@ class DefaultDownloadOrchestrator(
         filePath: String,
         ext: String,
     ): InstallOutcome? {
+        val entryId = _downloads.value[packageName]?.id
         updateEntry(packageName) { it.copy(stage = DownloadStage.Installing) }
         var delegated = false
         return try {
             installer.ensurePermissionsOrThrow(ext)
-            systemInstallSerializer.awaitFreeAndMarkPending(packageName)
+            systemInstallSerializer.awaitFreeAndMarkPending(packageName, timeoutMs = 0L)
             val outcome = installer.install(filePath, ext)
             delegated = outcome == InstallOutcome.DELEGATED_TO_SYSTEM
             if (outcome == InstallOutcome.COMPLETED) {
@@ -611,7 +612,9 @@ class DefaultDownloadOrchestrator(
                     Logger.w(e) { "Orchestrator: failed to clear pending install path post-install" }
                 }
                 pendingInstallNotifier.clearPending(packageName)
-                updateEntry(packageName) { it.copy(stage = DownloadStage.Completed) }
+                if (entryId != null) {
+                    updateEntry(packageName, onlyId = entryId) { it.copy(stage = DownloadStage.Completed) }
+                }
             }
             outcome
         } catch (e: CancellationException) {
@@ -620,7 +623,7 @@ class DefaultDownloadOrchestrator(
         } catch (t: Throwable) {
             if (!delegated) systemInstallSerializer.markCompleted(packageName)
             Logger.e(t) { "Orchestrator: standalone install failed for $packageName" }
-            markFailed(packageName, t.message)
+            if (entryId != null) markFailed(packageName, t.message, onlyId = entryId)
             null
         }
     }
@@ -631,20 +634,23 @@ class DefaultDownloadOrchestrator(
 
     private suspend fun updateEntry(
         packageName: String,
+        onlyId: String? = null,
         transform: (OrchestratedDownload) -> OrchestratedDownload,
     ) {
         stateMutex.withLock {
             _downloads.update { state ->
                 val current = state[packageName] ?: return@update state
+                if (onlyId != null && current.id != onlyId) return@update state
                 state + (packageName to transform(current))
             }
         }
     }
 
-    private suspend fun markFailed(packageName: String, message: String?) {
+    private suspend fun markFailed(packageName: String, message: String?, onlyId: String? = null) {
         stateMutex.withLock {
             _downloads.update { state ->
                 val current = state[packageName] ?: return@update state
+                if (onlyId != null && current.id != onlyId) return@update state
                 state + (packageName to current.copy(stage = DownloadStage.Failed, errorMessage = message))
             }
         }

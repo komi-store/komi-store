@@ -52,6 +52,7 @@ import zed.rainxch.core.presentation.components.progress.KomiCircularProgress
 import zed.rainxch.core.presentation.components.text.KomiText
 import zed.rainxch.core.presentation.components.text.KomiTextRole
 import zed.rainxch.core.presentation.locals.LocalPersonality
+import zed.rainxch.core.presentation.utils.rememberTapCooldown
 import zed.rainxch.details.presentation.DetailsAction
 import zed.rainxch.details.presentation.DetailsState
 import zed.rainxch.details.presentation.model.AttestationStatus
@@ -92,6 +93,7 @@ fun SmartInstallButton(
 ) {
     val colors = LocalPersonality.current.colors
     val shape = LocalPersonality.current.shape
+    val primaryCooldown = rememberTapCooldown()
     val installedApp = state.installedApp
     val isInstalled = installedApp != null && !installedApp.isPendingInstall
     val isUpdateAvailable =
@@ -121,7 +123,7 @@ fun SmartInstallButton(
 
     val enabled = remember(primaryAsset, isDownloading, isInstalling) {
         primaryAsset != null && !isDownloading && !isInstalling
-    }
+    } && !primaryCooldown.active
     val isActiveDownload = state.isDownloading || state.downloadStage != DownloadStage.IDLE
 
     if (isSameVersionInstalled && !isActiveDownload) {
@@ -201,10 +203,12 @@ fun SmartInstallButton(
                 progress = progress,
                 onClick = {
                     if (!state.isDownloading && state.downloadStage == DownloadStage.IDLE) {
-                        if (showUpdateAffordance) {
-                            onAction(DetailsAction.UpdateApp)
-                        } else {
-                            onAction(DetailsAction.InstallPrimary)
+                        primaryCooldown.run {
+                            if (showUpdateAffordance) {
+                                onAction(DetailsAction.UpdateApp)
+                            } else {
+                                onAction(DetailsAction.InstallPrimary)
+                            }
                         }
                     }
                 },

@@ -1134,7 +1134,7 @@ class AppsViewModel(
         }
     }
 
-    private fun updateSingleApp(app: InstalledAppUi) {
+    private fun updateSingleApp(app: InstalledAppUi, waitForInstallGate: Boolean = false) {
         if (activeUpdates.containsKey(app.packageName)) {
             logger.debug("Update already in progress for ${app.packageName}")
             return
@@ -1302,7 +1302,10 @@ class AppsViewModel(
                     updateAppState(app.packageName, UpdateState.Installing)
 
                     try {
-                        systemInstallSerializer.awaitFreeAndMarkPending(app.packageName)
+                        systemInstallSerializer.awaitFreeAndMarkPending(
+                            app.packageName,
+                            timeoutMs = if (waitForInstallGate) SystemInstallSerializer.DEFAULT_TIMEOUT_MS else 0L,
+                        )
                         installer.install(filePath, ext)
                     } catch (e: CancellationException) {
                         throw e
@@ -1418,7 +1421,7 @@ class AppsViewModel(
 
                         logger.debug("Updating ${index + 1}/${appsToUpdate.size}: ${appItem.installedApp.appName}")
 
-                        updateSingleApp(appItem.installedApp)
+                        updateSingleApp(appItem.installedApp, waitForInstallGate = true)
                         activeUpdates[appItem.installedApp.packageName]?.join()
 
                         delay(1000.milliseconds)
