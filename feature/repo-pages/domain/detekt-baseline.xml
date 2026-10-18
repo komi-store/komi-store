@@ -1,0 +1,11 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues/>
+  <CurrentIssues>
+    <ID>NewLineAtEndOfFile:IssueLabel.kt$zed.rainxch.repopages.domain.model.IssueLabel.kt</ID>
+    <ID>NewLineAtEndOfFile:IssueState.kt$zed.rainxch.repopages.domain.model.IssueState.kt</ID>
+    <ID>NewLineAtEndOfFile:RepoIssueDetail.kt$zed.rainxch.repopages.domain.model.RepoIssueDetail.kt</ID>
+    <ID>NewLineAtEndOfFile:SecurityAdvisory.kt$zed.rainxch.repopages.domain.model.SecurityAdvisory.kt</ID>
+    <ID>NewLineAtEndOfFile:SecurityOverview.kt$zed.rainxch.repopages.domain.model.SecurityOverview.kt</ID>
+  </CurrentIssues>
+</SmellBaseline>

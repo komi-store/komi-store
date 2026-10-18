@@ -1,0 +1,111 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues/>
+  <CurrentIssues>
+    <ID>ComplexCondition:DetailsRoot.kt$event.type == KeyEventType.KeyDown &amp;&amp; (event.isMetaPressed || event.isCtrlPressed) &amp;&amp; event.key == Key.R</ID>
+    <ID>ComplexCondition:DetailsViewModel.kt$DetailsViewModel$!ignoreDowngrade &amp;&amp; installedApp != null &amp;&amp; !installedApp.isPendingInstall &amp;&amp; VersionHelper.normalizeVersion(release.tagName) != VersionHelper.normalizeVersion( installedApp.installedVersion, ) &amp;&amp; platform == Platform.ANDROID</ID>
+    <ID>ComplexCondition:ReleaseChannel.kt$!showMerged &amp;&amp; !showStalled &amp;&amp; !showSwitchToStable &amp;&amp; !showChannelChip</ID>
+    <ID>CyclomaticComplexMethod:ApkInspectSheet.kt$@Composable private fun PermissionsSection(permissions: List&lt;ApkPermission&gt;)</ID>
+    <ID>CyclomaticComplexMethod:AppHeader.kt$@OptIn(ExperimentalLayoutApi::class) @Composable fun AppHeader( author: GithubUserProfile?, repository: GithubRepoSummary, release: GithubRelease?, installedApp: InstalledApp?, modifier: Modifier = Modifier, installedApps: List&lt;InstalledApp&gt; = emptyList(), onSelectInstalledApp: (String) -&gt; Unit = {}, downloadStage: DownloadStage = DownloadStage.IDLE, downloadProgress: Int? = null, isCurrentUserOwner: Boolean = false, onPlatformClick: ((DiscoveryPlatform) -&gt; Unit)? = null, platformReleases: List&lt;PlatformRelease&gt; = emptyList(), devicePlatform: DiscoveryPlatform? = null, appLabel: String? = null, onAppLabelClick: () -&gt; Unit = {}, onOwnerClick: () -&gt; Unit = {}, )</ID>
+    <ID>CyclomaticComplexMethod:DetailsRoot.kt$@Composable fun DetailsRoot( onNavigateBack: () -&gt; Unit, onNavigateToDeveloperProfile: (username: String) -&gt; Unit, onOpenRepositoryInApp: (repoId: Long) -&gt; Unit, onNavigateToAbout: (repoId: Long, owner: String, repo: String, sourceHost: String?, translateTo: String?) -&gt; Unit, onNavigateToWhatsNew: (repoId: Long, owner: String, repo: String, sourceHost: String?) -&gt; Unit, onNavigateToIssues: (owner: String, repo: String) -&gt; Unit, onNavigateToSecurity: (owner: String, repo: String) -&gt; Unit, onNavigateToMarkdownViewer: (url: String) -&gt; Unit, viewModel: DetailsViewModel = koinViewModel(), )</ID>
+    <ID>CyclomaticComplexMethod:DetailsRoot.kt$@Composable fun DetailsScreen( state: DetailsState, onAction: (DetailsAction) -&gt; Unit, toastState: KomiToastState, onTranslateLanguage: ((String) -&gt; Unit)? = null, onReadMoreWhatsNew: (() -&gt; Unit)? = null, onOpenIssues: (() -&gt; Unit)? = null, onOpenSecurity: (() -&gt; Unit)? = null, )</ID>
+    <ID>CyclomaticComplexMethod:DetailsViewModel.kt$DetailsViewModel$@OptIn(ExperimentalTime::class) fun onAction(action: DetailsAction)</ID>
+    <ID>CyclomaticComplexMethod:DetailsViewModel.kt$DetailsViewModel$@OptIn(ExperimentalTime::class) private fun loadInitial()</ID>
+    <ID>CyclomaticComplexMethod:DetailsViewModel.kt$DetailsViewModel$@OptIn(ExperimentalTime::class) private fun refresh()</ID>
+    <ID>CyclomaticComplexMethod:DetailsViewModel.kt$DetailsViewModel$private fun installAsset( downloadUrl: String, assetName: String, sizeBytes: Long, releaseTag: String, isUpdate: Boolean = false, )</ID>
+    <ID>CyclomaticComplexMethod:DetailsViewModel.kt$DetailsViewModel$private fun persistPreferredVariantOnPick(picked: GithubAsset)</ID>
+    <ID>CyclomaticComplexMethod:DetailsViewModel.kt$DetailsViewModel$private suspend fun installAsset( isUpdate: Boolean, filePath: String, assetName: String, downloadUrl: String, sizeBytes: Long, releaseTag: String, )</ID>
+    <ID>CyclomaticComplexMethod:DetailsViewModel.kt$DetailsViewModel$private suspend fun observeOrchestratorEntry( packageKey: String, downloadUrl: String, assetName: String, sizeBytes: Long, releaseTag: String, isUpdate: Boolean, )</ID>
+    <ID>CyclomaticComplexMethod:Header.kt$fun LazyListScope.header( state: DetailsState, onAction: (DetailsAction) -&gt; Unit, )</ID>
+    <ID>CyclomaticComplexMethod:LogResultAsText.kt$@Composable fun LogResult.asText(): String</ID>
+    <ID>CyclomaticComplexMethod:RawDetailsStateMapper.kt$internal fun RawDetailsState.toView(): DetailsState</ID>
+    <ID>CyclomaticComplexMethod:ReleaseAssetsPicker.kt$@Composable private fun ReleaseAssetsItemsPicker( assetsList: ImmutableList&lt;GithubAsset&gt;, crossPlatformAssets: ImmutableList&lt;GithubAsset&gt;, showAllPlatforms: Boolean, selectedAsset: GithubAsset?, pinnedVariant: String?, showPicker: Boolean, onDismiss: () -&gt; Unit, onSelect: (GithubAsset) -&gt; Unit, onUnpin: () -&gt; Unit, onToggleShowAllPlatforms: (Boolean) -&gt; Unit, onDownloadForTransfer: (GithubAsset) -&gt; Unit, installedApps: ImmutableList&lt;InstalledApp&gt; = persistentListOf(), selectedReleaseTag: String? = null, modifier: Modifier = Modifier, )</ID>
+    <ID>CyclomaticComplexMethod:ReleaseChannel.kt$fun LazyListScope.releaseChannel( state: DetailsState, onAction: (DetailsAction) -&gt; Unit, )</ID>
+    <ID>CyclomaticComplexMethod:SmartInstallButton.kt$@Composable fun SmartInstallButton( isDownloading: Boolean, isInstalling: Boolean, progress: Int?, primaryAsset: GithubAsset?, onAction: (DetailsAction) -&gt; Unit, modifier: Modifier = Modifier, state: DetailsState, )</ID>
+    <ID>CyclomaticComplexMethod:WhatsNew.kt$@Composable private fun ExpandableMarkdownContent( release: GithubRelease, collapsedHeight: Dp, isExpanded: Boolean, onToggleExpanded: () -&gt; Unit, measuredHeightPx: Float?, onMeasured: (Float) -&gt; Unit, )</ID>
+    <ID>DestructuringDeclarationWithTooManyEntries:SmartInstallButton.kt$val (container, content, icon, label) = when (attestationStatus) { AttestationStatus.VERIFIED -&gt; AttestationVisual( container = colors.primaryContainer, content = colors.onPrimaryContainer, icon = Icons.Filled.VerifiedUser, label = stringResource(Res.string.verified_build), ) AttestationStatus.UNABLE_TO_VERIFY -&gt; AttestationVisual( container = colors.surfaceContainerHigh, content = colors.onSurfaceVariant, icon = Icons.Outlined.Warning, label = stringResource(Res.string.unable_to_verify_attestation), ) AttestationStatus.CHECKING -&gt; AttestationVisual( container = colors.surfaceContainerHigh, content = colors.onSurfaceVariant, icon = null, label = stringResource(Res.string.checking_attestation), ) else -&gt; AttestationVisual( container = Color.Transparent, content = Color.Transparent, icon = null, label = "", ) }</ID>
+    <ID>LargeClass:DetailsViewModel.kt$DetailsViewModel : ViewModel</ID>
+    <ID>LongMethod:About.kt$fun LazyListScope.about( readmeMarkdown: String, readmeLanguage: String?, onTranslateLanguage: ((String) -&gt; Unit)? = null, onOpenInternalMarkdown: ((String) -&gt; Unit)? = null, )</ID>
+    <ID>LongMethod:DetailsViewModel.kt$DetailsViewModel$@OptIn(ExperimentalTime::class) fun onAction(action: DetailsAction)</ID>
+    <ID>LongMethod:DetailsViewModel.kt$DetailsViewModel$@OptIn(ExperimentalTime::class) private fun loadInitial()</ID>
+    <ID>LongMethod:DetailsViewModel.kt$DetailsViewModel$@OptIn(ExperimentalTime::class) private fun refresh()</ID>
+    <ID>LongMethod:DetailsViewModel.kt$DetailsViewModel$private fun downloadAsset( downloadUrl: String, assetName: String, sizeBytes: Long, releaseTag: String, )</ID>
+    <ID>LongMethod:DetailsViewModel.kt$DetailsViewModel$private fun installAsset( downloadUrl: String, assetName: String, sizeBytes: Long, releaseTag: String, isUpdate: Boolean = false, )</ID>
+    <ID>LongMethod:DetailsViewModel.kt$DetailsViewModel$private fun installViaExternalApp()</ID>
+    <ID>LongMethod:DetailsViewModel.kt$DetailsViewModel$private fun openAppManager()</ID>
+    <ID>LongMethod:DetailsViewModel.kt$DetailsViewModel$private fun persistPreferredVariantOnPick(picked: GithubAsset)</ID>
+    <ID>LongMethod:DetailsViewModel.kt$DetailsViewModel$private fun retryReleases()</ID>
+    <ID>LongMethod:DetailsViewModel.kt$DetailsViewModel$private suspend fun installAsset( isUpdate: Boolean, filePath: String, assetName: String, downloadUrl: String, sizeBytes: Long, releaseTag: String, )</ID>
+    <ID>LongMethod:DetailsViewModel.kt$DetailsViewModel$private suspend fun observeOrchestratorEntry( packageKey: String, downloadUrl: String, assetName: String, sizeBytes: Long, releaseTag: String, isUpdate: Boolean, )</ID>
+    <ID>LongMethod:DetailsViewModel.kt$DetailsViewModel$private suspend fun saveInstalledAppToDatabase( apkInfo: ApkPackageInfo, assetName: String, assetUrl: String, assetSize: Long, releaseTag: String, isUpdate: Boolean, installOutcome: InstallOutcome, parkedFilePath: String? = null, )</ID>
+    <ID>LongMethod:Header.kt$fun LazyListScope.header( state: DetailsState, onAction: (DetailsAction) -&gt; Unit, )</ID>
+    <ID>LongMethod:RawDetailsStateMapper.kt$internal fun RawDetailsState.toView(): DetailsState</ID>
+    <ID>LongMethod:ReleaseChannel.kt$fun LazyListScope.releaseChannel( state: DetailsState, onAction: (DetailsAction) -&gt; Unit, )</ID>
+    <ID>LongMethod:WhatsNew.kt$fun LazyListScope.whatsNew( release: GithubRelease, isExpanded: Boolean, onToggleExpanded: () -&gt; Unit, collapsedHeight: Dp, measuredHeightPx: Float?, onMeasured: (Float) -&gt; Unit, onReadMore: (() -&gt; Unit)? = null, )</ID>
+    <ID>LongParameterList:DetailsViewModel.kt$DetailsViewModel$( apkInfo: ApkPackageInfo, assetName: String, assetUrl: String, assetSize: Long, releaseTag: String, isUpdate: Boolean, installOutcome: InstallOutcome, parkedFilePath: String? = null, )</ID>
+    <ID>LongParameterList:DetailsViewModel.kt$DetailsViewModel$( isUpdate: Boolean, filePath: String, assetName: String, downloadUrl: String, sizeBytes: Long, releaseTag: String, )</ID>
+    <ID>LongParameterList:DetailsViewModel.kt$DetailsViewModel$( packageKey: String, downloadUrl: String, assetName: String, sizeBytes: Long, releaseTag: String, isUpdate: Boolean, )</ID>
+    <ID>LongParameterList:DetailsViewModel.kt$DetailsViewModel$( private val repositoryId: Long, private val ownerParam: String, private val repoParam: String, private val sourceHostParam: String?, private val detailsRepository: DetailsRepository, private val downloader: Downloader, private val installer: Installer, private val platform: Platform, private val helper: BrowserHelper, private val shareManager: ShareManager, private val installedAppsRepository: InstalledAppsRepository, private val favouritesRepository: FavouritesRepository, private val starredRepository: StarredRepository, private val packageMonitor: PackageMonitor, private val syncInstalledAppsUseCase: SyncInstalledAppsUseCase, private val translationRepository: TranslationRepository, private val logger: KomiStoreLogger, private val isComingFromUpdate: Boolean, private val tweaksRepository: TweaksRepository, private val seenReposRepository: SeenReposRepository, private val installationManager: InstallationManager, private val attestationVerifier: AttestationVerifier, private val downloadOrchestrator: DownloadOrchestrator, private val externalImportRepository: ExternalImportRepository, private val apkInspector: ApkInspector, private val systemInstallSerializer: zed.rainxch.core.domain.system.SystemInstallSerializer, private val userSessionRepository: UserSessionRepository, private val packageNameParam: String? = null, )</ID>
+    <ID>LongParameterList:WhatsNew.kt$( release: GithubRelease, isExpanded: Boolean, onToggleExpanded: () -&gt; Unit, collapsedHeight: Dp, measuredHeightPx: Float?, onMeasured: (Float) -&gt; Unit, onReadMore: (() -&gt; Unit)? = null, )</ID>
+    <ID>MagicNumber:AppHeader.kt$140</ID>
+    <ID>MagicNumber:AppHeader.kt$170</ID>
+    <ID>MagicNumber:AppHeader.kt$255</ID>
+    <ID>MagicNumber:AppHeader.kt$255f</ID>
+    <ID>MagicNumber:AppHeader.kt$3</ID>
+    <ID>MagicNumber:AppHeader.kt$4</ID>
+    <ID>MagicNumber:AppHeader.kt$70</ID>
+    <ID>MagicNumber:AppHeader.kt$90</ID>
+    <ID>MagicNumber:DetailsViewModel.kt$DetailsViewModel$100</ID>
+    <ID>MagicNumber:DetailsViewModel.kt$DetailsViewModel$1000</ID>
+    <ID>MagicNumber:DetailsViewModel.kt$DetailsViewModel$1000L</ID>
+    <ID>MagicNumber:DetailsViewModel.kt$DetailsViewModel$999</ID>
+    <ID>MagicNumber:Header.kt$.35f</ID>
+    <ID>MagicNumber:Header.kt$.65f</ID>
+    <ID>MagicNumber:MarkdownTruncate.kt$0.75</ID>
+    <ID>MagicNumber:ReleaseChannel.kt$30</ID>
+    <ID>MatchingDeclarationName:ReleasesStatusCard.kt$ReleasesStatus</ID>
+    <ID>MatchingDeclarationName:ShowDowngradeWarning.kt$DowngradeWarning</ID>
+    <ID>MaxLineLength:DetailsAboutViewModel.kt$DetailsAboutViewModel$_state.update { it.copy(isLoading = false, errorMessage = e.message ?: getString(Res.string.failed_to_load)) }</ID>
+    <ID>MaxLineLength:DetailsWhatsNewViewModel.kt$DetailsWhatsNewViewModel$_state.update { it.copy(isLoading = false, errorMessage = e.message ?: getString(Res.string.failed_to_load)) }</ID>
+    <ID>MaxLineLength:LanguageLinkInterceptor.kt$&lt;no name provided&gt;$it.code.startsWith(normalizedCode, ignoreCase = true) || normalizedCode.startsWith(it.code, ignoreCase = true)</ID>
+    <ID>MaxLineLength:LanguageLinkInterceptor.kt$&lt;no name provided&gt;$val isInternalMarkdown = Regex("""(?i)^https://(?:raw\.githubusercontent\.com|github\.com)/[^/]+/[^/]+/(?:blob/)?[^/]+/.+\.md(?:[#?].*)?$""").find(uri) != null</ID>
+    <ID>MaxLineLength:MarkdownViewerViewModel.kt$MarkdownViewerViewModel$_state.update { it.copy(isLoading = false, errorMessage = e.message ?: getString(Res.string.failed_to_load)) }</ID>
+    <ID>MaxLineLength:VersionPicker.kt$"${formatIsoDateOrRaw(release.publishedAt)} · ${stringResource(Res.string.no_build_for_this_device)}"</ID>
+    <ID>NestedBlockDepth:DetailsViewModel.kt$DetailsViewModel$private fun openExternalInstaller()</ID>
+    <ID>ReturnCount:DetailsViewModel.kt$DetailsViewModel$@OptIn(ExperimentalTime::class) fun onAction(action: DetailsAction)</ID>
+    <ID>ReturnCount:DetailsViewModel.kt$DetailsViewModel$@OptIn(ExperimentalTime::class) private fun refresh()</ID>
+    <ID>ReturnCount:DetailsViewModel.kt$DetailsViewModel$private fun orchestratorKey(): String</ID>
+    <ID>ReturnCount:DetailsViewModel.kt$DetailsViewModel$private fun parkedFilePathIfMatches( releaseTag: String, assetName: String, ): String?</ID>
+    <ID>ReturnCount:DetailsViewModel.kt$DetailsViewModel$private fun persistPreferredVariantOnPick(picked: GithubAsset)</ID>
+    <ID>ReturnCount:DetailsViewModel.kt$DetailsViewModel$private fun pickPrimaryInstalledApp( apps: List&lt;InstalledApp&gt;, primaryAssetName: String?, releaseAssets: List&lt;GithubAsset&gt;, releaseHistory: List&lt;GithubRelease&gt; = _state.value.allReleases, releaseTag: String? = null, ): InstalledApp?</ID>
+    <ID>ReturnCount:LanguageLinkInterceptor.kt$&lt;no name provided&gt;$override fun openUri(uri: String)</ID>
+    <ID>ReturnCount:MarkdownTruncate.kt$fun truncateMarkdownPreview(content: String, maxChars: Int): String</ID>
+    <ID>ReturnCount:RawDetailsStateMapper.kt$private fun RawDetailsState.computeCanSwitchToStable(latestStable: GithubRelease?): Boolean</ID>
+    <ID>ReturnCount:RawDetailsStateMapper.kt$private fun RawDetailsState.computeIsPendingInstallReady(): Boolean</ID>
+    <ID>ThrowsCount:DetailsViewModel.kt$DetailsViewModel$@OptIn(ExperimentalTime::class) private fun loadInitial()</ID>
+    <ID>ThrowsCount:DetailsViewModel.kt$DetailsViewModel$@OptIn(ExperimentalTime::class) private fun refresh()</ID>
+    <ID>ThrowsCount:DetailsViewModel.kt$DetailsViewModel$private fun installAsset( downloadUrl: String, assetName: String, sizeBytes: Long, releaseTag: String, isUpdate: Boolean = false, )</ID>
+    <ID>ThrowsCount:DetailsViewModel.kt$DetailsViewModel$private fun installViaExternalApp()</ID>
+    <ID>ThrowsCount:DetailsViewModel.kt$DetailsViewModel$private fun overrideSigningKeyWarning()</ID>
+    <ID>TooGenericExceptionCaught:DetailsViewModel.kt$DetailsViewModel$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:DetailsViewModel.kt$DetailsViewModel$e: Throwable</ID>
+    <ID>TooGenericExceptionCaught:DetailsViewModel.kt$DetailsViewModel$t: Throwable</ID>
+    <ID>TooManyFunctions:ApkInspectSheet.kt$zed.rainxch.details.presentation.components.ApkInspectSheet.kt</ID>
+    <ID>TooManyFunctions:DetailsViewModel.kt$DetailsViewModel : ViewModel</ID>
+    <ID>TopLevelPropertyNaming:AppHeader.kt$private const val STALE_PLATFORM_DAYS = 365</ID>
+    <ID>TopLevelPropertyNaming:MarkdownViewerViewModel.kt$private const val RENDER_ENTER_DELAY_MS = 350L</ID>
+    <ID>UnusedParameter:AboutRoot.kt$onRetry: () -&gt; Unit</ID>
+    <ID>UnusedParameter:AppHeader.kt$release: GithubRelease?</ID>
+    <ID>UnusedParameter:DetailsRoot.kt$onNavigateToMarkdownViewer: (url: String) -&gt; Unit</ID>
+    <ID>UnusedParameter:ReleaseAssetsPicker.kt$isPrimary: Boolean</ID>
+    <ID>UseCheckOrError:DetailsViewModel.kt$DetailsViewModel$throw IllegalStateException("Downloaded file not found")</ID>
+    <ID>WildcardImport:About.kt$import zed.rainxch.githubstore.core.presentation.res.*</ID>
+    <ID>WildcardImport:DetailsRoot.kt$import zed.rainxch.githubstore.core.presentation.res.*</ID>
+    <ID>WildcardImport:LanguagePicker.kt$import zed.rainxch.githubstore.core.presentation.res.*</ID>
+    <ID>WildcardImport:LogResultAsText.kt$import zed.rainxch.githubstore.core.presentation.res.*</ID>
+    <ID>WildcardImport:Logs.kt$import zed.rainxch.githubstore.core.presentation.res.*</ID>
+    <ID>WildcardImport:ReleaseAssetsPicker.kt$import zed.rainxch.githubstore.core.presentation.res.*</ID>
+    <ID>WildcardImport:Stats.kt$import zed.rainxch.githubstore.core.presentation.res.*</ID>
+    <ID>WildcardImport:WhatsNew.kt$import zed.rainxch.githubstore.core.presentation.res.*</ID>
+  </CurrentIssues>
+</SmellBaseline>

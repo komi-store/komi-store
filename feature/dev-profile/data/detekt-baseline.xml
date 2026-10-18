@@ -1,0 +1,16 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues/>
+  <CurrentIssues>
+    <ID>CyclomaticComplexMethod:DeveloperProfileRepositoryImpl.kt$DeveloperProfileRepositoryImpl$override suspend fun getDeveloperRepositories(username: String): Result&lt;List&lt;DeveloperRepository&gt;&gt;</ID>
+    <ID>CyclomaticComplexMethod:DeveloperProfileRepositoryImpl.kt$DeveloperProfileRepositoryImpl$private suspend fun checkReleaseInfo( owner: String, repoName: String, ): ReleaseInfo</ID>
+    <ID>LongMethod:DeveloperProfileRepositoryImpl.kt$DeveloperProfileRepositoryImpl$override suspend fun getDeveloperRepositories(username: String): Result&lt;List&lt;DeveloperRepository&gt;&gt;</ID>
+    <ID>LongMethod:DeveloperProfileRepositoryImpl.kt$DeveloperProfileRepositoryImpl$private suspend fun checkReleaseInfo( owner: String, repoName: String, ): ReleaseInfo</ID>
+    <ID>LoopWithTooManyJumpStatements:DeveloperProfileRepositoryImpl.kt$DeveloperProfileRepositoryImpl$while</ID>
+    <ID>MagicNumber:DeveloperProfileRepositoryImpl.kt$DeveloperProfileRepositoryImpl$10</ID>
+    <ID>MagicNumber:DeveloperProfileRepositoryImpl.kt$DeveloperProfileRepositoryImpl$100</ID>
+    <ID>MagicNumber:DeveloperProfileRepositoryImpl.kt$DeveloperProfileRepositoryImpl$20</ID>
+    <ID>ReturnCount:DeveloperProfileRepositoryImpl.kt$DeveloperProfileRepositoryImpl$private suspend fun checkReleaseInfo( owner: String, repoName: String, ): ReleaseInfo</ID>
+    <ID>TooGenericExceptionCaught:DeveloperProfileRepositoryImpl.kt$DeveloperProfileRepositoryImpl$e: Exception</ID>
+  </CurrentIssues>
+</SmellBaseline>

@@ -1,0 +1,26 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues/>
+  <CurrentIssues>
+    <ID>CyclomaticComplexMethod:DeveloperRepoItem.kt$@OptIn(ExperimentalLayoutApi::class) @Composable fun DeveloperRepoItem( repository: DeveloperRepository, onItemClick: () -&gt; Unit, onToggleFavorite: () -&gt; Unit, modifier: Modifier = Modifier, )</ID>
+    <ID>LongMethod:DeveloperProfileViewModel.kt$DeveloperProfileViewModel$fun onAction(action: DeveloperProfileAction)</ID>
+    <ID>LongMethod:DeveloperProfileViewModel.kt$DeveloperProfileViewModel$private fun loadDeveloperData()</ID>
+    <ID>MagicNumber:ContributionCalendar.kt$100</ID>
+    <ID>MagicNumber:ContributionCalendar.kt$12</ID>
+    <ID>MagicNumber:ContributionCalendar.kt$13</ID>
+    <ID>MagicNumber:ContributionCalendar.kt$3</ID>
+    <ID>MagicNumber:ContributionCalendar.kt$4</ID>
+    <ID>MagicNumber:ContributionCalendar.kt$5</ID>
+    <ID>MagicNumber:ContributionCalendar.kt$6</ID>
+    <ID>MagicNumber:ContributionCalendar.kt$7</ID>
+    <ID>MaxLineLength:DeveloperRepoItem.kt$description = "An amazing Kotlin Multiplatform application that demonstrates modern Android development"</ID>
+    <ID>MaxLineLength:ProfileInfoCard.kt$Metric(value = formatCount(followers), label = stringResource(Res.string.followers), modifier = Modifier.weight(1f))</ID>
+    <ID>MaxLineLength:ProfileInfoCard.kt$Metric(value = formatCount(following), label = stringResource(Res.string.following), modifier = Modifier.weight(1f))</ID>
+    <ID>MaxLineLength:ProfileInfoCard.kt$Metric(value = formatCount(repos), label = stringResource(Res.string.profile_repos), modifier = Modifier.weight(1f))</ID>
+    <ID>ReturnCount:ContributionCalendar.kt$private fun dateToDayOfWeek(iso: String): Int</ID>
+    <ID>TooGenericExceptionCaught:DeveloperProfileViewModel.kt$DeveloperProfileViewModel$e: Exception</ID>
+    <ID>WildcardImport:DeveloperProfileRoot.kt$import zed.rainxch.githubstore.core.presentation.res.*</ID>
+    <ID>WildcardImport:DeveloperProfileViewModel.kt$import zed.rainxch.githubstore.core.presentation.res.*</ID>
+    <ID>WildcardImport:DeveloperRepoItem.kt$import zed.rainxch.githubstore.core.presentation.res.*</ID>
+  </CurrentIssues>
+</SmellBaseline>

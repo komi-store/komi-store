@@ -1,0 +1,13 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues/>
+  <CurrentIssues>
+    <ID>LongMethod:ProfileSections.kt$fun LazyListScope.profileSections( state: ProfileState, hasUnreadAnnouncements: Boolean, onAction: (ProfileAction) -&gt; Unit, )</ID>
+    <ID>TooGenericExceptionCaught:AnnouncementsViewModel.kt$AnnouncementsViewModel$t: Throwable</ID>
+    <ID>TooGenericExceptionCaught:WhatsNewViewModel.kt$WhatsNewViewModel$t: Throwable</ID>
+    <ID>TopLevelPropertyNaming:AnnouncementCard.kt$private const val BODY_COLLAPSED_LINES = 4</ID>
+    <ID>TopLevelPropertyNaming:ProfileSections.kt$private const val METRIC_PLACEHOLDER = "—"</ID>
+    <ID>UnusedParameter:MuteSettingsBottomSheet.kt$category: AnnouncementCategory</ID>
+    <ID>WildcardImport:ProfileSections.kt$import zed.rainxch.githubstore.core.presentation.res.*</ID>
+  </CurrentIssues>
+</SmellBaseline>

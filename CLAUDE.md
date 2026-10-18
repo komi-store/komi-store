@@ -15,6 +15,21 @@ Cross-platform app store for GitHub + Codeberg + Forgejo releases. **Kotlin Mult
 
 JDK 21+. Android SDK for Android.
 
+## Verification
+
+CI (`.github/workflows/pr-checks.yml`) runs on every PR and push to `main`. Existing findings live in committed baselines, so checks fail only on new issues.
+
+```bash
+./gradlew spotlessApply                                   # format files changed vs origin/main (ktlint 1.8.0 + .editorconfig)
+./gradlew detekt                                          # static analysis; baseline: <module>/detekt-baseline.xml
+./gradlew lintDebug                                       # Android Lint; baseline: <module>/lint-baseline.xml
+./gradlew jvmTest koverXmlReport                          # tests + merged coverage (build/reports/kover)
+./gradlew compileDebugKotlinAndroid; ./gradlew debugStabilityCheck   # Compose stability vs <module>/stability/*.stability
+./gradlew spotlessInstallGitPrePushHook                   # opt-in pre-push format check
+```
+
+Refresh a baseline only for an intentional change: `detektBaseline`, `updateLintBaseline`, or `debugStabilityDump`. The stability analyzer (0.7.0) shares one output file across a module's compilations, so run its tasks in their own Gradle invocation right after `compileDebugKotlinAndroid` (fixed upstream only in releases built for Kotlin 2.4). Kotlin must match the stability analyzer's Kotlin version (see its version map) when bumping either. Kotlin warnings are errors (`allWarningsAsErrors`); a module opts out with `komi.warningsAsErrors=false` in its own `gradle.properties` (currently only `feature:details:presentation`). CodeQL (`codeql.yml`) and Dependabot (`dependabot.yml`) run separately.
+
 ## Structure
 
 ```text
@@ -66,7 +81,7 @@ Kotlin 2.3.10, Compose Multiplatform 1.10.3, Ktor 3.4.0, Room 2.8.4, Koin 4.1.1,
 
 ## Convention plugins (`build-logic/convention/`)
 
-`convention.kmp.library` (domain/data), `convention.cmp.library` (core/presentation), `convention.cmp.feature` (feature presentation), `convention.cmp.application` (main app), `convention.room`, `convention.buildkonfig`.
+`convention.kmp.library` (domain/data), `convention.cmp.library` (core/presentation), `convention.cmp.feature` (feature presentation), `convention.cmp.application` (main app), `convention.room`, `convention.buildkonfig`, `convention.quality` (detekt + Kover, applied by the library and app conventions). The Compose conventions also apply the stability analyzer; Android Lint is configured in `configureKotlinAndroid`.
 
 ## Adding a feature
 
@@ -89,7 +104,7 @@ Kotlin 2.3.10, Compose Multiplatform 1.10.3, Ktor 3.4.0, Room 2.8.4, Koin 4.1.1,
 - **Per-host PATs:** `HostTokenRepository` stores `{host, token, label, createdAt}` rows AES-256-GCM encrypted via KSafe. `HostTokenInterceptor` (Ktor plugin) injects `Authorization: token $pat` on matched host. `HostNames.apiHostToTokenHost` maps `api.github.com → github.com` so the GitHub-direct client looks up the right PAT. UI at `Tweaks → Access Tokens` (`HostTokensScreen`).
 - **KSafe:** AES-256-GCM with hardware-backed Keystore on Android. Wraps every persisted credential / pref via `core/data/secure/KSafeSafe.kt` extension funcs (`safeGet`, `safePut`, `safeDelete`, `safeGetFlow`) — surface log + return null/false on transient failure instead of throwing through coroutine scopes.
 - **Translation providers:** `TranslationProvider` enum = `GOOGLE`, `YOUDAO`, `LIBRE_TRANSLATE`, `DEEPL`, `MICROSOFT`. Each per-provider config persisted via `TweaksRepository` (KSafe-encrypted). `TranslationRepositoryImpl.resolveTranslator()` picks the impl. LibreTranslate defaults to the bundled `translate.disroot.org` mirror when user URL pref blank. DeepL auto-routes `:fx`-suffixed keys to `api-free.deepl.com`. Microsoft uses No-Trace by default — text never stored, never used for training.
-- **Gradle:** Config + build cache enabled. 4GB Gradle heap, 3GB Kotlin daemon. Official Kotlin style.
+- **Gradle:** Config + build cache enabled. 4GB Gradle heap, 3GB Kotlin daemon. Official Kotlin style, enforced by Spotless (no format-on-build).
 
 ## Active skills (apply on matching domain)
 

@@ -1,0 +1,7 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues/>
+  <CurrentIssues>
+    <ID>NewLineAtEndOfFile:ImportFormat.kt$zed.rainxch.apps.domain.model.ImportFormat.kt</ID>
+  </CurrentIssues>
+</SmellBaseline>
