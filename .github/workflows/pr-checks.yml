@@ -114,17 +114,7 @@ jobs:
 
       - name: Merge detekt SARIF
         if: always()
-        run: |
-          python3 - <<'EOF'
-          import glob, json
-          runs = []
-          for path in glob.glob("**/build/reports/detekt/detekt.sarif", recursive=True):
-              with open(path) as f:
-                  runs.extend(json.load(f).get("runs", []))
-          if runs:
-              with open("detekt.sarif", "w") as f:
-                  json.dump({"version": "2.1.0", "runs": runs}, f)
-          EOF
+        run: python3 .github/scripts/merge_sarif.py '**/build/reports/detekt/detekt.sarif' detekt.sarif
 
       - name: Upload detekt SARIF
         if: always() && hashFiles('detekt.sarif') != '' && (github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository)
@@ -163,17 +153,7 @@ jobs:
 
       - name: Merge lint SARIF
         if: always()
-        run: |
-          python3 - <<'EOF'
-          import glob, json
-          runs = []
-          for path in glob.glob("**/build/reports/lint-results-debug.sarif", recursive=True):
-              with open(path) as f:
-                  runs.extend(json.load(f).get("runs", []))
-          if runs:
-              with open("lint.sarif", "w") as f:
-                  json.dump({"version": "2.1.0", "runs": runs}, f)
-          EOF
+        run: python3 .github/scripts/merge_sarif.py '**/build/reports/lint-results-debug.sarif' lint.sarif
 
       - name: Upload lint SARIF
         if: always() && hashFiles('lint.sarif') != '' && (github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository)
