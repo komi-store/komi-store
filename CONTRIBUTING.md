@@ -165,6 +165,8 @@ We use Kotlin's official style, enforced by Spotless (ktlint plus the Compose ru
 - **No KDoc or filler comments.** Comment only non-obvious invariants, tricky concurrency or workarounds.
 - **Dependencies** go into `gradle/libs.versions.toml`, and new modules use a convention plugin from `build-logic/convention/` instead of a hand-rolled build script.
 
+The whole codebase was formatted once in #1080. That commit is listed in `.git-blame-ignore-revs`, which GitHub's blame view already skips; run `git config blame.ignoreRevsFile .git-blame-ignore-revs` once so local `git blame` skips it too.
+
 ---
 
 ## Branching and commit style

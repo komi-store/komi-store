@@ -20,11 +20,13 @@ Spotless checks only files changed against `origin/main`, but it checks the whol
 
 ## Baselines
 
+ktlint findings the formatter can't fix (mostly Compose rules) are listed per file and rule in `config/ktlint/baseline.txt`, and Spotless suppresses exactly those. When you fix one, delete its line.
+
 Refresh a baseline only for an intentional change: `detektBaseline`, `updateLintBaseline` or `debugStabilityDump`. The stability analyzer (0.7.0) shares one output file across a module's compilations, so run its tasks in their own Gradle invocation right after `compileDebugKotlinAndroid` (fixed upstream only in releases built for Kotlin 2.4). Kotlin must match the stability analyzer's Kotlin version (see its version map) when bumping either.
 
 ## Warnings as errors
 
-Kotlin warnings are errors (`allWarningsAsErrors`). A module opts out with `komi.warningsAsErrors=false` in its own `gradle.properties`; today only `feature:details:presentation` does, until the one-time format.
+Kotlin warnings are errors (`allWarningsAsErrors`). A module can opt out with `komi.warningsAsErrors=false` in its own `gradle.properties`; none does.
 
 ## Konsist
 
