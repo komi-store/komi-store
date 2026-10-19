@@ -1,3 +1,5 @@
+@file:Suppress("MatchingDeclarationName")
+
 package zed.rainxch.core.data.network.interceptor
 
 import io.ktor.client.plugins.api.createClientPlugin
@@ -5,9 +7,9 @@ import io.ktor.client.request.header
 import io.ktor.http.HttpHeaders
 import io.ktor.http.URLProtocol
 import io.ktor.http.authority
-import kotlin.coroutines.cancellation.CancellationException
 import zed.rainxch.core.domain.model.account.HostNames
 import zed.rainxch.core.domain.repository.HostTokenRepository
+import kotlin.coroutines.cancellation.CancellationException
 
 class HostTokenInterceptorConfig {
     var repository: HostTokenRepository? = null
