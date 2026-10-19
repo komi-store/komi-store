@@ -134,7 +134,7 @@ fun TweaksRoot(
                                 getString(Res.string.proxy_test_probe_failed)
                             }
                         }
-                    val message = getString(Res.string.proxy_test_master_result, *parts.toTypedArray())
+                    val message = getString(Res.string.proxy_test_master_result, parts[0], parts[1], parts[2])
                     when {
                         latencies.all { it != null } -> toastState.success(message)
                         latencies.all { it == null } -> toastState.danger(message)
