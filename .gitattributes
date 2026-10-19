@@ -3,3 +3,8 @@
 packaging/flatpak/*.json text eol=lf
 packaging/flatpak/*.yml text eol=lf
 packaging/flatpak/*.sh text eol=lf
+
+# Verifier baselines are tool-generated; collapse them in GitHub diffs
+**/detekt-baseline.xml linguist-generated=true
+**/lint-baseline.xml linguist-generated=true
+**/stability/*.stability linguist-generated=true

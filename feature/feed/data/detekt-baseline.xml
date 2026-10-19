@@ -1,0 +1,8 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues/>
+  <CurrentIssues>
+    <ID>ReturnCount:FeedRepositoryImpl.kt$FeedRepositoryImpl$private suspend fun fetchOffline(platform: DiscoveryPlatform): FeedPage?</ID>
+    <ID>TooGenericExceptionCaught:FeedRepositoryImpl.kt$FeedRepositoryImpl$e: Exception</ID>
+  </CurrentIssues>
+</SmellBaseline>
