@@ -5,6 +5,15 @@
 //   ./gradlew :presentation:stabilityDump
 
 @Composable
+internal fun zed.rainxch.core.presentation.components.FallbackAppIcon(appName: kotlin.String, avatarFallbackUrl: kotlin.String?, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - appName: STABLE (String is immutable)
+    - avatarFallbackUrl: STABLE (class with no mutable properties)
+    - modifier: STABLE (marked @Stable or @Immutable)
+
+@Composable
 public fun zed.rainxch.core.presentation.components.GitHubStoreImage(imageModel: kotlin.Function0<kotlin.Any?>, modifier: androidx.compose.ui.Modifier, colorFilter: androidx.compose.ui.graphics.ColorFilter?, showLoadingIndicator: kotlin.Boolean, contentScale: androidx.compose.ui.layout.ContentScale, contentDescription: kotlin.String?): kotlin.Unit
   skippable: true
   restartable: true
@@ -17,7 +26,7 @@ public fun zed.rainxch.core.presentation.components.GitHubStoreImage(imageModel:
     - contentDescription: STABLE (class with no mutable properties)
 
 @Composable
-public fun zed.rainxch.core.presentation.components.InstalledAppIcon(packageName: kotlin.String, appName: kotlin.String, modifier: androidx.compose.ui.Modifier, apkFilePath: kotlin.String?): kotlin.Unit
+public fun zed.rainxch.core.presentation.components.InstalledAppIcon(packageName: kotlin.String, appName: kotlin.String, modifier: androidx.compose.ui.Modifier, apkFilePath: kotlin.String?, avatarFallbackUrl: kotlin.String?): kotlin.Unit
   skippable: true
   restartable: true
   params:
@@ -25,6 +34,7 @@ public fun zed.rainxch.core.presentation.components.InstalledAppIcon(packageName
     - appName: STABLE (String is immutable)
     - modifier: STABLE (marked @Stable or @Immutable)
     - apkFilePath: STABLE (class with no mutable properties)
+    - avatarFallbackUrl: STABLE (class with no mutable properties)
 
 @Composable
 public fun zed.rainxch.core.presentation.components.ScrollbarContainer(listState: androidx.compose.foundation.lazy.LazyListState, enabled: kotlin.Boolean, modifier: androidx.compose.ui.Modifier, content: @[Composable] androidx.compose.runtime.internal.ComposableFunction0<kotlin.Unit>): kotlin.Unit
@@ -377,6 +387,19 @@ public fun zed.rainxch.core.presentation.components.buttons.KomiSegmented(select
     - onSelect: STABLE (function type)
     - modifier: STABLE (marked @Stable or @Immutable)
     - size: STABLE (class with no mutable properties)
+
+@Composable
+public fun zed.rainxch.core.presentation.components.buttons.KomiSoftIconButton(icon: androidx.compose.ui.graphics.vector.ImageVector, contentDescription: kotlin.String, onClick: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier, accent: kotlin.Boolean, enabled: kotlin.Boolean, size: androidx.compose.ui.unit.Dp): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - icon: STABLE (marked @Stable or @Immutable)
+    - contentDescription: STABLE (String is immutable)
+    - onClick: STABLE (function type)
+    - modifier: STABLE (marked @Stable or @Immutable)
+    - accent: STABLE (primitive type)
+    - enabled: STABLE (primitive type)
+    - size: STABLE (marked @Stable or @Immutable)
 
 @Composable
 private fun zed.rainxch.core.presentation.components.buttons.MangaButton(personality: zed.rainxch.core.presentation.personality.MangaPersonality, onClick: kotlin.Function0<kotlin.Unit>, label: kotlin.String, modifier: androidx.compose.ui.Modifier, variant: zed.rainxch.core.presentation.components.buttons.KomiButtonVariant, size: zed.rainxch.core.presentation.components.buttons.KomiButtonSize, enabled: kotlin.Boolean, loading: kotlin.Boolean, emphasized: kotlin.Boolean, fullWidth: kotlin.Boolean, leadingIcon: androidx.compose.ui.graphics.vector.ImageVector?, trailingIcon: androidx.compose.ui.graphics.vector.ImageVector?, containerColor: androidx.compose.ui.graphics.Color, contentColor: androidx.compose.ui.graphics.Color): kotlin.Unit

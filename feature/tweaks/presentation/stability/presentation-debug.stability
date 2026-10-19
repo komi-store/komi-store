@@ -850,11 +850,13 @@ public fun zed.rainxch.tweaks.presentation.mirror.MirrorPickerRoot(onNavigateBac
     - viewModel: UNSTABLE (has mutable properties or unstable members)
 
 @Composable
-private fun zed.rainxch.tweaks.presentation.mirror.MirrorSettingsRow(mirror: zed.rainxch.core.domain.model.mirror.MirrorConfig, selected: kotlin.Boolean, last: kotlin.Boolean, onClick: kotlin.Function0<kotlin.Unit>): kotlin.Unit
+private fun zed.rainxch.tweaks.presentation.mirror.MirrorSettingsRow(mirror: zed.rainxch.core.domain.model.mirror.MirrorConfig, measuredMs: kotlin.Int?, isFastest: kotlin.Boolean, selected: kotlin.Boolean, last: kotlin.Boolean, onClick: kotlin.Function0<kotlin.Unit>): kotlin.Unit
   skippable: false
   restartable: true
   params:
     - mirror: UNSTABLE (has mutable properties or unstable members)
+    - measuredMs: STABLE (class with no mutable properties)
+    - isFastest: STABLE (primitive type)
     - selected: STABLE (primitive type)
     - last: STABLE (primitive type)
     - onClick: STABLE (function type)
