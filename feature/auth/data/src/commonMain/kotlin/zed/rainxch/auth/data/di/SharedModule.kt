@@ -13,6 +13,7 @@ val authModule =
         single<GitHubAuthApi> {
             GitHubAuthApi(
                 proxyConfigFlow = ProxyManager.configFlow(ProxyScope.DISCOVERY),
+                appScope = get(),
             )
         }
 

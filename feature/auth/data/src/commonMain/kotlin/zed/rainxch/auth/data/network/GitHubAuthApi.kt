@@ -20,8 +20,6 @@ import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -41,14 +39,13 @@ private const val REQUEST_TIMEOUT_MS = 60_000L
 
 class GitHubAuthApi(
     proxyConfigFlow: StateFlow<ProxyConfig>,
+    appScope: CoroutineScope,
 ) {
     private val json =
         Json {
             ignoreUnknownKeys = true
             isLenient = true
         }
-
-    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
 
     @Volatile
     private var currentHttp: HttpClient = buildHttp(proxyConfigFlow.value)
@@ -67,7 +64,7 @@ class GitHubAuthApi(
                 currentValidationHttp = buildValidationHttp(config)
                 previousHttp.close()
                 previousValidationHttp.close()
-            }.launchIn(scope)
+            }.launchIn(appScope)
     }
 
     val http: HttpClient get() = currentHttp

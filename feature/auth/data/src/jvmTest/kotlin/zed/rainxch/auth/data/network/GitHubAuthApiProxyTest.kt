@@ -1,5 +1,9 @@
 package zed.rainxch.auth.data.network
 
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.runBlocking
@@ -11,17 +15,25 @@ import java.net.ServerSocket
 import java.net.Socket
 import java.util.Collections
 import kotlin.concurrent.thread
+import kotlin.test.AfterTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
 import kotlin.test.assertTrue
 
 class GitHubAuthApiProxyTest {
+    private val appScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+
+    @AfterTest
+    fun tearDown() {
+        appScope.cancel()
+    }
+
     @Test
     fun device_flow_requests_go_through_the_configured_proxy() =
         runBlocking {
             FakeProxy().use { proxy ->
-                val api = GitHubAuthApi(MutableStateFlow(proxy.config))
+                val api = GitHubAuthApi(MutableStateFlow(proxy.config), appScope)
 
                 val start = api.startDeviceFlowViaBackend(BACKEND)
 
@@ -34,7 +46,7 @@ class GitHubAuthApiProxyTest {
     fun pat_validation_goes_through_the_configured_proxy() =
         runBlocking {
             FakeProxy().use { proxy ->
-                val api = GitHubAuthApi(MutableStateFlow(proxy.config))
+                val api = GitHubAuthApi(MutableStateFlow(proxy.config), appScope)
 
                 val result = api.validatePersonalAccessToken("ghp_not_a_real_token")
 
@@ -50,7 +62,7 @@ class GitHubAuthApiProxyTest {
             FakeProxy().use { first ->
                 FakeProxy().use { second ->
                     val proxyConfig = MutableStateFlow<ProxyConfig>(first.config)
-                    val api = GitHubAuthApi(proxyConfig)
+                    val api = GitHubAuthApi(proxyConfig, appScope)
                     api.startDeviceFlowViaBackend(BACKEND)
 
                     val before = api.http
