@@ -15,9 +15,6 @@
     <ID>MagicNumber:AuthenticationViewModel.kt$AuthenticationViewModel$5000L</ID>
     <ID>MagicNumber:AuthenticationViewModel.kt$AuthenticationViewModel$60</ID>
     <ID>MagicNumber:AuthenticationViewModel.kt$AuthenticationViewModel$8</ID>
-    <ID>MaxLineLength:AuthenticationRoot.kt$(scaleIn(spring(dampingRatio = Spring.DampingRatioMediumBouncy)) + fadeIn())</ID>
-    <ID>MaxLineLength:AuthenticationViewModel.kt$AuthenticationViewModel$"startDeviceFlow failed. topClass=${t::class.simpleName} topMsg=${t.message} | rootClass=$rootClass rootMsg=$rootMsg"</ID>
-    <ID>MaxLineLength:AuthenticationViewModel.kt$AuthenticationViewModel$logger.debug("Polling device token (code=${deviceCode.take(8)}..., interval=${pollingIntervalMs}ms, path=$authPath)")</ID>
     <ID>ReturnCount:AuthenticationViewModel.kt$AuthenticationViewModel$private fun restoreFromSavedState()</ID>
     <ID>ReturnCount:AuthenticationViewModel.kt$AuthenticationViewModel$private fun tryPollIfReady()</ID>
     <ID>TooGenericExceptionCaught:AuthenticationViewModel.kt$AuthenticationViewModel$e: Exception</ID>

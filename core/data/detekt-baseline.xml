@@ -153,57 +153,16 @@
     <ID>MatchingDeclarationName:DownloadNotificationActions.kt$DownloadNotificationAction</ID>
     <ID>MatchingDeclarationName:ObtainiumImportMapper.kt$ObtainiumMapResult</ID>
     <ID>MatchingDeclarationName:OsTrustManager.kt$OsTrustChain</ID>
-    <ID>MaxLineLength:AndroidDownloadProgressNotifier.kt$AndroidDownloadProgressNotifier$private fun notificationIdFor(packageName: String): Int</ID>
     <ID>MaxLineLength:AndroidDownloader.kt$AndroidDownloader$"The partial cannot be resumed (server refused the range, or served a span we did not ask for); restarting from zero"</ID>
-    <ID>MaxLineLength:AndroidPackageMonitor.kt$AndroidPackageMonitor$val isUpdatedSystem = (pkg.applicationInfo?.flags ?: 0) and ApplicationInfo.FLAG_UPDATED_SYSTEM_APP != 0</ID>
-    <ID>MaxLineLength:AndroidPendingInstallNotifier.kt$AndroidPendingInstallNotifier$private fun notificationIdFor(packageName: String): Int</ID>
-    <ID>MaxLineLength:AnnouncementMapper.kt$private fun String.parseIconHint(): AnnouncementIconHint?</ID>
     <ID>MaxLineLength:AutoUpdateWorker.kt$AutoUpdateWorker$"AutoUpdateWorker: Conditions not met (autoUpdate=$autoUpdateEnabled, installer=$installerType, silentReady=$silentReady), skipping"</ID>
-    <ID>MaxLineLength:AutoUpdateWorker.kt$AutoUpdateWorker$Logger.d { "AutoUpdateWorker: Install command completed for ${app.appName}, waiting for system confirmation via broadcast" }</ID>
-    <ID>MaxLineLength:AutoUpdateWorker.kt$AutoUpdateWorker$Logger.w { "AutoUpdateWorker: APK info extraction failed for ${app.appName}, installing without validation" }</ID>
-    <ID>MaxLineLength:AutoUpdateWorker.kt$AutoUpdateWorker$successfulApps.isEmpty() -&gt; "Failed to update ${failedApps.size} app${if (failedApps.size &gt; 1) "s" else ""}"</ID>
-    <ID>MaxLineLength:DefaultDownloadOrchestrator.kt$DefaultDownloadOrchestrator$private fun generateId(): String</ID>
-    <ID>MaxLineLength:DefaultSystemInstallSerializer.kt$DefaultSystemInstallSerializer$"SystemInstallSerializer: timed out waiting for ${pending.value} to clear; force-claiming for $packageName"</ID>
     <ID>MaxLineLength:DesktopAppLauncher.kt$DesktopAppLauncher$"Get-ItemProperty HKLM:\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\* | Where-Object { \$_.DisplayName -eq '$displayName' } | Select-Object -First 1 -ExpandProperty InstallLocation"</ID>
     <ID>MaxLineLength:DesktopAppLauncher.kt$DesktopAppLauncher$"Get-ItemProperty HKLM:\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\* | Where-Object { \$_.DisplayName -like '*$searchName*' } | Select-Object -First 1 -ExpandProperty DisplayName"</ID>
     <ID>MaxLineLength:DesktopDownloader.kt$DesktopDownloader$"The partial cannot be resumed (server refused the range, or served a span we did not ask for); restarting from zero"</ID>
     <ID>MaxLineLength:DesktopInstaller.kt$DesktopInstaller$"This is an Arch Linux package (.pkg.tar.zst) — not supported on your distribution. Look for a .deb, .rpm, or .AppImage in the release."</ID>
     <ID>MaxLineLength:DhizukuInstallerServiceImpl.kt$DhizukuInstallerServiceImpl$"installPackage() called — fileSize=$fileSize, expected=$expectedPackageName@$expectedVersionCode, installer=$installerPackageName"</ID>
     <ID>MaxLineLength:DhizukuInstallerServiceImpl.kt$DhizukuInstallerServiceImpl.&lt;no name provided&gt;$"install requires user action (Android 14+ update-ownership gate) — installerAttribution=$installerPackageName"</ID>
-    <ID>MaxLineLength:DownloadLifecycleTest.kt$DownloadLifecycleTest.DirDownloader$override suspend fun getDownloadedFilePath(fileName: String): String?</ID>
-    <ID>MaxLineLength:HttpClientFactory.jvm.kt$proxy(Proxy(Proxy.Type.HTTP, InetSocketAddress.createUnresolved(proxyConfig.host, proxyConfig.port)))</ID>
-    <ID>MaxLineLength:HttpClientFactory.jvm.kt$proxy(Proxy(Proxy.Type.SOCKS, InetSocketAddress.createUnresolved(proxyConfig.host, proxyConfig.port)))</ID>
-    <ID>MaxLineLength:HttpClientFactory.kt$suspend inline</ID>
-    <ID>MaxLineLength:InstalledAppsRepositoryImpl.kt$InstalledAppsRepositoryImpl$AssetOwnership.narrowToApp(installableForApp, installedAssetName, release.tagName, self?.installedVersion)</ID>
-    <ID>MaxLineLength:InstalledAppsRepositoryImpl.kt$InstalledAppsRepositoryImpl$override suspend fun getAppByRepoId(repoId: Long): InstalledApp?</ID>
-    <ID>MaxLineLength:InstalledAppsRepositoryImpl.kt$InstalledAppsRepositoryImpl$override suspend fun getAppsByRepoId(repoId: Long): List&lt;InstalledApp&gt;</ID>
-    <ID>MaxLineLength:InstallerSourceClassifier.kt$InstallerSourceClassifier$fun classifyByInstaller(installerPackageName: String?): InstallerKind</ID>
-    <ID>MaxLineLength:MirrorRewriter.kt$MirrorRewriter$fun mirrorProbeUrl(template: String?): String?</ID>
-    <ID>MaxLineLength:OsTrustManager.kt$CompositeX509TrustManager$override fun getAcceptedIssuers(): Array&lt;X509Certificate&gt;</ID>
-    <ID>MaxLineLength:PackageEventReceiver.kt$PackageEventReceiver$installedVersion = refreshed.tagForObservedBuild(systemInfo.versionName, systemInfo.versionCode)</ID>
-    <ID>MaxLineLength:PackageEventReceiver.kt$PackageEventReceiver$private fun getBackstopScope(): CoroutineScope</ID>
-    <ID>MaxLineLength:PackageEventReceiver.kt$PackageEventReceiver$private fun getSystemInstallSerializer(): SystemInstallSerializer</ID>
-    <ID>MaxLineLength:PartialDownload.kt$PartialNaming$fun assetNameOfMeta(fileName: String): String?</ID>
-    <ID>MaxLineLength:ShizukuServiceManager.kt$ShizukuServiceManager$private fun isShizukuOrSuiInstalled(): Boolean</ID>
     <ID>MaxLineLength:ShizukuServiceManager.kt$ShizukuServiceManager.&lt;no name provided&gt;$"onServiceConnected() — name=$name, binder=${binder?.javaClass?.name}, binderAlive=${binder?.pingBinder()}"</ID>
-    <ID>MaxLineLength:SilentInstallerDispatcher.kt$SilentInstallerDispatcher$"Dhizuku returned PENDING_USER_ACTION with attribution=$installerAttribution; retrying without attribution"</ID>
-    <ID>MaxLineLength:SilentInstallerDispatcher.kt$SilentInstallerDispatcher$override fun choosePrimaryAsset(assets: List&lt;GithubAsset&gt;): GithubAsset?</ID>
-    <ID>MaxLineLength:TweaksRepositoryImpl.kt$TweaksRepositoryImpl$MigrationEntry(intPreferencesKey("external_import_banner_dismissed_at"), K_EXTERNAL_IMPORT_BANNER_DISMISSED_AT)</ID>
-    <ID>MaxLineLength:TweaksRepositoryImpl.kt$TweaksRepositoryImpl$is zed.rainxch.core.domain.model.installation.InstallerAttribution.Custom -&gt; "custom:${attribution.packageName.trim()}"</ID>
-    <ID>MaxLineLength:TweaksRepositoryImpl.kt$TweaksRepositoryImpl$is zed.rainxch.core.domain.model.installation.InstallerAttribution.Preset -&gt; "preset:${attribution.key.name}"</ID>
-    <ID>MaxLineLength:TweaksRepositoryImpl.kt$TweaksRepositoryImpl$override fun getAccentId(): Flow&lt;AccentId&gt;</ID>
-    <ID>MaxLineLength:TweaksRepositoryImpl.kt$TweaksRepositoryImpl$override fun getBatteryOptimizationPromptDismissed(): Flow&lt;Boolean&gt;</ID>
-    <ID>MaxLineLength:TweaksRepositoryImpl.kt$TweaksRepositoryImpl$override fun getExternalImportBannerDismissedAtCount(): Flow&lt;Int&gt;</ID>
-    <ID>MaxLineLength:TweaksRepositoryImpl.kt$TweaksRepositoryImpl$override fun getFontTheme(): Flow&lt;FontTheme&gt;</ID>
-    <ID>MaxLineLength:TweaksRepositoryImpl.kt$TweaksRepositoryImpl$override fun getLastSeenWhatsNewVersionCode(): Flow&lt;Int?&gt;</ID>
-    <ID>MaxLineLength:TweaksRepositoryImpl.kt$TweaksRepositoryImpl$override fun getMangaPaper(): Flow&lt;MangaPaperId&gt;</ID>
-    <ID>MaxLineLength:TweaksRepositoryImpl.kt$TweaksRepositoryImpl$override fun getThemeColor(): Flow&lt;AppTheme&gt;</ID>
-    <ID>MaxLineLength:TweaksRepositoryImpl.kt$TweaksRepositoryImpl$override fun getUpdateCheckInterval(): Flow&lt;Long&gt;</ID>
-    <ID>MaxLineLength:TweaksRepositoryImpl.kt$TweaksRepositoryImpl$override suspend</ID>
-    <ID>MaxLineLength:TweaksRepositoryImpl.kt$TweaksRepositoryImpl$private</ID>
     <ID>MaxLineLength:UpdateCheckWorker.kt$UpdateCheckWorker$"UpdateCheckWorker: Auto-update enabled with $installerType, scheduling AutoUpdateWorker for ${appsWithUpdates.size} apps"</ID>
-    <ID>MaxLineLength:UpdateCheckWorker.kt$UpdateCheckWorker$private</ID>
-    <ID>MaxLineLength:createDataStore.kt$context.filesDir.resolve(_root_ide_package_.zed.rainxch.core.data.local.data_store.dataStoreFileName).absolutePath</ID>
     <ID>NestedBlockDepth:AndroidDownloader.kt$AndroidDownloader$private suspend fun downloadAttempt( client: OkHttpClient, url: String, partFile: File, metaFile: File, destination: File, downloadId: String, identity: AssetIdentity?, emit: suspend (DownloadProgress) -&gt; Unit, )</ID>
     <ID>NestedBlockDepth:DefaultDownloadOrchestrator.kt$DefaultDownloadOrchestrator$override suspend fun discard(packageName: String)</ID>
     <ID>NestedBlockDepth:DesktopAppLauncher.kt$DesktopAppLauncher$private fun launchWindowsApp(installedApp: InstalledApp)</ID>

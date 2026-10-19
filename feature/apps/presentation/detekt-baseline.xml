@@ -42,16 +42,6 @@
     <ID>MagicNumber:StatusDotCluster.kt$0.4f</ID>
     <ID>MagicNumber:StatusDotCluster.kt$0.75f</ID>
     <ID>MatchingDeclarationName:VersionLine.kt$VersionLineTarget</ID>
-    <ID>MaxLineLength:AppsViewModel.kt$AppsViewModel$logger.debug("Deleted mismatched existing file ($normalizedExisting != $normalizedLatest): $deleted")</ID>
-    <ID>MaxLineLength:AppsViewModel.kt$AppsViewModel$logger.debug("Launched installer for ${app.appName} $latestVersion, waiting for system confirmation")</ID>
-    <ID>MaxLineLength:ExternalImportViewModel.kt$ExternalImportViewModel$activeSearchPackage = if (current.activeSearchPackage == packageName) null else current.activeSearchPackage</ID>
-    <ID>MaxLineLength:ExternalImportViewModel.kt$ExternalImportViewModel$searchResults = if (current.activeSearchPackage == packageName) persistentListOf() else current.searchResults</ID>
-    <ID>MaxLineLength:LinkAppBottomSheet.kt$InstallerCategory.SYSTEM_UPDATE -&gt; stringResource(Res.string.installer_category_system_update)</ID>
-    <ID>MaxLineLength:StarredCandidateRow.kt$private</ID>
-    <ID>MaxLineLength:StarredPickerRoot.kt$onClick = { onAction(StarredPickerAction.OnSortRuleSelected(StarredPickerSortRule.Alphabetical)) }</ID>
-    <ID>MaxLineLength:StarredPickerRoot.kt$onClick = { onAction(StarredPickerAction.OnSortRuleSelected(StarredPickerSortRule.MostStars)) }</ID>
-    <ID>MaxLineLength:StarredPickerRoot.kt$onClick = { onAction(StarredPickerAction.OnSortRuleSelected(StarredPickerSortRule.RecentlyStarred)) }</ID>
-    <ID>MaxLineLength:UpdatesBanner.kt$progress = { updateAllProgress.current.toFloat() / updateAllProgress.total.coerceAtLeast(1) }</ID>
     <ID>ReturnCount:AppsViewModel.kt$AppsViewModel$fun tryCandidate(rawToken: String): String?</ID>
     <ID>ReturnCount:AppsViewModel.kt$AppsViewModel$private fun parseGithubUrl(input: String): Pair&lt;String, String&gt;?</ID>
     <ID>ReturnCount:AppsViewModel.kt$AppsViewModel$private fun suggestFilterForLink( deviceAppName: String, packageName: String, firstAssetName: String?, ): String?</ID>

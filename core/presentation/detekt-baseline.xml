@@ -135,18 +135,6 @@
     <ID>MagicNumber:TimeFormatters.kt$4</ID>
     <ID>MagicNumber:TimeFormatters.kt$7</ID>
     <ID>MatchingDeclarationName:AlertBlockQuote.kt$GithubAlertKind</ID>
-    <ID>MaxLineLength:GridColumnsTest.kt$GridColumnsTest$widthCappedCellWidths(density, availableSize = 1110, spacing = 10, maxCardWidth = 550.dp, contentPaddingHorizontal = 12.dp)</ID>
-    <ID>MaxLineLength:GridColumnsTest.kt$GridColumnsTest$widthCappedCellWidths(density, availableSize = 1134, spacing = 10, maxCardWidth = 550.dp, contentPaddingHorizontal = 0.dp)</ID>
-    <ID>MaxLineLength:GridPaper.kt$drawLine(color = color, start = Offset(0f, y), end = Offset(size.width, y), strokeWidth = stroke, alpha = opacity)</ID>
-    <ID>MaxLineLength:GridPaper.kt$drawLine(color = color, start = Offset(x, 0f), end = Offset(x, size.height), strokeWidth = stroke, alpha = opacity)</ID>
-    <ID>MaxLineLength:KomiActionRow.kt$tone = if (item.variant == KomiButtonVariant.Destructive) KomiMenuTone.Danger else KomiMenuTone.Default</ID>
-    <ID>MaxLineLength:KomiChip.kt$Icon(imageVector = Icons.Default.Close, contentDescription = "Remove", modifier = Modifier.size(iconSize), tint = color)</ID>
-    <ID>MaxLineLength:KomiChip.kt$Icon(imageVector = leadingIcon, contentDescription = null, modifier = Modifier.size(metrics.icon), tint = fg)</ID>
-    <ID>MaxLineLength:KomiChip.kt$style = TextStyle(fontFamily = type.mono.fontFamily, fontWeight = FontWeight.Bold, fontSize = (fontSizeSp - 1.5f).sp)</ID>
-    <ID>MaxLineLength:KomiDropdown.kt$trigger = { onClick -&gt; KomiIconButton(Icons.Default.MoreVert, "More", onClick, variant = KomiButtonVariant.Outline) }</ID>
-    <ID>MaxLineLength:KomiRepoCard.kt$description = "High-performance self-hosted photo and video management. Back up and browse your library from any device."</ID>
-    <ID>MaxLineLength:KomiTextField.kt$imageVector = if (passwordVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility</ID>
-    <ID>MaxLineLength:KomiToast.kt$data = KomiToastData(id = 4, message = "Download failed.", tone = KomiToastTone.Danger, actionLabel = "Retry", onAction = {})</ID>
     <ID>ReturnCount:AlertBlockQuote.kt$GithubAlertKind.Companion$fun parse(blockquoteText: String): Match?</ID>
     <ID>ReturnCount:GithubStoreMarkdownComponents.kt$private fun findChildRecursive( node: ASTNode, type: IElementType, ): ASTNode?</ID>
     <ID>ReturnCount:GithubStoreMarkdownComponents.kt$private fun findEnclosingLinkDestination( imageNode: ASTNode, content: String, ): String?</ID>
