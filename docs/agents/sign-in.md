@@ -2,7 +2,7 @@
 
 ## GitHub OAuth
 
-`GITHUB_CLIENT_ID` comes from `local.properties`. Deep links: `githubstore://auth` (web-OAuth handoff), `githubstore://callback` (leftover from the device flow), `githubstore://repo`, `githubstore://apps`; the full set is in `DeepLinkParser.kt`.
+`GITHUB_CLIENT_ID` comes from `local.properties`; without the key, the build uses the built-in client id (`BuildKonfigConventionPlugin`). An empty value overrides it and breaks sign-in. Deep links: `githubstore://auth` (web-OAuth handoff), `githubstore://callback` (leftover from the device flow), `githubstore://repo`, `githubstore://apps`; the full set is in `DeepLinkParser.kt`.
 
 ## Sign-in flow (web OAuth first)
 
@@ -14,7 +14,7 @@ Backend rate limits: 10 device starts and 200 device polls per hour per IP. Endp
 
 ## The `X-GitHub-Token` header
 
-The client attaches the user's token as `X-GitHub-Token` when `TokenStore.currentToken()` is non-null on `/v1/search`, `/v1/search/explore`, `/v1/repo`, `/v1/releases`, `/v1/readme` and `/v1/user`. The backend re-sends it as `Authorization: token $token` to GitHub; without it, the backend round-robins a pool of 4 service tokens.
+The client attaches the user's token as `X-GitHub-Token` when `TokenStore.currentToken()` is non-null on `/v1/search`, `/v1/search/explore`, `/v1/repo` (including `POST .../refresh`), `/v1/releases`, `/v1/readme`, `/v1/user` and `/v1/users/{user}/repos`. The backend re-sends it as `Authorization: token $token` to GitHub; without it, the backend round-robins a pool of 4 service tokens.
 
 - An upstream 401 comes back as a backend `502` and is treated like "GitHub unreachable": the client falls back through `shouldFallbackToGithubOrRethrow`.
 - A `429` gets no fallback (the same limit applies), only backoff.

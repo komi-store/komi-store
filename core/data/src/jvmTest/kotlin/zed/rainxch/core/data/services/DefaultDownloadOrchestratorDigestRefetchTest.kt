@@ -19,7 +19,6 @@ import zed.rainxch.core.domain.model.system.SystemArchitecture
 import zed.rainxch.core.domain.network.AssetIdentity
 import zed.rainxch.core.domain.network.DigestVerifier
 import zed.rainxch.core.domain.network.Downloader
-import zed.rainxch.core.domain.network.SlowDownloadDetector
 import zed.rainxch.core.domain.repository.InstalledAppsRepository
 import zed.rainxch.core.domain.system.DownloadSpec
 import zed.rainxch.core.domain.system.DownloadStage
@@ -70,7 +69,6 @@ class DefaultDownloadOrchestratorDigestRefetchTest {
         installer = StubInstaller,
         installedAppsRepository = StubInstalledAppsRepository(),
         pendingInstallNotifier = StubNotifier,
-        slowDownloadDetector = StubSlowDownloadDetector,
         appScope = scope,
         systemInstallSerializer = StubInstallSerializer,
         tokenStore = StubTokenStore,
@@ -371,14 +369,6 @@ class DefaultDownloadOrchestratorDigestRefetchTest {
         ) = Unit
 
         override fun clearPending(packageName: String) = Unit
-    }
-
-    private object StubSlowDownloadDetector : SlowDownloadDetector {
-        override val suggestMirror: Flow<Unit> = emptyFlow()
-
-        override suspend fun onProgress(progress: DownloadProgress) = Unit
-
-        override suspend fun reset() = Unit
     }
 
     private object StubInstallSerializer : SystemInstallSerializer {

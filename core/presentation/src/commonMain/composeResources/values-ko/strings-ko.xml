@@ -1035,6 +1035,8 @@
     <string name="adaptive_pick_repo_subtitle">왼쪽의 카드를 탭하면 여기에서 세부 정보를 볼 수 있어요.</string>
     <string name="adaptive_pick_repo_title">저장소를 선택하세요</string>
     <string name="apps_section_pending_installs">설치 준비 완료</string>
+    <string name="apps_section_in_progress">진행 중</string>
+    <string name="download_failed">다운로드 실패</string>
     <string name="apps_updates_banner_hide">목록 숨기기</string>
     <string name="apps_updates_banner_show">목록 보기</string>
     <string name="apps_updates_banner_subtitle">한 번에 검토하거나 모두 업데이트하세요.</string>
