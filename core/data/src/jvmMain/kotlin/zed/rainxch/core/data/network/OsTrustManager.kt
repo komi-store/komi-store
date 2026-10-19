@@ -2,6 +2,7 @@ package zed.rainxch.core.data.network
 
 import zed.rainxch.core.domain.system.DesktopOs
 import java.security.KeyStore
+import java.security.cert.CertificateException
 import java.security.cert.X509Certificate
 import javax.net.ssl.SSLContext
 import javax.net.ssl.SSLSocketFactory
@@ -76,7 +77,7 @@ private class CompositeX509TrustManager(
                 lastError = t
             }
         }
-        throw lastError ?: java.security.cert.CertificateException("No trust manager accepted the chain")
+        throw CertificateException("No trust manager accepted the chain", lastError)
     }
 
     override fun checkServerTrusted(
@@ -92,7 +93,7 @@ private class CompositeX509TrustManager(
                 lastError = t
             }
         }
-        throw lastError ?: java.security.cert.CertificateException("No trust manager accepted the chain")
+        throw CertificateException("No trust manager accepted the chain", lastError)
     }
 
     override fun getAcceptedIssuers(): Array<X509Certificate> = delegates.flatMap { it.acceptedIssuers.toList() }.toTypedArray()
