@@ -8,7 +8,7 @@ The `sign-windows` job runs after every push to `generate-installers`. The SignP
 
 ## WinGet
 
-`.github/workflows/winget-publish.yml` fires on `release: [released]` and uses `vedantmgoyal9/winget-releaser@main` to publish the MSI (`installers-regex: '\.msi$'`) as `zed.rainxch.githubstore`. The secret `WINGET_TOKEN` is a PAT with `Contents` and `Pull requests` write access on `komi-store/winget-pkgs` (a fork of `microsoft/winget-pkgs`). The workflow doesn't set `fork-user`; the action defaults it to the repository owner, `komi-store`.
+`.github/workflows/winget-publish.yml` fires on `release: [released]` and uses `vedantmgoyal9/winget-releaser` to publish the MSI (`installers-regex: '\.msi$'`) as `zed.rainxch.githubstore`. The secret `WINGET_TOKEN` is a PAT with `Contents` and `Pull requests` write access on `komi-store/winget-pkgs` (a fork of `microsoft/winget-pkgs`). The workflow doesn't set `fork-user`; the action defaults it to the repository owner, `komi-store`.
 
 ## Scoop
 
