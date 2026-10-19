@@ -16,6 +16,7 @@ If you're contributing to a sibling repo ([`backend`](https://github.com/komi-st
 - [Project layout](#project-layout)
 - [Coding conventions](#coding-conventions)
 - [Branching and commit style](#branching-and-commit-style)
+- [Using AI tools](#using-ai-tools)
 - [Pull request process](#pull-request-process)
 - [Translations](#translations)
 - [Release flow](#release-flow)
@@ -88,7 +89,7 @@ sdk.dir=/path/to/Android/sdk
 GITHUB_CLIENT_ID=your-oauth-client-id-or-leave-blank-for-local
 ```
 
-`GITHUB_CLIENT_ID` is only needed if you want to test the GitHub OAuth device-flow login locally. The rest of the app works without it.
+`GITHUB_CLIENT_ID` is only needed if you want to test GitHub sign-in locally. The rest of the app works without it.
 
 ### Common commands
 
@@ -124,79 +125,45 @@ The first build will pull a lot of dependencies. Subsequent builds reuse the Gra
 ## Project layout
 
 ```text
-composeApp/                          # Main app entry points + navigation
+composeApp/                          # App entry points, navigation, DI wiring
 core/
-  domain/                            # Repository interfaces, models, use cases
-  data/                              # Repo implementations, Ktor, Room, DI
-  presentation/                      # Shared theme + reusable Compose components
+  domain/                            # Interfaces, models, pure logic
+  data/                              # Repositories, Ktor, Room, Koin, platform code
+  presentation/                      # Personality design system, Komi* components, strings
 feature/
-  apps/                              # Installed apps management
-  auth/                              # GitHub OAuth device flow
-  details/                           # Repo + release details
-  dev-profile/                       # Developer / user profile
-  favourites/                        # Saved favorites
-  home/                              # Discovery (trending / hot / popular)
-  profile/                           # User profile, settings, appearance
+  apps/                              # Installed apps, updates, import
+  auth/                              # Sign-in (web OAuth, device flow, personal access token)
+  details/                           # Repository and release details, installs
+  dev-profile/                       # Developer profile
+  favourites/                        # Saved favourites, importing stars
+  feed/                              # Explore feed
+  home/                              # Top charts
+  profile/                           # Account, announcements, what's new
+  recently-viewed/                   # Recently viewed repositories
+  repo-pages/                        # Issues, security advisories
   search/                            # Search with filters
-  starred/                           # Starred repos
-build-logic/convention/              # Custom Gradle convention plugins
+  starred/                           # Starred repositories
+  tweaks/                            # Settings
+konsist-test/                        # Architecture rules
+build-logic/convention/              # Gradle convention plugins
 ```
 
-Each `feature/<name>/` typically has up to three sub-modules: `domain/`, `data/`, `presentation/`. Some features (favourites, starred) are presentation-only and consume core repositories directly.
+Each `feature/<name>/` has up to three sub-modules: `domain/`, `data/`, `presentation/`. `profile`, `recently-viewed` and `tweaks` are presentation-only.
 
-The full architectural rundown lives in [CLAUDE.md](CLAUDE.md). Per-feature notes live in `feature/<name>/CLAUDE.md`.
+The architecture is described in [`docs/agents/architecture.md`](docs/agents/architecture.md). Per-feature notes live in `feature/<name>/CLAUDE.md`.
 
 ---
 
 ## Coding conventions
 
-We use Kotlin's official style (`kotlin.code.style=official`). CI lints every PR with ktlint through Spotless. The full rule set is in [`docs/code-style.md`](docs/code-style.md). The big rules:
+We use Kotlin's official style, enforced by Spotless (ktlint plus the Compose rules) on the files you change. The full rule set, with examples from the codebase, is [`docs/code-style.md`](docs/code-style.md). In short:
 
-### Architecture
-
-- **Clean Architecture + MVI.** Domain layer has zero framework dependencies. Data layer implements domain interfaces. Presentation layer holds ViewModels and Compose code.
-- **State / Action / Event** pattern for every screen:
-
-  ```kotlin
-  class XViewModel : ViewModel() {
-      private val _state = MutableStateFlow(XState())
-      val state = _state.asStateFlow()
-
-      private val _events = Channel<XEvent>()
-      val events = _events.receiveAsFlow()
-
-      fun onAction(action: XAction) { ... }
-  }
-  ```
-
-- **Sealed interfaces** for actions, events, navigation routes.
-- **Koin** for DI. Each feature module exposes a Koin module from `data/di/SharedModule.kt`. ViewModels are wired in `composeApp/.../app/di/initKoin.kt` and injected via `koinViewModel()`.
-- **Type-safe navigation** via `@Serializable` sealed interface `GithubStoreGraph`.
-
-### Source sets
-
-- `commonMain` — shared code (Compose UI, ViewModels, repository contracts).
-- `androidMain` — Android-only platform impls (Shizuku, PackageManager, OkHttp).
-- `jvmMain` — Desktop-only platform impls (CIO, file paths, native installers).
-
-### Naming
-
-- Packages: `zed.rainxch.{module}.{layer}`.
-- Private state: underscore prefix (`_state`, `_events`).
-- Composables: `PascalCase`.
-- Boolean state: `isXxx` / `hasXxx` / `canXxx`.
-
-### Comments
-
-- **Don't write KDoc / docstrings** to explain a function unless the function's intent isn't obvious from its signature and body.
-- **Inline comments** are reserved for non-obvious invariants, tricky concurrency, third-party-bug workarounds, or counter-intuitive choices. If reading the code answers the "why," delete the comment.
-- This applies globally. Reviewers will push back on filler comments.
-
-### Tech stack reminders
-
-- Kotlin 2.3.10 · Compose Multiplatform 1.10.x · Ktor 3.x · Room 2.8.x · Koin 4.x.
-- All versions live in `gradle/libs.versions.toml` (Version Catalog). Adding a dep? Add the version + alias there, not directly in the module's `build.gradle.kts`.
-- Convention plugins in `build-logic/convention/` standardize module setup. Adding a new module? Pick the right plugin (`convention.kmp.library`, `convention.cmp.library`, `convention.cmp.feature`, etc.) instead of hand-rolling the build script.
+- **Clean Architecture with MVVM.** The domain layer has no framework dependencies, the data layer implements it, and presentation holds ViewModels and Compose UI.
+- **Every screen** has a ViewModel with one `state` flow, one `onAction(FooAction)` taking a sealed action type, and a `Channel` for one-off events, plus a `FooRoot` composable that collects them and calls a stateless `FooScreen`.
+- **Errors are typed** and become string resources in the UI. Never show an exception's message to users.
+- **UI uses `Komi*` components** and `LocalPersonality` tokens; all user-visible text comes from string resources.
+- **No KDoc or filler comments.** Comment only non-obvious invariants, tricky concurrency or workarounds.
+- **Dependencies** go into `gradle/libs.versions.toml`, and new modules use a convention plugin from `build-logic/convention/` instead of a hand-rolled build script.
 
 ---
 
@@ -220,7 +187,19 @@ We use Kotlin's official style (`kotlin.code.style=official`). CI lints every PR
   - ✅ `feat: support multi-select platform filter on Home`
   - ❌ `fixed bug` / `wip` / `more changes`
 - Long bodies are fine for non-trivial changes — explain the *why*, not the *what* (the diff already shows the *what*).
-- AI assistants are fine — use whatever helps you ship. Just make sure the commit message + PR description are written in your own voice and the code is one you've read and stand behind. Auto-generated `Co-Authored-By: Claude/Cursor/...` trailers add noise to `git log`; trim them before pushing.
+
+---
+
+## Using AI tools
+
+AI coding tools are welcome. These keep such PRs easy to review:
+
+- **You own every line.** Read the diff before you push and be ready to explain any part of it.
+- **Point your tool at the repo's guidance.** [`AGENTS.md`](AGENTS.md) is written for coding agents (Claude Code reads it through `CLAUDE.md`), and `feature/<name>/CLAUDE.md` holds notes per feature.
+- **Run the checks and try the change.** CI only catches what it can check; say in the PR which device or OS you ran it on.
+- **Keep it small and in scope.** One issue, one PR. Large generated refactors are hard to review; open an issue first.
+- **Write the description yourself, briefly:** what changed, why, how you tested it.
+- **Trim generated trailers.** `Co-Authored-By: Claude/Cursor/...` lines add noise to `git log`; remove them before pushing.
 
 ---
 
@@ -242,13 +221,13 @@ We use Kotlin's official style (`kotlin.code.style=official`). CI lints every PR
    ```
 
    (Or the narrower module-specific tasks if you know the change is scoped.)
-5. **Push and open a PR** against `main`. Fill out the description with:
+5. **Push and open a PR** against `main`. The PR template asks for:
    - **What** the change does.
    - **Why** — the user-facing problem or technical motivation.
    - **How to test** — exact steps a reviewer can follow on a clean checkout.
    - **Screenshots** or screen recordings for any UI change. Mandatory for visual diffs.
    - **Linked issue:** `Closes #123` / `Fixes #123`.
-6. **Run the local checks yourself before review.** CI (`.github/workflows/pr-checks.yml`) builds and tests every PR and runs Spotless, detekt, Android Lint, the Compose stability check and Konsist. The commands are under Verification in `CLAUDE.md`; run them locally first instead of waiting for CI.
+6. **Run the local checks yourself before review.** CI (`.github/workflows/pr-checks.yml`) builds and tests every PR and runs Spotless, detekt, Android Lint, the Compose stability check and Konsist. The commands are under "Before you push" in [`AGENTS.md`](AGENTS.md); run them locally first instead of waiting for CI.
 7. **Address review comments** with follow-up commits (don't force-push during review unless the reviewer asks). Squash on merge happens automatically.
 8. **Merge** is performed by maintainers via GitHub's "Squash and merge". Your branch is deleted automatically.
 
@@ -300,7 +279,7 @@ Don't machine-translate without verification — bad translations are worse than
 
 Releases are cut by maintainers from `main` after a short stabilization window:
 
-1. Bump `versionName` and `versionCode` in `composeApp/build.gradle.kts`.
+1. Bump `projectVersionName` and `projectVersionCode` in `gradle/libs.versions.toml`.
 2. Tag the commit `vX.Y.Z`.
 3. Maintainer builds Android with signing key (release) and Desktop (`.exe`, `.msi`, `.dmg`, `.pkg`, `.deb`, `.rpm`, `.appimage`, `.tar.zst`).
 4. Release notes are written manually — covering the user-facing changes, not every commit.
