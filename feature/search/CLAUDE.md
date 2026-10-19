@@ -38,7 +38,7 @@ sealed interface SearchSource { object GitHub; data class Forgejo(host); /* Code
 
 ## Navigation
 
-`GithubStoreGraph.SearchScreen(initialPlatform: String?)`. The name is parsed to `DiscoveryPlatform` and passed to the VM via `parametersOf`.
+`GithubStoreGraph.SearchScreen(initialPlatform: String?)`. The name is parsed to `DiscoveryPlatform` and passed to the VM via `parametersOf`. No caller sets it today. On Desktop the VM follows the sidebar's `BrowseFilterStore.platform` instead (`observeBrowseFilter`).
 
 ## Notes
 

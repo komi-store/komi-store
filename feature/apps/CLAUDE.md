@@ -1,6 +1,6 @@
 # Apps Feature
 
-Installed-apps manager. Lists apps tracked by GHS, launches them, checks and installs updates, links apps installed elsewhere to a repo. In the Android bottom nav (label "Library"); on Desktop the sidebar omits it and it opens from the window menu bar (Go > Library, `githubstore://apps`).
+Installed-apps manager. Lists apps tracked by Komi Store, launches them, checks and installs updates, links apps installed elsewhere to a repo. In the Android bottom nav (label "Library"); on Desktop the sidebar omits it and it opens from the window menu bar (Go > Library, `githubstore://apps`).
 
 ## Structure
 
@@ -36,6 +36,9 @@ interface AppsRepository {
 
 - `AppsViewModel` is created in `AppNavigation` (not by `AppsRoot`) and its state is collected there for the bottom-nav update badge, so it loads at app start and outlives the screen.
 - Uses `InstalledAppsRepository` + `SyncInstalledAppsUseCase`. `openApp` via `AppLauncher`. `getLatestRelease` / `fetchRepoInfo` go backend first, GitHub direct on fallback; a non-null `sourceHost` routes them to the `ForgejoClientRegistry` client instead. `linkAppToRepo` only persists `sourceHost` on `InstalledApp.sourceHost`.
+- **Stored match:** Update and re-download start from the release and asset the last update check stored on the row (`resolveUpdateTarget` -> `storedUpdateTarget`). `getLatestRelease` runs only when nothing is stored, or after a download from the stored match failed (`storedMatchFailures`).
+- **Missing file:** Install on a pending row whose `pendingInstallFilePath` is gone calls `redownloadPendingApp`, which downloads again in the pinned variant; the row stays parked.
+- **Downloads:** in-progress downloads come from `DownloadOrchestrator.downloads` whoever started them, Details included (`observeOrchestratorDownloads`), and render as `InProgressAppCard`s. The app's own row is hidden while its card is shown.
 - **`sourceHost` propagation:** `AppsAction.OnNavigateToRepo` + `AppsEvent.NavigateToRepo` carry `sourceHost`, owner, repo, packageName; `AppsRoot.onNavigateToRepo` is `(repoId, sourceHost, owner, repo, packageName) -> Unit` and routes to `GithubStoreGraph.DetailsScreen(sourceHost = ..., packageName = ...)`.
 - **Multi-source backend match:** link suggestions (`RepoMatchSuggestion`) may come from GitHub *or* a Forgejo host; the link sheet shows a source host chip per row (GitHub / Codeberg / host) so the user picks the right forge variant.
 - **Grouped by repo:** apps sharing a `repoId` render together inside each section (`AppsState.pendingGroups` / `updateGroups` / `idleGroups` from `groupedByRepo()`, which keeps each group at its first member's sort position). Up-to-date groups are one `AppGroupCard` (owner/repo header + unframed `CompactAppRow`s with `AppGroupDivider`); update and pending groups are an `AppGroupStack` (header above the cards). `InstalledAppIcon` lives in `core/presentation`.

@@ -20,7 +20,8 @@ feature/tweaks/presentation/
 ├── hosttokens/    # HostTokensRoot (per-host PATs)
 ├── mirror/        # MirrorPickerRoot
 ├── connection/    # paste-a-proxy-URL sheet
-└── model/         # ProxyScopeFormState, ProxyType, LanguagePickerOption
+├── model/         # ProxyScopeFormState, ProxyType, LanguagePickerOption
+└── utils/         # TweaksDeepLinkBus: desktop Help > Feedback opens the feedback sheet
 ```
 
 ## Sections
@@ -29,7 +30,7 @@ Android: one scrolling column of Look & feel, Connectivity, Installs & updates, 
 
 ## Sub-screen VMs (registered in `composeApp/.../app/di/ViewModelsModule.kt`)
 
-`SkippedUpdatesViewModel` (unskip = `setSkippedReleaseTag(pkg, null)` then `checkForUpdates`), `HiddenRepositoriesViewModel` (`HiddenReposRepository.unhide` / `clearAll`), `HostTokensViewModel` (`HostTokenRepository`), `FeedbackViewModel`, `MirrorPickerViewModel` (explicit `viewModel {}`; `named("test")` HttpClient for the 5s mirror latency test), `AppInfoViewModel`, `LicensesViewModel`.
+`SkippedUpdatesViewModel` (unskip = `setSkippedReleaseTag(pkg, null)` then `checkForUpdates`), `HiddenRepositoriesViewModel` (`HiddenReposRepository.unhide` / `clearAll`), `HostTokensViewModel` (`HostTokenRepository`), `FeedbackViewModel`, `MirrorPickerViewModel` (explicit `viewModel {}`; measures every mirror on open through `MirrorRepository.measureLatencies()`, Direct included; "Pick fastest" (`OnAutoPickFastest`) applies `fastestReleaseMirror` once; the `named("test")` HttpClient only backs the 5 s "Test connection"), `AppInfoViewModel`, `LicensesViewModel`.
 
 ## Navigation
 
@@ -41,6 +42,6 @@ Android: one scrolling column of Look & feel, Connectivity, Installs & updates, 
 - **Proxy:** a master config plus one config per `ProxyScope` (`DISCOVERY` / `DOWNLOAD` / `TRANSLATION`). Only the per-scope configs reach `ProxyManager`; `TweaksViewModel` copies the master into every scope flagged use-master when it is saved. `ProxyRepository.setMasterProxyConfig` alone changes no traffic.
 - **Content width (desktop only, Look & feel):** `OnContentWidthSelected` persists `ContentWidth` (`COMPACT` / `WIDE` / `EXTRA_WIDE`). `MainViewModel` feeds it to `LocalContentWidth` (provided in `AppNavigation`); screens read it through `contentWidthCap()` / `Modifier.constrainedContentWidth()` (core/presentation).
 - **Custom forges (Connectivity):** `CustomForgesDialog` adds / removes hosts in `TweaksRepository`; the host rows under the entry can also remove. Hosts become `SearchSourceUi.CustomForge` chips in Search and are passed to `RepositoryUrlParser.parse` by the Apps link sheet and external import.
-- **Access Tokens (`HostTokensScreen`):** lists / adds / edits / deletes / validates per-host PATs in `HostTokenRepository`. Saved tokens are not attached to any request yet (root CLAUDE.md, Per-host PATs).
+- **Access Tokens (`HostTokensScreen`):** lists / adds / edits / deletes / validates per-host PATs in `HostTokenRepository`. Saved tokens are not attached to any request yet (`docs/agents/forges.md`).
 - **Translation provider:** Google and LibreTranslate switch immediately. Youdao, DeepL and Microsoft with a required credential field blank only set `draftTranslationProvider` (form shown, persisted provider unchanged); the switch happens on that provider's credentials save.
 - **Language:** `OnAppLanguageSelected` persists the tag. Android applies it from `MainActivity` (collects `getAppLanguage()`, then `recreate()`). Desktop gets `OnAppLanguageChangeRequiresRestart`; the toast action calls `restartAppAfterLanguageChange()` (relaunch + `exitProcess`). The Android actual is empty and never called.

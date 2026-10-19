@@ -16,7 +16,7 @@ CodeQL (`codeql.yml`) and Dependabot (`dependabot.yml`) run separately.
 
 ## Spotless
 
-Spotless checks only files changed against `origin/main`, but it checks the whole file. Until the one-time format of the codebase lands, touching an old file means formatting all of it in that PR; keep such PRs small or format the file in a separate commit. Compose rule findings (missing `modifier`, parameter order, naming) are not auto-fixable and have to be fixed by hand in files you touch.
+Spotless checks only files changed against `origin/main`, but it checks the whole file. The codebase was formatted once in #1080 (listed in `.git-blame-ignore-revs`). Compose rule findings (missing `modifier`, parameter order, naming) are not auto-fixable and have to be fixed by hand in files you touch.
 
 ## Baselines
 
@@ -36,4 +36,4 @@ The rules and their allowlists live in `konsist-test/src/test/kotlin/zed/rainxch
 
 ## Agent config
 
-The `Agent config` job runs [agnix](https://github.com/agent-sh/agnix) on `AGENTS.md`, the `CLAUDE.md` files and `.claude/`, and fails on broken agent configuration.
+The `Agent config` job runs [agnix](https://github.com/agent-sh/agnix) over the repository (`AGENTS.md`, the `CLAUDE.md` files, `.claude/` and the rest) with its default rules, and fails only on errors. It runs in CI only.

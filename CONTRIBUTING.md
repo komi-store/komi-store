@@ -2,7 +2,7 @@
 
 Thanks for your interest in helping out. This document covers everything you need to ship a change — from setting up the project locally to landing a clean PR.
 
-If you're contributing to a sibling repo ([`backend`](https://github.com/komi-store/komi-store-backend) or [`api`](https://github.com/komi-store/komi-store-backend-data)), check that repo's own contributing notes; the rules below are specific to the **GitHub-Store** client app.
+If you're contributing to a sibling repo ([`backend`](https://github.com/komi-store/komi-store-backend) or [`api`](https://github.com/komi-store/komi-store-backend-data)), check that repo's own contributing notes; the rules below are specific to the **Komi Store** client app.
 
 ---
 
@@ -48,13 +48,13 @@ Plenty of ways to help, even without writing code:
 
 Two ways:
 
-- **Inside the app: `Profile → Send feedback`.** Auto-fills app version, platform, and installer. Pick the channel (email or GitHub issue) and you're done.
+- **Inside the app: `Tweaks → Send feedback`.** Auto-fills app version, platform, and installer. Pick the channel (email or GitHub issue) and you're done.
 - **On GitHub: [open a bug report](https://github.com/komi-store/komi-store/issues/new?template=bug_report.md).** Tell us what went wrong, how to reproduce, your setup. Logs and screenshots help but aren't required.
 
 If you have logs handy, grab them from:
 
 - **Android:** `adb logcat | grep zed.rainxch.githubstore`
-- **Desktop:** `~/Library/Logs/GitHub-Store/session.log` (macOS), `%LOCALAPPDATA%/GitHub-Store/logs/session.log` (Windows), `$XDG_STATE_HOME/GitHub-Store/logs/session.log` (Linux). Crashes also drop a `crash-<timestamp>.log` next to it.
+- **Desktop:** `~/Library/Logs/Komi-Store/session.log` (macOS), `%LOCALAPPDATA%/Komi-Store/logs/session.log` (Windows), `$XDG_STATE_HOME/Komi-Store/logs/session.log` (Linux). Crashes also drop a `crash-<timestamp>.log` next to it.
 
 ---
 
@@ -71,7 +71,7 @@ For bigger ideas (new screens, new platform, architectural shifts), open the iss
 ### Requirements
 
 - **JDK 21** (Temurin recommended). Set `JAVA_HOME` accordingly.
-- **Android Studio** Hedgehog or newer with the Kotlin Multiplatform plugin.
+- **Android Studio** Narwhal 3 Feature Drop (2025.1.3) or newer, which AGP 8.13 needs, with the Kotlin Multiplatform plugin.
 - **Android SDK** for Android builds (target API 36, min API 26).
 - **Git** with a configured username/email.
 
@@ -86,10 +86,9 @@ Create `local.properties` in the repo root:
 
 ```properties
 sdk.dir=/path/to/Android/sdk
-GITHUB_CLIENT_ID=your-oauth-client-id-or-leave-blank-for-local
 ```
 
-`GITHUB_CLIENT_ID` is only needed if you want to test GitHub sign-in locally. The rest of the app works without it.
+`GITHUB_CLIENT_ID` is optional. Without the key the build uses the app's built-in OAuth client id; add `GITHUB_CLIENT_ID=<id>` only to sign in through your own OAuth app. Don't leave it empty: an empty value overrides the built-in id and breaks sign-in.
 
 ### Common commands
 
@@ -97,7 +96,7 @@ GITHUB_CLIENT_ID=your-oauth-client-id-or-leave-blank-for-local
 # Android debug build
 ./gradlew :composeApp:assembleDebug
 
-# Android release build (needs signing config in local.properties)
+# Android release build (unsigned; the build has no signing config)
 ./gradlew :composeApp:assembleRelease
 
 # Desktop run (dev mode)
@@ -216,22 +215,13 @@ AI coding tools are welcome. These keep such PRs easy to review:
    ```
 
 3. **Make the change.** Keep the PR focused; if it grows beyond one logical change, split it into a stack.
-4. **Run the local checks:**
-
-   ```bash
-   ./gradlew spotlessApply build
-   ```
-
-   (Or the narrower module-specific tasks if you know the change is scoped.)
-5. **Push and open a PR** against `main`. The PR template asks for:
-   - **What** the change does.
-   - **Why** — the user-facing problem or technical motivation.
-   - **How to test** — exact steps a reviewer can follow on a clean checkout.
-   - **Screenshots** or screen recordings for any UI change. Mandatory for visual diffs.
-   - **Linked issue:** `Closes #123` / `Fixes #123`.
-6. **Run the local checks yourself before review.** CI (`.github/workflows/pr-checks.yml`) builds and tests every PR and runs Spotless, detekt, Android Lint, the Compose stability check and Konsist. The commands are under "Before you push" in [`AGENTS.md`](AGENTS.md); run them locally first instead of waiting for CI.
-7. **Address review comments** with follow-up commits (don't force-push during review unless the reviewer asks). Squash on merge happens automatically.
-8. **Merge** is performed by maintainers via GitHub's "Squash and merge". Your branch is deleted automatically.
+4. **Run the checks CI runs.** CI (`.github/workflows/pr-checks.yml`) builds and tests every PR and runs Spotless, detekt, Android Lint, the Compose stability check and Konsist. The commands are under "Before you push" in [`AGENTS.md`](AGENTS.md) (`/verify` in Claude Code); run them before opening the PR instead of waiting for CI.
+5. **Push and open a PR** against `main`. The PR template asks:
+   - **What and why:** what changes for the user or the codebase, with the issue linked (`Fixes #123`).
+   - **How it was tested:** the device or OS, the steps and what you saw, with screenshots or a recording for UI changes.
+   - **Notes for the reviewer:** anything you're unsure about.
+6. **Address review comments** with follow-up commits (don't force-push during review unless the reviewer asks).
+7. **Merge** is performed by maintainers via GitHub's "Squash and merge". Your branch is deleted automatically.
 
 ### What gets a PR rejected
 
@@ -283,7 +273,7 @@ Releases are cut by maintainers from `main` after a short stabilization window:
 
 1. Bump `projectVersionName` and `projectVersionCode` in `gradle/libs.versions.toml`.
 2. Tag the commit `vX.Y.Z`.
-3. Maintainer builds Android with signing key (release) and Desktop (`.exe`, `.msi`, `.dmg`, `.pkg`, `.deb`, `.rpm`, `.appimage`, `.tar.zst`).
+3. The maintainer builds and signs Android. Desktop installers (`.exe`, `.msi`, `.dmg`, `.pkg`, `.deb`, `.rpm`, `.appimage`, `.tar.zst`) are built by CI from the `generate-installers` branch, which also creates the draft release (see [`docs/agents/distribution.md`](docs/agents/distribution.md)).
 4. Release notes are written manually — covering the user-facing changes, not every commit.
 5. F-Droid and the in-app updater pick up the release automatically.
 
@@ -293,7 +283,7 @@ You don't normally need to touch this as a contributor; just be aware that landi
 
 ## Security disclosures
 
-**Do not open public issues for security vulnerabilities.** Use [GitHub's private vulnerability reporting](https://github.com/komi-store/komi-store/security/advisories/new) or email `admin@komistore.app` with the details.
+**Do not open public issues for security vulnerabilities.** Use [GitHub's private vulnerability reporting](https://github.com/komi-store/komi-store/security/advisories/new) or the contact in [`SECURITY.md`](SECURITY.md).
 
 We treat token leaks, install-flow exploits, and signing-bypass paths as critical. Other issues we'll triage on a best-effort basis.
 
