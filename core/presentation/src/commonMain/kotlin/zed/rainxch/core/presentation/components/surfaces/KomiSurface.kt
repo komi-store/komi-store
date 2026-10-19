@@ -172,7 +172,7 @@ private fun MangaSurface(
                 ).combinedClickable(
                     interactionSource = interaction,
                     indication = null,
-                    onClick = onClick,
+                    onClick = onClick ?: {},
                     onLongClick = onLongClick,
                 )
         } else if (elev.shadow > 0.dp) {
