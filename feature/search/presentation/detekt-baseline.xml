@@ -8,7 +8,7 @@
     <ID>ComplexCondition:SearchRoot.kt$state.repositories.isNotEmpty() &amp;&amp; state.visibleRepos.isEmpty() &amp;&amp; state.isHideSeenEnabled &amp;&amp; !state.hasMorePages</ID>
     <ID>ComplexCondition:SearchRoot.kt$state.repositories.isNotEmpty() &amp;&amp; state.visibleRepos.isEmpty() &amp;&amp; state.isHideSeenEnabled &amp;&amp; state.hasMorePages</ID>
     <ID>ComplexCondition:SearchRoot.kt$state.repositories.isNotEmpty() &amp;&amp; state.visibleRepos.isEmpty() &amp;&amp; state.isHideSeenEnabled &amp;&amp; state.hasMorePages &amp;&amp; !state.isLoadingMore &amp;&amp; !state.isLoading</ID>
-    <ID>ComplexCondition:SearchRoot.kt$totalItems == 0 || state.isLoadingMore || state.isLoading || !state.hasMorePages</ID>
+    <ID>ComplexCondition:SearchRoot.kt$totalItems == 0 || currentState.isLoadingMore || currentState.isLoading || !currentState.hasMorePages</ID>
     <ID>CyclomaticComplexMethod:ProgrammingLanguageMapper.kt$fun ProgrammingLanguageUi.label(): StringResource</ID>
     <ID>CyclomaticComplexMethod:ProgrammingLanguageMappers.kt$fun ProgrammingLanguageUi.toDomain(): ProgrammingLanguage</ID>
     <ID>CyclomaticComplexMethod:SearchRoot.kt$@Composable fun SearchScreen( state: SearchState, toastState: KomiToastState, onAction: (SearchAction) -&gt; Unit, )</ID>

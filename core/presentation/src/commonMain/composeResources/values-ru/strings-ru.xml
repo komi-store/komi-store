@@ -785,7 +785,6 @@
     <string name="feedback_send_via_github">Открыть как Issue на GitHub</string>
     <string name="feedback_send_success_email">Спасибо — открываем почтовый клиент.</string>
     <string name="feedback_send_success_github">Спасибо — открываем браузер.</string>
-    <string name="feedback_send_error">Не удалось открыть канал обратной связи: %1$s</string>
 
     <!-- ═══════════════════════════════════════════════════════════════
          E5 — Mirror feature
@@ -817,7 +816,6 @@
     <string name="mirror_test_http_error">Зеркало вернуло %1$d</string>
     <string name="mirror_test_timeout">Превышено время ожидания (5s)</string>
     <string name="mirror_test_dns_fail">Не удалось разрешить имя хоста</string>
-    <string name="mirror_test_other">Ошибка: %1$s</string>
     <string name="mirror_deploy_your_own_hint">Все зеркала недоступны? За 5 минут можно развернуть своё — смотри документацию.</string>
     <string name="mirror_removed_toast">%1$s больше недоступно, выполнен переход на прямой доступ через GitHub.</string>
 
@@ -1107,7 +1105,6 @@
     <string name="host_tokens_undo_action">Отменить</string>
     <string name="host_tokens_undo_failed">Не удалось восстановить токен для %1$s</string>
     <string name="host_tokens_undo_snackbar">Токен для %1$s удалён</string>
-    <string name="host_tokens_validation_failed">Проверка не пройдена: %1$s</string>
     <string name="host_tokens_validation_failed_fallback">неизвестная ошибка</string>
     <string name="host_tokens_validation_host_invalid">Неверный хост</string>
     <string name="host_tokens_validation_host_required">Требуется хост</string>

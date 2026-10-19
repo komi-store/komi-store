@@ -53,7 +53,7 @@ import zed.rainxch.tweaks.presentation.feedback.model.FeedbackChannel
 fun FeedbackBottomSheet(
     onDismiss: () -> Unit,
     onSent: (FeedbackChannel) -> Unit,
-    onError: (String) -> Unit,
+    onError: () -> Unit,
     viewModel: FeedbackViewModel = koinViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -61,7 +61,7 @@ fun FeedbackBottomSheet(
     ObserveAsEvents(viewModel.events) { event ->
         when (event) {
             is FeedbackEvent.OnSent -> onSent(event.channel)
-            is FeedbackEvent.OnSendError -> onError(event.message)
+            FeedbackEvent.OnSendError -> onError()
         }
     }
 

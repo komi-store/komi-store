@@ -13,7 +13,5 @@ sealed interface TestResult {
 
     data object DnsFailure : TestResult
 
-    data class Other(
-        val message: String,
-    ) : TestResult
+    data object Other : TestResult
 }

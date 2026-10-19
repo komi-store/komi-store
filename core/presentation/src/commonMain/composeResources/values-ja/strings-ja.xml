@@ -759,7 +759,6 @@
     <string name="feedback_send_via_github">GitHub Issue として開く</string>
     <string name="feedback_send_success_email">ありがとうございます — メールクライアントを開いています。</string>
     <string name="feedback_send_success_github">ありがとうございます — ブラウザを開いています。</string>
-    <string name="feedback_send_error">フィードバックチャンネルを開けませんでした: %1$s</string>
 
     <!-- ═══════════════════════════════════════════════════════════════
          E5 — Mirror feature
@@ -791,7 +790,6 @@
     <string name="mirror_test_http_error">ミラーが %1$d を返しました</string>
     <string name="mirror_test_timeout">5s 後にタイムアウト</string>
     <string name="mirror_test_dns_fail">ホストを解決できませんでした</string>
-    <string name="mirror_test_other">失敗: %1$s</string>
     <string name="mirror_deploy_your_own_hint">すべてのミラーが使えない場合は、5 分で自前のミラーをホストできます — ドキュメントをご覧ください。</string>
     <string name="mirror_removed_toast">%1$s は利用できなくなりました。GitHub 直接に切り替えました。</string>
 
@@ -1074,7 +1072,6 @@
     <string name="host_tokens_undo_action">元に戻す</string>
     <string name="host_tokens_undo_failed">%1$s のトークンを復元できませんでした</string>
     <string name="host_tokens_undo_snackbar">%1$s のトークンを削除しました</string>
-    <string name="host_tokens_validation_failed">検証に失敗しました: %1$s</string>
     <string name="host_tokens_validation_failed_fallback">不明なエラー</string>
     <string name="host_tokens_validation_host_invalid">ホストが無効です</string>
     <string name="host_tokens_validation_host_required">ホストは必須です</string>

@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import io.ktor.client.HttpClient
 import io.ktor.client.request.get
 import io.ktor.util.network.UnresolvedAddressException
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -13,14 +14,13 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
-import org.jetbrains.compose.resources.getString
 import zed.rainxch.core.data.network.MirrorRewriter
+import zed.rainxch.core.domain.logging.KomiStoreLogger
 import zed.rainxch.core.domain.model.mirror.MirrorConfig
 import zed.rainxch.core.domain.model.mirror.MirrorPreference
 import zed.rainxch.core.domain.model.mirror.fastestReleaseMirror
 import zed.rainxch.core.domain.repository.MirrorRepository
 import zed.rainxch.githubstore.core.presentation.res.Res
-import zed.rainxch.githubstore.core.presentation.res.error_unknown
 import zed.rainxch.githubstore.core.presentation.res.mirror_custom_validation_https
 import zed.rainxch.githubstore.core.presentation.res.mirror_custom_validation_template
 import kotlin.time.Duration.Companion.milliseconds
@@ -29,6 +29,7 @@ import kotlin.time.TimeSource
 class MirrorPickerViewModel(
     private val mirrorRepository: MirrorRepository,
     private val testHttpClient: HttpClient,
+    private val logger: KomiStoreLogger,
 ) : ViewModel() {
     private val _state = MutableStateFlow(MirrorPickerState())
     val state = _state.asStateFlow()
@@ -181,6 +182,7 @@ class MirrorPickerViewModel(
         }
     }
 
+    @Suppress("TooGenericExceptionCaught")
     private fun runTest() {
         viewModelScope.launch {
             _state.update { it.copy(isTesting = true, testResult = null) }
@@ -202,41 +204,27 @@ class MirrorPickerViewModel(
                 }
             val targetUrl = MirrorRewriter.probeUrl(template)
 
-            val result =
+            val testResult: TestResult =
                 withTimeoutOrNull(5_000L.milliseconds) {
-                    runCatching {
+                    try {
                         val mark = TimeSource.Monotonic.markNow()
                         val response = testHttpClient.get(targetUrl)
                         val elapsedMs = mark.elapsedNow().inWholeMilliseconds
-                        response.status.value to elapsedMs
-                    }
-                }
-
-            val testResult: TestResult =
-                when {
-                    result == null -> {
-                        TestResult.Timeout
-                    }
-
-                    result.isSuccess -> {
-                        val (status, ms) = result.getOrThrow()
+                        val status = response.status.value
                         if (status in 200..299) {
-                            TestResult.Success(ms)
+                            TestResult.Success(elapsedMs)
                         } else {
                             TestResult.HttpError(status)
                         }
-                    }
-
-                    result.exceptionOrNull() is UnresolvedAddressException -> {
+                    } catch (e: CancellationException) {
+                        throw e
+                    } catch (_: UnresolvedAddressException) {
                         TestResult.DnsFailure
+                    } catch (e: Exception) {
+                        logger.error("MirrorPickerViewModel: mirror test failed for $targetUrl", e)
+                        TestResult.Other
                     }
-
-                    else -> {
-                        TestResult.Other(
-                            result.exceptionOrNull()?.message ?: getString(Res.string.error_unknown),
-                        )
-                    }
-                }
+                } ?: TestResult.Timeout
 
             _state.update { it.copy(isTesting = false, testResult = testResult) }
         }

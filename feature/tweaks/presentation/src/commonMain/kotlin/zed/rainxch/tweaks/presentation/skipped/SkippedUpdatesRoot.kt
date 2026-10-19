@@ -67,7 +67,7 @@ fun SkippedUpdatesRoot(
                     toastState.info(getString(Res.string.skipped_updates_unskipped_snackbar, event.appName))
                 }
 
-            is SkippedUpdatesEvent.Failure ->
+            SkippedUpdatesEvent.Failure ->
                 coroutineScope.launch {
                     toastState.danger(getString(Res.string.skipped_updates_unskip_failure))
                 }

@@ -810,7 +810,6 @@
     <string name="feedback_send_via_github">فتح كمشكلة GitHub</string>
     <string name="feedback_send_success_email">شكراً — جارٍ فتح عميل البريد.</string>
     <string name="feedback_send_success_github">شكراً — جارٍ فتح المتصفح.</string>
-    <string name="feedback_send_error">تعذّر فتح قناة الملاحظات: %1$s</string>
 
     <!-- Tweaks - Custom forges -->
     <string name="custom_forges_entry_label">منصّات مخصّصة</string>
@@ -839,7 +838,6 @@
     <string name="mirror_test_http_error">أرجعت المرآة %1$d</string>
     <string name="mirror_test_timeout">انتهت المهلة بعد 5 ثوانٍ</string>
     <string name="mirror_test_dns_fail">تعذّر حل اسم المضيف</string>
-    <string name="mirror_test_other">فشل: %1$s</string>
     <string name="mirror_deploy_your_own_hint">كل المرايا معطّلة؟ يمكنك استضافة مرآتك الخاصة في 5 دقائق — راجع الوثائق.</string>
     <string name="mirror_removed_toast">%1$s لم يعد متاحاً، تم التبديل إلى GitHub المباشر.</string>
 
@@ -1133,7 +1131,6 @@
     <string name="host_tokens_undo_action">تراجع</string>
     <string name="host_tokens_undo_failed">تعذّر استعادة الرمز لـ %1$s</string>
     <string name="host_tokens_undo_snackbar">تمت إزالة الرمز لـ %1$s</string>
-    <string name="host_tokens_validation_failed">فشل التحقق: %1$s</string>
     <string name="host_tokens_validation_failed_fallback">خطأ غير معروف</string>
     <string name="host_tokens_validation_host_invalid">المضيف غير صالح</string>
     <string name="host_tokens_validation_host_required">المضيف مطلوب</string>

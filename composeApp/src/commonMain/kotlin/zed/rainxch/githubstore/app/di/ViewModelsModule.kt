@@ -181,6 +181,7 @@ val viewModelsModule =
             MirrorPickerViewModel(
                 mirrorRepository = get(),
                 testHttpClient = get(qualifier = named("test")),
+                logger = get(),
             )
         }
     }
