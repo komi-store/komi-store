@@ -16,6 +16,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import zed.rainxch.core.presentation.components.icon.KomiIcon
+import zed.rainxch.core.presentation.components.overlays.KomiTooltip
 import zed.rainxch.core.presentation.locals.LocalPersonality
 
 @Composable
@@ -39,21 +40,23 @@ fun KomiSoftIconButton(
             Modifier.border(1.dp, colors.outlineVariant.copy(alpha = alpha), shape)
         }
 
-    Box(
-        modifier =
-            modifier
-                .minimumInteractiveComponentSize()
-                .size(size)
-                .clip(shape)
-                .then(surface)
-                .clickable(enabled = enabled, role = Role.Button, onClick = onClick),
-        contentAlignment = Alignment.Center,
-    ) {
-        KomiIcon(
-            imageVector = icon,
-            contentDescription = contentDescription,
-            tint = tint.copy(alpha = alpha),
-            modifier = Modifier.size(size * 0.5f),
-        )
+    KomiTooltip(text = contentDescription, modifier = modifier) {
+        Box(
+            modifier =
+                Modifier
+                    .minimumInteractiveComponentSize()
+                    .size(size)
+                    .clip(shape)
+                    .then(surface)
+                    .clickable(enabled = enabled, role = Role.Button, onClick = onClick),
+            contentAlignment = Alignment.Center,
+        ) {
+            KomiIcon(
+                imageVector = icon,
+                contentDescription = contentDescription,
+                tint = tint.copy(alpha = alpha),
+                modifier = Modifier.size(size * 0.5f),
+            )
+        }
     }
 }

@@ -29,7 +29,6 @@
 1 feature/details/presentation/src/commonMain/kotlin/zed/rainxch/details/presentation/about/AboutRoot.kt
 9 feature/details/presentation/src/commonMain/kotlin/zed/rainxch/details/presentation/components/ApkInspectSheet.kt
 3 feature/details/presentation/src/commonMain/kotlin/zed/rainxch/details/presentation/components/AppHeader.kt
-1 feature/details/presentation/src/commonMain/kotlin/zed/rainxch/details/presentation/components/InspectApkButton.kt
 4 feature/details/presentation/src/commonMain/kotlin/zed/rainxch/details/presentation/components/LanguagePicker.kt
 1 feature/details/presentation/src/commonMain/kotlin/zed/rainxch/details/presentation/components/LinkedRepoBanner.kt
 1 feature/details/presentation/src/commonMain/kotlin/zed/rainxch/details/presentation/components/PlatformHandoffSheet.kt
@@ -42,7 +41,6 @@
 1 feature/details/presentation/src/commonMain/kotlin/zed/rainxch/details/presentation/components/sections/About.kt
 3 feature/details/presentation/src/commonMain/kotlin/zed/rainxch/details/presentation/components/sections/Header.kt
 1 feature/details/presentation/src/commonMain/kotlin/zed/rainxch/details/presentation/components/sections/Logs.kt
-1 feature/details/presentation/src/commonMain/kotlin/zed/rainxch/details/presentation/components/sections/ReleaseChannel.kt
 1 feature/details/presentation/src/commonMain/kotlin/zed/rainxch/details/presentation/components/sections/ReportIssue.kt
 1 feature/details/presentation/src/commonMain/kotlin/zed/rainxch/details/presentation/components/sections/Stats.kt
 3 feature/details/presentation/src/commonMain/kotlin/zed/rainxch/details/presentation/components/sections/WhatsNew.kt

@@ -18,13 +18,12 @@
 4 feature/auth/presentation/src/commonMain/kotlin/zed/rainxch/auth/presentation/AuthenticationRoot.kt
 4 feature/details/presentation/src/commonMain/kotlin/zed/rainxch/details/presentation/components/ApkInspectSheet.kt
 11 feature/details/presentation/src/commonMain/kotlin/zed/rainxch/details/presentation/components/AppHeader.kt
-1 feature/details/presentation/src/commonMain/kotlin/zed/rainxch/details/presentation/components/InspectApkButton.kt
 2 feature/details/presentation/src/commonMain/kotlin/zed/rainxch/details/presentation/components/LanguagePicker.kt
 2 feature/details/presentation/src/commonMain/kotlin/zed/rainxch/details/presentation/components/ReleaseAssetsPicker.kt
 8 feature/details/presentation/src/commonMain/kotlin/zed/rainxch/details/presentation/components/SmartInstallButton.kt
 2 feature/details/presentation/src/commonMain/kotlin/zed/rainxch/details/presentation/components/TranslationCard.kt
 1 feature/details/presentation/src/commonMain/kotlin/zed/rainxch/details/presentation/components/VersionPicker.kt
-2 feature/details/presentation/src/commonMain/kotlin/zed/rainxch/details/presentation/components/sections/ReleaseChannel.kt
+1 feature/details/presentation/src/commonMain/kotlin/zed/rainxch/details/presentation/components/sections/ReleaseChannel.kt
 4 feature/details/presentation/src/commonMain/kotlin/zed/rainxch/details/presentation/components/sections/WhatsNew.kt
 2 feature/details/presentation/src/commonMain/kotlin/zed/rainxch/details/presentation/components/states/ErrorState.kt
 1 feature/dev-profile/presentation/src/commonMain/kotlin/zed/rainxch/devprofile/presentation/DeveloperProfileRoot.kt

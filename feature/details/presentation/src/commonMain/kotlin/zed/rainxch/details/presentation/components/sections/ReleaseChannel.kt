@@ -8,7 +8,6 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
@@ -17,7 +16,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -35,16 +33,11 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Popup
-import androidx.compose.ui.window.PopupProperties
 import org.jetbrains.compose.resources.stringResource
-import zed.rainxch.core.presentation.components.buttons.KomiButton
-import zed.rainxch.core.presentation.components.buttons.KomiButtonSize
-import zed.rainxch.core.presentation.components.buttons.KomiButtonVariant
 import zed.rainxch.core.presentation.components.icon.KomiIcon
+import zed.rainxch.core.presentation.components.overlays.KomiCoachmark
 import zed.rainxch.core.presentation.components.text.KomiText
 import zed.rainxch.core.presentation.components.text.KomiTextRole
 import zed.rainxch.core.presentation.locals.LocalPersonality
@@ -96,7 +89,12 @@ fun LazyListScope.releaseChannel(
                                 stringResource(Res.string.channel_chip_stable_only)
                             }
                         val pulse by rememberChipPulse(active = state.isChannelChipCoachmarkPending)
-                        Box(
+                        KomiCoachmark(
+                            visible = state.isChannelChipCoachmarkPending,
+                            title = stringResource(Res.string.channel_chip_coachmark_title),
+                            text = stringResource(Res.string.channel_chip_coachmark_body),
+                            dismissLabel = stringResource(Res.string.channel_chip_coachmark_dismiss),
+                            onDismiss = { onAction(DetailsAction.OnAcknowledgeChannelChipCoachmark) },
                             modifier =
                                 Modifier.graphicsLayer {
                                     scaleX = pulse
@@ -115,13 +113,6 @@ fun LazyListScope.releaseChannel(
                                 onClick = { onAction(DetailsAction.ToggleIncludeBetas) },
                                 contentDescriptionText = channelLabel,
                             )
-                            if (state.isChannelChipCoachmarkPending) {
-                                ChannelChipCoachmark(
-                                    onDismiss = {
-                                        onAction(DetailsAction.OnAcknowledgeChannelChipCoachmark)
-                                    },
-                                )
-                            }
                         }
                     }
 
@@ -248,67 +239,3 @@ private fun rememberChipPulse(active: Boolean) =
                 ),
             label = "channel-chip-pulse-scale",
         )
-
-@Composable
-private fun ChannelChipCoachmark(onDismiss: () -> Unit) {
-    val colors = LocalPersonality.current.colors
-    Popup(
-        alignment = Alignment.TopStart,
-        offset =
-            androidx.compose.ui.unit
-                .IntOffset(x = 0, y = -220),
-        properties =
-            PopupProperties(
-                focusable = false,
-                dismissOnBackPress = true,
-                dismissOnClickOutside = false,
-            ),
-        onDismissRequest = onDismiss,
-    ) {
-        Column(
-            modifier =
-                Modifier
-                    .width(280.dp)
-                    .clip(RoundedCornerShape(LocalPersonality.current.shape.corner))
-                    .background(colors.primary)
-                    .padding(horizontal = 16.dp, vertical = 14.dp),
-            verticalArrangement = Arrangement.spacedBy(6.dp),
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(6.dp),
-            ) {
-                KomiIcon(
-                    imageVector = Icons.Default.Science,
-                    contentDescription = null,
-                    tint = colors.onPrimary,
-                    modifier = Modifier.size(16.dp),
-                )
-                KomiText(
-                    text = stringResource(Res.string.channel_chip_coachmark_title),
-                    role = KomiTextRole.LegacyTitle,
-                    color = colors.onPrimary,
-                    fontWeight = FontWeight.Bold,
-                    uppercase = false,
-                )
-            }
-            KomiText(
-                text = stringResource(Res.string.channel_chip_coachmark_body),
-                role = KomiTextRole.LegacyBody,
-                fontSize = 13.sp,
-                color = colors.onPrimary.copy(alpha = 0.9f),
-            )
-            Row(
-                modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
-                horizontalArrangement = Arrangement.End,
-            ) {
-                KomiButton(
-                    onClick = onDismiss,
-                    label = stringResource(Res.string.channel_chip_coachmark_dismiss),
-                    variant = KomiButtonVariant.Text,
-                    size = KomiButtonSize.Sm,
-                )
-            }
-        }
-    }
-}

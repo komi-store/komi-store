@@ -38,6 +38,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import zed.rainxch.core.presentation.components.overlays.KomiTooltip
 import zed.rainxch.core.presentation.locals.LocalPersonality
 import zed.rainxch.core.presentation.personality.ClassicPersonality
 import zed.rainxch.core.presentation.personality.MangaPersonality
@@ -63,30 +64,30 @@ fun KomiIconButton(
     size: KomiIconButtonSize = KomiIconButtonSize.Md,
     enabled: Boolean = true,
 ) {
-    when (val personality = LocalPersonality.current) {
-        is MangaPersonality -> {
-            MangaIconButton(
-                personality = personality,
-                icon = icon,
-                contentDescription = contentDescription,
-                onClick = onClick,
-                modifier = modifier,
-                variant = variant,
-                size = size,
-                enabled = enabled,
-            )
-        }
+    KomiTooltip(text = contentDescription, modifier = modifier) {
+        when (val personality = LocalPersonality.current) {
+            is MangaPersonality -> {
+                MangaIconButton(
+                    personality = personality,
+                    icon = icon,
+                    contentDescription = contentDescription,
+                    onClick = onClick,
+                    variant = variant,
+                    size = size,
+                    enabled = enabled,
+                )
+            }
 
-        is ClassicPersonality -> {
-            ClassicIconButton(
-                icon = icon,
-                contentDescription = contentDescription,
-                onClick = onClick,
-                modifier = modifier,
-                variant = variant,
-                size = size,
-                enabled = enabled,
-            )
+            is ClassicPersonality -> {
+                ClassicIconButton(
+                    icon = icon,
+                    contentDescription = contentDescription,
+                    onClick = onClick,
+                    variant = variant,
+                    size = size,
+                    enabled = enabled,
+                )
+            }
         }
     }
 }
