@@ -15,19 +15,6 @@ feature/apps/
     └── starred/     # StarredPickerRoot/ViewModel: APK-shipping subset of user's GitHub stars
 ```
 
-## Key interface
-
-```kotlin
-interface AppsRepository {
-    suspend fun getApps(): Flow<List<InstalledApp>>
-    suspend fun openApp(installedApp: InstalledApp, onCantLaunchApp: () -> Unit = {})
-    suspend fun getLatestRelease(owner, repo, includePreReleases = false, sourceHost: String? = null): GithubRelease?
-    suspend fun fetchRepoInfo(owner, repo, sourceHost: String? = null): GithubRepoInfo?
-    suspend fun linkAppToRepo(..., sourceHost: String? = null)
-    /* getDeviceApps / getTrackedPackageNames / exportApps / exportObtainium / importApps */
-}
-```
-
 ## Navigation
 
 `GithubStoreGraph.AppsScreen`, `ExternalImportScreen`, `StarredPickerScreen`.
