@@ -204,7 +204,7 @@ private fun ChipCountPill(
     color: Color,
     colors: PersonalityColors,
 ) {
-    val pillBg = if (selected) Color.White.copy(alpha = 0.22f) else colors.surfaceVariant
+    val pillBg = if (selected) colors.onPrimaryTint else colors.surfaceVariant
     KomiText(
         text = count.toString(),
         role = KomiTextRole.Mono,

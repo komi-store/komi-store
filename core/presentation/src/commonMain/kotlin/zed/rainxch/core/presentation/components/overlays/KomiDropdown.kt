@@ -144,7 +144,7 @@ private fun MenuEntries(
             KomiMenuDivider -> {
                 HorizontalDivider(
                     thickness = if (isManga) 2.dp else 1.dp,
-                    color = if (isManga) colors.outline.copy(alpha = 0.3f) else colors.outlineVariant,
+                    color = colors.divider,
                 )
             }
 
@@ -176,7 +176,7 @@ private fun KomiMenuRow(
     val pressed by interaction.collectIsPressedAsState()
     val focused by interaction.collectIsFocusedAsState()
     val wash =
-        if (isManga && item.enabled && (hovered || pressed)) colors.onSurface.copy(alpha = 0.10f) else Color.Transparent
+        if (isManga && item.enabled && (hovered || pressed)) colors.pressOverlay else Color.Transparent
 
     Row(
         modifier =

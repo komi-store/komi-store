@@ -69,6 +69,7 @@ internal fun ColorScheme.toClassicColors(): PersonalityColors =
         surfaceContainerHigh = surfaceContainerHigh,
         outline = outline,
         outlineVariant = outlineVariant,
+        divider = outlineVariant,
         error = error,
         onError = onError,
         shadow = Color.Black,

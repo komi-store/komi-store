@@ -35,7 +35,7 @@ fun KomiSoftIconButton(
     val tint = if (accent) colors.primary else colors.onSurfaceVariant
     val surface =
         if (accent) {
-            Modifier.background(colors.primary.copy(alpha = 0.12f * alpha), shape)
+            Modifier.background(if (enabled) colors.primaryTint else colors.disabledContainer, shape)
         } else {
             Modifier.border(1.dp, colors.outlineVariant.copy(alpha = alpha), shape)
         }

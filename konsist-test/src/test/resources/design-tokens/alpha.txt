@@ -1,13 +1,5 @@
 3 composeApp/src/commonMain/kotlin/zed/rainxch/githubstore/app/navigation/DesktopSidebar.kt
-2 core/presentation/src/commonMain/kotlin/zed/rainxch/core/presentation/components/adaptive/AdaptiveListDetail.kt
-1 core/presentation/src/commonMain/kotlin/zed/rainxch/core/presentation/components/buttons/KomiSoftIconButton.kt
-2 core/presentation/src/commonMain/kotlin/zed/rainxch/core/presentation/components/cards/KomiRepoCard.kt
-1 core/presentation/src/commonMain/kotlin/zed/rainxch/core/presentation/components/chips/KomiChip.kt
-2 core/presentation/src/commonMain/kotlin/zed/rainxch/core/presentation/components/dividers/KomiDivider.kt
-1 core/presentation/src/commonMain/kotlin/zed/rainxch/core/presentation/components/lists/KomiList.kt
-2 core/presentation/src/commonMain/kotlin/zed/rainxch/core/presentation/components/markdown/MarkdownUtils.kt
-2 core/presentation/src/commonMain/kotlin/zed/rainxch/core/presentation/components/overlays/KomiDropdown.kt
-1 core/presentation/src/commonMain/kotlin/zed/rainxch/core/presentation/components/overlays/KomiSheet.kt
+1 core/presentation/src/commonMain/kotlin/zed/rainxch/core/presentation/components/cards/KomiRepoCard.kt
 3 feature/apps/presentation/src/commonMain/kotlin/zed/rainxch/apps/presentation/components/AdvancedAppSettingsBottomSheet.kt
 2 feature/apps/presentation/src/commonMain/kotlin/zed/rainxch/apps/presentation/components/AppsTopbar.kt
 1 feature/apps/presentation/src/commonMain/kotlin/zed/rainxch/apps/presentation/components/CompactAppRow.kt

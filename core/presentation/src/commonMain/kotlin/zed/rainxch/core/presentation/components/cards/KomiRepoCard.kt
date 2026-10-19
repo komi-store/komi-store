@@ -220,7 +220,7 @@ fun KomiRepoCard(
             HorizontalDivider(
                 modifier = Modifier.padding(top = if (compact) 9.dp else 12.dp),
                 thickness = 2.dp,
-                color = colors.outline.copy(alpha = 0.3f),
+                color = colors.divider,
             )
             Row(
                 modifier = Modifier.fillMaxWidth().padding(top = if (compact) 9.dp else 11.dp),

@@ -176,7 +176,7 @@ private fun MangaBottomSheet(
         shape = RectangleShape,
         containerColor = colors.background,
         contentColor = colors.onSurface,
-        scrimColor = colors.scrim.copy(alpha = 0.5f),
+        scrimColor = colors.scrimOverlay,
         dragHandle = null,
     ) {
         Column(Modifier.fillMaxWidth()) {

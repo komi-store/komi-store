@@ -150,7 +150,7 @@ fun KomiListRow(
             else -> colors.onSurface
         }
     val subtitleColor =
-        if (selected && !isManga) colors.onPrimaryContainer.copy(alpha = 0.8f) else colors.onSurfaceVariant
+        if (selected && !isManga) colors.onPrimaryContainer else colors.onSurfaceVariant
     val clickModifier =
         when {
             onClick == null && onLongClick == null -> {

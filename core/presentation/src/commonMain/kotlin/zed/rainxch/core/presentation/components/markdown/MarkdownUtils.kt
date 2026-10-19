@@ -17,8 +17,8 @@ fun rememberMarkdownColors(): MarkdownColors {
 
     return DefaultMarkdownColors(
         text = colorScheme.onBackground,
-        codeBackground = colorScheme.surfaceVariant.copy(alpha = 0.5f),
-        inlineCodeBackground = colorScheme.surfaceVariant.copy(alpha = 0.5f),
+        codeBackground = colorScheme.surfaceContainerHigh,
+        inlineCodeBackground = colorScheme.surfaceContainerHigh,
         dividerColor = colorScheme.outlineVariant,
         tableBackground = colorScheme.surface,
     )
