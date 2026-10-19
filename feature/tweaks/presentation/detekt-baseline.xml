@@ -65,7 +65,8 @@
     <ID>MaxLineLength:Translation.kt$onClick = { runCatching { uriHandler.openUri("https://portal.azure.com/#create/Microsoft.CognitiveServicesTextTranslation") } }</ID>
     <ID>MaxLineLength:TweaksSections.kt$if (showHead) SettingsSectionHead(stringResource(Res.string.section_installs_and_updates), TweaksDecorSlot.InstallsUpdates)</ID>
     <ID>MaxLineLength:TweaksViewModel.kt$TweaksViewModel$(attribution as? zed.rainxch.core.domain.model.installation.InstallerAttribution.Custom)?.packageName</ID>
-    <ID>NestedBlockDepth:FeedbackComposer.kt$FeedbackComposer$fun composeBody(state: FeedbackState, channel: FeedbackChannel): String</ID>
+    <ID>MaxLineLength:TweaksViewModel.kt$TweaksViewModel$private</ID>
+    <ID>NestedBlockDepth:FeedbackComposer.kt$FeedbackComposer$fun composeBody( state: FeedbackState, channel: FeedbackChannel, ): String</ID>
     <ID>ReturnCount:PasteProxyUrlSheet.kt$fun parseProxyUrl(raw: String): PastedProxy?</ID>
     <ID>ReturnCount:TweaksViewModel.kt$TweaksViewModel$fun onAction(action: TweaksAction)</ID>
     <ID>ReturnCount:TweaksViewModel.kt$TweaksViewModel$private fun buildMasterProxyConfig(): ProxyConfig?</ID>

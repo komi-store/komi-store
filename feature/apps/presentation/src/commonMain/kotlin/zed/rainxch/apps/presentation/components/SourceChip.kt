@@ -20,10 +20,11 @@ fun SourceChip(
 ) {
     val colors = LocalPersonality.current.colors
     val shape = LocalPersonality.current.shape
-    val label = when {
-        host.equals("codeberg.org", ignoreCase = true) -> "Codeberg"
-        else -> host
-    }
+    val label =
+        when {
+            host.equals("codeberg.org", ignoreCase = true) -> "Codeberg"
+            else -> host
+        }
     KomiText(
         text = label,
         role = KomiTextRole.Label,
@@ -31,9 +32,10 @@ fun SourceChip(
         fontWeight = FontWeight.SemiBold,
         uppercase = false,
         color = colors.onPrimaryContainer,
-        modifier = modifier
-            .clip(RoundedCornerShape(shape.cornerSmall))
-            .background(colors.primaryContainer)
-            .padding(horizontal = 6.dp, vertical = 2.dp),
+        modifier =
+            modifier
+                .clip(RoundedCornerShape(shape.cornerSmall))
+                .background(colors.primaryContainer)
+                .padding(horizontal = 6.dp, vertical = 2.dp),
     )
 }

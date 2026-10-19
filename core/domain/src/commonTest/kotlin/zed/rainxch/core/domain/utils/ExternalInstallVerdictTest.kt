@@ -1,9 +1,9 @@
 package zed.rainxch.core.domain.utils
 
-import kotlin.test.Test
-import kotlin.test.assertEquals
 import zed.rainxch.core.domain.model.installation.InstallSource
 import zed.rainxch.core.domain.model.installation.InstalledApp
+import kotlin.test.Test
+import kotlin.test.assertEquals
 
 class ExternalInstallVerdictTest {
     private fun app(

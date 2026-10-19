@@ -94,9 +94,7 @@ object UpdateScheduler {
                     BackoffPolicy.EXPONENTIAL,
                     15,
                     TimeUnit.MINUTES,
-                )
-
-                .build()
+                ).build()
 
         WorkManager
             .getInstance(context)

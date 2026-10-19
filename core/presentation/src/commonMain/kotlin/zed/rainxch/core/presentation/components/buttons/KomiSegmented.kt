@@ -33,11 +33,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.tooling.preview.Preview
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import zed.rainxch.core.presentation.components.text.KomiText
@@ -95,7 +95,7 @@ private fun <T> MangaSegmented(
     selected: T,
     items: ImmutableList<KomiSegmentedItem<T>>,
     onSelect: (T) -> Unit,
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
     size: KomiIconButtonSize,
 ) {
     val colors = personality.colors
@@ -173,7 +173,7 @@ private fun <T> ClassicSegmented(
     selected: T,
     items: ImmutableList<KomiSegmentedItem<T>>,
     onSelect: (T) -> Unit,
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
     size: KomiIconButtonSize,
 ) {
     val colors = LocalPersonality.current.colors
@@ -258,26 +258,34 @@ private fun SegmentContent(
     }
 }
 
-private fun segmentShape(index: Int, count: Int, active: Boolean): Shape {
+private fun segmentShape(
+    index: Int,
+    count: Int,
+    active: Boolean,
+): Shape {
     if (active || count == 1) return RoundedCornerShape(SegmentPill)
     return when (index) {
-        0 ->
+        0 -> {
             RoundedCornerShape(
                 topStart = SegmentPill,
                 bottomStart = SegmentPill,
                 topEnd = SegmentInnerCorner,
                 bottomEnd = SegmentInnerCorner,
             )
+        }
 
-        count - 1 ->
+        count - 1 -> {
             RoundedCornerShape(
                 topStart = SegmentInnerCorner,
                 bottomStart = SegmentInnerCorner,
                 topEnd = SegmentPill,
                 bottomEnd = SegmentPill,
             )
+        }
 
-        else -> RoundedCornerShape(SegmentInnerCorner)
+        else -> {
+            RoundedCornerShape(SegmentInnerCorner)
+        }
     }
 }
 

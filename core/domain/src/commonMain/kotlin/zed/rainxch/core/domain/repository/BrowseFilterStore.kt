@@ -9,5 +9,6 @@ interface BrowseFilterStore {
     val category: StateFlow<FeedCategory>
 
     fun setPlatform(platform: DiscoveryPlatform)
+
     fun setCategory(category: FeedCategory)
 }

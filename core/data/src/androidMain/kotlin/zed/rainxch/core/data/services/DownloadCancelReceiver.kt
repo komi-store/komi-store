@@ -12,12 +12,24 @@ import zed.rainxch.core.domain.system.DownloadOrchestrator
 import zed.rainxch.core.domain.system.DownloadProgressNotifier
 
 class DownloadCancelReceiver : BroadcastReceiver() {
-    override fun onReceive(context: Context, intent: Intent) {
+    override fun onReceive(
+        context: Context,
+        intent: Intent,
+    ) {
         val dispatch =
             when (intent.data?.scheme) {
-                URI_SCHEME_DISCARD -> Dispatch.DELETE
-                URI_SCHEME_PAUSE -> Dispatch.PAUSE
-                URI_SCHEME_RESUME -> Dispatch.RESUME
+                URI_SCHEME_DISCARD -> {
+                    Dispatch.DELETE
+                }
+
+                URI_SCHEME_PAUSE -> {
+                    Dispatch.PAUSE
+                }
+
+                URI_SCHEME_RESUME -> {
+                    Dispatch.RESUME
+                }
+
                 else -> {
                     Logger.w { "DownloadCancelReceiver: unknown data URI ${intent.data}, ignoring" }
                     return

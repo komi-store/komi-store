@@ -61,29 +61,54 @@ class MirrorPickerViewModel(
     fun onAction(action: MirrorPickerAction) {
         when (action) {
             MirrorPickerAction.OnNavigateBack -> {}
-            is MirrorPickerAction.OnSelectMirror -> selectMirror(action.mirror)
-            MirrorPickerAction.OnCustomMirrorClicked ->
+
+            is MirrorPickerAction.OnSelectMirror -> {
+                selectMirror(action.mirror)
+            }
+
+            MirrorPickerAction.OnCustomMirrorClicked -> {
                 _state.update {
                     it.copy(
                         isCustomDialogVisible = true,
                         customDraft = "",
-                        customDraftError = null
+                        customDraftError = null,
                     )
                 }
+            }
 
-            is MirrorPickerAction.OnCustomDraftChanged -> updateDraft(action.value)
-            MirrorPickerAction.OnCustomMirrorConfirm -> confirmCustom()
-            MirrorPickerAction.OnCustomMirrorDismiss ->
+            is MirrorPickerAction.OnCustomDraftChanged -> {
+                updateDraft(action.value)
+            }
+
+            MirrorPickerAction.OnCustomMirrorConfirm -> {
+                confirmCustom()
+            }
+
+            MirrorPickerAction.OnCustomMirrorDismiss -> {
                 _state.update { it.copy(isCustomDialogVisible = false) }
+            }
 
-            MirrorPickerAction.OnMeasureLatencies -> measureLatencies(force = true)
-            MirrorPickerAction.OnAutoPickFastest -> pickFastest()
-            MirrorPickerAction.OnTestConnection -> runTest()
-            MirrorPickerAction.OnRefreshCatalog -> refresh()
-            MirrorPickerAction.OnDeployYourOwnClicked ->
+            MirrorPickerAction.OnMeasureLatencies -> {
+                measureLatencies(force = true)
+            }
+
+            MirrorPickerAction.OnAutoPickFastest -> {
+                pickFastest()
+            }
+
+            MirrorPickerAction.OnTestConnection -> {
+                runTest()
+            }
+
+            MirrorPickerAction.OnRefreshCatalog -> {
+                refresh()
+            }
+
+            MirrorPickerAction.OnDeployYourOwnClicked -> {
                 viewModelScope.launch {
                     _events.send(MirrorPickerEvent.OpenUrl("https://github.com/hunshcn/gh-proxy"))
                 }
+            }
         }
     }
 
@@ -121,7 +146,7 @@ class MirrorPickerViewModel(
                 it.copy(
                     isCustomDialogVisible = false,
                     customDraft = "",
-                    customDraftError = null
+                    customDraftError = null,
                 )
             }
         }
@@ -151,7 +176,7 @@ class MirrorPickerViewModel(
                 MirrorPickerEvent.FastestMirrorChosen(
                     displayName = fastest.first.name,
                     latencyMs = fastest.second,
-                )
+                ),
             )
         }
     }
@@ -161,38 +186,57 @@ class MirrorPickerViewModel(
             _state.update { it.copy(isTesting = true, testResult = null) }
             val template =
                 when (val pref = state.value.preference) {
-                    MirrorPreference.Direct -> null
-                    is MirrorPreference.Custom -> pref.template
-                    is MirrorPreference.Selected ->
-                        state.value.mirrors.firstOrNull { it.id == pref.id }?.urlTemplate
+                    MirrorPreference.Direct -> {
+                        null
+                    }
+
+                    is MirrorPreference.Custom -> {
+                        pref.template
+                    }
+
+                    is MirrorPreference.Selected -> {
+                        state.value.mirrors
+                            .firstOrNull { it.id == pref.id }
+                            ?.urlTemplate
+                    }
                 }
             val targetUrl = MirrorRewriter.probeUrl(template)
 
-            val result = withTimeoutOrNull(5_000L.milliseconds) {
-                runCatching {
-                    val mark = TimeSource.Monotonic.markNow()
-                    val response = testHttpClient.get(targetUrl)
-                    val elapsedMs = mark.elapsedNow().inWholeMilliseconds
-                    response.status.value to elapsedMs
-                }
-            }
-
-            val testResult: TestResult = when {
-                result == null -> TestResult.Timeout
-
-                result.isSuccess -> {
-                    val (status, ms) = result.getOrThrow()
-                    if (status in 200..299) {
-                        TestResult.Success(ms)
-                    } else TestResult.HttpError(status)
+            val result =
+                withTimeoutOrNull(5_000L.milliseconds) {
+                    runCatching {
+                        val mark = TimeSource.Monotonic.markNow()
+                        val response = testHttpClient.get(targetUrl)
+                        val elapsedMs = mark.elapsedNow().inWholeMilliseconds
+                        response.status.value to elapsedMs
+                    }
                 }
 
-                result.exceptionOrNull() is UnresolvedAddressException -> TestResult.DnsFailure
+            val testResult: TestResult =
+                when {
+                    result == null -> {
+                        TestResult.Timeout
+                    }
 
-                else -> TestResult.Other(
-                    result.exceptionOrNull()?.message ?: getString(Res.string.error_unknown)
-                )
-            }
+                    result.isSuccess -> {
+                        val (status, ms) = result.getOrThrow()
+                        if (status in 200..299) {
+                            TestResult.Success(ms)
+                        } else {
+                            TestResult.HttpError(status)
+                        }
+                    }
+
+                    result.exceptionOrNull() is UnresolvedAddressException -> {
+                        TestResult.DnsFailure
+                    }
+
+                    else -> {
+                        TestResult.Other(
+                            result.exceptionOrNull()?.message ?: getString(Res.string.error_unknown),
+                        )
+                    }
+                }
 
             _state.update { it.copy(isTesting = false, testResult = testResult) }
         }

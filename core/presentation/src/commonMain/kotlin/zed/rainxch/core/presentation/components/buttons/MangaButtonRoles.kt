@@ -21,14 +21,19 @@ internal fun mangaButtonContent(
     ambient: Color,
 ): Color =
     when (variant) {
-        KomiButtonVariant.Primary ->
+        KomiButtonVariant.Primary -> {
             ensureContrast(colors.onPrimary, colors.primary, colors.onBackground, colors.background)
+        }
 
-        KomiButtonVariant.Destructive ->
+        KomiButtonVariant.Destructive -> {
             ensureContrast(colors.onError, colors.error, colors.onBackground, colors.background)
+        }
 
-        KomiButtonVariant.Tonal ->
+        KomiButtonVariant.Tonal -> {
             ensureContrast(colors.onSurface, colors.surfaceVariant, colors.onBackground, colors.background)
+        }
 
-        KomiButtonVariant.Outline, KomiButtonVariant.Text -> ambient
+        KomiButtonVariant.Outline, KomiButtonVariant.Text -> {
+            ambient
+        }
     }

@@ -12,7 +12,6 @@ data class SigningFingerprintSeedResponse(
         val fingerprint: String,
         val owner: String,
         val repo: String,
-
         val observedAt: Long,
     )
 }

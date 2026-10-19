@@ -22,7 +22,6 @@ class AndroidExternalAppScanner(
 
     override suspend fun isPermissionGranted(): Boolean =
         withContext(Dispatchers.IO) {
-
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) return@withContext true
             val pkgs = listInstalledPackages(includeMeta = false)
 
@@ -37,7 +36,6 @@ class AndroidExternalAppScanner(
                 if (granted) {
                     0
                 } else {
-
                     INVISIBLE_GUESS
                 }
             VisiblePackageEstimate(

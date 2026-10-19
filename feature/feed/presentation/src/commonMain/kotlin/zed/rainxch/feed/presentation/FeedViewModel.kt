@@ -24,6 +24,7 @@ import zed.rainxch.core.domain.model.installation.InstalledApp
 import zed.rainxch.core.domain.model.installation.hasActualUpdate
 import zed.rainxch.core.domain.model.installation.isReallyInstalled
 import zed.rainxch.core.domain.model.repository.DiscoveryPlatform
+import zed.rainxch.core.domain.model.repository.FeedCategory
 import zed.rainxch.core.domain.model.system.Platform
 import zed.rainxch.core.domain.repository.BrowseFilterStore
 import zed.rainxch.core.domain.repository.FavouritesRepository
@@ -33,7 +34,6 @@ import zed.rainxch.core.domain.repository.SeenReposRepository
 import zed.rainxch.core.domain.repository.StarredRepository
 import zed.rainxch.core.domain.repository.TweaksRepository
 import zed.rainxch.core.domain.repository.UserSessionRepository
-import zed.rainxch.core.domain.model.repository.FeedCategory
 import zed.rainxch.feed.domain.repository.FeedRepository
 import zed.rainxch.feed.presentation.model.toDiscoveryRepoUi
 import zed.rainxch.githubstore.core.presentation.res.Res
@@ -54,7 +54,6 @@ class FeedViewModel(
     private val logger: KomiStoreLogger,
     private val shareManager: ShareManager,
 ) : ViewModel() {
-
     private var hasLoadedInitialData = false
     private var loadJob: Job? = null
     private var pageJob: Job? = null
@@ -75,49 +74,57 @@ class FeedViewModel(
     private var currentUserLogin: String? = null
 
     private val _state = MutableStateFlow(FeedState(selectedPlatform = selectedPlatform))
-    val state: StateFlow<FeedState> = _state
-        .onStart {
-            if (!hasLoadedInitialData) {
-                selectedPlatform = browseFilterStore.platform.value
-                selectedCategory = browseFilterStore.category.value
-                _state.update {
-                    it.copy(selectedPlatform = selectedPlatform, selectedCategory = selectedCategory)
+    val state: StateFlow<FeedState> =
+        _state
+            .onStart {
+                if (!hasLoadedInitialData) {
+                    selectedPlatform = browseFilterStore.platform.value
+                    selectedCategory = browseFilterStore.category.value
+                    _state.update {
+                        it.copy(selectedPlatform = selectedPlatform, selectedCategory = selectedCategory)
+                    }
+                    observeCurrentUser()
+                    observeInstalledApps()
+                    observeFavourites()
+                    observeStarredRepos()
+                    observeSeenRepos()
+                    observeHiddenRepos()
+                    observeHideSeenEnabled()
+                    observeFeedLayout()
+                    observeBrowseFilter()
+                    reload(isRefresh = false)
+                    hasLoadedInitialData = true
                 }
-                observeCurrentUser()
-                observeInstalledApps()
-                observeFavourites()
-                observeStarredRepos()
-                observeSeenRepos()
-                observeHiddenRepos()
-                observeHideSeenEnabled()
-                observeFeedLayout()
-                observeBrowseFilter()
-                reload(isRefresh = false)
-                hasLoadedInitialData = true
-            }
-        }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5_000L),
-            initialValue = FeedState(selectedPlatform = selectedPlatform),
-        )
+            }.stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(5_000L),
+                initialValue = FeedState(selectedPlatform = selectedPlatform),
+            )
 
     private val _events = Channel<FeedEvent>(capacity = Channel.BUFFERED)
     val events = _events.receiveAsFlow()
 
     fun onAction(action: FeedAction) {
         when (action) {
-            FeedAction.OnRefresh -> reload(isRefresh = true)
+            FeedAction.OnRefresh -> {
+                reload(isRefresh = true)
+            }
 
-            FeedAction.OnRetry -> reload(isRefresh = false)
+            FeedAction.OnRetry -> {
+                reload(isRefresh = false)
+            }
 
-            FeedAction.OnLoadMore -> loadMore()
+            FeedAction.OnLoadMore -> {
+                loadMore()
+            }
 
-            FeedAction.OnPlatformPickerOpen ->
+            FeedAction.OnPlatformPickerOpen -> {
                 _state.update { it.copy(isPlatformPickerVisible = true) }
+            }
 
-            FeedAction.OnPlatformPickerDismiss ->
+            FeedAction.OnPlatformPickerDismiss -> {
                 _state.update { it.copy(isPlatformPickerVisible = false) }
+            }
 
             FeedAction.OnResetFilters -> {
                 browseFilterStore.setCategory(FeedCategory.All)
@@ -139,104 +146,122 @@ class FeedViewModel(
                 viewModelScope.launch { tweaksRepository.setRepoGridLayout(grid) }
             }
 
-            is FeedAction.OnShareClick -> viewModelScope.launch {
-                runCatching {
-                    shareManager.shareText("https://github-store.org/app?repo=${action.repo.fullName}")
-                }.onFailure { t ->
-                    logger.error("Failed to share link: ${t.message}")
-                    _events.send(FeedEvent.OnMessage(getString(Res.string.failed_to_share_link)))
-                    return@launch
-                }
-                if (isDesktop()) {
-                    _events.send(FeedEvent.OnMessage(getString(Res.string.link_copied_to_clipboard)))
-                }
-            }
-
-            is FeedAction.OnHideRepository -> viewModelScope.launch {
-                val repo = action.repo
-                try {
-                    hiddenReposRepository.hide(
-                        repoId = repo.id,
-                        repoName = repo.name,
-                        repoOwner = repo.owner.login,
-                        repoOwnerAvatarUrl = repo.owner.avatarUrl,
-                    )
-                } catch (e: CancellationException) {
-                    throw e
-                } catch (e: Throwable) {
-                    logger.warn("Hide repository failed for ${repo.id}: ${e.message}")
+            is FeedAction.OnShareClick -> {
+                viewModelScope.launch {
+                    runCatching {
+                        shareManager.shareText("https://github-store.org/app?repo=${action.repo.fullName}")
+                    }.onFailure { t ->
+                        logger.error("Failed to share link: ${t.message}")
+                        _events.send(FeedEvent.OnMessage(getString(Res.string.failed_to_share_link)))
+                        return@launch
+                    }
+                    if (isDesktop()) {
+                        _events.send(FeedEvent.OnMessage(getString(Res.string.link_copied_to_clipboard)))
+                    }
                 }
             }
 
-            is FeedAction.OnMarkAsSeen -> viewModelScope.launch {
-                val repo = action.repo
-                try {
-                    seenReposRepository.markAsSeen(
-                        repoId = repo.id,
-                        repoName = repo.name,
-                        repoOwner = repo.owner.login,
-                        repoOwnerAvatarUrl = repo.owner.avatarUrl,
-                        repoDescription = repo.description,
-                        primaryLanguage = repo.language,
-                        repoUrl = repo.htmlUrl,
-                    )
-                } catch (e: CancellationException) {
-                    throw e
-                } catch (e: Throwable) {
-                    logger.warn("Mark as seen failed for ${repo.id}: ${e.message}")
+            is FeedAction.OnHideRepository -> {
+                viewModelScope.launch {
+                    val repo = action.repo
+                    try {
+                        hiddenReposRepository.hide(
+                            repoId = repo.id,
+                            repoName = repo.name,
+                            repoOwner = repo.owner.login,
+                            repoOwnerAvatarUrl = repo.owner.avatarUrl,
+                        )
+                    } catch (e: CancellationException) {
+                        throw e
+                    } catch (e: Throwable) {
+                        logger.warn("Hide repository failed for ${repo.id}: ${e.message}")
+                    }
                 }
             }
 
-            is FeedAction.OnMarkAsUnseen -> viewModelScope.launch {
-                try {
-                    seenReposRepository.removeFromHistory(action.repoId)
-                } catch (e: CancellationException) {
-                    throw e
-                } catch (e: Throwable) {
-                    logger.warn("Mark as unseen failed for ${action.repoId}: ${e.message}")
+            is FeedAction.OnMarkAsSeen -> {
+                viewModelScope.launch {
+                    val repo = action.repo
+                    try {
+                        seenReposRepository.markAsSeen(
+                            repoId = repo.id,
+                            repoName = repo.name,
+                            repoOwner = repo.owner.login,
+                            repoOwnerAvatarUrl = repo.owner.avatarUrl,
+                            repoDescription = repo.description,
+                            primaryLanguage = repo.language,
+                            repoUrl = repo.htmlUrl,
+                        )
+                    } catch (e: CancellationException) {
+                        throw e
+                    } catch (e: Throwable) {
+                        logger.warn("Mark as seen failed for ${repo.id}: ${e.message}")
+                    }
+                }
+            }
+
+            is FeedAction.OnMarkAsUnseen -> {
+                viewModelScope.launch {
+                    try {
+                        seenReposRepository.removeFromHistory(action.repoId)
+                    } catch (e: CancellationException) {
+                        throw e
+                    } catch (e: Throwable) {
+                        logger.warn("Mark as unseen failed for ${action.repoId}: ${e.message}")
+                    }
                 }
             }
 
             FeedAction.OnSearchClick,
             FeedAction.OnProfileClick,
-            is FeedAction.OnRepoClick -> Unit
+            is FeedAction.OnRepoClick,
+            -> {
+                Unit
+            }
         }
     }
 
     private fun reload(isRefresh: Boolean) {
         loadJob?.cancel()
         pageJob?.cancel()
-        loadJob = viewModelScope.launch {
-            _state.update {
-                it.copy(
-                    isRefreshing = isRefresh,
-                    isLoading = !isRefresh && feedRepos.isEmpty(),
-                    errorMessage = null,
-                )
+        loadJob =
+            viewModelScope.launch {
+                _state.update {
+                    it.copy(
+                        isRefreshing = isRefresh,
+                        isLoading = !isRefresh && feedRepos.isEmpty(),
+                        errorMessage = null,
+                    )
+                }
+                loadPage(page = 1, replace = true, forceRefresh = isRefresh)
             }
-            loadPage(page = 1, replace = true, forceRefresh = isRefresh)
-        }
     }
 
     private fun loadMore() {
         if (!hasMore || _state.value.isLoadingMore || _state.value.isLoading) return
         pageJob?.cancel()
-        pageJob = viewModelScope.launch {
-            loadPage(page = nextPage, replace = false, forceRefresh = false)
-        }
+        pageJob =
+            viewModelScope.launch {
+                loadPage(page = nextPage, replace = false, forceRefresh = false)
+            }
     }
 
-    private suspend fun loadPage(page: Int, replace: Boolean, forceRefresh: Boolean) {
+    private suspend fun loadPage(
+        page: Int,
+        replace: Boolean,
+        forceRefresh: Boolean,
+    ) {
         if (!replace) _state.update { it.copy(isLoadingMore = true) }
 
         feedRepository.getFeed(selectedPlatform, page, forceRefresh).fold(
             onSuccess = { feedPage ->
-                feedRepos = if (replace) {
-                    feedPage.items
-                } else {
-                    val existing = feedRepos.mapTo(HashSet()) { it.id }
-                    feedRepos + feedPage.items.filter { it.id !in existing }
-                }
+                feedRepos =
+                    if (replace) {
+                        feedPage.items
+                    } else {
+                        val existing = feedRepos.mapTo(HashSet()) { it.id }
+                        feedRepos + feedPage.items.filter { it.id !in existing }
+                    }
                 nextPage = feedPage.page + 1
                 hasMore = feedPage.hasMore
                 isOffline = feedPage.isOffline
@@ -258,11 +283,12 @@ class FeedViewModel(
                         isLoading = false,
                         isRefreshing = false,
                         isLoadingMore = false,
-                        errorMessage = if (feedRepos.isEmpty()) {
-                            error.message ?: getString(Res.string.feed_failed_to_load)
-                        } else {
-                            it.errorMessage
-                        },
+                        errorMessage =
+                            if (feedRepos.isEmpty()) {
+                                error.message ?: getString(Res.string.feed_failed_to_load)
+                            } else {
+                                it.errorMessage
+                            },
                     )
                 }
             },
@@ -270,11 +296,12 @@ class FeedViewModel(
     }
 
     private fun rebuild() {
-        val visible = feedRepos
-            .filter { repo -> repo.id !in hiddenIds && (!isHideSeenEnabled || repo.id !in seenIds) }
-            .filter { repo -> selectedCategory.matches(repo.topicCodes) }
-            .map { it.toCard() }
-            .toImmutableList()
+        val visible =
+            feedRepos
+                .filter { repo -> repo.id !in hiddenIds && (!isHideSeenEnabled || repo.id !in seenIds) }
+                .filter { repo -> selectedCategory.matches(repo.topicCodes) }
+                .map { it.toCard() }
+                .toImmutableList()
 
         _state.update {
             it.copy(
@@ -292,8 +319,9 @@ class FeedViewModel(
             isFavourite = id in favouriteIds,
             isStarred = id in starredIds,
             isSeen = id in seenIds,
-            isCurrentUserOwner = currentUserLogin != null &&
-                owner.login.equals(currentUserLogin, ignoreCase = true),
+            isCurrentUserOwner =
+                currentUserLogin != null &&
+                    owner.login.equals(currentUserLogin, ignoreCase = true),
         )
 
     private fun observeBrowseFilter() {
@@ -319,12 +347,13 @@ class FeedViewModel(
         }
     }
 
-    private fun detectedPlatform(): DiscoveryPlatform = when (getPlatform()) {
-        Platform.ANDROID -> DiscoveryPlatform.Android
-        Platform.WINDOWS -> DiscoveryPlatform.Windows
-        Platform.MACOS -> DiscoveryPlatform.Macos
-        Platform.LINUX -> DiscoveryPlatform.Linux
-    }
+    private fun detectedPlatform(): DiscoveryPlatform =
+        when (getPlatform()) {
+            Platform.ANDROID -> DiscoveryPlatform.Android
+            Platform.WINDOWS -> DiscoveryPlatform.Windows
+            Platform.MACOS -> DiscoveryPlatform.Macos
+            Platform.LINUX -> DiscoveryPlatform.Linux
+        }
 
     private fun observeInstalledApps() {
         viewModelScope.launch {

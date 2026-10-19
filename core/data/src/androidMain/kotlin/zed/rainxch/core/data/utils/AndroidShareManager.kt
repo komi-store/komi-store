@@ -18,30 +18,33 @@ class AndroidShareManager(
     private var filePickerLauncher: ActivityResultLauncher<Intent>? = null
 
     fun registerActivityResultLauncher(activity: ComponentActivity) {
-        filePickerLauncher = activity.registerForActivityResult(
-            ActivityResultContracts.StartActivityForResult()
-        ) { result ->
-            val callback = filePickerCallback
-            filePickerCallback = null
+        filePickerLauncher =
+            activity.registerForActivityResult(
+                ActivityResultContracts.StartActivityForResult(),
+            ) { result ->
+                val callback = filePickerCallback
+                filePickerCallback = null
 
-            if (result.resultCode == Activity.RESULT_OK) {
-                val uri = result.data?.data
-                if (uri != null) {
-                    try {
-                        val content = context.contentResolver.openInputStream(uri)
-                            ?.bufferedReader()
-                            ?.use { it.readText() }
-                        callback?.invoke(content)
-                    } catch (e: Exception) {
+                if (result.resultCode == Activity.RESULT_OK) {
+                    val uri = result.data?.data
+                    if (uri != null) {
+                        try {
+                            val content =
+                                context.contentResolver
+                                    .openInputStream(uri)
+                                    ?.bufferedReader()
+                                    ?.use { it.readText() }
+                            callback?.invoke(content)
+                        } catch (e: Exception) {
+                            callback?.invoke(null)
+                        }
+                    } else {
                         callback?.invoke(null)
                     }
                 } else {
                     callback?.invoke(null)
                 }
-            } else {
-                callback?.invoke(null)
             }
-        }
     }
 
     override fun shareText(text: String) {
@@ -59,54 +62,67 @@ class AndroidShareManager(
         context.startActivity(chooser)
     }
 
-    override fun shareFile(fileName: String, content: String, mimeType: String) {
+    override fun shareFile(
+        fileName: String,
+        content: String,
+        mimeType: String,
+    ) {
         val cacheDir = File(context.cacheDir, "exports")
         cacheDir.mkdirs()
 
         val file = File(cacheDir, fileName)
         file.writeText(content)
 
-        val uri: Uri = FileProvider.getUriForFile(
-            context,
-            "${context.packageName}.fileprovider",
-            file
-        )
+        val uri: Uri =
+            FileProvider.getUriForFile(
+                context,
+                "${context.packageName}.fileprovider",
+                file,
+            )
 
-        val intent = Intent(Intent.ACTION_SEND).apply {
-            type = mimeType
-            putExtra(Intent.EXTRA_STREAM, uri)
-            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        }
+        val intent =
+            Intent(Intent.ACTION_SEND).apply {
+                type = mimeType
+                putExtra(Intent.EXTRA_STREAM, uri)
+                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            }
 
-        val chooser = Intent.createChooser(intent, null).apply {
-            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        }
+        val chooser =
+            Intent.createChooser(intent, null).apply {
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            }
 
         context.startActivity(chooser)
     }
 
-    override fun pickFile(mimeType: String, onResult: (String?) -> Unit) {
+    override fun pickFile(
+        mimeType: String,
+        onResult: (String?) -> Unit,
+    ) {
         filePickerCallback = onResult
 
         val launcher = filePickerLauncher
         if (launcher != null) {
-            val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
-                addCategory(Intent.CATEGORY_OPENABLE)
-                type = mimeType
-            }
+            val intent =
+                Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+                    addCategory(Intent.CATEGORY_OPENABLE)
+                    type = mimeType
+                }
             launcher.launch(intent)
         } else {
-
-            val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
-                addCategory(Intent.CATEGORY_OPENABLE)
-                type = mimeType
-                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            }
-            try {
-                context.startActivity(Intent.createChooser(intent, null).apply {
+            val intent =
+                Intent(Intent.ACTION_GET_CONTENT).apply {
+                    addCategory(Intent.CATEGORY_OPENABLE)
+                    type = mimeType
                     addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                })
+                }
+            try {
+                context.startActivity(
+                    Intent.createChooser(intent, null).apply {
+                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    },
+                )
 
                 onResult(null)
             } catch (e: Exception) {

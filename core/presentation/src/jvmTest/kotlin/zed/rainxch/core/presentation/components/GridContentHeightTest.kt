@@ -4,11 +4,15 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class GridContentHeightTest {
+    private fun item(
+        height: Int,
+        span: Int,
+    ) = GridItemExtent(height = height, span = span)
 
-    private fun item(height: Int, span: Int) = GridItemExtent(height = height, span = span)
-
-    private fun assertEstimate(expected: Float, actual: Float) =
-        assertEquals(expected, actual, absoluteTolerance = 0.01f)
+    private fun assertEstimate(
+        expected: Float,
+        actual: Float,
+    ) = assertEquals(expected, actual, absoluteTolerance = 0.01f)
 
     @Test
     fun emptyWindowEstimatesNothing() {
@@ -39,12 +43,13 @@ class GridContentHeightTest {
         val height =
             estimateGridContentHeight(
                 totalItemsCount = 4,
-                visibleItems = listOf(
-                    item(height = 40, span = 3),
-                    item(height = 200, span = 1),
-                    item(height = 200, span = 1),
-                    item(height = 200, span = 1),
-                ),
+                visibleItems =
+                    listOf(
+                        item(height = 40, span = 3),
+                        item(height = 200, span = 1),
+                        item(height = 200, span = 1),
+                        item(height = 200, span = 1),
+                    ),
                 lanes = 3,
                 mainAxisItemSpacing = 0,
                 contentPadding = 0,
@@ -57,12 +62,13 @@ class GridContentHeightTest {
         val height =
             estimateGridContentHeight(
                 totalItemsCount = 4,
-                visibleItems = listOf(
-                    item(height = 30, span = 2),
-                    item(height = 30, span = 2),
-                    item(height = 100, span = 1),
-                    item(height = 100, span = 1),
-                ),
+                visibleItems =
+                    listOf(
+                        item(height = 30, span = 2),
+                        item(height = 30, span = 2),
+                        item(height = 100, span = 1),
+                        item(height = 100, span = 1),
+                    ),
                 lanes = 2,
                 mainAxisItemSpacing = 0,
                 contentPadding = 0,

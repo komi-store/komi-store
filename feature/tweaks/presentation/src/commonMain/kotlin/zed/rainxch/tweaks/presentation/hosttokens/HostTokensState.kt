@@ -6,11 +6,8 @@ import zed.rainxch.core.domain.model.account.HostToken
 
 data class HostTokensState(
     val tokens: List<HostToken> = emptyList(),
-
     val validationByHost: Map<String, ValidationLine> = emptyMap(),
-
     val validatingHosts: Set<String> = emptySet(),
-
     val draftMode: DraftMode = DraftMode.Closed,
     val draftForge: ForgeKind? = null,
     val draftHost: String = "",

@@ -15,9 +15,9 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
-import zed.rainxch.core.presentation.locals.LocalPersonality
 import zed.rainxch.apps.presentation.model.AppItem
 import zed.rainxch.apps.presentation.model.CompactStatusFlags
+import zed.rainxch.core.presentation.locals.LocalPersonality
 import zed.rainxch.githubstore.core.presentation.res.Res
 import zed.rainxch.githubstore.core.presentation.res.apps_compact_status_filter_active
 import zed.rainxch.githubstore.core.presentation.res.apps_compact_status_pending_install
@@ -59,15 +59,16 @@ fun StatusDotCluster(
 ) {
     val colors = LocalPersonality.current.colors
 
-    val items = buildList {
-        if (flags.readyToInstall) add(StatusItem(DotShape.Ring, colors.primary))
-        if (flags.pendingInstall) add(StatusItem(DotShape.Chevron, colors.primary))
-        if (flags.variantStale) add(StatusItem(DotShape.Triangle, colors.error))
-        if (flags.variantPinned) add(StatusItem(DotShape.Diamond, colors.primary))
-        if (flags.filterActive) add(StatusItem(DotShape.Square, colors.primary))
-        if (flags.preReleaseOn) add(StatusItem(DotShape.Circle, colors.primary))
-        if (flags.updatesIgnored) add(StatusItem(DotShape.Bar, colors.outline))
-    }
+    val items =
+        buildList {
+            if (flags.readyToInstall) add(StatusItem(DotShape.Ring, colors.primary))
+            if (flags.pendingInstall) add(StatusItem(DotShape.Chevron, colors.primary))
+            if (flags.variantStale) add(StatusItem(DotShape.Triangle, colors.error))
+            if (flags.variantPinned) add(StatusItem(DotShape.Diamond, colors.primary))
+            if (flags.filterActive) add(StatusItem(DotShape.Square, colors.primary))
+            if (flags.preReleaseOn) add(StatusItem(DotShape.Circle, colors.primary))
+            if (flags.updatesIgnored) add(StatusItem(DotShape.Bar, colors.outline))
+        }
 
     if (items.isEmpty()) return
 
@@ -83,7 +84,10 @@ fun StatusDotCluster(
     }
 }
 
-private data class StatusItem(val shape: DotShape, val color: Color)
+private data class StatusItem(
+    val shape: DotShape,
+    val color: Color,
+)
 
 private enum class DotShape {
     Circle,
@@ -95,12 +99,25 @@ private enum class DotShape {
     Bar,
 }
 
-private fun DrawScope.drawShape(shape: DotShape, color: Color) {
+private fun DrawScope.drawShape(
+    shape: DotShape,
+    color: Color,
+) {
     val s = size.minDimension
     when (shape) {
-        DotShape.Circle -> drawCircle(color = color, radius = s / 2f)
-        DotShape.Square ->
-            drawRect(color = color, size = androidx.compose.ui.geometry.Size(s, s))
+        DotShape.Circle -> {
+            drawCircle(color = color, radius = s / 2f)
+        }
+
+        DotShape.Square -> {
+            drawRect(
+                color = color,
+                size =
+                    androidx.compose.ui.geometry
+                        .Size(s, s),
+            )
+        }
+
         DotShape.Triangle -> {
             val path =
                 Path().apply {
@@ -111,6 +128,7 @@ private fun DrawScope.drawShape(shape: DotShape, color: Color) {
                 }
             drawPath(path, color)
         }
+
         DotShape.Diamond -> {
             val path =
                 Path().apply {
@@ -122,12 +140,15 @@ private fun DrawScope.drawShape(shape: DotShape, color: Color) {
                 }
             drawPath(path, color)
         }
-        DotShape.Ring ->
+
+        DotShape.Ring -> {
             drawCircle(
                 color = color,
                 radius = s / 2f - 1f,
                 style = Stroke(width = 1.5f),
             )
+        }
+
         DotShape.Chevron -> {
             val path =
                 Path().apply {
@@ -137,12 +158,18 @@ private fun DrawScope.drawShape(shape: DotShape, color: Color) {
                 }
             drawPath(path, color, style = Stroke(width = 1.5f))
         }
-        DotShape.Bar ->
+
+        DotShape.Bar -> {
             drawRect(
                 color = color,
-                topLeft = androidx.compose.ui.geometry.Offset(0f, s * 0.4f),
-                size = androidx.compose.ui.geometry.Size(s, s * 0.2f),
+                topLeft =
+                    androidx.compose.ui.geometry
+                        .Offset(0f, s * 0.4f),
+                size =
+                    androidx.compose.ui.geometry
+                        .Size(s, s * 0.2f),
             )
+        }
     }
 }
 
@@ -152,16 +179,17 @@ fun buildCompactRowSemantics(
     installedVersion: String,
     flags: CompactStatusFlags,
 ): String {
-    val parts = buildList {
-        add(appName)
-        add(installedVersion)
-        if (flags.readyToInstall) add(stringResource(Res.string.apps_compact_status_ready_to_install))
-        if (flags.pendingInstall) add(stringResource(Res.string.apps_compact_status_pending_install))
-        if (flags.variantStale) add(stringResource(Res.string.apps_compact_status_variant_stale))
-        if (flags.variantPinned) add(stringResource(Res.string.apps_compact_status_variant_pinned))
-        if (flags.filterActive) add(stringResource(Res.string.apps_compact_status_filter_active))
-        if (flags.preReleaseOn) add(stringResource(Res.string.apps_compact_status_pre_release_on))
-        if (flags.updatesIgnored) add(stringResource(Res.string.apps_compact_status_updates_ignored))
-    }
+    val parts =
+        buildList {
+            add(appName)
+            add(installedVersion)
+            if (flags.readyToInstall) add(stringResource(Res.string.apps_compact_status_ready_to_install))
+            if (flags.pendingInstall) add(stringResource(Res.string.apps_compact_status_pending_install))
+            if (flags.variantStale) add(stringResource(Res.string.apps_compact_status_variant_stale))
+            if (flags.variantPinned) add(stringResource(Res.string.apps_compact_status_variant_pinned))
+            if (flags.filterActive) add(stringResource(Res.string.apps_compact_status_filter_active))
+            if (flags.preReleaseOn) add(stringResource(Res.string.apps_compact_status_pre_release_on))
+            if (flags.updatesIgnored) add(stringResource(Res.string.apps_compact_status_updates_ignored))
+        }
     return parts.joinToString(", ")
 }

@@ -7,7 +7,6 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNull
 
 class AssetSelectorTest {
-
     private val apk = listOf(".apk")
 
     private fun asset(

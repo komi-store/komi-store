@@ -5,5 +5,7 @@ sealed interface VerificationResult {
 
     data object Unverified : VerificationResult
 
-    data class Error(val reason: String) : VerificationResult
+    data class Error(
+        val reason: String,
+    ) : VerificationResult
 }

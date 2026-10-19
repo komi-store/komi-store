@@ -1,39 +1,43 @@
 package zed.rainxch.core.domain.utils
 
-import kotlin.test.Test
-import kotlin.test.assertEquals
 import zed.rainxch.core.domain.model.account.github.GithubAsset
 import zed.rainxch.core.domain.model.account.github.GithubRelease
 import zed.rainxch.core.domain.model.repository.DiscoveryPlatform
+import kotlin.test.Test
+import kotlin.test.assertEquals
 
 class ReleasePlatformsTest {
-    private fun release(tag: String, vararg assets: String) =
-        GithubRelease(
-            id = tag.hashCode().toLong(),
-            tagName = tag,
-            name = tag,
-            publishedAt = "2026-01-01T00:00:00Z",
-            description = null,
-            assets = assets.map {
+    private fun release(
+        tag: String,
+        vararg assets: String,
+    ) = GithubRelease(
+        id = tag.hashCode().toLong(),
+        tagName = tag,
+        name = tag,
+        publishedAt = "2026-01-01T00:00:00Z",
+        description = null,
+        assets =
+            assets.map {
                 GithubAsset(id = it.hashCode().toLong(), name = it, contentType = "", size = 1L, downloadUrl = "")
             },
-            tarballUrl = "",
-            zipballUrl = "",
-            htmlUrl = "",
-        )
-
-    private val notesnook = listOf(
-        release("3.4.13-android", "notesnook-arm64-v8a.apk", "notesnook-x86_64.apk"),
-        release(
-            "v3.4.8",
-            "latest.yml",
-            "notesnook_linux_x86_64.AppImage",
-            "notesnook_mac_arm64.dmg",
-            "notesnook_win_x64.exe",
-        ),
-        release("3.4.12-android", "notesnook-arm64-v8a.apk"),
-        release("v3.4.7", "notesnook_linux_x86_64.AppImage", "notesnook_win_x64.exe"),
+        tarballUrl = "",
+        zipballUrl = "",
+        htmlUrl = "",
     )
+
+    private val notesnook =
+        listOf(
+            release("3.4.13-android", "notesnook-arm64-v8a.apk", "notesnook-x86_64.apk"),
+            release(
+                "v3.4.8",
+                "latest.yml",
+                "notesnook_linux_x86_64.AppImage",
+                "notesnook_mac_arm64.dmg",
+                "notesnook_win_x64.exe",
+            ),
+            release("3.4.12-android", "notesnook-arm64-v8a.apk"),
+            release("v3.4.7", "notesnook_linux_x86_64.AppImage", "notesnook_win_x64.exe"),
+        )
 
     @Test
     fun releasePlatformsIgnoreNonInstallerFiles() {

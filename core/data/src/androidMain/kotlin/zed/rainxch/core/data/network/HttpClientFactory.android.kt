@@ -20,7 +20,6 @@ actual fun createPlatformHttpClient(proxyConfig: ProxyConfig): HttpClient {
                 }
 
                 is ProxyConfig.System -> {
-
                     proxy = resolveAndroidSystemProxy()
                 }
 
@@ -78,7 +77,6 @@ actual fun createPlatformHttpClient(proxyConfig: ProxyConfig): HttpClient {
 }
 
 internal fun resolveAndroidSystemProxy(): Proxy {
-
     val httpsHost = System.getProperty("https.proxyHost")?.takeIf { it.isNotBlank() }
     val httpsPort = System.getProperty("https.proxyPort")?.toIntOrNull()?.takeIf { it in 1..65535 }
     if (httpsHost != null && httpsPort != null) {

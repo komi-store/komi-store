@@ -7,13 +7,21 @@ sealed interface ExternalImportAction {
 
     data object OnRequestPermission : ExternalImportAction
 
-    data class OnPermissionGranted(val sdkInt: Int?) : ExternalImportAction
+    data class OnPermissionGranted(
+        val sdkInt: Int?,
+    ) : ExternalImportAction
 
-    data class OnPermissionDenied(val sdkInt: Int?) : ExternalImportAction
+    data class OnPermissionDenied(
+        val sdkInt: Int?,
+    ) : ExternalImportAction
 
-    data class OnSkipCard(val packageName: String) : ExternalImportAction
+    data class OnSkipCard(
+        val packageName: String,
+    ) : ExternalImportAction
 
-    data class OnSkipForever(val packageName: String) : ExternalImportAction
+    data class OnSkipForever(
+        val packageName: String,
+    ) : ExternalImportAction
 
     data object OnSkipRemaining : ExternalImportAction
 
@@ -22,16 +30,22 @@ sealed interface ExternalImportAction {
         val suggestion: RepoSuggestionUi,
     ) : ExternalImportAction
 
-    data class OnLinkCard(val packageName: String) : ExternalImportAction
+    data class OnLinkCard(
+        val packageName: String,
+    ) : ExternalImportAction
 
-    data class OnToggleCardExpanded(val packageName: String) : ExternalImportAction
+    data class OnToggleCardExpanded(
+        val packageName: String,
+    ) : ExternalImportAction
 
     data class OnSearchOverrideChanged(
         val packageName: String,
         val query: String,
     ) : ExternalImportAction
 
-    data class OnSearchOverrideSubmit(val packageName: String) : ExternalImportAction
+    data class OnSearchOverrideSubmit(
+        val packageName: String,
+    ) : ExternalImportAction
 
     data object OnUndoLast : ExternalImportAction
 

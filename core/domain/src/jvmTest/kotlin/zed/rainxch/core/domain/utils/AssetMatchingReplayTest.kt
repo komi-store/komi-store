@@ -1,13 +1,13 @@
 package zed.rainxch.core.domain.utils
 
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertTrue
 import zed.rainxch.core.domain.model.account.github.GithubAsset
 import zed.rainxch.core.domain.model.account.github.GithubRelease
 import zed.rainxch.core.domain.model.account.github.isEffectivelyPreRelease
 import zed.rainxch.core.domain.model.installation.InstallSource
 import zed.rainxch.core.domain.model.installation.InstalledApp
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 /**
  * Replays the update check over the real release histories of 48 Android projects.
@@ -22,7 +22,6 @@ import zed.rainxch.core.domain.model.installation.InstalledApp
  * first same-app candidate.
  */
 class AssetMatchingReplayTest {
-
     private data class CorpusRelease(
         val tag: String,
         val published: String,
@@ -73,7 +72,11 @@ class AssetMatchingReplayTest {
         val self = replayApp(installedTag, installedAssetName)
         val repoApps = listOf(self)
 
-        fun belongsElsewhere(assetName: String, releaseTag: String, releaseAssets: List<String>): Boolean {
+        fun belongsElsewhere(
+            assetName: String,
+            releaseTag: String,
+            releaseAssets: List<String>,
+        ): Boolean {
             if (!AssetOwnership.canOwn(self, assetName)) return true
             val owner =
                 AssetOwnership.ownerOf(
@@ -123,7 +126,10 @@ class AssetMatchingReplayTest {
         return null
     }
 
-    private fun replayApp(installedTag: String, installedAssetName: String?): InstalledApp =
+    private fun replayApp(
+        installedTag: String,
+        installedAssetName: String?,
+    ): InstalledApp =
         InstalledApp(
             packageName = "replay.app",
             repoId = 1L,

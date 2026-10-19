@@ -7,7 +7,6 @@ import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 class VersionLineTest {
-
     @Test
     fun a_normal_update_points_at_the_stores_latest() {
         val line =

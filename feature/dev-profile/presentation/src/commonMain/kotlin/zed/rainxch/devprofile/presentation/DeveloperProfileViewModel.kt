@@ -13,8 +13,8 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.getString
-import zed.rainxch.core.domain.model.repository.FavoriteRepo
 import zed.rainxch.core.domain.model.error.RateLimitException
+import zed.rainxch.core.domain.model.repository.FavoriteRepo
 import zed.rainxch.core.domain.repository.FavouritesRepository
 import zed.rainxch.devprofile.domain.model.RepoFilterType
 import zed.rainxch.devprofile.domain.model.RepoSortType
@@ -125,7 +125,8 @@ class DeveloperProfileViewModel(
 
     private fun loadContributions() {
         viewModelScope.launch {
-            repository.getContributionCalendar(username)
+            repository
+                .getContributionCalendar(username)
                 .onSuccess { cal ->
                     _state.update {
                         it.copy(
@@ -133,8 +134,7 @@ class DeveloperProfileViewModel(
                             isLoadingContributions = false,
                         )
                     }
-                }
-                .onFailure {
+                }.onFailure {
                     _state.update { it.copy(isLoadingContributions = false) }
                 }
         }
@@ -203,7 +203,9 @@ class DeveloperProfileViewModel(
             is DeveloperProfileAction.OnRepositoryClick,
             is DeveloperProfileAction.OnOpenLink,
             is DeveloperProfileAction.OnNavigateToUser,
-            -> Unit
+            -> {
+                Unit
+            }
 
             is DeveloperProfileAction.OnFilterChange -> {
                 _state.update { it.copy(currentFilter = action.filter) }

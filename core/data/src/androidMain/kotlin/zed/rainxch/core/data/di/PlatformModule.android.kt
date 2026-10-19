@@ -9,9 +9,10 @@ import zed.rainxch.core.data.local.data_store.createAnnouncementsDataStore
 import zed.rainxch.core.data.local.data_store.createDataStore
 import zed.rainxch.core.data.local.db.AppDatabase
 import zed.rainxch.core.data.local.db.initDatabase
+import zed.rainxch.core.data.network.AndroidDigestVerifier
 import zed.rainxch.core.data.services.AndroidApkInspector
-import zed.rainxch.core.data.services.AndroidDownloader
 import zed.rainxch.core.data.services.AndroidDownloadProgressNotifier
+import zed.rainxch.core.data.services.AndroidDownloader
 import zed.rainxch.core.data.services.AndroidFileLocationsProvider
 import zed.rainxch.core.data.services.AndroidInstaller
 import zed.rainxch.core.data.services.AndroidInstallerInfoExtractor
@@ -22,10 +23,10 @@ import zed.rainxch.core.data.services.AndroidUpdateScheduleManager
 import zed.rainxch.core.data.services.DownloadNotificationObserver
 import zed.rainxch.core.data.services.FileLocationsProvider
 import zed.rainxch.core.data.services.LocalizationManager
+import zed.rainxch.core.data.services.dhizuku.DhizukuServiceManager
 import zed.rainxch.core.data.services.external.AndroidExternalAppScanner
 import zed.rainxch.core.data.services.external.InstallerSourceClassifier
 import zed.rainxch.core.data.services.external.ManifestHintExtractor
-import zed.rainxch.core.data.services.dhizuku.DhizukuServiceManager
 import zed.rainxch.core.data.services.installer.AndroidInstallerStatusProvider
 import zed.rainxch.core.data.services.installer.SilentInstallerDispatcher
 import zed.rainxch.core.data.services.root.RootServiceManager
@@ -34,7 +35,10 @@ import zed.rainxch.core.data.utils.AndroidAppLauncher
 import zed.rainxch.core.data.utils.AndroidBrowserHelper
 import zed.rainxch.core.data.utils.AndroidClipboardHelper
 import zed.rainxch.core.data.utils.AndroidShareManager
-import zed.rainxch.core.data.network.AndroidDigestVerifier
+import zed.rainxch.core.domain.helpers.AppLauncher
+import zed.rainxch.core.domain.helpers.BrowserHelper
+import zed.rainxch.core.domain.helpers.ClipboardHelper
+import zed.rainxch.core.domain.helpers.ShareManager
 import zed.rainxch.core.domain.network.DigestVerifier
 import zed.rainxch.core.domain.network.Downloader
 import zed.rainxch.core.domain.system.ApkInspector
@@ -46,10 +50,6 @@ import zed.rainxch.core.domain.system.InstallerStatusProvider
 import zed.rainxch.core.domain.system.PackageMonitor
 import zed.rainxch.core.domain.system.PendingInstallNotifier
 import zed.rainxch.core.domain.system.UpdateScheduleManager
-import zed.rainxch.core.domain.helpers.AppLauncher
-import zed.rainxch.core.domain.helpers.BrowserHelper
-import zed.rainxch.core.domain.helpers.ClipboardHelper
-import zed.rainxch.core.domain.helpers.ShareManager
 
 actual val corePlatformModule =
     module {
@@ -116,7 +116,8 @@ actual val corePlatformModule =
         }
 
         single<zed.rainxch.core.domain.system.AggressiveOemDetector> {
-            zed.rainxch.core.data.services.AndroidAggressiveOemDetector(context = androidContext())
+            zed.rainxch.core.data.services
+                .AndroidAggressiveOemDetector(context = androidContext())
         }
 
         single<PendingInstallNotifier> {
@@ -171,25 +172,41 @@ actual val corePlatformModule =
             createDataStore(androidContext())
         }
 
-        single<DataStore<Preferences>>(qualifier = org.koin.core.qualifier.named("announcements")) {
+        single<DataStore<Preferences>>(
+            qualifier =
+                org.koin.core.qualifier
+                    .named("announcements"),
+        ) {
             createAnnouncementsDataStore(androidContext())
         }
 
-        single<eu.anifantakis.lib.ksafe.KSafe>(qualifier = org.koin.core.qualifier.named("tokens")) {
+        single<eu.anifantakis.lib.ksafe.KSafe>(
+            qualifier =
+                org.koin.core.qualifier
+                    .named("tokens"),
+        ) {
             eu.anifantakis.lib.ksafe.KSafe(
                 context = androidContext(),
                 fileName = "ghs_tokens",
             )
         }
 
-        single<eu.anifantakis.lib.ksafe.KSafe>(qualifier = org.koin.core.qualifier.named("prefs")) {
+        single<eu.anifantakis.lib.ksafe.KSafe>(
+            qualifier =
+                org.koin.core.qualifier
+                    .named("prefs"),
+        ) {
             eu.anifantakis.lib.ksafe.KSafe(
                 context = androidContext(),
                 fileName = "ghs_prefs",
             )
         }
 
-        single<eu.anifantakis.lib.ksafe.KSafe>(qualifier = org.koin.core.qualifier.named("announcements_cache")) {
+        single<eu.anifantakis.lib.ksafe.KSafe>(
+            qualifier =
+                org.koin.core.qualifier
+                    .named("announcements_cache"),
+        ) {
             eu.anifantakis.lib.ksafe.KSafe(
                 context = androidContext(),
                 fileName = "ghs_announcements",

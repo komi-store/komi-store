@@ -3,37 +3,30 @@ package zed.rainxch.core.domain.utils
 import zed.rainxch.core.domain.model.account.github.GithubAsset
 
 object AssetVariant {
-
     private val ARCH_TOKENS =
         setOf(
-
             "arm64-v8a",
             "arm64",
             "aarch64",
-
             "armeabi-v7a",
             "armeabi",
             "armv7",
             "armv7a",
             "armv8",
-
             "x86_64",
             "x86-64",
             "x64",
             "x86",
             "i386",
             "i686",
-
             "mips",
             "mips64",
-
             "universal",
             "all",
         )
 
     private val FLAVOR_TOKENS =
         setOf(
-
             "fdroid",
             "f-droid",
             "play",
@@ -44,7 +37,6 @@ object AssetVariant {
             "huawei",
             "amazon",
             "samsung",
-
             "foss",
             "libre",
             "free",
@@ -61,7 +53,11 @@ object AssetVariant {
     private val VOCABULARY: Set<String> by lazy { ARCH_TOKENS + FLAVOR_TOKENS }
 
     private fun canonicalFlavorToken(token: String): String =
-        token.replace('-', ' ').replace('_', ' ').replace(" ", "").lowercase()
+        token
+            .replace('-', ' ')
+            .replace('_', ' ')
+            .replace(" ", "")
+            .lowercase()
 
     private fun tokenize(assetName: String): List<String> {
         val withoutExt = assetName.substringBeforeLast('.')
@@ -128,7 +124,9 @@ object AssetVariant {
             if (consumed[i] || consumed[i + 1] || consumed[i + 2]) continue
             val candidate = "${tokens[i]}-${tokens[i + 1]}-${tokens[i + 2]}"
             if (candidate in VOCABULARY) {
-                consumed[i] = true; consumed[i + 1] = true; consumed[i + 2] = true
+                consumed[i] = true
+                consumed[i + 1] = true
+                consumed[i + 2] = true
             }
         }
         for (i in 0 until tokens.size - 1) {
@@ -136,7 +134,8 @@ object AssetVariant {
             val dashed = "${tokens[i]}-${tokens[i + 1]}"
             val underscored = "${tokens[i]}_${tokens[i + 1]}"
             if (dashed in VOCABULARY || underscored in VOCABULARY) {
-                consumed[i] = true; consumed[i + 1] = true
+                consumed[i] = true
+                consumed[i + 1] = true
             }
         }
 
@@ -180,7 +179,10 @@ object AssetVariant {
     // The asset name with its own release's version blanked out, together with any build id
     // next to it (a commit hash or build number, before or after). No guessing at how a
     // project writes versions; null when the name doesn't carry the tag's version.
-    fun tagGlob(assetName: String, releaseTag: String?): String? {
+    fun tagGlob(
+        assetName: String,
+        releaseTag: String?,
+    ): String? {
         val version = tagVersion(releaseTag) ?: return null
         val lower = assetName.lowercase()
         val range = releaseVersionRange(lower, version) ?: return null
@@ -189,15 +191,23 @@ object AssetVariant {
 
     // Two names are the same file family when either form agrees: today's version pattern,
     // or each name with its own release's version blanked out. Stored globs use either form.
-    fun familyGlobs(assetName: String, releaseTag: String?): Set<String> =
-        setOfNotNull(deriveGlob(assetName), tagGlob(assetName, releaseTag))
+    fun familyGlobs(
+        assetName: String,
+        releaseTag: String?,
+    ): Set<String> = setOfNotNull(deriveGlob(assetName), tagGlob(assetName, releaseTag))
 
-    fun tagStem(assetName: String, releaseTag: String?): String? =
+    fun tagStem(
+        assetName: String,
+        releaseTag: String?,
+    ): String? =
         tagGlob(assetName, releaseTag)
             ?.let { extractBaseStem(it.replace('*', '-')) }
             ?.takeIf { it.isNotEmpty() }
 
-    private fun releaseVersionRange(lower: String, version: String): IntRange? {
+    private fun releaseVersionRange(
+        lower: String,
+        version: String,
+    ): IntRange? {
         for (match in versionInName(version).findAll(lower)) {
             val at = match.range.first
             if (!startsCleanly(lower, at)) continue
@@ -221,17 +231,27 @@ object AssetVariant {
         var previous: Char? = null
         for (c in version) {
             when {
-                c in BUILD_ID_SEPARATORS -> pattern.append("[._+-]")
-                previous != null && previous !in BUILD_ID_SEPARATORS && previous.isDigit() != c.isDigit() ->
+                c in BUILD_ID_SEPARATORS -> {
+                    pattern.append("[._+-]")
+                }
+
+                previous != null && previous !in BUILD_ID_SEPARATORS && previous.isDigit() != c.isDigit() -> {
                     pattern.append("[._-]?").append(Regex.escape(c.toString()))
-                else -> pattern.append(Regex.escape(c.toString()))
+                }
+
+                else -> {
+                    pattern.append(Regex.escape(c.toString()))
+                }
             }
             previous = c
         }
         return Regex(pattern.toString())
     }
 
-    private fun startsCleanly(lower: String, at: Int): Boolean {
+    private fun startsCleanly(
+        lower: String,
+        at: Int,
+    ): Boolean {
         val before = lower.getOrNull(at - 1) ?: return true
         if (before.isDigit()) return false
         if (before.isLetter()) return hasVersionPrefix(lower, at)
@@ -239,17 +259,25 @@ object AssetVariant {
     }
 
     // "v4.4.25": the v is part of the version when it stands alone before it.
-    private fun hasVersionPrefix(lower: String, at: Int): Boolean =
-        lower.getOrNull(at - 1) == 'v' && lower.getOrNull(at - 2)?.isLetterOrDigit() != true
+    private fun hasVersionPrefix(
+        lower: String,
+        at: Int,
+    ): Boolean = lower.getOrNull(at - 1) == 'v' && lower.getOrNull(at - 2)?.isLetterOrDigit() != true
 
-    private fun endsCleanly(lower: String, end: Int): Boolean {
+    private fun endsCleanly(
+        lower: String,
+        end: Int,
+    ): Boolean {
         val after = lower.getOrNull(end) ?: return true
         if (after.isDigit()) return false
         return !((after == '.' || after == '_') && lower.getOrNull(end + 1)?.isDigit() == true)
     }
 
     // End of a build id that follows the version at `from`, glued or after one separator.
-    private fun buildIdAfter(lower: String, from: Int): Int? {
+    private fun buildIdAfter(
+        lower: String,
+        from: Int,
+    ): Int? {
         val start = if (lower.getOrNull(from)?.let { it in BUILD_ID_SEPARATORS } == true) from + 1 else from
         var end = start
         while (end < lower.length && lower[end].isLetterOrDigit()) end++
@@ -257,7 +285,10 @@ object AssetVariant {
     }
 
     // Start of a build id written just before the version, followed by one separator.
-    private fun buildIdBefore(lower: String, versionAt: Int): Int? {
+    private fun buildIdBefore(
+        lower: String,
+        versionAt: Int,
+    ): Int? {
         if (lower.getOrNull(versionAt - 1)?.let { it in BUILD_ID_SEPARATORS } != true) return null
         val end = versionAt - 1
         var start = end
@@ -280,11 +311,18 @@ object AssetVariant {
     private val BUILD_ID_SEPARATORS = setOf('.', '-', '_', '+')
 
     fun versionMajor(name: String): Int? =
-        VERSION_MAJOR.find(name)?.groupValues?.get(1)?.toIntOrNull()
+        VERSION_MAJOR
+            .find(name)
+            ?.groupValues
+            ?.get(1)
+            ?.toIntOrNull()
 
     private val VERSION_MAJOR = Regex("""(?<![A-Za-z\d])v?(\d+)\.\d+""", RegexOption.IGNORE_CASE)
 
-    fun extract(assetName: String, releaseTag: String? = null): String? {
+    fun extract(
+        assetName: String,
+        releaseTag: String? = null,
+    ): String? {
         val withoutExt = assetName.substringBeforeLast('.')
         val tagRange = tagVersion(releaseTag)?.let { releaseVersionRange(withoutExt.lowercasePerChar(), it) }
         val tailStart =
@@ -299,9 +337,11 @@ object AssetVariant {
 
         while (true) {
             val qmatch = PRE_RELEASE_PREFIX.find(tail) ?: break
-            tail = tail.substring(qmatch.range.last + 1)
-                .trimStart(*LEADING_SEPARATORS)
-                .trim()
+            tail =
+                tail
+                    .substring(qmatch.range.last + 1)
+                    .trimStart(*LEADING_SEPARATORS)
+                    .trim()
         }
         return tail
     }
@@ -327,18 +367,19 @@ object AssetVariant {
         pinnedGlob: String? = null,
         releaseTag: String? = null,
     ): GithubAsset? {
-
         if (!pinnedTokens.isNullOrEmpty()) {
-            val match = assets.firstOrNull { asset ->
-                extractTokens(asset.name) == pinnedTokens
-            }
+            val match =
+                assets.firstOrNull { asset ->
+                    extractTokens(asset.name) == pinnedTokens
+                }
             if (match != null) return match
         }
 
         if (!pinnedGlob.isNullOrBlank()) {
-            val match = assets.firstOrNull { asset ->
-                pinnedGlob in familyGlobs(asset.name, releaseTag)
-            }
+            val match =
+                assets.firstOrNull { asset ->
+                    pinnedGlob in familyGlobs(asset.name, releaseTag)
+                }
             if (match != null) return match
         }
 
@@ -408,19 +449,23 @@ object AssetVariant {
         val packageSegments =
             trackedPackageName.lowercase().split('.').filter { it.isNotBlank() }
 
-        val packageFlavorTokens = packageSegments.filter { it in FLAVOR_TOKENS }
-            .map(::canonicalFlavorToken)
-            .toSet()
+        val packageFlavorTokens =
+            packageSegments
+                .filter { it in FLAVOR_TOKENS }
+                .map(::canonicalFlavorToken)
+                .toSet()
 
         return if (packageFlavorTokens.isNotEmpty()) {
-            val matching = assets.filter { asset ->
-                extractTokens(asset.name).any { canonicalFlavorToken(it) in packageFlavorTokens }
-            }
+            val matching =
+                assets.filter { asset ->
+                    extractTokens(asset.name).any { canonicalFlavorToken(it) in packageFlavorTokens }
+                }
             matching.ifEmpty { assets }
         } else {
-            val unflavoured = assets.filter { asset ->
-                extractTokens(asset.name).none { it in FLAVOR_TOKENS }
-            }
+            val unflavoured =
+                assets.filter { asset ->
+                    extractTokens(asset.name).none { it in FLAVOR_TOKENS }
+                }
             unflavoured.ifEmpty { assets }
         }
     }

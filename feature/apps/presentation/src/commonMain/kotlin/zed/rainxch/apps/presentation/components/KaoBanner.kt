@@ -45,9 +45,10 @@ fun KaoBanner(
     val colors = LocalPersonality.current.colors
     val shape = LocalPersonality.current.shape
     Box(
-        modifier = modifier
-            .clip(RoundedCornerShape(shape.corner))
-            .background(colors.primaryContainer),
+        modifier =
+            modifier
+                .clip(RoundedCornerShape(shape.corner))
+                .background(colors.primaryContainer),
     ) {
         Column(
             modifier = Modifier.padding(start = 12.dp, top = 4.dp, end = 4.dp, bottom = 8.dp),
@@ -86,9 +87,10 @@ fun KaoBanner(
                 }
 
                 Box(
-                    modifier = Modifier
-                        .size(48.dp)
-                        .clickable(onClick = onDismiss),
+                    modifier =
+                        Modifier
+                            .size(48.dp)
+                            .clickable(onClick = onDismiss),
                     contentAlignment = Alignment.Center,
                 ) {
                     KomiIcon(

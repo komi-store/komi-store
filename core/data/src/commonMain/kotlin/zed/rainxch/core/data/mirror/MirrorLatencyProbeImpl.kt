@@ -11,10 +11,10 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
-import kotlin.time.TimeSource
 import zed.rainxch.core.data.network.MirrorRewriter
 import zed.rainxch.core.domain.model.mirror.MirrorConfig
 import zed.rainxch.core.domain.network.MirrorLatencyProbe
+import kotlin.time.TimeSource
 
 class MirrorLatencyProbeImpl(
     private val client: HttpClient,

@@ -7,7 +7,9 @@ sealed interface ProfileSession {
 
     data object SignedOut : ProfileSession
 
-    data class SignedIn(val profile: UserProfile) : ProfileSession
+    data class SignedIn(
+        val profile: UserProfile,
+    ) : ProfileSession
 }
 
 data class ProfileState(

@@ -1,6 +1,8 @@
 package zed.rainxch.core.domain.model.repository
 
-enum class FeedCategory(val topicCodes: Set<String>) {
+enum class FeedCategory(
+    val topicCodes: Set<String>,
+) {
     All(emptySet()),
     Ai(setOf("ai")),
     Privacy(setOf("privacy", "security")),
@@ -8,7 +10,8 @@ enum class FeedCategory(val topicCodes: Set<String>) {
     Media(setOf("audio", "video", "photo")),
     Social(setOf("social")),
     Reading(setOf("reader", "notes")),
-    Tools(setOf("launcher", "backup", "self-hosted"));
+    Tools(setOf("launcher", "backup", "self-hosted")),
+    ;
 
     fun matches(codes: List<String>): Boolean {
         if (this == All) return true

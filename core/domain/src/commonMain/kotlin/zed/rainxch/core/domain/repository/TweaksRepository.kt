@@ -6,10 +6,10 @@ import zed.rainxch.core.domain.model.appearance.AccentId
 import zed.rainxch.core.domain.model.appearance.AppPersonality
 import zed.rainxch.core.domain.model.appearance.AppTheme
 import zed.rainxch.core.domain.model.appearance.ContentWidth
-import zed.rainxch.core.domain.model.repository.DiscoveryPlatform
 import zed.rainxch.core.domain.model.appearance.FontTheme
-import zed.rainxch.core.domain.model.installation.InstallerType
 import zed.rainxch.core.domain.model.appearance.MangaPaperId
+import zed.rainxch.core.domain.model.installation.InstallerType
+import zed.rainxch.core.domain.model.repository.DiscoveryPlatform
 import zed.rainxch.core.domain.model.settings.TranslationProvider
 
 interface TweaksRepository {
@@ -179,7 +179,10 @@ interface TweaksRepository {
 
     fun getAnnouncementsMutedCategories(): Flow<Set<AnnouncementCategory>>
 
-    suspend fun setAnnouncementCategoryMuted(category: AnnouncementCategory, muted: Boolean)
+    suspend fun setAnnouncementCategoryMuted(
+        category: AnnouncementCategory,
+        muted: Boolean,
+    )
 
     fun getAnnouncementsLastFetchedAt(): Flow<Long>
 

@@ -47,7 +47,6 @@ data class WidthCappedGridCells(
     val maxCardWidth: Dp,
     val contentPaddingHorizontal: Dp = 0.dp,
 ) : GridCells {
-
     override fun Density.calculateCrossAxisCellSizes(
         availableSize: Int,
         spacing: Int,
@@ -61,12 +60,10 @@ data class WidthCappedStaggeredCells(
     val maxCardWidth: Dp,
     val contentPaddingHorizontal: Dp = 0.dp,
 ) : StaggeredGridCells {
-
     override fun Density.calculateCrossAxisCellSizes(
         availableSize: Int,
         spacing: Int,
-    ): IntArray =
-        widthCappedCellWidths(this, availableSize, spacing, maxCardWidth, contentPaddingHorizontal)
+    ): IntArray = widthCappedCellWidths(this, availableSize, spacing, maxCardWidth, contentPaddingHorizontal)
 }
 
 @Composable
@@ -99,10 +96,11 @@ internal fun widthCappedCellWidths(
     contentPaddingHorizontal: Dp,
 ): IntArray {
     val paddingPx = with(density) { contentPaddingHorizontal.roundToPx() }
-    val columns = gridColumnCount(
-        contentWidthDp = (availableSize + paddingPx * 2) / density.density,
-        maxCardWidthDp = maxCardWidth.value,
-    )
+    val columns =
+        gridColumnCount(
+            contentWidthDp = (availableSize + paddingPx * 2) / density.density,
+            maxCardWidthDp = maxCardWidth.value,
+        )
     val total = availableSize - spacing * (columns - 1)
     val size = total / columns
     val remainder = total % columns

@@ -8,7 +8,11 @@ interface StarredRepository {
 
     suspend fun isStarred(repoId: Long): Boolean
 
-    suspend fun setStarred(owner: String, repo: String, starred: Boolean): Result<Unit>
+    suspend fun setStarred(
+        owner: String,
+        repo: String,
+        starred: Boolean,
+    ): Result<Unit>
 
     suspend fun syncStarredRepos(forceRefresh: Boolean = false): Result<Unit>
 

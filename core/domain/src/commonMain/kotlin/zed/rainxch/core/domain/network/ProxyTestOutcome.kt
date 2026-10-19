@@ -1,13 +1,11 @@
 package zed.rainxch.core.domain.network
 
 sealed interface ProxyTestOutcome {
-
     data class Success(
         val latencyMs: Long,
     ) : ProxyTestOutcome
 
     sealed interface Failure : ProxyTestOutcome {
-
         data object DnsFailure : Failure
 
         data object ProxyUnreachable : Failure

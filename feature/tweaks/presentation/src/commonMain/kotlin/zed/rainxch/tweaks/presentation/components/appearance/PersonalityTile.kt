@@ -71,8 +71,7 @@ fun PersonalityTile(
                     } else {
                         Modifier
                     },
-                )
-                .clip(tileShape)
+                ).clip(tileShape)
                 .background(colors.surface)
                 .border(if (isActiveManga) 3.dp else 1.5.dp, borderColor, tileShape)
                 .clickable(onClick = onClick),
@@ -176,8 +175,7 @@ private fun BoxScope.MiniCard(
                             .background(ClassicCard, RoundedCornerShape(14.dp))
                             .border(1.dp, ClassicBorder, RoundedCornerShape(14.dp))
                     },
-                )
-                .padding(9.dp),
+                ).padding(9.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Box(
@@ -200,8 +198,11 @@ private fun BoxScope.MiniCard(
                         .fillMaxWidth(0.7f)
                         .height(7.dp)
                         .then(
-                            if (isManga) Modifier.background(onSurface)
-                            else Modifier.background(ClassicBar, RoundedCornerShape(4.dp)),
+                            if (isManga) {
+                                Modifier.background(onSurface)
+                            } else {
+                                Modifier.background(ClassicBar, RoundedCornerShape(4.dp))
+                            },
                         ),
             )
             Spacer(Modifier.height(5.dp))
@@ -211,8 +212,11 @@ private fun BoxScope.MiniCard(
                         .fillMaxWidth(0.9f)
                         .height(5.dp)
                         .then(
-                            if (isManga) Modifier.background(onSurface.copy(alpha = 0.45f))
-                            else Modifier.background(ClassicBarFaint, RoundedCornerShape(3.dp)),
+                            if (isManga) {
+                                Modifier.background(onSurface.copy(alpha = 0.45f))
+                            } else {
+                                Modifier.background(ClassicBarFaint, RoundedCornerShape(3.dp))
+                            },
                         ),
             )
         }

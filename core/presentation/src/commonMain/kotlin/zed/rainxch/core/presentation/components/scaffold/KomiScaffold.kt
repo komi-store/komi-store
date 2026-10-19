@@ -78,16 +78,19 @@ fun KomiScaffold(
             Box(modifier = Modifier.fillMaxSize()) {
                 if (isManga && grid) {
                     Box(
-                        modifier = Modifier.matchParentSize()
-                            .gridPaper(color = colors.onSurface, opacity = colors.gridOpacity)
+                        modifier =
+                            Modifier
+                                .matchParentSize()
+                                .gridPaper(color = colors.onSurface, opacity = colors.gridOpacity),
                     )
                 }
                 if (isManga && screentone) {
                     Box(
-                        modifier = Modifier.matchParentSize().screentoneFill(
-                            color = colors.onSurface,
-                            opacity = colors.screentoneOpacity
-                        )
+                        modifier =
+                            Modifier.matchParentSize().screentoneFill(
+                                color = colors.onSurface,
+                                opacity = colors.screentoneOpacity,
+                            ),
                     )
                 }
                 content(innerPadding)
@@ -104,8 +107,10 @@ private fun PreviewScaffold() {
     KomiScaffold(
         topBar = {
             Row(
-                modifier = Modifier.fillMaxWidth()
-                    .padding(horizontal = Spacing.lg, vertical = Spacing.md),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = Spacing.lg, vertical = Spacing.md),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 KomiText(text = "Discover", role = KomiTextRole.Title)
@@ -122,7 +127,7 @@ private fun PreviewScaffold() {
                         text = it,
                         role = KomiTextRole.Label,
                         color = colors.onSurfaceVariant,
-                        fontSize = 11.sp
+                        fontSize = 11.sp,
                     )
                 }
             }
@@ -132,7 +137,7 @@ private fun PreviewScaffold() {
                 icon = Icons.Default.Add,
                 contentDescription = "Add",
                 onClick = {},
-                variant = KomiButtonVariant.Primary
+                variant = KomiButtonVariant.Primary,
             )
         },
     ) { padding ->
@@ -143,7 +148,7 @@ private fun PreviewScaffold() {
             repeat(3) {
                 KomiSurface(
                     elevation = KomiSurfaceElevation.Card,
-                    contentPadding = PaddingValues(Spacing.lg)
+                    contentPadding = PaddingValues(Spacing.lg),
                 ) {
                     KomiText(text = "Panel ${it + 1}", role = KomiTextRole.Title)
                 }

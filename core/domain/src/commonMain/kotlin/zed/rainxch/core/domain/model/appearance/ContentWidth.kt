@@ -1,4 +1,5 @@
 package zed.rainxch.core.domain.model.appearance
+
 enum class ContentWidth {
     COMPACT,
     WIDE,

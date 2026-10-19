@@ -1,10 +1,10 @@
 package zed.rainxch.core.domain.utils
 
+import zed.rainxch.core.domain.model.account.github.GithubRelease
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
-import zed.rainxch.core.domain.model.account.github.GithubRelease
 
 class ReleaseLinesTest {
     private fun release(tag: String) =

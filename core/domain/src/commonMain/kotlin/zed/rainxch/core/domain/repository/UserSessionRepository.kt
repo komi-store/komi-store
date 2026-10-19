@@ -7,6 +7,7 @@ import zed.rainxch.core.domain.model.account.UserProfile
 
 interface UserSessionRepository {
     fun isUserLoggedIn(): Flow<Boolean>
+
     fun getUser(): Flow<UserProfile?>
 
     suspend fun isCurrentlyUserLoggedIn(): Boolean
@@ -22,5 +23,6 @@ interface UserSessionRepository {
     suspend fun notifySessionExpired(tokenKey: String?)
 
     suspend fun notifyRequestSucceeded(tokenKey: String?)
+
     suspend fun logout()
 }

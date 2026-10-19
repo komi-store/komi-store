@@ -9,7 +9,6 @@ import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
-import kotlin.coroutines.cancellation.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -22,17 +21,17 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.json.Json
-import kotlin.time.Clock
 import zed.rainxch.core.domain.model.account.HostNames
 import zed.rainxch.core.domain.model.account.HostToken
 import zed.rainxch.core.domain.model.account.TokenValidation
 import zed.rainxch.core.domain.repository.HostTokenRepository
+import kotlin.coroutines.cancellation.CancellationException
+import kotlin.time.Clock
 
 class HostTokenRepositoryImpl(
     private val ksafe: KSafe,
     private val httpClient: HttpClient,
 ) : HostTokenRepository {
-
     private val initScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
     private val rmwLock = Mutex()
     private val cache = MutableStateFlow<List<HostToken>>(emptyList())
@@ -47,8 +46,7 @@ class HostTokenRepositoryImpl(
         initScope.launch { runCatching { ensureLoaded() } }
     }
 
-    override fun observeAll(): Flow<List<HostToken>> =
-        cache.asStateFlow().onStart { ensureLoaded() }
+    override fun observeAll(): Flow<List<HostToken>> = cache.asStateFlow().onStart { ensureLoaded() }
 
     override suspend fun get(host: String): HostToken? {
         ensureLoaded()
@@ -56,18 +54,23 @@ class HostTokenRepositoryImpl(
         return cache.value.firstOrNull { it.host == key }
     }
 
-    override suspend fun set(host: String, token: String, displayName: String?) {
+    override suspend fun set(
+        host: String,
+        token: String,
+        displayName: String?,
+    ) {
         val key = HostNames.normalize(host)
         if (key.isBlank() || token.isBlank()) return
         rmwLock.withLock {
             ensureLoadedLocked()
             val now = Clock.System.now().toEpochMilliseconds()
-            val updated = HostToken(
-                host = key,
-                token = token,
-                displayName = displayName?.trim()?.takeIf { it.isNotEmpty() },
-                createdAtEpochMillis = now,
-            )
+            val updated =
+                HostToken(
+                    host = key,
+                    token = token,
+                    displayName = displayName?.trim()?.takeIf { it.isNotEmpty() },
+                    createdAtEpochMillis = now,
+                )
             val next = cache.value.filterNot { it.host == key } + updated
             persistOrThrow(next)
         }
@@ -84,15 +87,19 @@ class HostTokenRepositoryImpl(
         }
     }
 
-    override suspend fun validate(host: String, token: String): Result<TokenValidation> {
+    override suspend fun validate(
+        host: String,
+        token: String,
+    ): Result<TokenValidation> {
         val key = HostNames.normalize(host)
         if (key.isBlank()) return Result.failure(IllegalArgumentException("blank host"))
         return try {
-            val response = httpClient.get(buildUserUrl(key)) {
-                accept(ContentType.Application.Json)
-                header(HttpHeaders.Authorization, "Bearer $token")
-                header(HttpHeaders.UserAgent, "GithubStore/1.0 (host-token-validate)")
-            }
+            val response =
+                httpClient.get(buildUserUrl(key)) {
+                    accept(ContentType.Application.Json)
+                    header(HttpHeaders.Authorization, "Bearer $token")
+                    header(HttpHeaders.UserAgent, "GithubStore/1.0 (host-token-validate)")
+                }
             Result.success(mapValidation(response))
         } catch (ce: CancellationException) {
             throw ce
@@ -113,14 +120,19 @@ class HostTokenRepositoryImpl(
             val body = runCatching { response.bodyAsText() }.getOrDefault("")
             error("HTTP ${status.value} ${status.description}: ${body.take(200)}")
         }
-        val login = runCatching {
-            val text = response.bodyAsText()
-            val pattern = Regex("\"login\"\\s*:\\s*\"([^\"]+)\"")
-            pattern.find(text)?.groupValues?.getOrNull(1)
-        }.getOrNull()
+        val login =
+            runCatching {
+                val text = response.bodyAsText()
+                val pattern = Regex("\"login\"\\s*:\\s*\"([^\"]+)\"")
+                pattern.find(text)?.groupValues?.getOrNull(1)
+            }.getOrNull()
         val scopesHeader = response.headers["X-OAuth-Scopes"].orEmpty()
-        val scopes = if (scopesHeader.isBlank()) emptyList() else
-            scopesHeader.split(',').map { it.trim() }.filter { it.isNotEmpty() }
+        val scopes =
+            if (scopesHeader.isBlank()) {
+                emptyList()
+            } else {
+                scopesHeader.split(',').map { it.trim() }.filter { it.isNotEmpty() }
+            }
         val remaining = response.headers["X-RateLimit-Remaining"]?.toIntOrNull()
         return TokenValidation(login = login, scopes = scopes, rateLimitRemaining = remaining)
     }
@@ -136,9 +148,13 @@ class HostTokenRepositoryImpl(
     private suspend fun ensureLoadedLocked() {
         if (loaded) return
         val raw = runCatching { ksafe.get(KEY_TOKENS_JSON, "") }.getOrDefault("")
-        val list = if (raw.isBlank()) emptyList() else
-            runCatching { json.decodeFromString(ListSerializer(HostToken.serializer()), raw) }
-                .getOrDefault(emptyList())
+        val list =
+            if (raw.isBlank()) {
+                emptyList()
+            } else {
+                runCatching { json.decodeFromString(ListSerializer(HostToken.serializer()), raw) }
+                    .getOrDefault(emptyList())
+            }
         cache.value = list
         loaded = true
     }

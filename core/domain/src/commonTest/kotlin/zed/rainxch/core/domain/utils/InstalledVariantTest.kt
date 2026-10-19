@@ -1,10 +1,10 @@
 package zed.rainxch.core.domain.utils
 
+import zed.rainxch.core.domain.model.installation.InstallSource
+import zed.rainxch.core.domain.model.installation.InstalledApp
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
-import zed.rainxch.core.domain.model.installation.InstallSource
-import zed.rainxch.core.domain.model.installation.InstalledApp
 
 class InstalledVariantTest {
     private fun app(
@@ -42,21 +42,25 @@ class InstalledVariantTest {
         assetGlobPattern = glob,
     )
 
-    private fun marked(assets: List<String>, apps: List<InstalledApp>): List<String> =
-        assets.filter { AssetOwnership.variantStatus(it, "2.0.0", apps) != null }
+    private fun marked(
+        assets: List<String>,
+        apps: List<InstalledApp>,
+    ): List<String> = assets.filter { AssetOwnership.variantStatus(it, "2.0.0", apps) != null }
 
-    private val abiRelease = listOf(
-        "app-arm64-v8a-1.3.0.apk",
-        "app-armeabi-v7a-1.3.0.apk",
-        "app-universal-1.3.0.apk",
-    )
+    private val abiRelease =
+        listOf(
+            "app-arm64-v8a-1.3.0.apk",
+            "app-armeabi-v7a-1.3.0.apk",
+            "app-universal-1.3.0.apk",
+        )
 
-    private val morphe = listOf(
-        "google-photos-arm64-v8a-morphe-patches-v7.95.0.989626323.apk",
-        "instagram-arm64-v8a-piko-patches-v440.0.0.1.1.apk",
-        "instagram-armeabi-v7a-piko-patches-v440.0.0.1.1.apk",
-        "youtube-universal-morphe-patches-v20.1.1.apk",
-    )
+    private val morphe =
+        listOf(
+            "google-photos-arm64-v8a-morphe-patches-v7.95.0.989626323.apk",
+            "instagram-arm64-v8a-piko-patches-v440.0.0.1.1.apk",
+            "instagram-armeabi-v7a-piko-patches-v440.0.0.1.1.apk",
+            "youtube-universal-morphe-patches-v20.1.1.apk",
+        )
 
     @Test
     fun only_the_installed_abi_is_marked_in_a_single_app_release() {
@@ -72,10 +76,11 @@ class InstalledVariantTest {
 
     @Test
     fun every_installed_app_is_marked_in_a_multi_app_release() {
-        val apps = listOf(
-            app("com.instagram", "instagram-arm64-v8a-piko-patches-v436.0.0.1.1.apk"),
-            app("com.google.photos", "google-photos-arm64-v8a-morphe-patches-v7.90.0.1.apk"),
-        )
+        val apps =
+            listOf(
+                app("com.instagram", "instagram-arm64-v8a-piko-patches-v436.0.0.1.1.apk"),
+                app("com.google.photos", "google-photos-arm64-v8a-morphe-patches-v7.90.0.1.apk"),
+            )
         assertEquals(
             listOf(
                 "google-photos-arm64-v8a-morphe-patches-v7.95.0.989626323.apk",
@@ -105,13 +110,14 @@ class InstalledVariantTest {
 
     @Test
     fun the_installed_release_is_installed() {
-        val apps = listOf(
-            app(
-                "org.godotengine.editor.v4",
-                "Godot_v4.7.2-stable_android_editor.apk",
-                installedVersion = "4.7.2-stable",
-            ),
-        )
+        val apps =
+            listOf(
+                app(
+                    "org.godotengine.editor.v4",
+                    "Godot_v4.7.2-stable_android_editor.apk",
+                    installedVersion = "4.7.2-stable",
+                ),
+            )
         assertEquals(
             AssetOwnership.VariantStatus.INSTALLED,
             AssetOwnership.variantStatus("Godot_v4.7.2-stable_android_editor.apk", "4.7.2-stable", apps),

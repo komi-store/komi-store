@@ -66,11 +66,12 @@ fun AutoImportSummaryScreen(
             )
 
             KomiText(
-                text = pluralStringResource(
-                    Res.plurals.external_import_auto_summary_headline,
-                    autoLinkedCount,
-                    autoLinkedCount,
-                ),
+                text =
+                    pluralStringResource(
+                        Res.plurals.external_import_auto_summary_headline,
+                        autoLinkedCount,
+                        autoLinkedCount,
+                    ),
                 role = KomiTextRole.Title,
                 fontWeight = FontWeight.Bold,
                 color = colors.onSurface,
@@ -88,11 +89,12 @@ fun AutoImportSummaryScreen(
 
             if (cardsRemaining > 0) {
                 KomiText(
-                    text = pluralStringResource(
-                        Res.plurals.external_import_auto_summary_review_hint,
-                        cardsRemaining,
-                        cardsRemaining,
-                    ),
+                    text =
+                        pluralStringResource(
+                            Res.plurals.external_import_auto_summary_review_hint,
+                            cardsRemaining,
+                            cardsRemaining,
+                        ),
                     role = KomiTextRole.Body,
                     color = colors.onSurface,
                     textAlign = TextAlign.Center,
@@ -114,10 +116,11 @@ fun AutoImportSummaryScreen(
 
                     if (overflowCount > 0) {
                         ChipSurface(
-                            text = stringResource(
-                                Res.string.external_import_auto_summary_more_count,
-                                overflowCount,
-                            ),
+                            text =
+                                stringResource(
+                                    Res.string.external_import_auto_summary_more_count,
+                                    overflowCount,
+                                ),
                         )
                     }
                 }
@@ -146,9 +149,10 @@ private fun ChipSurface(text: String) {
     val shape = LocalPersonality.current.shape
 
     Box(
-        modifier = Modifier
-            .clip(RoundedCornerShape(shape.corner))
-            .background(colors.primaryContainer),
+        modifier =
+            Modifier
+                .clip(RoundedCornerShape(shape.corner))
+                .background(colors.primaryContainer),
     ) {
         KomiText(
             text = text,

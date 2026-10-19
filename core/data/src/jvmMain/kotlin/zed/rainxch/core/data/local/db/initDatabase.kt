@@ -8,7 +8,6 @@ import zed.rainxch.core.data.local.db.migrations.MIGRATION_19_20
 import java.io.File
 
 fun initDatabase(): AppDatabase {
-
     DesktopAppDataPaths.migrateFromTmpIfNeeded("github_store.db-wal")
     DesktopAppDataPaths.migrateFromTmpIfNeeded("github_store.db-shm")
     DesktopAppDataPaths.migrateFromTmpIfNeeded("github_store.db")

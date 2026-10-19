@@ -10,15 +10,15 @@ import zed.rainxch.core.domain.model.appearance.AccentId
 import zed.rainxch.core.domain.model.appearance.AppPersonality
 import zed.rainxch.core.domain.model.appearance.AppTheme
 import zed.rainxch.core.domain.model.appearance.ContentWidth
+import zed.rainxch.core.domain.model.appearance.FontTheme
 import zed.rainxch.core.domain.model.appearance.MangaPaperId
 import zed.rainxch.core.domain.model.installation.DhizukuAvailability
-import zed.rainxch.core.domain.model.appearance.FontTheme
 import zed.rainxch.core.domain.model.installation.InstallerAttribution
 import zed.rainxch.core.domain.model.installation.InstallerType
-import zed.rainxch.core.domain.model.settings.AppLanguages
-import zed.rainxch.core.domain.model.settings.ProxyScope
 import zed.rainxch.core.domain.model.installation.RootAvailability
 import zed.rainxch.core.domain.model.installation.ShizukuAvailability
+import zed.rainxch.core.domain.model.settings.AppLanguages
+import zed.rainxch.core.domain.model.settings.ProxyScope
 import zed.rainxch.core.domain.model.settings.SupportedTranslationLanguages
 import zed.rainxch.core.domain.model.settings.TranslationProvider
 import zed.rainxch.tweaks.presentation.components.desktop.DesktopSection
@@ -55,7 +55,6 @@ data class TweaksState(
     val isScrollbarEnabled: Boolean = false,
     val contentWidth: ContentWidth = ContentWidth.COMPACT,
     val translationProvider: TranslationProvider = TranslationProvider.Default,
-
     val draftTranslationProvider: TranslationProvider? = null,
     val youdaoAppKey: String = "",
     val youdaoAppSecret: String = "",
@@ -68,7 +67,6 @@ data class TweaksState(
     val microsoftTranslatorKey: String = "",
     val microsoftTranslatorRegion: String = "",
     val isMicrosoftTranslatorKeyVisible: Boolean = false,
-
     val selectedAppLanguage: String? = null,
     val autoTranslateEnabled: Boolean = false,
     val autoTranslateTargetLang: String? = null,
@@ -91,7 +89,6 @@ data class TweaksState(
     val connectionMasterExpanded: Boolean = false,
     val expandedProxyScope: ProxyScope? = null,
     val desktopSection: DesktopSection = DesktopSection.LOOK,
-
     val showBatteryOptimizationCard: Boolean = false,
     val customForgeHosts: ImmutableSet<String> = persistentSetOf(),
     val showCustomForgesDialog: Boolean = false,
@@ -108,6 +105,5 @@ data class TweaksState(
     val displayedTranslationProvider: TranslationProvider
         get() = draftTranslationProvider ?: translationProvider
 
-    fun formFor(scope: ProxyScope): ProxyScopeFormState =
-        proxyForms[scope] ?: ProxyScopeFormState()
+    fun formFor(scope: ProxyScope): ProxyScopeFormState = proxyForms[scope] ?: ProxyScopeFormState()
 }

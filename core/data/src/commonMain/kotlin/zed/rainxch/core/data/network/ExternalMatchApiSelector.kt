@@ -13,12 +13,14 @@ class ExternalMatchApiSelector(
     tweaks: TweaksRepository,
     scope: CoroutineScope,
 ) : ExternalMatchApi {
-    private val flagState = tweaks.getExternalMatchSearchEnabled()
-        .stateIn(
-            scope = scope,
-            started = SharingStarted.Eagerly,
-            initialValue = false
-        )
+    private val flagState =
+        tweaks
+            .getExternalMatchSearchEnabled()
+            .stateIn(
+                scope = scope,
+                started = SharingStarted.Eagerly,
+                initialValue = false,
+            )
 
     override suspend fun match(request: ExternalMatchRequest): Result<ExternalMatchResponse> =
         if (flagState.value) {
