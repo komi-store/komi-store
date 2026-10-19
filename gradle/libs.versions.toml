@@ -3,7 +3,7 @@ agp = "8.13.2"
 composeBom = "2025.07.00"
 kermit = "2.0.8"
 kotlin = "2.3.10"
-ksp = "2.3.5"
+ksp = "2.3.12"
 
 androidDesugarJdkLibs = "2.1.5"
 androidTools = "32.0.1"
