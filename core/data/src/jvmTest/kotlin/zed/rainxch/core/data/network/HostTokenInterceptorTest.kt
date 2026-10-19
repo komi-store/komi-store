@@ -109,8 +109,10 @@ class HostTokenInterceptorTest {
 
         override fun observeAll(): Flow<List<HostToken>> = tokens
 
-        override suspend fun get(host: String): HostToken? =
-            tokens.value.firstOrNull { it.host == HostNames.normalize(host) }
+        override suspend fun get(host: String): HostToken? {
+            val normalized = HostNames.normalize(host)
+            return tokens.value.firstOrNull { it.host == normalized }
+        }
 
         override suspend fun set(
             host: String,
