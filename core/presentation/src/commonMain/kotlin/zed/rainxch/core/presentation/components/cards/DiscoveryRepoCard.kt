@@ -161,6 +161,6 @@ private fun RepoActionRow(
             tint = if (tint == Color.Unspecified) MaterialTheme.colorScheme.onSurface else tint,
             modifier = Modifier.size(22.dp),
         )
-        KomiText(text = label, role = KomiTextRole.LegacyBody, color = tint)
+        KomiText(text = label, role = KomiTextRole.Body, color = tint)
     }
 }

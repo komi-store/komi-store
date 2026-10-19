@@ -21,7 +21,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.sp
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
@@ -155,11 +154,10 @@ private fun KomiActionTile(
 
             KomiText(
                 text = item.title,
-                role = KomiTextRole.LegacyLabel,
+                role = KomiTextRole.LabelSmall,
                 color =
                     LocalPersonality.current.colors.onSurfaceVariant
                         .copy(alpha = if (item.enabled) 1f else 0.45f),
-                fontSize = 11.sp,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )

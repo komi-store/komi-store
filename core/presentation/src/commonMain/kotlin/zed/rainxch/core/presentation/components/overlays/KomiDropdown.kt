@@ -36,11 +36,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import zed.rainxch.core.presentation.components.buttons.KomiButtonVariant
@@ -208,21 +206,16 @@ private fun KomiMenuRow(
         Column(modifier = Modifier.weight(1f)) {
             KomiText(
                 text = item.label,
-                role = KomiTextRole.LegacyBody,
+                role = KomiTextRole.Label,
                 color = fg.copy(alpha = alpha),
-                fontSize = 14.sp,
-                fontWeight = if (isManga) FontWeight.W700 else null,
-                uppercase = false,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
             item.subtitle?.let { subtitle ->
                 KomiText(
                     text = subtitle,
-                    role = KomiTextRole.LegacyBody,
+                    role = KomiTextRole.Caption,
                     color = colors.onSurfaceVariant.copy(alpha = alpha),
-                    fontSize = 12.sp,
-                    uppercase = false,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
                 )

@@ -23,7 +23,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.mikepenz.markdown.compose.Markdown
 import com.mikepenz.markdown.compose.components.MarkdownComponentModel
@@ -107,7 +106,6 @@ fun AlertBlockQuote(
                     text = label,
                     style = MaterialTheme.typography.labelLarge,
                     color = palette.accent,
-                    fontWeight = FontWeight.SemiBold,
                 )
             }
 

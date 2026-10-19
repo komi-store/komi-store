@@ -202,10 +202,8 @@ fun KomiListRow(
         Column(modifier = Modifier.weight(1f)) {
             KomiText(
                 text = title,
-                role = KomiTextRole.LegacyLabel,
+                role = if (strong) KomiTextRole.CardTitle else KomiTextRole.ItemTitle,
                 color = titleColor,
-                fontWeight = if (strong) androidx.compose.ui.text.font.FontWeight.Black else null,
-                uppercase = false,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
@@ -213,9 +211,8 @@ fun KomiListRow(
             subtitle?.let {
                 KomiText(
                     text = it,
-                    role = KomiTextRole.LegacyBody,
+                    role = KomiTextRole.Body,
                     color = subtitleColor,
-                    uppercase = false,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )

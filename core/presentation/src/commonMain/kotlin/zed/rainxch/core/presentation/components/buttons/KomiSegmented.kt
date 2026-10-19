@@ -37,7 +37,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import zed.rainxch.core.presentation.components.text.KomiText
@@ -164,7 +163,7 @@ private fun <T> MangaSegmentCell(
                 .padding(horizontal = Spacing.md),
         contentAlignment = Alignment.Center,
     ) {
-        SegmentContent(item = item, contentColor = contentColor, iconSize = metrics.icon, textRole = KomiTextRole.LegacyStamp)
+        SegmentContent(item = item, contentColor = contentColor, iconSize = metrics.icon, textRole = KomiTextRole.Stamp)
     }
 }
 
@@ -222,7 +221,7 @@ private fun <T> ClassicSegmentCell(
                 .padding(horizontal = Spacing.md),
         contentAlignment = Alignment.Center,
     ) {
-        SegmentContent(item = item, contentColor = contentColor, iconSize = metrics.icon, textRole = KomiTextRole.LegacyLabel)
+        SegmentContent(item = item, contentColor = contentColor, iconSize = metrics.icon, textRole = KomiTextRole.Label)
     }
 }
 
@@ -251,7 +250,6 @@ private fun SegmentContent(
                 text = title,
                 role = textRole,
                 color = contentColor,
-                fontSize = 13.sp,
                 maxLines = 1,
             )
         }

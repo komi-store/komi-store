@@ -47,9 +47,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.IntOffset
-import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import zed.rainxch.core.presentation.components.text.KomiText
 import zed.rainxch.core.presentation.components.text.KomiTextRole
 import zed.rainxch.core.presentation.locals.LocalPersonality
@@ -228,7 +226,7 @@ private fun MangaButton(
             contentColor = resolvedContentColor.copy(alpha = resolvedContentColor.alpha * alpha),
             iconSize = metrics.icon,
             gap = metrics.gap,
-            fontSize = metrics.font,
+            labelRole = metrics.labelRole,
             loading = loading,
             leadingIcon = leadingIcon,
             trailingIcon = trailingIcon,
@@ -304,7 +302,7 @@ private fun ClassicButton(
             contentColor = LocalContentColor.current,
             iconSize = metrics.icon,
             gap = metrics.gap,
-            fontSize = TextUnit.Unspecified,
+            labelRole = metrics.labelRole,
             loading = loading,
             leadingIcon = leadingIcon,
             trailingIcon = trailingIcon,
@@ -380,7 +378,7 @@ private fun RowScope.KomiButtonContent(
     contentColor: Color,
     iconSize: Dp,
     gap: Dp,
-    fontSize: TextUnit,
+    labelRole: KomiTextRole,
     loading: Boolean,
     leadingIcon: ImageVector?,
     trailingIcon: ImageVector?,
@@ -404,11 +402,10 @@ private fun RowScope.KomiButtonContent(
 
         KomiText(
             text = label,
-            role = KomiTextRole.LegacyLabel,
+            role = labelRole,
             color = contentColor,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
-            fontSize = fontSize,
         )
 
         if (trailingIcon != null && !loading) {
@@ -425,7 +422,7 @@ private fun RowScope.KomiButtonContent(
 private data class ButtonMetrics(
     val height: Dp,
     val hPadding: Dp,
-    val font: TextUnit,
+    val labelRole: KomiTextRole,
     val icon: Dp,
     val gap: Dp,
     val shadow: Dp,
@@ -434,9 +431,9 @@ private data class ButtonMetrics(
 
 private fun buttonMetrics(size: KomiButtonSize): ButtonMetrics =
     when (size) {
-        KomiButtonSize.Sm -> ButtonMetrics(34.dp, 14.dp, 12.sp, 15.dp, 7.dp, 3.dp, 1.5.dp)
-        KomiButtonSize.Md -> ButtonMetrics(44.dp, 20.dp, 13.5.sp, 18.dp, 9.dp, 4.dp, 2.5.dp)
-        KomiButtonSize.Lg -> ButtonMetrics(54.dp, 26.dp, 16.sp, 22.dp, 10.dp, 5.dp, 3.dp)
+        KomiButtonSize.Sm -> ButtonMetrics(34.dp, 14.dp, KomiTextRole.LabelSmall, 15.dp, 7.dp, 3.dp, 1.5.dp)
+        KomiButtonSize.Md -> ButtonMetrics(44.dp, 20.dp, KomiTextRole.Label, 18.dp, 9.dp, 4.dp, 2.5.dp)
+        KomiButtonSize.Lg -> ButtonMetrics(54.dp, 26.dp, KomiTextRole.LabelLarge, 22.dp, 10.dp, 5.dp, 3.dp)
     }
 
 @Composable

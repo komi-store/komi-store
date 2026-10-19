@@ -31,7 +31,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import zed.rainxch.core.presentation.components.badge.KomiBadge
@@ -145,9 +144,8 @@ private fun MangaBottomBar(
                 Spacer(Modifier.height(4.dp))
                 KomiText(
                     text = item.label,
-                    role = KomiTextRole.LegacyLabel,
+                    role = KomiTextRole.LabelSmall,
                     color = if (selected) colors.onSurface else colors.onSurfaceVariant,
-                    fontSize = 10.5.sp,
                     maxLines = 1,
                 )
             }
@@ -204,10 +202,8 @@ private fun ClassicBottomBar(
                 Spacer(Modifier.height(4.dp))
                 KomiText(
                     text = item.label,
-                    role = KomiTextRole.LegacyLabel,
+                    role = KomiTextRole.LabelSmall,
                     color = tint,
-                    fontSize = 11.sp,
-                    uppercase = false,
                     maxLines = 1,
                 )
             }

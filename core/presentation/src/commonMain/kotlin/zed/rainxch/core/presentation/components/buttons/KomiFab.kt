@@ -26,7 +26,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import zed.rainxch.core.presentation.components.icon.KomiIcon
 import zed.rainxch.core.presentation.components.text.KomiText
 import zed.rainxch.core.presentation.components.text.KomiTextRole
@@ -58,7 +57,7 @@ fun KomiFab(
                     containerColor = colors.primaryContainer,
                     contentColor = colors.onPrimaryContainer,
                     icon = { KomiIcon(icon, contentDescription, modifier = Modifier.size(20.dp)) },
-                    text = { KomiText(label, role = KomiTextRole.LegacyLabel) },
+                    text = { KomiText(label, role = KomiTextRole.LabelLarge) },
                 )
             } else {
                 FloatingActionButton(
@@ -108,7 +107,7 @@ private fun MangaFab(
             horizontalArrangement = Arrangement.spacedBy(10.dp),
         ) {
             KomiIcon(icon, contentDescription, modifier = Modifier.size(22.dp), tint = colors.onPrimary)
-            KomiText(label, role = KomiTextRole.LegacyLabel, color = colors.onPrimary, fontSize = 15.sp)
+            KomiText(label, role = KomiTextRole.LabelLarge, color = colors.onPrimary)
         }
     } else {
         Box(modifier = base.size(56.dp), contentAlignment = Alignment.Center) {

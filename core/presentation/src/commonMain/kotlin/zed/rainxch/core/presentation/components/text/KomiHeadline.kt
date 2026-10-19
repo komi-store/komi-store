@@ -32,7 +32,7 @@ import zed.rainxch.core.presentation.personality.utils.PersonalityPreview
 fun KomiHeadline(
     text: String,
     modifier: Modifier = Modifier,
-    role: KomiTextRole = KomiTextRole.LegacyTitle,
+    role: KomiTextRole = KomiTextRole.SectionTitle,
     color: Color = Color.Unspecified,
     maxLines: Int = 1,
 ) {
@@ -152,7 +152,7 @@ private fun HeadlineSpeedLines(color: Color) {
 private fun KomiHeadlineStampPreview() {
     PersonalityPreview(mangaPersonality(headlineMarker = HeadlineMarker.Stamp)) {
         Column(verticalArrangement = Arrangement.spacedBy(18.dp)) {
-            KomiHeadline("Discover", role = KomiTextRole.LegacyDisplay)
+            KomiHeadline("Discover", role = KomiTextRole.Display)
             KomiHeadline("Trending Now")
         }
     }
@@ -163,7 +163,7 @@ private fun KomiHeadlineStampPreview() {
 private fun KomiHeadlineSpeedLinesPreview() {
     PersonalityPreview(mangaPersonality(headlineMarker = HeadlineMarker.SpeedLines)) {
         Column(verticalArrangement = Arrangement.spacedBy(18.dp)) {
-            KomiHeadline("Discover", role = KomiTextRole.LegacyDisplay)
+            KomiHeadline("Discover", role = KomiTextRole.Display)
             KomiHeadline("Trending Now")
         }
     }
@@ -180,7 +180,7 @@ private fun KomiHeadlineSpeedLinesDarkPreview() {
         ),
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(18.dp)) {
-            KomiHeadline("Discover", role = KomiTextRole.LegacyDisplay)
+            KomiHeadline("Discover", role = KomiTextRole.Display)
             KomiHeadline("Trending Now")
         }
     }
@@ -191,7 +191,7 @@ private fun KomiHeadlineSpeedLinesDarkPreview() {
 private fun KomiHeadlineClassicPreview() {
     PersonalityPreview(classicPersonality()) {
         Column(verticalArrangement = Arrangement.spacedBy(18.dp)) {
-            KomiHeadline("Discover", role = KomiTextRole.LegacyDisplay)
+            KomiHeadline("Discover", role = KomiTextRole.Display)
             KomiHeadline("Trending Now")
         }
     }

@@ -18,7 +18,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import zed.rainxch.core.presentation.components.buttons.KomiButtonVariant
 import zed.rainxch.core.presentation.components.buttons.KomiIconButton
 import zed.rainxch.core.presentation.components.overlays.KomiToastHost
@@ -113,7 +112,7 @@ private fun PreviewScaffold() {
                         .padding(horizontal = Spacing.lg, vertical = Spacing.md),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                KomiText(text = "Discover", role = KomiTextRole.LegacyTitle)
+                KomiText(text = "Discover", role = KomiTextRole.ScreenTitle)
             }
         },
         bottomBar = {
@@ -125,9 +124,8 @@ private fun PreviewScaffold() {
                 listOf("Explore", "Search", "Top Charts", "You").forEach {
                     KomiText(
                         text = it,
-                        role = KomiTextRole.LegacyLabel,
+                        role = KomiTextRole.LabelSmall,
                         color = colors.onSurfaceVariant,
-                        fontSize = 11.sp,
                     )
                 }
             }
@@ -150,7 +148,7 @@ private fun PreviewScaffold() {
                     elevation = KomiSurfaceElevation.Card,
                     contentPadding = PaddingValues(Spacing.lg),
                 ) {
-                    KomiText(text = "Panel ${it + 1}", role = KomiTextRole.LegacyTitle)
+                    KomiText(text = "Panel ${it + 1}", role = KomiTextRole.CardTitle)
                 }
             }
         }

@@ -30,12 +30,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import zed.rainxch.core.presentation.components.text.KomiText
 import zed.rainxch.core.presentation.components.text.KomiTextRole
 import zed.rainxch.core.presentation.locals.LocalPersonality
@@ -125,12 +123,7 @@ fun KomiBadge(
                 Text(
                     text = text,
                     color = fg,
-                    style =
-                        personality.type.legacyLabel.copy(
-                            fontWeight = FontWeight.W900,
-                            fontSize = metrics.font,
-                            fontFeatureSettings = "tnum",
-                        ),
+                    style = personality.type.labelSmall.copy(fontFeatureSettings = "tnum"),
                 )
             }
         }
@@ -185,7 +178,6 @@ private fun Modifier.semanticsLabel(label: String?): Modifier =
 
 private data class BadgeMetrics(
     val height: Dp,
-    val font: androidx.compose.ui.unit.TextUnit,
     val border: Dp,
     val shadow: Dp,
     val padX: Dp,
@@ -196,7 +188,6 @@ private fun badgeMetrics(size: KomiBadgeSize): BadgeMetrics =
     when (size) {
         KomiBadgeSize.Sm -> BadgeMetrics(
             height = 16.dp,
-            font = 10.5.sp,
             border = 2.dp,
             shadow = 1.5.dp,
             padX = 4.dp,
@@ -205,7 +196,6 @@ private fun badgeMetrics(size: KomiBadgeSize): BadgeMetrics =
 
         KomiBadgeSize.Md -> BadgeMetrics(
             height = 20.dp,
-            font = 12.5.sp,
             border = 2.dp,
             shadow = 2.dp,
             padX = 5.dp,
@@ -274,7 +264,7 @@ private fun PreviewRow() {
         KomiText(
             text = "Announcements",
             modifier = Modifier.weight(1f),
-            role = KomiTextRole.LegacyBody,
+            role = KomiTextRole.Body,
             color = colors.onSurface
         )
         KomiBadge(count = 3, size = KomiBadgeSize.Md)

@@ -26,13 +26,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import zed.rainxch.core.presentation.components.buttons.KomiButtonVariant
 import zed.rainxch.core.presentation.components.buttons.KomiIconButton
 import zed.rainxch.core.presentation.components.text.KomiText
@@ -106,7 +104,6 @@ private fun MangaTopBar(
 ) {
     val colors = personality.colors
     val isMast = size == KomiTopBarSize.Masthead
-    val titleSize = if (isMast) 27.sp else 22.sp
     val locale = appLocale()
     val annotatedTitle =
         remember(title, titleAccent, colors.primary, locale) {
@@ -139,7 +136,7 @@ private fun MangaTopBar(
         ) {
             MaterialText(
                 text = annotatedTitle,
-                style = personality.type.legacyTitle.copy(fontSize = titleSize),
+                style = personality.type.screenTitle,
                 color = colors.onSurface,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
@@ -148,10 +145,8 @@ private fun MangaTopBar(
                 KomiText(
                     text = it,
                     modifier = Modifier.padding(top = 2.dp),
-                    role = KomiTextRole.LegacyLabel,
+                    role = KomiTextRole.Overline,
                     color = colors.onSurfaceVariant,
-                    fontSize = 11.sp,
-                    fontWeight = FontWeight.W800,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
@@ -201,17 +196,15 @@ private fun ClassicTopBar(
         Column {
             KomiText(
                 text = title,
-                role = KomiTextRole.LegacyTitle,
+                role = KomiTextRole.ScreenTitle,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
             subtitle?.let {
                 KomiText(
                     text = it,
-                    role = KomiTextRole.LegacyLabel,
+                    role = KomiTextRole.Caption,
                     color = LocalPersonality.current.colors.onSurfaceVariant,
-                    fontSize = 12.sp,
-                    uppercase = false,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )

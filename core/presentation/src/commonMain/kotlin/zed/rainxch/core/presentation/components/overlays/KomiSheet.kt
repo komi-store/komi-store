@@ -47,7 +47,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import zed.rainxch.core.presentation.components.buttons.KomiButton
@@ -344,18 +343,15 @@ private fun MangaSheetInner(
                 )
                 KomiText(
                     text = title,
-                    role = KomiTextRole.LegacyTitle,
-                    fontSize = 19.sp,
+                    role = KomiTextRole.CardTitle,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
                 if (titleJp != null) {
                     KomiText(
                         text = titleJp,
-                        role = KomiTextRole.LegacyLabel,
+                        role = KomiTextRole.Caption,
                         color = colors.onSurfaceVariant,
-                        fontSize = 11.sp,
-                        uppercase = false,
                         maxLines = 1,
                     )
                 }
@@ -443,7 +439,7 @@ private fun ClassicBottomSheet(
             if (title != null) {
                 KomiText(
                     text = title,
-                    role = KomiTextRole.LegacyTitle,
+                    role = KomiTextRole.CardTitle,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
@@ -496,7 +492,7 @@ private fun ClassicCenterDialog(
                 if (title != null) {
                     KomiText(
                         text = title,
-                        role = KomiTextRole.LegacyTitle,
+                        role = KomiTextRole.CardTitle,
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis
                     )
@@ -521,7 +517,7 @@ private fun PreviewBody() {
     val colors = LocalPersonality.current.colors
     KomiText(
         text = "Remove immich from this device? Your library on the server is untouched.",
-        role = KomiTextRole.LegacyBody,
+        role = KomiTextRole.Body,
         color = colors.onSurface,
     )
 }

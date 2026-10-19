@@ -41,22 +41,18 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.em
-import androidx.compose.ui.unit.sp
+import zed.rainxch.core.presentation.components.text.KomiText
+import zed.rainxch.core.presentation.components.text.KomiTextRole
 import zed.rainxch.core.presentation.locals.LocalPersonality
-import zed.rainxch.core.presentation.locals.appLocale
 import zed.rainxch.core.presentation.personality.ClassicPersonality
 import zed.rainxch.core.presentation.personality.MangaPersonality
 import zed.rainxch.core.presentation.personality.classicPersonality
@@ -194,21 +190,12 @@ private fun MangaTextField(
 
     Column(modifier = modifier.then(if (enabled) Modifier else Modifier.alpha(0.5f))) {
         if (label != null) {
-            val labelStyle = TextStyle(
-                fontFamily = type.display.fontFamily,
-                fontSize = (metrics.font - 2f).sp,
-                letterSpacing = 0.05.em,
-            )
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    text = label.toUpperCase(appLocale()),
-                    style = labelStyle,
-                    color = colors.onSurface
-                )
+                KomiText(text = label, role = KomiTextRole.Overline, color = colors.onSurface)
                 if (required) {
-                    Text(
+                    KomiText(
                         text = "*",
-                        style = labelStyle,
+                        role = KomiTextRole.Overline,
                         color =
                             if (hasError) {
                                 colors.error
@@ -273,13 +260,7 @@ private fun MangaTextField(
                 onValueChange = onValueChange,
                 modifier = Modifier.weight(1f).focusRequester(focusRequester),
                 enabled = enabled,
-                textStyle =
-                    TextStyle(
-                        fontFamily = type.body.fontFamily,
-                        fontWeight = FontWeight.W700,
-                        fontSize = metrics.font.sp,
-                        color = colors.onSurface,
-                    ),
+                textStyle = type.reading.copy(color = colors.onSurface),
                 cursorBrush = SolidColor(if (hasAccent) colors.primary else colors.onSurface),
                 visualTransformation = visualTransformation,
                 singleLine = !multiline,
@@ -294,13 +275,9 @@ private fun MangaTextField(
                 interactionSource = interaction,
                 decorationBox = { inner ->
                     if (value.isEmpty() && placeholder != null) {
-                        Text(
+                        KomiText(
                             text = placeholder,
-                            style = TextStyle(
-                                fontFamily = type.body.fontFamily,
-                                fontWeight = FontWeight.W700,
-                                fontSize = metrics.font.sp
-                            ),
+                            role = KomiTextRole.Reading,
                             color = colors.onSurfaceVariant,
                             maxLines = if (multiline) Int.MAX_VALUE else 1,
                             overflow = TextOverflow.Ellipsis
@@ -329,13 +306,9 @@ private fun MangaTextField(
         val supporting = error ?: helper
         if (supporting != null) {
             Spacer(modifier = Modifier.height(6.dp))
-            Text(
+            KomiText(
                 text = supporting,
-                style = TextStyle(
-                    fontFamily = type.body.fontFamily,
-                    fontWeight = FontWeight.W700,
-                    fontSize = (metrics.font - 3.5f).sp
-                ),
+                role = KomiTextRole.Caption,
                 color = if (hasError) colors.error else colors.onSurfaceVariant,
             )
         }
@@ -492,7 +465,6 @@ private fun ClassicTextField(
 private data class FieldMetrics(
     val height: Dp,
     val paddingX: Dp,
-    val font: Float,
     val icon: Dp,
     val border: Dp,
     val shadow: Dp,
@@ -500,9 +472,9 @@ private data class FieldMetrics(
 
 private fun fieldMetrics(size: KomiTextFieldSize): FieldMetrics =
     when (size) {
-        KomiTextFieldSize.Sm -> FieldMetrics(38.dp, 11.dp, 13f, 16.dp, 2.5.dp, 3.dp)
-        KomiTextFieldSize.Md -> FieldMetrics(46.dp, 12.dp, 15f, 19.dp, 3.dp, 4.dp)
-        KomiTextFieldSize.Lg -> FieldMetrics(54.dp, 14.dp, 17f, 21.dp, 3.dp, 5.dp)
+        KomiTextFieldSize.Sm -> FieldMetrics(38.dp, 11.dp, 16.dp, 2.5.dp, 3.dp)
+        KomiTextFieldSize.Md -> FieldMetrics(46.dp, 12.dp, 19.dp, 3.dp, 4.dp)
+        KomiTextFieldSize.Lg -> FieldMetrics(54.dp, 14.dp, 21.dp, 3.dp, 5.dp)
     }
 
 @Composable

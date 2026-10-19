@@ -55,12 +55,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
 import zed.rainxch.core.presentation.components.text.KomiText
 import zed.rainxch.core.presentation.components.text.KomiTextRole
@@ -229,10 +227,8 @@ private fun MangaToastPanel(
                 KomiText(
                     text = data.message,
                     modifier = Modifier.weight(1f),
-                    role = KomiTextRole.LegacyBody,
+                    role = KomiTextRole.Body,
                     color = colors.onSurface,
-                    fontSize = 13.5.sp,
-                    fontWeight = FontWeight.W700,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
                 )
@@ -247,10 +243,8 @@ private fun MangaToastPanel(
                                 data.onAction?.invoke()
                                 onClose()
                             },
-                        role = KomiTextRole.LegacyTitle,
+                        role = KomiTextRole.Label,
                         color = accent,
-                        fontSize = 14.sp,
-                        uppercase = true,
                     )
                 }
                 if (showX) {
@@ -328,7 +322,7 @@ private fun SfxKicker(
                 alpha = alphaAnim.value
                 rotationZ = -8f
             },
-        style = personality.type.legacyLabel.copy(fontWeight = FontWeight.W900, fontSize = 22.sp),
+        style = personality.type.labelLarge,
         color = color,
     )
 }
