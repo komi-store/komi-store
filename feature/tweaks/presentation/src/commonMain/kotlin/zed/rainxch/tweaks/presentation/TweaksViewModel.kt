@@ -357,18 +357,18 @@ class TweaksViewModel(
 
     private fun persistInstallerAttribution(attribution: zed.rainxch.core.domain.model.installation.InstallerAttribution) {
         viewModelScope.launch {
-            runCatching {
+            try {
                 tweaksRepository.setInstallerAttribution(attribution)
-            }.onSuccess {
                 _state.update {
                     it.copy(
                         installerAttributionCustomExpanded = false,
                         installerAttributionCustomError = null,
                     )
                 }
-            }.onFailure { error ->
-                if (error is CancellationException) throw error
-                logger.error("TweaksViewModel: failed to persist installer attribution", error)
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                logger.error("TweaksViewModel: failed to persist installer attribution", e)
                 _state.update {
                     it.copy(installerAttributionCustomError = "write_failed")
                 }
@@ -508,17 +508,19 @@ class TweaksViewModel(
     private fun evaluateBatteryOptimizationCard() {
         viewModelScope.launch {
             val dismissed =
-                runCatching {
+                try {
                     withTimeoutOrNull(BATTERY_OPT_PREF_READ_TIMEOUT_MS.milliseconds) {
                         tweaksRepository.getBatteryOptimizationPromptDismissed().firstOrNull()
                     }
-                }.onFailure { error ->
-                    if (error is CancellationException) throw error
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (e: Exception) {
                     logger.error(
                         "TweaksViewModel: failed to read battery-opt dismissed flag",
-                        error,
+                        e,
                     )
-                }.getOrNull() ?: false
+                    null
+                } ?: false
             val show =
                 aggressiveOemDetector.isAggressiveOem() &&
                     !aggressiveOemDetector.isBatteryOptimizationIgnored() &&
@@ -637,13 +639,14 @@ class TweaksViewModel(
                             ProxyConfig.System
                         }
                     viewModelScope.launch {
-                        runCatching {
+                        try {
                             proxyRepository.setProxyConfig(action.scope, config)
-                        }.onSuccess {
                             clearDirty(action.scope)
                             _events.send(TweaksEvent.OnProxySaved)
-                        }.onFailure { error ->
-                            if (error is CancellationException) throw error
+                        } catch (e: CancellationException) {
+                            throw e
+                        } catch (e: Exception) {
+                            logger.error("TweaksViewModel: failed to save proxy config", e)
                             _events.send(
                                 TweaksEvent.OnProxySaveError(
                                     getString(Res.string.failed_to_save_proxy_settings),
@@ -730,13 +733,14 @@ class TweaksViewModel(
                     }
 
                 viewModelScope.launch {
-                    runCatching {
+                    try {
                         proxyRepository.setProxyConfig(action.scope, config)
-                    }.onSuccess {
                         clearDirty(action.scope)
                         _events.send(TweaksEvent.OnProxySaved)
-                    }.onFailure { error ->
-                        if (error is CancellationException) throw error
+                    } catch (e: CancellationException) {
+                        throw e
+                    } catch (e: Exception) {
+                        logger.error("TweaksViewModel: failed to save proxy config", e)
                         _events.send(
                             TweaksEvent.OnProxySaveError(
                                 getString(Res.string.failed_to_save_proxy_settings),
@@ -826,19 +830,19 @@ class TweaksViewModel(
                     }
                 } else {
                     viewModelScope.launch {
-                        runCatching {
+                        try {
                             tweaksRepository.setInstallerAttribution(
                                 zed.rainxch.core.domain.model.installation.InstallerAttribution.Custom(
                                     draft,
                                 ),
                             )
-                        }.onSuccess {
                             _state.update { it.copy(installerAttributionCustomError = null) }
-                        }.onFailure { error ->
-                            if (error is CancellationException) throw error
+                        } catch (e: CancellationException) {
+                            throw e
+                        } catch (e: Exception) {
                             logger.error(
                                 "TweaksViewModel: failed to persist installer attribution",
-                                error,
+                                e,
                             )
                             _state.update { it.copy(installerAttributionCustomError = "write_failed") }
                         }
@@ -908,19 +912,19 @@ class TweaksViewModel(
             TweaksAction.OnClearDownloadsConfirm -> {
                 _state.update { it.copy(isClearDownloadsDialogVisible = false) }
                 viewModelScope.launch {
-                    runCatching {
+                    try {
                         cacheRepository.clearCache()
-                    }.onSuccess {
                         cacheSizeJob?.cancel()
                         cacheSizeJob = null
                         refreshCacheSize()
                         _events.send(TweaksEvent.OnCacheCleared)
-                    }.onFailure { error ->
-                        if (error is CancellationException) throw error
+                    } catch (e: CancellationException) {
+                        throw e
+                    } catch (e: Exception) {
+                        logger.error("TweaksViewModel: failed to clear downloads", e)
                         _events.send(
                             TweaksEvent.OnCacheClearError(
-                                error.message
-                                    ?: getString(Res.string.tweaks_clear_downloads_failed),
+                                getString(Res.string.tweaks_clear_downloads_failed),
                             ),
                         )
                     }
@@ -1231,13 +1235,14 @@ class TweaksViewModel(
 
             TweaksAction.OnDismissBatteryOptimizationCard -> {
                 viewModelScope.launch {
-                    runCatching {
+                    try {
                         tweaksRepository.setBatteryOptimizationPromptDismissed(true)
-                    }.onFailure {
-                        if (it is CancellationException) throw it
+                    } catch (e: CancellationException) {
+                        throw e
+                    } catch (e: Exception) {
                         logger.error(
                             "TweaksViewModel: failed to persist battery-opt dismiss",
-                            it,
+                            e,
                         )
                     }
                     _state.update { it.copy(showBatteryOptimizationCard = false) }
@@ -1281,16 +1286,15 @@ class TweaksViewModel(
                         }
                         return@launch
                     }
-                    val result = runCatching { tweaksRepository.addCustomForgeHost(raw) }
-                    if (result.isSuccess) {
+                    try {
+                        tweaksRepository.addCustomForgeHost(raw)
                         _state.update { it.copy(customForgeDraft = "", customForgeError = null) }
-                    } else {
+                    } catch (e: CancellationException) {
+                        throw e
+                    } catch (e: Exception) {
+                        logger.error("TweaksViewModel: failed to add custom forge host", e)
                         _state.update {
-                            it.copy(
-                                customForgeError =
-                                    result.exceptionOrNull()?.message
-                                        ?: getString(Res.string.tweaks_custom_forge_save_failed),
-                            )
+                            it.copy(customForgeError = getString(Res.string.tweaks_custom_forge_save_failed))
                         }
                     }
                 }
@@ -1298,14 +1302,14 @@ class TweaksViewModel(
 
             is TweaksAction.OnRemoveCustomForge -> {
                 viewModelScope.launch {
-                    val result = runCatching { tweaksRepository.removeCustomForgeHost(action.host) }
-                    if (result.isFailure) {
+                    try {
+                        tweaksRepository.removeCustomForgeHost(action.host)
+                    } catch (e: CancellationException) {
+                        throw e
+                    } catch (e: Exception) {
+                        logger.error("TweaksViewModel: failed to remove custom forge host", e)
                         _state.update {
-                            it.copy(
-                                customForgeError =
-                                    result.exceptionOrNull()?.message
-                                        ?: getString(Res.string.tweaks_custom_forge_remove_failed),
-                            )
+                            it.copy(customForgeError = getString(Res.string.tweaks_custom_forge_remove_failed))
                         }
                     }
                 }
@@ -1322,22 +1326,23 @@ class TweaksViewModel(
                             ProxyConfig.System
                         }
                     viewModelScope.launch {
-                        runCatching {
+                        try {
                             proxyRepository.setMasterProxyConfig(config)
                             ProxyScope.entries.forEach { scope ->
                                 if (_state.value.useMain(scope)) {
                                     proxyRepository.setProxyConfig(scope, config)
                                 }
                             }
-                        }.onSuccess {
                             _state.update {
                                 it.copy(
                                     masterProxyForm = it.masterProxyForm.copy(isDraftDirty = false),
                                 )
                             }
                             _events.send(TweaksEvent.OnProxySaved)
-                        }.onFailure { error ->
-                            if (error is CancellationException) throw error
+                        } catch (e: CancellationException) {
+                            throw e
+                        } catch (e: Exception) {
+                            logger.error("TweaksViewModel: failed to save main proxy config", e)
                             _events.send(
                                 TweaksEvent.OnProxySaveError(
                                     getString(Res.string.failed_to_save_proxy_settings),
@@ -1399,22 +1404,23 @@ class TweaksViewModel(
             TweaksAction.OnMasterProxySave -> {
                 val config = buildMasterProxyConfig() ?: return
                 viewModelScope.launch {
-                    runCatching {
+                    try {
                         proxyRepository.setMasterProxyConfig(config)
                         ProxyScope.entries.forEach { scope ->
                             if (_state.value.useMain(scope)) {
                                 proxyRepository.setProxyConfig(scope, config)
                             }
                         }
-                    }.onSuccess {
                         _state.update {
                             it.copy(
                                 masterProxyForm = it.masterProxyForm.copy(isDraftDirty = false),
                             )
                         }
                         _events.send(TweaksEvent.OnProxySaved)
-                    }.onFailure { error ->
-                        if (error is CancellationException) throw error
+                    } catch (e: CancellationException) {
+                        throw e
+                    } catch (e: Exception) {
+                        logger.error("TweaksViewModel: failed to save main proxy config", e)
                         _events.send(
                             TweaksEvent.OnProxySaveError(
                                 getString(Res.string.failed_to_save_proxy_settings),
@@ -1490,7 +1496,7 @@ class TweaksViewModel(
                     )
                 }
                 viewModelScope.launch {
-                    runCatching {
+                    try {
                         proxyRepository.setUseMaster(action.scope, action.useMain)
                         if (action.useMain) {
                             val master = proxyRepository.getMasterProxyConfig().first()
@@ -1498,8 +1504,10 @@ class TweaksViewModel(
                                 proxyRepository.setProxyConfig(action.scope, master)
                             }
                         }
-                    }.onFailure { error ->
-                        if (error is CancellationException) throw error
+                    } catch (e: CancellationException) {
+                        throw e
+                    } catch (e: Exception) {
+                        logger.error("TweaksViewModel: failed to save proxy scope source", e)
                         _events.send(
                             TweaksEvent.OnProxySaveError(
                                 getString(Res.string.failed_to_save_proxy_settings),
