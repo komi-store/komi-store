@@ -764,7 +764,6 @@
     <string name="feedback_send_via_github">Ouvrir comme Issue GitHub</string>
     <string name="feedback_send_success_email">Merci — ouverture de votre client e-mail.</string>
     <string name="feedback_send_success_github">Merci — ouverture de votre navigateur.</string>
-    <string name="feedback_send_error">Impossible d'ouvrir le canal de commentaires : %1$s</string>
 
     <!-- ═══════════════════════════════════════════════════════════════
          E5 — Mirror feature
@@ -796,7 +795,6 @@
     <string name="mirror_test_http_error">Le miroir a renvoyé %1$d</string>
     <string name="mirror_test_timeout">Délai dépassé après 5s</string>
     <string name="mirror_test_dns_fail">Impossible de résoudre l'hôte</string>
-    <string name="mirror_test_other">Échec : %1$s</string>
     <string name="mirror_deploy_your_own_hint">Tous les miroirs hors ligne ? Vous pouvez héberger le vôtre en 5 minutes — consultez la documentation.</string>
     <string name="mirror_removed_toast">%1$s n'est plus disponible, basculé vers GitHub direct.</string>
 
@@ -1081,7 +1079,6 @@
     <string name="host_tokens_undo_action">Annuler</string>
     <string name="host_tokens_undo_failed">Impossible de restaurer le jeton pour %1$s</string>
     <string name="host_tokens_undo_snackbar">Jeton pour %1$s supprimé</string>
-    <string name="host_tokens_validation_failed">Échec de la validation : %1$s</string>
     <string name="host_tokens_validation_failed_fallback">erreur inconnue</string>
     <string name="host_tokens_validation_host_invalid">Hôte invalide</string>
     <string name="host_tokens_validation_host_required">Hôte requis</string>

@@ -15,6 +15,7 @@ import zed.rainxch.core.domain.getOsVersion
 import zed.rainxch.core.domain.getPlatform
 import zed.rainxch.core.domain.getSystemLocaleTag
 import zed.rainxch.core.domain.helpers.BrowserHelper
+import zed.rainxch.core.domain.logging.KomiStoreLogger
 import zed.rainxch.core.domain.model.installation.InstallerType
 import zed.rainxch.core.domain.model.system.Platform
 import zed.rainxch.core.domain.repository.TweaksRepository
@@ -29,6 +30,7 @@ class FeedbackViewModel(
     private val tweaksRepository: TweaksRepository,
     private val userSessionRepository: UserSessionRepository,
     private val appVersionInfo: AppVersionInfo,
+    private val logger: KomiStoreLogger,
 ) : ViewModel() {
     private val _state = MutableStateFlow(FeedbackState())
     val state = _state.asStateFlow()
@@ -111,8 +113,9 @@ class FeedbackViewModel(
             val url = FeedbackComposer.composeUrl(current, channel)
             browserHelper.openUrl(url) { error ->
                 failed = true
+                logger.warn("FeedbackViewModel: couldn't open the $channel channel: $error")
                 viewModelScope.launch {
-                    _events.send(FeedbackEvent.OnSendError(error))
+                    _events.send(FeedbackEvent.OnSendError)
                 }
             }
 

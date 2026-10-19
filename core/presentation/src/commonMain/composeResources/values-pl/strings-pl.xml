@@ -784,7 +784,6 @@
     <string name="feedback_send_via_github">Otwórz jako Issue w GitHub</string>
     <string name="feedback_send_success_email">Dziękujemy — otwieramy klienta poczty.</string>
     <string name="feedback_send_success_github">Dziękujemy — otwieramy przeglądarkę.</string>
-    <string name="feedback_send_error">Nie udało się otworzyć kanału opinii: %1$s</string>
 
     <!-- ═══════════════════════════════════════════════════════════════
          E5 — Mirror feature
@@ -816,7 +815,6 @@
     <string name="mirror_test_http_error">Serwer lustrzany zwrócił %1$d</string>
     <string name="mirror_test_timeout">Przekroczono limit czasu po 5s</string>
     <string name="mirror_test_dns_fail">Nie można rozwiązać nazwy hosta</string>
-    <string name="mirror_test_other">Niepowodzenie: %1$s</string>
     <string name="mirror_deploy_your_own_hint">Wszystkie serwery lustrzane niedostępne? Możesz uruchomić własny w 5 minut — sprawdź dokumentację.</string>
     <string name="mirror_removed_toast">%1$s nie jest już dostępny, przełączono na GitHub bezpośrednio.</string>
 
@@ -1106,7 +1104,6 @@
     <string name="host_tokens_undo_action">Cofnij</string>
     <string name="host_tokens_undo_failed">Nie udało się przywrócić tokena dla %1$s</string>
     <string name="host_tokens_undo_snackbar">Usunięto token dla %1$s</string>
-    <string name="host_tokens_validation_failed">Weryfikacja nie powiodła się: %1$s</string>
     <string name="host_tokens_validation_failed_fallback">nieznany błąd</string>
     <string name="host_tokens_validation_host_invalid">Nieprawidłowy host</string>
     <string name="host_tokens_validation_host_required">Host jest wymagany</string>

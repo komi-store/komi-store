@@ -105,7 +105,67 @@ fun TweaksRoot(
                 coroutineScope.launch { toastState.danger(event.message) }
             }
 
-            else -> Unit
+            TweaksEvent.OnProxySaved -> {
+                coroutineScope.launch { toastState.success(getString(Res.string.proxy_saved)) }
+            }
+
+            is TweaksEvent.OnProxySaveError -> {
+                coroutineScope.launch { toastState.danger(event.message) }
+            }
+
+            is TweaksEvent.OnProxyTestSuccess -> {
+                coroutineScope.launch {
+                    toastState.success(getString(Res.string.proxy_test_success, event.latencyMs))
+                }
+            }
+
+            is TweaksEvent.OnProxyTestError -> {
+                coroutineScope.launch { toastState.danger(event.message) }
+            }
+
+            is TweaksEvent.OnMasterProxyTestResult -> {
+                coroutineScope.launch {
+                    val latencies = listOf(event.searchMs, event.downloadMs, event.translationMs)
+                    val parts =
+                        latencies.map { ms ->
+                            if (ms != null) {
+                                getString(Res.string.proxy_test_probe_ok, ms)
+                            } else {
+                                getString(Res.string.proxy_test_probe_failed)
+                            }
+                        }
+                    val message = getString(Res.string.proxy_test_master_result, parts[0], parts[1], parts[2])
+                    when {
+                        latencies.all { it != null } -> toastState.success(message)
+                        latencies.all { it == null } -> toastState.danger(message)
+                        else -> toastState.warning(message)
+                    }
+                }
+            }
+
+            TweaksEvent.OnSeenHistoryCleared -> {
+                coroutineScope.launch { toastState.info(getString(Res.string.seen_history_cleared)) }
+            }
+
+            TweaksEvent.OnTranslationProviderSaved -> {
+                coroutineScope.launch { toastState.success(getString(Res.string.translation_provider_saved)) }
+            }
+
+            TweaksEvent.OnYoudaoCredentialsSaved -> {
+                coroutineScope.launch { toastState.success(getString(Res.string.translation_youdao_saved)) }
+            }
+
+            TweaksEvent.OnLibreTranslateCredentialsSaved -> {
+                coroutineScope.launch { toastState.success(getString(Res.string.translation_libre_saved)) }
+            }
+
+            TweaksEvent.OnDeeplCredentialsSaved -> {
+                coroutineScope.launch { toastState.success(getString(Res.string.translation_deepl_saved)) }
+            }
+
+            TweaksEvent.OnMicrosoftTranslatorCredentialsSaved -> {
+                coroutineScope.launch { toastState.success(getString(Res.string.translation_microsoft_saved)) }
+            }
         }
     }
 
@@ -256,9 +316,9 @@ fun TweaksRoot(
                     toastState.success(msg)
                 }
             },
-            onError = { error ->
+            onError = {
                 coroutineScope.launch {
-                    toastState.danger(getString(Res.string.feedback_send_error, error))
+                    toastState.danger(getString(Res.string.feedback_send_failed))
                 }
             },
         )

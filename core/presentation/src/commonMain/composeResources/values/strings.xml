@@ -141,6 +141,9 @@
     <string name="proxy_test_error_auth_required">Proxy authentication required.</string>
     <string name="proxy_test_error_status">Unexpected response: HTTP %1$d</string>
     <string name="proxy_test_error_unknown">Connection test failed</string>
+    <string name="proxy_test_master_result">Search: %1$s, Downloads: %2$s, Translation: %3$s</string>
+    <string name="proxy_test_probe_ok">%1$d ms</string>
+    <string name="proxy_test_probe_failed">failed</string>
 
     <!-- Snackbar -->
     <string name="logout_success">Logged out successfully</string>
@@ -1011,7 +1014,7 @@
     <string name="feedback_send_via_github">Open as GitHub Issue</string>
     <string name="feedback_send_success_email">Thanks — opening your mail client.</string>
     <string name="feedback_send_success_github">Thanks — opening your browser.</string>
-    <string name="feedback_send_error">Couldn't open feedback channel: %1$s</string>
+    <string name="feedback_send_failed">Couldn't open the feedback channel</string>
 
     <!-- Tweaks feature - Custom forges -->
     <string name="custom_forges_entry_label">Custom forges</string>
@@ -1058,7 +1061,7 @@
     <string name="mirror_test_http_error">Mirror returned %1$d</string>
     <string name="mirror_test_timeout">Timed out after 5s</string>
     <string name="mirror_test_dns_fail">Could not resolve host</string>
-    <string name="mirror_test_other">Failed: %1$s</string>
+    <string name="mirror_test_failed">Connection failed</string>
 
     <!-- Mirror - Footer hint -->
     <string name="mirror_deploy_your_own_hint">All mirrors broken? You can host your own in 5 minutes — see docs.</string>
@@ -1287,7 +1290,9 @@
     <string name="host_tokens_action_add">Add token</string>
     <string name="host_tokens_action_delete">Delete</string>
     <string name="host_tokens_saved">Saved token for %1$s</string>
-    <string name="host_tokens_validation_failed">Validation failed: %1$s</string>
+    <string name="host_tokens_load_failed">Couldn't load saved tokens</string>
+    <string name="host_tokens_save_failed">Couldn't save token for %1$s</string>
+    <string name="host_tokens_delete_failed">Couldn't delete token for %1$s</string>
 
     <!-- Host tokens — picker / forge presets / inline feedback / undo -->
     <string name="host_tokens_picker_title">Add token for…</string>
@@ -1313,6 +1318,8 @@
     <string name="host_tokens_compose_replace_title">Replace token for %1$s</string>
     <string name="host_tokens_compose_add_title">Add token</string>
     <string name="host_tokens_validation_failed_fallback">unknown error</string>
+    <string name="host_tokens_validation_http">HTTP %1$d</string>
+    <string name="host_tokens_validation_unreachable">couldn't reach the server</string>
     <string name="host_tokens_undo_failed">Couldn't restore token for %1$s</string>
 
     <!-- Tweaks redesign (P14/P15/P16) -->
