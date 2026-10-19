@@ -19,26 +19,67 @@ import io.ktor.http.Parameters
 import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.serialization.json.Json
 import zed.rainxch.auth.domain.repository.RejectedKind
 import zed.rainxch.core.data.dto.GithubDeviceStartDto
 import zed.rainxch.core.data.dto.GithubDeviceTokenErrorDto
 import zed.rainxch.core.data.dto.GithubDeviceTokenSuccessDto
+import zed.rainxch.core.data.network.createPlatformHttpClient
+import zed.rainxch.core.domain.model.settings.ProxyConfig
 
-object GitHubAuthApi {
+private const val HEADER_REQUEST_ID = "X-Request-ID"
+private const val REQUEST_TIMEOUT_MS = 60_000L
+
+class GitHubAuthApi(
+    proxyConfigFlow: StateFlow<ProxyConfig>,
+) {
     private val json =
         Json {
             ignoreUnknownKeys = true
             isLenient = true
         }
 
-    val http by lazy {
-        HttpClient {
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+
+    @Volatile
+    private var currentHttp: HttpClient = buildHttp(proxyConfigFlow.value)
+
+    @Volatile
+    private var currentValidationHttp: HttpClient = buildValidationHttp(proxyConfigFlow.value)
+
+    init {
+        proxyConfigFlow
+            .drop(1)
+            .distinctUntilChanged()
+            .onEach { config ->
+                val previousHttp = currentHttp
+                val previousValidationHttp = currentValidationHttp
+                currentHttp = buildHttp(config)
+                currentValidationHttp = buildValidationHttp(config)
+                previousHttp.close()
+                previousValidationHttp.close()
+            }.launchIn(scope)
+    }
+
+    val http: HttpClient get() = currentHttp
+
+    private val validationHttp: HttpClient get() = currentValidationHttp
+
+    private fun buildHttp(proxyConfig: ProxyConfig): HttpClient =
+        createPlatformHttpClient(proxyConfig).config {
             install(ContentNegotiation) { json(json) }
 
             install(HttpTimeout) {
-                requestTimeoutMillis = 60_000
+                requestTimeoutMillis = REQUEST_TIMEOUT_MS
                 connectTimeoutMillis = 30_000
                 socketTimeoutMillis = 30_000
             }
@@ -49,10 +90,9 @@ object GitHubAuthApi {
                 exponentialDelay()
             }
         }
-    }
 
-    private val validationHttp by lazy {
-        HttpClient {
+    private fun buildValidationHttp(proxyConfig: ProxyConfig): HttpClient =
+        createPlatformHttpClient(proxyConfig).config {
             install(ContentNegotiation) { json(json) }
             install(HttpTimeout) {
                 requestTimeoutMillis = 10_000
@@ -60,7 +100,6 @@ object GitHubAuthApi {
                 socketTimeoutMillis = 10_000
             }
         }
-    }
 
     suspend fun startDeviceFlowDirect(clientId: String): GithubDeviceStartDto =
         withRetry(maxAttempts = 3, initialDelay = 1000) {
@@ -308,8 +347,6 @@ object GitHubAuthApi {
     private fun HttpStatusCode.isSuccessLike(): Boolean = this in HttpStatusCode.OK..HttpStatusCode.MultipleChoices
 
     private fun String?.asRequestIdTag(): String = if (this.isNullOrBlank()) "(X-Request-ID=<none>)" else "(X-Request-ID=$this)"
-
-    private const val HEADER_REQUEST_ID = "X-Request-ID"
 
     private suspend fun <T> withRetry(
         maxAttempts: Int = 3,

@@ -36,6 +36,8 @@ import java.util.concurrent.TimeoutException
 class AuthenticationRepositoryImpl(
     private val tokenStore: TokenStore,
     private val logger: KomiStoreLogger,
+    private val gitHubAuthApi: GitHubAuthApi,
+    private val webAuthApi: WebAuthApi,
 ) : AuthenticationRepository {
     override val accessTokenFlow: Flow<String?>
         get() = tokenStore.tokenFlow().map { it?.accessToken }
@@ -48,7 +50,7 @@ class AuthenticationRepositoryImpl(
             }
 
             try {
-                val dto = GitHubAuthApi.startDeviceFlowViaBackend(BACKEND_ORIGIN)
+                val dto = gitHubAuthApi.startDeviceFlowViaBackend(BACKEND_ORIGIN)
                 logger.info(
                     "Device flow started via Backend. interval=${dto.intervalSec}s expires=${dto.expiresInSec}s completeUri=${dto.verificationUriComplete != null}",
                 )
@@ -65,7 +67,7 @@ class AuthenticationRepositoryImpl(
                             "class=$backendClass status=$backendStatus origin=$BACKEND_ORIGIN msg=$backendMsg",
                     )
                     try {
-                        val dto = GitHubAuthApi.startDeviceFlowDirect(clientId)
+                        val dto = gitHubAuthApi.startDeviceFlowDirect(clientId)
                         logger.info("Device flow started via Direct fallback.")
                         DeviceFlowStart(dto.toDomain(), AuthPath.Direct)
                     } catch (inner: CancellationException) {
@@ -122,7 +124,7 @@ class AuthenticationRepositoryImpl(
                 }
 
                 try {
-                    val res = GitHubAuthApi.pollDeviceTokenDirect(clientId, start.deviceCode)
+                    val res = gitHubAuthApi.pollDeviceTokenDirect(clientId, start.deviceCode)
                     val success = res.getOrNull()?.toDomain()
 
                     if (success != null) {
@@ -282,8 +284,8 @@ class AuthenticationRepositoryImpl(
 
             val primaryResult =
                 when (path) {
-                    AuthPath.Backend -> GitHubAuthApi.pollDeviceTokenViaBackend(BACKEND_ORIGIN, deviceCode)
-                    AuthPath.Direct -> GitHubAuthApi.pollDeviceTokenDirect(clientId, deviceCode)
+                    AuthPath.Backend -> gitHubAuthApi.pollDeviceTokenViaBackend(BACKEND_ORIGIN, deviceCode)
+                    AuthPath.Direct -> gitHubAuthApi.pollDeviceTokenDirect(clientId, deviceCode)
                 }
 
             val primaryError = primaryResult.exceptionOrNull()
@@ -292,7 +294,7 @@ class AuthenticationRepositoryImpl(
                     "Backend poll infra error (${primaryError::class.simpleName}: " +
                         "${primaryError.message}) — escalating to Direct for rest of session",
                 )
-                val fallbackResult = GitHubAuthApi.pollDeviceTokenDirect(clientId, deviceCode)
+                val fallbackResult = gitHubAuthApi.pollDeviceTokenDirect(clientId, deviceCode)
                 return@withContext PollOutcome(interpretPollResult(fallbackResult), AuthPath.Direct)
             }
 
@@ -354,7 +356,7 @@ class AuthenticationRepositoryImpl(
     override suspend fun registerWebAuth(): Result<WebAuthRegistration> =
         withContext(Dispatchers.IO) {
             val pkce = PkceGenerator.generate()
-            WebAuthApi
+            webAuthApi
                 .register(
                     state = pkce.state,
                     codeChallenge = pkce.codeChallenge,
@@ -366,7 +368,7 @@ class AuthenticationRepositoryImpl(
 
     override suspend fun exchangeWebAuthHandoff(handoffId: String): Result<String> =
         withContext(Dispatchers.IO) {
-            WebAuthApi
+            webAuthApi
                 .consumeHandoff(handoffId)
                 .mapCatching { accessToken ->
                     val dto =
@@ -394,7 +396,7 @@ class AuthenticationRepositoryImpl(
                 )
             }
 
-            when (val validation = GitHubAuthApi.validatePersonalAccessToken(trimmed)) {
+            when (val validation = gitHubAuthApi.validatePersonalAccessToken(trimmed)) {
                 is PatValidation.Valid -> {
                     logger.debug("PAT network-validated against GitHub /user")
                 }

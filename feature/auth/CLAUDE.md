@@ -59,7 +59,7 @@ User picks it ("Use device code instead") when the web flow can't complete (brow
 
 - Primary sub-path: backend proxy `/v1/auth/device/start` + `/poll` on `api.github-store.org` for networks throttling `github.com` (China, corporate filters).
 - Each session picks one `AuthPath` (`Backend` | `Direct`), persists in `SavedStateHandle`. Start falls back to `Direct` on infra errors (timeout / connect failure / backend 5xx / network-error text) or a backend 429; a poll escalates `Backend -> Direct` only on infra errors. Other HTTP 4xx and GitHub negative 200-bodies (`authorization_pending`, `slow_down`, `access_denied`, `expired_token`, `bad_verification_code`) are real answers and never trigger fallback.
-- Backend rate limits hard: 10 starts/hr, 200 polls/hr per IP. `GitHubAuthApi.http` (also used by `WebAuthApi`) is its own Ktor client outside DI: no proxy, `HttpRequestRetry` with 2 retries on 5xx / exceptions. Only `startDeviceFlowDirect` adds `withRetry(maxAttempts = 3)` on top; don't add more retry loops.
+- Backend rate limits hard: 10 starts/hr, 200 polls/hr per IP. `GitHubAuthApi.http` (also used by `WebAuthApi`) has `HttpRequestRetry` with 2 retries on 5xx / exceptions. Only `startDeviceFlowDirect` adds `withRetry(maxAttempts = 3)` on top; don't add more retry loops.
 - Backend responses carry `X-Request-ID`; `GitHubAuthApi` embeds it in error messages via `asRequestIdTag()` for cross-log correlation.
 
 ## PAT path (last resort)
@@ -72,6 +72,7 @@ User picks it ("Use device code instead") when the web flow can't complete (brow
 ## Notes
 
 - Token stored via `TokenStore` (`DefaultTokenStore`: KSafe-encrypted, migrates the legacy DataStore entry once). Only `AuthenticationViewModel` collects `accessTokenFlow`, on the injected app `CoroutineScope`.
+- `GitHubAuthApi` and `WebAuthApi` are Koin singles. Their clients come from `createPlatformHttpClient` with the `ProxyScope.DISCOVERY` proxy ("Search & metadata" in Tweaks) and are rebuilt when it changes, so every sign-in path follows the user's proxy.
 - `GITHUB_CLIENT_ID` in `local.properties` for builds; must match the OAuth App registered on the backend and used by the Worker.
 - Endpoints: `WEB_ORIGIN = https://github-store.org`, `BACKEND_ORIGIN = https://api.github-store.org`. Constants in `core/data/network/BackendEndpoints.kt`.
 - Android deep-link filters in `composeApp/src/androidMain/AndroidManifest.xml`: scheme `githubstore`, hosts `auth`, `callback`, `repo`, `apps`. Desktop registers the protocol via `DesktopDeepLink` on Win/Linux (macOS uses the bundle Info.plist `CFBundleURLTypes`).

@@ -13,7 +13,9 @@ import kotlinx.serialization.json.Json
 import zed.rainxch.core.data.network.BACKEND_ORIGIN
 import zed.rainxch.core.data.network.WEB_ORIGIN
 
-object WebAuthApi {
+class WebAuthApi(
+    private val gitHubAuthApi: GitHubAuthApi,
+) {
     private val json =
         Json {
             ignoreUnknownKeys = true
@@ -27,7 +29,7 @@ object WebAuthApi {
     ): Result<String> =
         runCatching {
             val res =
-                GitHubAuthApi.http.post("$WEB_ORIGIN/auth/register") {
+                gitHubAuthApi.http.post("$WEB_ORIGIN/auth/register") {
                     accept(ContentType.Application.Json)
                     contentType(ContentType.Application.Json)
                     headers.append(HttpHeaders.UserAgent, "GithubStore/1.0 (WebAuth)")
@@ -56,7 +58,7 @@ object WebAuthApi {
     suspend fun consumeHandoff(handoffId: String): Result<String> =
         runCatching {
             val res =
-                GitHubAuthApi.http.post("$BACKEND_ORIGIN/v1/oauth/handoff/$handoffId") {
+                gitHubAuthApi.http.post("$BACKEND_ORIGIN/v1/oauth/handoff/$handoffId") {
                     accept(ContentType.Application.Json)
                     headers.append(HttpHeaders.UserAgent, "GithubStore/1.0 (WebAuth)")
                 }
