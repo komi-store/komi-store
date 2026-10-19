@@ -66,10 +66,8 @@ fun LanguagePicker(
         Column(modifier = Modifier.fillMaxWidth()) {
             KomiText(
                 text = stringResource(Res.string.translate_to),
-                role = KomiTextRole.LegacyTitle,
-                fontWeight = FontWeight.SemiBold,
+                role = KomiTextRole.CardTitle,
                 modifier = Modifier.padding(vertical = 6.dp),
-                uppercase = false,
             )
             Spacer(Modifier.height(8.dp))
 
@@ -91,7 +89,7 @@ fun LanguagePicker(
                             .fillMaxWidth()
                             .padding(horizontal = 16.dp, vertical = 4.dp)
                             .clip(RoundedCornerShape(shape.corner))
-                            .background(colors.primaryContainer.copy(alpha = 0.4f))
+                            .background(colors.primaryTint)
                             .clickable { onLanguageSelected(deviceLanguage) }
                             .padding(horizontal = 12.dp, vertical = 10.dp),
                     verticalAlignment = Alignment.CenterVertically,
@@ -106,17 +104,13 @@ fun LanguagePicker(
                     Column(modifier = Modifier.weight(1f)) {
                         KomiText(
                             text = deviceLanguage.displayName,
-                            role = KomiTextRole.LegacyTitle,
-                            fontWeight = FontWeight.SemiBold,
+                            role = KomiTextRole.CardTitle,
                             color = colors.primary,
-                            uppercase = false,
                         )
                         KomiText(
                             text = stringResource(Res.string.select_language),
-                            role = KomiTextRole.LegacyLabel,
-                            fontSize = 11.sp,
-                            color = colors.primary.copy(alpha = 0.7f),
-                            uppercase = false,
+                            role = KomiTextRole.Caption,
+                            color = colors.primary,
                         )
                     }
                     if (deviceLanguage.code == selectedLanguageCode) {
@@ -172,22 +166,18 @@ private fun LanguageListItem(
         Column(modifier = Modifier.weight(1f)) {
             KomiText(
                 text = language.displayName,
-                role = KomiTextRole.LegacyTitle,
-                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                role = KomiTextRole.ItemTitle,
                 color =
                     if (isSelected) {
                         colors.primary
                     } else {
                         colors.onSurface
                     },
-                uppercase = false,
             )
             KomiText(
                 text = language.code,
-                role = KomiTextRole.LegacyLabel,
-                fontSize = 11.sp,
+                role = KomiTextRole.Caption,
                 color = colors.outline,
-                uppercase = false,
             )
         }
 

@@ -241,39 +241,6 @@ fun LazyListScope.header(
                         )
                     }
                 }
-
-                if (state.isInstallDropdownExpanded) {
-                    val density = LocalDensity.current
-                    Popup(
-                        alignment = Alignment.TopStart,
-                        offset = with(density) { IntOffset(0, 20.dp.roundToPx()) },
-                        onDismissRequest = { onAction(DetailsAction.OnToggleInstallDropdown) },
-                        properties = PopupProperties(focusable = true),
-                    ) {
-                        KomiSurface(elevation = KomiSurfaceElevation.Modal) {
-                            Column(modifier = Modifier.width(300.dp)) {
-                                InstallOptionItem(
-                                    title = stringResource(Res.string.open_in_obtainium),
-                                    subtitle = stringResource(Res.string.obtainium_description),
-                                    icon = Icons.Default.Update,
-                                    onClick = { onAction(DetailsAction.OpenInObtainium) },
-                                )
-                                InstallOptionItem(
-                                    title = stringResource(Res.string.inspect_with_appmanager),
-                                    subtitle = stringResource(Res.string.appmanager_description),
-                                    icon = Icons.Default.Security,
-                                    onClick = { onAction(DetailsAction.OpenInAppManager) },
-                                )
-                                InstallOptionItem(
-                                    title = stringResource(Res.string.open_with_external_installer),
-                                    subtitle = stringResource(Res.string.external_installer_description),
-                                    icon = Icons.AutoMirrored.Filled.OpenInNew,
-                                    onClick = { onAction(DetailsAction.InstallWithExternalApp) },
-                                )
-                            }
-                        }
-                    }
-                }
             }
         }
 
@@ -316,54 +283,8 @@ private fun ReleaseHint(
         )
         KomiText(
             text = text,
-            role = KomiTextRole.LegacyBody,
-            fontSize = 13.sp,
-            fontWeight = if (emphasized) FontWeight.SemiBold else FontWeight.Normal,
+            role = if (emphasized) KomiTextRole.Label else KomiTextRole.Body,
             color = tint,
-            uppercase = false,
         )
-    }
-}
-
-@Composable
-private fun InstallOptionItem(
-    title: String,
-    subtitle: String,
-    icon: ImageVector,
-    onClick: () -> Unit,
-) {
-    val colors = LocalPersonality.current.colors
-    Row(
-        modifier =
-            Modifier
-                .fillMaxWidth()
-                .clickable(onClick = onClick)
-                .padding(horizontal = 14.dp, vertical = 10.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
-    ) {
-        KomiIcon(
-            imageVector = icon,
-            contentDescription = null,
-            modifier = Modifier.size(20.dp),
-            tint = colors.onSurface,
-        )
-        Column(modifier = Modifier.weight(1f)) {
-            KomiText(
-                text = title,
-                role = KomiTextRole.LegacyBody,
-                color = colors.onSurface,
-                uppercase = false,
-                fontSize = 14.sp,
-                fontWeight = FontWeight.W600,
-            )
-            KomiText(
-                text = subtitle,
-                role = KomiTextRole.LegacyBody,
-                color = colors.onSurfaceVariant,
-                uppercase = false,
-                fontSize = 12.sp,
-            )
-        }
     }
 }

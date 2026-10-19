@@ -62,7 +62,22 @@ import zed.rainxch.details.presentation.model.DownloadStage
 import zed.rainxch.details.presentation.utils.extractArchitectureFromName
 import zed.rainxch.details.presentation.utils.isExactArchitectureMatch
 import zed.rainxch.githubstore.core.presentation.res.Res
+import androidx.compose.material.icons.filled.Security
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
+import zed.rainxch.core.presentation.components.overlays.KomiDropdown
+import zed.rainxch.core.presentation.components.overlays.KomiMenuEntry
+import zed.rainxch.core.presentation.components.overlays.KomiMenuItem
+import zed.rainxch.core.presentation.components.overlays.KomiRichTooltip
+import zed.rainxch.githubstore.core.presentation.res.appmanager_description
+import zed.rainxch.githubstore.core.presentation.res.external_installer_description
+import zed.rainxch.githubstore.core.presentation.res.inspect_with_appmanager
+import zed.rainxch.githubstore.core.presentation.res.obtainium_description
+import zed.rainxch.githubstore.core.presentation.res.open_in_obtainium
+import zed.rainxch.githubstore.core.presentation.res.open_with_external_installer
 import zed.rainxch.githubstore.core.presentation.res.architecture_compatible
+import zed.rainxch.githubstore.core.presentation.res.attestation_unverified_explainer
+import zed.rainxch.githubstore.core.presentation.res.attestation_verified_explainer
 import zed.rainxch.githubstore.core.presentation.res.checking_attestation
 import zed.rainxch.githubstore.core.presentation.res.delete_task
 import zed.rainxch.githubstore.core.presentation.res.downloading
@@ -147,7 +162,7 @@ fun SmartInstallButton(
         else -> colors.primary
     }
     val onAccent = when {
-        !enabled && !isActiveDownload -> colors.onSurface.copy(alpha = 0.45f)
+        !enabled && !isActiveDownload -> colors.disabledContent
         else -> colors.onPrimary
     }
 
@@ -251,13 +266,18 @@ fun SmartInstallButton(
                     size = ButtonHeight,
                 )
             } else if (state.isObtainiumEnabled) {
-                TrailingActionPill(
-                    container = if (enabled) accent else colors.surfaceContainerHigh,
-                    content = onAccent,
-                    icon = Icons.Default.KeyboardArrowDown,
-                    contentDescription = stringResource(Res.string.show_install_options),
-                    onClick = { onAction(DetailsAction.OnToggleInstallDropdown) },
-                )
+                KomiDropdown(
+                    entries = installOptions(),
+                    onSelect = { item -> installOptionAction(item.id)?.let(onAction) },
+                ) { open ->
+                    TrailingActionPill(
+                        container = if (enabled) accent else colors.surfaceContainerHigh,
+                        content = onAccent,
+                        icon = Icons.Default.KeyboardArrowDown,
+                        contentDescription = stringResource(Res.string.show_install_options),
+                        onClick = open,
+                    )
+                }
             }
         }
 
@@ -388,11 +408,8 @@ private fun IdleLabel(
             }
             KomiText(
                 text = text,
-                role = KomiTextRole.LegacyTitle,
+                role = KomiTextRole.ItemTitle,
                 color = contentColor,
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 15.sp,
-                uppercase = false,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
@@ -410,10 +427,8 @@ private fun IdleLabel(
             ) {
                 KomiText(
                     text = subtitle,
-                    role = KomiTextRole.LegacyLabel,
+                    role = KomiTextRole.Caption,
                     color = contentColor.copy(alpha = 0.78f),
-                    fontSize = 11.sp,
-                    uppercase = false,
                 )
                 if (assetArch != null && isExactArchitectureMatch(
                         assetName = primaryAsset.name.lowercase(),
@@ -461,11 +476,8 @@ private fun DownloadingLabel(
         }
         KomiText(
             text = label,
-            role = KomiTextRole.LegacyTitle,
-            fontSize = 15.sp,
+            role = KomiTextRole.ItemTitle,
             color = contentColor,
-            fontWeight = FontWeight.SemiBold,
-            uppercase = false,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
         )
@@ -480,16 +492,49 @@ private fun DownloadingLabel(
             }
             KomiText(
                 text = progressText,
-                role = KomiTextRole.LegacyLabel,
-                fontSize = 11.sp,
+                role = KomiTextRole.Caption,
                 color = contentColor.copy(alpha = 0.78f),
-                uppercase = false,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
         }
     }
 }
+
+@Composable
+private fun installOptions(): ImmutableList<KomiMenuEntry> =
+    persistentListOf(
+        KomiMenuItem(
+            id = OPTION_OBTAINIUM,
+            label = stringResource(Res.string.open_in_obtainium),
+            subtitle = stringResource(Res.string.obtainium_description),
+            icon = Icons.Default.Update,
+        ),
+        KomiMenuItem(
+            id = OPTION_APP_MANAGER,
+            label = stringResource(Res.string.inspect_with_appmanager),
+            subtitle = stringResource(Res.string.appmanager_description),
+            icon = Icons.Default.Security,
+        ),
+        KomiMenuItem(
+            id = OPTION_EXTERNAL_INSTALLER,
+            label = stringResource(Res.string.open_with_external_installer),
+            subtitle = stringResource(Res.string.external_installer_description),
+            icon = Icons.AutoMirrored.Filled.OpenInNew,
+        ),
+    )
+
+private fun installOptionAction(id: String): DetailsAction? =
+    when (id) {
+        OPTION_OBTAINIUM -> DetailsAction.OpenInObtainium
+        OPTION_APP_MANAGER -> DetailsAction.OpenInAppManager
+        OPTION_EXTERNAL_INSTALLER -> DetailsAction.InstallWithExternalApp
+        else -> null
+    }
+
+private const val OPTION_OBTAINIUM = "obtainium"
+private const val OPTION_APP_MANAGER = "app_manager"
+private const val OPTION_EXTERNAL_INSTALLER = "external_installer"
 
 @Composable
 private fun TrailingActionPill(
@@ -554,7 +599,7 @@ private fun InstalledSplitRow(
                 .clip(leftShape)
                 .border(
                     width = 1.dp,
-                    color = colors.error.copy(alpha = 0.55f),
+                    color = colors.error,
                     shape = leftShape,
                 )
                 .clickable(onClick = onUninstall),
@@ -572,11 +617,8 @@ private fun InstalledSplitRow(
                 )
                 KomiText(
                     text = stringResource(Res.string.uninstall),
-                    role = KomiTextRole.LegacyTitle,
+                    role = KomiTextRole.ItemTitle,
                     color = colors.error,
-                    fontWeight = FontWeight.SemiBold,
-                    fontSize = 15.sp,
-                    uppercase = false,
                 )
             }
         }
@@ -601,11 +643,8 @@ private fun InstalledSplitRow(
                 )
                 KomiText(
                     text = stringResource(Res.string.open_app),
-                    role = KomiTextRole.LegacyTitle,
+                    role = KomiTextRole.ItemTitle,
                     color = colors.onPrimary,
-                    fontWeight = FontWeight.SemiBold,
-                    fontSize = 15.sp,
-                    uppercase = false,
                 )
             }
         }
@@ -615,7 +654,6 @@ private fun InstalledSplitRow(
 @Composable
 private fun AttestationBadge(attestationStatus: AttestationStatus) {
     val colors = LocalPersonality.current.colors
-    val shape = LocalPersonality.current.shape
     AnimatedVisibility(
         visible = attestationStatus == AttestationStatus.VERIFIED ||
             attestationStatus == AttestationStatus.CHECKING ||
@@ -649,44 +687,72 @@ private fun AttestationBadge(attestationStatus: AttestationStatus) {
                 label = "",
             )
         }
-        Box(
-            modifier = Modifier
-                .padding(top = 10.dp)
-                .clip(RoundedCornerShape(shape.cornerSmall))
-                .background(container)
-                .border(
-                    width = 0.5.dp,
-                    color = colors.outlineVariant.copy(alpha = 0.4f),
-                    shape = RoundedCornerShape(shape.cornerSmall),
-                ),
+        val explainer =
+            when (attestationStatus) {
+                AttestationStatus.VERIFIED -> stringResource(Res.string.attestation_verified_explainer)
+                AttestationStatus.UNABLE_TO_VERIFY -> stringResource(Res.string.attestation_unverified_explainer)
+                else -> null
+            }
+        val badge: @Composable () -> Unit = {
+            AttestationChip(
+                container = container,
+                content = content,
+                icon = icon,
+                label = label,
+                checking = attestationStatus == AttestationStatus.CHECKING,
+            )
+        }
+        if (explainer != null) {
+            KomiRichTooltip(title = label, text = explainer, modifier = Modifier.padding(top = 10.dp), content = badge)
+        } else {
+            Box(modifier = Modifier.padding(top = 10.dp)) { badge() }
+        }
+    }
+}
+
+@Composable
+private fun AttestationChip(
+    container: Color,
+    content: Color,
+    icon: androidx.compose.ui.graphics.vector.ImageVector?,
+    label: String,
+    checking: Boolean,
+) {
+    val colors = LocalPersonality.current.colors
+    val shape = LocalPersonality.current.shape
+    Box(
+        modifier = Modifier
+            .clip(RoundedCornerShape(shape.cornerSmall))
+            .background(container)
+            .border(
+                width = 0.5.dp,
+                color = colors.divider,
+                shape = RoundedCornerShape(shape.cornerSmall),
+            ),
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
         ) {
-            Row(
-                modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(6.dp),
-            ) {
-                if (attestationStatus == AttestationStatus.CHECKING) {
-                    KomiCircularProgress(
-                        modifier = Modifier.size(13.dp),
-                        color = content,
-                    )
-                } else if (icon != null) {
-                    KomiIcon(
-                        imageVector = icon,
-                        contentDescription = null,
-                        modifier = Modifier.size(14.dp),
-                        tint = content,
-                    )
-                }
-                KomiText(
-                    text = label,
-                    role = KomiTextRole.LegacyLabel,
-                    fontSize = 11.sp,
+            if (checking) {
+                KomiCircularProgress(
+                    modifier = Modifier.size(13.dp),
                     color = content,
-                    fontWeight = FontWeight.SemiBold,
-                    uppercase = false,
+                )
+            } else if (icon != null) {
+                KomiIcon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    modifier = Modifier.size(14.dp),
+                    tint = content,
                 )
             }
+            KomiText(
+                text = label,
+                role = KomiTextRole.LabelSmall,
+                color = content,
+            )
         }
     }
 }

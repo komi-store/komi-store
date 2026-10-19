@@ -34,11 +34,8 @@ fun LazyListScope.logs(state: DetailsState) {
         ) {
             KomiText(
                 text = stringResource(Res.string.install_logs),
-                role = KomiTextRole.LegacyTitle,
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 20.sp,
+                role = KomiTextRole.CardTitle,
                 color = colors.onBackground,
-                uppercase = false,
             )
         }
     }
@@ -52,7 +49,6 @@ fun LazyListScope.logs(state: DetailsState) {
         KomiText(
             text = "> ${log.result.asText()}: ${log.assetName}",
             role = KomiTextRole.Mono,
-            fontSize = 11.sp,
             color =
                 if (log.result is LogResult.Error) {
                     colors.error

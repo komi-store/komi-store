@@ -137,7 +137,7 @@ private fun AboutScreen(
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         KomiText(
                             text = state.errorMessage,
-                            role = KomiTextRole.LegacyBody,
+                            role = KomiTextRole.Body,
                             color = personalityColors.error,
                         )
 
@@ -145,7 +145,7 @@ private fun AboutScreen(
 
                         KomiText(
                             text = stringResource(Res.string.retry),
-                            role = KomiTextRole.LegacyLabel,
+                            role = KomiTextRole.Overline,
                             color = personalityColors.primary,
                             modifier = Modifier
                                 .padding(8.dp)
@@ -164,11 +164,8 @@ private fun AboutScreen(
                         Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
                             KomiText(
                                 text = stringResource(Res.string.details_about_screen_title),
-                                role = KomiTextRole.LegacyDisplay,
-                                fontWeight = FontWeight.SemiBold,
-                                fontSize = 26.sp,
+                                role = KomiTextRole.ScreenTitle,
                                 color = personalityColors.onBackground,
-                                uppercase = false,
                             )
 
                             state.readmeLanguage?.let { lang ->
@@ -176,10 +173,8 @@ private fun AboutScreen(
 
                                 KomiText(
                                     text = lang,
-                                    role = KomiTextRole.LegacyLabel,
-                                    fontSize = 11.sp,
+                                    role = KomiTextRole.Caption,
                                     color = personalityColors.onSurfaceVariant,
-                                    uppercase = false,
                                 )
                             }
                         }

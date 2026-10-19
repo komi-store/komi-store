@@ -246,6 +246,8 @@
     <string name="verified_build">Verified build</string>
     <string name="checking_attestation">Checking\u2026</string>
     <string name="unable_to_verify_attestation">Could not verify</string>
+    <string name="attestation_verified_explainer">This file's SHA-256 matches a build attestation the repository published on GitHub, so it came from the repository's own build.</string>
+    <string name="attestation_unverified_explainer">Komi Store couldn't check this file against the repository's build attestations. That alone doesn't make it unsafe.</string>
     <string name="install_version">Install %1$s</string>
     <string name="failed_to_open_app">Failed to open %1$s</string>
     <string name="failed_to_uninstall">Failed to uninstall %1$s</string>

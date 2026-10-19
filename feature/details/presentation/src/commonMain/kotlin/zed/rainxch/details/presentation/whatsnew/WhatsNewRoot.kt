@@ -131,7 +131,7 @@ private fun WhatsNewScreen(
                     ) {
                         KomiText(
                             text = state.errorMessage,
-                            role = KomiTextRole.LegacyBody,
+                            role = KomiTextRole.Body,
                             color = personalityColors.error,
                         )
                     }
@@ -146,11 +146,8 @@ private fun WhatsNewScreen(
                         item(key = "header") {
                             KomiText(
                                 text = stringResource(Res.string.details_whats_new_screen_title),
-                                role = KomiTextRole.LegacyDisplay,
-                                fontWeight = FontWeight.SemiBold,
-                                fontSize = 26.sp,
+                                role = KomiTextRole.ScreenTitle,
                                 color = personalityColors.onBackground,
-                                uppercase = false,
                             )
                         }
 
@@ -184,22 +181,18 @@ private fun WhatsNewScreen(
                                 ) {
                                     KomiText(
                                         text = release.tagName,
-                                        role = KomiTextRole.LegacyTitle,
-                                        fontWeight = FontWeight.Bold,
+                                        role = KomiTextRole.CardTitle,
                                         color = personalityColors.primary,
                                         maxLines = 1,
                                         overflow = TextOverflow.Ellipsis,
                                         modifier = Modifier.weight(1f),
-                                        uppercase = false,
                                     )
 
                                     KomiText(
                                         text = release.publishedDate,
-                                        role = KomiTextRole.LegacyLabel,
-                                        fontSize = 12.sp,
+                                        role = KomiTextRole.Caption,
                                         color = personalityColors.onSurfaceVariant,
                                         maxLines = 1,
-                                        uppercase = false,
                                     )
                                 }
 

@@ -61,6 +61,7 @@ import zed.rainxch.core.presentation.components.chips.KomiChip
 import zed.rainxch.core.presentation.components.chips.KomiChipKind
 import zed.rainxch.core.presentation.components.chips.KomiChipSize
 import zed.rainxch.core.presentation.components.icon.KomiIcon
+import zed.rainxch.core.presentation.components.overlays.KomiTooltip
 import zed.rainxch.core.presentation.components.progress.KomiCircularProgress
 import zed.rainxch.core.presentation.components.text.KomiText
 import zed.rainxch.core.presentation.components.text.KomiTextRole
@@ -212,24 +213,25 @@ fun AppHeader(
             ) {
                 KomiText(
                     text = author?.login ?: repository.owner.login,
-                    role = KomiTextRole.LegacyLabel,
-                    fontSize = 13.sp,
-                    color = colors.onSurface.copy(alpha = 0.75f),
+                    role = KomiTextRole.Body,
+                    color = colors.onSurfaceVariant,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     modifier =
                         Modifier
                             .weight(1f, fill = false)
                             .clickable(onClick = onOwnerClick),
-                    uppercase = false,
                 )
                 if (isCurrentUserOwner) {
-                    KomiIcon(
-                        imageVector = Icons.Filled.Verified,
-                        contentDescription = stringResource(Res.string.self_owned_badge),
-                        modifier = Modifier.size(16.dp),
-                        tint = colors.primary,
-                    )
+                    val selfOwned = stringResource(Res.string.self_owned_badge)
+                    KomiTooltip(text = selfOwned) {
+                        KomiIcon(
+                            imageVector = Icons.Filled.Verified,
+                            contentDescription = selfOwned,
+                            modifier = Modifier.size(16.dp),
+                            tint = colors.primary,
+                        )
+                    }
                 }
             }
             Row(
@@ -240,22 +242,17 @@ fun AppHeader(
                 horizontalArrangement = Arrangement.spacedBy(10.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
+                val type = LocalPersonality.current.type
+                // BasicText keeps the repository's own case; KomiText would capitalize a display role in Manga.
                 androidx.compose.foundation.text.BasicText(
                     text = repository.name,
-                    style =
-                        LocalPersonality.current.type.legacyDisplay.copy(
-                            fontWeight = FontWeight.Black,
-                            fontSize = 30.sp,
-                            letterSpacing = (-0.4).sp,
-                            color = colors.onSurface,
-                        ),
+                    style = type.display.copy(color = colors.onSurface),
                     maxLines = 1,
                     softWrap = false,
                     autoSize =
                         androidx.compose.foundation.text.TextAutoSize.StepBased(
-                            minFontSize = 18.sp,
-                            maxFontSize = 30.sp,
-                            stepSize = 1.sp,
+                            minFontSize = type.sectionTitle.fontSize,
+                            maxFontSize = type.display.fontSize,
                         ),
                     modifier = Modifier.weight(1f, fill = false),
                 )
@@ -280,7 +277,7 @@ fun AppHeader(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(6.dp),
                 ) {
-                    val statColor = colors.onSurface.copy(alpha = 0.88f)
+                    val statColor = colors.onSurface
                     KomiIcon(
                         imageVector = Icons.Outlined.History,
                         contentDescription = null,
@@ -289,19 +286,15 @@ fun AppHeader(
                     )
                     KomiText(
                         text = stringResource(Res.string.details_last_push, lastPushLabel),
-                        role = KomiTextRole.LegacyLabel,
-                        fontSize = 13.sp,
-                        fontWeight = FontWeight.SemiBold,
+                        role = KomiTextRole.Label,
                         color = statColor,
-                        uppercase = false,
                     )
                 }
             }
             Spacer(Modifier.height(12.dp))
             KomiText(
                 text = repository.description ?: stringResource(Res.string.no_description),
-                role = KomiTextRole.LegacyBody,
-                fontSize = 14.sp,
+                role = KomiTextRole.Body,
                 color = colors.onSurfaceVariant,
                 modifier = Modifier.padding(horizontal = 20.dp),
             )
@@ -508,11 +501,8 @@ private fun InstalledStatusPill(installedApp: InstalledApp) {
                         else -> Res.string.installed
                     },
                 ),
-            role = KomiTextRole.LegacyLabel,
-            fontWeight = FontWeight.SemiBold,
-            fontSize = 12.sp,
+            role = KomiTextRole.LabelSmall,
             color = colors.primary,
-            uppercase = false,
         )
     }
 }

@@ -123,7 +123,7 @@ private fun MarkdownViewerScreen(
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             KomiText(
                                 text = state.errorMessage,
-                                role = KomiTextRole.LegacyBody,
+                                role = KomiTextRole.Body,
                                 color = personalityColors.error,
                             )
 
@@ -131,7 +131,7 @@ private fun MarkdownViewerScreen(
 
                             KomiText(
                                 text = stringResource(Res.string.retry),
-                                role = KomiTextRole.LegacyLabel,
+                                role = KomiTextRole.Overline,
                                 color = personalityColors.primary,
                                 modifier =
                                     Modifier

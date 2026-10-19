@@ -73,11 +73,8 @@ fun LazyListScope.whatsNew(
         ) {
             KomiText(
                 text = stringResource(Res.string.whats_new),
-                role = KomiTextRole.LegacyTitle,
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 22.sp,
+                role = KomiTextRole.SectionTitle,
                 color = colors.onBackground,
-                uppercase = false,
             )
         }
 
@@ -96,21 +93,17 @@ fun LazyListScope.whatsNew(
         ) {
             KomiText(
                 text = release.tagName,
-                role = KomiTextRole.LegacyTitle,
-                fontWeight = FontWeight.SemiBold,
+                role = KomiTextRole.CardTitle,
                 color = colors.primary,
                 maxLines = 1,
                 overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
                 modifier = Modifier.weight(1f),
-                uppercase = false,
             )
             KomiText(
                 text = formatIsoDateOrRaw(release.publishedAt),
-                role = KomiTextRole.LegacyLabel,
-                fontSize = 12.sp,
+                role = KomiTextRole.Caption,
                 color = colors.onSurfaceVariant,
                 maxLines = 1,
-                uppercase = false,
             )
         }
     }
@@ -255,10 +248,8 @@ private fun ExpandableMarkdownContent(
                     } else {
                         stringResource(Res.string.read_more)
                     },
-                    role = KomiTextRole.LegacyTitle,
-                    fontWeight = FontWeight.Bold,
+                    role = KomiTextRole.CardTitle,
                     color = personalityColors.surface,
-                    uppercase = false,
                 )
                 if (!isExpanded) {
                     KomiIcon(

@@ -153,7 +153,7 @@ fun LazyListScope.releaseChannel(
                         Modifier
                             .fillMaxWidth()
                             .clip(cardShape)
-                            .background(colors.error.copy(alpha = 0.25f))
+                            .background(colors.errorTint)
                             .padding(horizontal = 14.dp, vertical = 12.dp),
                 ) {
                     KomiIcon(
@@ -166,15 +166,13 @@ fun LazyListScope.releaseChannel(
                     Column {
                         KomiText(
                             text = title,
-                            role = KomiTextRole.LegacyTitle,
+                            role = KomiTextRole.CardTitle,
                             color = colors.onError,
-                            uppercase = false,
                         )
                         Spacer(Modifier.height(4.dp))
                         KomiText(
                             text = stringResource(Res.string.stalled_project_warning_description),
-                            role = KomiTextRole.LegacyBody,
-                            fontSize = 13.sp,
+                            role = KomiTextRole.Body,
                             color = colors.onError,
                         )
                     }
@@ -218,10 +216,8 @@ private fun ChannelChip(
         Spacer(Modifier.size(6.dp))
         KomiText(
             text = label,
-            role = KomiTextRole.LegacyLabel,
-            fontSize = 12.sp,
+            role = KomiTextRole.Caption,
             color = tint,
-            uppercase = false,
         )
     }
 }

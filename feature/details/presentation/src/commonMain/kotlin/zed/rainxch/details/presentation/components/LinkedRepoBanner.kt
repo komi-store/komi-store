@@ -62,15 +62,12 @@ fun LinkedRepoBanner(
             ) {
                 KomiText(
                     text = stringResource(Res.string.details_linked_repo_banner_title, owner, repo),
-                    role = KomiTextRole.LegacyBody,
-                    fontWeight = FontWeight.SemiBold,
+                    role = KomiTextRole.Label,
                     color = colors.onSurface,
-                    uppercase = false,
                 )
                 KomiText(
                     text = stringResource(Res.string.details_linked_repo_banner_body),
-                    role = KomiTextRole.LegacyBody,
-                    fontSize = 13.sp,
+                    role = KomiTextRole.Body,
                     color = colors.onSurfaceVariant,
                 )
             }

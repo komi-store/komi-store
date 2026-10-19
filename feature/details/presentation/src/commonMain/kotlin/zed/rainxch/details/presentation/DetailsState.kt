@@ -59,7 +59,6 @@ data class DetailsState(
     val systemArchitecture: SystemArchitecture = SystemArchitecture.UNKNOWN,
     val isObtainiumAvailable: Boolean = false,
     val isObtainiumEnabled: Boolean = false,
-    val isInstallDropdownExpanded: Boolean = false,
     val isAppManagerAvailable: Boolean = false,
     val isAppManagerEnabled: Boolean = false,
     val installedApp: InstalledApp? = null,

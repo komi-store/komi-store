@@ -71,19 +71,14 @@ fun PlatformHandoffSheet(
             }
             KomiText(
                 text = stringResource(Res.string.get_it_on_platform, platform.toLabel()),
-                role = KomiTextRole.LegacyTitle,
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 20.sp,
+                role = KomiTextRole.CardTitle,
                 color = colors.onSurface,
-                uppercase = false,
             )
         }
         KomiText(
             text = "${release.tagName} · ${formatIsoDateOrRaw(release.publishedAt)}",
-            role = KomiTextRole.LegacyBody,
-            fontSize = 13.sp,
+            role = KomiTextRole.Body,
             color = colors.onSurfaceVariant,
-            uppercase = false,
         )
         Spacer(Modifier.size(12.dp))
 
@@ -101,19 +96,15 @@ fun PlatformHandoffSheet(
                 Column(modifier = Modifier.weight(1f)) {
                     KomiText(
                         text = asset.name,
-                        role = KomiTextRole.LegacyBody,
-                        fontSize = 14.sp,
+                        role = KomiTextRole.Body,
                         color = colors.onSurface,
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis,
-                        uppercase = false,
                     )
                     KomiText(
                         text = formatFileSize(asset.size),
-                        role = KomiTextRole.LegacyLabel,
-                        fontSize = 12.sp,
+                        role = KomiTextRole.Caption,
                         color = colors.onSurfaceVariant,
-                        uppercase = false,
                     )
                 }
                 KomiIconButton(

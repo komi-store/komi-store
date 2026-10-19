@@ -76,16 +76,14 @@ fun ErrorState(
 
                 KomiText(
                     text = stringResource(kind.titleRes),
-                    role = KomiTextRole.LegacyTitle,
-                    fontWeight = FontWeight.SemiBold,
+                    role = KomiTextRole.CardTitle,
                     color = colors.onSurface,
                     textAlign = TextAlign.Center,
-                    uppercase = false,
                 )
 
                 KomiText(
                     text = stringResource(kind.subtitleRes),
-                    role = KomiTextRole.LegacyBody,
+                    role = KomiTextRole.Body,
                     color = colors.onSurfaceVariant,
                     textAlign = TextAlign.Center,
                 )
@@ -94,9 +92,8 @@ fun ErrorState(
                     Spacer(Modifier.height(4.dp))
                     KomiText(
                         text = errorMessage,
-                        role = KomiTextRole.LegacyBody,
-                        fontSize = 13.sp,
-                        color = colors.onSurfaceVariant.copy(alpha = 0.7f),
+                        role = KomiTextRole.Body,
+                        color = colors.onSurfaceVariant,
                         textAlign = TextAlign.Center,
                         modifier = Modifier
                             .fillMaxWidth()

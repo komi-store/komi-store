@@ -139,7 +139,7 @@ private fun EmptyState() {
     ) {
         KomiText(
             text = stringResource(Res.string.apk_inspect_empty),
-            role = KomiTextRole.LegacyBody,
+            role = KomiTextRole.Body,
             color = colors.onSurfaceVariant,
         )
     }
@@ -168,24 +168,20 @@ private fun Header(inspection: ApkInspection) {
     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
         KomiText(
             text = stringResource(Res.string.apk_inspect_title),
-            role = KomiTextRole.LegacyLabel,
+            role = KomiTextRole.Overline,
             color = colors.primary,
-            fontWeight = FontWeight.SemiBold,
         )
         KomiText(
             text = inspection.appLabel,
-            role = KomiTextRole.LegacyTitle,
-            fontWeight = FontWeight.SemiBold,
+            role = KomiTextRole.CardTitle,
             color = colors.onSurface,
             maxLines = 2,
             overflow = TextOverflow.Ellipsis,
             modifier = Modifier.copyableOnLongPress(inspection.appLabel),
-            uppercase = false,
         )
         KomiText(
             text = inspection.packageName,
             role = KomiTextRole.Mono,
-            fontSize = 13.sp,
             color = colors.onSurfaceVariant,
             modifier = Modifier.copyableOnLongPress(inspection.packageName),
         )
@@ -204,17 +200,14 @@ private fun SourceChip(label: String) {
     val shape = LocalPersonality.current.shape
     KomiText(
         text = label,
-        role = KomiTextRole.LegacyLabel,
-        fontSize = 11.sp,
+        role = KomiTextRole.LabelSmall,
         color = colors.onSurfaceVariant,
-        fontWeight = FontWeight.Medium,
         modifier =
             Modifier
                 .padding(top = 4.dp)
                 .clip(RoundedCornerShape(shape.cornerSmall))
                 .background(colors.surfaceContainerHigh)
                 .padding(horizontal = 12.dp, vertical = 4.dp),
-        uppercase = false,
     )
 }
 
@@ -310,8 +303,7 @@ private fun PermissionsSection(permissions: List<ApkPermission>) {
         if (permissions.isEmpty()) {
             KomiText(
                 text = stringResource(Res.string.apk_inspect_permissions_empty),
-                role = KomiTextRole.LegacyBody,
-                fontSize = 13.sp,
+                role = KomiTextRole.Body,
                 color = colors.onSurfaceVariant,
             )
             return@InspectSection
@@ -394,24 +386,19 @@ private fun PermissionGroupHeader(
     ) {
         KomiText(
             text = label,
-            role = KomiTextRole.LegacyLabel,
-            fontWeight = FontWeight.SemiBold,
+            role = KomiTextRole.LabelSmall,
             color = color,
             modifier = Modifier.weight(1f, fill = false),
-            uppercase = false,
         )
         KomiText(
             text = count.toString(),
-            role = KomiTextRole.LegacyLabel,
-            fontSize = 11.sp,
+            role = KomiTextRole.LabelSmall,
             color = color,
-            fontWeight = FontWeight.Bold,
             modifier =
                 Modifier
                     .clip(RoundedCornerShape(shape.cornerSmall))
                     .background(color.copy(alpha = 0.16f))
                     .padding(horizontal = 8.dp, vertical = 1.dp),
-            uppercase = false,
         )
         Spacer(modifier = Modifier.weight(1f))
         if (collapsible) {
@@ -443,15 +430,13 @@ private fun PermissionRow(permission: ApkPermission) {
         ) {
             KomiText(
                 text = permission.displayName,
-                role = KomiTextRole.LegacyBody,
+                role = KomiTextRole.Label,
                 color = colors.onSurface,
-                fontWeight = FontWeight.SemiBold,
             )
             permission.description?.let { desc ->
                 KomiText(
                     text = desc,
-                    role = KomiTextRole.LegacyBody,
-                    fontSize = 13.sp,
+                    role = KomiTextRole.Body,
                     color = colors.onSurfaceVariant,
                 )
             }
@@ -459,8 +444,7 @@ private fun PermissionRow(permission: ApkPermission) {
             KomiText(
                 text = permission.name,
                 role = KomiTextRole.Mono,
-                fontSize = 11.sp,
-                color = colors.onSurfaceVariant.copy(alpha = 0.65f),
+                color = colors.onSurfaceVariant,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.copyableOnLongPress(permission.name),
@@ -468,16 +452,13 @@ private fun PermissionRow(permission: ApkPermission) {
         }
         KomiText(
             text = chipLabel,
-            role = KomiTextRole.LegacyLabel,
-            fontSize = 11.sp,
+            role = KomiTextRole.LabelSmall,
             color = chipColor,
-            fontWeight = FontWeight.SemiBold,
             modifier =
                 Modifier
                     .clip(RoundedCornerShape(shape.cornerSmall))
                     .background(chipColor.copy(alpha = chipAlpha))
                     .padding(horizontal = 10.dp, vertical = 2.dp),
-            uppercase = false,
         )
     }
 }
@@ -561,7 +542,7 @@ private fun InspectSection(
                     Modifier
                         .size(32.dp)
                         .clip(RoundedCornerShape(personality.shape.cornerSmall))
-                        .background(colors.primary.copy(alpha = 0.14f)),
+                        .background(colors.primaryTint),
                 contentAlignment = Alignment.Center,
             ) {
                 KomiIcon(
@@ -574,10 +555,8 @@ private fun InspectSection(
             Spacer(Modifier.width(10.dp))
             KomiText(
                 text = title,
-                role = KomiTextRole.LegacyTitle,
-                fontWeight = FontWeight.SemiBold,
+                role = KomiTextRole.CardTitle,
                 color = colors.onSurface,
-                uppercase = false,
             )
         }
         KomiSurface(
@@ -609,8 +588,7 @@ private fun InspectRow(
         if (label.isNotEmpty()) {
             KomiText(
                 text = label,
-                role = KomiTextRole.LegacyBody,
-                fontSize = 13.sp,
+                role = KomiTextRole.Body,
                 color = colors.onSurfaceVariant,
                 modifier = Modifier.width(120.dp),
             )
@@ -623,8 +601,7 @@ private fun InspectRow(
             }
         KomiText(
             text = value,
-            role = if (monospace) KomiTextRole.Mono else KomiTextRole.LegacyBody,
-            fontSize = 13.sp,
+            role = if (monospace) KomiTextRole.Mono else KomiTextRole.Body,
             color = colors.onSurface,
             modifier = valueModifier,
         )
@@ -642,7 +619,6 @@ private fun DangerNote(text: String) {
             Modifier
                 .clip(noteShape)
                 .background(colors.error)
-                .border(1.dp, colors.error.copy(alpha = 0.35f), noteShape)
                 .padding(horizontal = 12.dp, vertical = 6.dp),
     ) {
         KomiIcon(
@@ -653,10 +629,8 @@ private fun DangerNote(text: String) {
         )
         KomiText(
             text = text,
-            role = KomiTextRole.LegacyLabel,
+            role = KomiTextRole.LabelSmall,
             color = colors.onError,
-            fontWeight = FontWeight.SemiBold,
-            uppercase = false,
         )
     }
 }

@@ -113,8 +113,7 @@ fun TranslationCard(
                             SupportedLanguages.all.firstOrNull { it.code == state.detectedSourceLanguage }?.displayName
                                 ?: state.detectedSourceLanguage,
                         ),
-                    role = KomiTextRole.LegacyBody,
-                    fontSize = 13.sp,
+                    role = KomiTextRole.Body,
                     color = colors.onSurfaceVariant,
                 )
             }
@@ -135,7 +134,7 @@ private fun Header(
                 Modifier
                     .size(34.dp)
                     .clip(RoundedCornerShape(shape.corner))
-                    .background(colors.primary.copy(alpha = 0.14f)),
+                    .background(colors.primaryTint),
             contentAlignment = Alignment.Center,
         ) {
             KomiIcon(
@@ -149,11 +148,8 @@ private fun Header(
         Column(modifier = Modifier.weight(1f)) {
             KomiText(
                 text = stringResource(Res.string.translation_card_title),
-                role = KomiTextRole.LegacyTitle,
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 17.sp,
+                role = KomiTextRole.CardTitle,
                 color = colors.onSurface,
-                uppercase = false,
             )
             val subtitle =
                 when {
@@ -175,8 +171,7 @@ private fun Header(
                 }
             KomiText(
                 text = subtitle,
-                role = KomiTextRole.LegacyBody,
-                fontSize = 13.sp,
+                role = KomiTextRole.Body,
                 color = colors.onSurfaceVariant,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
@@ -196,8 +191,7 @@ private fun TargetLanguageRow(
     Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
         KomiText(
             text = stringResource(Res.string.translation_card_target_label),
-            role = KomiTextRole.LegacyLabel,
-            fontSize = 12.sp,
+            role = KomiTextRole.Overline,
             color = colors.onSurfaceVariant,
         )
         Row(
@@ -206,7 +200,7 @@ private fun TargetLanguageRow(
                     .fillMaxWidth()
                     .clip(rowShape)
                     .background(colors.surfaceContainerHigh)
-                    .border(1.dp, colors.outlineVariant.copy(alpha = 0.5f), rowShape)
+                    .border(1.dp, colors.divider, rowShape)
                     .clickable(onClick = onPick)
                     .padding(horizontal = 14.dp, vertical = 12.dp),
             verticalAlignment = Alignment.CenterVertically,
@@ -220,13 +214,11 @@ private fun TargetLanguageRow(
             Spacer(Modifier.width(10.dp))
             KomiText(
                 text = displayName,
-                role = KomiTextRole.LegacyBody,
-                fontWeight = FontWeight.SemiBold,
+                role = KomiTextRole.Label,
                 color = colors.onSurface,
                 modifier = Modifier.weight(1f),
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
-                uppercase = false,
             )
             KomiIcon(
                 imageVector = Icons.Default.ExpandMore,
@@ -306,8 +298,7 @@ private fun ErrorRow(
     ) {
         KomiText(
             text = message,
-            role = KomiTextRole.LegacyBody,
-            fontSize = 13.sp,
+            role = KomiTextRole.Body,
             color = colors.onError,
             modifier = Modifier.weight(1f),
             maxLines = 2,
@@ -325,9 +316,7 @@ private fun ErrorRow(
         ) {
             KomiText(
                 text = stringResource(Res.string.translation_card_retry),
-                role = KomiTextRole.LegacyLabel,
-                fontSize = 12.sp,
-                fontWeight = FontWeight.SemiBold,
+                role = KomiTextRole.Overline,
                 color = colors.onError,
             )
         }

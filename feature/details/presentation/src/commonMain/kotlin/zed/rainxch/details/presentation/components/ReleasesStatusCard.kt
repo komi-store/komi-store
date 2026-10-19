@@ -67,15 +67,12 @@ fun ReleasesStatusCard(
                     )
                     KomiText(
                         text = stringResource(Res.string.releases_load_failed),
-                        role = KomiTextRole.LegacyTitle,
+                        role = KomiTextRole.CardTitle,
                         color = colors.onSurface,
-                        fontWeight = FontWeight.SemiBold,
-                        uppercase = false,
                     )
                     KomiText(
                         text = stringResource(Res.string.releases_load_failed_description),
-                        role = KomiTextRole.LegacyBody,
-                        fontSize = 13.sp,
+                        role = KomiTextRole.Body,
                         color = colors.onSurfaceVariant,
                     )
                     Spacer(Modifier.height(4.dp))
@@ -95,7 +92,7 @@ fun ReleasesStatusCard(
                         )
                         KomiText(
                             text = stringResource(Res.string.loading_releases),
-                            role = KomiTextRole.LegacyBody,
+                            role = KomiTextRole.Body,
                             color = colors.onSurfaceVariant,
                         )
                     }
@@ -110,10 +107,8 @@ fun ReleasesStatusCard(
                     )
                     KomiText(
                         text = stringResource(Res.string.no_releases_published),
-                        role = KomiTextRole.LegacyTitle,
+                        role = KomiTextRole.CardTitle,
                         color = colors.onSurface,
-                        fontWeight = FontWeight.SemiBold,
-                        uppercase = false,
                     )
                 }
             }

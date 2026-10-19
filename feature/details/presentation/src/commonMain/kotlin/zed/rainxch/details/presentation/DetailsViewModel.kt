@@ -413,12 +413,6 @@ class DetailsViewModel(
                 openAppManager()
             }
 
-            DetailsAction.OnToggleInstallDropdown -> {
-                _state.update {
-                    it.copy(isInstallDropdownExpanded = !it.isInstallDropdownExpanded)
-                }
-            }
-
             is DetailsAction.SelectReleaseCategory -> {
                 selectReleaseCategory(action)
             }
@@ -1331,10 +1325,6 @@ class DetailsViewModel(
             }
 
         currentDownloadJob = job
-
-        _state.update {
-            it.copy(isInstallDropdownExpanded = false)
-        }
     }
 
     private fun openExternalInstaller() {
@@ -1526,9 +1516,6 @@ class DetailsViewModel(
                     }
                 }
             }
-        _state.update {
-            it.copy(isInstallDropdownExpanded = false)
-        }
     }
 
     private fun openObtainium() {
@@ -1545,9 +1532,6 @@ class DetailsViewModel(
                     }
                 },
             )
-        }
-        _state.update {
-            it.copy(isInstallDropdownExpanded = false)
         }
     }
 
