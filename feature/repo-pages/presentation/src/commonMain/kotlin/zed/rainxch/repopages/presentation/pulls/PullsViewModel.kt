@@ -74,7 +74,8 @@ class PullsViewModel(
             _state.update {
                 if (append) it.copy(isLoadingMore = true) else it.copy(isLoading = true, errorMessage = null)
             }
-            repository.getPullRequests(owner, repo, filter, page)
+            repository
+                .getPullRequests(owner, repo, filter, page)
                 .onSuccess { newPulls ->
                     if (generation != requestGeneration) return@onSuccess
                     _state.update { st ->
@@ -88,8 +89,7 @@ class PullsViewModel(
                             errorMessage = null,
                         )
                     }
-                }
-                .onFailure { e ->
+                }.onFailure { e ->
                     if (generation != requestGeneration) return@onFailure
                     _state.update {
                         it.copy(

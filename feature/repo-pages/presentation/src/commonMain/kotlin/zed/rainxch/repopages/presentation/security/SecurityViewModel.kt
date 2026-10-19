@@ -33,11 +33,11 @@ class SecurityViewModel(
     private fun load() {
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true, errorMessage = null) }
-            repository.getSecurityOverview(owner, repo)
+            repository
+                .getSecurityOverview(owner, repo)
                 .onSuccess { overview ->
                     _state.update { it.copy(isLoading = false, overview = overview, errorMessage = null) }
-                }
-                .onFailure { e ->
+                }.onFailure { e ->
                     _state.update {
                         it.copy(
                             isLoading = false,

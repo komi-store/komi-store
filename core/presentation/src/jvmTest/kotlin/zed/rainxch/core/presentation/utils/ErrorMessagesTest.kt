@@ -12,7 +12,6 @@ import kotlin.test.assertNull
 import kotlin.test.assertSame
 
 class ErrorMessagesTest {
-
     @Test
     fun a_rate_limit_shows_the_rate_limit_message() {
         val error = RateLimitException(RateLimitInfo(limit = 60, remaining = 0, resetTimestamp = 0))
@@ -21,12 +20,13 @@ class ErrorMessagesTest {
     }
 
     @Test
-    fun an_error_with_a_message_keeps_it() = runBlocking {
-        val error = Exception("Not Found")
+    fun an_error_with_a_message_keeps_it() =
+        runBlocking {
+            val error = Exception("Not Found")
 
-        assertNull(error.userMessageResource(Res.string.failed_to_load))
-        assertEquals("Not Found", error.toUserMessage(Res.string.failed_to_load))
-    }
+            assertNull(error.userMessageResource(Res.string.failed_to_load))
+            assertEquals("Not Found", error.toUserMessage(Res.string.failed_to_load))
+        }
 
     @Test
     fun an_error_without_a_message_falls_back() {
