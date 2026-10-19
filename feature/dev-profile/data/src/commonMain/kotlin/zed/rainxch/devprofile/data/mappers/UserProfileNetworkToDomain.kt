@@ -21,4 +21,5 @@ fun UserProfileNetwork.toDeveloperProfile(): DeveloperProfile =
         createdAt = createdAt.orEmpty(),
         updatedAt = updatedAt.orEmpty(),
         htmlUrl = htmlUrl,
+        userType = type,
     )
