@@ -2,7 +2,6 @@ package zed.rainxch.core.data.mirror
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import eu.anifantakis.lib.ksafe.KSafe
@@ -84,14 +83,6 @@ class MirrorRepositoryImpl(
                         MigrationEntry(
                             legacyKey = longPreferencesKey("mirror_cached_list_at"),
                             ksafeKey = K_CACHED_AT
-                        ),
-                        MigrationEntry(
-                            legacyKey = longPreferencesKey("mirror_auto_suggest_snooze_until"),
-                            ksafeKey = K_SUGGEST_SNOOZE
-                        ),
-                        MigrationEntry(
-                            legacyKey = booleanPreferencesKey("mirror_auto_suggest_dismissed"),
-                            ksafeKey = K_SUGGEST_DISMISSED
                         ),
                     ),
                 )
@@ -179,16 +170,6 @@ class MirrorRepositoryImpl(
 
     override fun observeRemovedNotices(): Flow<MirrorRemoved> = _removedNotices.asSharedFlow()
 
-    override suspend fun snoozeAutoSuggest(forMs: Long) {
-        migrationDeferred.await()
-        ksafe.safePut(K_SUGGEST_SNOOZE, Clock.System.now().toEpochMilliseconds() + forMs)
-    }
-
-    override suspend fun dismissAutoSuggestPermanently() {
-        migrationDeferred.await()
-        ksafe.safePut(K_SUGGEST_DISMISSED, true)
-    }
-
     private suspend fun readCachedCatalogOrBundled(): List<MirrorConfig> {
         val cachedJson = runCatching {
             ksafe.safeGet(key = K_CACHED_JSON, defaultValue = "")
@@ -252,8 +233,6 @@ class MirrorRepositoryImpl(
         const val K_CUSTOM_TEMPLATE = "mirror_custom_template"
         const val K_CACHED_JSON = "mirror_cached_list_json"
         const val K_CACHED_AT = "mirror_cached_list_at"
-        const val K_SUGGEST_SNOOZE = "mirror_auto_suggest_snooze_until"
-        const val K_SUGGEST_DISMISSED = "mirror_auto_suggest_dismissed"
         const val DIRECT_MIRROR_ID = "direct"
         const val CUSTOM_MIRROR_ID_SENTINEL = "__custom__"
     }
