@@ -9,6 +9,9 @@ on:
         description: 'Release tag (e.g. v1.8.3)'
         required: true
 
+permissions:
+  contents: read
+
 jobs:
   update-cask:
     name: Update Homebrew Cask
