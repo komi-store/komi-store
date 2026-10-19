@@ -139,7 +139,7 @@ private fun EmptyState() {
     ) {
         KomiText(
             text = stringResource(Res.string.apk_inspect_empty),
-            role = KomiTextRole.Body,
+            role = KomiTextRole.LegacyBody,
             color = colors.onSurfaceVariant,
         )
     }
@@ -168,13 +168,13 @@ private fun Header(inspection: ApkInspection) {
     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
         KomiText(
             text = stringResource(Res.string.apk_inspect_title),
-            role = KomiTextRole.Label,
+            role = KomiTextRole.LegacyLabel,
             color = colors.primary,
             fontWeight = FontWeight.SemiBold,
         )
         KomiText(
             text = inspection.appLabel,
-            role = KomiTextRole.Title,
+            role = KomiTextRole.LegacyTitle,
             fontWeight = FontWeight.SemiBold,
             color = colors.onSurface,
             maxLines = 2,
@@ -204,7 +204,7 @@ private fun SourceChip(label: String) {
     val shape = LocalPersonality.current.shape
     KomiText(
         text = label,
-        role = KomiTextRole.Label,
+        role = KomiTextRole.LegacyLabel,
         fontSize = 11.sp,
         color = colors.onSurfaceVariant,
         fontWeight = FontWeight.Medium,
@@ -310,7 +310,7 @@ private fun PermissionsSection(permissions: List<ApkPermission>) {
         if (permissions.isEmpty()) {
             KomiText(
                 text = stringResource(Res.string.apk_inspect_permissions_empty),
-                role = KomiTextRole.Body,
+                role = KomiTextRole.LegacyBody,
                 fontSize = 13.sp,
                 color = colors.onSurfaceVariant,
             )
@@ -394,7 +394,7 @@ private fun PermissionGroupHeader(
     ) {
         KomiText(
             text = label,
-            role = KomiTextRole.Label,
+            role = KomiTextRole.LegacyLabel,
             fontWeight = FontWeight.SemiBold,
             color = color,
             modifier = Modifier.weight(1f, fill = false),
@@ -402,7 +402,7 @@ private fun PermissionGroupHeader(
         )
         KomiText(
             text = count.toString(),
-            role = KomiTextRole.Label,
+            role = KomiTextRole.LegacyLabel,
             fontSize = 11.sp,
             color = color,
             fontWeight = FontWeight.Bold,
@@ -443,14 +443,14 @@ private fun PermissionRow(permission: ApkPermission) {
         ) {
             KomiText(
                 text = permission.displayName,
-                role = KomiTextRole.Body,
+                role = KomiTextRole.LegacyBody,
                 color = colors.onSurface,
                 fontWeight = FontWeight.SemiBold,
             )
             permission.description?.let { desc ->
                 KomiText(
                     text = desc,
-                    role = KomiTextRole.Body,
+                    role = KomiTextRole.LegacyBody,
                     fontSize = 13.sp,
                     color = colors.onSurfaceVariant,
                 )
@@ -468,7 +468,7 @@ private fun PermissionRow(permission: ApkPermission) {
         }
         KomiText(
             text = chipLabel,
-            role = KomiTextRole.Label,
+            role = KomiTextRole.LegacyLabel,
             fontSize = 11.sp,
             color = chipColor,
             fontWeight = FontWeight.SemiBold,
@@ -574,7 +574,7 @@ private fun InspectSection(
             Spacer(Modifier.width(10.dp))
             KomiText(
                 text = title,
-                role = KomiTextRole.Title,
+                role = KomiTextRole.LegacyTitle,
                 fontWeight = FontWeight.SemiBold,
                 color = colors.onSurface,
                 uppercase = false,
@@ -609,7 +609,7 @@ private fun InspectRow(
         if (label.isNotEmpty()) {
             KomiText(
                 text = label,
-                role = KomiTextRole.Body,
+                role = KomiTextRole.LegacyBody,
                 fontSize = 13.sp,
                 color = colors.onSurfaceVariant,
                 modifier = Modifier.width(120.dp),
@@ -623,7 +623,7 @@ private fun InspectRow(
             }
         KomiText(
             text = value,
-            role = if (monospace) KomiTextRole.Mono else KomiTextRole.Body,
+            role = if (monospace) KomiTextRole.Mono else KomiTextRole.LegacyBody,
             fontSize = 13.sp,
             color = colors.onSurface,
             modifier = valueModifier,
@@ -653,7 +653,7 @@ private fun DangerNote(text: String) {
         )
         KomiText(
             text = text,
-            role = KomiTextRole.Label,
+            role = KomiTextRole.LegacyLabel,
             color = colors.onError,
             fontWeight = FontWeight.SemiBold,
             uppercase = false,

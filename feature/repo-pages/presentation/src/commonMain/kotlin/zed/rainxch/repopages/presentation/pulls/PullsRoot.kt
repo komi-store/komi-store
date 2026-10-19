@@ -216,7 +216,7 @@ private fun PullRow(
                     if (pull.isDraft) {
                         KomiText(
                             text = stringResource(Res.string.repo_pages_pr_draft),
-                            role = KomiTextRole.Label,
+                            role = KomiTextRole.LegacyLabel,
                             fontSize = 11.sp,
                             color = colors.onSurfaceVariant,
                             uppercase = false,
@@ -228,7 +228,7 @@ private fun PullRow(
 
                     KomiText(
                         text = pull.title,
-                        role = KomiTextRole.Title,
+                        role = KomiTextRole.LegacyTitle,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.SemiBold,
                         color = colors.onSurface,
@@ -241,7 +241,7 @@ private fun PullRow(
                 KomiText(
                     text = "#${pull.number} · " +
                         stringResource(Res.string.repo_pages_issue_opened_by, pull.authorLogin),
-                    role = KomiTextRole.Body,
+                    role = KomiTextRole.LegacyBody,
                     fontSize = 13.sp,
                     color = colors.onSurfaceVariant,
                     maxLines = 1,

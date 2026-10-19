@@ -289,8 +289,8 @@ private fun ClassicSurface(
 @Composable
 private fun PreviewPanelBody() {
     Column(verticalArrangement = Arrangement.spacedBy(Spacing.xs)) {
-        KomiText("Ollama", role = KomiTextRole.Title)
-        KomiText("Run large language models locally.", role = KomiTextRole.Body)
+        KomiText("Ollama", role = KomiTextRole.LegacyTitle)
+        KomiText("Run large language models locally.", role = KomiTextRole.LegacyBody)
         KomiText("v0.5.4 · 174M", role = KomiTextRole.Mono)
     }
 }

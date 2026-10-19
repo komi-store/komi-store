@@ -202,7 +202,7 @@ fun KomiListRow(
         Column(modifier = Modifier.weight(1f)) {
             KomiText(
                 text = title,
-                role = KomiTextRole.Label,
+                role = KomiTextRole.LegacyLabel,
                 color = titleColor,
                 fontWeight = if (strong) androidx.compose.ui.text.font.FontWeight.Black else null,
                 uppercase = false,
@@ -213,7 +213,7 @@ fun KomiListRow(
             subtitle?.let {
                 KomiText(
                     text = it,
-                    role = KomiTextRole.Body,
+                    role = KomiTextRole.LegacyBody,
                     color = subtitleColor,
                     uppercase = false,
                     maxLines = 1,

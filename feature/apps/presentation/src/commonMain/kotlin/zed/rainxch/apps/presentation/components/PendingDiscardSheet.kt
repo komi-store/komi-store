@@ -54,7 +54,7 @@ fun PendingDiscardSheet(
     ) {
         KomiText(
             text = stringResource(Res.string.confirm_discard_pending_message, app.appName),
-            role = KomiTextRole.Body,
+            role = KomiTextRole.LegacyBody,
         )
     }
 }

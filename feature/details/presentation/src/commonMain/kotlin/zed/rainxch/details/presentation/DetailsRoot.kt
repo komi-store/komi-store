@@ -220,7 +220,7 @@ fun DetailsRoot(
             title = {
                 KomiText(
                     text = stringResource(Res.string.downgrade_warning_title),
-                    role = KomiTextRole.Title,
+                    role = KomiTextRole.LegacyTitle,
                     fontWeight = FontWeight.SemiBold,
                     uppercase = false,
                 )
@@ -246,7 +246,7 @@ fun DetailsRoot(
                         Column {
                             KomiText(
                                 text = targetName,
-                                role = KomiTextRole.Title,
+                                role = KomiTextRole.LegacyTitle,
                                 fontWeight = FontWeight.SemiBold,
                                 fontSize = 15.sp,
                                 uppercase = false,
@@ -255,7 +255,7 @@ fun DetailsRoot(
                             )
                             KomiText(
                                 text = warning.packageName,
-                                role = KomiTextRole.Body,
+                                role = KomiTextRole.LegacyBody,
                                 fontSize = 12.sp,
                                 color = personality.colors.onSurfaceVariant,
                                 maxLines = 1,
@@ -270,7 +270,7 @@ fun DetailsRoot(
                                 warning.targetVersion,
                                 warning.currentVersion,
                             ),
-                        role = KomiTextRole.Body,
+                        role = KomiTextRole.LegacyBody,
                     )
                     KomiText(
                         text =
@@ -278,7 +278,7 @@ fun DetailsRoot(
                                 Res.string.downgrade_warning_uninstall_note,
                                 warning.currentVersion,
                             ),
-                        role = KomiTextRole.Body,
+                        role = KomiTextRole.LegacyBody,
                         color = personality.colors.error,
                     )
                 }
@@ -347,7 +347,7 @@ fun DetailsRoot(
             title = {
                 KomiText(
                     text = stringResource(Res.string.signing_key_changed_title),
-                    role = KomiTextRole.Title,
+                    role = KomiTextRole.LegacyTitle,
                     fontWeight = FontWeight.SemiBold,
                     uppercase = false,
                 )
@@ -360,7 +360,7 @@ fun DetailsRoot(
                             warning.expectedFingerprint.take(19),
                             warning.actualFingerprint.take(19),
                         ),
-                    role = KomiTextRole.Body,
+                    role = KomiTextRole.LegacyBody,
                 )
             },
             confirmButton = {
@@ -395,7 +395,7 @@ fun DetailsRoot(
             title = {
                 KomiText(
                     text = stringResource(Res.string.confirm_uninstall_title),
-                    role = KomiTextRole.Title,
+                    role = KomiTextRole.LegacyTitle,
                     fontWeight = FontWeight.SemiBold,
                     uppercase = false,
                 )
@@ -403,7 +403,7 @@ fun DetailsRoot(
             text = {
                 KomiText(
                     text = stringResource(Res.string.confirm_uninstall_message, appName),
-                    role = KomiTextRole.Body,
+                    role = KomiTextRole.LegacyBody,
                 )
             },
             confirmButton = {
@@ -438,7 +438,7 @@ fun DetailsRoot(
             title = {
                 KomiText(
                     text = stringResource(Res.string.details_unlink_external_app_dialog_title),
-                    role = KomiTextRole.Title,
+                    role = KomiTextRole.LegacyTitle,
                     fontWeight = FontWeight.SemiBold,
                     uppercase = false,
                 )
@@ -449,7 +449,7 @@ fun DetailsRoot(
                         Res.string.details_unlink_external_app_dialog_body,
                         appName
                     ),
-                    role = KomiTextRole.Body,
+                    role = KomiTextRole.LegacyBody,
                 )
             },
             confirmButton = {
@@ -483,7 +483,7 @@ fun DetailsRoot(
             title = {
                 KomiText(
                     text = stringResource(Res.string.install_permission_unavailable),
-                    role = KomiTextRole.Title,
+                    role = KomiTextRole.LegacyTitle,
                     fontWeight = FontWeight.SemiBold,
                     uppercase = false,
                 )
@@ -491,7 +491,7 @@ fun DetailsRoot(
             text = {
                 KomiText(
                     text = stringResource(Res.string.install_permission_blocked_message),
-                    role = KomiTextRole.Body,
+                    role = KomiTextRole.LegacyBody,
                 )
             },
             confirmButton = {

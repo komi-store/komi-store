@@ -66,7 +66,7 @@ fun LanguagePicker(
         Column(modifier = Modifier.fillMaxWidth()) {
             KomiText(
                 text = stringResource(Res.string.translate_to),
-                role = KomiTextRole.Title,
+                role = KomiTextRole.LegacyTitle,
                 fontWeight = FontWeight.SemiBold,
                 modifier = Modifier.padding(vertical = 6.dp),
                 uppercase = false,
@@ -106,14 +106,14 @@ fun LanguagePicker(
                     Column(modifier = Modifier.weight(1f)) {
                         KomiText(
                             text = deviceLanguage.displayName,
-                            role = KomiTextRole.Title,
+                            role = KomiTextRole.LegacyTitle,
                             fontWeight = FontWeight.SemiBold,
                             color = colors.primary,
                             uppercase = false,
                         )
                         KomiText(
                             text = stringResource(Res.string.select_language),
-                            role = KomiTextRole.Label,
+                            role = KomiTextRole.LegacyLabel,
                             fontSize = 11.sp,
                             color = colors.primary.copy(alpha = 0.7f),
                             uppercase = false,
@@ -172,7 +172,7 @@ private fun LanguageListItem(
         Column(modifier = Modifier.weight(1f)) {
             KomiText(
                 text = language.displayName,
-                role = KomiTextRole.Title,
+                role = KomiTextRole.LegacyTitle,
                 fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
                 color =
                     if (isSelected) {
@@ -184,7 +184,7 @@ private fun LanguageListItem(
             )
             KomiText(
                 text = language.code,
-                role = KomiTextRole.Label,
+                role = KomiTextRole.LegacyLabel,
                 fontSize = 11.sp,
                 color = colors.outline,
                 uppercase = false,

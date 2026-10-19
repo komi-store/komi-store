@@ -88,7 +88,7 @@ fun StarredRepositoryItem(
                 ) {
                     KomiText(
                         text = repository.repoName,
-                        role = KomiTextRole.Title,
+                        role = KomiTextRole.LegacyTitle,
                         fontWeight = FontWeight.SemiBold,
                         color = colors.onSurface,
                         maxLines = 1,
@@ -102,7 +102,7 @@ fun StarredRepositoryItem(
                     ) {
                         KomiText(
                             text = repository.repoOwner,
-                            role = KomiTextRole.Body,
+                            role = KomiTextRole.LegacyBody,
                             fontSize = 13.sp,
                             color = colors.onSurfaceVariant,
                             maxLines = 1,
@@ -132,7 +132,7 @@ fun StarredRepositoryItem(
                 Spacer(Modifier.height(10.dp))
                 KomiText(
                     text = description,
-                    role = KomiTextRole.Body,
+                    role = KomiTextRole.LegacyBody,
                     fontSize = 13.sp,
                     color = colors.onSurfaceVariant,
                     maxLines = 3,
@@ -228,7 +228,7 @@ private fun TonalBadge(
     ) {
         KomiText(
             text = text,
-            role = KomiTextRole.Label,
+            role = KomiTextRole.LegacyLabel,
             fontSize = 12.sp,
             fontWeight = FontWeight.SemiBold,
             color = content,

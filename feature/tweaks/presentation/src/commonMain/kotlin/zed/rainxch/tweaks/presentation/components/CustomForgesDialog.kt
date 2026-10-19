@@ -39,13 +39,13 @@ fun CustomForgesDialog(
     val colors = personality.colors
     KomiDialog(
         onDismissRequest = { onAction(TweaksAction.OnDismissCustomForgesDialog) },
-        title = { KomiText(stringResource(Res.string.custom_forges_dialog_title), role = KomiTextRole.Title) },
+        title = { KomiText(stringResource(Res.string.custom_forges_dialog_title), role = KomiTextRole.LegacyTitle) },
         text = {
             Column {
 
                 KomiText(
                     text = stringResource(Res.string.custom_forges_dialog_builtin_note),
-                    role = KomiTextRole.Body,
+                    role = KomiTextRole.LegacyBody,
                     fontSize = 13.sp,
                     color = colors.onPrimaryContainer,
                     uppercase = false,
@@ -57,7 +57,7 @@ fun CustomForgesDialog(
                 )
                 KomiText(
                     text = stringResource(Res.string.custom_forges_dialog_help),
-                    role = KomiTextRole.Body,
+                    role = KomiTextRole.LegacyBody,
                     fontSize = 13.sp,
                     color = colors.onSurfaceVariant,
                     uppercase = false,
@@ -84,7 +84,7 @@ fun CustomForgesDialog(
                 if (state.customForgeError != null) {
                     KomiText(
                         text = state.customForgeError,
-                        role = KomiTextRole.Body,
+                        role = KomiTextRole.LegacyBody,
                         fontSize = 13.sp,
                         color = colors.error,
                         uppercase = false,
@@ -94,7 +94,7 @@ fun CustomForgesDialog(
                 if (state.customForgeHosts.isEmpty()) {
                     KomiText(
                         text = stringResource(Res.string.custom_forges_empty),
-                        role = KomiTextRole.Body,
+                        role = KomiTextRole.LegacyBody,
                         fontSize = 13.sp,
                         color = colors.onSurfaceVariant,
                         uppercase = false,

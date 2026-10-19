@@ -69,7 +69,7 @@ fun RepositoryActionsSheet(
             Column(modifier = Modifier.weight(1f)) {
                 KomiText(
                     text = repository.fullName,
-                    role = KomiTextRole.Title,
+                    role = KomiTextRole.LegacyTitle,
                     fontWeight = FontWeight.SemiBold,
                     color = colors.onSurface,
                     maxLines = 1,
@@ -80,7 +80,7 @@ fun RepositoryActionsSheet(
                 repository.description?.let {
                     KomiText(
                         text = it,
-                        role = KomiTextRole.Body,
+                        role = KomiTextRole.LegacyBody,
                         fontSize = 13.sp,
                         color = colors.onSurfaceVariant,
                         maxLines = 1,
@@ -144,7 +144,7 @@ private fun SheetRow(
 
         KomiText(
             text = label,
-            role = KomiTextRole.Body,
+            role = KomiTextRole.LegacyBody,
             color = tint,
         )
     }

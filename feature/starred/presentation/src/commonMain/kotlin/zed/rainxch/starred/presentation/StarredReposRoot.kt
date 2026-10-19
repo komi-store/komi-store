@@ -247,7 +247,7 @@ fun StarredReposScreen(
                     ) {
                         KomiText(
                             text = message,
-                            role = KomiTextRole.Body,
+                            role = KomiTextRole.LegacyBody,
                             color = colors.onSurface,
                             uppercase = false,
                             modifier = Modifier.weight(1f),
@@ -390,7 +390,7 @@ private fun EmptyStateContent(
 
         KomiText(
             text = title,
-            role = KomiTextRole.Title,
+            role = KomiTextRole.LegacyTitle,
             color = colors.onSurface,
             textAlign = TextAlign.Center,
             uppercase = false,
@@ -400,7 +400,7 @@ private fun EmptyStateContent(
 
         KomiText(
             text = message,
-            role = KomiTextRole.Body,
+            role = KomiTextRole.LegacyBody,
             color = colors.onSurfaceVariant,
             textAlign = TextAlign.Center,
             uppercase = false,
@@ -457,7 +457,7 @@ private fun NotInstallableHint(
                     count,
                     count,
                 ),
-            role = KomiTextRole.Body,
+            role = KomiTextRole.LegacyBody,
             color = colors.onSurfaceVariant,
             uppercase = false,
             modifier = Modifier.weight(1f),

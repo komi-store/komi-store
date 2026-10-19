@@ -164,7 +164,7 @@ private fun <T> MangaSegmentCell(
                 .padding(horizontal = Spacing.md),
         contentAlignment = Alignment.Center,
     ) {
-        SegmentContent(item = item, contentColor = contentColor, iconSize = metrics.icon, textRole = KomiTextRole.Stamp)
+        SegmentContent(item = item, contentColor = contentColor, iconSize = metrics.icon, textRole = KomiTextRole.LegacyStamp)
     }
 }
 
@@ -222,7 +222,7 @@ private fun <T> ClassicSegmentCell(
                 .padding(horizontal = Spacing.md),
         contentAlignment = Alignment.Center,
     ) {
-        SegmentContent(item = item, contentColor = contentColor, iconSize = metrics.icon, textRole = KomiTextRole.Label)
+        SegmentContent(item = item, contentColor = contentColor, iconSize = metrics.icon, textRole = KomiTextRole.LegacyLabel)
     }
 }
 

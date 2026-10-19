@@ -60,7 +60,7 @@ fun EmptyStateScreen(
 
                 KomiText(
                     text = stringResource(Res.string.external_import_empty_all_matched),
-                    role = KomiTextRole.Title,
+                    role = KomiTextRole.LegacyTitle,
                     fontWeight = FontWeight.SemiBold,
                     color = colors.onSurface,
                     textAlign = TextAlign.Center,
@@ -87,7 +87,7 @@ fun EmptyStateScreen(
 
                 KomiText(
                     text = stringResource(Res.string.external_import_empty_no_apps_title),
-                    role = KomiTextRole.Title,
+                    role = KomiTextRole.LegacyTitle,
                     fontWeight = FontWeight.SemiBold,
                     color = colors.onSurface,
                     textAlign = TextAlign.Center,
@@ -95,7 +95,7 @@ fun EmptyStateScreen(
 
                 KomiText(
                     text = stringResource(Res.string.external_import_empty_no_apps_body),
-                    role = KomiTextRole.Body,
+                    role = KomiTextRole.LegacyBody,
                     color = colors.onSurfaceVariant,
                     textAlign = TextAlign.Center,
                     uppercase = false,

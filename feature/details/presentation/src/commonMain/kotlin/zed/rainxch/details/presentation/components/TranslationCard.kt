@@ -113,7 +113,7 @@ fun TranslationCard(
                             SupportedLanguages.all.firstOrNull { it.code == state.detectedSourceLanguage }?.displayName
                                 ?: state.detectedSourceLanguage,
                         ),
-                    role = KomiTextRole.Body,
+                    role = KomiTextRole.LegacyBody,
                     fontSize = 13.sp,
                     color = colors.onSurfaceVariant,
                 )
@@ -149,7 +149,7 @@ private fun Header(
         Column(modifier = Modifier.weight(1f)) {
             KomiText(
                 text = stringResource(Res.string.translation_card_title),
-                role = KomiTextRole.Title,
+                role = KomiTextRole.LegacyTitle,
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 17.sp,
                 color = colors.onSurface,
@@ -175,7 +175,7 @@ private fun Header(
                 }
             KomiText(
                 text = subtitle,
-                role = KomiTextRole.Body,
+                role = KomiTextRole.LegacyBody,
                 fontSize = 13.sp,
                 color = colors.onSurfaceVariant,
                 maxLines = 1,
@@ -196,7 +196,7 @@ private fun TargetLanguageRow(
     Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
         KomiText(
             text = stringResource(Res.string.translation_card_target_label),
-            role = KomiTextRole.Label,
+            role = KomiTextRole.LegacyLabel,
             fontSize = 12.sp,
             color = colors.onSurfaceVariant,
         )
@@ -220,7 +220,7 @@ private fun TargetLanguageRow(
             Spacer(Modifier.width(10.dp))
             KomiText(
                 text = displayName,
-                role = KomiTextRole.Body,
+                role = KomiTextRole.LegacyBody,
                 fontWeight = FontWeight.SemiBold,
                 color = colors.onSurface,
                 modifier = Modifier.weight(1f),
@@ -306,7 +306,7 @@ private fun ErrorRow(
     ) {
         KomiText(
             text = message,
-            role = KomiTextRole.Body,
+            role = KomiTextRole.LegacyBody,
             fontSize = 13.sp,
             color = colors.onError,
             modifier = Modifier.weight(1f),
@@ -325,7 +325,7 @@ private fun ErrorRow(
         ) {
             KomiText(
                 text = stringResource(Res.string.translation_card_retry),
-                role = KomiTextRole.Label,
+                role = KomiTextRole.LegacyLabel,
                 fontSize = 12.sp,
                 fontWeight = FontWeight.SemiBold,
                 color = colors.onError,

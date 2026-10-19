@@ -152,7 +152,7 @@ private fun Coachmark(onDismiss: () -> Unit) {
                         )
                         KomiText(
                             text = stringResource(Res.string.apk_inspect_coachmark_title),
-                            role = KomiTextRole.Title,
+                            role = KomiTextRole.LegacyTitle,
                             fontWeight = FontWeight.SemiBold,
                             fontSize = 16.sp,
                             color = colors.onPrimary,
@@ -161,7 +161,7 @@ private fun Coachmark(onDismiss: () -> Unit) {
                     }
                     KomiText(
                         text = stringResource(Res.string.apk_inspect_coachmark_body),
-                        role = KomiTextRole.Body,
+                        role = KomiTextRole.LegacyBody,
                         fontSize = 13.sp,
                         color = colors.onPrimary.copy(alpha = 0.9f),
                     )

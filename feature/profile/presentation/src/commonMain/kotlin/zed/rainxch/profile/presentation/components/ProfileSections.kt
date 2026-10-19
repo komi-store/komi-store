@@ -72,7 +72,7 @@ fun LazyListScope.profileSections(
         if (state.isUserLoggedIn) {
             KomiText(
                 text = stringResource(Res.string.profile_section_library),
-                role = KomiTextRole.Title,
+                role = KomiTextRole.LegacyTitle,
             )
         }
 
@@ -118,7 +118,7 @@ fun LazyListScope.profileSections(
 
         KomiText(
             text = stringResource(Res.string.profile_section_updates),
-            role = KomiTextRole.Title,
+            role = KomiTextRole.LegacyTitle,
         )
 
         Spacer(Modifier.height(8.dp))
@@ -148,7 +148,7 @@ fun LazyListScope.profileSections(
 
         KomiText(
             text = stringResource(Res.string.section_app_block),
-            role = KomiTextRole.Title,
+            role = KomiTextRole.LegacyTitle,
         )
 
         Spacer(Modifier.height(8.dp))
@@ -178,7 +178,7 @@ fun LazyListScope.profileSections(
 
             KomiText(
                 text = stringResource(Res.string.profile_section_account),
-                role = KomiTextRole.Title,
+                role = KomiTextRole.LegacyTitle,
             )
 
             Spacer(Modifier.height(8.dp))
@@ -249,7 +249,7 @@ private fun SignedOutContent(onAction: (ProfileAction) -> Unit) {
         Spacer(Modifier.height(4.dp))
         KomiText(
             text = stringResource(Res.string.profile_sign_in_title),
-            role = KomiTextRole.Title,
+            role = KomiTextRole.LegacyTitle,
             fontSize = 22.sp,
             fontWeight = FontWeight.SemiBold,
             color = colors.onSurface,
@@ -258,7 +258,7 @@ private fun SignedOutContent(onAction: (ProfileAction) -> Unit) {
         )
         KomiText(
             text = stringResource(Res.string.profile_sign_in_description),
-            role = KomiTextRole.Body,
+            role = KomiTextRole.LegacyBody,
             color = colors.onSurfaceVariant,
             textAlign = TextAlign.Center,
         )
@@ -320,7 +320,7 @@ private fun SignedInContent(
                 val displayName = profile.name.takeIf { it.isNotBlank() } ?: profile.username
                 KomiText(
                     text = displayName,
-                    role = KomiTextRole.Title,
+                    role = KomiTextRole.LegacyTitle,
                     fontWeight = FontWeight.SemiBold,
                     color = colors.onSurface,
                     maxLines = 1,
@@ -329,7 +329,7 @@ private fun SignedInContent(
                 )
                 KomiText(
                     text = "@${profile.username}",
-                    role = KomiTextRole.Label,
+                    role = KomiTextRole.LegacyLabel,
                     color = colors.onSurfaceVariant,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
@@ -339,7 +339,7 @@ private fun SignedInContent(
                     Spacer(Modifier.height(2.dp))
                     KomiText(
                         text = bio,
-                        role = KomiTextRole.Body,
+                        role = KomiTextRole.LegacyBody,
                         fontSize = 13.sp,
                         color = colors.onSurfaceVariant,
                         maxLines = 3,
@@ -432,7 +432,7 @@ private fun Metric(
     ) {
         KomiText(
             text = value,
-            role = KomiTextRole.Title,
+            role = KomiTextRole.LegacyTitle,
             fontSize = 18.sp,
             fontWeight = FontWeight.SemiBold,
             color = colors.onSurface,
@@ -442,7 +442,7 @@ private fun Metric(
         )
         KomiText(
             text = label,
-            role = KomiTextRole.Label,
+            role = KomiTextRole.LegacyLabel,
             fontSize = 11.sp,
             color = colors.onSurfaceVariant,
             maxLines = 1,

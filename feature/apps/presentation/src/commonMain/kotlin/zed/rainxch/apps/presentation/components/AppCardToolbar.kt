@@ -63,7 +63,7 @@ internal fun AppCardToolbar(
         val preReleaseString = stringResource(Res.string.pre_release_badge)
         KomiText(
             text = preReleaseString,
-            role = KomiTextRole.Body,
+            role = KomiTextRole.LegacyBody,
             fontSize = 13.sp,
             color = colors.onSurfaceVariant,
         )

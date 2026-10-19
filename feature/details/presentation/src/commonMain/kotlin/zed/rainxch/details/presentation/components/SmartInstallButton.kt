@@ -389,7 +389,7 @@ private fun IdleLabel(
             }
             KomiText(
                 text = text,
-                role = KomiTextRole.Title,
+                role = KomiTextRole.LegacyTitle,
                 color = contentColor,
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 15.sp,
@@ -411,7 +411,7 @@ private fun IdleLabel(
             ) {
                 KomiText(
                     text = subtitle,
-                    role = KomiTextRole.Label,
+                    role = KomiTextRole.LegacyLabel,
                     color = contentColor.copy(alpha = 0.78f),
                     fontSize = 11.sp,
                     uppercase = false,
@@ -462,7 +462,7 @@ private fun DownloadingLabel(
         }
         KomiText(
             text = label,
-            role = KomiTextRole.Title,
+            role = KomiTextRole.LegacyTitle,
             fontSize = 15.sp,
             color = contentColor,
             fontWeight = FontWeight.SemiBold,
@@ -481,7 +481,7 @@ private fun DownloadingLabel(
             }
             KomiText(
                 text = progressText,
-                role = KomiTextRole.Label,
+                role = KomiTextRole.LegacyLabel,
                 fontSize = 11.sp,
                 color = contentColor.copy(alpha = 0.78f),
                 uppercase = false,
@@ -573,7 +573,7 @@ private fun InstalledSplitRow(
                 )
                 KomiText(
                     text = stringResource(Res.string.uninstall),
-                    role = KomiTextRole.Title,
+                    role = KomiTextRole.LegacyTitle,
                     color = colors.error,
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 15.sp,
@@ -602,7 +602,7 @@ private fun InstalledSplitRow(
                 )
                 KomiText(
                     text = stringResource(Res.string.open_app),
-                    role = KomiTextRole.Title,
+                    role = KomiTextRole.LegacyTitle,
                     color = colors.onPrimary,
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 15.sp,
@@ -681,7 +681,7 @@ private fun AttestationBadge(attestationStatus: AttestationStatus) {
                 }
                 KomiText(
                     text = label,
-                    role = KomiTextRole.Label,
+                    role = KomiTextRole.LegacyLabel,
                     fontSize = 11.sp,
                     color = content,
                     fontWeight = FontWeight.SemiBold,

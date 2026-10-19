@@ -103,14 +103,14 @@ fun PasteProxyUrlSheet(
         ) {
             KomiText(
                 text = stringResource(Res.string.tweaks_connection_paste_url_title),
-                role = KomiTextRole.Title,
+                role = KomiTextRole.LegacyTitle,
                 fontWeight = FontWeight.SemiBold,
                 color = colors.onSurface,
             )
 
             KomiText(
                 text = stringResource(Res.string.tweaks_connection_paste_url_body),
-                role = KomiTextRole.Body,
+                role = KomiTextRole.LegacyBody,
                 fontSize = 13.sp,
                 color = colors.onSurfaceVariant,
                 uppercase = false,

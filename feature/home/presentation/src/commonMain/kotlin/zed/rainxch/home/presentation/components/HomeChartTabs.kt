@@ -114,7 +114,7 @@ private fun ChartTabSegment(
                         ChartTab.Popular -> Res.string.home_chart_popular
                     },
                 ),
-            role = KomiTextRole.Label,
+            role = KomiTextRole.LegacyLabel,
             color = fg,
             fontSize = 13.sp,
             fontWeight = FontWeight.W800,
@@ -131,7 +131,7 @@ private fun ChartTabSegment(
                             ChartTab.Popular -> Res.string.home_chart_popular_jp
                         },
                     ),
-                role = KomiTextRole.Label,
+                role = KomiTextRole.LegacyLabel,
                 color = kicker,
                 fontSize = 9.sp,
                 uppercase = false,

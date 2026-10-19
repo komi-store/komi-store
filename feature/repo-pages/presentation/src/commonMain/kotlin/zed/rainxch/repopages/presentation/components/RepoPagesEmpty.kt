@@ -24,7 +24,7 @@ fun RepoPagesEmpty(
     ) {
         KomiText(
             text = message,
-            role = KomiTextRole.Body,
+            role = KomiTextRole.LegacyBody,
             color = colors.onSurfaceVariant,
             textAlign = TextAlign.Center,
         )

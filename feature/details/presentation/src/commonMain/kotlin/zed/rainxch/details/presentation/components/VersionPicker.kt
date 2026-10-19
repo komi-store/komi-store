@@ -94,7 +94,7 @@ fun VersionPicker(
     ) {
         KomiText(
             text = stringResource(Res.string.versions_title),
-            role = KomiTextRole.Label,
+            role = KomiTextRole.LegacyLabel,
             fontWeight = FontWeight.SemiBold,
             fontSize = 12.sp,
             color = colors.primary,
@@ -127,7 +127,7 @@ fun VersionPicker(
                                 release.tagName
                             }
                         } ?: stringResource(Res.string.no_version_selected),
-                    role = KomiTextRole.Stamp,
+                    role = KomiTextRole.LegacyStamp,
                     fontWeight = FontWeight.SemiBold,
                     color = colors.onSurface,
                     overflow = TextOverflow.Clip,
@@ -138,7 +138,7 @@ fun VersionPicker(
                     if (name != selectedRelease?.tagName) {
                         KomiText(
                             text = name,
-                            role = KomiTextRole.Body,
+                            role = KomiTextRole.LegacyBody,
                             fontSize = 13.sp,
                             color = colors.onSurfaceVariant,
                             maxLines = 1,
@@ -175,7 +175,7 @@ fun VersionPicker(
         ) {
             KomiText(
                 text = stringResource(Res.string.versions_title),
-                role = KomiTextRole.Title,
+                role = KomiTextRole.LegacyTitle,
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 20.sp,
                 color = colors.onSurface,
@@ -211,7 +211,7 @@ fun VersionPicker(
             if (filteredReleases.isEmpty()) {
                 KomiText(
                     text = stringResource(Res.string.not_available),
-                    role = KomiTextRole.Body,
+                    role = KomiTextRole.LegacyBody,
                     color = colors.onSurfaceVariant,
                     modifier = Modifier.padding(vertical = 16.dp),
                 )
@@ -280,7 +280,7 @@ private fun VersionListItem(
             ) {
                 KomiText(
                     text = release.tagName,
-                    role = KomiTextRole.Stamp,
+                    role = KomiTextRole.LegacyStamp,
                     fontWeight = if (isSelected) FontWeight.Bold else FontWeight.SemiBold,
                     color =
                         when {
@@ -293,7 +293,7 @@ private fun VersionListItem(
                 if (isLatest) {
                     KomiText(
                         text = stringResource(Res.string.latest_badge),
-                        role = KomiTextRole.Label,
+                        role = KomiTextRole.LegacyLabel,
                         fontWeight = FontWeight.Bold,
                         fontSize = 10.sp,
                         color = colors.primary,
@@ -314,7 +314,7 @@ private fun VersionListItem(
                     val specificLabel = release.preReleaseLabel()
                     KomiText(
                         text = specificLabel ?: stringResource(Res.string.pre_release_badge),
-                        role = KomiTextRole.Label,
+                        role = KomiTextRole.LegacyLabel,
                         fontWeight = FontWeight.Bold,
                         fontSize = 10.sp,
                         color = colors.primary,
@@ -333,7 +333,7 @@ private fun VersionListItem(
                 if (name != release.tagName) {
                     KomiText(
                         text = name,
-                        role = KomiTextRole.Body,
+                        role = KomiTextRole.LegacyBody,
                         fontSize = 13.sp,
                         color = colors.onSurfaceVariant,
                         maxLines = 1,
@@ -348,7 +348,7 @@ private fun VersionListItem(
                     } else {
                         "${formatIsoDateOrRaw(release.publishedAt)} · ${stringResource(Res.string.no_build_for_this_device)}"
                     },
-                role = KomiTextRole.Label,
+                role = KomiTextRole.LegacyLabel,
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Medium,
                 color = colors.onSurfaceVariant,
@@ -377,7 +377,7 @@ private fun VersionBadge(text: String) {
     val shape = RoundedCornerShape(LocalPersonality.current.shape.cornerSmall)
     KomiText(
         text = text,
-        role = KomiTextRole.Label,
+        role = KomiTextRole.LegacyLabel,
         fontWeight = FontWeight.Bold,
         fontSize = 10.sp,
         color = colors.primary,

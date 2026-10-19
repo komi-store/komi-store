@@ -71,7 +71,7 @@ fun PlatformHandoffSheet(
             }
             KomiText(
                 text = stringResource(Res.string.get_it_on_platform, platform.toLabel()),
-                role = KomiTextRole.Title,
+                role = KomiTextRole.LegacyTitle,
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 20.sp,
                 color = colors.onSurface,
@@ -80,7 +80,7 @@ fun PlatformHandoffSheet(
         }
         KomiText(
             text = "${release.tagName} · ${formatIsoDateOrRaw(release.publishedAt)}",
-            role = KomiTextRole.Body,
+            role = KomiTextRole.LegacyBody,
             fontSize = 13.sp,
             color = colors.onSurfaceVariant,
             uppercase = false,
@@ -101,7 +101,7 @@ fun PlatformHandoffSheet(
                 Column(modifier = Modifier.weight(1f)) {
                     KomiText(
                         text = asset.name,
-                        role = KomiTextRole.Body,
+                        role = KomiTextRole.LegacyBody,
                         fontSize = 14.sp,
                         color = colors.onSurface,
                         maxLines = 2,
@@ -110,7 +110,7 @@ fun PlatformHandoffSheet(
                     )
                     KomiText(
                         text = formatFileSize(asset.size),
-                        role = KomiTextRole.Label,
+                        role = KomiTextRole.LegacyLabel,
                         fontSize = 12.sp,
                         color = colors.onSurfaceVariant,
                         uppercase = false,

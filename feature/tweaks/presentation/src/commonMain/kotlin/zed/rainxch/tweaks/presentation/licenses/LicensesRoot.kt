@@ -78,14 +78,14 @@ fun LicensesRoot(
             Column(modifier = Modifier.padding(16.dp)) {
                 KomiText(
                     text = stringResource(Res.string.tweaks_licenses_intro_title),
-                    role = KomiTextRole.Body,
+                    role = KomiTextRole.LegacyBody,
                     color = colors.onSurface,
                     uppercase = false,
                 )
                 Spacer(Modifier.height(4.dp))
                 KomiText(
                     text = stringResource(Res.string.tweaks_licenses_intro_body),
-                    role = KomiTextRole.Body,
+                    role = KomiTextRole.LegacyBody,
                     fontSize = 13.sp,
                     color = colors.onSurfaceVariant,
                     uppercase = false,
@@ -109,7 +109,7 @@ fun LicensesRoot(
             state.loadError -> {
                 KomiText(
                     text = stringResource(Res.string.tweaks_licenses_load_failed),
-                    role = KomiTextRole.Body,
+                    role = KomiTextRole.LegacyBody,
                     color = LocalPersonality.current.colors.error,
                     uppercase = false,
                     modifier = Modifier.padding(16.dp),
@@ -150,7 +150,7 @@ private fun LibraryRow(library: LibraryEntry, onClick: () -> Unit) {
         ) {
             KomiText(
                 text = library.name,
-                role = KomiTextRole.Title,
+                role = KomiTextRole.LegacyTitle,
                 fontWeight = FontWeight.SemiBold,
                 color = colors.onSurface,
                 maxLines = 1,

@@ -124,7 +124,7 @@ fun KomiRepoCard(
                 Column(modifier = Modifier.weight(1f)) {
                     KomiText(
                         text = name,
-                        role = KomiTextRole.Title,
+                        role = KomiTextRole.LegacyTitle,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                     )
@@ -135,7 +135,7 @@ fun KomiRepoCard(
                     ) {
                         KomiText(
                             text = "@$owner",
-                            role = KomiTextRole.Body,
+                            role = KomiTextRole.LegacyBody,
                             color = colors.onSurfaceVariant,
                             fontSize = 12.sp,
                             fontWeight = FontWeight.W600,
@@ -147,7 +147,7 @@ fun KomiRepoCard(
                             Diamond(color = colors.onSurfaceVariant)
                             KomiText(
                                 text = language,
-                                role = KomiTextRole.Body,
+                                role = KomiTextRole.LegacyBody,
                                 color = colors.onSurface,
                                 fontSize = 12.sp,
                                 fontWeight = FontWeight.W800,
@@ -168,7 +168,7 @@ fun KomiRepoCard(
 
             KomiText(
                 text = description,
-                role = KomiTextRole.Body,
+                role = KomiTextRole.LegacyBody,
                 color = colors.onSurface,
                 fontSize = 13.5.sp,
                 fontWeight = FontWeight.W500,
@@ -262,7 +262,7 @@ fun KomiRepoCard(
                     if (!compact) {
                         KomiText(
                             text = "Read",
-                            role = KomiTextRole.Label,
+                            role = KomiTextRole.LegacyLabel,
                             color = colors.onSurface,
                             fontSize = 12.5.sp,
                             modifier = Modifier.padding(end = 2.dp),
@@ -364,7 +364,7 @@ private fun CardIconTile(
                 } else {
                     KomiText(
                         text = monogram.uppercase(),
-                        role = KomiTextRole.Title,
+                        role = KomiTextRole.LegacyTitle,
                         color = colors.onSurface,
                         fontSize = (size.value * 0.46f).sp,
                         maxLines = 1,
@@ -390,7 +390,7 @@ private fun CardIconTile(
                 } else {
                     KomiText(
                         text = monogram.uppercase(),
-                        role = KomiTextRole.Title,
+                        role = KomiTextRole.LegacyTitle,
                         color = colors.onSurface,
                         fontSize = (size.value * 0.42f).sp,
                         maxLines = 1,
@@ -479,13 +479,13 @@ private fun RankStamp(
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             KomiText(
                 text = "NO.",
-                role = KomiTextRole.Label,
+                role = KomiTextRole.LegacyLabel,
                 color = colors.onPrimary,
                 fontSize = 8.sp,
             )
             KomiText(
                 text = rank.toString().padStart(2, '0'),
-                role = KomiTextRole.Title,
+                role = KomiTextRole.LegacyTitle,
                 color = colors.onPrimary,
                 fontSize = 21.sp,
             )
@@ -508,7 +508,7 @@ private fun BurstBadge(
         )
         KomiText(
             text = text,
-            role = KomiTextRole.Title,
+            role = KomiTextRole.LegacyTitle,
             color = colors.onPrimary,
             fontSize = 13.sp,
             modifier = Modifier.rotate(-6f),
@@ -534,7 +534,7 @@ private fun NewReleaseStamp(
         ) {
             KomiText(
                 text = "New Release",
-                role = KomiTextRole.Label,
+                role = KomiTextRole.LegacyLabel,
                 color = colors.onPrimary,
                 fontSize = 10.5.sp,
             )
@@ -542,7 +542,7 @@ private fun NewReleaseStamp(
         if (version != null) {
             KomiText(
                 text = "v$version",
-                role = KomiTextRole.Title,
+                role = KomiTextRole.LegacyTitle,
                 color = colors.onSurface,
                 fontSize = 14.sp,
                 modifier = Modifier.padding(top = 4.dp),
@@ -579,7 +579,7 @@ private fun ClassicBadge(
         ) {
             KomiText(
                 text = text,
-                role = KomiTextRole.Label,
+                role = KomiTextRole.LegacyLabel,
                 color = colors.onPrimaryContainer,
                 fontSize = 11.sp,
             )
@@ -606,7 +606,7 @@ private fun Stat(
         )
         KomiText(
             text = value,
-            role = KomiTextRole.Body,
+            role = KomiTextRole.LegacyBody,
             color = colors.onSurface,
             fontSize = 13.5.sp,
             fontWeight = FontWeight.W800,

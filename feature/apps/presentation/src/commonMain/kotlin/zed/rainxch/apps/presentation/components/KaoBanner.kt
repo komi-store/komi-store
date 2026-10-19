@@ -72,7 +72,7 @@ fun KaoBanner(
                 ) {
                     KomiText(
                         text = stringResource(Res.string.kao_banner_title),
-                        role = KomiTextRole.Stamp,
+                        role = KomiTextRole.LegacyStamp,
                         fontWeight = FontWeight.SemiBold,
                         uppercase = false,
                         color = colors.onPrimaryContainer,
@@ -80,7 +80,7 @@ fun KaoBanner(
 
                     KomiText(
                         text = stringResource(Res.string.kao_banner_body),
-                        role = KomiTextRole.Body,
+                        role = KomiTextRole.LegacyBody,
                         fontSize = 13.sp,
                         color = colors.onPrimaryContainer,
                     )

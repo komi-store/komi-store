@@ -34,7 +34,7 @@ fun LazyListScope.logs(state: DetailsState) {
         ) {
             KomiText(
                 text = stringResource(Res.string.install_logs),
-                role = KomiTextRole.Title,
+                role = KomiTextRole.LegacyTitle,
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 20.sp,
                 color = colors.onBackground,

@@ -53,7 +53,7 @@ fun LazyListScope.reportIssue(repoUrl: String) {
             )
             KomiText(
                 text = stringResource(Res.string.report_issue),
-                role = KomiTextRole.Title,
+                role = KomiTextRole.LegacyTitle,
                 fontWeight = FontWeight.SemiBold,
                 color = colors.onSurface,
                 modifier = Modifier.weight(1f),

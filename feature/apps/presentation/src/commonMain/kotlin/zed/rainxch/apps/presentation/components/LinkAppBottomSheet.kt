@@ -153,7 +153,7 @@ private fun PickAppStep(
     ) {
         KomiText(
             text = stringResource(Res.string.link_app_title),
-            role = KomiTextRole.Title,
+            role = KomiTextRole.LegacyTitle,
             color = colors.onSurface,
             fontWeight = FontWeight.Bold,
         )
@@ -162,7 +162,7 @@ private fun PickAppStep(
 
         KomiText(
             text = stringResource(Res.string.pick_installed_app),
-            role = KomiTextRole.Body,
+            role = KomiTextRole.LegacyBody,
             color = colors.onSurfaceVariant,
         )
 
@@ -207,7 +207,7 @@ private fun PickAppStep(
                     ) {
                         KomiText(
                             text = stringResource(Res.string.no_apps_found),
-                            role = KomiTextRole.Body,
+                            role = KomiTextRole.LegacyBody,
                             color = colors.onSurfaceVariant,
                         )
                     }
@@ -238,7 +238,7 @@ private fun DeviceAppItem(
         ) {
             KomiText(
                 text = app.appName,
-                role = KomiTextRole.Body,
+                role = KomiTextRole.LegacyBody,
                 color = colors.onSurface,
                 fontWeight = FontWeight.Medium,
                 maxLines = 1,
@@ -268,7 +268,7 @@ private fun DeviceAppItem(
                             InstallerCategory.PLAY_STORE -> stringResource(Res.string.installer_category_play_store)
                             InstallerCategory.SYSTEM_UPDATE -> stringResource(Res.string.installer_category_system_update)
                         },
-                        role = KomiTextRole.Label,
+                        role = KomiTextRole.LegacyLabel,
                         fontSize = 11.sp,
                         color = when (app.installerCategory) {
                             InstallerCategory.SIDE_STORE -> colors.onPrimaryContainer
@@ -287,7 +287,7 @@ private fun DeviceAppItem(
 
                 KomiText(
                     text = app.packageName,
-                    role = KomiTextRole.Body,
+                    role = KomiTextRole.LegacyBody,
                     fontSize = 13.sp,
                     color = colors.onSurfaceVariant,
                     maxLines = 1,
@@ -303,7 +303,7 @@ private fun DeviceAppItem(
         app.versionName?.let { version ->
             KomiText(
                 text = version,
-                role = KomiTextRole.Label,
+                role = KomiTextRole.LegacyLabel,
                 fontSize = 12.sp,
                 color = colors.outline,
                 maxLines = 1,
@@ -348,7 +348,7 @@ private fun SmartMatchStep(
 
             KomiText(
                 text = stringResource(Res.string.link_smart_search_title),
-                role = KomiTextRole.Title,
+                role = KomiTextRole.LegacyTitle,
                 color = colors.onSurface,
                 fontWeight = FontWeight.Bold,
                 maxLines = 1,
@@ -362,7 +362,7 @@ private fun SmartMatchStep(
         if (selectedApp != null) {
             KomiText(
                 text = selectedApp.appName,
-                role = KomiTextRole.Title,
+                role = KomiTextRole.LegacyTitle,
                 color = colors.onSurface,
                 fontWeight = FontWeight.SemiBold,
                 maxLines = 1,
@@ -373,7 +373,7 @@ private fun SmartMatchStep(
 
             KomiText(
                 text = selectedApp.packageName,
-                role = KomiTextRole.Body,
+                role = KomiTextRole.LegacyBody,
                 fontSize = 13.sp,
                 color = colors.onSurfaceVariant,
                 maxLines = 1,
@@ -402,7 +402,7 @@ private fun SmartMatchStep(
 
                     KomiText(
                         text = stringResource(Res.string.link_smart_search_searching),
-                        role = KomiTextRole.Body,
+                        role = KomiTextRole.LegacyBody,
                         color = colors.onSurfaceVariant,
                     )
                 }
@@ -424,7 +424,7 @@ private fun SmartMatchStep(
 
                     KomiText(
                         text = validationStatus ?: stringResource(Res.string.validating_repo),
-                        role = KomiTextRole.Body,
+                        role = KomiTextRole.LegacyBody,
                         color = colors.onSurfaceVariant,
                         uppercase = false,
                     )
@@ -434,7 +434,7 @@ private fun SmartMatchStep(
             error != null -> {
                 KomiText(
                     text = stringResource(Res.string.link_smart_search_failed),
-                    role = KomiTextRole.Body,
+                    role = KomiTextRole.LegacyBody,
                     color = colors.error,
                 )
 
@@ -451,7 +451,7 @@ private fun SmartMatchStep(
             suggestions.isEmpty() -> {
                 KomiText(
                     text = stringResource(Res.string.link_smart_search_no_matches),
-                    role = KomiTextRole.Body,
+                    role = KomiTextRole.LegacyBody,
                     color = colors.onSurfaceVariant,
                 )
             }
@@ -514,7 +514,7 @@ private fun SuggestionRow(
         Column(modifier = Modifier.weight(1f)) {
             KomiText(
                 text = "${suggestion.owner}/${suggestion.repo}",
-                role = KomiTextRole.Body,
+                role = KomiTextRole.LegacyBody,
                 color = colors.onSurface,
                 fontWeight = FontWeight.Medium,
                 maxLines = 1,
@@ -526,7 +526,7 @@ private fun SuggestionRow(
             if (description != null) {
                 KomiText(
                     text = description,
-                    role = KomiTextRole.Body,
+                    role = KomiTextRole.LegacyBody,
                     fontSize = 13.sp,
                     color = colors.onSurfaceVariant,
                     maxLines = 2,
@@ -553,7 +553,7 @@ private fun SuggestionRow(
                 ) {
                     KomiText(
                         text = hostLabel,
-                        role = KomiTextRole.Label,
+                        role = KomiTextRole.LegacyLabel,
                         fontSize = 11.sp,
                         color = hostFg,
                         maxLines = 1,
@@ -578,7 +578,7 @@ private fun SuggestionRow(
                             RepoMatchSource.FORGEJO_SEARCH -> stringResource(Res.string.match_source_search)
                             RepoMatchSource.STARRED -> stringResource(Res.string.match_source_starred)
                         },
-                        role = KomiTextRole.Label,
+                        role = KomiTextRole.LegacyLabel,
                         fontSize = 11.sp,
                         color = colors.onPrimaryContainer,
                         maxLines = 1,
@@ -591,7 +591,7 @@ private fun SuggestionRow(
 
                 KomiText(
                     text = "${(suggestion.confidence * 100).toInt()}%",
-                    role = KomiTextRole.Label,
+                    role = KomiTextRole.LegacyLabel,
                     fontSize = 11.sp,
                     color = colors.onSurfaceVariant,
                     uppercase = false,
@@ -611,7 +611,7 @@ private fun SuggestionRow(
 
                     KomiText(
                         text = "$stars",
-                        role = KomiTextRole.Label,
+                        role = KomiTextRole.LegacyLabel,
                         fontSize = 11.sp,
                         color = colors.onSurfaceVariant,
                         uppercase = false,
@@ -653,7 +653,7 @@ private fun EnterUrlStep(
 
             KomiText(
                 text = stringResource(Res.string.link_app_title),
-                role = KomiTextRole.Title,
+                role = KomiTextRole.LegacyTitle,
                 color = colors.onSurface,
                 fontWeight = FontWeight.Bold,
             )
@@ -672,7 +672,7 @@ private fun EnterUrlStep(
                 Column(modifier = Modifier.weight(1f)) {
                     KomiText(
                         text = selectedApp.appName,
-                        role = KomiTextRole.Title,
+                        role = KomiTextRole.LegacyTitle,
                         color = colors.onSurface,
                         fontWeight = FontWeight.SemiBold,
                         uppercase = false,
@@ -680,7 +680,7 @@ private fun EnterUrlStep(
 
                     KomiText(
                         text = selectedApp.packageName,
-                        role = KomiTextRole.Body,
+                        role = KomiTextRole.LegacyBody,
                         fontSize = 13.sp,
                         color = colors.onSurfaceVariant,
                         uppercase = false,
@@ -690,7 +690,7 @@ private fun EnterUrlStep(
                 selectedApp.versionName?.let {
                     KomiText(
                         text = it,
-                        role = KomiTextRole.Label,
+                        role = KomiTextRole.LegacyLabel,
                         color = colors.primary,
                         uppercase = false,
                     )
@@ -729,7 +729,7 @@ private fun EnterUrlStep(
 
             KomiText(
                 text = validationStatus,
-                role = KomiTextRole.Body,
+                role = KomiTextRole.LegacyBody,
                 fontSize = 13.sp,
                 color = colors.onSurfaceVariant,
                 uppercase = false,
@@ -777,7 +777,7 @@ private fun PickAssetStep(
 
             KomiText(
                 text = stringResource(Res.string.select_asset_title),
-                role = KomiTextRole.Title,
+                role = KomiTextRole.LegacyTitle,
                 color = colors.onSurface,
                 fontWeight = FontWeight.Bold,
             )
@@ -787,7 +787,7 @@ private fun PickAssetStep(
 
         KomiText(
             text = stringResource(Res.string.select_asset_description),
-            role = KomiTextRole.Body,
+            role = KomiTextRole.LegacyBody,
             color = colors.onSurfaceVariant,
             modifier = Modifier.padding(horizontal = 4.dp),
         )
@@ -831,14 +831,14 @@ private fun PickAssetStep(
             Column(modifier = Modifier.weight(1f)) {
                 KomiText(
                     text = stringResource(Res.string.fallback_older_releases_title),
-                    role = KomiTextRole.Body,
+                    role = KomiTextRole.LegacyBody,
                     color = colors.onSurface,
                     fontWeight = FontWeight.Medium,
                 )
 
                 KomiText(
                     text = stringResource(Res.string.fallback_older_releases_description),
-                    role = KomiTextRole.Body,
+                    role = KomiTextRole.LegacyBody,
                     fontSize = 13.sp,
                     color = colors.onSurfaceVariant,
                 )
@@ -884,7 +884,7 @@ private fun PickAssetStep(
                     Column(modifier = Modifier.weight(1f)) {
                         KomiText(
                             text = asset.name,
-                            role = KomiTextRole.Body,
+                            role = KomiTextRole.LegacyBody,
                             color = colors.onSurface,
                             fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
                             maxLines = 2,
@@ -894,7 +894,7 @@ private fun PickAssetStep(
 
                         KomiText(
                             text = formatFileSize(asset.size),
-                            role = KomiTextRole.Body,
+                            role = KomiTextRole.LegacyBody,
                             fontSize = 13.sp,
                             color = colors.onSurfaceVariant,
                             uppercase = false,
@@ -913,7 +913,7 @@ private fun PickAssetStep(
 
                         KomiText(
                             text = "$downloadProgress%",
-                            role = KomiTextRole.Label,
+                            role = KomiTextRole.LegacyLabel,
                             fontSize = 11.sp,
                             color = colors.primary,
                             uppercase = false,
@@ -944,7 +944,7 @@ private fun PickAssetStep(
                     ) {
                         KomiText(
                             text = message,
-                            role = KomiTextRole.Body,
+                            role = KomiTextRole.LegacyBody,
                             color =
                                 if (isError) {
                                     colors.error
@@ -961,7 +961,7 @@ private fun PickAssetStep(
             Spacer(Modifier.height(8.dp))
             KomiText(
                 text = validationStatus,
-                role = KomiTextRole.Body,
+                role = KomiTextRole.LegacyBody,
                 fontSize = 13.sp,
                 color = colors.onSurfaceVariant,
                 uppercase = false,
@@ -972,7 +972,7 @@ private fun PickAssetStep(
             Spacer(Modifier.height(8.dp))
             KomiText(
                 text = validationError,
-                role = KomiTextRole.Body,
+                role = KomiTextRole.LegacyBody,
                 fontSize = 13.sp,
                 color = colors.error,
                 uppercase = false,

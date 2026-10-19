@@ -81,7 +81,7 @@ fun FavouriteRepositoryItem(
 
                 KomiText(
                     text = favouriteRepository.repoOwner,
-                    role = KomiTextRole.Label,
+                    role = KomiTextRole.LegacyLabel,
                     fontWeight = FontWeight.Medium,
                     color = colors.onSurfaceVariant,
                     uppercase = false,
@@ -110,7 +110,7 @@ fun FavouriteRepositoryItem(
                 Column(modifier = Modifier.weight(1f)) {
                     KomiText(
                         text = favouriteRepository.repoName,
-                        role = KomiTextRole.Title,
+                        role = KomiTextRole.LegacyTitle,
                         fontWeight = FontWeight.SemiBold,
                         color = colors.onSurface,
                         uppercase = false,
@@ -123,7 +123,7 @@ fun FavouriteRepositoryItem(
 
                         KomiText(
                             text = it,
-                            role = KomiTextRole.Body,
+                            role = KomiTextRole.LegacyBody,
                             fontSize = 13.sp,
                             color = colors.onSurfaceVariant,
                             uppercase = false,

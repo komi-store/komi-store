@@ -100,7 +100,7 @@ fun translationSectionContent(
             Column(modifier = Modifier.padding(start = 15.dp, end = 15.dp, bottom = 15.dp)) {
                 KomiText(
                     text = stringResource(Res.string.translation_auto_target_label),
-                    role = KomiTextRole.Label,
+                    role = KomiTextRole.LegacyLabel,
                     fontSize = 12.sp,
                     color = LocalPersonality.current.colors.onSurfaceVariant,
                     uppercase = false,
@@ -153,7 +153,7 @@ private fun TranslationTargetDropdown(
     ) {
         KomiText(
             text = currentLabel,
-            role = KomiTextRole.Body,
+            role = KomiTextRole.LegacyBody,
             color = colors.onSurface,
             fontWeight = FontWeight.Medium,
             maxLines = 1,
@@ -268,7 +268,7 @@ private fun DeeplCredentialsForm(
     ) {
         KomiText(
             text = stringResource(Res.string.translation_deepl_help),
-            role = KomiTextRole.Body,
+            role = KomiTextRole.LegacyBody,
             fontSize = 13.sp,
             color = LocalPersonality.current.colors.onSurfaceVariant,
             uppercase = false,
@@ -312,7 +312,7 @@ private fun MicrosoftCredentialsForm(
     ) {
         KomiText(
             text = stringResource(Res.string.translation_microsoft_help),
-            role = KomiTextRole.Body,
+            role = KomiTextRole.LegacyBody,
             fontSize = 13.sp,
             color = LocalPersonality.current.colors.onSurfaceVariant,
             uppercase = false,

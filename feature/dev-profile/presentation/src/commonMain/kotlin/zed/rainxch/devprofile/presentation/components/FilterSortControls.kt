@@ -131,7 +131,7 @@ fun FilterSortControls(
                 stringResource(Res.string.showing_x_of_y_repositories, repoCount, totalCount)
             },
             maxLines = 1,
-            role = KomiTextRole.Body,
+            role = KomiTextRole.LegacyBody,
             fontSize = 13.sp,
             color = colors.onSurfaceVariant,
             uppercase = false,
@@ -174,7 +174,7 @@ private fun FilterPill(
     ) {
         KomiText(
             text = label,
-            role = KomiTextRole.Label,
+            role = KomiTextRole.LegacyLabel,
             fontSize = 12.sp,
             fontWeight = FontWeight.SemiBold,
             color = content,

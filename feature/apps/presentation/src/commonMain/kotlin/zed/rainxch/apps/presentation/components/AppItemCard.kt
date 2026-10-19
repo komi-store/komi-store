@@ -108,7 +108,7 @@ fun AppItemCard(
                 Column(modifier = Modifier.weight(1f).fillMaxWidth()) {
                     KomiText(
                         text = app.appName,
-                        role = KomiTextRole.Title,
+                        role = KomiTextRole.LegacyTitle,
                         color = colors.onSurface,
                         fontWeight = FontWeight.Bold,
                         maxLines = 2,
@@ -132,7 +132,7 @@ fun AppItemCard(
 
                         KomiText(
                             text = app.repoOwner,
-                            role = KomiTextRole.Body,
+                            role = KomiTextRole.LegacyBody,
                             fontSize = 13.sp,
                             uppercase = false,
                             color = colors.onSurfaceVariant,
@@ -152,7 +152,7 @@ fun AppItemCard(
                         app.pendingInstallFilePath != null -> {
                             KomiText(
                                 text = stringResource(Res.string.ready_to_install),
-                                role = KomiTextRole.Body,
+                                role = KomiTextRole.LegacyBody,
                                 fontSize = 13.sp,
                                 uppercase = false,
                                 color = colors.primary,
@@ -164,7 +164,7 @@ fun AppItemCard(
 
                                 KomiText(
                                     text = appItem.versionLabel,
-                                    role = KomiTextRole.Body,
+                                    role = KomiTextRole.LegacyBody,
                                     fontSize = 13.sp,
                                     uppercase = false,
                                     color =
@@ -182,7 +182,7 @@ fun AppItemCard(
                         app.isPendingInstall -> {
                             KomiText(
                                 text = stringResource(Res.string.pending_install),
-                                role = KomiTextRole.Body,
+                                role = KomiTextRole.LegacyBody,
                                 fontSize = 13.sp,
                                 uppercase = false,
                                 color = colors.primary,
@@ -192,7 +192,7 @@ fun AppItemCard(
                         app.preferredVariantStale -> {
                             KomiText(
                                 text = stringResource(Res.string.variant_stale_hint),
-                                role = KomiTextRole.Body,
+                                role = KomiTextRole.LegacyBody,
                                 fontSize = 13.sp,
                                 uppercase = false,
                                 color = colors.error,
@@ -207,7 +207,7 @@ fun AppItemCard(
                         app.isUpdateAvailable -> {
                             KomiText(
                                 text = appItem.versionLabel,
-                                role = KomiTextRole.Body,
+                                role = KomiTextRole.LegacyBody,
                                 fontSize = 13.sp,
                                 uppercase = false,
                                 color = colors.primary,
@@ -222,7 +222,7 @@ fun AppItemCard(
                                             Res.string.variant_label_inline,
                                             app.preferredAssetVariant,
                                         ),
-                                    role = KomiTextRole.Label,
+                                    role = KomiTextRole.LegacyLabel,
                                     fontSize = 11.sp,
                                     uppercase = false,
                                     color = colors.onSurfaceVariant,
@@ -235,7 +235,7 @@ fun AppItemCard(
                         else -> {
                             KomiText(
                                 text = appItem.idleVersionLabel,
-                                role = KomiTextRole.Body,
+                                role = KomiTextRole.LegacyBody,
                                 fontSize = 13.sp,
                                 uppercase = false,
                                 color = colors.onSurfaceVariant,
@@ -252,7 +252,7 @@ fun AppItemCard(
 
                 KomiText(
                     text = app.repoDescription,
-                    role = KomiTextRole.Body,
+                    role = KomiTextRole.LegacyBody,
                     uppercase = false,
                     color = colors.onSurfaceVariant,
                     maxLines = 2,
@@ -286,7 +286,7 @@ fun AppItemCard(
 
                         KomiText(
                             text = stringResource(Res.string.installing),
-                            role = KomiTextRole.Body,
+                            role = KomiTextRole.LegacyBody,
                             fontSize = 13.sp,
                             color = colors.onSurface,
                         )
@@ -304,7 +304,7 @@ fun AppItemCard(
 
                         KomiText(
                             text = stringResource(Res.string.checking),
-                            role = KomiTextRole.Body,
+                            role = KomiTextRole.LegacyBody,
                             fontSize = 13.sp,
                             color = colors.onSurface,
                         )
@@ -325,7 +325,7 @@ fun AppItemCard(
 
                         KomiText(
                             text = stringResource(Res.string.updated_successfully),
-                            role = KomiTextRole.Body,
+                            role = KomiTextRole.LegacyBody,
                             fontSize = 13.sp,
                             color = colors.primary,
                         )
@@ -335,7 +335,7 @@ fun AppItemCard(
                 is UpdateState.Error -> {
                     KomiText(
                         text = stringResource(Res.string.error_with_message, state.message),
-                        role = KomiTextRole.Body,
+                        role = KomiTextRole.LegacyBody,
                         fontSize = 13.sp,
                         uppercase = false,
                         color = colors.error,

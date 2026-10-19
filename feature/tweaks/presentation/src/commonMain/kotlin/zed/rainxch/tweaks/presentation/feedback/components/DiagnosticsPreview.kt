@@ -46,14 +46,14 @@ fun DiagnosticsPreview(
                 Column {
                     KomiText(
                         text = stringResource(Res.string.feedback_diagnostics_header),
-                        role = KomiTextRole.Title,
+                        role = KomiTextRole.LegacyTitle,
                         fontWeight = FontWeight.Medium,
                         color = colors.onSurface,
                         uppercase = false,
                     )
                     KomiText(
                         text = stringResource(Res.string.feedback_diagnostics_include),
-                        role = KomiTextRole.Body,
+                        role = KomiTextRole.LegacyBody,
                         fontSize = 13.sp,
                         color = colors.onSurfaceVariant,
                         uppercase = false,
@@ -68,7 +68,7 @@ fun DiagnosticsPreview(
             if (enabled && diagnostics != null) {
                 KomiText(
                     text = formatDiagnostics(diagnostics, channel),
-                    role = KomiTextRole.Body,
+                    role = KomiTextRole.LegacyBody,
                     fontSize = 13.sp,
                     color = colors.onSurfaceVariant,
                     uppercase = false,

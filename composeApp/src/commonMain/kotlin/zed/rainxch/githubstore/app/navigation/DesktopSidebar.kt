@@ -222,7 +222,7 @@ private fun SidebarSideHeading(
         ) {
             KomiText(
                 text = title,
-                role = KomiTextRole.Label,
+                role = KomiTextRole.LegacyLabel,
                 color = colors.onSurfaceVariant,
                 fontSize = 11.sp,
                 fontWeight = FontWeight.W800,
@@ -231,7 +231,7 @@ private fun SidebarSideHeading(
             if (LocalPersonality.current.usesDecor) {
                 KomiText(
                     text = jp,
-                    role = KomiTextRole.Label,
+                    role = KomiTextRole.LegacyLabel,
                     color = colors.onSurfaceVariant.copy(alpha = 0.7f),
                     fontSize = 9.5.sp,
                     uppercase = false,
@@ -294,7 +294,7 @@ private fun SidebarNavRow(
             NavIcon(icon, fg, badgeCount)
             KomiText(
                 text = label,
-                role = KomiTextRole.Label,
+                role = KomiTextRole.LegacyLabel,
                 color = fg,
                 fontSize = 14.sp,
                 fontWeight = FontWeight.W800,
@@ -304,7 +304,7 @@ private fun SidebarNavRow(
             kicker?.takeIf { LocalPersonality.current.usesDecor }?.let {
                 KomiText(
                     text = it,
-                    role = KomiTextRole.Label,
+                    role = KomiTextRole.LegacyLabel,
                     color = fg.copy(alpha = 0.8f),
                     fontSize = 9.5.sp,
                     uppercase = false,
@@ -391,7 +391,7 @@ private fun SidebarPlatformRow(
             } else {
                 KomiText(
                     text = label,
-                    role = KomiTextRole.Label,
+                    role = KomiTextRole.LegacyLabel,
                     color = colors.onSurface,
                     fontSize = 9.sp,
                     fontWeight = FontWeight.W800,
@@ -424,7 +424,7 @@ private fun SidebarPlatformRow(
             }
             KomiText(
                 text = label,
-                role = KomiTextRole.Label,
+                role = KomiTextRole.LegacyLabel,
                 color = colors.onSurface,
                 fontSize = 12.5.sp,
                 fontWeight = if (selected) FontWeight.W900 else FontWeight.W700,
@@ -486,7 +486,7 @@ private fun SidebarCategoryRow(
             InkDiamond(filled = selected)
             KomiText(
                 text = stringResource(category.sidebarLabelRes()),
-                role = KomiTextRole.Label,
+                role = KomiTextRole.LegacyLabel,
                 color = if (selected) colors.onSurface else colors.onSurfaceVariant,
                 fontSize = 12.5.sp,
                 fontWeight = if (selected) FontWeight.W900 else FontWeight.W700,

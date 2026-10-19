@@ -155,7 +155,7 @@ private fun KomiActionTile(
 
             KomiText(
                 text = item.title,
-                role = KomiTextRole.Label,
+                role = KomiTextRole.LegacyLabel,
                 color =
                     LocalPersonality.current.colors.onSurfaceVariant
                         .copy(alpha = if (item.enabled) 1f else 0.45f),

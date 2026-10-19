@@ -28,6 +28,7 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -37,6 +38,7 @@ import zed.rainxch.core.presentation.components.buttons.KomiIconButton
 import zed.rainxch.core.presentation.components.text.KomiText
 import zed.rainxch.core.presentation.components.text.KomiTextRole
 import zed.rainxch.core.presentation.locals.LocalPersonality
+import zed.rainxch.core.presentation.locals.appLocale
 import zed.rainxch.core.presentation.personality.ClassicPersonality
 import zed.rainxch.core.presentation.personality.MangaPersonality
 import zed.rainxch.core.presentation.personality.classicPersonality
@@ -105,9 +107,10 @@ private fun MangaTopBar(
     val colors = personality.colors
     val isMast = size == KomiTopBarSize.Masthead
     val titleSize = if (isMast) 27.sp else 22.sp
+    val locale = appLocale()
     val annotatedTitle =
-        remember(title, titleAccent, colors.primary) {
-            mangaTitle(title, titleAccent, colors.primary)
+        remember(title, titleAccent, colors.primary, locale) {
+            mangaTitle(title.toUpperCase(locale), titleAccent?.toUpperCase(locale), colors.primary)
         }
 
     Row(
@@ -136,7 +139,7 @@ private fun MangaTopBar(
         ) {
             MaterialText(
                 text = annotatedTitle,
-                style = personality.type.title.copy(fontSize = titleSize),
+                style = personality.type.legacyTitle.copy(fontSize = titleSize),
                 color = colors.onSurface,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
@@ -145,7 +148,7 @@ private fun MangaTopBar(
                 KomiText(
                     text = it,
                     modifier = Modifier.padding(top = 2.dp),
-                    role = KomiTextRole.Label,
+                    role = KomiTextRole.LegacyLabel,
                     color = colors.onSurfaceVariant,
                     fontSize = 11.sp,
                     fontWeight = FontWeight.W800,
@@ -170,17 +173,15 @@ private fun mangaTitle(
     accentSub: String?,
     accent: Color,
 ): AnnotatedString {
-    val upper = title.uppercase()
-    if (accentSub.isNullOrEmpty()) return AnnotatedString(upper)
-    val accentUpper = accentSub.uppercase()
-    val idx = upper.indexOf(accentUpper)
-    if (idx < 0) return AnnotatedString(upper)
+    if (accentSub.isNullOrEmpty()) return AnnotatedString(title)
+    val idx = title.indexOf(accentSub)
+    if (idx < 0) return AnnotatedString(title)
     return buildAnnotatedString {
-        append(upper.substring(0, idx))
+        append(title.substring(0, idx))
         withStyle(SpanStyle(color = accent)) {
-            append(upper.substring(idx, idx + accentUpper.length))
+            append(title.substring(idx, idx + accentSub.length))
         }
-        append(upper.substring(idx + accentUpper.length))
+        append(title.substring(idx + accentSub.length))
     }
 }
 
@@ -200,14 +201,14 @@ private fun ClassicTopBar(
         Column {
             KomiText(
                 text = title,
-                role = KomiTextRole.Title,
+                role = KomiTextRole.LegacyTitle,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
             subtitle?.let {
                 KomiText(
                     text = it,
-                    role = KomiTextRole.Label,
+                    role = KomiTextRole.LegacyLabel,
                     color = LocalPersonality.current.colors.onSurfaceVariant,
                     fontSize = 12.sp,
                     uppercase = false,

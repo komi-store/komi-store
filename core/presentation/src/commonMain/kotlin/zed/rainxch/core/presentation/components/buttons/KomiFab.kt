@@ -58,7 +58,7 @@ fun KomiFab(
                     containerColor = colors.primaryContainer,
                     contentColor = colors.onPrimaryContainer,
                     icon = { KomiIcon(icon, contentDescription, modifier = Modifier.size(20.dp)) },
-                    text = { KomiText(label, role = KomiTextRole.Label) },
+                    text = { KomiText(label, role = KomiTextRole.LegacyLabel) },
                 )
             } else {
                 FloatingActionButton(
@@ -108,7 +108,7 @@ private fun MangaFab(
             horizontalArrangement = Arrangement.spacedBy(10.dp),
         ) {
             KomiIcon(icon, contentDescription, modifier = Modifier.size(22.dp), tint = colors.onPrimary)
-            KomiText(label, role = KomiTextRole.Label, color = colors.onPrimary, fontSize = 15.sp)
+            KomiText(label, role = KomiTextRole.LegacyLabel, color = colors.onPrimary, fontSize = 15.sp)
         }
     } else {
         Box(modifier = base.size(56.dp), contentAlignment = Alignment.Center) {

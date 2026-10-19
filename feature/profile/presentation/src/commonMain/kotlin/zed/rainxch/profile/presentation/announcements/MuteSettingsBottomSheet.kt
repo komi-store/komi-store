@@ -50,7 +50,7 @@ fun MuteSettingsBottomSheet(
         ) {
             KomiText(
                 text = stringResource(Res.string.announcements_mute_settings_title),
-                role = KomiTextRole.Title,
+                role = KomiTextRole.LegacyTitle,
                 fontWeight = FontWeight.SemiBold,
                 color = colors.onSurface,
                 uppercase = false,
@@ -103,7 +103,7 @@ private fun CategoryRow(
     ) {
         KomiText(
             text = label,
-            role = KomiTextRole.Body,
+            role = KomiTextRole.LegacyBody,
             color = colors.onSurface,
             modifier = Modifier.weight(1f),
             uppercase = false,

@@ -100,14 +100,14 @@ fun HiddenRepositoriesRoot(
                     ) {
                         KomiText(
                             text = stringResource(Res.string.hidden_repositories_empty_title),
-                            role = KomiTextRole.Title,
+                            role = KomiTextRole.LegacyTitle,
                             fontWeight = FontWeight.SemiBold,
                             color = colors.onSurface,
                         )
                         Spacer(Modifier.size(8.dp))
                         KomiText(
                             text = stringResource(Res.string.hidden_repositories_empty_description),
-                            role = KomiTextRole.Body,
+                            role = KomiTextRole.LegacyBody,
                             color = colors.onSurfaceVariant,
                             uppercase = false,
                         )

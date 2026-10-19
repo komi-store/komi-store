@@ -253,7 +253,7 @@ private fun StateLoggedOut(
     ) {
         KomiText(
             text = stringResource(Res.string.unlock_full_experience),
-            role = KomiTextRole.Display,
+            role = KomiTextRole.LegacyDisplay,
             fontWeight = FontWeight.SemiBold,
             color = colors.onBackground,
             textAlign = TextAlign.Center,
@@ -360,7 +360,7 @@ private fun BenefitsCard() {
             ) {
                 KomiText(
                     text = stringResource(Res.string.more_requests),
-                    role = KomiTextRole.Title,
+                    role = KomiTextRole.LegacyTitle,
                     fontWeight = FontWeight.SemiBold,
                     color = colors.onSurface,
                     uppercase = false,
@@ -368,7 +368,7 @@ private fun BenefitsCard() {
 
                 KomiText(
                     text = stringResource(Res.string.more_requests_description),
-                    role = KomiTextRole.Body,
+                    role = KomiTextRole.LegacyBody,
                     fontSize = 13.sp,
                     color = colors.onSurfaceVariant,
                     uppercase = false,
@@ -403,7 +403,7 @@ private fun StateDevicePrompt(
             ) {
                 KomiText(
                     text = stringResource(Res.string.enter_code_on_github),
-                    role = KomiTextRole.Label,
+                    role = KomiTextRole.LegacyLabel,
                     color = colors.onSurfaceVariant,
                     uppercase = false,
                 )
@@ -459,7 +459,7 @@ private fun StateDevicePrompt(
 
                     KomiText(
                         text = info,
-                        role = KomiTextRole.Body,
+                        role = KomiTextRole.LegacyBody,
                         fontSize = 13.sp,
                         fontWeight = FontWeight.Medium,
                         color = colors.primary,
@@ -547,7 +547,7 @@ private fun StateDevicePrompt(
 
             KomiText(
                 text = stringResource(Res.string.auth_rate_limited, state.pollIntervalSec),
-                role = KomiTextRole.Label,
+                role = KomiTextRole.LegacyLabel,
                 fontSize = 11.sp,
                 color = colors.onSurfaceVariant,
                 uppercase = false,
@@ -573,7 +573,7 @@ private fun StatePending() {
 
         KomiText(
             text = stringResource(Res.string.waiting_for_authorization),
-            role = KomiTextRole.Title,
+            role = KomiTextRole.LegacyTitle,
             color = colors.onSurfaceVariant,
             textAlign = TextAlign.Center,
             uppercase = false,
@@ -617,7 +617,7 @@ private fun StateLoggedIn() {
 
         KomiText(
             text = stringResource(Res.string.signed_in),
-            role = KomiTextRole.Title,
+            role = KomiTextRole.LegacyTitle,
             fontWeight = FontWeight.SemiBold,
             color = colors.onBackground,
             uppercase = false,
@@ -627,7 +627,7 @@ private fun StateLoggedIn() {
 
         KomiText(
             text = stringResource(Res.string.redirecting_message),
-            role = KomiTextRole.Body,
+            role = KomiTextRole.LegacyBody,
             color = colors.onSurfaceVariant,
             uppercase = false,
         )
@@ -669,7 +669,7 @@ private fun StateError(
 
                 KomiText(
                     text = stringResource(authState.error.titleRes()),
-                    role = KomiTextRole.Title,
+                    role = KomiTextRole.LegacyTitle,
                     fontWeight = FontWeight.SemiBold,
                     color = colors.onSurface,
                     textAlign = TextAlign.Center,
@@ -680,7 +680,7 @@ private fun StateError(
 
                 KomiText(
                     text = stringResource(authState.error.hintRes()),
-                    role = KomiTextRole.Body,
+                    role = KomiTextRole.LegacyBody,
                     fontSize = 13.sp,
                     color = colors.onSurfaceVariant,
                     textAlign = TextAlign.Center,
@@ -752,7 +752,7 @@ private fun PatSignInSheet(
         ) {
             KomiText(
                 text = stringResource(Res.string.pat_sheet_title),
-                role = KomiTextRole.Title,
+                role = KomiTextRole.LegacyTitle,
                 fontWeight = FontWeight.SemiBold,
                 color = colors.onSurface,
                 uppercase = false,
@@ -760,7 +760,7 @@ private fun PatSignInSheet(
 
             KomiText(
                 text = stringResource(Res.string.pat_sheet_description),
-                role = KomiTextRole.Body,
+                role = KomiTextRole.LegacyBody,
                 fontSize = 13.sp,
                 color = colors.onSurfaceVariant,
                 uppercase = false,

@@ -47,12 +47,12 @@ fun LogoutDialog(
     ) {
         KomiText(
             text = stringResource(Res.string.logout_confirmation),
-            role = KomiTextRole.Body,
+            role = KomiTextRole.LegacyBody,
         )
         Spacer(Modifier.height(8.dp))
         KomiText(
             text = stringResource(Res.string.logout_revocation_note),
-            role = KomiTextRole.Body,
+            role = KomiTextRole.LegacyBody,
         )
     }
 }

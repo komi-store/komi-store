@@ -208,7 +208,7 @@ private fun KomiMenuRow(
         Column(modifier = Modifier.weight(1f)) {
             KomiText(
                 text = item.label,
-                role = KomiTextRole.Body,
+                role = KomiTextRole.LegacyBody,
                 color = fg.copy(alpha = alpha),
                 fontSize = 14.sp,
                 fontWeight = if (isManga) FontWeight.W700 else null,
@@ -219,7 +219,7 @@ private fun KomiMenuRow(
             item.subtitle?.let { subtitle ->
                 KomiText(
                     text = subtitle,
-                    role = KomiTextRole.Body,
+                    role = KomiTextRole.LegacyBody,
                     color = colors.onSurfaceVariant.copy(alpha = alpha),
                     fontSize = 12.sp,
                     uppercase = false,

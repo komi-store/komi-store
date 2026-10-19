@@ -59,7 +59,7 @@ fun RateLimitDialog(
         title = {
             KomiText(
                 text = stringResource(Res.string.rate_limit_exceeded),
-                role = KomiTextRole.Title,
+                role = KomiTextRole.LegacyTitle,
                 fontWeight = FontWeight.Black,
                 color = colors.onSurface,
                 uppercase = false,
@@ -82,7 +82,7 @@ fun RateLimitDialog(
                                 60,
                             )
                         },
-                    role = KomiTextRole.Body,
+                    role = KomiTextRole.LegacyBody,
                     color = colors.outline,
                     uppercase = false,
                 )
@@ -93,7 +93,7 @@ fun RateLimitDialog(
                             Res.string.rate_limit_resets_in_minutes,
                             timeUntilReset,
                         ),
-                    role = KomiTextRole.Body,
+                    role = KomiTextRole.LegacyBody,
                     fontWeight = FontWeight.Bold,
                     color = colors.onSurface,
                     uppercase = false,
@@ -104,7 +104,7 @@ fun RateLimitDialog(
 
                     KomiText(
                         text = stringResource(Res.string.rate_limit_tip_sign_in),
-                        role = KomiTextRole.Body,
+                        role = KomiTextRole.LegacyBody,
                         fontSize = 13.sp,
                         color = colors.primary,
                         uppercase = false,

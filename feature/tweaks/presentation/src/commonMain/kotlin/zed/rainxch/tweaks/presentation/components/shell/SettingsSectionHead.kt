@@ -60,7 +60,7 @@ fun SettingsSectionHead(
 
         KomiText(
             text = label,
-            role = if (isManga) KomiTextRole.Stamp else KomiTextRole.Title,
+            role = if (isManga) KomiTextRole.LegacyStamp else KomiTextRole.LegacyTitle,
             color = colors.onSurface,
             fontSize = 18.sp,
             uppercase = if (isManga) null else false,
@@ -69,7 +69,7 @@ fun SettingsSectionHead(
         if (kicker != null) {
             KomiText(
                 text = kicker,
-                role = KomiTextRole.Label,
+                role = KomiTextRole.LegacyLabel,
                 color = colors.onSurfaceVariant,
                 fontSize = 11.sp,
                 uppercase = false,

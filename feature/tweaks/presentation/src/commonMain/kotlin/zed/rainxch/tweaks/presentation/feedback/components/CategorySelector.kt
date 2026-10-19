@@ -41,7 +41,7 @@ fun CategorySelector(
     Column(modifier = modifier) {
         KomiText(
             text = stringResource(Res.string.feedback_category_label),
-            role = KomiTextRole.Label,
+            role = KomiTextRole.LegacyLabel,
             fontSize = 12.sp,
             fontWeight = FontWeight.SemiBold,
             color = colors.onSurfaceVariant,
@@ -98,7 +98,7 @@ internal fun FeedbackPillChip(
     ) {
         KomiText(
             text = label,
-            role = KomiTextRole.Label,
+            role = KomiTextRole.LegacyLabel,
             fontSize = 12.sp,
             fontWeight = FontWeight.SemiBold,
             color = content,

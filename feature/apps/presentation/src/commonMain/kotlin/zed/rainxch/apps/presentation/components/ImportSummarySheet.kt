@@ -95,7 +95,7 @@ fun ImportSummarySheet(
             }
             KomiText(
                 text = stringResource(Res.string.import_summary_title, formatLabel),
-                role = KomiTextRole.Title,
+                role = KomiTextRole.LegacyTitle,
                 color = colors.onSurface,
                 fontWeight = FontWeight.SemiBold,
                 uppercase = false,
@@ -113,7 +113,7 @@ fun ImportSummarySheet(
                 .joinToString(", ")
             KomiText(
                 text = "",
-                role = KomiTextRole.Body,
+                role = KomiTextRole.LegacyBody,
                 color = colors.onSurface,
                 modifier = Modifier
                     .height(0.dp)
@@ -206,7 +206,7 @@ private fun UnknownFormatSheet(
 
                 KomiText(
                     text = stringResource(Res.string.import_summary_unknown_format),
-                    role = KomiTextRole.Title,
+                    role = KomiTextRole.LegacyTitle,
                     fontSize = 16.sp,
                     color = colors.onSurface,
                     fontWeight = FontWeight.SemiBold,
@@ -216,7 +216,7 @@ private fun UnknownFormatSheet(
 
             KomiText(
                 text = stringResource(Res.string.import_summary_unknown_caption),
-                role = KomiTextRole.Body,
+                role = KomiTextRole.LegacyBody,
                 color = colors.onSurfaceVariant,
             )
 
@@ -270,7 +270,7 @@ private fun SummaryBucket(
             Column(modifier = Modifier.weight(1f)) {
                 KomiText(
                     text = title,
-                    role = KomiTextRole.Title,
+                    role = KomiTextRole.LegacyTitle,
                     fontSize = 14.sp,
                     color = colors.onSurface,
                     fontWeight = FontWeight.Medium,
@@ -280,7 +280,7 @@ private fun SummaryBucket(
                 if (!caption.isNullOrBlank()) {
                     KomiText(
                         text = caption,
-                        role = KomiTextRole.Body,
+                        role = KomiTextRole.LegacyBody,
                         fontSize = 13.sp,
                         color = colors.onSurfaceVariant,
                     )
@@ -319,7 +319,7 @@ private fun SummaryBucket(
                 items(items.size) { idx ->
                     KomiText(
                         text = items[idx],
-                        role = KomiTextRole.Body,
+                        role = KomiTextRole.LegacyBody,
                         fontSize = 13.sp,
                         uppercase = false,
                         color = colors.onSurfaceVariant,

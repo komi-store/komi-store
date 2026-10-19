@@ -113,7 +113,7 @@ private fun PreviewScaffold() {
                         .padding(horizontal = Spacing.lg, vertical = Spacing.md),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                KomiText(text = "Discover", role = KomiTextRole.Title)
+                KomiText(text = "Discover", role = KomiTextRole.LegacyTitle)
             }
         },
         bottomBar = {
@@ -125,7 +125,7 @@ private fun PreviewScaffold() {
                 listOf("Explore", "Search", "Top Charts", "You").forEach {
                     KomiText(
                         text = it,
-                        role = KomiTextRole.Label,
+                        role = KomiTextRole.LegacyLabel,
                         color = colors.onSurfaceVariant,
                         fontSize = 11.sp,
                     )
@@ -150,7 +150,7 @@ private fun PreviewScaffold() {
                     elevation = KomiSurfaceElevation.Card,
                     contentPadding = PaddingValues(Spacing.lg),
                 ) {
-                    KomiText(text = "Panel ${it + 1}", role = KomiTextRole.Title)
+                    KomiText(text = "Panel ${it + 1}", role = KomiTextRole.LegacyTitle)
                 }
             }
         }

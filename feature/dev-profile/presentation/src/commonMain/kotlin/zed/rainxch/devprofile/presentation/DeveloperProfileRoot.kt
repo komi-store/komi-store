@@ -242,7 +242,7 @@ fun DeveloperProfileScreen(
                     ) {
                         KomiText(
                             text = state.errorMessage,
-                            role = KomiTextRole.Body,
+                            role = KomiTextRole.LegacyBody,
                             color = colors.onSurface,
                             uppercase = false,
                             modifier = Modifier.weight(1f),
@@ -305,7 +305,7 @@ private fun EmptyReposContent(
         KomiText(
             text = message,
             maxLines = 2,
-            role = KomiTextRole.Body,
+            role = KomiTextRole.LegacyBody,
             color = colors.onSurfaceVariant,
             textAlign = TextAlign.Center,
             uppercase = false,
@@ -366,7 +366,7 @@ private fun ErrorContent(
         KomiText(
             text = stringResource(Res.string.error_generic, message),
             maxLines = 3,
-            role = KomiTextRole.Title,
+            role = KomiTextRole.LegacyTitle,
             color = colors.onSurface,
             textAlign = TextAlign.Center,
             uppercase = false,

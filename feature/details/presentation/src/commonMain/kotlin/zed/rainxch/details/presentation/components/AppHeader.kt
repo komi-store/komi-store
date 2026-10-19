@@ -214,7 +214,7 @@ fun AppHeader(
             ) {
                 KomiText(
                     text = author?.login ?: repository.owner.login,
-                    role = KomiTextRole.Label,
+                    role = KomiTextRole.LegacyLabel,
                     fontSize = 13.sp,
                     color = colors.onSurface.copy(alpha = 0.75f),
                     maxLines = 1,
@@ -245,7 +245,7 @@ fun AppHeader(
                 androidx.compose.foundation.text.BasicText(
                     text = repository.name,
                     style =
-                        LocalPersonality.current.type.display.copy(
+                        LocalPersonality.current.type.legacyDisplay.copy(
                             fontWeight = FontWeight.Black,
                             fontSize = 30.sp,
                             letterSpacing = (-0.4).sp,
@@ -291,7 +291,7 @@ fun AppHeader(
                     )
                     KomiText(
                         text = stringResource(Res.string.details_last_push, lastPushLabel),
-                        role = KomiTextRole.Label,
+                        role = KomiTextRole.LegacyLabel,
                         fontSize = 13.sp,
                         fontWeight = FontWeight.SemiBold,
                         color = statColor,
@@ -302,7 +302,7 @@ fun AppHeader(
             Spacer(Modifier.height(12.dp))
             KomiText(
                 text = repository.description ?: stringResource(Res.string.no_description),
-                role = KomiTextRole.Body,
+                role = KomiTextRole.LegacyBody,
                 fontSize = 14.sp,
                 color = colors.onSurfaceVariant,
                 modifier = Modifier.padding(horizontal = 20.dp),
@@ -510,7 +510,7 @@ private fun InstalledStatusPill(installedApp: InstalledApp) {
                         else -> Res.string.installed
                     },
                 ),
-            role = KomiTextRole.Label,
+            role = KomiTextRole.LegacyLabel,
             fontWeight = FontWeight.SemiBold,
             fontSize = 12.sp,
             color = colors.primary,

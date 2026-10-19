@@ -78,7 +78,7 @@ private fun SectionLabel(type: WhatsNewSectionType) {
 
     KomiText(
         text = label,
-        role = KomiTextRole.Label,
+        role = KomiTextRole.LegacyLabel,
         fontSize = 12.sp,
         fontWeight = FontWeight.SemiBold,
         color = color,
@@ -94,13 +94,13 @@ private fun BulletRow(text: String) {
     ) {
         KomiText(
             text = "•",
-            role = KomiTextRole.Body,
+            role = KomiTextRole.LegacyBody,
             color = colors.onSurfaceVariant,
             uppercase = false,
         )
         KomiText(
             text = text,
-            role = KomiTextRole.Body,
+            role = KomiTextRole.LegacyBody,
             color = colors.onSurface,
             modifier = Modifier.fillMaxWidth(),
             uppercase = false,

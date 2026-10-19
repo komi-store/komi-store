@@ -136,7 +136,7 @@ private fun UsernameInputPanel(
     ) {
         KomiText(
             text = stringResource(Res.string.import_stars_subtitle),
-            role = KomiTextRole.Body,
+            role = KomiTextRole.LegacyBody,
             color = colors.onSurfaceVariant,
         )
 
@@ -150,7 +150,7 @@ private fun UsernameInputPanel(
         if (state.errorMessage != null) {
             KomiText(
                 text = state.errorMessage,
-                role = KomiTextRole.Body,
+                role = KomiTextRole.LegacyBody,
                 fontSize = 13.sp,
                 color = colors.error,
             )
@@ -190,7 +190,7 @@ private fun ResultsPanel(
                     state.importedUsername ?: "",
                     state.candidates.size,
                 ),
-                role = KomiTextRole.Body,
+                role = KomiTextRole.LegacyBody,
                 color = colors.onSurfaceVariant,
                 uppercase = false,
                 modifier = Modifier.weight(1f),
@@ -252,7 +252,7 @@ private fun ResultsPanel(
                     } else {
                         stringResource(Res.string.import_stars_no_match)
                     },
-                    role = KomiTextRole.Body,
+                    role = KomiTextRole.LegacyBody,
                     color = colors.onSurfaceVariant,
                     uppercase = false,
                 )
@@ -299,7 +299,7 @@ private fun CandidateRow(
         Column(modifier = Modifier.weight(1f)) {
             KomiText(
                 text = "${candidate.owner}/${candidate.name}",
-                role = KomiTextRole.Title,
+                role = KomiTextRole.LegacyTitle,
                 fontWeight = FontWeight.SemiBold,
                 color = colors.onBackground,
                 uppercase = false,
@@ -308,7 +308,7 @@ private fun CandidateRow(
             if (!candidate.description.isNullOrBlank()) {
                 KomiText(
                     text = candidate.description,
-                    role = KomiTextRole.Body,
+                    role = KomiTextRole.LegacyBody,
                     fontSize = 13.sp,
                     color = colors.onSurfaceVariant,
                     uppercase = false,

@@ -69,7 +69,7 @@ fun RepoCandidateRow(
         Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
             KomiText(
                 text = suggestion.repo,
-                role = KomiTextRole.Title,
+                role = KomiTextRole.LegacyTitle,
                 fontWeight = FontWeight.SemiBold,
                 color = colors.onSurface,
                 maxLines = 1,
@@ -87,7 +87,7 @@ fun RepoCandidateRow(
                             Res.string.external_import_card_owner_byline,
                             suggestion.owner,
                         ),
-                    role = KomiTextRole.Body,
+                    role = KomiTextRole.LegacyBody,
                     fontSize = 13.sp,
                     color = colors.onSurfaceVariant,
                     maxLines = 1,
@@ -122,7 +122,7 @@ fun RepoCandidateRow(
                                     suggestion.sourceHost
                                 }
                             },
-                        role = KomiTextRole.Label,
+                        role = KomiTextRole.LegacyLabel,
                         fontSize = 11.sp,
                         color =
                             if (suggestion.sourceHost == null) {
@@ -141,7 +141,7 @@ fun RepoCandidateRow(
             if (!suggestion.description.isNullOrBlank()) {
                 KomiText(
                     text = suggestion.description,
-                    role = KomiTextRole.Body,
+                    role = KomiTextRole.LegacyBody,
                     fontSize = 13.sp,
                     color = colors.onSurfaceVariant,
                     maxLines = 2,
@@ -162,7 +162,7 @@ fun RepoCandidateRow(
 
                     KomiText(
                         text = formatCompactCount(suggestion.stars),
-                        role = KomiTextRole.Label,
+                        role = KomiTextRole.LegacyLabel,
                         fontSize = 11.sp,
                         color = colors.onSurfaceVariant,
                         uppercase = false,
@@ -189,7 +189,7 @@ fun RepoCandidateRow(
                         Res.string.external_import_match_confidence_chip,
                         suggestion.confidencePercent,
                     ),
-                role = KomiTextRole.Label,
+                role = KomiTextRole.LegacyLabel,
                 fontSize = 12.sp,
                 color = chipFg,
                 uppercase = false,

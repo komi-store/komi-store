@@ -1,0 +1,3 @@
+1 feature/details/presentation/src/commonMain/kotlin/zed/rainxch/details/presentation/components/InspectApkButton.kt
+1 feature/details/presentation/src/commonMain/kotlin/zed/rainxch/details/presentation/components/sections/Header.kt
+1 feature/details/presentation/src/commonMain/kotlin/zed/rainxch/details/presentation/components/sections/ReleaseChannel.kt

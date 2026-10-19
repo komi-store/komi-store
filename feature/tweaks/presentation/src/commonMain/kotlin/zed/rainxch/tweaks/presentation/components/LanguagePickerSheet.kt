@@ -64,7 +64,7 @@ fun LanguagePickerSheet(
         if (intro != null) {
             KomiText(
                 text = intro,
-                role = KomiTextRole.Body,
+                role = KomiTextRole.LegacyBody,
                 fontSize = 13.sp,
                 color = LocalPersonality.current.colors.onSurfaceVariant,
                 uppercase = false,
@@ -150,7 +150,7 @@ private fun LanguageRow(
             Column(modifier = Modifier.weight(1f)) {
                 KomiText(
                     text = title,
-                    role = KomiTextRole.Body,
+                    role = KomiTextRole.LegacyBody,
                     fontSize = 15.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = colors.onSurface,
@@ -162,7 +162,7 @@ private fun LanguageRow(
                 if (!subtitleTag.isNullOrBlank()) {
                     KomiText(
                         text = subtitleTag,
-                        role = KomiTextRole.Label,
+                        role = KomiTextRole.LegacyLabel,
                         fontSize = 11.sp,
                         color = colors.onSurfaceVariant,
                         maxLines = 1,

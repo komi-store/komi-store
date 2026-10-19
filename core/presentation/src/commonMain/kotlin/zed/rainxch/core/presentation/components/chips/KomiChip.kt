@@ -36,6 +36,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpOffset
@@ -44,6 +45,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import zed.rainxch.core.presentation.locals.LocalPersonality
+import zed.rainxch.core.presentation.locals.appLocale
 import zed.rainxch.core.presentation.personality.ClassicPersonality
 import zed.rainxch.core.presentation.personality.MangaPersonality
 import zed.rainxch.core.presentation.personality.classicPersonality
@@ -216,7 +218,7 @@ private fun ChipLabel(
             fontSize = fontSizeSp.sp,
             letterSpacing = if (isFilter) 0.05.em else 0.04.em,
         )
-    Text(text = label.uppercase(), style = style, color = color, maxLines = 1, overflow = TextOverflow.Clip)
+    Text(text = label.toUpperCase(appLocale()), style = style, color = color, maxLines = 1, overflow = TextOverflow.Clip)
 }
 
 @Composable

@@ -119,7 +119,7 @@ fun AnnouncementCard(
 
                     KomiText(
                         text = announcement.title,
-                        role = KomiTextRole.Title,
+                        role = KomiTextRole.LegacyTitle,
                         fontWeight = FontWeight.SemiBold,
                         color = colors.onSurface,
                         maxLines = 3,
@@ -177,7 +177,7 @@ private fun HeaderRow(
             Spacer(Modifier.width(4.dp))
             KomiText(
                 text = stringResource(Res.string.announcements_acknowledged),
-                role = KomiTextRole.Label,
+                role = KomiTextRole.LegacyLabel,
                 fontSize = 11.sp,
                 color = colors.primary,
             )
@@ -198,7 +198,7 @@ private fun CategoryChip(category: AnnouncementCategory) {
     ) {
         KomiText(
             text = stringResource(categoryLabel(category)),
-            role = KomiTextRole.Label,
+            role = KomiTextRole.LegacyLabel,
             fontSize = 11.sp,
             color = colors.onSurfaceVariant,
             uppercase = false,
@@ -217,7 +217,7 @@ private fun ExpandableBody(
     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
         KomiText(
             text = body,
-            role = KomiTextRole.Body,
+            role = KomiTextRole.LegacyBody,
             color = colors.onSurface,
             uppercase = false,
             maxLines = if (isExpanded) Int.MAX_VALUE else BODY_COLLAPSED_LINES,

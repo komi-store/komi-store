@@ -145,7 +145,7 @@ private fun MangaBottomBar(
                 Spacer(Modifier.height(4.dp))
                 KomiText(
                     text = item.label,
-                    role = KomiTextRole.Label,
+                    role = KomiTextRole.LegacyLabel,
                     color = if (selected) colors.onSurface else colors.onSurfaceVariant,
                     fontSize = 10.5.sp,
                     maxLines = 1,
@@ -204,7 +204,7 @@ private fun ClassicBottomBar(
                 Spacer(Modifier.height(4.dp))
                 KomiText(
                     text = item.label,
-                    role = KomiTextRole.Label,
+                    role = KomiTextRole.LegacyLabel,
                     color = tint,
                     fontSize = 11.sp,
                     uppercase = false,

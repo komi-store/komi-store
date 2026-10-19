@@ -27,7 +27,7 @@ fun SourceChip(
         }
     KomiText(
         text = label,
-        role = KomiTextRole.Label,
+        role = KomiTextRole.LegacyLabel,
         fontSize = 11.sp,
         fontWeight = FontWeight.SemiBold,
         uppercase = false,

@@ -61,14 +61,14 @@ fun HostTokensEntryCard(
             Column(modifier = Modifier.weight(1f)) {
                 KomiText(
                     text = stringResource(Res.string.host_tokens_title),
-                    role = KomiTextRole.Title,
+                    role = KomiTextRole.LegacyTitle,
                     fontWeight = FontWeight.SemiBold,
                     color = colors.onSurface,
                     uppercase = false,
                 )
                 KomiText(
                     text = stringResource(Res.string.host_tokens_entry_subtitle),
-                    role = KomiTextRole.Body,
+                    role = KomiTextRole.LegacyBody,
                     fontSize = 13.sp,
                     color = colors.onSurfaceVariant,
                     uppercase = false,

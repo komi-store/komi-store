@@ -328,7 +328,7 @@ private fun IssueRow(
             ) {
                 KomiText(
                     text = issue.title,
-                    role = KomiTextRole.Title,
+                    role = KomiTextRole.LegacyTitle,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = colors.onSurface,
@@ -343,7 +343,7 @@ private fun IssueRow(
                                 Res.string.repo_pages_issue_opened_by,
                                 issue.authorLogin
                             ),
-                    role = KomiTextRole.Body,
+                    role = KomiTextRole.LegacyBody,
                     fontSize = 13.sp,
                     color = colors.onSurfaceVariant,
                     maxLines = 1,

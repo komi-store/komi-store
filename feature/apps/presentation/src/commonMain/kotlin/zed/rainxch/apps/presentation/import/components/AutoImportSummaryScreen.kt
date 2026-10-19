@@ -72,7 +72,7 @@ fun AutoImportSummaryScreen(
                         autoLinkedCount,
                         autoLinkedCount,
                     ),
-                role = KomiTextRole.Title,
+                role = KomiTextRole.LegacyTitle,
                 fontWeight = FontWeight.Bold,
                 color = colors.onSurface,
                 textAlign = TextAlign.Center,
@@ -81,7 +81,7 @@ fun AutoImportSummaryScreen(
 
             KomiText(
                 text = stringResource(Res.string.external_import_auto_summary_body),
-                role = KomiTextRole.Body,
+                role = KomiTextRole.LegacyBody,
                 color = colors.onSurfaceVariant,
                 textAlign = TextAlign.Center,
                 uppercase = false,
@@ -95,7 +95,7 @@ fun AutoImportSummaryScreen(
                             cardsRemaining,
                             cardsRemaining,
                         ),
-                    role = KomiTextRole.Body,
+                    role = KomiTextRole.LegacyBody,
                     color = colors.onSurface,
                     textAlign = TextAlign.Center,
                     uppercase = false,
@@ -156,7 +156,7 @@ private fun ChipSurface(text: String) {
     ) {
         KomiText(
             text = text,
-            role = KomiTextRole.Label,
+            role = KomiTextRole.LegacyLabel,
             fontSize = 12.sp,
             fontWeight = FontWeight.Medium,
             color = colors.onPrimaryContainer,

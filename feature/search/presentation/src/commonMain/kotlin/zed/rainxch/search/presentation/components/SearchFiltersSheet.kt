@@ -87,7 +87,7 @@ fun SearchFiltersSheet(
             ) {
                 KomiText(
                     text = stringResource(Res.string.search_filters_title),
-                    role = KomiTextRole.Title,
+                    role = KomiTextRole.LegacyTitle,
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 22.sp,
                     modifier = Modifier.weight(1f),
@@ -169,7 +169,7 @@ private fun FilterSection(
     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
         KomiText(
             text = title,
-            role = KomiTextRole.Label,
+            role = KomiTextRole.LegacyLabel,
             fontWeight = FontWeight.SemiBold,
             fontSize = 13.sp,
             color = colors.onSurfaceVariant,
@@ -226,7 +226,7 @@ private fun SelectableChip(
 
             KomiText(
                 text = text,
-                role = KomiTextRole.Label,
+                role = KomiTextRole.LegacyLabel,
                 fontWeight = FontWeight.Medium,
                 color = content,
                 uppercase = false,
@@ -270,7 +270,7 @@ private fun NavRow(
 
             KomiText(
                 text = value,
-                role = KomiTextRole.Body,
+                role = KomiTextRole.LegacyBody,
                 fontWeight = FontWeight.SemiBold,
                 color = colors.onSurface,
                 uppercase = false,

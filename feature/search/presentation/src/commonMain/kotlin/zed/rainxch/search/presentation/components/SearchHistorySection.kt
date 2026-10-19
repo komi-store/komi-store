@@ -48,7 +48,7 @@ fun SearchHistorySection(
         ) {
             KomiText(
                 text = stringResource(Res.string.recent_searches),
-                role = KomiTextRole.Title,
+                role = KomiTextRole.LegacyTitle,
                 color = colors.onSurfaceVariant,
                 fontWeight = FontWeight.Medium,
             )
@@ -81,7 +81,7 @@ fun SearchHistorySection(
 
                 KomiText(
                     text = query,
-                    role = KomiTextRole.Body,
+                    role = KomiTextRole.LegacyBody,
                     color = colors.onSurface,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,

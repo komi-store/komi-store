@@ -334,7 +334,7 @@ private fun HomeEndCap() {
         if (LocalPersonality.current.usesDecor) {
             KomiText(
                 text = stringResource(Res.string.feed_end_cap),
-                role = KomiTextRole.Label,
+                role = KomiTextRole.LegacyLabel,
                 color = LocalPersonality.current.colors.onSurfaceVariant,
             )
         }
@@ -354,7 +354,7 @@ private fun HomeEmpty() {
     ) {
         KomiText(
             text = stringResource(Res.string.feed_empty_title),
-            role = KomiTextRole.Title,
+            role = KomiTextRole.LegacyTitle,
             color = LocalPersonality.current.colors.onSurfaceVariant,
             textAlign = TextAlign.Center,
         )
@@ -374,7 +374,7 @@ private fun HomeLoading() {
 
             KomiText(
                 text = stringResource(Res.string.home_finding_repositories),
-                role = KomiTextRole.Title,
+                role = KomiTextRole.LegacyTitle,
                 color = LocalPersonality.current.colors.onSurfaceVariant,
             )
         }
@@ -396,7 +396,7 @@ private fun HomeError(
         ) {
             KomiText(
                 text = message,
-                role = KomiTextRole.Body,
+                role = KomiTextRole.LegacyBody,
                 color = LocalPersonality.current.colors.onSurface,
                 uppercase = false,
             )

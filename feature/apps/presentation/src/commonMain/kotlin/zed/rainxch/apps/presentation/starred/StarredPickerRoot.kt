@@ -121,7 +121,7 @@ private fun StarredPickerScreen(
                             } else {
                                 stringResource(Res.string.starred_picker_empty)
                             },
-                            role = KomiTextRole.Body,
+                            role = KomiTextRole.LegacyBody,
                             color = colors.onSurfaceVariant,
                             uppercase = false,
                         )
@@ -141,7 +141,7 @@ private fun StarredPickerScreen(
                                 state.apkCount,
                                 state.trackedCount,
                             ),
-                            role = KomiTextRole.Body,
+                            role = KomiTextRole.LegacyBody,
                             color = colors.onSurfaceVariant,
                             uppercase = false,
                         )
@@ -165,7 +165,7 @@ private fun StarredPickerScreen(
                                         state.scanProgress,
                                         state.scanTotal,
                                     ),
-                                    role = KomiTextRole.Label,
+                                    role = KomiTextRole.LegacyLabel,
                                     fontSize = 11.sp,
                                     color = colors.onSurfaceVariant,
                                     uppercase = false,
@@ -185,7 +185,7 @@ private fun StarredPickerScreen(
                             ) {
                                 KomiText(
                                     text = stringResource(Res.string.starred_picker_rate_limited),
-                                    role = KomiTextRole.Body,
+                                    role = KomiTextRole.LegacyBody,
                                     fontSize = 13.sp,
                                     color = colors.error,
                                     modifier = Modifier.weight(1f),
@@ -248,7 +248,7 @@ private fun StarredPickerScreen(
                         ) {
                             KomiText(
                                 text = stringResource(Res.string.starred_picker_filter_show_all),
-                                role = KomiTextRole.Body,
+                                role = KomiTextRole.LegacyBody,
                                 fontSize = 13.sp,
                                 color = colors.onSurfaceVariant,
                                 modifier = Modifier.weight(1f),
@@ -265,7 +265,7 @@ private fun StarredPickerScreen(
 
                         KomiText(
                             text = stringResource(Res.string.starred_picker_star_dedup_tooltip),
-                            role = KomiTextRole.Label,
+                            role = KomiTextRole.LegacyLabel,
                             fontSize = 11.sp,
                             color = colors.onSurfaceVariant,
                             uppercase = false,
@@ -278,7 +278,7 @@ private fun StarredPickerScreen(
                             ) {
                                 KomiText(
                                     text = stringResource(Res.string.starred_picker_no_match),
-                                    role = KomiTextRole.Body,
+                                    role = KomiTextRole.LegacyBody,
                                     color = colors.onSurfaceVariant,
                                     uppercase = false,
                                 )

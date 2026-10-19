@@ -175,14 +175,14 @@ fun LazyListScope.releaseChannel(
                     Column {
                         KomiText(
                             text = title,
-                            role = KomiTextRole.Title,
+                            role = KomiTextRole.LegacyTitle,
                             color = colors.onError,
                             uppercase = false,
                         )
                         Spacer(Modifier.height(4.dp))
                         KomiText(
                             text = stringResource(Res.string.stalled_project_warning_description),
-                            role = KomiTextRole.Body,
+                            role = KomiTextRole.LegacyBody,
                             fontSize = 13.sp,
                             color = colors.onError,
                         )
@@ -227,7 +227,7 @@ private fun ChannelChip(
         Spacer(Modifier.size(6.dp))
         KomiText(
             text = label,
-            role = KomiTextRole.Label,
+            role = KomiTextRole.LegacyLabel,
             fontSize = 12.sp,
             color = tint,
             uppercase = false,
@@ -286,7 +286,7 @@ private fun ChannelChipCoachmark(onDismiss: () -> Unit) {
                 )
                 KomiText(
                     text = stringResource(Res.string.channel_chip_coachmark_title),
-                    role = KomiTextRole.Title,
+                    role = KomiTextRole.LegacyTitle,
                     color = colors.onPrimary,
                     fontWeight = FontWeight.Bold,
                     uppercase = false,
@@ -294,7 +294,7 @@ private fun ChannelChipCoachmark(onDismiss: () -> Unit) {
             }
             KomiText(
                 text = stringResource(Res.string.channel_chip_coachmark_body),
-                role = KomiTextRole.Body,
+                role = KomiTextRole.LegacyBody,
                 fontSize = 13.sp,
                 color = colors.onPrimary.copy(alpha = 0.9f),
             )

@@ -404,7 +404,7 @@ private fun RowScope.KomiButtonContent(
 
         KomiText(
             text = label,
-            role = KomiTextRole.Label,
+            role = KomiTextRole.LegacyLabel,
             color = contentColor,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,

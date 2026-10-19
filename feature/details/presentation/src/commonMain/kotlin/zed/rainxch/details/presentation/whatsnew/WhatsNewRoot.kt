@@ -131,7 +131,7 @@ private fun WhatsNewScreen(
                     ) {
                         KomiText(
                             text = state.errorMessage,
-                            role = KomiTextRole.Body,
+                            role = KomiTextRole.LegacyBody,
                             color = personalityColors.error,
                         )
                     }
@@ -146,7 +146,7 @@ private fun WhatsNewScreen(
                         item(key = "header") {
                             KomiText(
                                 text = stringResource(Res.string.details_whats_new_screen_title),
-                                role = KomiTextRole.Display,
+                                role = KomiTextRole.LegacyDisplay,
                                 fontWeight = FontWeight.SemiBold,
                                 fontSize = 26.sp,
                                 color = personalityColors.onBackground,
@@ -184,7 +184,7 @@ private fun WhatsNewScreen(
                                 ) {
                                     KomiText(
                                         text = release.tagName,
-                                        role = KomiTextRole.Title,
+                                        role = KomiTextRole.LegacyTitle,
                                         fontWeight = FontWeight.Bold,
                                         color = personalityColors.primary,
                                         maxLines = 1,
@@ -195,7 +195,7 @@ private fun WhatsNewScreen(
 
                                     KomiText(
                                         text = release.publishedDate,
-                                        role = KomiTextRole.Label,
+                                        role = KomiTextRole.LegacyLabel,
                                         fontSize = 12.sp,
                                         color = personalityColors.onSurfaceVariant,
                                         maxLines = 1,

@@ -73,7 +73,7 @@ fun LazyListScope.whatsNew(
         ) {
             KomiText(
                 text = stringResource(Res.string.whats_new),
-                role = KomiTextRole.Title,
+                role = KomiTextRole.LegacyTitle,
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 22.sp,
                 color = colors.onBackground,
@@ -96,7 +96,7 @@ fun LazyListScope.whatsNew(
         ) {
             KomiText(
                 text = release.tagName,
-                role = KomiTextRole.Title,
+                role = KomiTextRole.LegacyTitle,
                 fontWeight = FontWeight.SemiBold,
                 color = colors.primary,
                 maxLines = 1,
@@ -106,7 +106,7 @@ fun LazyListScope.whatsNew(
             )
             KomiText(
                 text = formatIsoDateOrRaw(release.publishedAt),
-                role = KomiTextRole.Label,
+                role = KomiTextRole.LegacyLabel,
                 fontSize = 12.sp,
                 color = colors.onSurfaceVariant,
                 maxLines = 1,
@@ -255,7 +255,7 @@ private fun ExpandableMarkdownContent(
                     } else {
                         stringResource(Res.string.read_more)
                     },
-                    role = KomiTextRole.Title,
+                    role = KomiTextRole.LegacyTitle,
                     fontWeight = FontWeight.Bold,
                     color = personalityColors.surface,
                     uppercase = false,

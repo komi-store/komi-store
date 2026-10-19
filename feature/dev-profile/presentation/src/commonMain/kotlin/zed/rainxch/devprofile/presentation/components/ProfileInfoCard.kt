@@ -83,7 +83,7 @@ fun ProfileInfoCard(
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         KomiText(
                             text = profile.name ?: profile.login,
-                            role = KomiTextRole.Title,
+                            role = KomiTextRole.LegacyTitle,
                             fontWeight = FontWeight.SemiBold,
                             color = colors.onSurface,
                             maxLines = 1,
@@ -101,7 +101,7 @@ fun ProfileInfoCard(
 
                     KomiText(
                         text = "@${profile.login}",
-                        role = KomiTextRole.Label,
+                        role = KomiTextRole.LegacyLabel,
                         color = colors.onSurfaceVariant,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
@@ -160,7 +160,7 @@ private fun BioText(bio: String, onMention: (String) -> Unit) {
     }
     KomiText(
         text = annotated,
-        role = KomiTextRole.Body,
+        role = KomiTextRole.LegacyBody,
         color = colors.onSurfaceVariant,
         maxLines = 5,
         overflow = TextOverflow.Ellipsis,
@@ -196,7 +196,7 @@ private fun Metric(value: String, label: String, modifier: Modifier = Modifier) 
     ) {
         KomiText(
             text = value,
-            role = KomiTextRole.Title,
+            role = KomiTextRole.LegacyTitle,
             fontWeight = FontWeight.SemiBold,
             fontSize = 18.sp,
             color = colors.onSurface,
@@ -206,7 +206,7 @@ private fun Metric(value: String, label: String, modifier: Modifier = Modifier) 
 
         KomiText(
             text = label,
-            role = KomiTextRole.Label,
+            role = KomiTextRole.LegacyLabel,
             fontSize = 11.sp,
             color = colors.onSurfaceVariant,
             maxLines = 1,
@@ -237,7 +237,7 @@ private fun OrgPill() {
     ) {
         KomiText(
             text = stringResource(Res.string.dev_profile_org_badge),
-            role = KomiTextRole.Label,
+            role = KomiTextRole.LegacyLabel,
             fontSize = 11.sp,
             fontWeight = FontWeight.SemiBold,
             color = colors.onPrimaryContainer,
@@ -339,7 +339,7 @@ private fun StaticChip(icon: ImageVector, text: String) {
 
             KomiText(
                 text = text,
-                role = KomiTextRole.Label,
+                role = KomiTextRole.LegacyLabel,
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Medium,
                 color = colors.onSurface,
@@ -380,7 +380,7 @@ private fun LinkChip(icon: ImageVector, text: String, onClick: () -> Unit) {
 
             KomiText(
                 text = text,
-                role = KomiTextRole.Label,
+                role = KomiTextRole.LegacyLabel,
                 fontSize = 12.sp,
                 fontWeight = FontWeight.SemiBold,
                 color = colors.primary,

@@ -136,7 +136,7 @@ fun CompactAppRow(
         Column(modifier = Modifier.weight(1f)) {
             KomiText(
                 text = app.appName,
-                role = KomiTextRole.Title,
+                role = KomiTextRole.LegacyTitle,
                 fontSize = 13.sp,
                 color = colors.onSurface,
                 uppercase = false,
@@ -154,7 +154,7 @@ fun CompactAppRow(
 
                 KomiText(
                     text = if (showVersionMigration) appItem.versionLabel else app.installedVersion,
-                    role = KomiTextRole.Body,
+                    role = KomiTextRole.LegacyBody,
                     fontSize = 13.sp,
                     color =
                         if (showVersionMigration && appItem.isVersionDowngrade) {
@@ -179,7 +179,7 @@ fun CompactAppRow(
                             Res.string.error_with_message,
                             appItem.error ?: stringResource(Res.string.download_failed),
                         ),
-                    role = KomiTextRole.Body,
+                    role = KomiTextRole.LegacyBody,
                     fontSize = 13.sp,
                     uppercase = false,
                     color = colors.error,

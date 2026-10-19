@@ -21,7 +21,7 @@ fun DeployYourOwnHint(
 ) {
     KomiText(
         text = stringResource(Res.string.mirror_deploy_your_own_hint),
-        role = KomiTextRole.Body,
+        role = KomiTextRole.LegacyBody,
         fontSize = 13.sp,
         color = LocalPersonality.current.colors.primary,
         uppercase = false,

@@ -106,7 +106,7 @@ fun AppsSectionHeader(
         ) {
             KomiText(
                 text = title,
-                role = KomiTextRole.Stamp,
+                role = KomiTextRole.LegacyStamp,
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 22.sp,
                 uppercase = false,
@@ -115,7 +115,7 @@ fun AppsSectionHeader(
 
             KomiText(
                 text = stringResource(Res.string.apps_section_count_suffix, count),
-                role = KomiTextRole.Label,
+                role = KomiTextRole.LegacyLabel,
                 fontWeight = FontWeight.Medium,
                 fontSize = 13.sp,
                 uppercase = false,

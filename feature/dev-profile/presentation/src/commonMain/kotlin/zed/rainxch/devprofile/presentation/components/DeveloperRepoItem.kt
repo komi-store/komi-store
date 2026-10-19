@@ -74,7 +74,7 @@ fun DeveloperRepoItem(
                     KomiText(
                         text = repository.name,
                         maxLines = 1,
-                        role = KomiTextRole.Title,
+                        role = KomiTextRole.LegacyTitle,
                         fontWeight = FontWeight.SemiBold,
                         overflow = TextOverflow.Ellipsis,
                         color = colors.onSurface,
@@ -92,7 +92,7 @@ fun DeveloperRepoItem(
                         text =
                             stringResource(label, formatRelativeLong(dateString))
                                 .replaceFirstChar { it.uppercase() },
-                        role = KomiTextRole.Label,
+                        role = KomiTextRole.LegacyLabel,
                         fontSize = 12.sp,
                         overflow = TextOverflow.Ellipsis,
                         color = colors.onSurfaceVariant,
@@ -114,7 +114,7 @@ fun DeveloperRepoItem(
                 KomiText(
                     text = description,
                     maxLines = 2,
-                    role = KomiTextRole.Body,
+                    role = KomiTextRole.LegacyBody,
                     fontSize = 13.sp,
                     color = colors.onSurfaceVariant,
                     overflow = TextOverflow.Ellipsis,
@@ -291,7 +291,7 @@ private fun TonalBadge(
     ) {
         KomiText(
             text = text,
-            role = KomiTextRole.Label,
+            role = KomiTextRole.LegacyLabel,
             fontSize = 12.sp,
             fontWeight = FontWeight.SemiBold,
             color = content,

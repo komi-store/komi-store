@@ -51,14 +51,14 @@ fun ClearDownloadsDialog(
         ) {
             KomiText(
                 text = stringResource(Res.string.delete_downloads_confirmation_title),
-                role = KomiTextRole.Title,
+                role = KomiTextRole.LegacyTitle,
                 color = colors.onSurface,
                 fontWeight = FontWeight.Bold,
             )
 
             KomiText(
                 text = stringResource(Res.string.delete_downloads_confirmation_message, cacheSize),
-                role = KomiTextRole.Body,
+                role = KomiTextRole.LegacyBody,
                 color = colors.onSurfaceVariant,
                 uppercase = false,
             )

@@ -48,6 +48,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpOffset
@@ -55,6 +56,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import zed.rainxch.core.presentation.locals.LocalPersonality
+import zed.rainxch.core.presentation.locals.appLocale
 import zed.rainxch.core.presentation.personality.ClassicPersonality
 import zed.rainxch.core.presentation.personality.MangaPersonality
 import zed.rainxch.core.presentation.personality.classicPersonality
@@ -199,7 +201,7 @@ private fun MangaTextField(
             )
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
-                    text = label.uppercase(),
+                    text = label.toUpperCase(appLocale()),
                     style = labelStyle,
                     color = colors.onSurface
                 )

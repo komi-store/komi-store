@@ -126,7 +126,7 @@ fun KomiBadge(
                     text = text,
                     color = fg,
                     style =
-                        personality.type.label.copy(
+                        personality.type.legacyLabel.copy(
                             fontWeight = FontWeight.W900,
                             fontSize = metrics.font,
                             fontFeatureSettings = "tnum",
@@ -274,7 +274,7 @@ private fun PreviewRow() {
         KomiText(
             text = "Announcements",
             modifier = Modifier.weight(1f),
-            role = KomiTextRole.Body,
+            role = KomiTextRole.LegacyBody,
             color = colors.onSurface
         )
         KomiBadge(count = 3, size = KomiBadgeSize.Md)

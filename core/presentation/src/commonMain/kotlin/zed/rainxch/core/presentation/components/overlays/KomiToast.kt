@@ -229,7 +229,7 @@ private fun MangaToastPanel(
                 KomiText(
                     text = data.message,
                     modifier = Modifier.weight(1f),
-                    role = KomiTextRole.Body,
+                    role = KomiTextRole.LegacyBody,
                     color = colors.onSurface,
                     fontSize = 13.5.sp,
                     fontWeight = FontWeight.W700,
@@ -247,7 +247,7 @@ private fun MangaToastPanel(
                                 data.onAction?.invoke()
                                 onClose()
                             },
-                        role = KomiTextRole.Title,
+                        role = KomiTextRole.LegacyTitle,
                         color = accent,
                         fontSize = 14.sp,
                         uppercase = true,
@@ -328,7 +328,7 @@ private fun SfxKicker(
                 alpha = alphaAnim.value
                 rotationZ = -8f
             },
-        style = personality.type.label.copy(fontWeight = FontWeight.W900, fontSize = 22.sp),
+        style = personality.type.legacyLabel.copy(fontWeight = FontWeight.W900, fontSize = 22.sp),
         color = color,
     )
 }

@@ -45,7 +45,7 @@ fun StatItem(
     ) {
         KomiText(
             text = label,
-            role = KomiTextRole.Label,
+            role = KomiTextRole.LegacyLabel,
             fontSize = 12.sp,
             fontWeight = FontWeight.SemiBold,
             color = colors.onSurfaceVariant,
@@ -55,7 +55,7 @@ fun StatItem(
         )
         KomiText(
             text = formatCount(stat),
-            role = KomiTextRole.Title,
+            role = KomiTextRole.LegacyTitle,
             fontSize = 22.sp,
             fontWeight = FontWeight.Black,
             color = colors.onSurface,
@@ -84,7 +84,7 @@ fun TextStatItem(
     ) {
         KomiText(
             text = label,
-            role = KomiTextRole.Label,
+            role = KomiTextRole.LegacyLabel,
             fontSize = 12.sp,
             fontWeight = FontWeight.SemiBold,
             color = colors.onSurfaceVariant,
@@ -94,7 +94,7 @@ fun TextStatItem(
         )
         KomiText(
             text = value,
-            role = KomiTextRole.Title,
+            role = KomiTextRole.LegacyTitle,
             fontSize = 18.sp,
             fontWeight = FontWeight.Black,
             color = colors.onSurface,

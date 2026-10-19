@@ -123,7 +123,7 @@ private fun SecurityContent(
             item(key = "advisories_empty") {
                 KomiText(
                     text = stringResource(Res.string.repo_pages_security_no_advisories),
-                    role = KomiTextRole.Body,
+                    role = KomiTextRole.LegacyBody,
                     color = colors.onSurfaceVariant,
                 )
             }
@@ -141,7 +141,7 @@ private fun SecurityContent(
             if (policy.isNullOrBlank()) {
                 KomiText(
                     text = stringResource(Res.string.repo_pages_security_no_policy),
-                    role = KomiTextRole.Body,
+                    role = KomiTextRole.LegacyBody,
                     color = colors.onSurfaceVariant,
                 )
             } else {
@@ -160,7 +160,7 @@ private fun SectionHeader(text: String) {
     val colors = LocalPersonality.current.colors
     KomiText(
         text = text,
-        role = KomiTextRole.Title,
+        role = KomiTextRole.LegacyTitle,
         fontWeight = FontWeight.SemiBold,
         color = colors.onBackground,
         uppercase = false,
@@ -184,7 +184,7 @@ private fun AdvisoryCard(advisory: SecurityAdvisory) {
         ) {
             KomiText(
                 text = advisory.summary,
-                role = KomiTextRole.Title,
+                role = KomiTextRole.LegacyTitle,
                 fontSize = 14.sp,
                 fontWeight = FontWeight.SemiBold,
                 color = colors.onSurface,
@@ -205,7 +205,7 @@ private fun AdvisoryCard(advisory: SecurityAdvisory) {
                 if (meta.isNotEmpty()) {
                     KomiText(
                         text = meta,
-                        role = KomiTextRole.Label,
+                        role = KomiTextRole.LegacyLabel,
                         fontSize = 12.sp,
                         color = colors.onSurfaceVariant,
                         uppercase = false,
@@ -242,7 +242,7 @@ private fun SeverityBadge(severity: AdvisorySeverity) {
         }
     KomiText(
         text = label,
-        role = KomiTextRole.Label,
+        role = KomiTextRole.LegacyLabel,
         fontSize = 12.sp,
         fontWeight = FontWeight.SemiBold,
         color = color,

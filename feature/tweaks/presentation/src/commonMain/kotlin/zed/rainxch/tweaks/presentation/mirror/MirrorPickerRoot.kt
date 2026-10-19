@@ -149,7 +149,7 @@ fun MirrorPickerRoot(
         ) {
             KomiText(
                 text = stringResource(Res.string.mirror_picker_description),
-                role = KomiTextRole.Body,
+                role = KomiTextRole.LegacyBody,
                 color = colors.onSurfaceVariant,
                 uppercase = false,
             )
@@ -233,7 +233,7 @@ fun MirrorPickerRoot(
             state.testResult?.let { result ->
                 KomiText(
                     text = formatTestResult(result),
-                    role = KomiTextRole.Body,
+                    role = KomiTextRole.LegacyBody,
                     color = colors.onSurface,
                     uppercase = false,
                 )

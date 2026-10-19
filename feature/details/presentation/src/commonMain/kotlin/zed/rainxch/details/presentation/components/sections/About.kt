@@ -71,7 +71,7 @@ fun LazyListScope.about(
             ) {
                 KomiText(
                     text = stringResource(Res.string.about_this_app),
-                    role = KomiTextRole.Title,
+                    role = KomiTextRole.LegacyTitle,
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 22.sp,
                     color = colors.onBackground,
@@ -80,7 +80,7 @@ fun LazyListScope.about(
                 readmeLanguage?.let {
                     KomiText(
                         text = it,
-                        role = KomiTextRole.Label,
+                        role = KomiTextRole.LegacyLabel,
                         fontSize = 11.sp,
                         color = colors.outline,
                         uppercase = false,

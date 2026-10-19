@@ -60,7 +60,7 @@ fun VariantPickerDialog(
             Column {
                 KomiText(
                     text = stringResource(Res.string.variant_picker_title),
-                    role = KomiTextRole.Title,
+                    role = KomiTextRole.LegacyTitle,
                     fontWeight = FontWeight.Bold,
                 )
 
@@ -68,7 +68,7 @@ fun VariantPickerDialog(
 
                 KomiText(
                     text = app.appName,
-                    role = KomiTextRole.Body,
+                    role = KomiTextRole.LegacyBody,
                     fontSize = 13.sp,
                     uppercase = false,
                     color = colors.onSurfaceVariant,
@@ -102,7 +102,7 @@ fun VariantPickerDialog(
                         Column(modifier = Modifier.weight(1f)) {
                             KomiText(
                                 text = stringResource(Res.string.variant_picker_stale_title),
-                                role = KomiTextRole.Body,
+                                role = KomiTextRole.LegacyBody,
                                 fontWeight = FontWeight.SemiBold,
                                 color = colors.onError,
                             )
@@ -113,7 +113,7 @@ fun VariantPickerDialog(
                                         Res.string.variant_picker_stale_was,
                                         state.variantPickerCurrentVariant,
                                     ),
-                                    role = KomiTextRole.Body,
+                                    role = KomiTextRole.LegacyBody,
                                     fontSize = 13.sp,
                                     uppercase = false,
                                     color = colors.onError,
@@ -127,7 +127,7 @@ fun VariantPickerDialog(
 
                 KomiText(
                     text = stringResource(Res.string.variant_picker_description),
-                    role = KomiTextRole.Body,
+                    role = KomiTextRole.LegacyBody,
                     color = colors.onSurfaceVariant,
                 )
 
@@ -155,7 +155,7 @@ fun VariantPickerDialog(
                                     VariantPickerError.SaveFailed -> Res.string.variant_picker_save_failed
                                 },
                             ),
-                            role = KomiTextRole.Body,
+                            role = KomiTextRole.LegacyBody,
                             color = colors.error,
                             modifier = Modifier.padding(vertical = 8.dp),
                         )
@@ -266,7 +266,7 @@ private fun VariantRow(
         Column(modifier = Modifier.weight(1f)) {
             KomiText(
                 text = title,
-                role = KomiTextRole.Body,
+                role = KomiTextRole.LegacyBody,
                 color = colors.onSurface,
                 fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,
                 uppercase = false,
@@ -276,7 +276,7 @@ private fun VariantRow(
 
             KomiText(
                 text = subtitle,
-                role = KomiTextRole.Body,
+                role = KomiTextRole.LegacyBody,
                 fontSize = 13.sp,
                 uppercase = false,
                 color = colors.onSurfaceVariant,

@@ -76,7 +76,7 @@ fun ErrorState(
 
                 KomiText(
                     text = stringResource(kind.titleRes),
-                    role = KomiTextRole.Title,
+                    role = KomiTextRole.LegacyTitle,
                     fontWeight = FontWeight.SemiBold,
                     color = colors.onSurface,
                     textAlign = TextAlign.Center,
@@ -85,7 +85,7 @@ fun ErrorState(
 
                 KomiText(
                     text = stringResource(kind.subtitleRes),
-                    role = KomiTextRole.Body,
+                    role = KomiTextRole.LegacyBody,
                     color = colors.onSurfaceVariant,
                     textAlign = TextAlign.Center,
                 )
@@ -94,7 +94,7 @@ fun ErrorState(
                     Spacer(Modifier.height(4.dp))
                     KomiText(
                         text = errorMessage,
-                        role = KomiTextRole.Body,
+                        role = KomiTextRole.LegacyBody,
                         fontSize = 13.sp,
                         color = colors.onSurfaceVariant.copy(alpha = 0.7f),
                         textAlign = TextAlign.Center,

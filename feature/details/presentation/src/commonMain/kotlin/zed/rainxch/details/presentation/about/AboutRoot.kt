@@ -137,7 +137,7 @@ private fun AboutScreen(
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         KomiText(
                             text = state.errorMessage,
-                            role = KomiTextRole.Body,
+                            role = KomiTextRole.LegacyBody,
                             color = personalityColors.error,
                         )
 
@@ -145,7 +145,7 @@ private fun AboutScreen(
 
                         KomiText(
                             text = stringResource(Res.string.retry),
-                            role = KomiTextRole.Label,
+                            role = KomiTextRole.LegacyLabel,
                             color = personalityColors.primary,
                             modifier = Modifier
                                 .padding(8.dp)
@@ -164,7 +164,7 @@ private fun AboutScreen(
                         Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
                             KomiText(
                                 text = stringResource(Res.string.details_about_screen_title),
-                                role = KomiTextRole.Display,
+                                role = KomiTextRole.LegacyDisplay,
                                 fontWeight = FontWeight.SemiBold,
                                 fontSize = 26.sp,
                                 color = personalityColors.onBackground,
@@ -176,7 +176,7 @@ private fun AboutScreen(
 
                                 KomiText(
                                     text = lang,
-                                    role = KomiTextRole.Label,
+                                    role = KomiTextRole.LegacyLabel,
                                     fontSize = 11.sp,
                                     color = personalityColors.onSurfaceVariant,
                                     uppercase = false,

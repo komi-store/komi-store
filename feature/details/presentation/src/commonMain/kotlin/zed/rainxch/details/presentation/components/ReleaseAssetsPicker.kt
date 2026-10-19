@@ -113,7 +113,7 @@ fun ReleaseAssetsPicker(
     ) {
         KomiText(
             text = stringResource(Res.string.assets_title),
-            role = KomiTextRole.Label,
+            role = KomiTextRole.LegacyLabel,
             fontWeight = FontWeight.SemiBold,
             fontSize = 12.sp,
             color = colors.primary,
@@ -139,7 +139,7 @@ fun ReleaseAssetsPicker(
         ) {
             KomiText(
                 text = selectedAsset?.name ?: stringResource(Res.string.no_assets_selected),
-                role = KomiTextRole.Stamp,
+                role = KomiTextRole.LegacyStamp,
                 fontWeight = FontWeight.SemiBold,
                 color = colors.onSurface,
                 overflow = TextOverflow.Ellipsis,
@@ -191,7 +191,7 @@ private fun ReleaseAssetsItemsPicker(
                 Column(modifier = Modifier.weight(1f).padding(vertical = 6.dp)) {
                     KomiText(
                         text = stringResource(Res.string.assets_title),
-                        role = KomiTextRole.Title,
+                        role = KomiTextRole.LegacyTitle,
                         fontWeight = FontWeight.SemiBold,
                         fontSize = 20.sp,
                         color = colors.onSurface,
@@ -216,7 +216,7 @@ private fun ReleaseAssetsItemsPicker(
                 ) {
                     KomiText(
                         text = stringResource(Res.string.variant_picker_pinned, pinnedVariant),
-                        role = KomiTextRole.Body,
+                        role = KomiTextRole.LegacyBody,
                         fontSize = 13.sp,
                         color = colors.onSurfaceVariant,
                         modifier = Modifier.weight(1f),
@@ -253,7 +253,7 @@ private fun ReleaseAssetsItemsPicker(
                 Spacer(Modifier.size(12.dp))
                 KomiText(
                     text = stringResource(Res.string.show_all_platforms_label),
-                    role = KomiTextRole.Body,
+                    role = KomiTextRole.LegacyBody,
                     color = colors.onSurface,
                     modifier = Modifier.weight(1f),
                 )
@@ -343,7 +343,7 @@ private fun ReleaseAssetsItemsPicker(
                                 text = stringResource(
                                     if (allInstalled) Res.string.installed else Res.string.assets_section_your_app,
                                 ),
-                                role = KomiTextRole.Label,
+                                role = KomiTextRole.LegacyLabel,
                                 fontWeight = FontWeight.SemiBold,
                                 color = colors.primary,
                                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
@@ -372,7 +372,7 @@ private fun ReleaseAssetsItemsPicker(
                             item(key = "section-header-available") {
                                 KomiText(
                                     text = stringResource(Res.string.assets_section_available),
-                                    role = KomiTextRole.Label,
+                                    role = KomiTextRole.LegacyLabel,
                                     fontWeight = FontWeight.SemiBold,
                                     color = colors.primary,
                                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
@@ -409,7 +409,7 @@ private fun ReleaseAssetsItemsPicker(
                     item {
                         KomiText(
                             text = stringResource(Res.string.no_assets_in_list),
-                            role = KomiTextRole.Body,
+                            role = KomiTextRole.LegacyBody,
                             color = colors.onSurfaceVariant,
                             textAlign = TextAlign.Center,
                             modifier = Modifier.fillMaxWidth().padding(16.dp),
@@ -446,7 +446,7 @@ private fun ReleaseAssetsAboutDialog(
         ) {
             KomiText(
                 text = stringResource(Res.string.multiple_assets_info_dialog_title),
-                role = KomiTextRole.Title,
+                role = KomiTextRole.LegacyTitle,
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 20.sp,
                 color = colors.onSurface,
@@ -455,7 +455,7 @@ private fun ReleaseAssetsAboutDialog(
             Spacer(Modifier.size(12.dp))
             KomiText(
                 text = stringResource(Res.string.multiple_assets_info_dialog_text),
-                role = KomiTextRole.Body,
+                role = KomiTextRole.LegacyBody,
                 color = colors.onSurfaceVariant,
             )
         }
@@ -487,7 +487,7 @@ private fun ReleaseAssetItem(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 KomiText(
                     text = asset.name,
-                    role = KomiTextRole.Stamp,
+                    role = KomiTextRole.LegacyStamp,
                     fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
                     overflow = TextOverflow.Ellipsis,
                     maxLines = 2,
@@ -509,7 +509,7 @@ private fun ReleaseAssetItem(
                     Spacer(Modifier.width(6.dp))
                     KomiText(
                         text = stringResource(variantBadge),
-                        role = KomiTextRole.Label,
+                        role = KomiTextRole.LegacyLabel,
                         fontSize = 11.sp,
                         color = colors.onSurfaceVariant,
                         modifier = Modifier
@@ -523,7 +523,7 @@ private fun ReleaseAssetItem(
                     Spacer(Modifier.width(6.dp))
                     KomiText(
                         text = stringResource(Res.string.variant_picker_pinned_badge),
-                        role = KomiTextRole.Label,
+                        role = KomiTextRole.LegacyLabel,
                         fontSize = 11.sp,
                         color = colors.onPrimaryContainer,
                         modifier = Modifier
@@ -536,7 +536,7 @@ private fun ReleaseAssetItem(
             }
             KomiText(
                 text = formatFileSize(asset.size),
-                role = KomiTextRole.Body,
+                role = KomiTextRole.LegacyBody,
                 fontSize = 13.sp,
                 color = colors.onSurfaceVariant,
                 maxLines = 1,
@@ -606,7 +606,7 @@ private fun PlatformSectionCard(
             ) {
                 KomiText(
                     text = platformLabel,
-                    role = KomiTextRole.Title,
+                    role = KomiTextRole.LegacyTitle,
                     fontWeight = FontWeight.SemiBold,
                     color = colors.onSurface,
                     modifier = Modifier.weight(1f),
@@ -665,7 +665,7 @@ private fun SectionChip(
     val content = colors.onPrimaryContainer
     KomiText(
         text = label,
-        role = KomiTextRole.Label,
+        role = KomiTextRole.LegacyLabel,
         fontSize = 11.sp,
         fontWeight = FontWeight.SemiBold,
         color = content,

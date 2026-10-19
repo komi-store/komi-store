@@ -91,7 +91,7 @@ fun AnnouncementsScreen(
                                     Res.string.announcements_empty
                                 },
                             ),
-                        role = KomiTextRole.Body,
+                        role = KomiTextRole.LegacyBody,
                         color = colors.onSurfaceVariant,
                         uppercase = false,
                     )
@@ -106,7 +106,7 @@ fun AnnouncementsScreen(
                         item {
                             KomiText(
                                 text = stringResource(Res.string.announcements_refresh_failed),
-                                role = KomiTextRole.Label,
+                                role = KomiTextRole.LegacyLabel,
                                 fontSize = 11.sp,
                                 color = colors.onSurfaceVariant,
                                 uppercase = false,

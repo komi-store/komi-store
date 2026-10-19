@@ -107,7 +107,7 @@ fun InProgressAppCard(
                 Column(modifier = Modifier.weight(1f).fillMaxWidth()) {
                     KomiText(
                         text = download.displayAppName,
-                        role = KomiTextRole.Title,
+                        role = KomiTextRole.LegacyTitle,
                         color = colors.onSurface,
                         fontWeight = FontWeight.Bold,
                         maxLines = 2,
@@ -131,7 +131,7 @@ fun InProgressAppCard(
 
                         KomiText(
                             text = download.repoOwner,
-                            role = KomiTextRole.Body,
+                            role = KomiTextRole.LegacyBody,
                             fontSize = 13.sp,
                             uppercase = false,
                             color = colors.onSurfaceVariant,
@@ -151,7 +151,7 @@ fun InProgressAppCard(
 
                 KomiText(
                     text = description,
-                    role = KomiTextRole.Body,
+                    role = KomiTextRole.LegacyBody,
                     uppercase = false,
                     color = colors.onSurfaceVariant,
                     maxLines = 2,
@@ -251,7 +251,7 @@ fun InProgressAppCard(
 
                         KomiText(
                             text = stringResource(Res.string.installing),
-                            role = KomiTextRole.Body,
+                            role = KomiTextRole.LegacyBody,
                             fontSize = 13.sp,
                             color = colors.onSurface,
                             modifier = Modifier.weight(1f),
@@ -273,7 +273,7 @@ fun InProgressAppCard(
                     ) {
                         KomiText(
                             text = assetCaption(download, formatFileSize(download.assetSize)),
-                            role = KomiTextRole.Body,
+                            role = KomiTextRole.LegacyBody,
                             fontSize = 12.sp,
                             uppercase = false,
                             color = colors.onSurfaceVariant,
@@ -305,7 +305,7 @@ fun InProgressAppCard(
                                 Res.string.error_with_message,
                                 download.errorMessage ?: stringResource(Res.string.download_failed),
                             ),
-                        role = KomiTextRole.Body,
+                        role = KomiTextRole.LegacyBody,
                         fontSize = 13.sp,
                         uppercase = false,
                         color = colors.error,
@@ -360,7 +360,7 @@ private fun StageLine(
     if (download.stage == DownloadStage.AwaitingInstall) {
         KomiText(
             text = stringResource(Res.string.ready_to_install),
-            role = KomiTextRole.Body,
+            role = KomiTextRole.LegacyBody,
             fontSize = 13.sp,
             uppercase = false,
             color = colors.primary,
@@ -391,7 +391,7 @@ private fun VersionLine(
 
     KomiText(
         text = text,
-        role = KomiTextRole.Body,
+        role = KomiTextRole.LegacyBody,
         fontSize = 13.sp,
         uppercase = false,
         color = if (isDowngrade) DowngradeWarningColor else colors.onSurfaceVariant,
@@ -416,7 +416,7 @@ private fun ProgressBody(
         ) {
             KomiText(
                 text = stringResource(if (paused) Res.string.paused else Res.string.downloading),
-                role = KomiTextRole.Body,
+                role = KomiTextRole.LegacyBody,
                 fontSize = 13.sp,
                 color = if (paused) colors.onSurfaceVariant else colors.onSurface,
                 modifier = Modifier.weight(1f),
@@ -425,7 +425,7 @@ private fun ProgressBody(
             if (percent != null) {
                 KomiText(
                     text = "$percent%",
-                    role = KomiTextRole.Body,
+                    role = KomiTextRole.LegacyBody,
                     fontSize = 13.sp,
                     uppercase = false,
                     color = colors.onSurfaceVariant,
@@ -445,7 +445,7 @@ private fun ProgressBody(
 
         KomiText(
             text = assetCaption(download, downloadSizeLabel(download)),
-            role = KomiTextRole.Body,
+            role = KomiTextRole.LegacyBody,
             fontSize = 12.sp,
             uppercase = false,
             color = colors.onSurfaceVariant,

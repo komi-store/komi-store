@@ -38,7 +38,7 @@ fun LazyListScope.stats(repoStats: RepoStats) {
         ) {
             KomiText(
                 text = stringResource(Res.string.details_stats_section),
-                role = KomiTextRole.Title,
+                role = KomiTextRole.LegacyTitle,
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 22.sp,
                 color = colors.onBackground,

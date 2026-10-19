@@ -117,7 +117,7 @@ fun UpdatesBanner(
                     Column(modifier = Modifier.weight(1f)) {
                         KomiText(
                             text = title,
-                            role = KomiTextRole.Title,
+                            role = KomiTextRole.LegacyTitle,
                             fontWeight = FontWeight.SemiBold,
                             fontSize = 18.sp,
                             uppercase = false,
@@ -128,7 +128,7 @@ fun UpdatesBanner(
 
                         KomiText(
                             text = stringResource(Res.string.apps_updates_banner_subtitle),
-                            role = KomiTextRole.Body,
+                            role = KomiTextRole.LegacyBody,
                             fontSize = 13.sp,
                             color = colors.onPrimaryContainer.copy(alpha = 0.78f),
                             maxLines = 2,
@@ -161,7 +161,7 @@ fun UpdatesBanner(
                                         updateAllProgress.current,
                                         updateAllProgress.total,
                                     ),
-                                    role = KomiTextRole.Title,
+                                    role = KomiTextRole.LegacyTitle,
                                     fontSize = 14.sp,
                                     fontWeight = FontWeight.SemiBold,
                                     uppercase = false,
@@ -173,7 +173,7 @@ fun UpdatesBanner(
                                         Res.string.currently_updating,
                                         updateAllProgress.currentAppName,
                                     ),
-                                    role = KomiTextRole.Body,
+                                    role = KomiTextRole.LegacyBody,
                                     fontSize = 13.sp,
                                     color = colors.onPrimaryContainer.copy(alpha = 0.78f),
                                     maxLines = 1,

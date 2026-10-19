@@ -344,7 +344,7 @@ private fun MangaSheetInner(
                 )
                 KomiText(
                     text = title,
-                    role = KomiTextRole.Title,
+                    role = KomiTextRole.LegacyTitle,
                     fontSize = 19.sp,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
@@ -352,7 +352,7 @@ private fun MangaSheetInner(
                 if (titleJp != null) {
                     KomiText(
                         text = titleJp,
-                        role = KomiTextRole.Label,
+                        role = KomiTextRole.LegacyLabel,
                         color = colors.onSurfaceVariant,
                         fontSize = 11.sp,
                         uppercase = false,
@@ -443,7 +443,7 @@ private fun ClassicBottomSheet(
             if (title != null) {
                 KomiText(
                     text = title,
-                    role = KomiTextRole.Title,
+                    role = KomiTextRole.LegacyTitle,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
@@ -496,7 +496,7 @@ private fun ClassicCenterDialog(
                 if (title != null) {
                     KomiText(
                         text = title,
-                        role = KomiTextRole.Title,
+                        role = KomiTextRole.LegacyTitle,
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis
                     )
@@ -521,7 +521,7 @@ private fun PreviewBody() {
     val colors = LocalPersonality.current.colors
     KomiText(
         text = "Remove immich from this device? Your library on the server is untouched.",
-        role = KomiTextRole.Body,
+        role = KomiTextRole.LegacyBody,
         color = colors.onSurface,
     )
 }

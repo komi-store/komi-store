@@ -316,7 +316,7 @@ private fun ReleaseHint(
         )
         KomiText(
             text = text,
-            role = KomiTextRole.Body,
+            role = KomiTextRole.LegacyBody,
             fontSize = 13.sp,
             fontWeight = if (emphasized) FontWeight.SemiBold else FontWeight.Normal,
             color = tint,
@@ -351,7 +351,7 @@ private fun InstallOptionItem(
         Column(modifier = Modifier.weight(1f)) {
             KomiText(
                 text = title,
-                role = KomiTextRole.Body,
+                role = KomiTextRole.LegacyBody,
                 color = colors.onSurface,
                 uppercase = false,
                 fontSize = 14.sp,
@@ -359,7 +359,7 @@ private fun InstallOptionItem(
             )
             KomiText(
                 text = subtitle,
-                role = KomiTextRole.Body,
+                role = KomiTextRole.LegacyBody,
                 color = colors.onSurfaceVariant,
                 uppercase = false,
                 fontSize = 12.sp,

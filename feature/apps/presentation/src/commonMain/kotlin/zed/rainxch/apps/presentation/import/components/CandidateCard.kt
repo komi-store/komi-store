@@ -112,7 +112,7 @@ fun CandidateCard(
                 ) {
                     KomiText(
                         text = candidate.appLabel,
-                        role = KomiTextRole.Title,
+                        role = KomiTextRole.LegacyTitle,
                         fontWeight = FontWeight.SemiBold,
                         color = colors.onSurface,
                         maxLines = 1,
@@ -122,7 +122,7 @@ fun CandidateCard(
 
                     KomiText(
                         text = candidate.packageName,
-                        role = KomiTextRole.Body,
+                        role = KomiTextRole.LegacyBody,
                         fontSize = 13.sp,
                         color = colors.onSurfaceVariant,
                         maxLines = 1,
@@ -140,7 +140,7 @@ fun CandidateCard(
                                 Res.string.external_import_card_installer_chip,
                                 candidate.installerLabel,
                             ),
-                            role = KomiTextRole.Label,
+                            role = KomiTextRole.LegacyLabel,
                             fontSize = 11.sp,
                             color = colors.onPrimaryContainer,
                             uppercase = false,
@@ -260,7 +260,7 @@ private fun PreselectedRow(suggestion: RepoSuggestionUi?) {
         if (suggestion == null) {
             KomiText(
                 text = stringResource(Res.string.external_import_card_preselect_unknown),
-                role = KomiTextRole.Body,
+                role = KomiTextRole.LegacyBody,
                 color = contentColor,
                 uppercase = false,
                 modifier = Modifier.padding(horizontal = 12.dp, vertical = 12.dp),
@@ -272,14 +272,14 @@ private fun PreselectedRow(suggestion: RepoSuggestionUi?) {
             ) {
                 KomiText(
                     text = stringResource(Res.string.external_import_card_preselect_known_prefix),
-                    role = KomiTextRole.Label,
+                    role = KomiTextRole.LegacyLabel,
                     fontSize = 11.sp,
                     color = contentColor,
                 )
 
                 KomiText(
                     text = suggestion.repo,
-                    role = KomiTextRole.Title,
+                    role = KomiTextRole.LegacyTitle,
                     fontWeight = FontWeight.SemiBold,
                     color = contentColor,
                     maxLines = 1,
@@ -296,7 +296,7 @@ private fun PreselectedRow(suggestion: RepoSuggestionUi?) {
                             Res.string.external_import_card_owner_byline,
                             suggestion.owner,
                         ),
-                        role = KomiTextRole.Body,
+                        role = KomiTextRole.LegacyBody,
                         fontSize = 13.sp,
                         color = contentColor,
                         maxLines = 1,
@@ -310,7 +310,7 @@ private fun PreselectedRow(suggestion: RepoSuggestionUi?) {
                             Res.string.external_import_match_confidence_chip,
                             suggestion.confidencePercent,
                         ),
-                        role = KomiTextRole.Label,
+                        role = KomiTextRole.LegacyLabel,
                         fontSize = 11.sp,
                         color = contentColor,
                         uppercase = false,

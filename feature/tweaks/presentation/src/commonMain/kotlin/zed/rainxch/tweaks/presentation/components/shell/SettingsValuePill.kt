@@ -50,7 +50,7 @@ fun SettingsValuePill(
             ) {
                 KomiText(
                     text = value,
-                    role = KomiTextRole.Label,
+                    role = KomiTextRole.LegacyLabel,
                     color = colors.onSurface,
                     fontSize = 13.sp,
                     fontWeight = FontWeight.Black,
@@ -80,7 +80,7 @@ fun SettingsValuePill(
             ) {
                 KomiText(
                     text = value,
-                    role = KomiTextRole.Label,
+                    role = KomiTextRole.LegacyLabel,
                     color = colors.onSurface,
                     fontSize = 13.sp,
                     fontWeight = FontWeight.SemiBold,

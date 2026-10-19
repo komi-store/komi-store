@@ -95,7 +95,7 @@ fun PersonalityTile(
             if (isManga) {
                 KomiText(
                     text = "ドン",
-                    role = KomiTextRole.Label,
+                    role = KomiTextRole.LegacyLabel,
                     color = colors.primary,
                     fontSize = 13.sp,
                     fontWeight = FontWeight.Black,
@@ -132,13 +132,13 @@ fun PersonalityTile(
         Column(modifier = Modifier.padding(horizontal = 11.dp, vertical = 9.dp)) {
             KomiText(
                 text = if (isManga) "Manga" else "Classic",
-                role = KomiTextRole.Stamp,
+                role = KomiTextRole.LegacyStamp,
                 color = colors.onSurface,
                 fontSize = 16.sp,
             )
             KomiText(
                 text = if (isManga) "Inked comic panels" else "Clean Material 3",
-                role = KomiTextRole.Body,
+                role = KomiTextRole.LegacyBody,
                 color = colors.onSurfaceVariant,
                 fontSize = 11.sp,
                 fontWeight = FontWeight.Medium,
