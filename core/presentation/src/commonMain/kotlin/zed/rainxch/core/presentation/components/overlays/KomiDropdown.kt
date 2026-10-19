@@ -24,8 +24,10 @@ import androidx.compose.material.icons.filled.Flag
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MenuDefaults
 import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -95,6 +97,7 @@ fun KomiDropdown(
     }
 }
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun WideMenu(
     expanded: Boolean,
@@ -124,6 +127,8 @@ private fun WideMenu(
             DropdownMenu(
                 expanded = expanded,
                 onDismissRequest = onDismiss,
+                shape = MenuDefaults.standaloneGroupShape,
+                containerColor = MenuDefaults.groupStandardContainerColor,
             ) {
                 MenuEntries(entries = entries, value = value, onPick = onPick)
             }

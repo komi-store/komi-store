@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalMaterial3ExpressiveApi::class)
+
 package zed.rainxch.core.presentation.components.buttons
 
 import androidx.compose.animation.core.animateFloatAsState
@@ -28,6 +30,7 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
@@ -252,6 +255,7 @@ private fun ClassicButton(
 ) {
     val colors = personality.colors
     val metrics = buttonMetrics(size)
+    val shapes = ButtonDefaults.shapesFor(metrics.height)
     val active = enabled && !loading
     val contentPadding = PaddingValues(horizontal = metrics.hPadding)
     val buttonModifier =
@@ -313,6 +317,7 @@ private fun ClassicButton(
         KomiButtonVariant.Primary -> {
             Button(
                 onClick = onClick,
+                shapes = shapes,
                 modifier = buttonModifier,
                 enabled = active,
                 contentPadding = contentPadding,
@@ -324,6 +329,7 @@ private fun ClassicButton(
         KomiButtonVariant.Tonal -> {
             FilledTonalButton(
                 onClick = onClick,
+                shapes = shapes,
                 modifier = buttonModifier,
                 enabled = active,
                 contentPadding = contentPadding,
@@ -335,6 +341,7 @@ private fun ClassicButton(
         KomiButtonVariant.Outline -> {
             OutlinedButton(
                 onClick = onClick,
+                shapes = shapes,
                 modifier = buttonModifier,
                 enabled = active,
                 contentPadding = contentPadding,
@@ -346,6 +353,7 @@ private fun ClassicButton(
         KomiButtonVariant.Text -> {
             TextButton(
                 onClick = onClick,
+                shapes = shapes,
                 modifier = buttonModifier,
                 enabled = active,
                 contentPadding = contentPadding,
@@ -357,6 +365,7 @@ private fun ClassicButton(
         KomiButtonVariant.Destructive -> {
             Button(
                 onClick = onClick,
+                shapes = shapes,
                 modifier = buttonModifier,
                 enabled = active,
                 contentPadding = contentPadding,

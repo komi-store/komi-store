@@ -20,6 +20,7 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
@@ -180,6 +181,7 @@ private fun MangaIconButton(
     }
 }
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun ClassicIconButton(
     icon: ImageVector,
@@ -205,6 +207,7 @@ private fun ClassicIconButton(
         KomiButtonVariant.Primary -> {
             FilledIconButton(
                 onClick = onClick,
+                shapes = IconButtonDefaults.shapes(),
                 modifier = modifier.then(sizeModifier),
                 enabled = enabled,
                 content = content,
@@ -214,6 +217,7 @@ private fun ClassicIconButton(
         KomiButtonVariant.Tonal -> {
             FilledTonalIconButton(
                 onClick = onClick,
+                shapes = IconButtonDefaults.shapes(),
                 modifier = modifier.then(sizeModifier),
                 enabled = enabled,
                 content = content,
@@ -223,6 +227,7 @@ private fun ClassicIconButton(
         KomiButtonVariant.Outline -> {
             OutlinedIconButton(
                 onClick = onClick,
+                shapes = IconButtonDefaults.shapes(),
                 modifier = modifier.then(sizeModifier),
                 enabled = enabled,
                 content = content,
@@ -232,6 +237,7 @@ private fun ClassicIconButton(
         KomiButtonVariant.Text -> {
             IconButton(
                 onClick = onClick,
+                shapes = IconButtonDefaults.shapes(),
                 modifier = modifier.then(sizeModifier),
                 enabled = enabled,
                 content = content,
@@ -241,6 +247,7 @@ private fun ClassicIconButton(
         KomiButtonVariant.Destructive -> {
             FilledIconButton(
                 onClick = onClick,
+                shapes = IconButtonDefaults.shapes(),
                 modifier = modifier.then(sizeModifier),
                 enabled = enabled,
                 colors =
