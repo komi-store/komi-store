@@ -266,10 +266,8 @@ private fun OAuthCoexistenceNote() {
             )
             KomiText(
                 text = stringResource(Res.string.host_tokens_oauth_coexistence),
-                role = KomiTextRole.LegacyBody,
-                fontSize = 13.sp,
+                role = KomiTextRole.Body,
                 color = colors.onSurfaceVariant,
-                uppercase = false,
             )
         }
     }
@@ -291,23 +289,19 @@ private fun EmptyStatePicker(
             Spacer(Modifier.height(8.dp))
             KomiText(
                 text = stringResource(Res.string.host_tokens_empty_title),
-                role = KomiTextRole.LegacyTitle,
-                fontWeight = FontWeight.SemiBold,
+                role = KomiTextRole.SectionTitle,
                 color = colors.onSurface,
             )
             Spacer(Modifier.height(4.dp))
             KomiText(
                 text = stringResource(Res.string.host_tokens_empty_subtitle),
-                role = KomiTextRole.LegacyBody,
-                fontSize = 13.sp,
+                role = KomiTextRole.Body,
                 color = colors.onSurfaceVariant,
-                uppercase = false,
             )
             Spacer(Modifier.height(16.dp))
             KomiText(
                 text = stringResource(Res.string.host_tokens_picker_title),
-                role = KomiTextRole.LegacyLabel,
-                fontWeight = FontWeight.SemiBold,
+                role = KomiTextRole.Overline,
                 color = colors.onSurfaceVariant,
             )
             Spacer(Modifier.height(4.dp))
@@ -339,7 +333,7 @@ private fun PresetForgeCard(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .settingsRowDivider(colors.outline.copy(alpha = 0.22f), show = !last)
+            .settingsRowDivider(colors.divider, show = !last)
             .padding(horizontal = 16.dp, vertical = 12.dp),
         verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
@@ -355,17 +349,13 @@ private fun PresetForgeCard(
             Column(modifier = Modifier.weight(1f)) {
                 KomiText(
                     text = kind.displayName,
-                    role = KomiTextRole.LegacyTitle,
-                    fontWeight = FontWeight.SemiBold,
+                    role = KomiTextRole.CardTitle,
                     color = colors.onSurface,
-                    uppercase = false,
                 )
                 KomiText(
                     text = kind.tokenHost,
-                    role = KomiTextRole.LegacyBody,
-                    fontSize = 13.sp,
+                    role = KomiTextRole.Body,
                     color = colors.onSurfaceVariant,
-                    uppercase = false,
                 )
             }
         }
@@ -409,16 +399,13 @@ private fun OtherForgeCard(onPick: () -> Unit) {
         Column(modifier = Modifier.weight(1f)) {
             KomiText(
                 text = stringResource(Res.string.host_tokens_picker_other),
-                role = KomiTextRole.LegacyTitle,
+                role = KomiTextRole.CardTitle,
                 color = colors.onSurface,
-                uppercase = false,
             )
             KomiText(
                 text = stringResource(Res.string.host_tokens_picker_other_subtitle),
-                role = KomiTextRole.LegacyBody,
-                fontSize = 13.sp,
+                role = KomiTextRole.Body,
                 color = colors.onSurfaceVariant,
-                uppercase = false,
             )
         }
     }
@@ -434,7 +421,7 @@ private fun PickerDialog(
 ) {
     KomiDialog(
         onDismissRequest = onDismiss,
-        title = { KomiText(stringResource(Res.string.host_tokens_picker_title), role = KomiTextRole.LegacyTitle) },
+        title = { KomiText(stringResource(Res.string.host_tokens_picker_title), role = KomiTextRole.CardTitle) },
         text = {
             SettingsGroup {
                 presetForges.forEach { kind ->
@@ -476,7 +463,7 @@ private fun TokenRow(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .settingsRowDivider(colors.outline.copy(alpha = 0.22f), show = !last)
+            .settingsRowDivider(colors.divider, show = !last)
             .padding(start = 16.dp, top = 12.dp, end = 8.dp, bottom = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(4.dp),
@@ -490,10 +477,8 @@ private fun TokenRow(
             Column(modifier = Modifier.weight(1f)) {
                 KomiText(
                     text = forge?.displayName ?: token.host,
-                    role = KomiTextRole.LegacyTitle,
-                    fontWeight = FontWeight.SemiBold,
+                    role = KomiTextRole.CardTitle,
                     color = colors.onSurface,
-                    uppercase = false,
                 )
                 val secondary = when {
                     validation?.isSuccess == true -> {
@@ -516,14 +501,12 @@ private fun TokenRow(
                 }
                 KomiText(
                     text = secondary,
-                    role = KomiTextRole.LegacyBody,
-                    fontSize = 13.sp,
+                    role = KomiTextRole.Body,
                     color = if (validation != null && !validation.isSuccess) {
                         colors.error
                     } else {
                         colors.onSurfaceVariant
                     },
-                    uppercase = false,
                 )
             }
             if (isValidating) {
@@ -584,7 +567,7 @@ private fun AddTokenDialog(
     }
     KomiDialog(
         onDismissRequest = { onAction(HostTokensAction.OnAddDismiss) },
-        title = { KomiText(title, role = KomiTextRole.LegacyTitle, uppercase = false) },
+        title = { KomiText(title, role = KomiTextRole.CardTitle) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 if (state.draftForge == null) {

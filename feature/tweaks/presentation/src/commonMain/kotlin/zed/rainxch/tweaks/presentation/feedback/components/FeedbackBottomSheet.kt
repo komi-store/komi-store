@@ -180,8 +180,7 @@ private fun FeedbackHeader(onDismiss: () -> Unit) {
     ) {
         KomiText(
             text = stringResource(Res.string.feedback_title),
-            role = KomiTextRole.LegacyTitle,
-            fontWeight = FontWeight.SemiBold,
+            role = KomiTextRole.CardTitle,
             color = colors.onSurface,
         )
         KomiIconButton(
@@ -199,11 +198,8 @@ private fun SectionLabel(text: String, topGap: androidx.compose.ui.unit.Dp = 4.d
         if (topGap > 0.dp) Spacer(Modifier.height(topGap))
         KomiText(
             text = text,
-            role = KomiTextRole.LegacyLabel,
-            fontSize = 12.sp,
-            fontWeight = FontWeight.SemiBold,
+            role = KomiTextRole.LabelSmall,
             color = LocalPersonality.current.colors.onSurfaceVariant,
-            uppercase = false,
         )
     }
 }

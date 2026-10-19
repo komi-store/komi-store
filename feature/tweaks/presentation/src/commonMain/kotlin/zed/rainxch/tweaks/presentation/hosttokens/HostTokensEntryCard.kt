@@ -48,7 +48,7 @@ fun HostTokensEntryCard(
                 modifier = Modifier
                     .size(36.dp)
                     .clip(RoundedCornerShape(personality.shape.cornerSmall))
-                    .background(colors.primary.copy(alpha = 0.14f)),
+                    .background(colors.primaryTint),
                 contentAlignment = Alignment.Center,
             ) {
                 KomiIcon(
@@ -61,17 +61,13 @@ fun HostTokensEntryCard(
             Column(modifier = Modifier.weight(1f)) {
                 KomiText(
                     text = stringResource(Res.string.host_tokens_title),
-                    role = KomiTextRole.LegacyTitle,
-                    fontWeight = FontWeight.SemiBold,
+                    role = KomiTextRole.CardTitle,
                     color = colors.onSurface,
-                    uppercase = false,
                 )
                 KomiText(
                     text = stringResource(Res.string.host_tokens_entry_subtitle),
-                    role = KomiTextRole.LegacyBody,
-                    fontSize = 13.sp,
+                    role = KomiTextRole.Body,
                     color = colors.onSurfaceVariant,
-                    uppercase = false,
                 )
             }
             KomiIcon(

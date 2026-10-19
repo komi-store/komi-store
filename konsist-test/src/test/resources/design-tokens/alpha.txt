@@ -22,8 +22,5 @@
 2 feature/search/presentation/src/commonMain/kotlin/zed/rainxch/search/presentation/components/SearchFiltersSheet.kt
 1 feature/starred/presentation/src/commonMain/kotlin/zed/rainxch/starred/presentation/StarredReposRoot.kt
 3 feature/starred/presentation/src/commonMain/kotlin/zed/rainxch/starred/presentation/components/StarredRepositoryItem.kt
-5 feature/tweaks/presentation/src/commonMain/kotlin/zed/rainxch/tweaks/presentation/appinfo/AppInfoRoot.kt
-2 feature/tweaks/presentation/src/commonMain/kotlin/zed/rainxch/tweaks/presentation/components/appearance/PersonalityTile.kt
-1 feature/tweaks/presentation/src/commonMain/kotlin/zed/rainxch/tweaks/presentation/components/shell/SettingsSectionHead.kt
-1 feature/tweaks/presentation/src/commonMain/kotlin/zed/rainxch/tweaks/presentation/hosttokens/HostTokensEntryCard.kt
-2 feature/tweaks/presentation/src/commonMain/kotlin/zed/rainxch/tweaks/presentation/hosttokens/HostTokensRoot.kt
+4 feature/tweaks/presentation/src/commonMain/kotlin/zed/rainxch/tweaks/presentation/appinfo/AppInfoRoot.kt
+1 feature/tweaks/presentation/src/commonMain/kotlin/zed/rainxch/tweaks/presentation/components/appearance/PersonalityTile.kt

@@ -56,7 +56,7 @@ fun PersonalityTile(
     val isManga = kind == AppPersonality.MANGA
     val isActiveManga = LocalPersonality.current is MangaPersonality
     val tileShape = if (isActiveManga) RectangleShape else RoundedCornerShape(LocalPersonality.current.shape.corner)
-    val borderColor = if (selected) colors.primary else colors.outline.copy(alpha = 0.45f)
+    val borderColor = if (selected) colors.primary else colors.divider
 
     Column(
         modifier =
@@ -95,11 +95,8 @@ fun PersonalityTile(
             if (isManga) {
                 KomiText(
                     text = "ドン",
-                    role = KomiTextRole.LegacyLabel,
+                    role = KomiTextRole.Label,
                     color = colors.primary,
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.Black,
-                    uppercase = false,
                     modifier =
                         Modifier
                             .align(Alignment.TopEnd)
@@ -132,17 +129,13 @@ fun PersonalityTile(
         Column(modifier = Modifier.padding(horizontal = 11.dp, vertical = 9.dp)) {
             KomiText(
                 text = if (isManga) "Manga" else "Classic",
-                role = KomiTextRole.LegacyStamp,
+                role = KomiTextRole.Stamp,
                 color = colors.onSurface,
-                fontSize = 16.sp,
             )
             KomiText(
                 text = if (isManga) "Inked comic panels" else "Clean Material 3",
-                role = KomiTextRole.LegacyBody,
+                role = KomiTextRole.LabelSmall,
                 color = colors.onSurfaceVariant,
-                fontSize = 11.sp,
-                fontWeight = FontWeight.Medium,
-                uppercase = false,
                 modifier = Modifier.padding(top = 1.dp),
             )
         }

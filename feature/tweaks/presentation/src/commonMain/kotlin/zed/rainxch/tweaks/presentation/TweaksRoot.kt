@@ -269,10 +269,8 @@ fun TweaksRoot(
                     tweaksKicker(TweaksDecorSlot.Footer)?.let { footer ->
                         KomiText(
                             text = footer,
-                            role = KomiTextRole.LegacyStamp,
+                            role = KomiTextRole.Caption,
                             color = LocalPersonality.current.colors.onSurfaceVariant,
-                            fontSize = 11.sp,
-                            uppercase = false,
                             textAlign = TextAlign.Center,
                             modifier = Modifier.fillMaxWidth().padding(top = 10.dp),
                         )

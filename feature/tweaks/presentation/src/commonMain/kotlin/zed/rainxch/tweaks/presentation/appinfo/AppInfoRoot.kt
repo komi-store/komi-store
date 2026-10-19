@@ -132,7 +132,7 @@ fun AppInfoRoot(
 
                 KomiText(
                     text = stringResource(Res.string.tweaks_app_info_community_section),
-                    role = KomiTextRole.LegacyTitle
+                    role = KomiTextRole.SectionTitle
                 )
                 Spacer(Modifier.height(8.dp))
 
@@ -205,23 +205,19 @@ private fun AppIdentityCard(versionName: String) {
             ) {
                 KomiText(
                     text = stringResource(Res.string.tweaks_app_info_app_name),
-                    role = KomiTextRole.LegacyTitle,
-                    fontWeight = FontWeight.SemiBold,
+                    role = KomiTextRole.SectionTitle,
                     color = colors.onSurface,
                 )
                 KomiText(
                     text = versionName.ifBlank { "—" },
                     role = KomiTextRole.Mono,
                     color = colors.onSurfaceVariant,
-                    uppercase = false,
                 )
                 Spacer(Modifier.height(4.dp))
                 KomiText(
                     text = stringResource(Res.string.tweaks_app_info_tagline),
-                    role = KomiTextRole.LegacyBody,
-                    fontSize = 13.sp,
+                    role = KomiTextRole.Body,
                     color = colors.onSurfaceVariant,
-                    uppercase = false,
                 )
             }
         }
@@ -247,15 +243,13 @@ private fun CommunityCard(
             ) {
                 KomiText(
                     text = stringResource(Res.string.tweaks_app_info_community_title),
-                    role = KomiTextRole.LegacyTitle,
-                    fontWeight = FontWeight.SemiBold,
+                    role = KomiTextRole.SectionTitle,
                     color = colors.onSurface,
                     modifier = Modifier.weight(1f),
                 )
                 KomiText(
                     text = stringResource(Res.string.tweaks_app_info_community_subtitle),
-                    role = KomiTextRole.LegacyLabel,
-                    fontSize = 11.sp,
+                    role = KomiTextRole.Overline,
                     color = colors.onSurfaceVariant,
                 )
             }
@@ -316,7 +310,7 @@ private fun CommunityCard(
             }
 
             Spacer(Modifier.height(16.dp))
-            KomiHorizontalDivider(color = colors.outline.copy(alpha = 0.5f))
+            KomiHorizontalDivider(color = colors.divider)
             Spacer(Modifier.height(14.dp))
 
             Row(
@@ -327,17 +321,13 @@ private fun CommunityCard(
                 Column(modifier = Modifier.weight(1f)) {
                     KomiText(
                         text = stringResource(Res.string.tweaks_app_info_community_business_title),
-                        role = KomiTextRole.LegacyTitle,
-                        fontWeight = FontWeight.SemiBold,
+                        role = KomiTextRole.CardTitle,
                         color = colors.onSurface,
-                        uppercase = false,
                     )
                     KomiText(
                         text = stringResource(Res.string.tweaks_app_info_community_business_subtitle),
-                        role = KomiTextRole.LegacyBody,
-                        fontSize = 13.sp,
+                        role = KomiTextRole.Body,
                         color = colors.onSurfaceVariant,
-                        uppercase = false,
                     )
                 }
                 KomiButton(
@@ -400,13 +390,10 @@ private fun SocialTile(
             }
             KomiText(
                 text = label,
-                role = KomiTextRole.LegacyLabel,
-                fontSize = 12.sp,
-                fontWeight = FontWeight.SemiBold,
+                role = KomiTextRole.LabelSmall,
                 color = LocalPersonality.current.colors.onSurface,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
-                uppercase = false,
             )
         }
     }
@@ -462,21 +449,17 @@ private fun ActionRow(
             ) {
                 KomiText(
                     text = title,
-                    role = KomiTextRole.LegacyStamp,
-                    fontWeight = FontWeight.SemiBold,
+                    role = KomiTextRole.ItemTitle,
                     color = colors.onSurface,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    uppercase = false,
                 )
                 KomiText(
                     text = subtitle,
-                    role = KomiTextRole.LegacyBody,
-                    fontSize = 13.sp,
+                    role = KomiTextRole.Body,
                     color = colors.onSurfaceVariant,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    uppercase = false,
                 )
             }
             KomiIcon(

@@ -95,17 +95,14 @@ private fun HeadlineLabel(
     ) {
         KomiText(
             text = latin,
-            role = KomiTextRole.LegacyStamp,
+            role = KomiTextRole.Stamp,
             color = colors.onSurfaceVariant,
-            fontSize = 13.sp,
         )
         if (kicker != null) {
             KomiText(
                 text = kicker,
-                role = KomiTextRole.LegacyLabel,
+                role = KomiTextRole.Caption,
                 color = colors.onSurfaceVariant,
-                fontSize = 11.sp,
-                uppercase = false,
             )
         }
     }

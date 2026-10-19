@@ -39,16 +39,14 @@ fun CustomForgesDialog(
     val colors = personality.colors
     KomiDialog(
         onDismissRequest = { onAction(TweaksAction.OnDismissCustomForgesDialog) },
-        title = { KomiText(stringResource(Res.string.custom_forges_dialog_title), role = KomiTextRole.LegacyTitle) },
+        title = { KomiText(stringResource(Res.string.custom_forges_dialog_title), role = KomiTextRole.CardTitle) },
         text = {
             Column {
 
                 KomiText(
                     text = stringResource(Res.string.custom_forges_dialog_builtin_note),
-                    role = KomiTextRole.LegacyBody,
-                    fontSize = 13.sp,
+                    role = KomiTextRole.Body,
                     color = colors.onPrimaryContainer,
-                    uppercase = false,
                     modifier = Modifier
                         .padding(bottom = 10.dp)
                         .clip(RoundedCornerShape(personality.shape.cornerSmall))
@@ -57,10 +55,8 @@ fun CustomForgesDialog(
                 )
                 KomiText(
                     text = stringResource(Res.string.custom_forges_dialog_help),
-                    role = KomiTextRole.LegacyBody,
-                    fontSize = 13.sp,
+                    role = KomiTextRole.Body,
                     color = colors.onSurfaceVariant,
-                    uppercase = false,
                 )
                 Row(
                     modifier = Modifier.padding(top = 12.dp).fillMaxWidth(),
@@ -84,20 +80,16 @@ fun CustomForgesDialog(
                 if (state.customForgeError != null) {
                     KomiText(
                         text = state.customForgeError,
-                        role = KomiTextRole.LegacyBody,
-                        fontSize = 13.sp,
+                        role = KomiTextRole.Body,
                         color = colors.error,
-                        uppercase = false,
                         modifier = Modifier.padding(top = 4.dp),
                     )
                 }
                 if (state.customForgeHosts.isEmpty()) {
                     KomiText(
                         text = stringResource(Res.string.custom_forges_empty),
-                        role = KomiTextRole.LegacyBody,
-                        fontSize = 13.sp,
+                        role = KomiTextRole.Body,
                         color = colors.onSurfaceVariant,
-                        uppercase = false,
                         modifier = Modifier.padding(top = 16.dp),
                     )
                 } else {

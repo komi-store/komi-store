@@ -71,17 +71,15 @@ fun TweaksStubScreen(
                 )
                 KomiText(
                     text = stringResource(Res.string.tweaks_stub_coming_soon_title),
-                    role = KomiTextRole.LegacyTitle,
-                    fontWeight = FontWeight.SemiBold,
+                    role = KomiTextRole.SectionTitle,
                     color = colors.onSurface,
                     textAlign = TextAlign.Center,
                 )
                 KomiText(
                     text = stringResource(Res.string.tweaks_stub_coming_soon_body),
-                    role = KomiTextRole.LegacyBody,
+                    role = KomiTextRole.Body,
                     color = colors.onSurfaceVariant,
                     textAlign = TextAlign.Center,
-                    uppercase = false,
                 )
             }
         }

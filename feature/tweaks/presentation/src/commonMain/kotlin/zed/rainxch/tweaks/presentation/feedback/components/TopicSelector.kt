@@ -30,9 +30,7 @@ fun TopicSelector(
     Column(modifier = modifier) {
         KomiText(
             text = stringResource(Res.string.feedback_topic_label),
-            role = KomiTextRole.LegacyLabel,
-            fontSize = 12.sp,
-            fontWeight = FontWeight.SemiBold,
+            role = KomiTextRole.Overline,
             color = LocalPersonality.current.colors.onSurfaceVariant,
         )
         Spacer(Modifier.height(8.dp))

@@ -60,19 +60,15 @@ fun SettingsSectionHead(
 
         KomiText(
             text = label,
-            role = if (isManga) KomiTextRole.LegacyStamp else KomiTextRole.LegacyTitle,
+            role = KomiTextRole.SectionTitle,
             color = colors.onSurface,
-            fontSize = 18.sp,
-            uppercase = if (isManga) null else false,
         )
 
         if (kicker != null) {
             KomiText(
                 text = kicker,
-                role = KomiTextRole.LegacyLabel,
+                role = KomiTextRole.Caption,
                 color = colors.onSurfaceVariant,
-                fontSize = 11.sp,
-                uppercase = false,
             )
         }
 
@@ -81,7 +77,7 @@ fun SettingsSectionHead(
                 Modifier
                     .weight(1f)
                     .height(if (isManga) 2.dp else 1.dp)
-                    .background(if (isManga) colors.outline.copy(alpha = 0.3f) else colors.outlineVariant),
+                    .background(colors.divider),
         )
     }
 }

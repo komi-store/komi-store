@@ -50,11 +50,8 @@ fun SettingsValuePill(
             ) {
                 KomiText(
                     text = value,
-                    role = KomiTextRole.LegacyLabel,
+                    role = KomiTextRole.Label,
                     color = colors.onSurface,
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.Black,
-                    uppercase = false,
                 )
                 KomiIcon(
                     imageVector = Icons.Filled.KeyboardArrowDown,
@@ -80,11 +77,8 @@ fun SettingsValuePill(
             ) {
                 KomiText(
                     text = value,
-                    role = KomiTextRole.LegacyLabel,
+                    role = KomiTextRole.Label,
                     color = colors.onSurface,
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    uppercase = false,
                 )
                 KomiIcon(
                     imageVector = Icons.Filled.KeyboardArrowDown,

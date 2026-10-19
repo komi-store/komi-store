@@ -104,7 +104,7 @@ fun privacySectionContent(
         ) {
             KomiText(
                 text = stringResource(Res.string.tweaks_privacy_clear_viewed_dialog_body),
-                role = KomiTextRole.LegacyBody,
+                role = KomiTextRole.Body,
             )
         }
     }

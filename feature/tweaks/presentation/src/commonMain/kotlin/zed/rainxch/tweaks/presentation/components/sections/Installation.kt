@@ -331,10 +331,8 @@ private fun ActionButton(label: String, onClick: () -> Unit) {
 private fun HintRow(text: String) {
     KomiText(
         text = text,
-        role = KomiTextRole.LegacyBody,
-        fontSize = 13.sp,
+        role = KomiTextRole.Body,
         color = LocalPersonality.current.colors.onSurfaceVariant,
-        uppercase = false,
         modifier = Modifier.padding(horizontal = 15.dp, vertical = 6.dp),
     )
 }
@@ -380,11 +378,8 @@ private fun StatusDot(color: Color, label: String) {
         Box(modifier = Modifier.size(8.dp).clip(RoundedCornerShape(LocalPersonality.current.shape.cornerSmall)).background(color))
         KomiText(
             text = label,
-            role = KomiTextRole.LegacyLabel,
-            fontSize = 11.sp,
+            role = KomiTextRole.LabelSmall,
             color = color,
-            fontWeight = FontWeight.Medium,
-            uppercase = false,
         )
     }
 }
@@ -419,18 +414,14 @@ private fun IntervalBlock(
     Column(modifier = Modifier.padding(start = 15.dp, end = 15.dp, top = 4.dp, bottom = 12.dp)) {
         KomiText(
             text = stringResource(Res.string.update_check_interval_title),
-            role = KomiTextRole.LegacyLabel,
+            role = KomiTextRole.Caption,
             color = colors.onSurfaceVariant,
-            uppercase = false,
-            fontSize = 12.sp,
         )
         Spacer(Modifier.height(4.dp))
         KomiText(
             text = formatIntervalLabel(IntervalStops[currentIndex]),
-            role = KomiTextRole.LegacyTitle,
-            fontWeight = FontWeight.SemiBold,
+            role = KomiTextRole.CardTitle,
             color = if (enabled) colors.primary else colors.onSurfaceVariant,
-            uppercase = false,
         )
         Spacer(Modifier.height(6.dp))
         KomiSlider(
@@ -454,17 +445,13 @@ private fun BatteryOptimizationGroup(
         Column(modifier = Modifier.fillMaxWidth().padding(15.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             KomiText(
                 text = stringResource(Res.string.battery_optimization_card_title),
-                role = KomiTextRole.LegacyTitle,
-                fontWeight = FontWeight.SemiBold,
+                role = KomiTextRole.CardTitle,
                 color = colors.onSurface,
-                uppercase = false,
             )
             KomiText(
                 text = stringResource(Res.string.battery_optimization_card_description),
-                role = KomiTextRole.LegacyBody,
-                fontSize = 13.sp,
+                role = KomiTextRole.Body,
                 color = colors.onSurfaceVariant,
-                uppercase = false,
             )
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.End)) {
                 KomiButton(

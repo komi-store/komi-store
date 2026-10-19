@@ -78,17 +78,14 @@ fun LicensesRoot(
             Column(modifier = Modifier.padding(16.dp)) {
                 KomiText(
                     text = stringResource(Res.string.tweaks_licenses_intro_title),
-                    role = KomiTextRole.LegacyBody,
+                    role = KomiTextRole.Body,
                     color = colors.onSurface,
-                    uppercase = false,
                 )
                 Spacer(Modifier.height(4.dp))
                 KomiText(
                     text = stringResource(Res.string.tweaks_licenses_intro_body),
-                    role = KomiTextRole.LegacyBody,
-                    fontSize = 13.sp,
+                    role = KomiTextRole.Body,
                     color = colors.onSurfaceVariant,
-                    uppercase = false,
                 )
             }
         }
@@ -109,9 +106,8 @@ fun LicensesRoot(
             state.loadError -> {
                 KomiText(
                     text = stringResource(Res.string.tweaks_licenses_load_failed),
-                    role = KomiTextRole.LegacyBody,
+                    role = KomiTextRole.Body,
                     color = LocalPersonality.current.colors.error,
-                    uppercase = false,
                     modifier = Modifier.padding(16.dp),
                 )
             }
@@ -150,19 +146,15 @@ private fun LibraryRow(library: LibraryEntry, onClick: () -> Unit) {
         ) {
             KomiText(
                 text = library.name,
-                role = KomiTextRole.LegacyTitle,
-                fontWeight = FontWeight.SemiBold,
+                role = KomiTextRole.CardTitle,
                 color = colors.onSurface,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
-                uppercase = false,
             )
             KomiText(
                 text = library.license,
                 role = KomiTextRole.Mono,
-                fontSize = 11.sp,
                 color = colors.onSurfaceVariant,
-                uppercase = false,
             )
         }
     }

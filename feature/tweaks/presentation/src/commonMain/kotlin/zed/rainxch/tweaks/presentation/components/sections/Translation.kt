@@ -100,10 +100,8 @@ fun translationSectionContent(
             Column(modifier = Modifier.padding(start = 15.dp, end = 15.dp, bottom = 15.dp)) {
                 KomiText(
                     text = stringResource(Res.string.translation_auto_target_label),
-                    role = KomiTextRole.LegacyLabel,
-                    fontSize = 12.sp,
+                    role = KomiTextRole.Caption,
                     color = LocalPersonality.current.colors.onSurfaceVariant,
-                    uppercase = false,
                 )
                 Spacer(Modifier.height(6.dp))
                 TranslationTargetDropdown(
@@ -153,12 +151,10 @@ private fun TranslationTargetDropdown(
     ) {
         KomiText(
             text = currentLabel,
-            role = KomiTextRole.LegacyBody,
+            role = KomiTextRole.Label,
             color = colors.onSurface,
-            fontWeight = FontWeight.Medium,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
-            uppercase = false,
             modifier = Modifier.weight(1f, fill = false),
         )
 
@@ -268,10 +264,8 @@ private fun DeeplCredentialsForm(
     ) {
         KomiText(
             text = stringResource(Res.string.translation_deepl_help),
-            role = KomiTextRole.LegacyBody,
-            fontSize = 13.sp,
+            role = KomiTextRole.Body,
             color = LocalPersonality.current.colors.onSurfaceVariant,
-            uppercase = false,
         )
         KomiButton(
             onClick = { runCatching { uriHandler.openUri("https://www.deepl.com/pro-api") } },
@@ -312,10 +306,8 @@ private fun MicrosoftCredentialsForm(
     ) {
         KomiText(
             text = stringResource(Res.string.translation_microsoft_help),
-            role = KomiTextRole.LegacyBody,
-            fontSize = 13.sp,
+            role = KomiTextRole.Body,
             color = LocalPersonality.current.colors.onSurfaceVariant,
-            uppercase = false,
         )
         KomiButton(
             onClick = { runCatching { uriHandler.openUri("https://portal.azure.com/#create/Microsoft.CognitiveServicesTextTranslation") } },
