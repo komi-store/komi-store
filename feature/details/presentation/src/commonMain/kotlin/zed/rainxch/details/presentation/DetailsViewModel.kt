@@ -68,6 +68,7 @@ import zed.rainxch.core.domain.use_cases.SyncInstalledAppsUseCase
 import zed.rainxch.core.domain.utils.platforms
 import zed.rainxch.core.domain.utils.toDiscoveryPlatform
 import zed.rainxch.core.presentation.utils.daysSinceIso
+import zed.rainxch.core.presentation.utils.toUserMessage
 import zed.rainxch.core.domain.utils.AssetFilter
 import zed.rainxch.core.domain.utils.AssetOwnership
 import zed.rainxch.core.domain.utils.AssetVariant
@@ -1671,7 +1672,7 @@ class DetailsViewModel(
                 .onFailure { e ->
                     _state.update { it.copy(isStarred = !target) }
                     _events.send(
-                        DetailsEvent.OnMessage(e.message ?: getString(Res.string.failed_to_load)),
+                        DetailsEvent.OnMessage(e.toUserMessage(Res.string.failed_to_load)),
                     )
                 }
         }

@@ -70,6 +70,7 @@ import zed.rainxch.core.domain.helpers.BrowserHelper
 import zed.rainxch.core.domain.helpers.ShareManager
 import zed.rainxch.core.presentation.utils.TimeZoneChangeSignal
 import zed.rainxch.core.presentation.utils.formatFileSize
+import zed.rainxch.core.presentation.utils.toUserMessage
 import zed.rainxch.githubstore.core.presentation.res.*
 import java.io.File
 import kotlin.time.Duration.Companion.milliseconds
@@ -1533,7 +1534,7 @@ class AppsViewModel(
                         AppsEvent.ShowError(
                             getString(
                                 Res.string.update_all_failed,
-                                arrayOf(e.message),
+                                e.toUserMessage(Res.string.error_unknown),
                             ),
                         ),
                     )

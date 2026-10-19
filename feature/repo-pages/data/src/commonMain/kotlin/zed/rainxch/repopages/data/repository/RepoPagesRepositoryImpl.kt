@@ -73,7 +73,7 @@ class RepoPagesRepositoryImpl(
             val issues = dtos.filter { it.pullRequest == null }.map { it.toRepoIssue() }
             Result.success(IssuesPage(issues = issues, hasMore = dtos.size >= PER_PAGE))
         } catch (e: RateLimitException) {
-            throw e
+            Result.failure(e)
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
@@ -130,7 +130,7 @@ class RepoPagesRepositoryImpl(
                 )
             }
         } catch (e: RateLimitException) {
-            throw e
+            Result.failure(e)
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
@@ -155,7 +155,7 @@ class RepoPagesRepositoryImpl(
                 )
             }
         } catch (e: RateLimitException) {
-            throw e
+            Result.failure(e)
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
@@ -230,7 +230,7 @@ class RepoPagesRepositoryImpl(
             val dto: IssueCommentDto = response.body()
             Result.success(dto.toIssueComment())
         } catch (e: RateLimitException) {
-            throw e
+            Result.failure(e)
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
@@ -258,7 +258,7 @@ class RepoPagesRepositoryImpl(
             val dto: IssueDto = response.body()
             Result.success(dto.number)
         } catch (e: RateLimitException) {
-            throw e
+            Result.failure(e)
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
@@ -291,7 +291,7 @@ class RepoPagesRepositoryImpl(
                 Result.failure(authAwareError(response.status.value, "Failed to add reaction"))
             }
         } catch (e: RateLimitException) {
-            throw e
+            Result.failure(e)
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
@@ -321,7 +321,7 @@ class RepoPagesRepositoryImpl(
             val dtos: List<PullRequestDto> = response.body()
             Result.success(dtos.map { it.toRepoPullRequest() })
         } catch (e: RateLimitException) {
-            throw e
+            Result.failure(e)
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {

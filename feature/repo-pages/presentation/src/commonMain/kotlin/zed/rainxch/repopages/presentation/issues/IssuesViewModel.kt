@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.getString
 import zed.rainxch.core.domain.repository.UserSessionRepository
+import zed.rainxch.core.presentation.utils.toUserMessage
 import zed.rainxch.githubstore.core.presentation.res.Res
 import zed.rainxch.githubstore.core.presentation.res.failed_to_load
 import zed.rainxch.githubstore.core.presentation.res.repo_pages_new_issue_created
@@ -109,7 +110,7 @@ class IssuesViewModel(
                 }
                 .onFailure { e ->
                     _state.update { it.copy(isCreatingIssue = false) }
-                    _events.send(IssuesEvent.OnMessage(e.message ?: getString(Res.string.repo_pages_new_issue_failed)))
+                    _events.send(IssuesEvent.OnMessage(e.toUserMessage(Res.string.repo_pages_new_issue_failed)))
                 }
         }
     }
@@ -160,7 +161,7 @@ class IssuesViewModel(
                         it.copy(
                             isLoading = false,
                             isLoadingMore = false,
-                            errorMessage = e.message ?: getString(Res.string.failed_to_load),
+                            errorMessage = e.toUserMessage(Res.string.failed_to_load),
                         )
                     }
                 }

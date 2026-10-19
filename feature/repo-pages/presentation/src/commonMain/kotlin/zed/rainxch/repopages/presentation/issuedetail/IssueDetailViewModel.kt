@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.getString
 import zed.rainxch.core.domain.repository.UserSessionRepository
+import zed.rainxch.core.presentation.utils.toUserMessage
 import zed.rainxch.githubstore.core.presentation.res.Res
 import zed.rainxch.githubstore.core.presentation.res.failed_to_load
 import zed.rainxch.githubstore.core.presentation.res.repo_pages_comment_failed
@@ -98,7 +99,7 @@ class IssueDetailViewModel(
                     _state.update { it.copy(isPostingComment = false) }
                     _events.send(
                         IssueDetailEvent.OnMessage(
-                            e.message ?: getString(Res.string.repo_pages_comment_failed)
+                            e.toUserMessage(Res.string.repo_pages_comment_failed)
                         )
                     )
                 }
@@ -130,7 +131,7 @@ class IssueDetailViewModel(
                     }
                     _events.send(
                         IssueDetailEvent.OnMessage(
-                            e.message ?: getString(Res.string.repo_pages_react_failed)
+                            e.toUserMessage(Res.string.repo_pages_react_failed)
                         )
                     )
                 }
@@ -174,7 +175,7 @@ class IssueDetailViewModel(
                     }
                     _events.send(
                         IssueDetailEvent.OnMessage(
-                            e.message ?: getString(Res.string.repo_pages_react_failed)
+                            e.toUserMessage(Res.string.repo_pages_react_failed)
                         )
                     )
                 }
@@ -207,7 +208,7 @@ class IssueDetailViewModel(
                     _state.update {
                         it.copy(
                             isLoading = false,
-                            errorMessage = e.message ?: getString(Res.string.failed_to_load),
+                            errorMessage = e.toUserMessage(Res.string.failed_to_load),
                         )
                     }
                 }

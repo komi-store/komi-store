@@ -23,6 +23,7 @@ import zed.rainxch.core.domain.repository.UserSessionRepository
 import zed.rainxch.core.domain.repository.FavouritesRepository
 import zed.rainxch.core.domain.repository.StarredRepository
 import zed.rainxch.core.domain.repository.TweaksRepository
+import zed.rainxch.core.presentation.utils.toUserMessage
 import zed.rainxch.githubstore.core.presentation.res.*
 import zed.rainxch.starred.presentation.mappers.toStarredRepositoryUi
 import zed.rainxch.starred.presentation.model.StarredRepositoryUi
@@ -183,7 +184,7 @@ class StarredReposViewModel(
                         it.copy(
                             isSyncing = false,
                             lastSyncSubtitle = subtitle,
-                            errorMessage = error.message ?: getString(Res.string.sync_starred_failed),
+                            errorMessage = error.toUserMessage(Res.string.sync_starred_failed),
                         )
                     }
                 }
