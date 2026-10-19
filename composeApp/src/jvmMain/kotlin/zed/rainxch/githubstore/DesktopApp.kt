@@ -40,7 +40,6 @@ import zed.rainxch.githubstore.app.di.initKoin
 import zed.rainxch.githubstore.core.presentation.res.Res
 import zed.rainxch.githubstore.core.presentation.res.app_icon
 import zed.rainxch.githubstore.core.presentation.res.app_name
-import zed.rainxch.githubstore.core.presentation.res.bottom_nav_apps_title
 import zed.rainxch.githubstore.core.presentation.res.bottom_nav_explore_title
 import zed.rainxch.githubstore.core.presentation.res.bottom_nav_search_title
 import zed.rainxch.githubstore.core.presentation.res.favourites
@@ -204,10 +203,6 @@ fun main(args: Array<String>) {
                     Item(
                         text = stringResource(Res.string.bottom_nav_search_title),
                         onClick = { deepLinkUri = "githubstore://search" },
-                    )
-                    Item(
-                        text = stringResource(Res.string.bottom_nav_apps_title),
-                        onClick = { deepLinkUri = "githubstore://apps" },
                     )
                     Item(
                         text = stringResource(Res.string.favourites),

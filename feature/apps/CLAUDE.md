@@ -1,6 +1,6 @@
 # Apps Feature
 
-Installed-apps manager. Lists apps tracked by Komi Store, launches them, checks and installs updates, links apps installed elsewhere to a repo. In the Android bottom nav (label "Library"); on Desktop the sidebar omits it and it opens from the window menu bar (Go > Library, `githubstore://apps`).
+Installed-apps manager. Lists apps tracked by Komi Store, launches them, checks and installs updates, links apps installed elsewhere to a repo. In the Android bottom nav (label "Library"). Android only: Desktop hands the downloaded installer to the OS and never records an installed app, so the Desktop sidebar and menu bar leave Library out.
 
 ## Structure
 
