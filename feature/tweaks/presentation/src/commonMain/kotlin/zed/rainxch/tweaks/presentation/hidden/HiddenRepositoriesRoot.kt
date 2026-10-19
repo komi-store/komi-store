@@ -65,7 +65,7 @@ fun HiddenRepositoriesRoot(
             HiddenRepositoriesEvent.UnhiddenAll ->
                 toastState.info(getString(Res.string.hidden_repositories_unhidden_all_snackbar))
 
-            is HiddenRepositoriesEvent.Failure ->
+            HiddenRepositoriesEvent.Failure ->
                 toastState.danger(getString(Res.string.hidden_repositories_unhide_failure))
         }
     }

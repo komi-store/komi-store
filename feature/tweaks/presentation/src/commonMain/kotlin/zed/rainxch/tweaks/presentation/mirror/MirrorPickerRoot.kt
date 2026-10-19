@@ -61,8 +61,8 @@ import zed.rainxch.githubstore.core.presentation.res.mirror_status_ok
 import zed.rainxch.githubstore.core.presentation.res.mirror_status_unknown
 import zed.rainxch.githubstore.core.presentation.res.mirror_test_button
 import zed.rainxch.githubstore.core.presentation.res.mirror_test_dns_fail
+import zed.rainxch.githubstore.core.presentation.res.mirror_test_failed
 import zed.rainxch.githubstore.core.presentation.res.mirror_test_http_error
-import zed.rainxch.githubstore.core.presentation.res.mirror_test_other
 import zed.rainxch.githubstore.core.presentation.res.mirror_test_success
 import zed.rainxch.githubstore.core.presentation.res.mirror_test_timeout
 import zed.rainxch.githubstore.core.presentation.res.navigate_back
@@ -307,7 +307,7 @@ private fun formatTestResult(result: TestResult): String =
         is TestResult.HttpError -> stringResource(Res.string.mirror_test_http_error, result.code)
         TestResult.Timeout -> stringResource(Res.string.mirror_test_timeout)
         TestResult.DnsFailure -> stringResource(Res.string.mirror_test_dns_fail)
-        is TestResult.Other -> stringResource(Res.string.mirror_test_other, result.message)
+        TestResult.Other -> stringResource(Res.string.mirror_test_failed)
     }
 
 private fun isMirrorSelected(

@@ -11,10 +11,12 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import zed.rainxch.core.domain.logging.KomiStoreLogger
 import zed.rainxch.core.domain.repository.HiddenReposRepository
 
 class HiddenRepositoriesViewModel(
     private val hiddenReposRepository: HiddenReposRepository,
+    private val logger: KomiStoreLogger,
 ) : ViewModel() {
     private val _state = MutableStateFlow(HiddenRepositoriesState())
     val state = _state.asStateFlow()
@@ -63,7 +65,8 @@ class HiddenRepositoriesViewModel(
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Throwable) {
-                _events.send(HiddenRepositoriesEvent.Failure(e.message.orEmpty()))
+                logger.error("HiddenRepositoriesViewModel: failed to unhide $repoId", e)
+                _events.send(HiddenRepositoriesEvent.Failure)
             }
         }
     }
@@ -76,7 +79,8 @@ class HiddenRepositoriesViewModel(
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Throwable) {
-                _events.send(HiddenRepositoriesEvent.Failure(e.message.orEmpty()))
+                logger.error("HiddenRepositoriesViewModel: failed to unhide all", e)
+                _events.send(HiddenRepositoriesEvent.Failure)
             }
         }
     }

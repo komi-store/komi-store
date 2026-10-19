@@ -795,7 +795,6 @@
     <string name="feedback_send_via_github">GitHub Issue olarak aç</string>
     <string name="feedback_send_success_email">Teşekkürler — posta istemciniz açılıyor.</string>
     <string name="feedback_send_success_github">Teşekkürler — tarayıcınız açılıyor.</string>
-    <string name="feedback_send_error">Geri bildirim kanalı açılamadı: %1$s</string>
 
     <!-- ═══════════════════════════════════════════════════════════════
          E5 — Mirror feature
@@ -827,7 +826,6 @@
     <string name="mirror_test_http_error">Ayna %1$d döndürdü</string>
     <string name="mirror_test_timeout">5s sonra zaman aşımı</string>
     <string name="mirror_test_dns_fail">Ana bilgisayar çözümlenemedi</string>
-    <string name="mirror_test_other">Başarısız: %1$s</string>
     <string name="mirror_deploy_your_own_hint">Tüm aynalar mı çöktü? 5 dakikada kendinizinkini barındırabilirsiniz — belgelere bakın.</string>
     <string name="mirror_removed_toast">%1$s artık kullanılamıyor, Doğrudan GitHub'a geçildi.</string>
 
@@ -1119,7 +1117,6 @@
     <string name="host_tokens_undo_action">Geri al</string>
     <string name="host_tokens_undo_failed">%1$s için token geri yüklenemedi</string>
     <string name="host_tokens_undo_snackbar">%1$s için token kaldırıldı</string>
-    <string name="host_tokens_validation_failed">Doğrulama başarısız: %1$s</string>
     <string name="host_tokens_validation_failed_fallback">bilinmeyen hata</string>
     <string name="host_tokens_validation_host_invalid">Geçersiz host</string>
     <string name="host_tokens_validation_host_required">Host gerekli</string>

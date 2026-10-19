@@ -7,7 +7,5 @@ sealed interface HiddenRepositoriesEvent {
 
     data object UnhiddenAll : HiddenRepositoriesEvent
 
-    data class Failure(
-        val message: String,
-    ) : HiddenRepositoriesEvent
+    data object Failure : HiddenRepositoriesEvent
 }

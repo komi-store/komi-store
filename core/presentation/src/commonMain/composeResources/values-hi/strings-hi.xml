@@ -796,7 +796,6 @@
     <string name="feedback_send_via_github">GitHub Issue के रूप में खोलें</string>
     <string name="feedback_send_success_email">धन्यवाद — आपका मेल क्लाइंट खुल रहा है।</string>
     <string name="feedback_send_success_github">धन्यवाद — आपका ब्राउज़र खुल रहा है।</string>
-    <string name="feedback_send_error">फ़ीडबैक चैनल नहीं खुल सका: %1$s</string>
 
     <!-- ═══════════════════════════════════════════════════════════════
          E5 — Mirror feature
@@ -828,7 +827,6 @@
     <string name="mirror_test_http_error">मिरर ने %1$d लौटाया</string>
     <string name="mirror_test_timeout">5s बाद टाइमआउट</string>
     <string name="mirror_test_dns_fail">होस्ट हल नहीं हो सका</string>
-    <string name="mirror_test_other">विफल: %1$s</string>
     <string name="mirror_deploy_your_own_hint">सभी मिरर बंद हैं? आप 5 मिनट में अपना खुद का होस्ट कर सकते हैं — दस्तावेज़ देखें।</string>
     <string name="mirror_removed_toast">%1$s अब उपलब्ध नहीं है, Direct GitHub पर स्विच किया गया।</string>
 
@@ -1107,7 +1105,6 @@
     <string name="host_tokens_undo_action">पूर्ववत करें</string>
     <string name="host_tokens_undo_failed">%1$s के लिए टोकन पुनर्स्थापित नहीं हो सका</string>
     <string name="host_tokens_undo_snackbar">%1$s के लिए टोकन हटाया गया</string>
-    <string name="host_tokens_validation_failed">सत्यापन विफल: %1$s</string>
     <string name="host_tokens_validation_failed_fallback">अज्ञात त्रुटि</string>
     <string name="host_tokens_validation_host_invalid">अमान्य होस्ट</string>
     <string name="host_tokens_validation_host_required">होस्ट आवश्यक</string>

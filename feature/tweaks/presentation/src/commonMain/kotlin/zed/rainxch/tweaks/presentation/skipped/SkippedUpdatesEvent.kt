@@ -5,7 +5,5 @@ sealed interface SkippedUpdatesEvent {
         val appName: String,
     ) : SkippedUpdatesEvent
 
-    data class Failure(
-        val message: String,
-    ) : SkippedUpdatesEvent
+    data object Failure : SkippedUpdatesEvent
 }

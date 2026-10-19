@@ -787,7 +787,6 @@
     <string name="feedback_send_via_github">GitHub ইস্যু হিসেবে খুলুন</string>
     <string name="feedback_send_success_email">ধন্যবাদ — মেইল ক্লায়েন্ট খোলা হচ্ছে।</string>
     <string name="feedback_send_success_github">ধন্যবাদ — ব্রাউজার খোলা হচ্ছে।</string>
-    <string name="feedback_send_error">ফিডব্যাক চ্যানেল খোলা যায়নি: %1$s</string>
 
     <!-- E5 — Mirror feature -->
     <!-- Tweaks - Custom forges -->
@@ -817,7 +816,6 @@
     <string name="mirror_test_http_error">মিরর %1$d ফেরত দিয়েছে</string>
     <string name="mirror_test_timeout">5 সেকেন্ড পরে টাইমআউট</string>
     <string name="mirror_test_dns_fail">হোস্ট রিসলভ করা যায়নি</string>
-    <string name="mirror_test_other">ব্যর্থ: %1$s</string>
     <string name="mirror_deploy_your_own_hint">সব মিরর নষ্ট? ৫ মিনিটে নিজের মিরর হোস্ট করুন — ডক্স দেখুন।</string>
     <string name="mirror_removed_toast">%1$s আর পাওয়া যাচ্ছে না, Direct GitHub-এ স্যুইচ করা হয়েছে।</string>
 
@@ -1109,7 +1107,6 @@
     <string name="host_tokens_undo_action">পূর্বাবস্থায় ফেরান</string>
     <string name="host_tokens_undo_failed">%1$s এর জন্য টোকেন পুনরুদ্ধার করা যায়নি</string>
     <string name="host_tokens_undo_snackbar">%1$s এর জন্য টোকেন সরানো হয়েছে</string>
-    <string name="host_tokens_validation_failed">যাচাই ব্যর্থ হয়েছে: %1$s</string>
     <string name="host_tokens_validation_failed_fallback">অজানা ত্রুটি</string>
     <string name="host_tokens_validation_host_invalid">অবৈধ হোস্ট</string>
     <string name="host_tokens_validation_host_required">হোস্ট প্রয়োজন</string>

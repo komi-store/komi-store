@@ -7,7 +7,5 @@ sealed interface FeedbackEvent {
         val channel: FeedbackChannel,
     ) : FeedbackEvent
 
-    data class OnSendError(
-        val message: String,
-    ) : FeedbackEvent
+    data object OnSendError : FeedbackEvent
 }

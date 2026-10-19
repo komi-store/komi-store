@@ -256,9 +256,9 @@ fun TweaksRoot(
                     toastState.success(msg)
                 }
             },
-            onError = { error ->
+            onError = {
                 coroutineScope.launch {
-                    toastState.danger(getString(Res.string.feedback_send_error, error))
+                    toastState.danger(getString(Res.string.feedback_send_failed))
                 }
             },
         )

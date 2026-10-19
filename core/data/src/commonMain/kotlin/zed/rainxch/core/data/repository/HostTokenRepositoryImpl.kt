@@ -9,6 +9,7 @@ import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
+import io.ktor.util.network.UnresolvedAddressException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -24,7 +25,9 @@ import kotlinx.serialization.json.Json
 import zed.rainxch.core.domain.model.account.HostNames
 import zed.rainxch.core.domain.model.account.HostToken
 import zed.rainxch.core.domain.model.account.TokenValidation
+import zed.rainxch.core.domain.model.error.TokenValidationException
 import zed.rainxch.core.domain.repository.HostTokenRepository
+import java.io.IOException
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.time.Clock
 
@@ -103,6 +106,10 @@ class HostTokenRepositoryImpl(
             Result.success(mapValidation(response))
         } catch (ce: CancellationException) {
             throw ce
+        } catch (e: IOException) {
+            Result.failure(TokenValidationException.Unreachable(e))
+        } catch (e: UnresolvedAddressException) {
+            Result.failure(TokenValidationException.Unreachable(e))
         } catch (t: Throwable) {
             Result.failure(t)
         }
@@ -116,10 +123,7 @@ class HostTokenRepositoryImpl(
 
     private suspend fun mapValidation(response: HttpResponse): TokenValidation {
         val status = response.status
-        if (status.value !in 200..299) {
-            val body = runCatching { response.bodyAsText() }.getOrDefault("")
-            error("HTTP ${status.value} ${status.description}: ${body.take(200)}")
-        }
+        if (status.value !in 200..299) throw TokenValidationException.HttpStatus(status.value)
         val login =
             runCatching {
                 val text = response.bodyAsText()

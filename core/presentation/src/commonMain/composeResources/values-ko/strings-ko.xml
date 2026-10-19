@@ -788,7 +788,6 @@
     <string name="feedback_send_via_github">GitHub Issue로 열기</string>
     <string name="feedback_send_success_email">감사합니다 — 메일 클라이언트를 열고 있습니다.</string>
     <string name="feedback_send_success_github">감사합니다 — 브라우저를 열고 있습니다.</string>
-    <string name="feedback_send_error">피드백 채널을 열 수 없습니다: %1$s</string>
 
     <!-- ═══════════════════════════════════════════════════════════════
          E5 — Mirror feature
@@ -820,7 +819,6 @@
     <string name="mirror_test_http_error">미러가 %1$d를 반환했습니다</string>
     <string name="mirror_test_timeout">5s 후 타임아웃</string>
     <string name="mirror_test_dns_fail">호스트를 확인할 수 없습니다</string>
-    <string name="mirror_test_other">실패: %1$s</string>
     <string name="mirror_deploy_your_own_hint">모든 미러가 다운되었나요? 5분 안에 직접 호스팅할 수 있습니다 — 문서를 참조하세요.</string>
     <string name="mirror_removed_toast">%1$s를 더 이상 사용할 수 없어 GitHub 직접으로 전환했습니다.</string>
 
@@ -1102,7 +1100,6 @@
     <string name="host_tokens_undo_action">실행 취소</string>
     <string name="host_tokens_undo_failed">%1$s 토큰을 복원할 수 없습니다</string>
     <string name="host_tokens_undo_snackbar">%1$s 토큰이 제거되었습니다</string>
-    <string name="host_tokens_validation_failed">유효성 검사 실패: %1$s</string>
     <string name="host_tokens_validation_failed_fallback">알 수 없는 오류</string>
     <string name="host_tokens_validation_host_invalid">잘못된 호스트</string>
     <string name="host_tokens_validation_host_required">호스트가 필요합니다</string>
