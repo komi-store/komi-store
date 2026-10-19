@@ -1,7 +1,6 @@
 package zed.rainxch.devprofile.presentation.components
 
 import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
@@ -152,7 +151,7 @@ private fun FilterPill(
         } else {
             colors.surfaceContainerHigh
         },
-        animationSpec = tween(durationMillis = 180),
+        animationSpec = LocalPersonality.current.motion.fastEffects(),
         label = "filter_container",
     )
     val content by animateColorAsState(
@@ -161,7 +160,7 @@ private fun FilterPill(
         } else {
             colors.onSurface
         },
-        animationSpec = tween(durationMillis = 180),
+        animationSpec = LocalPersonality.current.motion.fastEffects(),
         label = "filter_content",
     )
     Box(

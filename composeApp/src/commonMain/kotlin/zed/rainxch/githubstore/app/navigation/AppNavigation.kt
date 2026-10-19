@@ -1,7 +1,6 @@
 package zed.rainxch.githubstore.app.navigation
 
 import androidx.compose.animation.SharedTransitionLayout
-import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
@@ -161,6 +160,7 @@ fun AppNavigation(
                                     if (showBottomBar) Modifier.consumeWindowInsets(PaddingValues(bottom = bottomBarHeight)) else Modifier,
                                 ),
                     ) {
+                        val motion = LocalPersonality.current.motion
                         NavHost(
                             navController = navController,
                             startDestination = GithubStoreGraph.ExploreScreen,
@@ -172,13 +172,13 @@ fun AppNavigation(
                                     val sign = if (to > from) 1 else -1
                                     slideInHorizontally(
                                         initialOffsetX = { it * sign },
-                                        animationSpec = tween(280),
-                                    ) + fadeIn(tween(220))
+                                        animationSpec = motion.medium(),
+                                    ) + fadeIn(motion.medium())
                                 } else {
                                     slideInHorizontally(
                                         initialOffsetX = { it / 6 },
-                                        animationSpec = tween(280),
-                                    ) + fadeIn(tween(220))
+                                        animationSpec = motion.medium(),
+                                    ) + fadeIn(motion.medium())
                                 }
                             },
                             exitTransition = {
@@ -188,20 +188,20 @@ fun AppNavigation(
                                     val sign = if (to > from) -1 else 1
                                     slideOutHorizontally(
                                         targetOffsetX = { it * sign },
-                                        animationSpec = tween(280),
-                                    ) + fadeOut(tween(220))
+                                        animationSpec = motion.medium(),
+                                    ) + fadeOut(motion.medium())
                                 } else {
-                                    fadeOut(tween(180))
+                                    fadeOut(motion.short())
                                 }
                             },
                             popEnterTransition = {
-                                fadeIn(tween(220))
+                                fadeIn(motion.medium())
                             },
                             popExitTransition = {
                                 slideOutHorizontally(
                                     targetOffsetX = { it / 6 },
-                                    animationSpec = tween(280),
-                                ) + fadeOut(tween(220))
+                                    animationSpec = motion.medium(),
+                                ) + fadeOut(motion.medium())
                             },
                         ) {
                             composable<GithubStoreGraph.ExploreScreen> {
@@ -495,25 +495,25 @@ fun AppNavigation(
                                 enterTransition = {
                                     slideInHorizontally(
                                         initialOffsetX = { fullWidth -> fullWidth },
-                                        animationSpec = tween(durationMillis = 280),
+                                        animationSpec = motion.medium(),
                                     )
                                 },
                                 exitTransition = {
                                     slideOutHorizontally(
                                         targetOffsetX = { fullWidth -> -fullWidth / 4 },
-                                        animationSpec = tween(durationMillis = 280),
+                                        animationSpec = motion.medium(),
                                     )
                                 },
                                 popEnterTransition = {
                                     slideInHorizontally(
                                         initialOffsetX = { fullWidth -> -fullWidth / 4 },
-                                        animationSpec = tween(durationMillis = 280),
+                                        animationSpec = motion.medium(),
                                     )
                                 },
                                 popExitTransition = {
                                     slideOutHorizontally(
                                         targetOffsetX = { fullWidth -> fullWidth },
-                                        animationSpec = tween(durationMillis = 280),
+                                        animationSpec = motion.medium(),
                                     )
                                 },
                             ) { backStackEntry ->
@@ -540,25 +540,25 @@ fun AppNavigation(
                                 enterTransition = {
                                     slideInHorizontally(
                                         initialOffsetX = { fullWidth -> fullWidth },
-                                        animationSpec = tween(durationMillis = 280),
+                                        animationSpec = motion.medium(),
                                     )
                                 },
                                 exitTransition = {
                                     slideOutHorizontally(
                                         targetOffsetX = { fullWidth -> -fullWidth / 4 },
-                                        animationSpec = tween(durationMillis = 280),
+                                        animationSpec = motion.medium(),
                                     )
                                 },
                                 popEnterTransition = {
                                     slideInHorizontally(
                                         initialOffsetX = { fullWidth -> -fullWidth / 4 },
-                                        animationSpec = tween(durationMillis = 280),
+                                        animationSpec = motion.medium(),
                                     )
                                 },
                                 popExitTransition = {
                                     slideOutHorizontally(
                                         targetOffsetX = { fullWidth -> fullWidth },
-                                        animationSpec = tween(durationMillis = 280),
+                                        animationSpec = motion.medium(),
                                     )
                                 },
                             ) { backStackEntry ->

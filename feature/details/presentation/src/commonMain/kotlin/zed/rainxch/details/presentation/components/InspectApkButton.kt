@@ -4,7 +4,6 @@ import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -13,6 +12,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -73,29 +73,27 @@ fun InspectApkButton(
 }
 
 @Composable
-private fun rememberPulse(active: Boolean) =
-    rememberInfiniteTransition(label = "inspect-pulse")
+private fun rememberPulse(active: Boolean): State<Float> {
+    val motion = LocalPersonality.current.motion
+    val on = active && motion.animates
+    return rememberInfiniteTransition(label = "inspect-pulse")
         .animateFloat(
-            initialValue = if (active) 1f else 1f,
-            targetValue = if (active) 1.08f else 1f,
-            animationSpec =
-                infiniteRepeatable(
-                    animation = tween(durationMillis = 900),
-                    repeatMode = RepeatMode.Reverse,
-                ),
+            initialValue = 1f,
+            targetValue = if (on) 1.08f else 1f,
+            animationSpec = infiniteRepeatable(animation = motion.ambient(), repeatMode = RepeatMode.Reverse),
             label = "inspect-pulse-scale",
         )
+}
 
 @Composable
-private fun rememberTilt(active: Boolean) =
-    rememberInfiniteTransition(label = "inspect-tilt")
+private fun rememberTilt(active: Boolean): State<Float> {
+    val motion = LocalPersonality.current.motion
+    val on = active && motion.animates
+    return rememberInfiniteTransition(label = "inspect-tilt")
         .animateFloat(
-            initialValue = if (active) -6f else 0f,
-            targetValue = if (active) 6f else 0f,
-            animationSpec =
-                infiniteRepeatable(
-                    animation = tween(durationMillis = 1300),
-                    repeatMode = RepeatMode.Reverse,
-                ),
+            initialValue = if (on) -6f else 0f,
+            targetValue = if (on) 6f else 0f,
+            animationSpec = infiniteRepeatable(animation = motion.ambient(), repeatMode = RepeatMode.Reverse),
             label = "inspect-tilt-deg",
         )
+}

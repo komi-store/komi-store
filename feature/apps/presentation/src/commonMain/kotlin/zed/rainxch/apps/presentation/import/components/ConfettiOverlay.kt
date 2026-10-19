@@ -2,7 +2,6 @@ package zed.rainxch.apps.presentation.import.components
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
@@ -75,10 +74,11 @@ fun ConfettiOverlay(
     val progress = remember { Animatable(0f) }
     var size by remember { mutableStateOf(IntSize.Zero) }
 
+    val motion = LocalPersonality.current.motion
     LaunchedEffect(Unit) {
         progress.animateTo(
             targetValue = 1f,
-            animationSpec = tween(durationMillis = 1500, easing = LinearEasing),
+            animationSpec = motion.ambient(easing = LinearEasing),
         )
     }
 

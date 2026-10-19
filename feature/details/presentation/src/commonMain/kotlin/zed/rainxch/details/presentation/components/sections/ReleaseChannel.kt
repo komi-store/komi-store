@@ -4,7 +4,6 @@ import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -24,6 +23,7 @@ import androidx.compose.material.icons.filled.Restore
 import androidx.compose.material.icons.filled.Science
 import androidx.compose.material.icons.filled.WarningAmber
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -227,15 +227,13 @@ private fun ChannelChip(
 }
 
 @Composable
-private fun rememberChipPulse(active: Boolean) =
-    rememberInfiniteTransition(label = "channel-chip-pulse")
+private fun rememberChipPulse(active: Boolean): State<Float> {
+    val motion = LocalPersonality.current.motion
+    return rememberInfiniteTransition(label = "channel-chip-pulse")
         .animateFloat(
             initialValue = 1f,
-            targetValue = if (active) 1.06f else 1f,
-            animationSpec =
-                infiniteRepeatable(
-                    animation = tween(durationMillis = 1100),
-                    repeatMode = RepeatMode.Reverse,
-                ),
+            targetValue = if (active && motion.animates) 1.06f else 1f,
+            animationSpec = infiniteRepeatable(animation = motion.ambient(), repeatMode = RepeatMode.Reverse),
             label = "channel-chip-pulse-scale",
         )
+}

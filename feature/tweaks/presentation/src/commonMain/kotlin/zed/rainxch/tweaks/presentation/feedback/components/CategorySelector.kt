@@ -1,7 +1,6 @@
 package zed.rainxch.tweaks.presentation.feedback.components
 
 import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -76,7 +75,7 @@ internal fun FeedbackPillChip(
         } else {
             colors.surfaceContainerHigh
         },
-        animationSpec = tween(durationMillis = 180),
+        animationSpec = LocalPersonality.current.motion.fastEffects(),
         label = "chip_container",
     )
     val content by animateColorAsState(
@@ -85,7 +84,7 @@ internal fun FeedbackPillChip(
         } else {
             colors.onSurface
         },
-        animationSpec = tween(durationMillis = 180),
+        animationSpec = LocalPersonality.current.motion.fastEffects(),
         label = "chip_content",
     )
     Box(

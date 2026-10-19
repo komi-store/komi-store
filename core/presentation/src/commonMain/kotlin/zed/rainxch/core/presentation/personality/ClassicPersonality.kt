@@ -2,11 +2,11 @@ package zed.rainxch.core.presentation.personality
 
 import androidx.compose.runtime.Immutable
 import zed.rainxch.core.domain.model.appearance.AccentId
+import zed.rainxch.core.presentation.personality.classic.ClassicMotion
 import zed.rainxch.core.presentation.personality.classic.ClassicShadow
 import zed.rainxch.core.presentation.personality.classic.ClassicShape
 import zed.rainxch.core.presentation.personality.classic.ClassicType
 import zed.rainxch.core.presentation.personality.classic.classicColors
-import zed.rainxch.core.presentation.personality.model.MotionLevel
 import zed.rainxch.core.presentation.personality.model.PersonalityColors
 import zed.rainxch.core.presentation.personality.model.PersonalityMotion
 import zed.rainxch.core.presentation.personality.model.PersonalityShadow
@@ -32,11 +32,5 @@ fun classicPersonality(
         type = ClassicType,
         shape = ClassicShape,
         shadow = ClassicShadow,
-        motion =
-            PersonalityMotion(
-                level = MotionLevel.SUBTLE,
-                cardEnterMs = 220,
-                screenTransitionMs = 200,
-                pressMs = 120,
-            ),
+        motion = ClassicMotion,
     )

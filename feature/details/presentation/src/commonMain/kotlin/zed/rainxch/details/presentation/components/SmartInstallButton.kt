@@ -3,7 +3,6 @@ package zed.rainxch.details.presentation.components
 import zed.rainxch.core.presentation.utils.formatFileSize
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
@@ -296,7 +295,7 @@ private fun PrimaryAction(
     }
     val animatedFraction by animateFloatAsState(
         targetValue = targetFraction,
-        animationSpec = tween(durationMillis = 350),
+        animationSpec = LocalPersonality.current.motion.defaultEffects(),
         label = "install-progress",
     )
 

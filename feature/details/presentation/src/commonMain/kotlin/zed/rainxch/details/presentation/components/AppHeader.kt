@@ -1,9 +1,7 @@
 package zed.rainxch.details.presentation.components
 
 import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -129,19 +127,19 @@ fun AppHeader(
     val tintFraction = if (isDark) 0.10f else 0.06f
     val animatedAccent by animateColorAsState(
         targetValue = normalizedAccent,
-        animationSpec = tween(durationMillis = 1800, easing = LinearOutSlowInEasing),
+        animationSpec = LocalPersonality.current.motion.slowEffects(),
         label = "details-hero-accent",
     )
     val animatedSurface by animateColorAsState(
         targetValue = lerp(surface, normalizedAccent, tintFraction),
-        animationSpec = tween(durationMillis = 1800, easing = LinearOutSlowInEasing),
+        animationSpec = LocalPersonality.current.motion.slowEffects(),
         label = "details-hero-surface",
     )
     val borderColor = colors.outline
 
     val animatedProgress by animateFloatAsState(
         targetValue = (downloadProgress ?: 0) / 100f,
-        animationSpec = tween(durationMillis = 500),
+        animationSpec = LocalPersonality.current.motion.defaultEffects(),
         label = "avatar-progress",
     )
 

@@ -1,8 +1,6 @@
 package zed.rainxch.core.presentation.components.badge
 
 import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -82,10 +80,7 @@ fun KomiBadge(
         val popScale = remember { Animatable(if (animate && !motionOff) 0f else 1f) }
         LaunchedEffect(animate) {
             if (animate && !motionOff) {
-                popScale.animateTo(
-                    1f,
-                    spring(dampingRatio = 0.45f, stiffness = Spring.StiffnessMedium)
-                )
+                popScale.animateTo(1f, personality.motion.fastSpatial())
             }
         }
         val transformed = animate || tilt

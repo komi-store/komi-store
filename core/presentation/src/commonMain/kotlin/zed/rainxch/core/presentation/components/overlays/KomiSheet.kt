@@ -1,8 +1,6 @@
 package zed.rainxch.core.presentation.components.overlays
 
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.snap
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -219,7 +217,7 @@ private fun MangaCenterDialog(
     LaunchedEffect(Unit) { shown = true }
     val progress by animateFloatAsState(
         targetValue = if (shown) 1f else 0f,
-        animationSpec = if (motionOff) snap() else tween(personality.motion.cardEnterMs),
+        animationSpec = personality.motion.defaultSpatial(),
         label = "komiSheetPop",
     )
 

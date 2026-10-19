@@ -1,7 +1,6 @@
 package zed.rainxch.apps.presentation.components
 
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -65,7 +64,7 @@ fun UpdatesBanner(
 ) {
     val rotation by animateFloatAsState(
         targetValue = if (isExpanded) 0f else -90f,
-        animationSpec = tween(durationMillis = 180),
+        animationSpec = LocalPersonality.current.motion.fastSpatial(),
         label = "updates-banner-chevron",
     )
     val colors = LocalPersonality.current.colors

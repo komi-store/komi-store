@@ -4,10 +4,7 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.MutableTransitionState
-import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.spring
-import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
@@ -166,10 +163,7 @@ fun AuthenticationScreen(
                         is AuthLoginState.Error -> 0.96f
                         else -> 1f
                     },
-                    animationSpec = spring(
-                        dampingRatio = Spring.DampingRatioMediumBouncy,
-                        stiffness = Spring.StiffnessLow,
-                    ),
+                    animationSpec = LocalPersonality.current.motion.fastSpatial(),
                     label = "icon_scale",
                 )
 
@@ -188,17 +182,15 @@ fun AuthenticationScreen(
 
                 Spacer(Modifier.height(24.dp))
 
+                val motion = LocalPersonality.current.motion
                 AnimatedContent(
                     targetState = state.loginState,
                     transitionSpec = {
-                        val enter = fadeIn(tween(350)) + slideInVertically(
-                            animationSpec = spring(
-                                dampingRatio = Spring.DampingRatioLowBouncy,
-                                stiffness = Spring.StiffnessMediumLow,
-                            ),
+                        val enter = fadeIn(motion.defaultEffects()) + slideInVertically(
+                            animationSpec = motion.defaultSpatial(),
                             initialOffsetY = { it / 5 },
                         )
-                        val exit = fadeOut(tween(200))
+                        val exit = fadeOut(motion.fastEffects())
                         enter togetherWith exit
                     },
                     contentKey = { it::class },
@@ -436,10 +428,11 @@ private fun StateDevicePrompt(
                             },
                         contentAlignment = Alignment.Center,
                     ) {
+                        val motion = LocalPersonality.current.motion
                         AnimatedContent(
                             targetState = state.copied,
                             transitionSpec = {
-                                (scaleIn(spring(dampingRatio = Spring.DampingRatioMediumBouncy)) + fadeIn()) togetherWith
+                                (scaleIn(motion.fastSpatial()) + fadeIn()) togetherWith
                                     (scaleOut() + fadeOut())
                             },
                             label = "copy_icon",
@@ -473,17 +466,17 @@ private fun StateDevicePrompt(
 
                     val animatedProgress by animateFloatAsState(
                         targetValue = authState.progressFraction,
-                        animationSpec = tween(900),
+                        animationSpec = LocalPersonality.current.motion.long(),
                         label = "countdown_progress",
                     )
                     val progressColor by animateColorAsState(
                         targetValue = if (authState.isUrgent) colors.error else colors.primary,
-                        animationSpec = tween(500),
+                        animationSpec = LocalPersonality.current.motion.defaultEffects(),
                         label = "progress_color",
                     )
                     val timerColor by animateColorAsState(
                         targetValue = if (authState.isUrgent) colors.error else colors.onSurfaceVariant,
-                        animationSpec = tween(500),
+                        animationSpec = LocalPersonality.current.motion.defaultEffects(),
                         label = "timer_color",
                     )
 
@@ -595,7 +588,7 @@ private fun StateLoggedIn() {
 
         AnimatedVisibility(
             visibleState = checkmarkVisibility,
-            enter = scaleIn(spring(dampingRatio = Spring.DampingRatioMediumBouncy)) + fadeIn(),
+            enter = scaleIn(LocalPersonality.current.motion.fastSpatial()) + fadeIn(),
         ) {
             Box(
                 modifier = Modifier

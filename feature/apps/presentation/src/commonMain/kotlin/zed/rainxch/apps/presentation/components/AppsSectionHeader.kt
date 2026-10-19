@@ -1,7 +1,6 @@
 package zed.rainxch.apps.presentation.components
 
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -54,7 +53,7 @@ fun AppsSectionHeader(
     val colors = LocalPersonality.current.colors
     val rotation by animateFloatAsState(
         targetValue = if (isExpanded) 0f else -90f,
-        animationSpec = tween(durationMillis = 180),
+        animationSpec = LocalPersonality.current.motion.fastSpatial(),
         label = "section-chevron",
     )
 
