@@ -8,15 +8,16 @@ import zed.rainxch.core.domain.model.installation.InstalledApp
 import zed.rainxch.core.domain.model.transfer.ObtainiumApp
 
 fun InstalledApp.toObtainiumApp(): ObtainiumApp {
-    val additional: JsonElement = buildJsonObject {
-        if (!assetFilterRegex.isNullOrBlank()) {
-            put("apkFilterRegEx", JsonPrimitive(assetFilterRegex))
-            put("invertAPKFilter", JsonPrimitive(false))
+    val additional: JsonElement =
+        buildJsonObject {
+            if (!assetFilterRegex.isNullOrBlank()) {
+                put("apkFilterRegEx", JsonPrimitive(assetFilterRegex))
+                put("invertAPKFilter", JsonPrimitive(false))
+            }
+            put("fallbackToOlderReleases", JsonPrimitive(fallbackToOlderReleases))
+            put("trackOnly", JsonPrimitive(false))
+            put("dontSortReleasesList", JsonPrimitive(false))
         }
-        put("fallbackToOlderReleases", JsonPrimitive(fallbackToOlderReleases))
-        put("trackOnly", JsonPrimitive(false))
-        put("dontSortReleasesList", JsonPrimitive(false))
-    }
 
     return ObtainiumApp(
         id = packageName,

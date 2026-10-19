@@ -19,10 +19,10 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.getString
 import zed.rainxch.core.domain.model.repository.FavoriteRepo
-import zed.rainxch.core.domain.repository.UserSessionRepository
 import zed.rainxch.core.domain.repository.FavouritesRepository
 import zed.rainxch.core.domain.repository.StarredRepository
 import zed.rainxch.core.domain.repository.TweaksRepository
+import zed.rainxch.core.domain.repository.UserSessionRepository
 import zed.rainxch.githubstore.core.presentation.res.*
 import zed.rainxch.starred.presentation.mappers.toStarredRepositoryUi
 import zed.rainxch.starred.presentation.model.StarredRepositoryUi
@@ -74,12 +74,13 @@ class StarredReposViewModel(
         if (lastSyncTime == null) return null
 
         val diff = Clock.System.now().toEpochMilliseconds() - lastSyncTime
-        val relative = when {
-            diff < 60_000 -> getString(Res.string.just_now)
-            diff < 3_600_000 -> getString(Res.string.minutes_ago, diff / 60_000)
-            diff < 86_400_000 -> getString(Res.string.hours_ago, diff / 3_600_000)
-            else -> getString(Res.string.days_ago, diff / 86_400_000)
-        }
+        val relative =
+            when {
+                diff < 60_000 -> getString(Res.string.just_now)
+                diff < 3_600_000 -> getString(Res.string.minutes_ago, diff / 60_000)
+                diff < 86_400_000 -> getString(Res.string.hours_ago, diff / 3_600_000)
+                else -> getString(Res.string.days_ago, diff / 86_400_000)
+            }
 
         return "${getString(Res.string.last_synced)}: $relative"
     }
@@ -109,14 +110,15 @@ class StarredReposViewModel(
                 val favoriteIds = favorites.map { it.repoId }.toSet()
                 val currentLogin = user?.username
 
-                val items = starred.map {
-                    it.toStarredRepositoryUi(
-                        isFavorite = favoriteIds.contains(it.repoId),
-                        isCurrentUserOwner =
-                            currentLogin != null &&
-                                it.repoOwner.equals(currentLogin, ignoreCase = true),
-                    )
-                }
+                val items =
+                    starred.map {
+                        it.toStarredRepositoryUi(
+                            isFavorite = favoriteIds.contains(it.repoId),
+                            isCurrentUserOwner =
+                                currentLogin != null &&
+                                    it.repoOwner.equals(currentLogin, ignoreCase = true),
+                        )
+                    }
 
                 items.sortedWith(starredComparator(sortRule)) to sortRule
             }.flowOn(Dispatchers.Default)
@@ -134,17 +136,20 @@ class StarredReposViewModel(
 
     private fun starredComparator(sortRule: StarredSortRule): Comparator<StarredRepositoryUi> =
         when (sortRule) {
-            StarredSortRule.RecentlyStarred ->
+            StarredSortRule.RecentlyStarred -> {
                 compareByDescending<StarredRepositoryUi> { it.starredAt ?: Long.MIN_VALUE }
                     .thenBy { it.repoName.lowercase() }
+            }
 
-            StarredSortRule.NameAsc ->
+            StarredSortRule.NameAsc -> {
                 compareBy<StarredRepositoryUi> { it.repoName.lowercase() }
                     .thenBy { it.repoOwner.lowercase() }
+            }
 
-            StarredSortRule.StarsDesc ->
+            StarredSortRule.StarsDesc -> {
                 compareByDescending<StarredRepositoryUi> { it.stargazersCount }
                     .thenBy { it.repoName.lowercase() }
+            }
         }
 
     private fun syncIfNeeded() {
@@ -192,13 +197,21 @@ class StarredReposViewModel(
 
     fun onAction(action: StarredReposAction) {
         when (action) {
-            StarredReposAction.OnNavigateBackClick -> Unit
+            StarredReposAction.OnNavigateBackClick -> {
+                Unit
+            }
 
-            is StarredReposAction.OnRepositoryClick -> Unit
+            is StarredReposAction.OnRepositoryClick -> {
+                Unit
+            }
 
-            is StarredReposAction.OnDeveloperProfileClick -> Unit
+            is StarredReposAction.OnDeveloperProfileClick -> {
+                Unit
+            }
 
-            StarredReposAction.OnSignInClick -> Unit
+            StarredReposAction.OnSignInClick -> {
+                Unit
+            }
 
             StarredReposAction.OnRefresh -> {
                 _state.update { it.copy(searchQuery = "") }

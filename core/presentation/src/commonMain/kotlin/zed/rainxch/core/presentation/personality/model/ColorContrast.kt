@@ -7,7 +7,10 @@ import kotlin.math.min
 
 private const val MIN_BODY_CONTRAST = 4.5f
 
-fun contrastRatio(a: Color, b: Color): Float {
+fun contrastRatio(
+    a: Color,
+    b: Color,
+): Float {
     val hi = max(a.luminance(), b.luminance())
     val lo = min(a.luminance(), b.luminance())
     return (hi + 0.05f) / (lo + 0.05f)

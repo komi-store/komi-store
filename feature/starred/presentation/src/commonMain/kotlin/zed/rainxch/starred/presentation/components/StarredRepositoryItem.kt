@@ -2,10 +2,10 @@ package zed.rainxch.starred.presentation.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -73,16 +73,18 @@ fun StarredRepositoryItem(
             ) {
                 GitHubStoreImage(
                     imageModel = { repository.repoOwnerAvatarUrl },
-                    modifier = Modifier
-                        .size(36.dp)
-                        .clip(RoundedCornerShape(shape.cornerSmall))
-                        .clickable(onClick = onDevProfileClick),
+                    modifier =
+                        Modifier
+                            .size(36.dp)
+                            .clip(RoundedCornerShape(shape.cornerSmall))
+                            .clickable(onClick = onDevProfileClick),
                 )
 
                 Column(
-                    modifier = Modifier
-                        .weight(1f)
-                        .clickable(onClick = onDevProfileClick),
+                    modifier =
+                        Modifier
+                            .weight(1f)
+                            .clickable(onClick = onDevProfileClick),
                 ) {
                     KomiText(
                         text = repository.repoName,
@@ -191,7 +193,10 @@ fun StarredRepositoryItem(
 }
 
 @Composable
-private fun StatChipNeutral(icon: ImageVector, label: String) {
+private fun StatChipNeutral(
+    icon: ImageVector,
+    label: String,
+) {
     val colors = LocalPersonality.current.colors
     KomiChip(
         label = label,
@@ -215,10 +220,11 @@ private fun TonalBadge(
     content: Color,
 ) {
     Box(
-        modifier = Modifier
-            .clip(RoundedCornerShape(LocalPersonality.current.shape.cornerSmall))
-            .background(container)
-            .padding(horizontal = 10.dp, vertical = 5.dp),
+        modifier =
+            Modifier
+                .clip(RoundedCornerShape(LocalPersonality.current.shape.cornerSmall))
+                .background(container)
+                .padding(horizontal = 10.dp, vertical = 5.dp),
     ) {
         KomiText(
             text = text,
@@ -238,35 +244,40 @@ private fun FavoriteToggle(
 ) {
     val colors = LocalPersonality.current.colors
     val shape = LocalPersonality.current.shape
-    val tint = if (favorited) {
-        colors.error
-    } else {
-        colors.onSurfaceVariant
-    }
-    val container = if (favorited) {
-        colors.error.copy(alpha = 0.45f)
-    } else {
-        colors.surfaceContainerHigh
-    }
+    val tint =
+        if (favorited) {
+            colors.error
+        } else {
+            colors.onSurfaceVariant
+        }
+    val container =
+        if (favorited) {
+            colors.error.copy(alpha = 0.45f)
+        } else {
+            colors.surfaceContainerHigh
+        }
     Box(
-        modifier = Modifier
-            .size(38.dp)
-            .clip(RoundedCornerShape(shape.cornerSmall))
-            .background(container)
-            .clickable(onClick = onClick),
+        modifier =
+            Modifier
+                .size(38.dp)
+                .clip(RoundedCornerShape(shape.cornerSmall))
+                .background(container)
+                .clickable(onClick = onClick),
         contentAlignment = Alignment.Center,
     ) {
         KomiIcon(
-            imageVector = if (favorited) {
-                Icons.Filled.Favorite
-            } else {
-                Icons.Outlined.FavoriteBorder
-            },
-            contentDescription = if (favorited) {
-                stringResource(Res.string.remove_from_favourites)
-            } else {
-                stringResource(Res.string.add_to_favourites)
-            },
+            imageVector =
+                if (favorited) {
+                    Icons.Filled.Favorite
+                } else {
+                    Icons.Outlined.FavoriteBorder
+                },
+            contentDescription =
+                if (favorited) {
+                    stringResource(Res.string.remove_from_favourites)
+                } else {
+                    stringResource(Res.string.add_to_favourites)
+                },
             tint = tint,
             modifier = Modifier.size(18.dp),
         )
@@ -278,23 +289,24 @@ private fun FavoriteToggle(
 private fun PreviewStarredRepoItem() {
     PersonalityPreview {
         StarredRepositoryItem(
-            repository = StarredRepositoryUi(
-                repoId = 1,
-                repoName = "awesome-app",
-                repoOwner = "developer",
-                repoOwnerAvatarUrl = "",
-                repoDescription = "An awesome application that does amazing things",
-                primaryLanguage = "Kotlin",
-                repoUrl = "",
-                stargazersCount = 1234,
-                forksCount = 567,
-                openIssuesCount = 12,
-                isInstalled = true,
-                isFavorite = false,
-                latestRelease = "v1.2.3",
-                latestReleaseUrl = null,
-                starredAt = null,
-            ),
+            repository =
+                StarredRepositoryUi(
+                    repoId = 1,
+                    repoName = "awesome-app",
+                    repoOwner = "developer",
+                    repoOwnerAvatarUrl = "",
+                    repoDescription = "An awesome application that does amazing things",
+                    primaryLanguage = "Kotlin",
+                    repoUrl = "",
+                    stargazersCount = 1234,
+                    forksCount = 567,
+                    openIssuesCount = 12,
+                    isInstalled = true,
+                    isFavorite = false,
+                    latestRelease = "v1.2.3",
+                    latestReleaseUrl = null,
+                    starredAt = null,
+                ),
             onToggleFavoriteClick = {},
             onItemClick = {},
             onDevProfileClick = {},

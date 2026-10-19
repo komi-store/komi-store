@@ -30,17 +30,17 @@ class HiddenRepositoriesViewModel(
                     HiddenRepositoriesState(
                         isLoading = false,
                         items =
-                            repos.map { repo ->
-                                HiddenRepoUi(
-                                    repoId = repo.repoId,
-                                    repoName = repo.repoName,
-                                    repoOwner = repo.repoOwner,
-                                    repoOwnerAvatarUrl = repo.repoOwnerAvatarUrl,
-                                )
-                            }.toImmutableList(),
+                            repos
+                                .map { repo ->
+                                    HiddenRepoUi(
+                                        repoId = repo.repoId,
+                                        repoName = repo.repoName,
+                                        repoOwner = repo.repoOwner,
+                                        repoOwnerAvatarUrl = repo.repoOwnerAvatarUrl,
+                                    )
+                                }.toImmutableList(),
                     )
-            }
-            .launchIn(viewModelScope)
+            }.launchIn(viewModelScope)
     }
 
     fun onAction(action: HiddenRepositoriesAction) {
@@ -51,9 +51,11 @@ class HiddenRepositoriesViewModel(
     }
 
     private fun unhide(repoId: Long) {
-
         val fullName =
-            _state.value.items.firstOrNull { it.repoId == repoId }?.fullName.orEmpty()
+            _state.value.items
+                .firstOrNull { it.repoId == repoId }
+                ?.fullName
+                .orEmpty()
         viewModelScope.launch {
             try {
                 hiddenReposRepository.unhide(repoId)

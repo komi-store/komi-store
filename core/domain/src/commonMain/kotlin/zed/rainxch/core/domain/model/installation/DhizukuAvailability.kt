@@ -4,5 +4,5 @@ enum class DhizukuAvailability {
     UNAVAILABLE,
     NOT_RUNNING,
     PERMISSION_NEEDED,
-    READY
+    READY,
 }

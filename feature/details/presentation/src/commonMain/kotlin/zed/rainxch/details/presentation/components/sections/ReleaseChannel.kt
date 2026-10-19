@@ -25,13 +25,6 @@ import androidx.compose.material.icons.filled.Bolt
 import androidx.compose.material.icons.filled.Restore
 import androidx.compose.material.icons.filled.Science
 import androidx.compose.material.icons.filled.WarningAmber
-import zed.rainxch.core.presentation.components.buttons.KomiButton
-import zed.rainxch.core.presentation.components.buttons.KomiButtonSize
-import zed.rainxch.core.presentation.components.buttons.KomiButtonVariant
-import zed.rainxch.core.presentation.components.icon.KomiIcon
-import zed.rainxch.core.presentation.components.text.KomiText
-import zed.rainxch.core.presentation.components.text.KomiTextRole
-import zed.rainxch.core.presentation.locals.LocalPersonality
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -48,6 +41,13 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import org.jetbrains.compose.resources.stringResource
+import zed.rainxch.core.presentation.components.buttons.KomiButton
+import zed.rainxch.core.presentation.components.buttons.KomiButtonSize
+import zed.rainxch.core.presentation.components.buttons.KomiButtonVariant
+import zed.rainxch.core.presentation.components.icon.KomiIcon
+import zed.rainxch.core.presentation.components.text.KomiText
+import zed.rainxch.core.presentation.components.text.KomiTextRole
+import zed.rainxch.core.presentation.locals.LocalPersonality
 import zed.rainxch.details.presentation.DetailsAction
 import zed.rainxch.details.presentation.DetailsState
 import zed.rainxch.githubstore.core.presentation.res.Res
@@ -97,15 +97,15 @@ fun LazyListScope.releaseChannel(
                             }
                         val pulse by rememberChipPulse(active = state.isChannelChipCoachmarkPending)
                         Box(
-                            modifier = Modifier.graphicsLayer {
-                                scaleX = pulse
-                                scaleY = pulse
-                            },
+                            modifier =
+                                Modifier.graphicsLayer {
+                                    scaleX = pulse
+                                    scaleY = pulse
+                                },
                         ) {
                             ChannelChip(
                                 label = channelLabel,
                                 icon = Icons.Default.Science,
-
                                 tint =
                                     if (includeBetas) {
                                         colors.primary
@@ -113,7 +113,6 @@ fun LazyListScope.releaseChannel(
                                         colors.onSurfaceVariant
                                     },
                                 onClick = { onAction(DetailsAction.ToggleIncludeBetas) },
-
                                 contentDescriptionText = channelLabel,
                             )
                             if (state.isChannelChipCoachmarkPending) {
@@ -129,10 +128,11 @@ fun LazyListScope.releaseChannel(
                     if (showSwitchToStable) {
                         if (state.latestStableRelease != null) {
                             ChannelChip(
-                                label = stringResource(
-                                    Res.string.action_switch_to_stable,
-                                    state.latestStableRelease.tagName,
-                                ),
+                                label =
+                                    stringResource(
+                                        Res.string.action_switch_to_stable,
+                                        state.latestStableRelease.tagName,
+                                    ),
                                 icon = Icons.Default.Restore,
                                 tint = colors.primary,
                                 onClick = { onAction(DetailsAction.SwitchToStable) },
@@ -144,24 +144,26 @@ fun LazyListScope.releaseChannel(
             }
 
             if (state.stalledStableSinceDays != null) {
-                val title = if (state.stalledStableSinceDays >= 30) {
-                    stringResource(
-                        Res.string.stalled_project_warning_months,
-                        state.stalledStableSinceDays / 30
-                    )
-                } else {
-                    stringResource(
-                        Res.string.stalled_project_warning_days,
-                        state.stalledStableSinceDays
-                    )
-                }
+                val title =
+                    if (state.stalledStableSinceDays >= 30) {
+                        stringResource(
+                            Res.string.stalled_project_warning_months,
+                            state.stalledStableSinceDays / 30,
+                        )
+                    } else {
+                        stringResource(
+                            Res.string.stalled_project_warning_days,
+                            state.stalledStableSinceDays,
+                        )
+                    }
                 Row(
                     verticalAlignment = Alignment.Top,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clip(cardShape)
-                        .background(colors.error.copy(alpha = 0.25f))
-                        .padding(horizontal = 14.dp, vertical = 12.dp),
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .clip(cardShape)
+                            .background(colors.error.copy(alpha = 0.25f))
+                            .padding(horizontal = 14.dp, vertical = 12.dp),
                 ) {
                     KomiIcon(
                         imageVector = Icons.Default.WarningAmber,
@@ -203,18 +205,18 @@ private fun ChannelChip(
     val shape = LocalPersonality.current.shape
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
-            .clip(RoundedCornerShape(shape.corner))
-            .background(colors.surfaceContainerHigh)
-            .clickable(onClick = onClick)
-            .then(
-                if (contentDescriptionText != null) {
-                    Modifier.semantics { contentDescription = contentDescriptionText }
-                } else {
-                    Modifier
-                },
-            )
-            .padding(horizontal = 12.dp, vertical = 8.dp),
+        modifier =
+            Modifier
+                .clip(RoundedCornerShape(shape.corner))
+                .background(colors.surfaceContainerHigh)
+                .clickable(onClick = onClick)
+                .then(
+                    if (contentDescriptionText != null) {
+                        Modifier.semantics { contentDescription = contentDescriptionText }
+                    } else {
+                        Modifier
+                    },
+                ).padding(horizontal = 12.dp, vertical = 8.dp),
     ) {
         KomiIcon(
             imageVector = icon,
@@ -252,7 +254,9 @@ private fun ChannelChipCoachmark(onDismiss: () -> Unit) {
     val colors = LocalPersonality.current.colors
     Popup(
         alignment = Alignment.TopStart,
-        offset = androidx.compose.ui.unit.IntOffset(x = 0, y = -220),
+        offset =
+            androidx.compose.ui.unit
+                .IntOffset(x = 0, y = -220),
         properties =
             PopupProperties(
                 focusable = false,
@@ -262,11 +266,12 @@ private fun ChannelChipCoachmark(onDismiss: () -> Unit) {
         onDismissRequest = onDismiss,
     ) {
         Column(
-            modifier = Modifier
-                .width(280.dp)
-                .clip(RoundedCornerShape(LocalPersonality.current.shape.corner))
-                .background(colors.primary)
-                .padding(horizontal = 16.dp, vertical = 14.dp),
+            modifier =
+                Modifier
+                    .width(280.dp)
+                    .clip(RoundedCornerShape(LocalPersonality.current.shape.corner))
+                    .background(colors.primary)
+                    .padding(horizontal = 16.dp, vertical = 14.dp),
             verticalArrangement = Arrangement.spacedBy(6.dp),
         ) {
             Row(

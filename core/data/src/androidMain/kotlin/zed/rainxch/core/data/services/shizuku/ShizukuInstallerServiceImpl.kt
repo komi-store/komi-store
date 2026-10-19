@@ -5,8 +5,7 @@ import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.util.concurrent.TimeUnit
 
-class ShizukuInstallerServiceImpl() : IShizukuInstallerService.Stub() {
-
+class ShizukuInstallerServiceImpl : IShizukuInstallerService.Stub() {
     companion object {
         private const val TAG = "ShizukuService"
 
@@ -16,8 +15,13 @@ class ShizukuInstallerServiceImpl() : IShizukuInstallerService.Stub() {
         private const val UNINSTALL_TIMEOUT_SECONDS = 30L
 
         private fun log(msg: String) = android.util.Log.d(TAG, msg)
+
         private fun logW(msg: String) = android.util.Log.w(TAG, msg)
-        private fun logE(msg: String, e: Throwable? = null) = android.util.Log.e(TAG, msg, e)
+
+        private fun logE(
+            msg: String,
+            e: Throwable? = null,
+        ) = android.util.Log.e(TAG, msg, e)
     }
 
     override fun installPackage(
@@ -30,34 +34,36 @@ class ShizukuInstallerServiceImpl() : IShizukuInstallerService.Stub() {
 
         return try {
             val safeInstaller = installerPackageName?.takeIf { it.isNotBlank() }
-            val command = if (safeInstaller != null) {
-                arrayOf("pm", "install", "-i", safeInstaller, "-S", fileSize.toString())
-            } else {
-                arrayOf("pm", "install", "-S", fileSize.toString())
-            }
+            val command =
+                if (safeInstaller != null) {
+                    arrayOf("pm", "install", "-i", safeInstaller, "-S", fileSize.toString())
+                } else {
+                    arrayOf("pm", "install", "-S", fileSize.toString())
+                }
             log("Executing: ${command.joinToString(" ")}")
 
             val process = Runtime.getRuntime().exec(command)
 
-            val writeThread = Thread {
-                try {
-                    ParcelFileDescriptor.AutoCloseInputStream(pfd).use { input ->
-                        process.outputStream.use { output ->
-                            val buffer = ByteArray(65536)
-                            var bytesWritten = 0L
-                            var read: Int
-                            while (input.read(buffer).also { read = it } != -1) {
-                                output.write(buffer, 0, read)
-                                bytesWritten += read
+            val writeThread =
+                Thread {
+                    try {
+                        ParcelFileDescriptor.AutoCloseInputStream(pfd).use { input ->
+                            process.outputStream.use { output ->
+                                val buffer = ByteArray(65536)
+                                var bytesWritten = 0L
+                                var read: Int
+                                while (input.read(buffer).also { read = it } != -1) {
+                                    output.write(buffer, 0, read)
+                                    bytesWritten += read
+                                }
+                                output.flush()
+                                log("APK piped to pm stdin: $bytesWritten bytes (expected: $fileSize)")
                             }
-                            output.flush()
-                            log("APK piped to pm stdin: $bytesWritten bytes (expected: $fileSize)")
                         }
+                    } catch (e: Exception) {
+                        logE("Error piping APK to pm stdin", e)
                     }
-                } catch (e: Exception) {
-                    logE("Error piping APK to pm stdin", e)
                 }
-            }
             writeThread.start()
 
             val stdout = BufferedReader(InputStreamReader(process.inputStream)).readText().trim()

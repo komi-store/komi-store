@@ -32,45 +32,54 @@ internal class DeeplTranslator(
             )
         }
 
-        val host = if (authKey.endsWith(":fx")) {
-            "https://api-free.deepl.com"
-        } else {
-            "https://api.deepl.com"
-        }
+        val host =
+            if (authKey.endsWith(":fx")) {
+                "https://api-free.deepl.com"
+            } else {
+                "https://api.deepl.com"
+            }
         val endpoint = "$host/v2/translate"
         val target = mapLanguageCode(targetLanguage)
         val source = mapSourceLanguageCode(sourceLanguage)
 
-        val response = httpClient().submitForm(
-            url = endpoint,
-            formParameters = Parameters.build {
-                append("text", text)
-                append("target_lang", target)
-                if (source != null) append("source_lang", source)
-                append("preserve_formatting", "1")
-            },
-        ) {
-            header(HttpHeaders.Authorization, "DeepL-Auth-Key $authKey")
-        }
+        val response =
+            httpClient().submitForm(
+                url = endpoint,
+                formParameters =
+                    Parameters.build {
+                        append("text", text)
+                        append("target_lang", target)
+                        if (source != null) append("source_lang", source)
+                        append("preserve_formatting", "1")
+                    },
+            ) {
+                header(HttpHeaders.Authorization, "DeepL-Auth-Key $authKey")
+            }
 
         val body = response.bodyAsText()
         if (!response.status.isSuccess()) {
-            val message = runCatching {
-                json.parseToJsonElement(body).jsonObject["message"]?.jsonPrimitive?.content
-            }.getOrNull()
+            val message =
+                runCatching {
+                    json
+                        .parseToJsonElement(body)
+                        .jsonObject["message"]
+                        ?.jsonPrimitive
+                        ?.content
+                }.getOrNull()
             throw RuntimeException(
                 "DeepL HTTP ${response.status.value}: ${message ?: body.take(200)}",
             )
         }
 
-        val root = try {
-            json.parseToJsonElement(body).jsonObject
-        } catch (e: SerializationException) {
-            throw RuntimeException(
-                "DeepL returned non-JSON response: ${body.take(200)}",
-                e,
-            )
-        }
+        val root =
+            try {
+                json.parseToJsonElement(body).jsonObject
+            } catch (e: SerializationException) {
+                throw RuntimeException(
+                    "DeepL returned non-JSON response: ${body.take(200)}",
+                    e,
+                )
+            }
 
         val translations = root["translations"]?.jsonArray
         val errorMessage = root["message"]?.jsonPrimitive?.content
@@ -80,15 +89,18 @@ internal class DeeplTranslator(
             )
         }
 
-        val first = translations.firstOrNull()?.jsonObject
-            ?: throw RuntimeException("DeepL response missing translations")
-        val translation = first["text"]?.jsonPrimitive?.content
-            ?: throw RuntimeException("DeepL response missing translation text")
-        val detected = first["detected_source_language"]
-            ?.jsonPrimitive
-            ?.content
-            ?.lowercase()
-            ?.takeIf { it.isNotBlank() }
+        val first =
+            translations.firstOrNull()?.jsonObject
+                ?: throw RuntimeException("DeepL response missing translations")
+        val translation =
+            first["text"]?.jsonPrimitive?.content
+                ?: throw RuntimeException("DeepL response missing translation text")
+        val detected =
+            first["detected_source_language"]
+                ?.jsonPrimitive
+                ?.content
+                ?.lowercase()
+                ?.takeIf { it.isNotBlank() }
 
         return TranslationResult(
             translatedText = translation,

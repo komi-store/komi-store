@@ -1,4 +1,5 @@
 package zed.rainxch.core.domain.model.installation
+
 data class UpdateHistory(
     val id: Long = 0,
     val packageName: String,

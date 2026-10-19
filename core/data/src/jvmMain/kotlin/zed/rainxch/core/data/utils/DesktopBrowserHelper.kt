@@ -1,9 +1,9 @@
 package zed.rainxch.core.data.utils
 
 import zed.rainxch.core.domain.helpers.BrowserHelper
+import zed.rainxch.core.domain.system.DesktopOs
 import java.awt.Desktop
 import java.net.URI
-import zed.rainxch.core.domain.system.DesktopOs
 
 class DesktopBrowserHelper : BrowserHelper {
     override fun openUrl(

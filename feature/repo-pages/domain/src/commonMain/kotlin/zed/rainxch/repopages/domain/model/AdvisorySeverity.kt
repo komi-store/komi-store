@@ -1,4 +1,4 @@
-package zed.rainxch.repopages.domain.model;
+package zed.rainxch.repopages.domain.model
 
 enum class AdvisorySeverity {
     CRITICAL,
@@ -9,12 +9,13 @@ enum class AdvisorySeverity {
     ;
 
     companion object {
-        fun fromApi(value: String?): AdvisorySeverity = when (value?.lowercase()) {
-            "critical" -> CRITICAL
-            "high" -> HIGH
-            "medium" -> MEDIUM
-            "low" -> LOW
-            else -> UNKNOWN
-        }
+        fun fromApi(value: String?): AdvisorySeverity =
+            when (value?.lowercase()) {
+                "critical" -> CRITICAL
+                "high" -> HIGH
+                "medium" -> MEDIUM
+                "low" -> LOW
+                else -> UNKNOWN
+            }
     }
 }

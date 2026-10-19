@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.getString
 import zed.rainxch.core.domain.getPlatform
+import zed.rainxch.core.domain.helpers.ShareManager
 import zed.rainxch.core.domain.isDesktop
 import zed.rainxch.core.domain.logging.KomiStoreLogger
 import zed.rainxch.core.domain.model.account.github.GithubRepoSummary
@@ -36,7 +37,6 @@ import zed.rainxch.core.domain.repository.StarredRepository
 import zed.rainxch.core.domain.repository.TweaksRepository
 import zed.rainxch.core.domain.repository.UserSessionRepository
 import zed.rainxch.core.domain.use_cases.SyncInstalledAppsUseCase
-import zed.rainxch.core.domain.helpers.ShareManager
 import zed.rainxch.githubstore.core.presentation.res.Res
 import zed.rainxch.githubstore.core.presentation.res.failed_to_share_link
 import zed.rainxch.githubstore.core.presentation.res.home_failed_to_load_repositories
@@ -60,7 +60,6 @@ class HomeViewModel(
     private val logger: KomiStoreLogger,
     private val shareManager: ShareManager,
 ) : ViewModel() {
-
     private class ChartCache {
         var repos: List<GithubRepoSummary> = emptyList()
         var nextPage: Int = 1
@@ -86,40 +85,46 @@ class HomeViewModel(
     private var actionSheetRepoId: Long? = null
 
     private val _state = MutableStateFlow(HomeState())
-    val state: StateFlow<HomeState> = _state
-        .onStart {
-            if (!hasLoadedInitialData) {
-                selectedPlatform = browseFilterStore.platform.value
-                observeCurrentUser()
-                syncSystemState()
-                observeInstalledApps()
-                observeFavourites()
-                observeStarredRepos()
-                observeSeenRepos()
-                observeHiddenRepos()
-                observeBrowseFilter()
-                observeHideSeenEnabled()
-                observeRepoGridLayout()
-                loadChart(ChartTab.Trending, isRefresh = false)
-                hasLoadedInitialData = true
-            }
-        }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5_000L),
-            initialValue = HomeState(),
-        )
+    val state: StateFlow<HomeState> =
+        _state
+            .onStart {
+                if (!hasLoadedInitialData) {
+                    selectedPlatform = browseFilterStore.platform.value
+                    observeCurrentUser()
+                    syncSystemState()
+                    observeInstalledApps()
+                    observeFavourites()
+                    observeStarredRepos()
+                    observeSeenRepos()
+                    observeHiddenRepos()
+                    observeBrowseFilter()
+                    observeHideSeenEnabled()
+                    observeRepoGridLayout()
+                    loadChart(ChartTab.Trending, isRefresh = false)
+                    hasLoadedInitialData = true
+                }
+            }.stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(5_000L),
+                initialValue = HomeState(),
+            )
 
     private val _events = Channel<HomeEvent>(capacity = Channel.BUFFERED)
     val events = _events.receiveAsFlow()
 
     fun onAction(action: HomeAction) {
         when (action) {
-            HomeAction.OnRetry -> loadChart(selectedChart, isRefresh = false)
+            HomeAction.OnRetry -> {
+                loadChart(selectedChart, isRefresh = false)
+            }
 
-            HomeAction.OnRefresh -> loadChart(selectedChart, isRefresh = true)
+            HomeAction.OnRefresh -> {
+                loadChart(selectedChart, isRefresh = true)
+            }
 
-            HomeAction.OnLoadMore -> loadMore()
+            HomeAction.OnLoadMore -> {
+                loadMore()
+            }
 
             HomeAction.OnToggleGridLayout -> {
                 val grid = !_state.value.isGridLayout
@@ -127,13 +132,17 @@ class HomeViewModel(
                 viewModelScope.launch { tweaksRepository.setRepoGridLayout(grid) }
             }
 
-            is HomeAction.OnChartSelected -> selectChart(action.chart)
+            is HomeAction.OnChartSelected -> {
+                selectChart(action.chart)
+            }
 
-            HomeAction.OnPlatformPopupOpen ->
+            HomeAction.OnPlatformPopupOpen -> {
                 _state.update { it.copy(isPlatformPopupVisible = true) }
+            }
 
-            HomeAction.OnPlatformPopupDismiss ->
+            HomeAction.OnPlatformPopupDismiss -> {
                 _state.update { it.copy(isPlatformPopupVisible = false) }
+            }
 
             is HomeAction.OnPlatformSelected -> {
                 _state.update { it.copy(isPlatformPopupVisible = false) }
@@ -150,66 +159,76 @@ class HomeViewModel(
                 rebuild()
             }
 
-            is HomeAction.OnShareClick -> viewModelScope.launch {
-                runCatching {
-                    shareManager.shareText("https://github-store.org/app?repo=${action.repo.fullName}")
-                }.onFailure { t ->
-                    logger.error("Failed to share link: ${t.message}")
-                    _events.send(HomeEvent.OnMessage(getString(Res.string.failed_to_share_link)))
-                    return@launch
-                }
+            is HomeAction.OnShareClick -> {
+                viewModelScope.launch {
+                    runCatching {
+                        shareManager.shareText("https://github-store.org/app?repo=${action.repo.fullName}")
+                    }.onFailure { t ->
+                        logger.error("Failed to share link: ${t.message}")
+                        _events.send(HomeEvent.OnMessage(getString(Res.string.failed_to_share_link)))
+                        return@launch
+                    }
 
-                if (isDesktop()) {
-                    _events.send(HomeEvent.OnMessage(getString(Res.string.link_copied_to_clipboard)))
-                }
-            }
-
-            is HomeAction.OnHideRepository -> viewModelScope.launch {
-                val repo = action.repo
-                try {
-                    hiddenReposRepository.hide(
-                        repoId = repo.id,
-                        repoName = repo.name,
-                        repoOwner = repo.owner.login,
-                        repoOwnerAvatarUrl = repo.owner.avatarUrl,
-                    )
-                } catch (e: CancellationException) {
-                    throw e
-                } catch (e: Throwable) {
-                    logger.warn("Hide repository failed for ${repo.id}: ${e.message}")
+                    if (isDesktop()) {
+                        _events.send(HomeEvent.OnMessage(getString(Res.string.link_copied_to_clipboard)))
+                    }
                 }
             }
 
-            is HomeAction.OnMarkAsSeen -> viewModelScope.launch {
-                val repo = action.repo
-                try {
-                    seenReposRepository.markAsSeen(
-                        repoId = repo.id,
-                        repoName = repo.name,
-                        repoOwner = repo.owner.login,
-                        repoOwnerAvatarUrl = repo.owner.avatarUrl,
-                        repoDescription = repo.description,
-                        primaryLanguage = repo.language,
-                        repoUrl = repo.htmlUrl,
-                    )
-                } catch (e: CancellationException) {
-                    throw e
-                } catch (e: Throwable) {
-                    logger.warn("Mark as seen failed for ${repo.id}: ${e.message}")
+            is HomeAction.OnHideRepository -> {
+                viewModelScope.launch {
+                    val repo = action.repo
+                    try {
+                        hiddenReposRepository.hide(
+                            repoId = repo.id,
+                            repoName = repo.name,
+                            repoOwner = repo.owner.login,
+                            repoOwnerAvatarUrl = repo.owner.avatarUrl,
+                        )
+                    } catch (e: CancellationException) {
+                        throw e
+                    } catch (e: Throwable) {
+                        logger.warn("Hide repository failed for ${repo.id}: ${e.message}")
+                    }
                 }
             }
 
-            is HomeAction.OnMarkAsUnseen -> viewModelScope.launch {
-                try {
-                    seenReposRepository.removeFromHistory(action.repoId)
-                } catch (e: CancellationException) {
-                    throw e
-                } catch (e: Throwable) {
-                    logger.warn("Mark as unseen failed for ${action.repoId}: ${e.message}")
+            is HomeAction.OnMarkAsSeen -> {
+                viewModelScope.launch {
+                    val repo = action.repo
+                    try {
+                        seenReposRepository.markAsSeen(
+                            repoId = repo.id,
+                            repoName = repo.name,
+                            repoOwner = repo.owner.login,
+                            repoOwnerAvatarUrl = repo.owner.avatarUrl,
+                            repoDescription = repo.description,
+                            primaryLanguage = repo.language,
+                            repoUrl = repo.htmlUrl,
+                        )
+                    } catch (e: CancellationException) {
+                        throw e
+                    } catch (e: Throwable) {
+                        logger.warn("Mark as seen failed for ${repo.id}: ${e.message}")
+                    }
                 }
             }
 
-            is HomeAction.OnRepoClick -> Unit
+            is HomeAction.OnMarkAsUnseen -> {
+                viewModelScope.launch {
+                    try {
+                        seenReposRepository.removeFromHistory(action.repoId)
+                    } catch (e: CancellationException) {
+                        throw e
+                    } catch (e: Throwable) {
+                        logger.warn("Mark as unseen failed for ${action.repoId}: ${e.message}")
+                    }
+                }
+            }
+
+            is HomeAction.OnRepoClick -> {
+                Unit
+            }
         }
     }
 
@@ -223,41 +242,50 @@ class HomeViewModel(
         }
     }
 
-    private fun loadChart(tab: ChartTab, isRefresh: Boolean) {
+    private fun loadChart(
+        tab: ChartTab,
+        isRefresh: Boolean,
+    ) {
         loadJob?.cancel()
         loadMoreJob?.cancel()
-        loadJob = viewModelScope.launch {
-            val c = cache.getValue(tab)
-            c.nextPage = 1
-            c.hasMore = true
-            if (!isRefresh) {
-                c.repos = emptyList()
-            }
-            if (tab == selectedChart) {
-                _state.update {
-                    it.copy(
-                        isLoading = !isRefresh,
-                        isRefreshing = isRefresh,
-                        isLoadingMore = false,
-                        errorMessage = null,
-                    )
+        loadJob =
+            viewModelScope.launch {
+                val c = cache.getValue(tab)
+                c.nextPage = 1
+                c.hasMore = true
+                if (!isRefresh) {
+                    c.repos = emptyList()
                 }
-                if (!isRefresh) rebuild()
+                if (tab == selectedChart) {
+                    _state.update {
+                        it.copy(
+                            isLoading = !isRefresh,
+                            isRefreshing = isRefresh,
+                            isLoadingMore = false,
+                            errorMessage = null,
+                        )
+                    }
+                    if (!isRefresh) rebuild()
+                }
+                fetchPage(tab, page = 1, replace = true)
             }
-            fetchPage(tab, page = 1, replace = true)
-        }
     }
 
     private fun loadMore() {
         val c = cache.getValue(selectedChart)
         if (!c.hasMore || _state.value.isLoadingMore || _state.value.isLoading) return
         _state.update { it.copy(isLoadingMore = true) }
-        loadMoreJob = viewModelScope.launch {
-            fetchPage(selectedChart, page = c.nextPage, replace = false)
-        }
+        loadMoreJob =
+            viewModelScope.launch {
+                fetchPage(selectedChart, page = c.nextPage, replace = false)
+            }
     }
 
-    private suspend fun fetchPage(tab: ChartTab, page: Int, replace: Boolean) {
+    private suspend fun fetchPage(
+        tab: ChartTab,
+        page: Int,
+        replace: Boolean,
+    ) {
         try {
             val result = chartFlow(tab, page).first()
             val c = cache.getValue(tab)
@@ -287,8 +315,9 @@ class HomeViewModel(
                         isLoading = false,
                         isRefreshing = false,
                         isLoadingMore = false,
-                        errorMessage = it.errorMessage ?: t.message
-                            ?: getString(Res.string.home_failed_to_load_repositories),
+                        errorMessage =
+                            it.errorMessage ?: t.message
+                                ?: getString(Res.string.home_failed_to_load_repositories),
                     )
                 }
             }
@@ -298,7 +327,10 @@ class HomeViewModel(
     private fun platformSet(): Set<DiscoveryPlatform> =
         if (selectedPlatform == DiscoveryPlatform.All) emptySet() else setOf(selectedPlatform)
 
-    private fun chartFlow(tab: ChartTab, page: Int): Flow<PaginatedDiscoveryRepositories> =
+    private fun chartFlow(
+        tab: ChartTab,
+        page: Int,
+    ): Flow<PaginatedDiscoveryRepositories> =
         when (tab) {
             ChartTab.Trending -> homeRepository.getTrendingRepositories(platformSet(), page)
             ChartTab.Releases -> homeRepository.getHotReleaseRepositories(platformSet(), page)
@@ -316,10 +348,15 @@ class HomeViewModel(
 
     private fun rebuild() {
         val c = cache.getValue(selectedChart)
-        val visible = c.repos.filterVisible().map { it.toCard() }.toImmutableList()
-        val sheetCard = actionSheetRepoId?.let { id ->
-            c.repos.firstOrNull { it.id == id }?.toCard()
-        }
+        val visible =
+            c.repos
+                .filterVisible()
+                .map { it.toCard() }
+                .toImmutableList()
+        val sheetCard =
+            actionSheetRepoId?.let { id ->
+                c.repos.firstOrNull { it.id == id }?.toCard()
+            }
         _state.update {
             it.copy(
                 selectedChart = selectedChart,
@@ -344,8 +381,9 @@ class HomeViewModel(
             isFavourite = id in favouriteIds,
             isStarred = id in starredIds,
             isSeen = id in seenIds,
-            isCurrentUserOwner = currentUserLogin != null &&
-                owner.login.equals(currentUserLogin, ignoreCase = true),
+            isCurrentUserOwner =
+                currentUserLogin != null &&
+                    owner.login.equals(currentUserLogin, ignoreCase = true),
         )
     }
 
@@ -372,7 +410,6 @@ class HomeViewModel(
             }
         }
     }
-
 
     private fun observeBrowseFilter() {
         viewModelScope.launch {

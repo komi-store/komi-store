@@ -22,17 +22,19 @@ fun RepoMarkdown(
     modifier: Modifier = Modifier,
 ) {
     val isDark = isSystemInDarkTheme()
-    val imageTransformer: ImageTransformer = if (LocalInspectionMode.current) {
-        remember { NoOpImageTransformerImpl() }
-    } else {
-        val probeClient = koinInject<HttpClient>(qualifier = named("test"))
-        remember(probeClient) { MarkdownImageTransformer(probeClient) }
-    }
+    val imageTransformer: ImageTransformer =
+        if (LocalInspectionMode.current) {
+            remember { NoOpImageTransformerImpl() }
+        } else {
+            val probeClient = koinInject<HttpClient>(qualifier = named("test"))
+            remember(probeClient) { MarkdownImageTransformer(probeClient) }
+        }
     val colors = rememberMarkdownColors()
     val typography = rememberMarkdownTypography()
-    val components = remember(isDark, imageTransformer) {
-        githubStoreMarkdownComponents(imageTransformer, isDark)
-    }
+    val components =
+        remember(isDark, imageTransformer) {
+            githubStoreMarkdownComponents(imageTransformer, isDark)
+        }
     Markdown(
         content = content,
         colors = colors,

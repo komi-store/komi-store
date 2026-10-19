@@ -25,7 +25,6 @@ class CategoryListViewModel(
     private val homeRepository: HomeRepository,
     private val tweaksRepository: TweaksRepository,
 ) : ViewModel() {
-
     private val _state = MutableStateFlow(CategoryListState(category = category))
     val state = _state.asStateFlow()
 
@@ -45,8 +44,10 @@ class CategoryListViewModel(
 
     fun onAction(action: CategoryListAction) {
         when (action) {
-            CategoryListAction.OnLoadMore ->
+            CategoryListAction.OnLoadMore -> {
                 if (!_state.value.isLoadingMore && _state.value.hasMorePages) loadPage(initial = false)
+            }
+
             CategoryListAction.OnRefresh -> {
                 nextPage = 1
                 _state.update {
@@ -58,10 +59,17 @@ class CategoryListViewModel(
                 }
                 loadPage(initial = true)
             }
-            is CategoryListAction.OnRepoClick -> viewModelScope.launch {
-                _events.send(CategoryListEvent.NavigateToDetails(action.repoId))
+
+            is CategoryListAction.OnRepoClick -> {
+                viewModelScope.launch {
+                    _events.send(CategoryListEvent.NavigateToDetails(action.repoId))
+                }
             }
-            CategoryListAction.OnNavigateBack -> Unit
+
+            CategoryListAction.OnNavigateBack -> {
+                Unit
+            }
+
             CategoryListAction.OnToggleGridLayout -> {
                 val grid = !_state.value.isGridLayout
                 _state.update { it.copy(isGridLayout = grid) }
@@ -75,11 +83,12 @@ class CategoryListViewModel(
             _state.update {
                 if (initial) it.copy(isLoading = true) else it.copy(isLoadingMore = true)
             }
-            val flow = when (category) {
-                HomeCategory.HOT_RELEASE -> homeRepository.getHotReleaseRepositories(emptySet(), nextPage)
-                HomeCategory.TRENDING -> homeRepository.getTrendingRepositories(emptySet(), nextPage)
-                HomeCategory.MOST_POPULAR -> homeRepository.getMostPopular(emptySet(), nextPage)
-            }
+            val flow =
+                when (category) {
+                    HomeCategory.HOT_RELEASE -> homeRepository.getHotReleaseRepositories(emptySet(), nextPage)
+                    HomeCategory.TRENDING -> homeRepository.getTrendingRepositories(emptySet(), nextPage)
+                    HomeCategory.MOST_POPULAR -> homeRepository.getMostPopular(emptySet(), nextPage)
+                }
             runCatching { flow.firstOrNull() }
                 .onSuccess { paginated ->
                     if (paginated == null) {
@@ -93,17 +102,18 @@ class CategoryListViewModel(
                         return@onSuccess
                     }
                     val existing = _state.value.cards
-                    val incoming = paginated.repos.map { repo ->
-                        toHomeRepoCardUi(
-                            repo = repo,
-                            isInstalled = false,
-                            isUpdateAvailable = false,
-                            isFavourite = false,
-                            isStarred = false,
-                            isSeen = false,
-                            isCurrentUserOwner = false,
-                        )
-                    }
+                    val incoming =
+                        paginated.repos.map { repo ->
+                            toHomeRepoCardUi(
+                                repo = repo,
+                                isInstalled = false,
+                                isUpdateAvailable = false,
+                                isFavourite = false,
+                                isStarred = false,
+                                isSeen = false,
+                                isCurrentUserOwner = false,
+                            )
+                        }
                     val existingIds = existing.map { it.id }.toHashSet()
                     val merged = (existing + incoming.filter { it.id !in existingIds }).toImmutableList()
                     nextPage += 1
@@ -116,8 +126,7 @@ class CategoryListViewModel(
                             errorMessage = null,
                         )
                     }
-                }
-                .onFailure { e ->
+                }.onFailure { e ->
                     if (e is CancellationException) throw e
                     _state.update {
                         it.copy(

@@ -19,7 +19,7 @@ permissions:
 
 jobs:
   analyze:
-    name: Analyze (${{ matrix.language }})
+    name: Analyze (${{ matrix.language }}${{ matrix.target && format(', {0}', matrix.target) || '' }})
     runs-on: ubuntu-latest
     timeout-minutes: 90
     permissions:
@@ -30,7 +30,14 @@ jobs:
       matrix:
         include:
           - language: java-kotlin
+            target: android
             build-mode: manual
+            gradle-tasks: compileDebugKotlinAndroid
+          - language: java-kotlin
+            target: desktop
+            build-mode: manual
+            gradle-tasks: compileKotlinJvm
+            category: /language:java-kotlin/desktop
           - language: actions
             build-mode: none
     steps:
@@ -55,11 +62,11 @@ jobs:
       - name: Build for analysis
         if: matrix.language == 'java-kotlin'
         run: >-
-          ./gradlew compileKotlinJvm compileDebugKotlinAndroid
+          ./gradlew ${{ matrix.gradle-tasks }}
           --no-daemon --no-build-cache --no-configuration-cache
           -Pkotlin.compiler.execution.strategy=in-process
           -Pkotlin.incremental=false
 
       - uses: github/codeql-action/analyze@6f2ac81f5cd81fe351a197ba0b00d91d03cd2aee # v4.39.0
         with:
-          category: /language:${{ matrix.language }}
+          category: ${{ matrix.category || format('/language:{0}', matrix.language) }}

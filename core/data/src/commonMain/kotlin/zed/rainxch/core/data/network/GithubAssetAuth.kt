@@ -24,6 +24,9 @@ object GithubAssetAuth {
 
     fun isGithubApiHost(url: String): Boolean = hostOf(url) == "api.github.com"
 
-    fun assetApiUrl(owner: String, repo: String, assetId: Long): String =
-        "https://api.github.com/repos/$owner/$repo/releases/assets/$assetId"
+    fun assetApiUrl(
+        owner: String,
+        repo: String,
+        assetId: Long,
+    ): String = "https://api.github.com/repos/$owner/$repo/releases/assets/$assetId"
 }

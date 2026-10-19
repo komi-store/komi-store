@@ -91,7 +91,7 @@ fun IssueDetailRoot(
 private fun IssueDetailScreen(
     state: IssueDetailUiState,
     toastState: KomiToastState,
-    onAction: (IssueDetailAction) -> Unit
+    onAction: (IssueDetailAction) -> Unit,
 ) {
     KomiScaffold(
         topBar = {
@@ -99,7 +99,7 @@ private fun IssueDetailScreen(
                 title = "#${state.issueNumber}",
                 onBack = {
                     onAction(IssueDetailAction.OnBackClick)
-                }
+                },
             )
         },
         toastState = toastState,
@@ -119,29 +119,37 @@ private fun IssueDetailScreen(
             }
         },
     ) { innerPadding ->
-        val content = Modifier
-            .fillMaxWidth()
-            .padding(innerPadding)
+        val content =
+            Modifier
+                .fillMaxWidth()
+                .padding(innerPadding)
         when {
-            state.isLoading -> RepoPagesLoading(content)
-            state.errorMessage != null -> RepoPagesError(
-                message = state.errorMessage,
-                onRetry = { onAction(IssueDetailAction.OnRetryClick) },
-                modifier = content
-            )
+            state.isLoading -> {
+                RepoPagesLoading(content)
+            }
 
-            state.detail != null -> IssueDetailContent(
-                detail = state.detail,
-                isReactingIssue = state.isReactingIssue,
-                reactingCommentIds = state.reactingCommentIds,
-                onReactIssue = {
-                    onAction(IssueDetailAction.OnReactIssue)
-                },
-                onReactComment = {
-                    onAction(IssueDetailAction.OnReactComment(it))
-                },
-                modifier = content,
-            )
+            state.errorMessage != null -> {
+                RepoPagesError(
+                    message = state.errorMessage,
+                    onRetry = { onAction(IssueDetailAction.OnRetryClick) },
+                    modifier = content,
+                )
+            }
+
+            state.detail != null -> {
+                IssueDetailContent(
+                    detail = state.detail,
+                    isReactingIssue = state.isReactingIssue,
+                    reactingCommentIds = state.reactingCommentIds,
+                    onReactIssue = {
+                        onAction(IssueDetailAction.OnReactIssue)
+                    },
+                    onReactComment = {
+                        onAction(IssueDetailAction.OnReactComment(it))
+                    },
+                    modifier = content,
+                )
+            }
         }
     }
 }
@@ -172,10 +180,11 @@ private fun IssueDetailContent(
                 )
 
                 KomiText(
-                    text = "#${detail.number} · " +
+                    text =
+                        "#${detail.number} · " +
                             stringResource(
                                 Res.string.repo_pages_issue_opened_by,
-                                detail.authorLogin
+                                detail.authorLogin,
                             ),
                     role = KomiTextRole.Body,
                     fontSize = 13.sp,
@@ -191,7 +200,7 @@ private fun IssueDetailContent(
             ) {
                 Column(
                     modifier = Modifier.padding(14.dp),
-                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                    verticalArrangement = Arrangement.spacedBy(10.dp),
                 ) {
                     if (detail.bodyMarkdown.isBlank()) {
                         KomiText(
@@ -202,7 +211,7 @@ private fun IssueDetailContent(
                     } else {
                         RepoMarkdown(
                             content = detail.bodyMarkdown,
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier.fillMaxWidth(),
                         )
                     }
 
@@ -365,44 +374,48 @@ private fun CommentComposer(
 private fun IssueDetailScreenPreview() {
     PersonalityPreview {
         IssueDetailScreen(
-            state = IssueDetailUiState(
-                issueNumber = 123,
-                detail = RepoIssueDetail(
-                    number = 123,
-                    title = "Sample Issue Title",
-                    state = IssueState.OPEN,
-                    authorLogin = "sampleuser",
-                    authorAvatarUrl = null,
-                    bodyMarkdown = "This is a sample issue body with **markdown** support.",
-                    createdAt = "2023-10-27T10:00:00Z",
-                    labels = listOf(
-                        IssueLabel(name = "bug", color = "ff0000"),
-                        IssueLabel(name = "high priority", color = "00ff00")
-                    ),
-                    comments = listOf(
-                        IssueComment(
-                            id = 1,
-                            authorLogin = "commenter1",
+            state =
+                IssueDetailUiState(
+                    issueNumber = 123,
+                    detail =
+                        RepoIssueDetail(
+                            number = 123,
+                            title = "Sample Issue Title",
+                            state = IssueState.OPEN,
+                            authorLogin = "sampleuser",
                             authorAvatarUrl = null,
-                            bodyMarkdown = "This is a comment.",
-                            createdAt = "2023-10-27T11:00:00Z",
-                            reactionThumbsUp = 5
+                            bodyMarkdown = "This is a sample issue body with **markdown** support.",
+                            createdAt = "2023-10-27T10:00:00Z",
+                            labels =
+                                listOf(
+                                    IssueLabel(name = "bug", color = "ff0000"),
+                                    IssueLabel(name = "high priority", color = "00ff00"),
+                                ),
+                            comments =
+                                listOf(
+                                    IssueComment(
+                                        id = 1,
+                                        authorLogin = "commenter1",
+                                        authorAvatarUrl = null,
+                                        bodyMarkdown = "This is a comment.",
+                                        createdAt = "2023-10-27T11:00:00Z",
+                                        reactionThumbsUp = 5,
+                                    ),
+                                    IssueComment(
+                                        id = 2,
+                                        authorLogin = "commenter2",
+                                        authorAvatarUrl = null,
+                                        bodyMarkdown = "Another comment with `code`.",
+                                        createdAt = "2023-10-27T12:00:00Z",
+                                        reactionThumbsUp = 2,
+                                    ),
+                                ),
+                            reactionThumbsUp = 10,
                         ),
-                        IssueComment(
-                            id = 2,
-                            authorLogin = "commenter2",
-                            authorAvatarUrl = null,
-                            bodyMarkdown = "Another comment with `code`.",
-                            createdAt = "2023-10-27T12:00:00Z",
-                            reactionThumbsUp = 2
-                        )
-                    ),
-                    reactionThumbsUp = 10
+                    isLoggedIn = true,
                 ),
-                isLoggedIn = true
-            ),
             toastState = rememberKomiToastState(),
-            onAction = {}
+            onAction = {},
         )
     }
 }

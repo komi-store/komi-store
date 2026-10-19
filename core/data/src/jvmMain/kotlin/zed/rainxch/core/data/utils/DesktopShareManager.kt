@@ -15,13 +15,18 @@ class DesktopShareManager : ShareManager {
         clipboard.setContents(selection, null)
     }
 
-    override fun shareFile(fileName: String, content: String, mimeType: String) {
+    override fun shareFile(
+        fileName: String,
+        content: String,
+        mimeType: String,
+    ) {
         SwingUtilities.invokeLater {
-            val chooser = JFileChooser().apply {
-                dialogTitle = "Save exported apps"
-                selectedFile = File(fileName)
-                fileFilter = FileNameExtensionFilter("JSON files", "json")
-            }
+            val chooser =
+                JFileChooser().apply {
+                    dialogTitle = "Save exported apps"
+                    selectedFile = File(fileName)
+                    fileFilter = FileNameExtensionFilter("JSON files", "json")
+                }
 
             val result = chooser.showSaveDialog(null)
             if (result == JFileChooser.APPROVE_OPTION) {
@@ -34,12 +39,16 @@ class DesktopShareManager : ShareManager {
         }
     }
 
-    override fun pickFile(mimeType: String, onResult: (String?) -> Unit) {
+    override fun pickFile(
+        mimeType: String,
+        onResult: (String?) -> Unit,
+    ) {
         SwingUtilities.invokeLater {
-            val chooser = JFileChooser().apply {
-                dialogTitle = "Select file to import"
-                fileFilter = FileNameExtensionFilter("JSON files", "json")
-            }
+            val chooser =
+                JFileChooser().apply {
+                    dialogTitle = "Select file to import"
+                    fileFilter = FileNameExtensionFilter("JSON files", "json")
+                }
 
             val result = chooser.showOpenDialog(null)
             if (result == JFileChooser.APPROVE_OPTION) {

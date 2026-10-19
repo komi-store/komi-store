@@ -3,15 +3,6 @@ package zed.rainxch.core.data.local.db
 import android.content.Context
 import androidx.room.Room
 import kotlinx.coroutines.Dispatchers
-import zed.rainxch.core.data.local.db.migrations.MIGRATION_1_2
-import zed.rainxch.core.data.local.db.migrations.MIGRATION_2_3
-import zed.rainxch.core.data.local.db.migrations.MIGRATION_3_4
-import zed.rainxch.core.data.local.db.migrations.MIGRATION_4_5
-import zed.rainxch.core.data.local.db.migrations.MIGRATION_5_6
-import zed.rainxch.core.data.local.db.migrations.MIGRATION_6_7
-import zed.rainxch.core.data.local.db.migrations.MIGRATION_7_8
-import zed.rainxch.core.data.local.db.migrations.MIGRATION_8_9
-import zed.rainxch.core.data.local.db.migrations.MIGRATION_9_10
 import zed.rainxch.core.data.local.db.migrations.MIGRATION_10_11
 import zed.rainxch.core.data.local.db.migrations.MIGRATION_11_12
 import zed.rainxch.core.data.local.db.migrations.MIGRATION_12_13
@@ -21,6 +12,15 @@ import zed.rainxch.core.data.local.db.migrations.MIGRATION_15_16
 import zed.rainxch.core.data.local.db.migrations.MIGRATION_16_17
 import zed.rainxch.core.data.local.db.migrations.MIGRATION_17_18
 import zed.rainxch.core.data.local.db.migrations.MIGRATION_19_20
+import zed.rainxch.core.data.local.db.migrations.MIGRATION_1_2
+import zed.rainxch.core.data.local.db.migrations.MIGRATION_2_3
+import zed.rainxch.core.data.local.db.migrations.MIGRATION_3_4
+import zed.rainxch.core.data.local.db.migrations.MIGRATION_4_5
+import zed.rainxch.core.data.local.db.migrations.MIGRATION_5_6
+import zed.rainxch.core.data.local.db.migrations.MIGRATION_6_7
+import zed.rainxch.core.data.local.db.migrations.MIGRATION_7_8
+import zed.rainxch.core.data.local.db.migrations.MIGRATION_8_9
+import zed.rainxch.core.data.local.db.migrations.MIGRATION_9_10
 
 fun initDatabase(context: Context): AppDatabase {
     val appContext = context.applicationContext

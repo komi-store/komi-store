@@ -3,6 +3,7 @@ package zed.rainxch.details.presentation.components.sections
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -16,7 +17,6 @@ import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.automirrored.filled.OpenInNew
 import androidx.compose.material.icons.filled.Security
 import androidx.compose.material.icons.filled.Update
-import androidx.compose.foundation.layout.Column
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -33,6 +33,10 @@ import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import kotlinx.collections.immutable.toImmutableList
 import org.jetbrains.compose.resources.stringResource
+import zed.rainxch.core.domain.model.installation.InstallSource
+import zed.rainxch.core.domain.model.installation.isReallyInstalled
+import zed.rainxch.core.domain.utils.AssetVariant
+import zed.rainxch.core.domain.utils.assetPlatformOf
 import zed.rainxch.core.presentation.components.icon.KomiIcon
 import zed.rainxch.core.presentation.components.surfaces.KomiSurface
 import zed.rainxch.core.presentation.components.surfaces.KomiSurfaceElevation
@@ -42,15 +46,11 @@ import zed.rainxch.core.presentation.locals.LocalPersonality
 import zed.rainxch.details.presentation.DetailsAction
 import zed.rainxch.details.presentation.DetailsState
 import zed.rainxch.details.presentation.components.AppHeader
+import zed.rainxch.details.presentation.components.InspectApkButton
 import zed.rainxch.details.presentation.components.LinkedRepoBanner
 import zed.rainxch.details.presentation.components.ReleaseAssetsPicker
 import zed.rainxch.details.presentation.components.ReleasesStatus
 import zed.rainxch.details.presentation.components.ReleasesStatusCard
-import zed.rainxch.core.domain.model.installation.InstallSource
-import zed.rainxch.core.domain.model.installation.isReallyInstalled
-import zed.rainxch.core.domain.utils.AssetVariant
-import zed.rainxch.core.domain.utils.assetPlatformOf
-import zed.rainxch.details.presentation.components.InspectApkButton
 import zed.rainxch.details.presentation.components.SmartInstallButton
 import zed.rainxch.details.presentation.components.VersionPicker
 import zed.rainxch.details.presentation.components.VersionTypePicker
@@ -134,7 +134,6 @@ fun LazyListScope.header(
             )
         }
     } else {
-
         if (state.allReleases.isNotEmpty()) {
             item {
                 VersionTypePicker(
@@ -152,15 +151,14 @@ fun LazyListScope.header(
                     horizontalArrangement = Arrangement.spacedBy(6.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-
-                    val crossPlatformAssets = remember(state.selectedRelease) {
-                        state.selectedRelease
-                            ?.assets
-                            ?.filter {
-                                assetPlatformOf(it.name) != null
-                            }
-                            .orEmpty()
-                    }.toImmutableList()
+                    val crossPlatformAssets =
+                        remember(state.selectedRelease) {
+                            state.selectedRelease
+                                ?.assets
+                                ?.filter {
+                                    assetPlatformOf(it.name) != null
+                                }.orEmpty()
+                        }.toImmutableList()
 
                     val pinnedVariantLabel =
                         state.installedApp?.preferredAssetVariant?.let { stored ->
@@ -211,11 +209,11 @@ fun LazyListScope.header(
 
             val coachmarkActive =
                 state.isApkInspectCoachmarkPending &&
-                        canInspectApk &&
-                        !state.isDownloading &&
-                        !state.isInstalling &&
-                        state.downloadStage == DownloadStage.IDLE &&
-                        !state.isApkInspectSheetVisible
+                    canInspectApk &&
+                    !state.isDownloading &&
+                    !state.isInstalling &&
+                    state.downloadStage == DownloadStage.IDLE &&
+                    !state.isApkInspectSheetVisible
             Box(
                 modifier = Modifier.fillMaxWidth(),
             ) {
@@ -301,11 +299,12 @@ private fun ReleaseHint(
     val colors = LocalPersonality.current.colors
     val tint = if (emphasized) colors.primary else colors.onSurfaceVariant
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(LocalPersonality.current.shape.cornerSmall))
-            .clickable(onClick = onClick)
-            .padding(horizontal = 4.dp, vertical = 6.dp),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(LocalPersonality.current.shape.cornerSmall))
+                .clickable(onClick = onClick)
+                .padding(horizontal = 4.dp, vertical = 6.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(6.dp),
     ) {
@@ -335,10 +334,11 @@ private fun InstallOptionItem(
 ) {
     val colors = LocalPersonality.current.colors
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick)
-            .padding(horizontal = 14.dp, vertical = 10.dp),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .clickable(onClick = onClick)
+                .padding(horizontal = 14.dp, vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {

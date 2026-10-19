@@ -13,27 +13,42 @@ fun shouldFallbackToGithubOrRethrow(cause: Throwable): Boolean =
         else -> true
     }
 
-fun shouldFallbackToGithubOrRethrow(cause: Throwable, isSignedIn: Boolean): Boolean =
+fun shouldFallbackToGithubOrRethrow(
+    cause: Throwable,
+    isSignedIn: Boolean,
+): Boolean =
     when (cause) {
-        is CancellationException -> throw cause
-        is RateLimitedException -> throw cause.toDomainRateLimitException()
-        is BackendException ->
+        is CancellationException -> {
+            throw cause
+        }
+
+        is RateLimitedException -> {
+            throw cause.toDomainRateLimitException()
+        }
+
+        is BackendException -> {
             cause.statusCode in 500..599 ||
                 (isSignedIn && cause.statusCode in setOf(401, 403, 404))
-        else -> true
+        }
+
+        else -> {
+            true
+        }
     }
 
 private fun RateLimitedException.toDomainRateLimitException(): RateLimitException {
     val nowSec = Clock.System.now().epochSeconds
-    val reset = resetEpochSeconds
-        ?: retryAfterSeconds?.let { nowSec + it }
-        ?: nowSec
+    val reset =
+        resetEpochSeconds
+            ?: retryAfterSeconds?.let { nowSec + it }
+            ?: nowSec
     return RateLimitException(
-        rateLimitInfo = RateLimitInfo(
-            limit = 0,
-            remaining = 0,
-            resetTimestamp = reset,
-            resource = "backend",
-        ),
+        rateLimitInfo =
+            RateLimitInfo(
+                limit = 0,
+                remaining = 0,
+                resetTimestamp = reset,
+                resource = "backend",
+            ),
     )
 }

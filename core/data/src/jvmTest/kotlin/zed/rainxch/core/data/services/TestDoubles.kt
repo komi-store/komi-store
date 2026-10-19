@@ -1,12 +1,14 @@
 package zed.rainxch.core.data.services
 
-import java.io.File
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 import zed.rainxch.core.data.data_source.TokenStore
 import zed.rainxch.core.data.dto.GithubDeviceTokenSuccessDto
+import java.io.File
 
-internal class FakeFileLocations(private val dir: File) : FileLocationsProvider {
+internal class FakeFileLocations(
+    private val dir: File,
+) : FileLocationsProvider {
     override fun appDownloadsDir(): String = dir.absolutePath
 
     override fun userDownloadsDir(): String = dir.absolutePath

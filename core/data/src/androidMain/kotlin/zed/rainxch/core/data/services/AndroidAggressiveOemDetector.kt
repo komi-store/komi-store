@@ -53,7 +53,6 @@ class AndroidAggressiveOemDetector(
         }
 
     private companion object {
-
         private val AGGRESSIVE_OEMS =
             listOf(
                 "oppo",

@@ -2,6 +2,17 @@ package zed.rainxch.core.data.services
 
 import com.sun.net.httpserver.HttpExchange
 import com.sun.net.httpserver.HttpServer
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withTimeout
+import zed.rainxch.core.data.download.PartialIdentity
+import zed.rainxch.core.data.download.PartialNaming
+import zed.rainxch.core.data.download.PartialRetry
+import zed.rainxch.core.data.network.DesktopDigestVerifier
+import zed.rainxch.core.domain.network.AssetIdentity
+import zed.rainxch.core.domain.utils.AssetFileName
 import java.io.File
 import java.net.InetSocketAddress
 import java.nio.file.Files
@@ -15,20 +26,8 @@ import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.toList
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withTimeout
-import zed.rainxch.core.data.download.PartialIdentity
-import zed.rainxch.core.data.download.PartialNaming
-import zed.rainxch.core.data.download.PartialRetry
-import zed.rainxch.core.data.network.DesktopDigestVerifier
-import zed.rainxch.core.domain.network.AssetIdentity
-import zed.rainxch.core.domain.utils.AssetFileName
 
 class ResumeAgainstServerTest {
-
     private val body = ByteArray(4096) { (it * 7 and 0xFF).toByte() }
     private val resumeFrom = 500L
     private val scopedName = AssetFileName.scoped("owner", "repo", "app.apk")
@@ -220,8 +219,7 @@ class ResumeAgainstServerTest {
             pool.shutdownNow()
         }
 
-        fun awaitFirstRequest(timeoutMillis: Long): Boolean =
-            arrival.await(timeoutMillis, TimeUnit.MILLISECONDS)
+        fun awaitFirstRequest(timeoutMillis: Long): Boolean = arrival.await(timeoutMillis, TimeUnit.MILLISECONDS)
 
         private fun respond(exchange: HttpExchange) {
             val range = exchange.requestHeaders.getFirst("Range")
@@ -239,33 +237,50 @@ class ResumeAgainstServerTest {
                 return
             }
 
-            val requested = range?.let { RANGE_HEADER.find(it)?.groupValues?.get(1)?.toLong() }
+            val requested =
+                range?.let {
+                    RANGE_HEADER
+                        .find(it)
+                        ?.groupValues
+                        ?.get(1)
+                        ?.toLong()
+                }
             if (requested == null) {
                 send(exchange, 200, body, contentRange = null)
                 return
             }
             when (mode) {
-                Mode.ANSWER_206_FOR_THE_WRONG_SPAN ->
+                Mode.ANSWER_206_FOR_THE_WRONG_SPAN -> {
                     send(exchange, 206, body, contentRange = "bytes 0-${body.size - 1}/${body.size}")
+                }
 
-                else ->
+                else -> {
                     send(
                         exchange,
                         206,
                         body.copyOfRange(requested.toInt(), body.size),
                         contentRange = "bytes $requested-${body.size - 1}/${body.size}",
                     )
+                }
             }
         }
 
-        private fun send(exchange: HttpExchange, code: Int, payload: ByteArray, contentRange: String?) {
+        private fun send(
+            exchange: HttpExchange,
+            code: Int,
+            payload: ByteArray,
+            contentRange: String?,
+        ) {
             if (contentRange != null) exchange.responseHeaders.add("Content-Range", contentRange)
             exchange.sendResponseHeaders(code, payload.size.toLong())
             exchange.responseBody.use { it.write(payload) }
         }
     }
 
-    private inline fun withServer(mode: Mode, block: (RangeServer) -> Unit) {
+    private inline fun withServer(
+        mode: Mode,
+        block: (RangeServer) -> Unit,
+    ) {
         val server = RangeServer(body, mode)
         server.start()
         try {

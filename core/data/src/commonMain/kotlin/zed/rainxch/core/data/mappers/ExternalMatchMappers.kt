@@ -14,25 +14,27 @@ fun ExternalAppCandidate.toRequestItem(): ExternalMatchRequest.RequestItem =
         appLabel = appLabel,
         signingFingerprint = signingFingerprint,
         installerKind = installerKind.toWireString(),
-        manifestHint = manifestHint?.let {
-            ExternalMatchRequest.ManifestHintDto(owner = it.owner, repo = it.repo)
-        },
+        manifestHint =
+            manifestHint?.let {
+                ExternalMatchRequest.ManifestHintDto(owner = it.owner, repo = it.repo)
+            },
     )
 
 fun ExternalMatchResponse.toRepoMatchResults(): List<RepoMatchResult> =
     matches.map { entry ->
         RepoMatchResult(
             packageName = entry.packageName,
-            suggestions = entry.candidates.map { c ->
-                RepoMatchSuggestion(
-                    owner = c.owner,
-                    repo = c.repo,
-                    confidence = c.confidence,
-                    source = c.source.toRepoMatchSource(),
-                    stars = c.stars,
-                    description = c.description,
-                )
-            },
+            suggestions =
+                entry.candidates.map { c ->
+                    RepoMatchSuggestion(
+                        owner = c.owner,
+                        repo = c.repo,
+                        confidence = c.confidence,
+                        source = c.source.toRepoMatchSource(),
+                        stars = c.stars,
+                        description = c.description,
+                    )
+                },
         )
     }
 

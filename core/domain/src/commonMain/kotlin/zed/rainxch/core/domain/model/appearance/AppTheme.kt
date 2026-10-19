@@ -1,4 +1,5 @@
 package zed.rainxch.core.domain.model.appearance
+
 enum class AppTheme {
     DYNAMIC,
     NORD,
@@ -8,13 +9,13 @@ enum class AppTheme {
     ;
 
     companion object {
-
-        private val LEGACY_MIGRATION = mapOf(
-            "OCEAN" to NORD,
-            "SLATE" to NORD,
-            "PURPLE" to PLUM,
-            "AMBER" to CREAM,
-        )
+        private val LEGACY_MIGRATION =
+            mapOf(
+                "OCEAN" to NORD,
+                "SLATE" to NORD,
+                "PURPLE" to PLUM,
+                "AMBER" to CREAM,
+            )
 
         fun fromName(name: String?): AppTheme {
             if (name.isNullOrEmpty()) return NORD

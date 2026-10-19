@@ -59,21 +59,27 @@ class AutoUpdateWorker(
             val autoUpdateEnabled = tweaksRepository.getAutoUpdateEnabled().first()
             val installerType = tweaksRepository.getInstallerType().first()
 
-            val silentReady = when (installerType) {
-                InstallerType.SHIZUKU -> {
-                    shizukuServiceManager.refreshStatus()
-                    shizukuServiceManager.status.value == ShizukuStatus.READY
+            val silentReady =
+                when (installerType) {
+                    InstallerType.SHIZUKU -> {
+                        shizukuServiceManager.refreshStatus()
+                        shizukuServiceManager.status.value == ShizukuStatus.READY
+                    }
+
+                    InstallerType.DHIZUKU -> {
+                        dhizukuServiceManager.refreshStatus()
+                        dhizukuServiceManager.status.value == DhizukuStatus.READY
+                    }
+
+                    InstallerType.ROOT -> {
+                        rootServiceManager.refreshStatus()
+                        rootServiceManager.status.value == RootStatus.READY
+                    }
+
+                    InstallerType.DEFAULT -> {
+                        false
+                    }
                 }
-                InstallerType.DHIZUKU -> {
-                    dhizukuServiceManager.refreshStatus()
-                    dhizukuServiceManager.status.value == DhizukuStatus.READY
-                }
-                InstallerType.ROOT -> {
-                    rootServiceManager.refreshStatus()
-                    rootServiceManager.status.value == RootStatus.READY
-                }
-                InstallerType.DEFAULT -> false
-            }
 
             if (!autoUpdateEnabled || !silentReady) {
                 Logger.i {
@@ -163,7 +169,7 @@ class AutoUpdateWorker(
         }
 
         Logger.d { "AutoUpdateWorker: Downloading $assetName for ${app.appName}" }
-        downloader.download(assetUrl, assetName).collect {   }
+        downloader.download(assetUrl, assetName).collect { }
 
         val filePath =
             downloader.getDownloadedFilePath(assetName)
@@ -211,8 +217,7 @@ class AutoUpdateWorker(
                         releaseId = currentApp.latestReleaseId,
                         assetId = currentApp.latestAssetId,
                         assetDigest = currentApp.latestAssetDigest,
-                    )
-                    .withLatestSnapshot(
+                    ).withLatestSnapshot(
                         version = latestVersion,
                         assetName = assetName,
                         assetUrl = assetUrl,

@@ -25,13 +25,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import org.jetbrains.compose.resources.stringResource
+import zed.rainxch.apps.presentation.import.model.RepoSuggestionUi
+import zed.rainxch.apps.presentation.import.model.SuggestionChipTone
 import zed.rainxch.core.presentation.components.icon.KomiIcon
 import zed.rainxch.core.presentation.components.text.KomiText
 import zed.rainxch.core.presentation.components.text.KomiTextRole
 import zed.rainxch.core.presentation.locals.LocalPersonality
-import org.jetbrains.compose.resources.stringResource
-import zed.rainxch.apps.presentation.import.model.RepoSuggestionUi
-import zed.rainxch.apps.presentation.import.model.SuggestionChipTone
 import zed.rainxch.core.presentation.utils.formatCompactCount
 import zed.rainxch.githubstore.core.presentation.res.Res
 import zed.rainxch.githubstore.core.presentation.res.external_import_card_owner_byline
@@ -46,14 +46,16 @@ fun RepoCandidateRow(
 ) {
     val colors = LocalPersonality.current.colors
     val shape = LocalPersonality.current.shape
-    val chipBg = when (suggestion.chipTone) {
-        SuggestionChipTone.Primary -> colors.primaryContainer
-        SuggestionChipTone.Muted -> colors.surfaceVariant
-    }
-    val chipFg = when (suggestion.chipTone) {
-        SuggestionChipTone.Primary -> colors.onPrimaryContainer
-        SuggestionChipTone.Muted -> colors.onSurfaceVariant
-    }
+    val chipBg =
+        when (suggestion.chipTone) {
+            SuggestionChipTone.Primary -> colors.primaryContainer
+            SuggestionChipTone.Muted -> colors.surfaceVariant
+        }
+    val chipFg =
+        when (suggestion.chipTone) {
+            SuggestionChipTone.Primary -> colors.onPrimaryContainer
+            SuggestionChipTone.Muted -> colors.onSurfaceVariant
+        }
 
     Row(
         modifier =
@@ -80,10 +82,11 @@ fun RepoCandidateRow(
                 horizontalArrangement = Arrangement.spacedBy(6.dp),
             ) {
                 KomiText(
-                    text = stringResource(
-                        Res.string.external_import_card_owner_byline,
-                        suggestion.owner,
-                    ),
+                    text =
+                        stringResource(
+                            Res.string.external_import_card_owner_byline,
+                            suggestion.owner,
+                        ),
                     role = KomiTextRole.Body,
                     fontSize = 13.sp,
                     color = colors.onSurfaceVariant,
@@ -93,30 +96,40 @@ fun RepoCandidateRow(
                 )
 
                 Box(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(shape.cornerSmall))
-                        .background(
-                            if (suggestion.sourceHost == null) {
-                                colors.surfaceVariant
-                            } else {
-                                colors.primaryContainer
-                            },
-                        ),
+                    modifier =
+                        Modifier
+                            .clip(RoundedCornerShape(shape.cornerSmall))
+                            .background(
+                                if (suggestion.sourceHost == null) {
+                                    colors.surfaceVariant
+                                } else {
+                                    colors.primaryContainer
+                                },
+                            ),
                 ) {
                     KomiText(
-                        text = when {
-                            suggestion.sourceHost == null -> "GitHub"
-                            suggestion.sourceHost.equals("codeberg.org", ignoreCase = true) ->
-                                "Codeberg"
-                            else -> suggestion.sourceHost
-                        },
+                        text =
+                            when {
+                                suggestion.sourceHost == null -> {
+                                    "GitHub"
+                                }
+
+                                suggestion.sourceHost.equals("codeberg.org", ignoreCase = true) -> {
+                                    "Codeberg"
+                                }
+
+                                else -> {
+                                    suggestion.sourceHost
+                                }
+                            },
                         role = KomiTextRole.Label,
                         fontSize = 11.sp,
-                        color = if (suggestion.sourceHost == null) {
-                            colors.onSurfaceVariant
-                        } else {
-                            colors.onPrimaryContainer
-                        },
+                        color =
+                            if (suggestion.sourceHost == null) {
+                                colors.onSurfaceVariant
+                            } else {
+                                colors.onPrimaryContainer
+                            },
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                         uppercase = false,
@@ -167,15 +180,15 @@ fun RepoCandidateRow(
                 Modifier
                     .semantics {
                         contentDescription = confidenceLabel
-                    }
-                    .clip(RoundedCornerShape(shape.corner))
+                    }.clip(RoundedCornerShape(shape.corner))
                     .background(chipBg),
         ) {
             KomiText(
-                text = stringResource(
-                    Res.string.external_import_match_confidence_chip,
-                    suggestion.confidencePercent,
-                ),
+                text =
+                    stringResource(
+                        Res.string.external_import_match_confidence_chip,
+                        suggestion.confidencePercent,
+                    ),
                 role = KomiTextRole.Label,
                 fontSize = 12.sp,
                 color = chipFg,

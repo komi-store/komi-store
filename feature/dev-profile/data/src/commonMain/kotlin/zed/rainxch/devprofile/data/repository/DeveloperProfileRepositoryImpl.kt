@@ -3,7 +3,9 @@ package zed.rainxch.devprofile.data.repository
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
+import io.ktor.client.request.headers
 import io.ktor.client.request.parameter
+import io.ktor.client.request.url
 import io.ktor.http.isSuccess
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
@@ -21,11 +23,9 @@ import zed.rainxch.core.data.network.BackendApiClient
 import zed.rainxch.core.data.network.GitHubClientProvider
 import zed.rainxch.core.data.network.shouldFallbackToGithubOrRethrow
 import zed.rainxch.core.domain.logging.KomiStoreLogger
-import zed.rainxch.core.domain.model.system.Platform
 import zed.rainxch.core.domain.model.error.RateLimitException
+import zed.rainxch.core.domain.model.system.Platform
 import zed.rainxch.core.domain.repository.FavouritesRepository
-import io.ktor.client.request.headers
-import io.ktor.client.request.url
 import zed.rainxch.devprofile.data.dto.ContributionsResponse
 import zed.rainxch.devprofile.data.dto.GitHubRepoResponse
 import zed.rainxch.devprofile.data.dto.GitHubUserResponse
@@ -83,19 +83,21 @@ class DeveloperProfileRepositoryImpl(
     override suspend fun getContributionCalendar(username: String): Result<ContributionCalendar> {
         return withContext(Dispatchers.IO) {
             try {
-                val response = httpClient.get {
-                    url("https://github-contributions-api.jogruber.de/v4/$username?y=last")
-                    headers { remove("X-GitHub-Token") }
-                }
+                val response =
+                    httpClient.get {
+                        url("https://github-contributions-api.jogruber.de/v4/$username?y=last")
+                        headers { remove("X-GitHub-Token") }
+                    }
                 if (!response.status.isSuccess()) {
                     return@withContext Result.failure(
                         Exception("Failed to fetch contributions: ${response.status.description}"),
                     )
                 }
                 val body: ContributionsResponse = response.body()
-                val days = body.contributions.map {
-                    ContributionDay(date = it.date, count = it.count, level = it.level)
-                }
+                val days =
+                    body.contributions.map {
+                        ContributionDay(date = it.date, count = it.count, level = it.level)
+                    }
                 val total = body.total["lastYear"] ?: body.total.values.firstOrNull() ?: 0
                 Result.success(ContributionCalendar(totalLastYear = total, days = days))
             } catch (e: CancellationException) {
@@ -116,47 +118,50 @@ class DeveloperProfileRepositoryImpl(
                 var useBackend = true
 
                 while (true) {
-                    val pageRepos: List<GitHubRepoResponse> = if (useBackend) {
-                        val backendResult = backendApiClient.getUserRepos(
-                            username = username,
-                            page = page,
-                            perPage = perPage,
-                            sort = "updated",
-                            type = "owner",
-                        )
-                        val mapped = backendResult.fold(
-                            onSuccess = { it.map { repo -> repo.toGitHubRepoResponse() } },
-                            onFailure = { error ->
-                                if (!shouldFallbackToGithubOrRethrow(error)) {
-                                    return@withContext Result.failure(error)
-                                }
-                                useBackend = false
-                                null
-                            },
-                        )
-                        if (mapped != null) {
-                            mapped
+                    val pageRepos: List<GitHubRepoResponse> =
+                        if (useBackend) {
+                            val backendResult =
+                                backendApiClient.getUserRepos(
+                                    username = username,
+                                    page = page,
+                                    perPage = perPage,
+                                    sort = "updated",
+                                    type = "owner",
+                                )
+                            val mapped =
+                                backendResult.fold(
+                                    onSuccess = { it.map { repo -> repo.toGitHubRepoResponse() } },
+                                    onFailure = { error ->
+                                        if (!shouldFallbackToGithubOrRethrow(error)) {
+                                            return@withContext Result.failure(error)
+                                        }
+                                        useBackend = false
+                                        null
+                                    },
+                                )
+                            if (mapped != null) {
+                                mapped
+                            } else {
+                                continue
+                            }
                         } else {
-                            continue
-                        }
-                    } else {
-                        val response =
-                            httpClient.get("/users/$username/repos") {
-                                parameter("per_page", perPage)
-                                parameter("page", page)
-                                parameter("type", "owner")
-                                parameter("sort", "updated")
-                                parameter("direction", "desc")
+                            val response =
+                                httpClient.get("/users/$username/repos") {
+                                    parameter("per_page", perPage)
+                                    parameter("page", page)
+                                    parameter("type", "owner")
+                                    parameter("sort", "updated")
+                                    parameter("direction", "desc")
+                                }
+
+                            if (!response.status.isSuccess()) {
+                                return@withContext Result.failure(
+                                    Exception("Failed to fetch repositories: ${response.status.description}"),
+                                )
                             }
 
-                        if (!response.status.isSuccess()) {
-                            return@withContext Result.failure(
-                                Exception("Failed to fetch repositories: ${response.status.description}"),
-                            )
+                            response.body()
                         }
-
-                        response.body()
-                    }
 
                     if (pageRepos.isEmpty()) break
 
@@ -202,10 +207,11 @@ class DeveloperProfileRepositoryImpl(
         val installedApps = installedAppsDao.getAppsByRepoId(repo.id)
         val isFavorite = favoriteIds.contains(repo.id)
 
-        val info = checkReleaseInfo(
-            owner = repo.fullName.split("/")[0],
-            repoName = repo.name,
-        )
+        val info =
+            checkReleaseInfo(
+                owner = repo.fullName.split("/")[0],
+                repoName = repo.name,
+            )
 
         return repo.toDomain(
             hasReleases = info.hasReleases,
@@ -239,16 +245,28 @@ class DeveloperProfileRepositoryImpl(
                 if (stableRelease == null) {
                     return ReleaseInfo(releases.isNotEmpty(), false, null, null)
                 }
-                val hasInstallable = stableRelease.assets.any { asset ->
-                    val name = asset.name.lowercase()
-                    when (platform) {
-                        Platform.ANDROID -> name.endsWith(".apk")
-                        Platform.WINDOWS -> name.endsWith(".msi") || name.endsWith(".exe")
-                        Platform.MACOS -> name.endsWith(".dmg") || name.endsWith(".pkg")
-                        Platform.LINUX -> name.endsWith(".appimage") || name.endsWith(".deb") ||
-                            name.endsWith(".rpm") || name.endsWith(".pkg.tar.zst")
+                val hasInstallable =
+                    stableRelease.assets.any { asset ->
+                        val name = asset.name.lowercase()
+                        when (platform) {
+                            Platform.ANDROID -> {
+                                name.endsWith(".apk")
+                            }
+
+                            Platform.WINDOWS -> {
+                                name.endsWith(".msi") || name.endsWith(".exe")
+                            }
+
+                            Platform.MACOS -> {
+                                name.endsWith(".dmg") || name.endsWith(".pkg")
+                            }
+
+                            Platform.LINUX -> {
+                                name.endsWith(".appimage") || name.endsWith(".deb") ||
+                                    name.endsWith(".rpm") || name.endsWith(".pkg.tar.zst")
+                            }
+                        }
                     }
-                }
                 return ReleaseInfo(
                     hasReleases = true,
                     hasInstallable = hasInstallable,
@@ -286,11 +304,22 @@ class DeveloperProfileRepositoryImpl(
                 stableRelease.assets.any { asset ->
                     val name = asset.name.lowercase()
                     when (platform) {
-                        Platform.ANDROID -> name.endsWith(".apk")
-                        Platform.WINDOWS -> name.endsWith(".msi") || name.endsWith(".exe")
-                        Platform.MACOS -> name.endsWith(".dmg") || name.endsWith(".pkg")
-                        Platform.LINUX -> name.endsWith(".appimage") || name.endsWith(".deb") ||
-                            name.endsWith(".rpm") || name.endsWith(".pkg.tar.zst")
+                        Platform.ANDROID -> {
+                            name.endsWith(".apk")
+                        }
+
+                        Platform.WINDOWS -> {
+                            name.endsWith(".msi") || name.endsWith(".exe")
+                        }
+
+                        Platform.MACOS -> {
+                            name.endsWith(".dmg") || name.endsWith(".pkg")
+                        }
+
+                        Platform.LINUX -> {
+                            name.endsWith(".appimage") || name.endsWith(".deb") ||
+                                name.endsWith(".rpm") || name.endsWith(".pkg.tar.zst")
+                        }
                     }
                 }
 

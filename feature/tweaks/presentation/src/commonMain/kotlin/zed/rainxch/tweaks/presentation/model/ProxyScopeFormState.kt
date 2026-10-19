@@ -8,6 +8,5 @@ data class ProxyScopeFormState(
     val password: String = "",
     val isPasswordVisible: Boolean = false,
     val isTestInProgress: Boolean = false,
-
     val isDraftDirty: Boolean = false,
 )

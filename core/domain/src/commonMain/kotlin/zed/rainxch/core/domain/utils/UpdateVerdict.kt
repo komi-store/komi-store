@@ -71,11 +71,13 @@ object UpdateVerdict {
         val skipHolds = matchesSkipped && !skipSupersededByNewBuild
         val skipBecameStale =
             skipSupersededByNewBuild ||
-                (skippedTag != null &&
-                    !matchesSkipped &&
-                    !VersionMath.isTimestampTrackedTag(matched.tag) &&
-                    !VersionMath.isTimestampTrackedTag(skippedTag) &&
-                    VersionMath.isVersionNewer(matched.tag, skippedTag))
+                (
+                    skippedTag != null &&
+                        !matchesSkipped &&
+                        !VersionMath.isTimestampTrackedTag(matched.tag) &&
+                        !VersionMath.isTimestampTrackedTag(skippedTag) &&
+                        VersionMath.isVersionNewer(matched.tag, skippedTag)
+                )
 
         val timestampTracked = VersionMath.isTimestampTrackedTag(matched.tag)
         val sameTag = VersionMath.isExactSameVersion(matched.tag, installed.tag)
@@ -111,22 +113,41 @@ object UpdateVerdict {
 
         val tagVerdict =
             when {
-                usedTimestampLogic -> timestampWouldReport
-                codesAlreadyMatch -> false
-                !reconcilable -> false
-                else ->
+                usedTimestampLogic -> {
+                    timestampWouldReport
+                }
+
+                codesAlreadyMatch -> {
+                    false
+                }
+
+                !reconcilable -> {
+                    false
+                }
+
+                else -> {
                     VersionMath.isVersionNewer(
                         candidate = matched.tag,
                         current = installed.tag,
                     )
+                }
             }
 
         val isUpdateAvailable =
             when {
-                skipHolds -> false
-                deviceRunsMatchedRelease -> false
-                bound == null -> tagVerdict
-                else ->
+                skipHolds -> {
+                    false
+                }
+
+                deviceRunsMatchedRelease -> {
+                    false
+                }
+
+                bound == null -> {
+                    tagVerdict
+                }
+
+                else -> {
                     decideBound(
                         sameFile =
                             isSameFile(
@@ -139,6 +160,7 @@ object UpdateVerdict {
                         installedReleasePublishedAt = bound.releasePublishedAt,
                         fallback = tagVerdict,
                     )
+                }
             }
 
         return Result(
@@ -173,11 +195,12 @@ object UpdateVerdict {
         matchedPublishedAt: String?,
         installedReleasePublishedAt: String?,
         fallback: Boolean,
-    ): Boolean = when {
-        sameFile -> false
-        installedReleasePublishedAt == null -> fallback
-        else -> VersionMath.isPublishedAtAfter(matchedPublishedAt, installedReleasePublishedAt)
-    }
+    ): Boolean =
+        when {
+            sameFile -> false
+            installedReleasePublishedAt == null -> fallback
+            else -> VersionMath.isPublishedAtAfter(matchedPublishedAt, installedReleasePublishedAt)
+        }
 
     data class Result(
         val isUpdateAvailable: Boolean,

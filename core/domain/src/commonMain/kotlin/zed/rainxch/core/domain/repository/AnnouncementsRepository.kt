@@ -13,5 +13,8 @@ interface AnnouncementsRepository {
 
     suspend fun acknowledge(id: String)
 
-    suspend fun setMuted(category: AnnouncementCategory, muted: Boolean)
+    suspend fun setMuted(
+        category: AnnouncementCategory,
+        muted: Boolean,
+    )
 }

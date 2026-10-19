@@ -1,4 +1,5 @@
 package zed.rainxch.core.domain.model.repository
+
 data class HiddenRepo(
     val repoId: Long,
     val repoName: String,

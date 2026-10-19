@@ -30,7 +30,6 @@ data class ExternalImportState(
     val errorMessage: String? = null,
     val confettiPlayCount: Int = 0,
     val trackedCount: Int = 0,
-
     val scanStartedAtMs: Long? = null,
     val isSkipAvailable: Boolean = false,
 )

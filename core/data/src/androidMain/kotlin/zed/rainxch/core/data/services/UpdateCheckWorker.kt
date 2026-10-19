@@ -58,7 +58,6 @@ class UpdateCheckWorker(
             val appsWithUpdates = installedAppsRepository.getAppsWithUpdates().first()
 
             if (appsWithUpdates.isNotEmpty()) {
-
                 val autoUpdateEnabled = tweaksRepository.getAutoUpdateEnabled().first()
                 val installerType = tweaksRepository.getInstallerType().first()
 
@@ -69,7 +68,6 @@ class UpdateCheckWorker(
                     }
                     UpdateScheduler.scheduleAutoUpdate(applicationContext)
                 } else {
-
                     showUpdateNotification(appsWithUpdates)
                 }
             } else {
@@ -99,9 +97,10 @@ class UpdateCheckWorker(
             val trackedFlow = installedAppsRepository.getAllInstalledApps().first()
             val tracked = trackedFlow.map { it.packageName }.toSet()
 
-            val permanent = (
-                externalLinkDao.getDoNotRescanPackageNames() +
-                    externalLinkDao.getActiveSkippedPackageNames(System.currentTimeMillis())
+            val permanent =
+                (
+                    externalLinkDao.getDoNotRescanPackageNames() +
+                        externalLinkDao.getActiveSkippedPackageNames(System.currentTimeMillis())
                 ).toSet()
 
             val delta = (installed - tracked - permanent).take(MAX_DELTA_PACKAGES).toSet()
@@ -142,7 +141,6 @@ class UpdateCheckWorker(
 
     @SuppressLint("MissingPermission")
     private suspend fun showUpdateNotification(appsWithUpdates: List<zed.rainxch.core.domain.model.installation.InstalledApp>) {
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             val granted =
                 ContextCompat.checkSelfPermission(

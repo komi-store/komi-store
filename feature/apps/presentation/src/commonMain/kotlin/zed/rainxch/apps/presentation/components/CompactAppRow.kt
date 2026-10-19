@@ -2,7 +2,6 @@
 
 package zed.rainxch.apps.presentation.components
 
-import zed.rainxch.core.presentation.components.InstalledAppIcon
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -21,20 +20,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.OpenInNew
 import androidx.compose.material.icons.filled.Update
-import androidx.compose.material.icons.outlined.DeleteOutline
 import androidx.compose.material.icons.outlined.Close
+import androidx.compose.material.icons.outlined.DeleteOutline
 import androidx.compose.material.icons.outlined.MoreVert
-import zed.rainxch.core.presentation.components.buttons.KomiButton
-import zed.rainxch.core.presentation.components.buttons.KomiButtonVariant
-import zed.rainxch.core.presentation.components.buttons.KomiButtonSize
-import zed.rainxch.core.presentation.components.icon.KomiIcon
-import zed.rainxch.core.presentation.components.overlays.KomiDropdown
-import zed.rainxch.core.presentation.components.overlays.KomiMenuItem
-import zed.rainxch.core.presentation.components.overlays.KomiMenuTone
-import zed.rainxch.core.presentation.components.text.KomiText
-import zed.rainxch.core.presentation.components.text.KomiTextRole
-import zed.rainxch.core.presentation.locals.LocalPersonality
-import zed.rainxch.core.presentation.utils.rememberTapCooldown
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -50,6 +38,18 @@ import kotlinx.collections.immutable.toImmutableList
 import org.jetbrains.compose.resources.stringResource
 import zed.rainxch.apps.presentation.model.AppItem
 import zed.rainxch.apps.presentation.model.UpdateState
+import zed.rainxch.core.presentation.components.InstalledAppIcon
+import zed.rainxch.core.presentation.components.buttons.KomiButton
+import zed.rainxch.core.presentation.components.buttons.KomiButtonSize
+import zed.rainxch.core.presentation.components.buttons.KomiButtonVariant
+import zed.rainxch.core.presentation.components.icon.KomiIcon
+import zed.rainxch.core.presentation.components.overlays.KomiDropdown
+import zed.rainxch.core.presentation.components.overlays.KomiMenuItem
+import zed.rainxch.core.presentation.components.overlays.KomiMenuTone
+import zed.rainxch.core.presentation.components.text.KomiText
+import zed.rainxch.core.presentation.components.text.KomiTextRole
+import zed.rainxch.core.presentation.locals.LocalPersonality
+import zed.rainxch.core.presentation.utils.rememberTapCooldown
 import zed.rainxch.githubstore.core.presentation.res.Res
 import zed.rainxch.githubstore.core.presentation.res.advanced_settings_open
 import zed.rainxch.githubstore.core.presentation.res.apps_compact_more_actions
@@ -98,28 +98,27 @@ fun CompactAppRow(
     val showVersionMigration = app.isPendingInstall && appItem.versionTargetVersion != null
 
     Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .defaultMinSize(minHeight = 68.dp)
-            .then(
-                if (framed) {
-                    Modifier
-                        .clip(rowShape)
-                        .border(
-                            width = 1.dp,
-                            color = colors.outline,
-                            shape = rowShape,
-                        )
-                        .background(colors.surface)
-                } else {
-                    Modifier
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .defaultMinSize(minHeight = 68.dp)
+                .then(
+                    if (framed) {
+                        Modifier
+                            .clip(rowShape)
+                            .border(
+                                width = 1.dp,
+                                color = colors.outline,
+                                shape = rowShape,
+                            ).background(colors.surface)
+                    } else {
+                        Modifier
+                    },
+                ).clickable(onClick = onRowClick)
+                .padding(horizontal = 14.dp, vertical = 12.dp)
+                .semantics(mergeDescendants = true) {
+                    contentDescription = rowSemanticName
                 },
-            )
-            .clickable(onClick = onRowClick)
-            .padding(horizontal = 14.dp, vertical = 12.dp)
-            .semantics(mergeDescendants = true) {
-                contentDescription = rowSemanticName
-            },
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
@@ -204,13 +203,14 @@ fun CompactAppRow(
         } else if (!app.isPendingInstall && !isBusy) {
             val openLabel = stringResource(Res.string.open)
             Box(
-                modifier = Modifier
-                    .size(40.dp)
-                    .clickable(onClick = onOpenClick)
-                    .semantics {
-                        contentDescription = openLabel
-                        role = Role.Button
-                    },
+                modifier =
+                    Modifier
+                        .size(40.dp)
+                        .clickable(onClick = onOpenClick)
+                        .semantics {
+                            contentDescription = openLabel
+                            role = Role.Button
+                        },
                 contentAlignment = Alignment.Center,
             ) {
                 KomiIcon(
@@ -269,44 +269,45 @@ private fun CompactRowOverflow(
     val preReleaseActive = stringResource(Res.string.apps_menu_item_active, preReleaseBase)
     val ignoreUpdatesActive = stringResource(Res.string.apps_menu_item_active, ignoreUpdatesBase)
 
-    val entries = buildList {
-        add(KomiMenuItem(id = "advanced_settings", label = advancedSettingsLabel))
-        add(KomiMenuItem(id = "variant_picker", label = variantPickerLabel))
-        add(
-            KomiMenuItem(
-                id = "toggle_pre_releases",
-                label = if (isPreReleaseEnabled) preReleaseActive else preReleaseBase,
-            ),
-        )
-        add(
-            KomiMenuItem(
-                id = "toggle_update_check",
-                label = if (!isUpdateCheckEnabled) ignoreUpdatesActive else ignoreUpdatesBase,
-            ),
-        )
-        if (hasSkippedReleaseTag) {
-            add(KomiMenuItem(id = "unskip_version", label = unskipLabel))
-        }
-        if (isPending) {
+    val entries =
+        buildList {
+            add(KomiMenuItem(id = "advanced_settings", label = advancedSettingsLabel))
+            add(KomiMenuItem(id = "variant_picker", label = variantPickerLabel))
             add(
                 KomiMenuItem(
-                    id = "discard_pending",
-                    label = deleteTaskLabel,
-                    icon = Icons.Outlined.Close,
-                    tone = KomiMenuTone.Danger,
+                    id = "toggle_pre_releases",
+                    label = if (isPreReleaseEnabled) preReleaseActive else preReleaseBase,
                 ),
             )
-        } else {
             add(
                 KomiMenuItem(
-                    id = "uninstall",
-                    label = uninstallLabel,
-                    icon = Icons.Outlined.DeleteOutline,
-                    tone = KomiMenuTone.Danger,
+                    id = "toggle_update_check",
+                    label = if (!isUpdateCheckEnabled) ignoreUpdatesActive else ignoreUpdatesBase,
                 ),
             )
-        }
-    }.toImmutableList()
+            if (hasSkippedReleaseTag) {
+                add(KomiMenuItem(id = "unskip_version", label = unskipLabel))
+            }
+            if (isPending) {
+                add(
+                    KomiMenuItem(
+                        id = "discard_pending",
+                        label = deleteTaskLabel,
+                        icon = Icons.Outlined.Close,
+                        tone = KomiMenuTone.Danger,
+                    ),
+                )
+            } else {
+                add(
+                    KomiMenuItem(
+                        id = "uninstall",
+                        label = uninstallLabel,
+                        icon = Icons.Outlined.DeleteOutline,
+                        tone = KomiMenuTone.Danger,
+                    ),
+                )
+            }
+        }.toImmutableList()
 
     KomiDropdown(
         entries = entries,

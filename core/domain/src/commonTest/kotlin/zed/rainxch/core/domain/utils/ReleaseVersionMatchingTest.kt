@@ -1,12 +1,12 @@
 package zed.rainxch.core.domain.utils
 
+import zed.rainxch.core.domain.model.account.github.GithubAsset
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertNotEquals
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
-import zed.rainxch.core.domain.model.account.github.GithubAsset
 
 class ReleaseVersionMatchingTest {
     private fun asset(name: String) =
@@ -95,33 +95,37 @@ class ReleaseVersionMatchingTest {
     @Test
     fun aPinnedVariantSurvivesABuildIdRelease() {
         val pin = AssetVariant.fingerprintFromPickedAsset("InstallerX-Revived-online-26.09.apk", 2, "26.09")
-        val release = listOf(
-            asset("InstallerX-Revived-offline-26.10.b4a8da2.apk"),
-            asset("InstallerX-Revived-online-26.10.b4a8da2.apk"),
-        )
-        val picked = AssetVariant.resolvePreferredAsset(
-            assets = release,
-            pinnedVariant = pin?.variant,
-            pinnedTokens = pin?.tokens?.takeIf { it.isNotEmpty() },
-            pinnedGlob = pin?.glob,
-            releaseTag = "26.10.b4a8da2",
-        )
+        val release =
+            listOf(
+                asset("InstallerX-Revived-offline-26.10.b4a8da2.apk"),
+                asset("InstallerX-Revived-online-26.10.b4a8da2.apk"),
+            )
+        val picked =
+            AssetVariant.resolvePreferredAsset(
+                assets = release,
+                pinnedVariant = pin?.variant,
+                pinnedTokens = pin?.tokens?.takeIf { it.isNotEmpty() },
+                pinnedGlob = pin?.glob,
+                releaseTag = "26.10.b4a8da2",
+            )
         assertEquals("InstallerX-Revived-online-26.10.b4a8da2.apk", picked?.name)
     }
 
     @Test
     fun aPinStoredBeforeReleaseTagsStillMatches() {
         val legacyPin = AssetVariant.deriveGlob("Godot_v4.7.2-stable_android_editor.apk")
-        val release = listOf(
-            asset("Godot_v4.8-stable_android_editor_horizonos.apk"),
-            asset("Godot_v4.8-stable_android_editor.apk"),
-        )
-        val picked = AssetVariant.resolvePreferredAsset(
-            assets = release,
-            pinnedVariant = null,
-            pinnedGlob = legacyPin,
-            releaseTag = "4.8-stable",
-        )
+        val release =
+            listOf(
+                asset("Godot_v4.8-stable_android_editor_horizonos.apk"),
+                asset("Godot_v4.8-stable_android_editor.apk"),
+            )
+        val picked =
+            AssetVariant.resolvePreferredAsset(
+                assets = release,
+                pinnedVariant = null,
+                pinnedGlob = legacyPin,
+                releaseTag = "4.8-stable",
+            )
         assertEquals("Godot_v4.8-stable_android_editor.apk", picked?.name)
     }
 

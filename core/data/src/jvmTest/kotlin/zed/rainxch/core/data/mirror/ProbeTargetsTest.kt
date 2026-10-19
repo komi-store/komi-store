@@ -1,10 +1,10 @@
 package zed.rainxch.core.data.mirror
 
-import kotlin.test.Test
-import kotlin.test.assertEquals
 import zed.rainxch.core.domain.model.mirror.MirrorConfig
 import zed.rainxch.core.domain.model.mirror.MirrorStatus
 import zed.rainxch.core.domain.model.mirror.MirrorType
+import kotlin.test.Test
+import kotlin.test.assertEquals
 
 class ProbeTargetsTest {
     private val readme = "https://raw.githubusercontent.com/octocat/Hello-World/master/README"

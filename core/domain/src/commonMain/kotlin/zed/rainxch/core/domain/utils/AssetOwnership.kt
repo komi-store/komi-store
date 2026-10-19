@@ -5,7 +5,6 @@ import zed.rainxch.core.domain.model.account.github.GithubRelease
 import zed.rainxch.core.domain.model.installation.InstalledApp
 
 object AssetOwnership {
-
     // Each tag is the release its name came from; with it the comparison also holds when the
     // version is written in a way the name patterns don't recognise.
     fun isSameApp(
@@ -18,7 +17,10 @@ object AssetOwnership {
         return stemsOf(otherAssetName, otherTag).any { it in stems }
     }
 
-    private fun stemsOf(assetName: String, releaseTag: String?): Set<String> =
+    private fun stemsOf(
+        assetName: String,
+        releaseTag: String?,
+    ): Set<String> =
         setOfNotNull(
             AssetVariant.extractBaseStem(assetName).takeIf { it.isNotEmpty() },
             AssetVariant.tagStem(assetName, releaseTag),
@@ -84,9 +86,10 @@ object AssetOwnership {
     ): InstalledApp? {
         if (apps.isEmpty()) return null
 
-        val byFilter = apps.filter { app ->
-            AssetFilter.parse(app.assetFilterRegex)?.getOrNull()?.matches(assetName) == true
-        }
+        val byFilter =
+            apps.filter { app ->
+                AssetFilter.parse(app.assetFilterRegex)?.getOrNull()?.matches(assetName) == true
+            }
         if (byFilter.isNotEmpty()) return byFilter.closestVersionLine(assetName)
 
         val candidates = apps.filter { canOwn(it, assetName) }
@@ -97,17 +100,19 @@ object AssetOwnership {
             if (byGlob.isNotEmpty()) return byGlob.closestVersionLine(assetName)
         }
 
-        val byStem = candidates.filter { app ->
-            app.installedAssetName?.let { isSameApp(it, assetName, app.installedVersion, releaseTag) } == true
-        }
+        val byStem =
+            candidates.filter { app ->
+                app.installedAssetName?.let { isSameApp(it, assetName, app.installedVersion, releaseTag) } == true
+            }
         if (byStem.isNotEmpty()) return byStem.closestVersionLine(assetName)
 
-        val missing = apps.filter { app ->
-            canOwn(app, assetName) &&
-                app.installedAssetName?.let { own ->
-                    releaseAssets.none { isSameApp(it.name, own, releaseTag, app.installedVersion) }
-                } != false
-        }
+        val missing =
+            apps.filter { app ->
+                canOwn(app, assetName) &&
+                    app.installedAssetName?.let { own ->
+                        releaseAssets.none { isSameApp(it.name, own, releaseTag, app.installedVersion) }
+                    } != false
+            }
         val renamed = missing.singleOrNull() ?: return null
         val renamedFrom = renamed.installedAssetName ?: return renamed.takeIf { apps.size == 1 }
         return renamed.takeIf { isRename(renamedFrom, assetName, releaseHistory) }
@@ -122,13 +127,15 @@ object AssetOwnership {
         toAssetName: String,
         releaseHistory: List<GithubRelease>,
     ): Boolean {
-        val newestWithOld = releaseHistory.indexOfFirst { release ->
-            release.assets.any { isSameApp(it.name, fromAssetName) }
-        }
+        val newestWithOld =
+            releaseHistory.indexOfFirst { release ->
+                release.assets.any { isSameApp(it.name, fromAssetName) }
+            }
         if (newestWithOld < 0) return true
-        val oldestWithNew = releaseHistory.indexOfLast { release ->
-            release.assets.any { isSameApp(it.name, toAssetName) }
-        }
+        val oldestWithNew =
+            releaseHistory.indexOfLast { release ->
+                release.assets.any { isSameApp(it.name, toAssetName) }
+            }
         if (oldestWithNew > newestWithOld) return false
         if (oldestWithNew < 0) return true
         // A monorepo's brand-new app also starts after the installed one's last release;
@@ -139,10 +146,18 @@ object AssetOwnership {
 
     // A package that names its major version (org.godotengine.editor.v4) can't be updated by
     // another major's APK; that APK is a different app installed side by side.
-    fun canOwn(app: InstalledApp, assetName: String): Boolean {
-        val packageMajor = app.packageName.split('.').firstNotNullOfOrNull { segment ->
-            PACKAGE_MAJOR.matchEntire(segment)?.groupValues?.get(1)?.toIntOrNull()
-        } ?: return true
+    fun canOwn(
+        app: InstalledApp,
+        assetName: String,
+    ): Boolean {
+        val packageMajor =
+            app.packageName.split('.').firstNotNullOfOrNull { segment ->
+                PACKAGE_MAJOR
+                    .matchEntire(segment)
+                    ?.groupValues
+                    ?.get(1)
+                    ?.toIntOrNull()
+            } ?: return true
         val assetMajor = AssetVariant.versionMajor(assetName) ?: return true
         return packageMajor == assetMajor
     }

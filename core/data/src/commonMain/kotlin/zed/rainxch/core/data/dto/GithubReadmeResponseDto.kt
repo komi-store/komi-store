@@ -7,7 +7,6 @@ import kotlinx.serialization.Serializable
 data class GithubReadmeResponseDto(
     @SerialName("name") val name: String? = null,
     @SerialName("path") val path: String? = null,
-
     @SerialName("content") val content: String? = null,
     @SerialName("encoding") val encoding: String? = null,
     @SerialName("type") val type: String? = null,

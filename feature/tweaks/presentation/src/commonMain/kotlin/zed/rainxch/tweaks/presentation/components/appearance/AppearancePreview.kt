@@ -13,20 +13,20 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import kotlinx.collections.immutable.persistentListOf
 import zed.rainxch.core.domain.model.appearance.AccentId
 import zed.rainxch.core.domain.model.appearance.AppPersonality
+import zed.rainxch.core.presentation.components.buttons.KomiIconButtonSize
+import zed.rainxch.core.presentation.components.buttons.KomiSegmented
+import zed.rainxch.core.presentation.components.buttons.KomiSegmentedItem
+import zed.rainxch.core.presentation.components.inputs.KomiSwitch
 import zed.rainxch.core.presentation.locals.LocalPersonality
 import zed.rainxch.core.presentation.personality.utils.PersonalityPreview
 import zed.rainxch.tweaks.presentation.components.shell.SettingsGroup
 import zed.rainxch.tweaks.presentation.components.shell.SettingsRow
 import zed.rainxch.tweaks.presentation.components.shell.SettingsSectionHead
-import zed.rainxch.tweaks.presentation.components.shell.TweaksDecorSlot
-import kotlinx.collections.immutable.persistentListOf
-import zed.rainxch.core.presentation.components.buttons.KomiIconButtonSize
-import zed.rainxch.core.presentation.components.buttons.KomiSegmented
-import zed.rainxch.core.presentation.components.buttons.KomiSegmentedItem
 import zed.rainxch.tweaks.presentation.components.shell.SettingsValuePill
-import zed.rainxch.core.presentation.components.inputs.KomiSwitch
+import zed.rainxch.tweaks.presentation.components.shell.TweaksDecorSlot
 
 @Preview
 @Composable

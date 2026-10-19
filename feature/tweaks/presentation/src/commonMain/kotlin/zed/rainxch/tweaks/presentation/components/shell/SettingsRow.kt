@@ -12,8 +12,9 @@ fun Modifier.settingsRowDivider(
     color: Color,
     show: Boolean,
 ): Modifier =
-    if (!show) this
-    else
+    if (!show) {
+        this
+    } else {
         drawBehind {
             val stroke = 2.dp.toPx()
             drawLine(
@@ -23,6 +24,7 @@ fun Modifier.settingsRowDivider(
                 strokeWidth = stroke,
             )
         }
+    }
 
 @Composable
 fun SettingsRow(

@@ -44,7 +44,9 @@ class IssueDetailViewModel(
 
     fun onAction(action: IssueDetailAction) {
         when (action) {
-            IssueDetailAction.OnBackClick -> Unit
+            IssueDetailAction.OnBackClick -> {
+                Unit
+            }
 
             is IssueDetailAction.OnCommentChange -> {
                 _state.update { it.copy(commentText = action.comment) }
@@ -77,13 +79,13 @@ class IssueDetailViewModel(
                 return@launch
             }
             _state.update { it.copy(isPostingComment = true) }
-            repository.addIssueComment(
-                owner = owner,
-                repo = repo,
-                number = issueNumber,
-                body = text
-            )
-                .onSuccess { comment ->
+            repository
+                .addIssueComment(
+                    owner = owner,
+                    repo = repo,
+                    number = issueNumber,
+                    body = text,
+                ).onSuccess { comment ->
                     _state.update { st ->
                         val detail = st.detail
                         st.copy(
@@ -93,13 +95,12 @@ class IssueDetailViewModel(
                         )
                     }
                     _events.send(IssueDetailEvent.OnMessage(getString(Res.string.repo_pages_comment_posted)))
-                }
-                .onFailure { e ->
+                }.onFailure { e ->
                     _state.update { it.copy(isPostingComment = false) }
                     _events.send(
                         IssueDetailEvent.OnMessage(
-                            e.message ?: getString(Res.string.repo_pages_comment_failed)
-                        )
+                            e.message ?: getString(Res.string.repo_pages_comment_failed),
+                        ),
                     )
                 }
         }
@@ -118,33 +119,35 @@ class IssueDetailViewModel(
                     detail = st.detail?.copy(reactionThumbsUp = st.detail.reactionThumbsUp + 1),
                 )
             }
-            repository.reactToIssue(owner = owner, repo = repo, number = issueNumber)
+            repository
+                .reactToIssue(owner = owner, repo = repo, number = issueNumber)
                 .onFailure { e ->
                     _state.update { st ->
                         st.copy(
                             isReactingIssue = false,
-                            detail = st.detail?.copy(
-                                reactionThumbsUp = (st.detail.reactionThumbsUp - 1).coerceAtLeast(0)
-                            ),
+                            detail =
+                                st.detail?.copy(
+                                    reactionThumbsUp = (st.detail.reactionThumbsUp - 1).coerceAtLeast(0),
+                                ),
                         )
                     }
                     _events.send(
                         IssueDetailEvent.OnMessage(
-                            e.message ?: getString(Res.string.repo_pages_react_failed)
-                        )
+                            e.message ?: getString(Res.string.repo_pages_react_failed),
+                        ),
                     )
-                }
-                .onSuccess { created ->
+                }.onSuccess { created ->
                     _state.update { st ->
                         st.copy(
                             isReactingIssue = false,
-                            detail = if (created) {
-                                st.detail
-                            } else {
-                                st.detail?.copy(
-                                    reactionThumbsUp = (st.detail.reactionThumbsUp - 1).coerceAtLeast(0),
-                                )
-                            },
+                            detail =
+                                if (created) {
+                                    st.detail
+                                } else {
+                                    st.detail?.copy(
+                                        reactionThumbsUp = (st.detail.reactionThumbsUp - 1).coerceAtLeast(0),
+                                    )
+                                },
                         )
                     }
                 }
@@ -164,7 +167,8 @@ class IssueDetailViewModel(
                     detail = st.detail?.bumpComment(commentId, +1),
                 )
             }
-            repository.reactToComment(owner, repo, commentId)
+            repository
+                .reactToComment(owner, repo, commentId)
                 .onFailure { e ->
                     _state.update { st ->
                         st.copy(
@@ -174,11 +178,10 @@ class IssueDetailViewModel(
                     }
                     _events.send(
                         IssueDetailEvent.OnMessage(
-                            e.message ?: getString(Res.string.repo_pages_react_failed)
-                        )
+                            e.message ?: getString(Res.string.repo_pages_react_failed),
+                        ),
                     )
-                }
-                .onSuccess { created ->
+                }.onSuccess { created ->
                     _state.update { st ->
                         st.copy(
                             reactingCommentIds = st.reactingCommentIds - commentId,
@@ -192,18 +195,18 @@ class IssueDetailViewModel(
     private fun load() {
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true, errorMessage = null) }
-            repository.getIssueDetail(owner, repo, issueNumber)
+            repository
+                .getIssueDetail(owner, repo, issueNumber)
                 .onSuccess { detail ->
                     _state.update {
                         it.copy(
                             isLoading = false,
                             detail = detail,
                             errorMessage = null,
-                            issueNumber = issueNumber
+                            issueNumber = issueNumber,
                         )
                     }
-                }
-                .onFailure { e ->
+                }.onFailure { e ->
                     _state.update {
                         it.copy(
                             isLoading = false,
@@ -219,12 +222,13 @@ class IssueDetailViewModel(
         delta: Int,
     ): RepoIssueDetail =
         copy(
-            comments = comments.map { c ->
-                if (c.id == commentId) {
-                    c.copy(reactionThumbsUp = (c.reactionThumbsUp + delta).coerceAtLeast(0))
-                } else {
-                    c
-                }
-            },
+            comments =
+                comments.map { c ->
+                    if (c.id == commentId) {
+                        c.copy(reactionThumbsUp = (c.reactionThumbsUp + delta).coerceAtLeast(0))
+                    } else {
+                        c
+                    }
+                },
         )
 }

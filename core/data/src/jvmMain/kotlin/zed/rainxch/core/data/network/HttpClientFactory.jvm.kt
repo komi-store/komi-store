@@ -14,7 +14,6 @@ actual fun createPlatformHttpClient(proxyConfig: ProxyConfig): HttpClient =
     HttpClient(OkHttp) {
         engine {
             config {
-
                 buildOsTrustChainOrNull()?.let { chain ->
                     sslSocketFactory(chain.socketFactory, chain.trustManager)
                 }
@@ -53,7 +52,6 @@ actual fun createPlatformHttpClient(proxyConfig: ProxyConfig): HttpClient =
                         val proxyHost = proxyConfig.host
                         val proxyPort = proxyConfig.port
                         if (!username.isNullOrEmpty() && !password.isNullOrEmpty()) {
-
                             Authenticator.setDefault(
                                 object : Authenticator() {
                                     override fun getPasswordAuthentication(): PasswordAuthentication? {

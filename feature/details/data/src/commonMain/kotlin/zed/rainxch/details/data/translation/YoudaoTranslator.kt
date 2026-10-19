@@ -4,16 +4,16 @@ import io.ktor.client.HttpClient
 import io.ktor.client.request.forms.submitForm
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.Parameters
-import java.security.MessageDigest
-import kotlin.time.Clock
-import kotlin.time.ExperimentalTime
-import kotlin.uuid.ExperimentalUuidApi
-import kotlin.uuid.Uuid
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import zed.rainxch.details.domain.model.TranslationResult
+import java.security.MessageDigest
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
+import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
 
 @OptIn(ExperimentalTime::class, ExperimentalUuidApi::class)
 internal class YoudaoTranslator(
@@ -22,7 +22,6 @@ internal class YoudaoTranslator(
     private val appKey: String,
     private val appSecret: String,
 ) : Translator {
-
     override val maxChunkSize: Int = 4500
 
     override suspend fun translate(
@@ -87,14 +86,12 @@ internal class YoudaoTranslator(
         )
     }
 
-    private fun buildSignInput(q: String): String {
-
-        return if (q.length <= 20) {
+    private fun buildSignInput(q: String): String =
+        if (q.length <= 20) {
             q
         } else {
             q.substring(0, 10) + q.length.toString() + q.substring(q.length - 10)
         }
-    }
 
     private fun sha256Hex(input: String): String {
         val digest = MessageDigest.getInstance("SHA-256").digest(input.encodeToByteArray())

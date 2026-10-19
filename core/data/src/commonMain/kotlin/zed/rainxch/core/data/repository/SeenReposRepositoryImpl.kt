@@ -11,8 +11,7 @@ import zed.rainxch.core.domain.repository.SeenReposRepository
 class SeenReposRepositoryImpl(
     private val seenRepoDao: SeenRepoDao,
 ) : SeenReposRepository {
-    override fun getAllSeenRepoIds(): Flow<Set<Long>> =
-        seenRepoDao.getAllSeenRepoIds().map { it.toSet() }
+    override fun getAllSeenRepoIds(): Flow<Set<Long>> = seenRepoDao.getAllSeenRepoIds().map { it.toSet() }
 
     override fun getAllSeenRepos(): Flow<List<SeenRepo>> =
         seenRepoDao.getAllSeenRepos().map { entities ->

@@ -36,17 +36,19 @@ fun AppGroupHeader(
     val shape = LocalPersonality.current.shape
 
     Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .semantics(mergeDescendants = true) { heading() },
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .semantics(mergeDescendants = true) { heading() },
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(6.dp),
     ) {
         GitHubStoreImage(
             imageModel = { app.repoOwnerAvatarUrl },
-            modifier = Modifier
-                .size(18.dp)
-                .clip(RoundedCornerShape(shape.cornerSmall)),
+            modifier =
+                Modifier
+                    .size(18.dp)
+                    .clip(RoundedCornerShape(shape.cornerSmall)),
         )
 
         KomiText(
@@ -75,11 +77,12 @@ fun AppGroupCard(
     val shape = RoundedCornerShape(LocalPersonality.current.shape.corner)
 
     Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .clip(shape)
-            .border(width = 1.dp, color = colors.outline, shape = shape)
-            .background(colors.surface),
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .clip(shape)
+                .border(width = 1.dp, color = colors.outline, shape = shape)
+                .background(colors.surface),
     ) {
         AppGroupHeader(
             app = header,

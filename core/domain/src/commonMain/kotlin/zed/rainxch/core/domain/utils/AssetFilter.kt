@@ -13,7 +13,6 @@ class AssetFilter private constructor(
     override fun toString(): String = "AssetFilter($pattern)"
 
     companion object {
-
         fun parse(raw: String?): Result<AssetFilter>? {
             val trimmed = raw?.trim().orEmpty()
             if (trimmed.isEmpty()) return null
@@ -23,7 +22,6 @@ class AssetFilter private constructor(
         }
 
         fun suggestFromAssetName(assetName: String): String? {
-
             val versionAnchor = Regex("[-_ .]\\d")
             val match = versionAnchor.find(assetName) ?: return null
             val prefix = assetName.substring(0, match.range.first + 1)

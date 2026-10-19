@@ -8,7 +8,10 @@ sealed interface ProfileAction {
     data object OnStarredReposClick : ProfileAction
 
     data object OnFavouriteReposClick : ProfileAction
-    data class OnRepositoriesClick(val username: String) : ProfileAction
+
+    data class OnRepositoriesClick(
+        val username: String,
+    ) : ProfileAction
 
     data object OnLogoutDismiss : ProfileAction
 

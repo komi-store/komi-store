@@ -77,20 +77,29 @@ private fun SecurityScreen(
             )
         },
     ) { innerPadding ->
-        val contentModifier = Modifier
-            .fillMaxSize()
-            .padding(innerPadding)
+        val contentModifier =
+            Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
         when {
-            state.isLoading -> RepoPagesLoading(modifier = contentModifier)
-            state.errorMessage != null -> RepoPagesError(
-                message = state.errorMessage,
-                onRetry = { onAction(SecurityAction.OnRetry) },
-                modifier = contentModifier,
-            )
-            state.overview != null -> SecurityContent(
-                overview = state.overview,
-                modifier = contentModifier,
-            )
+            state.isLoading -> {
+                RepoPagesLoading(modifier = contentModifier)
+            }
+
+            state.errorMessage != null -> {
+                RepoPagesError(
+                    message = state.errorMessage,
+                    onRetry = { onAction(SecurityAction.OnRetry) },
+                    modifier = contentModifier,
+                )
+            }
+
+            state.overview != null -> {
+                SecurityContent(
+                    overview = state.overview,
+                    modifier = contentModifier,
+                )
+            }
         }
     }
 }
@@ -162,9 +171,10 @@ private fun SectionHeader(text: String) {
 @Composable
 private fun AdvisoryCard(advisory: SecurityAdvisory) {
     val colors = LocalPersonality.current.colors
-    val publishedDate = remember(advisory.publishedAt) {
-        advisory.publishedAt?.let { formatIsoDateOrRaw(it) }
-    }
+    val publishedDate =
+        remember(advisory.publishedAt) {
+            advisory.publishedAt?.let { formatIsoDateOrRaw(it) }
+        }
     KomiSurface(
         modifier = Modifier.fillMaxWidth(),
     ) {
@@ -184,13 +194,14 @@ private fun AdvisoryCard(advisory: SecurityAdvisory) {
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 SeverityBadge(advisory.severity)
 
-                val meta = buildString {
-                    advisory.cveId?.let { append(it) }
-                    publishedDate?.let {
-                        if (isNotEmpty()) append(" · ")
-                        append(it)
+                val meta =
+                    buildString {
+                        advisory.cveId?.let { append(it) }
+                        publishedDate?.let {
+                            if (isNotEmpty()) append(" · ")
+                            append(it)
+                        }
                     }
-                }
                 if (meta.isNotEmpty()) {
                     KomiText(
                         text = meta,
@@ -213,20 +224,22 @@ private fun AdvisoryCard(advisory: SecurityAdvisory) {
 private fun SeverityBadge(severity: AdvisorySeverity) {
     val statusColors = LocalStatusColors.current
     val shape = LocalPersonality.current.shape
-    val color = when (severity) {
-        AdvisorySeverity.CRITICAL -> statusColors.severityCritical
-        AdvisorySeverity.HIGH -> statusColors.severityHigh
-        AdvisorySeverity.MEDIUM -> statusColors.severityMedium
-        AdvisorySeverity.LOW -> statusColors.severityLow
-        AdvisorySeverity.UNKNOWN -> statusColors.severityUnknown
-    }
-    val label = when (severity) {
-        AdvisorySeverity.CRITICAL -> stringResource(Res.string.repo_pages_severity_critical)
-        AdvisorySeverity.HIGH -> stringResource(Res.string.repo_pages_severity_high)
-        AdvisorySeverity.MEDIUM -> stringResource(Res.string.repo_pages_severity_medium)
-        AdvisorySeverity.LOW -> stringResource(Res.string.repo_pages_severity_low)
-        AdvisorySeverity.UNKNOWN -> stringResource(Res.string.repo_pages_severity_unknown)
-    }
+    val color =
+        when (severity) {
+            AdvisorySeverity.CRITICAL -> statusColors.severityCritical
+            AdvisorySeverity.HIGH -> statusColors.severityHigh
+            AdvisorySeverity.MEDIUM -> statusColors.severityMedium
+            AdvisorySeverity.LOW -> statusColors.severityLow
+            AdvisorySeverity.UNKNOWN -> statusColors.severityUnknown
+        }
+    val label =
+        when (severity) {
+            AdvisorySeverity.CRITICAL -> stringResource(Res.string.repo_pages_severity_critical)
+            AdvisorySeverity.HIGH -> stringResource(Res.string.repo_pages_severity_high)
+            AdvisorySeverity.MEDIUM -> stringResource(Res.string.repo_pages_severity_medium)
+            AdvisorySeverity.LOW -> stringResource(Res.string.repo_pages_severity_low)
+            AdvisorySeverity.UNKNOWN -> stringResource(Res.string.repo_pages_severity_unknown)
+        }
     KomiText(
         text = label,
         role = KomiTextRole.Label,
@@ -234,8 +247,9 @@ private fun SeverityBadge(severity: AdvisorySeverity) {
         fontWeight = FontWeight.SemiBold,
         color = color,
         uppercase = false,
-        modifier = Modifier
-            .background(color.copy(alpha = 0.16f), RoundedCornerShape(shape.cornerSmall))
-            .padding(horizontal = 8.dp, vertical = 2.dp),
+        modifier =
+            Modifier
+                .background(color.copy(alpha = 0.16f), RoundedCornerShape(shape.cornerSmall))
+                .padding(horizontal = 8.dp, vertical = 2.dp),
     )
 }

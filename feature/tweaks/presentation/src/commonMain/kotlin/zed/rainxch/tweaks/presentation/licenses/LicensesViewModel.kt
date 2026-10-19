@@ -26,10 +26,12 @@ class LicensesViewModel : ViewModel() {
         viewModelScope.launch {
             runCatching {
                 val bytes = Res.readBytes(LICENSES_PATH)
-                json.decodeFromString(
-                    LicensesPayload.serializer(),
-                    bytes.decodeToString(),
-                ).libraries.toImmutableList()
+                json
+                    .decodeFromString(
+                        LicensesPayload.serializer(),
+                        bytes.decodeToString(),
+                    ).libraries
+                    .toImmutableList()
             }.onSuccess { libraries ->
                 _state.update {
                     it.copy(libraries = libraries, isLoading = false, loadError = false)
