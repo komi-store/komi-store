@@ -1,0 +1,11 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues/>
+  <CurrentIssues>
+    <ID>LoopWithTooManyJumpStatements:RepoPagesRepositoryImpl.kt$RepoPagesRepositoryImpl$for</ID>
+    <ID>MagicNumber:RepoPagesRepositoryImpl.kt$RepoPagesRepositoryImpl$401</ID>
+    <ID>MagicNumber:RepoPagesRepositoryImpl.kt$RepoPagesRepositoryImpl$403</ID>
+    <ID>TooGenericExceptionCaught:RepoPagesRepositoryImpl.kt$RepoPagesRepositoryImpl$e: Exception</ID>
+    <ID>TooManyFunctions:RepoPagesRepositoryImpl.kt$RepoPagesRepositoryImpl : RepoPagesRepository</ID>
+  </CurrentIssues>
+</SmellBaseline>

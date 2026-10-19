@@ -3,6 +3,7 @@ import org.gradle.api.Project
 import org.gradle.kotlin.dsl.dependencies
 import zed.rainxch.githubstore.convention.configureAndroidTarget
 import zed.rainxch.githubstore.convention.configureJvmTarget
+import zed.rainxch.githubstore.convention.configureStabilityAnalyzer
 import zed.rainxch.githubstore.convention.libs
 
 class CmpApplicationConventionPlugin : Plugin<Project> {
@@ -13,7 +14,10 @@ class CmpApplicationConventionPlugin : Plugin<Project> {
                 apply("org.jetbrains.kotlin.multiplatform")
                 apply("org.jetbrains.compose")
                 apply("org.jetbrains.kotlin.plugin.compose")
+                apply("zed.rainxch.convention.quality")
             }
+
+            configureStabilityAnalyzer()
 
             configureAndroidTarget()
             configureJvmTarget()

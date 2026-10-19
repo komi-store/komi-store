@@ -1,6 +1,7 @@
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.dependencies
+import zed.rainxch.githubstore.convention.configureStabilityAnalyzer
 import zed.rainxch.githubstore.convention.libs
 import kotlin.text.get
 
@@ -12,6 +13,8 @@ class CmpLibraryConventionPlugin : Plugin<Project> {
                 apply("org.jetbrains.kotlin.plugin.compose")
                 apply("org.jetbrains.compose")
             }
+
+            configureStabilityAnalyzer()
 
             dependencies {
                 "commonMainImplementation"(libs.findLibrary("jetbrains-compose-ui").get())

@@ -52,7 +52,11 @@ jsystemthemedetector = "3.9.1"
 work = "2.11.1"
 resources="1.10.3"
 
-ktlint-gradle = "12.1.1"
+ktlint = "1.8.0"
+spotless = "8.10.4"
+detekt = "1.23.8"
+kover = "0.9.11"
+stability-analyzer = "0.7.0"
 flatpak-gradle-generator = "1.7.0"
 
 projectApplicationId = "zed.rainxch.githubstore"
@@ -177,7 +181,8 @@ libsu-core = { module = "com.github.topjohnwu.libsu:core", version.ref = "libsu"
 # Dhizuku
 dhizuku-api = { module = "io.github.iamr0s:Dhizuku-API", version.ref = "dhizuku" }
 
-ktlint-gradlePlugin = { group = "org.jlleitschuh.gradle", name="ktlint-gradle", version.ref = "ktlint-gradle" }
+detekt-gradlePlugin = { group = "io.gitlab.arturbosch.detekt", name = "detekt-gradle-plugin", version.ref = "detekt" }
+stability-analyzer-gradlePlugin = { group = "com.github.skydoves", name = "compose-stability-gradle", version.ref = "stability-analyzer" }
 
 [plugins]
 
@@ -209,6 +214,12 @@ room = { id = "androidx.room", version.ref = "room" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 buildkonfig = { id = "com.codingfeline.buildkonfig", version.ref = "buildkonfig" }
 flatpak-gradle-generator = { id = "io.github.jwharm.flatpak-gradle-generator", version.ref = "flatpak-gradle-generator" }
+
+# Verification
+spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
+detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
+kover = { id = "org.jetbrains.kotlinx.kover", version.ref = "kover" }
+stability-analyzer = { id = "com.github.skydoves.compose.stability.analyzer", version.ref = "stability-analyzer" }
 
 [bundles]
 koin-common = [
