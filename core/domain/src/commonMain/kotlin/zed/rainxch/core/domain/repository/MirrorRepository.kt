@@ -19,8 +19,4 @@ interface MirrorRepository {
     suspend fun measureLatencies(): Result<Map<String, Int>>
 
     fun observeRemovedNotices(): Flow<MirrorRemoved>
-
-    suspend fun snoozeAutoSuggest(forMs: Long)
-
-    suspend fun dismissAutoSuggestPermanently()
 }

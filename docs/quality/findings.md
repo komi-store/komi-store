@@ -406,6 +406,8 @@ This is where most of the work is. Grouped by theme; each group lists the main e
 
 Agents read these files on every task. Each wrong line here produces wrong code later.
 
+Status: fixed by [#1065](https://github.com/komi-store/komi-store/pull/1065) and [#1076](https://github.com/komi-store/komi-store/pull/1076); the table stays as the record of what had drifted.
+
 | Claim | Reality |
 |---|---|
 | Root CLAUDE.md: version 1.8.3 (code 18) | the catalog says 1.9.3 / 22 ([libs.versions.toml:59-60](https://github.com/komi-store/komi-store/blob/cfa6bd30e6b35cbbc369d78a4599182a9a66beac/gradle/libs.versions.toml#L59-L60)) |
@@ -455,9 +457,9 @@ The higher the rung, the less it depends on anyone remembering.
 
 In order:
 
-1. **Contributor docs**: a short public `AGENTS.md`, a slimmer public `CLAUDE.md`, a refreshed `CONTRIBUTING.md`, a PR template, and the feature CLAUDE.md files corrected against the code (already prepared).
+1. **Done in [#1076](https://github.com/komi-store/komi-store/pull/1076). Contributor docs**: a short public `AGENTS.md`, a slimmer public `CLAUDE.md`, a refreshed `CONTRIBUTING.md`, a PR template, and the feature CLAUDE.md files corrected against the code (already prepared).
 2. **Open fix PRs land first, after [#1056](https://github.com/komi-store/komi-store/pull/1056) and this change**: [#1063](https://github.com/komi-store/komi-store/pull/1063) (bug 1), [#1062](https://github.com/komi-store/komi-store/pull/1062) (bug 2), the rate-limit fix (bugs 3 and 4), and other open work, so none of them has to rebase across a mass format.
-3. **The one-time format (D4)** as its own PR at a quiet moment: one `spotlessApply` over every file with the ratchet off for that run, the Compose findings fixed or suppressed, and the `feature:details:presentation` warnings opt-out dropped with its five warnings fixed. Then the squash SHA goes into `.git-blame-ignore-revs`.
+3. **Done in [#1080](https://github.com/komi-store/komi-store/pull/1080). The one-time format (D4)** as its own PR at a quiet moment: one `spotlessApply` over every file with the ratchet off for that run, the Compose findings fixed or suppressed, and the `feature:details:presentation` warnings opt-out dropped with its five warnings fixed. Then the squash SHA goes into `.git-blame-ignore-revs`.
 4. **Code changes from the decisions**, one PR each:
    - power-assert (A6), no wildcard imports (A7) and no stability annotations on screen state (D9), right after the format
    - error handling (D2, A1, A3) with Konsist rules for `runCatching` around suspend calls and `e.message` in presentation
@@ -465,4 +467,4 @@ In order:
    - ViewModels and navigation: the D1 shape as a Konsist rule, navigation lambdas (D3), typed route arguments (A8)
    - the test stack and the first ViewModel tests (D10)
    - logging through the injected `KomiStoreLogger` (D7)
-5. **Issues** for bugs 5 to 9.
+5. **Done. Issues** for bugs 5 to 9: [#1071](https://github.com/komi-store/komi-store/issues/1071) to [#1075](https://github.com/komi-store/komi-store/issues/1075).

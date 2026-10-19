@@ -13,16 +13,6 @@ feature/dev-profile/
     └── components/  ProfileInfoCard, ContributionCalendar, FilterSortControls, DeveloperRepoItem
 ```
 
-## Key interface
-
-```kotlin
-interface DeveloperProfileRepository {
-    suspend fun getDeveloperProfile(username: String): Result<DeveloperProfile>
-    suspend fun getDeveloperRepositories(username: String): Result<List<DeveloperRepository>>
-    suspend fun getContributionCalendar(username: String): Result<ContributionCalendar>
-}
-```
-
 ## Navigation
 
 `GithubStoreGraph.DeveloperProfileScreen(username: String)`. `username` reaches the VM through `koinViewModel { parametersOf(args.username) }`.

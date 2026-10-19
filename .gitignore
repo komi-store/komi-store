@@ -45,3 +45,5 @@ roadmap/
 
 .claude/komi
 .claude/settings.local.json
+.claude/worktrees/
+.gradle-local/

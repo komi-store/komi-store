@@ -14,7 +14,7 @@ When a rule and nearby code disagree, follow the rule. Fix the nearby code only 
 ## 1. Formatting and files
 
 - ktlint with the Compose rules decides formatting. Run `./gradlew spotlessApply` before pushing; nothing formats on compile. **[Spotless]**
-- No wildcard imports, including `res.*` (checked once the codebase is formatted). **[Spotless]**
+- No wildcard imports, including `res.*`. ktlint's `no-wildcard-imports` is still disabled in `.editorconfig`. **[review]**
 - One top-level public type per file, named after it. **[review]**
 - Production files stay under 800 lines. Today's larger files are on an allowlist that can only shrink. **[Konsist]**
 

@@ -2,17 +2,17 @@
 
 ## Installing apps on Android
 
-Silent installs go through Shizuku: `ShizukuProvider`, then AIDL, then `pm install -S`. On failure the app falls back to the standard installer. Dhizuku is supported as well; see `core/data/src/androidMain/.../services/`.
+Silent installs go through Shizuku (`ShizukuProvider`, then AIDL, then `pm install -S`), Dhizuku, or root through libsu (`services/root/RootServiceManager`). `services/installer/SilentInstallerDispatcher` in `core/data/src/androidMain` picks one from the installer setting and falls back to the standard installer on failure.
 
 ## Desktop logs
 
-`CrashReporter`, the first line of `DesktopApp.main`, tees stdout and stderr to a rotating `session.log` and writes `crash-<ts>.log` on an uncaught exception.
+`CrashReporter.install()`, called at the start of `DesktopApp.main`, tees stdout and stderr to a rotating `session.log` and writes `crash-<ts>.log` on an uncaught exception.
 
 | OS | Path |
 |---|---|
-| macOS | `~/Library/Logs/GitHub-Store/` |
-| Windows | `%LOCALAPPDATA%/GitHub-Store/logs/` |
-| Linux | `$XDG_STATE_HOME/GitHub-Store/logs/` |
+| macOS | `~/Library/Logs/Komi-Store/` |
+| Windows | `%LOCALAPPDATA%/Komi-Store/logs/` |
+| Linux | `$XDG_STATE_HOME/Komi-Store/logs/` (or `~/.local/state/Komi-Store/logs/`) |
 
 Android logs go to Logcat.
 

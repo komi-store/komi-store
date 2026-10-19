@@ -12,10 +12,12 @@ import io.ktor.serialization.kotlinx.json.*
 import io.ktor.util.network.UnresolvedAddressException
 import kotlinx.serialization.json.Json
 import zed.rainxch.core.data.data_source.TokenStore
+import zed.rainxch.core.data.network.interceptor.HostTokenInterceptor
 import zed.rainxch.core.data.network.interceptor.RateLimitInterceptor
 import zed.rainxch.core.data.network.interceptor.UnauthorizedInterceptor
 import zed.rainxch.core.domain.model.error.RateLimitException
 import zed.rainxch.core.domain.model.settings.ProxyConfig
+import zed.rainxch.core.domain.repository.HostTokenRepository
 import zed.rainxch.core.domain.repository.RateLimitRepository
 import zed.rainxch.core.domain.repository.UserSessionRepository
 import java.io.IOException
@@ -27,6 +29,7 @@ fun createGitHubHttpClient(
     tokenStore: TokenStore,
     rateLimitRepository: RateLimitRepository,
     userSessionRepository: UserSessionRepository? = null,
+    hostTokenRepository: HostTokenRepository? = null,
     proxyConfig: ProxyConfig = ProxyConfig.System,
 ): HttpClient {
     val json =
@@ -57,26 +60,16 @@ fun createGitHubHttpClient(
                 socketTimeoutMillis = HttpTimeoutConfig.INFINITE_TIMEOUT_MS
             }
 
-            install(HttpRequestRetry) {
-                maxRetries = 3
-                retryIf { _, response ->
-                    val code = response.status.value
-                    if (code == 403) {
-                        val remaining = response.headers["X-RateLimit-Remaining"]?.toIntOrNull()
-                        if (remaining == 0) return@retryIf false
-                    }
-                    code in 500..<600
-                }
-                retryOnExceptionIf { _, cause ->
-                    cause is HttpRequestTimeoutException ||
-                        cause is UnresolvedAddressException ||
-                        cause is IOException
-                }
-                exponentialDelay()
-            }
+            installGitHubRetry()
 
             install(HttpRedirect) {
                 checkHttpMethod = false
+            }
+
+            if (hostTokenRepository != null) {
+                install(HostTokenInterceptor) {
+                    repository = hostTokenRepository
+                }
             }
 
             expectSuccess = false
@@ -98,6 +91,26 @@ fun createGitHubHttpClient(
                 }
             }
         }.also { it.installMirrorRewrite() }
+}
+
+private fun HttpClientConfig<*>.installGitHubRetry() {
+    install(HttpRequestRetry) {
+        maxRetries = 3
+        retryIf { _, response ->
+            val code = response.status.value
+            if (code == 403) {
+                val remaining = response.headers["X-RateLimit-Remaining"]?.toIntOrNull()
+                if (remaining == 0) return@retryIf false
+            }
+            code in 500..<600
+        }
+        retryOnExceptionIf { _, cause ->
+            cause is HttpRequestTimeoutException ||
+                cause is UnresolvedAddressException ||
+                cause is IOException
+        }
+        exponentialDelay()
+    }
 }
 
 suspend inline fun <reified T> HttpClient.executeRequest(crossinline block: suspend HttpClient.() -> HttpResponse): Result<T> =
