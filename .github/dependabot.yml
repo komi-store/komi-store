@@ -16,10 +16,20 @@ updates:
           - "com.google.devtools.ksp*"
           - "*compose.stability*"
           - "com.github.skydoves:compose-stability*"
+          - "org.jetbrains.compose*"
+          - "com.codingfeline.buildkonfig*"
       gradle-minor-and-patch:
         update-types:
           - minor
           - patch
+        # Kotlin-coupled libraries move only with the kotlin-toolchain group; #1078 bundled Kotlin 2.4 here and broke build-logic.
+        exclude-patterns:
+          - "org.jetbrains.kotlin*"
+          - "com.google.devtools.ksp*"
+          - "*compose.stability*"
+          - "com.github.skydoves:compose-stability*"
+          - "org.jetbrains.compose*"
+          - "com.codingfeline.buildkonfig*"
 
   - package-ecosystem: github-actions
     directory: /
