@@ -24,17 +24,6 @@
     </issue>
 
     <issue
-        id="NewApi"
-        message="Call requires API level 34 (current min is 26): `android.content.pm.PackageInstaller.SessionParams#setInstallerPackageName`"
-        errorLine1="                params.setInstallerPackageName(name)"
-        errorLine2="                       ~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/androidMain/kotlin/zed/rainxch/core/data/services/dhizuku/DhizukuInstallerServiceImpl.kt"
-            line="59"
-            column="24"/>
-    </issue>
-
-    <issue
         id="PrivateApi"
         message="Accessing internal APIs via reflection is not supported and may not work on all devices or in the future"
         errorLine1="                val cls = Class.forName(&quot;android.app.AppGlobals&quot;)"
