@@ -40,7 +40,11 @@ fun PersonalityTheme(
             is MangaPersonality -> personality.copy(type = personality.type.withMangaFonts(script))
             is ClassicPersonality -> personality.copy(type = personality.type.withClassicFonts(script))
         }
-    val colorScheme = resolved.colors.toMaterialColorScheme()
+    val colorScheme =
+        when (resolved) {
+            is ClassicPersonality -> resolved.colorScheme
+            is MangaPersonality -> resolved.colors.toMaterialColorScheme()
+        }
     val typography = resolved.toMaterialTypography()
     CompositionLocalProvider(
         LocalPersonality provides resolved,

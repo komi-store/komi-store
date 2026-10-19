@@ -44,6 +44,7 @@ buildkonfig = "0.17.1"
 markdownRenderer = "0.39.2"
 coil3 = "3.3.0"
 highlights = "1.1.0"
+materialKolor = "4.1.1"
 shizuku = "13.1.5"
 libsu = "6.0.0"
 dhizuku = "2.5.4"
@@ -169,6 +170,7 @@ jetbrains-bundle = { module = "org.jetbrains.androidx.core:core-bundle", version
 markdown-renderer = { module = "com.mikepenz:multiplatform-markdown-renderer-m3", version.ref = "markdownRenderer" }
 markdown-renderer-coil3 = { module = "com.mikepenz:multiplatform-markdown-renderer-coil3", version.ref = "markdownRenderer" }
 highlights = { module = "dev.snipme:highlights", version.ref = "highlights" }
+material-kolor = { module = "com.materialkolor:material-kolor", version.ref = "materialKolor" }
 
 # WorkManager
 androidx-work-runtime = { module = "androidx.work:work-runtime-ktx", version.ref = "work" }

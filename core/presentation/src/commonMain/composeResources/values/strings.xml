@@ -1152,6 +1152,12 @@
     <string name="paper_night">Night</string>
     <string name="paper_nord">Nord</string>
     <string name="appearance_section_display">Display</string>
+    <string name="accent_crimson">Crimson</string>
+    <string name="accent_cobalt">Cobalt</string>
+    <string name="accent_sun">Sun</string>
+    <string name="accent_frost">Frost</string>
+    <string name="accent_mono">Mono</string>
+    <string name="accent_wallpaper">Wallpaper colors</string>
     <string name="auth_more_signin_options">More sign-in options</string>
     <string name="auth_hide_signin_options">Hide options</string>
     <string name="tweaks_sources_platforms_title">Discovery platforms</string>

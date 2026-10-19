@@ -6,7 +6,7 @@ import zed.rainxch.core.presentation.personality.manga.MangaAccent
 fun AccentId.toMangaAccent(): MangaAccent =
     when (this) {
         AccentId.MONO -> MangaAccent.MONO
-        AccentId.CRIMSON -> MangaAccent.CRIMSON
+        AccentId.CRIMSON, AccentId.WALLPAPER -> MangaAccent.CRIMSON
         AccentId.COBALT -> MangaAccent.COBALT
         AccentId.SUN -> MangaAccent.SUN
         AccentId.FROST -> MangaAccent.FROST

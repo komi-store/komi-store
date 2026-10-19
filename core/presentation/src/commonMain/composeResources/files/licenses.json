@@ -18,6 +18,7 @@
     {"name": "MOKO Permissions", "license": "Apache-2.0", "url": "https://github.com/icerockdev/moko-permissions"},
     {"name": "Navigation Compose", "license": "Apache-2.0", "url": "https://developer.android.com/jetpack/androidx/releases/navigation"},
     {"name": "multiplatform-markdown-renderer", "license": "Apache-2.0", "url": "https://github.com/mikepenz/multiplatform-markdown-renderer"},
+    {"name": "MaterialKolor", "license": "MIT", "url": "https://github.com/jordond/MaterialKolor"},
     {"name": "Shizuku", "license": "Apache-2.0", "url": "https://github.com/RikkaApps/Shizuku"},
     {"name": "WorkManager", "license": "Apache-2.0", "url": "https://developer.android.com/jetpack/androidx/releases/work"},
     {"name": "KSafe", "license": "Apache-2.0", "url": "https://github.com/Anifantakis/KSafe"},

@@ -4,7 +4,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Wallpaper
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -16,11 +19,22 @@ import zed.rainxch.core.presentation.components.text.KomiTextRole
 import zed.rainxch.core.presentation.locals.LocalPersonality
 import zed.rainxch.core.presentation.personality.MangaPersonality
 import zed.rainxch.core.presentation.personality.classic.classicAccentSwatch
+import zed.rainxch.core.presentation.personality.classic.systemWallpaperColorScheme
 import zed.rainxch.core.presentation.personality.manga.mangaAccentSwatch
+import zed.rainxch.core.presentation.personality.toAccentId
 import zed.rainxch.core.presentation.personality.toMangaAccent
 import zed.rainxch.tweaks.presentation.components.shell.SettingsGroup
 import zed.rainxch.tweaks.presentation.components.shell.TweaksDecorSlot
 import zed.rainxch.tweaks.presentation.components.shell.tweaksKicker
+import org.jetbrains.compose.resources.StringResource
+import org.jetbrains.compose.resources.stringResource
+import zed.rainxch.githubstore.core.presentation.res.Res
+import zed.rainxch.githubstore.core.presentation.res.accent_cobalt
+import zed.rainxch.githubstore.core.presentation.res.accent_crimson
+import zed.rainxch.githubstore.core.presentation.res.accent_frost
+import zed.rainxch.githubstore.core.presentation.res.accent_mono
+import zed.rainxch.githubstore.core.presentation.res.accent_sun
+import zed.rainxch.githubstore.core.presentation.res.accent_wallpaper
 
 private val AccentOrder =
     listOf(
@@ -61,25 +75,7 @@ fun AppearanceHeadline(
             }
 
             HeadlineLabel(latin = "Accent", slot = TweaksDecorSlot.Accent, modifier = Modifier.padding(top = 18.dp))
-            Row(
-                modifier = Modifier.padding(top = 10.dp),
-                horizontalArrangement = Arrangement.spacedBy(10.dp),
-            ) {
-                AccentOrder.forEach { entry ->
-                    val isManga = LocalPersonality.current is MangaPersonality
-                    val colors = LocalPersonality.current.colors
-                    val mangaSwatch = if (isManga) mangaAccentSwatch(entry.toMangaAccent()) else null
-                    val classicSwatch = if (isManga) null else classicAccentSwatch(entry, colors.isDark)
-
-                    AccentSwatch(
-                        fill = mangaSwatch?.first ?: classicSwatch?.first ?: colors.onSurface,
-                        onFill = mangaSwatch?.second ?: classicSwatch?.second ?: colors.background,
-                        mono = isManga && entry == AccentId.MONO,
-                        selected = accent == entry,
-                        onClick = { onAccentSelected(entry) },
-                    )
-                }
-            }
+            AccentRow(accent = accent, onAccentSelected = onAccentSelected, modifier = Modifier.padding(top = 10.dp))
         }
     }
 }
@@ -114,3 +110,52 @@ private fun HeadlineLabel(
         }
     }
 }
+
+@Composable
+private fun AccentRow(
+    accent: AccentId,
+    onAccentSelected: (AccentId) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val isManga = LocalPersonality.current is MangaPersonality
+    val colors = LocalPersonality.current.colors
+    val wallpaper = if (isManga) null else systemWallpaperColorScheme(colors.isDark)
+    val swatches =
+        remember(isManga, colors.isDark, wallpaper) {
+            val wallpaperSwatch = wallpaper?.let { AccentId.WALLPAPER to (it.primary to it.onPrimary) }
+            listOfNotNull(wallpaperSwatch) +
+                AccentOrder.map { entry ->
+                    entry to if (isManga) mangaAccentSwatch(entry.toMangaAccent()) else classicAccentSwatch(entry, colors.isDark)
+                }
+        }
+    // Manga has no wallpaper accent and draws it as Crimson, so Crimson shows as picked.
+    val picked = if (isManga) accent.toMangaAccent().toAccentId() else accent
+
+    Row(
+        modifier = modifier,
+        horizontalArrangement = Arrangement.spacedBy(10.dp),
+    ) {
+        swatches.forEach { (entry, swatch) ->
+            AccentSwatch(
+                fill = swatch?.first ?: colors.onSurface,
+                onFill = swatch?.second ?: colors.background,
+                mono = isManga && entry == AccentId.MONO,
+                selected = picked == entry,
+                label = stringResource(entry.label),
+                onClick = { onAccentSelected(entry) },
+                icon = if (entry == AccentId.WALLPAPER) Icons.Outlined.Wallpaper else null,
+            )
+        }
+    }
+}
+
+private val AccentId.label: StringResource
+    get() =
+        when (this) {
+            AccentId.MONO -> Res.string.accent_mono
+            AccentId.CRIMSON -> Res.string.accent_crimson
+            AccentId.COBALT -> Res.string.accent_cobalt
+            AccentId.SUN -> Res.string.accent_sun
+            AccentId.FROST -> Res.string.accent_frost
+            AccentId.WALLPAPER -> Res.string.accent_wallpaper
+        }
