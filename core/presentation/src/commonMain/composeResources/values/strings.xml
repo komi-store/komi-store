@@ -142,6 +142,9 @@
     <string name="proxy_test_error_auth_required">Proxy authentication required.</string>
     <string name="proxy_test_error_status">Unexpected response: HTTP %1$d</string>
     <string name="proxy_test_error_unknown">Connection test failed</string>
+    <string name="proxy_test_master_result">Search: %1$s, Downloads: %2$s, Translation: %3$s</string>
+    <string name="proxy_test_probe_ok">%1$d ms</string>
+    <string name="proxy_test_probe_failed">failed</string>
 
     <!-- Snackbar -->
     <string name="logout_success">Logged out successfully</string>

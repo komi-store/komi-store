@@ -646,8 +646,7 @@ class TweaksViewModel(
                             if (error is CancellationException) throw error
                             _events.send(
                                 TweaksEvent.OnProxySaveError(
-                                    error.message
-                                        ?: getString(Res.string.failed_to_save_proxy_settings),
+                                    getString(Res.string.failed_to_save_proxy_settings),
                                 ),
                             )
                         }
@@ -740,8 +739,7 @@ class TweaksViewModel(
                         if (error is CancellationException) throw error
                         _events.send(
                             TweaksEvent.OnProxySaveError(
-                                error.message
-                                    ?: getString(Res.string.failed_to_save_proxy_settings),
+                                getString(Res.string.failed_to_save_proxy_settings),
                             ),
                         )
                     }
@@ -1342,8 +1340,7 @@ class TweaksViewModel(
                             if (error is CancellationException) throw error
                             _events.send(
                                 TweaksEvent.OnProxySaveError(
-                                    error.message
-                                        ?: getString(Res.string.failed_to_save_proxy_settings),
+                                    getString(Res.string.failed_to_save_proxy_settings),
                                 ),
                             )
                         }
@@ -1420,8 +1417,7 @@ class TweaksViewModel(
                         if (error is CancellationException) throw error
                         _events.send(
                             TweaksEvent.OnProxySaveError(
-                                error.message
-                                    ?: getString(Res.string.failed_to_save_proxy_settings),
+                                getString(Res.string.failed_to_save_proxy_settings),
                             ),
                         )
                     }
@@ -1506,8 +1502,7 @@ class TweaksViewModel(
                         if (error is CancellationException) throw error
                         _events.send(
                             TweaksEvent.OnProxySaveError(
-                                error.message
-                                    ?: getString(Res.string.failed_to_save_proxy_settings),
+                                getString(Res.string.failed_to_save_proxy_settings),
                             ),
                         )
                     }
