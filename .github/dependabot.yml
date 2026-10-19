@@ -6,9 +6,9 @@ updates:
       interval: weekly
     open-pull-requests-limit: 5
     ignore:
-      # AGP 8.x uses a Gradle internal API removed in 9.6; lift this with the AGP 9 upgrade.
+      # AGP 8.13 is tested up to Gradle 9.4.1, and 9.6 removed an internal API it uses; lift this with the AGP 9 upgrade.
       - dependency-name: gradle-wrapper
-        versions: ["[9.6,)"]
+        versions: ["[9.5,)"]
     groups:
       kotlin-toolchain:
         patterns:
