@@ -122,16 +122,6 @@
             column="24"/>
     </issue>
 
-    <issue
-        id="UseKtx"
-        message="Use the KTX extension function `String.toUri` instead?"
-        errorLine1="            Intent(Intent.ACTION_VIEW, Uri.parse(uri)).apply {"
-        errorLine2="                                       ~~~~~~~~~~~~~~">
-        <location
-            file="src/androidMain/kotlin/zed/rainxch/core/data/services/AndroidPendingInstallNotifier.kt"
-            line="39"
-            column="40"/>
-    </issue>
 
     <issue
         id="UseKtx"
