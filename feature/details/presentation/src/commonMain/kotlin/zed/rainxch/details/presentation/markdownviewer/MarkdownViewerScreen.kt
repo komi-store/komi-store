@@ -30,15 +30,15 @@ import org.koin.compose.koinInject
 import org.koin.core.qualifier.named
 import zed.rainxch.core.presentation.components.bars.KomiTopBar
 import zed.rainxch.core.presentation.components.buttons.KomiIconButton
-import zed.rainxch.core.presentation.components.progress.KomiCircularProgress
-import zed.rainxch.core.presentation.components.text.KomiText
-import zed.rainxch.core.presentation.components.text.KomiTextRole
-import zed.rainxch.core.presentation.locals.LocalPersonality
 import zed.rainxch.core.presentation.components.markdown.MarkdownImageTransformer
 import zed.rainxch.core.presentation.components.markdown.githubStoreMarkdownComponents
 import zed.rainxch.core.presentation.components.markdown.rememberMarkdownColors
 import zed.rainxch.core.presentation.components.markdown.rememberMarkdownTypography
+import zed.rainxch.core.presentation.components.progress.KomiCircularProgress
 import zed.rainxch.core.presentation.components.scaffold.KomiScaffold
+import zed.rainxch.core.presentation.components.text.KomiText
+import zed.rainxch.core.presentation.components.text.KomiTextRole
+import zed.rainxch.core.presentation.locals.LocalPersonality
 import zed.rainxch.details.presentation.components.LanguagePicker
 import zed.rainxch.details.presentation.components.TranslationCard
 import zed.rainxch.details.presentation.utils.ProvideLanguageLinkInterceptor
@@ -50,7 +50,7 @@ import zed.rainxch.githubstore.core.presentation.res.retry
 fun MarkdownViewerRoot(
     onNavigateBack: () -> Unit,
     onNavigateToMarkdownViewer: (String) -> Unit,
-    viewModel: MarkdownViewerViewModel
+    viewModel: MarkdownViewerViewModel,
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
@@ -86,9 +86,10 @@ private fun MarkdownViewerScreen(
     val imageTransformer = remember(probeClient) { MarkdownImageTransformer(probeClient) }
     val colors = rememberMarkdownColors()
     val typography = rememberMarkdownTypography()
-    val components = remember(isDark, imageTransformer) {
-        githubStoreMarkdownComponents(imageTransformer, isDark)
-    }
+    val components =
+        remember(isDark, imageTransformer) {
+            githubStoreMarkdownComponents(imageTransformer, isDark)
+        }
     val personalityColors = LocalPersonality.current.colors
 
     KomiScaffold(
@@ -107,77 +108,84 @@ private fun MarkdownViewerScreen(
     ) { innerPadding ->
         Box(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
             when {
-                state.isLoading -> Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center,
-                ) { KomiCircularProgress() }
+                state.isLoading -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center,
+                    ) { KomiCircularProgress() }
+                }
 
-                state.errorMessage != null -> Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        KomiText(
-                            text = state.errorMessage,
-                            role = KomiTextRole.Body,
-                            color = personalityColors.error,
-                        )
+                state.errorMessage != null -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            KomiText(
+                                text = state.errorMessage,
+                                role = KomiTextRole.Body,
+                                color = personalityColors.error,
+                            )
 
-                        Spacer(Modifier.size(8.dp))
+                            Spacer(Modifier.size(8.dp))
 
-                        KomiText(
-                            text = stringResource(Res.string.retry),
-                            role = KomiTextRole.Label,
-                            color = personalityColors.primary,
-                            modifier = Modifier
-                                .padding(8.dp)
-                                .background(personalityColors.surfaceContainerHigh)
-                                .padding(horizontal = 12.dp, vertical = 6.dp)
-                                .clickable { onRetry() },
-                        )
+                            KomiText(
+                                text = stringResource(Res.string.retry),
+                                role = KomiTextRole.Label,
+                                color = personalityColors.primary,
+                                modifier =
+                                    Modifier
+                                        .padding(8.dp)
+                                        .background(personalityColors.surfaceContainerHigh)
+                                        .padding(horizontal = 12.dp, vertical = 6.dp)
+                                        .clickable { onRetry() },
+                            )
+                        }
                     }
                 }
 
-                else -> LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
-                    item(key = "translation_card") {
-                        TranslationCard(
-                            state = state.translation,
-                            deviceLanguageCode = state.deviceLanguageCode,
-                            onPickLanguage = onPickLanguage,
-                            onTranslate = onTranslate,
-                            onToggle = onToggleTranslation,
-                            onCancel = onClearTranslation,
-                        )
-                    }
-
-                    if (state.isReadyToRender) {
-                        items(items = state.markdownChunks) { chunk ->
-                            ProvideLanguageLinkInterceptor(
+                else -> {
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        item(key = "translation_card") {
+                            TranslationCard(
+                                state = state.translation,
+                                deviceLanguageCode = state.deviceLanguageCode,
+                                onPickLanguage = onPickLanguage,
                                 onTranslate = onTranslate,
-                                onClearTranslation = onClearTranslation,
-                                onOpenInternalMarkdown = onNavigateToMarkdownViewer,
-                            ) {
-                                Markdown(
-                                    content = chunk,
-                                    colors = colors,
-                                    typography = typography,
-                                    imageTransformer = imageTransformer,
-                                    components = components,
-                                    modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
-                                )
-                            }
+                                onToggle = onToggleTranslation,
+                                onCancel = onClearTranslation,
+                            )
                         }
-                    } else {
-                        item(key = "loading") {
-                            Box(
-                                modifier = Modifier.fillMaxWidth().padding(top = 32.dp),
-                                contentAlignment = Alignment.Center,
-                            ) {
-                                KomiCircularProgress(modifier = Modifier.size(32.dp))
+
+                        if (state.isReadyToRender) {
+                            items(items = state.markdownChunks) { chunk ->
+                                ProvideLanguageLinkInterceptor(
+                                    onTranslate = onTranslate,
+                                    onClearTranslation = onClearTranslation,
+                                    onOpenInternalMarkdown = onNavigateToMarkdownViewer,
+                                ) {
+                                    Markdown(
+                                        content = chunk,
+                                        colors = colors,
+                                        typography = typography,
+                                        imageTransformer = imageTransformer,
+                                        components = components,
+                                        modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
+                                    )
+                                }
+                            }
+                        } else {
+                            item(key = "loading") {
+                                Box(
+                                    modifier = Modifier.fillMaxWidth().padding(top = 32.dp),
+                                    contentAlignment = Alignment.Center,
+                                ) {
+                                    KomiCircularProgress(modifier = Modifier.size(32.dp))
+                                }
                             }
                         }
                     }

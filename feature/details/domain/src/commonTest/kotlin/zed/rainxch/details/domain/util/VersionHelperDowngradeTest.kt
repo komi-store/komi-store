@@ -1,15 +1,17 @@
 package zed.rainxch.details.domain.util
 
+import zed.rainxch.core.domain.model.account.github.GithubRelease
 import kotlin.test.Test
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
-import zed.rainxch.core.domain.model.account.github.GithubRelease
 
 class VersionHelperDowngradeTest {
-
     private var nextReleaseId = 0L
 
-    private fun release(tag: String, publishedAt: String): GithubRelease =
+    private fun release(
+        tag: String,
+        publishedAt: String,
+    ): GithubRelease =
         GithubRelease(
             id = nextReleaseId++,
             tagName = tag,
@@ -22,12 +24,13 @@ class VersionHelperDowngradeTest {
             htmlUrl = "",
         )
 
-    private val releasesNewestFirst = listOf(
-        release("2.0.2", "2026-09-13T13:12:13Z"),
-        release("2.0.1", "2026-08-24T03:05:31Z"),
-        release("v2.0.0", "2026-08-04T08:17:55Z"),
-        release("Alpha4.7.4", "2025-04-10T14:04:48Z"),
-    )
+    private val releasesNewestFirst =
+        listOf(
+            release("2.0.2", "2026-09-13T13:12:13Z"),
+            release("2.0.1", "2026-08-24T03:05:31Z"),
+            release("v2.0.0", "2026-08-04T08:17:55Z"),
+            release("Alpha4.7.4", "2025-04-10T14:04:48Z"),
+        )
 
     @Test
     fun stable_is_not_a_downgrade_when_the_nightly_release_is_gone() {
@@ -53,11 +56,12 @@ class VersionHelperDowngradeTest {
 
     @Test
     fun a_live_rolling_tag_still_proves_the_stable_release_older() {
-        val withRolling = listOf(
-            release("nightly", "2026-09-15T02:00:00Z"),
-            release("2.0.2", "2026-09-13T13:12:13Z"),
-            release("2.0.1", "2026-08-24T03:05:31Z"),
-        )
+        val withRolling =
+            listOf(
+                release("nightly", "2026-09-15T02:00:00Z"),
+                release("2.0.2", "2026-09-13T13:12:13Z"),
+                release("2.0.1", "2026-08-24T03:05:31Z"),
+            )
         assertTrue(
             VersionHelper.isDowngradeVersion(
                 candidate = "2.0.2",

@@ -24,37 +24,41 @@ fun separateAdjacentImageLinks(content: String): String {
 }
 
 private fun isPureImageLinkLine(line: String): Boolean {
-
     if ("](" !in line && !line.contains("<a", ignoreCase = true)) return false
 
     var stripped = line
 
-    stripped = stripped.replace(
-        Regex("""\[!\[[^\]]*]\([^)]+\)]\([^)]+\)"""),
-        "",
-    )
+    stripped =
+        stripped.replace(
+            Regex("""\[!\[[^\]]*]\([^)]+\)]\([^)]+\)"""),
+            "",
+        )
 
-    stripped = stripped.replace(
-        Regex("""!\[[^\]]*]\([^)]+\)"""),
-        "",
-    )
+    stripped =
+        stripped.replace(
+            Regex("""!\[[^\]]*]\([^)]+\)"""),
+            "",
+        )
 
-    stripped = stripped.replace(
-        Regex("""\[\s*]\([^)]+\)"""),
-        "",
-    )
+    stripped =
+        stripped.replace(
+            Regex("""\[\s*]\([^)]+\)"""),
+            "",
+        )
 
-    stripped = stripped.replace(
-        Regex(
-            """<a\b[^>]*>\s*(?:<img\b[^>]*/?>|\s)*</a>""",
-            RegexOption.IGNORE_CASE,
-        ),
-        "",
-    )
+    stripped =
+        stripped.replace(
+            Regex(
+                """<a\b[^>]*>\s*(?:<img\b[^>]*/?>|\s)*</a>""",
+                RegexOption.IGNORE_CASE,
+            ),
+            "",
+        )
 
-    stripped = stripped.replace(
-        Regex("""<img\b[^>]*/?>""", RegexOption.IGNORE_CASE),
-        "",
-    )
+    stripped =
+        stripped.replace(
+            Regex("""<img\b[^>]*/?>""", RegexOption.IGNORE_CASE),
+            "",
+        )
     return stripped.isBlank()
 }

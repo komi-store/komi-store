@@ -10,4 +10,3 @@ data class RepoIssue(
     val createdAt: String,
     val labels: List<IssueLabel>,
 )
-

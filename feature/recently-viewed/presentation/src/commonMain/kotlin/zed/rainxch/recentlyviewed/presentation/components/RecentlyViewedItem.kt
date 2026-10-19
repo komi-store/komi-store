@@ -60,19 +60,21 @@ fun RecentlyViewedItem(
             modifier = Modifier.fillMaxWidth().padding(16.dp),
         ) {
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(shape.cornerSmall))
-                    .clickable(onClick = onDevProfileClick)
-                    .padding(vertical = 2.dp),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(shape.cornerSmall))
+                        .clickable(onClick = onDevProfileClick)
+                        .padding(vertical = 2.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 GitHubStoreImage(
                     imageModel = { repo.repoOwnerAvatarUrl },
-                    modifier = Modifier
-                        .size(28.dp)
-                        .clip(RoundedCornerShape(shape.cornerSmall)),
+                    modifier =
+                        Modifier
+                            .size(28.dp)
+                            .clip(RoundedCornerShape(shape.cornerSmall)),
                 )
 
                 KomiText(

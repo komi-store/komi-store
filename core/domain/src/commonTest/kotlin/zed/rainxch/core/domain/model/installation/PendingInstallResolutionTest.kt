@@ -6,7 +6,6 @@ import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
 class PendingInstallResolutionTest {
-
     @Test
     fun noSystemAnswerKeepsThePark() {
         assertEquals(
@@ -33,8 +32,9 @@ class PendingInstallResolutionTest {
 
     @Test
     fun theTargetOnTheSystemConverges() {
-        val reached = parked().pendingInstallResolution(system("2.0.0", 200L))
-            as? PendingInstallResolution.Reached
+        val reached =
+            parked().pendingInstallResolution(system("2.0.0", 200L))
+                as? PendingInstallResolution.Reached
         assertNotNull(reached)
         assertEquals("2.0.0", reached.resolvedTag)
         assertEquals("2.0.0", reached.versionName)
@@ -51,8 +51,9 @@ class PendingInstallResolutionTest {
 
     @Test
     fun theTagFallsBackToTheLatestVersionWhenTheParkCarriesNone() {
-        val reached = parked(pendingInstallVersion = null)
-            .pendingInstallResolution(system("2.5.0", 200L)) as? PendingInstallResolution.Reached
+        val reached =
+            parked(pendingInstallVersion = null)
+                .pendingInstallResolution(system("2.5.0", 200L)) as? PendingInstallResolution.Reached
         assertNotNull(reached)
         assertEquals("2.0.0", reached.resolvedTag)
     }
@@ -76,27 +77,30 @@ class PendingInstallResolutionTest {
 
     @Test
     fun aCodeLessTargetConvergesOnAMovedName() {
-        val reached = parked(latestVersionCode = null)
-            .pendingInstallResolution(system("2.0.0", 100L)) as? PendingInstallResolution.Reached
+        val reached =
+            parked(latestVersionCode = null)
+                .pendingInstallResolution(system("2.0.0", 100L)) as? PendingInstallResolution.Reached
         assertNotNull(reached)
         assertEquals("2.0.0", reached.resolvedTag)
     }
 
     @Test
     fun aCodeLessTargetWithNoRecordedBaselineConvergesWhenThePackageAppears() {
-        val reached = parked(installedVersionName = null, latestVersionCode = null)
-            .pendingInstallResolution(system("2.0.0", 100L)) as? PendingInstallResolution.Reached
+        val reached =
+            parked(installedVersionName = null, latestVersionCode = null)
+                .pendingInstallResolution(system("2.0.0", 100L)) as? PendingInstallResolution.Reached
         assertNotNull(reached)
         assertEquals("2.0.0", reached.resolvedTag)
     }
 
     @Test
     fun aCodeLessTargetConvergesWhenTheSystemMatchesTheParkedTarget() {
-        val reached = parked(
-            installedVersionName = "1.6.17",
-            latestVersionCode = null,
-            pendingInstallVersion = "v1.6.17",
-        ).pendingInstallResolution(system("1.6.17", 100L)) as? PendingInstallResolution.Reached
+        val reached =
+            parked(
+                installedVersionName = "1.6.17",
+                latestVersionCode = null,
+                pendingInstallVersion = "v1.6.17",
+            ).pendingInstallResolution(system("1.6.17", 100L)) as? PendingInstallResolution.Reached
         assertNotNull(reached)
     }
 
@@ -108,7 +112,10 @@ class PendingInstallResolutionTest {
         )
     }
 
-    private fun system(versionName: String, versionCode: Long): SystemPackageInfo =
+    private fun system(
+        versionName: String,
+        versionCode: Long,
+    ): SystemPackageInfo =
         SystemPackageInfo(
             packageName = "com.example.app",
             versionName = versionName,
@@ -122,11 +129,12 @@ class PendingInstallResolutionTest {
         latestVersion: String? = "2.0.0",
         latestVersionCode: Long? = 200L,
         pendingInstallVersion: String? = "2.0.0",
-    ): InstalledApp = testInstalledApp(
-        installedVersionName = installedVersionName,
-        latestVersion = latestVersion,
-        latestVersionCode = latestVersionCode,
-        isPendingInstall = true,
-        pendingInstallVersion = pendingInstallVersion,
-    )
+    ): InstalledApp =
+        testInstalledApp(
+            installedVersionName = installedVersionName,
+            latestVersion = latestVersion,
+            latestVersionCode = latestVersionCode,
+            isPendingInstall = true,
+            pendingInstallVersion = pendingInstallVersion,
+        )
 }

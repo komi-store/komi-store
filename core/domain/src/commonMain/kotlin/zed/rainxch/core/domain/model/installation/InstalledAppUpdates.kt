@@ -130,7 +130,10 @@ fun InstalledApp.pendingInstallResolution(systemInfo: SystemPackageInfo?): Pendi
     )
 }
 
-private fun InstalledApp.installReachedTarget(versionName: String, versionCode: Long): Boolean {
+private fun InstalledApp.installReachedTarget(
+    versionName: String,
+    versionCode: Long,
+): Boolean {
     val targetCode = latestVersionCode ?: 0L
     return if (targetCode > 0L) {
         versionCode >= targetCode
@@ -177,20 +180,22 @@ fun InstalledApp.externalInstallUpdateFlag(
 fun InstalledApp.normalizeInstalledTag(
     tag: String,
     isUpdateAvailable: Boolean,
-): InstalledApp = copy(
-    installedVersion = tag,
-    isUpdateAvailable = isUpdateAvailable,
-)
+): InstalledApp =
+    copy(
+        installedVersion = tag,
+        isUpdateAvailable = isUpdateAvailable,
+    )
 
 fun InstalledApp.withMigratedVersionInfo(
     versionName: String?,
     versionCode: Long,
-): InstalledApp = copy(
-    installedVersionName = versionName,
-    installedVersionCode = versionCode,
-    latestVersionName = if (versionCode > 0L) versionName else latestVersionName,
-    latestVersionCode = if (versionCode > 0L) versionCode else latestVersionCode,
-)
+): InstalledApp =
+    copy(
+        installedVersionName = versionName,
+        installedVersionCode = versionCode,
+        latestVersionName = if (versionCode > 0L) versionName else latestVersionName,
+        latestVersionCode = if (versionCode > 0L) versionCode else latestVersionCode,
+    )
 
 fun InstalledApp.tagForObservedBuild(
     versionName: String?,
@@ -273,19 +278,21 @@ fun InstalledApp.markPending(
     releaseId: Long?,
     assetId: Long?,
     assetDigest: String?,
-): InstalledApp = copy(
-    isPendingInstall = true,
-    pendingInstallReleaseId = releaseId,
-    pendingInstallAssetId = assetId,
-    pendingInstallAssetDigest = assetDigest,
-)
+): InstalledApp =
+    copy(
+        isPendingInstall = true,
+        pendingInstallReleaseId = releaseId,
+        pendingInstallAssetId = assetId,
+        pendingInstallAssetDigest = assetDigest,
+    )
 
-fun InstalledApp.clearPending(): InstalledApp = copy(
-    isPendingInstall = false,
-    pendingInstallReleaseId = null,
-    pendingInstallAssetId = null,
-    pendingInstallAssetDigest = null,
-)
+fun InstalledApp.clearPending(): InstalledApp =
+    copy(
+        isPendingInstall = false,
+        pendingInstallReleaseId = null,
+        pendingInstallAssetId = null,
+        pendingInstallAssetDigest = null,
+    )
 
 fun InstalledApp.withLatestSnapshot(
     version: String,
@@ -293,10 +300,11 @@ fun InstalledApp.withLatestSnapshot(
     assetUrl: String?,
     versionName: String?,
     versionCode: Long?,
-): InstalledApp = copy(
-    latestVersion = version,
-    latestAssetName = assetName,
-    latestAssetUrl = assetUrl,
-    latestVersionName = versionName,
-    latestVersionCode = versionCode,
-)
+): InstalledApp =
+    copy(
+        latestVersion = version,
+        latestAssetName = assetName,
+        latestAssetUrl = assetUrl,
+        latestVersionName = versionName,
+        latestVersionCode = versionCode,
+    )

@@ -4,7 +4,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 
 interface DownloadOrchestrator {
-
     val downloads: StateFlow<Map<String, OrchestratedDownload>>
 
     fun observe(packageName: String): Flow<OrchestratedDownload?>

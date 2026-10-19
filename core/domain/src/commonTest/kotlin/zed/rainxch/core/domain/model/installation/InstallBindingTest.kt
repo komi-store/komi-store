@@ -18,54 +18,56 @@ class InstallBindingTest {
         latestReleaseId: Long? = 7001L,
         latestAssetId: Long? = 7002L,
         latestAssetDigest: String? = "sha256:aaa",
-    ): InstalledApp = InstalledApp(
-        packageName = "com.example.app",
-        repoId = 1L,
-        repoName = "app",
-        repoOwner = "owner",
-        repoOwnerAvatarUrl = "https://avatar",
-        repoDescription = null,
-        primaryLanguage = "Kotlin",
-        repoUrl = "https://github.com/owner/app",
-        installedVersion = installedVersion,
-        installedAssetName = "app-1.0.0.apk",
-        installedAssetUrl = "https://dl/app-1.0.0.apk",
-        latestVersion = latestVersion,
-        latestAssetName = "app-2.0.0.apk",
-        latestAssetUrl = "https://dl/app-2.0.0.apk",
-        latestAssetSize = 1024L,
-        latestReleaseId = latestReleaseId,
-        latestAssetId = latestAssetId,
-        latestAssetDigest = latestAssetDigest,
-        latestVersionCode = latestVersionCode,
-        appName = "App",
-        installSource = InstallSource.THIS_APP,
-        installedAt = 1000L,
-        lastCheckedAt = 2000L,
-        lastUpdatedAt = 1500L,
-        isUpdateAvailable = false,
-        signingFingerprint = signingFingerprint,
-        systemArchitecture = "arm64-v8a",
-        fileExtension = "apk",
-        installedVersionName = installedVersionName,
-        installedVersionCode = installedVersionCode,
-        installedReleaseId = installedReleaseId,
-        installedAssetId = installedAssetId,
-        installedAssetDigest = installedAssetDigest,
-    )
+    ): InstalledApp =
+        InstalledApp(
+            packageName = "com.example.app",
+            repoId = 1L,
+            repoName = "app",
+            repoOwner = "owner",
+            repoOwnerAvatarUrl = "https://avatar",
+            repoDescription = null,
+            primaryLanguage = "Kotlin",
+            repoUrl = "https://github.com/owner/app",
+            installedVersion = installedVersion,
+            installedAssetName = "app-1.0.0.apk",
+            installedAssetUrl = "https://dl/app-1.0.0.apk",
+            latestVersion = latestVersion,
+            latestAssetName = "app-2.0.0.apk",
+            latestAssetUrl = "https://dl/app-2.0.0.apk",
+            latestAssetSize = 1024L,
+            latestReleaseId = latestReleaseId,
+            latestAssetId = latestAssetId,
+            latestAssetDigest = latestAssetDigest,
+            latestVersionCode = latestVersionCode,
+            appName = "App",
+            installSource = InstallSource.THIS_APP,
+            installedAt = 1000L,
+            lastCheckedAt = 2000L,
+            lastUpdatedAt = 1500L,
+            isUpdateAvailable = false,
+            signingFingerprint = signingFingerprint,
+            systemArchitecture = "arm64-v8a",
+            fileExtension = "apk",
+            installedVersionName = installedVersionName,
+            installedVersionCode = installedVersionCode,
+            installedReleaseId = installedReleaseId,
+            installedAssetId = installedAssetId,
+            installedAssetDigest = installedAssetDigest,
+        )
 
     private fun local(
         packageName: String = "com.example.app",
         versionName: String = "1.0.0",
         versionCode: Long = 100L,
         signingFingerprint: String? = "AAAA",
-    ): SystemPackageInfo = SystemPackageInfo(
-        packageName = packageName,
-        versionName = versionName,
-        versionCode = versionCode,
-        isInstalled = true,
-        signingFingerprint = signingFingerprint,
-    )
+    ): SystemPackageInfo =
+        SystemPackageInfo(
+            packageName = packageName,
+            versionName = versionName,
+            versionCode = versionCode,
+            isInstalled = true,
+            signingFingerprint = signingFingerprint,
+        )
 
     @Test
     fun intactWhenEverythingMatches() {
@@ -99,8 +101,9 @@ class InstallBindingTest {
 
     @Test
     fun recordsWithoutReleaseIdStillVerifyViaLocalFacts() {
-        val status = app(installedReleaseId = null)
-            .bindingStatusAgainst(local())
+        val status =
+            app(installedReleaseId = null)
+                .bindingStatusAgainst(local())
         assertEquals(BindingStatus.Intact, status)
     }
 
@@ -112,8 +115,9 @@ class InstallBindingTest {
 
     @Test
     fun signingComparisonIgnoresCase() {
-        val status = app(signingFingerprint = "aabb")
-            .bindingStatusAgainst(local(signingFingerprint = "AABB"))
+        val status =
+            app(signingFingerprint = "aabb")
+                .bindingStatusAgainst(local(signingFingerprint = "AABB"))
         assertEquals(BindingStatus.Intact, status)
     }
 
@@ -137,8 +141,9 @@ class InstallBindingTest {
 
     @Test
     fun missingStoredSigningDoesNotBreak() {
-        val status = app(signingFingerprint = null)
-            .bindingStatusAgainst(local(signingFingerprint = "BBBB"))
+        val status =
+            app(signingFingerprint = null)
+                .bindingStatusAgainst(local(signingFingerprint = "BBBB"))
         assertEquals(BindingStatus.Intact, status)
     }
 
@@ -152,18 +157,19 @@ class InstallBindingTest {
 
     @Test
     fun confirmInstallRecordsTheBindingIdentity() {
-        val after = app().confirmInstall(
-            tag = "2.0.0",
-            releaseId = 7001L,
-            assetId = 7002L,
-            assetDigest = "sha256:aaa",
-            assetName = "app-2.0.0.apk",
-            assetUrl = "https://dl/app-2.0.0.apk",
-            versionName = "2.0.0",
-            versionCode = 200L,
-            signingFingerprint = "AAAA",
-            at = 3000L,
-        )
+        val after =
+            app().confirmInstall(
+                tag = "2.0.0",
+                releaseId = 7001L,
+                assetId = 7002L,
+                assetDigest = "sha256:aaa",
+                assetName = "app-2.0.0.apk",
+                assetUrl = "https://dl/app-2.0.0.apk",
+                versionName = "2.0.0",
+                versionCode = 200L,
+                signingFingerprint = "AAAA",
+                at = 3000L,
+            )
         assertEquals(7001L, after.installedReleaseId)
         assertEquals(7002L, after.installedAssetId)
         assertEquals("sha256:aaa", after.installedAssetDigest)
@@ -171,18 +177,19 @@ class InstallBindingTest {
 
     @Test
     fun confirmInstallTakesTheIdentityFromItsArgumentsNotTheSnapshot() {
-        val after = app().confirmInstall(
-            tag = "2.0.0",
-            releaseId = 999L,
-            assetId = 998L,
-            assetDigest = "sha256:zzz",
-            assetName = "app-2.0.0.apk",
-            assetUrl = "https://dl/app-2.0.0.apk",
-            versionName = "2.0.0",
-            versionCode = 200L,
-            signingFingerprint = "AAAA",
-            at = 3000L,
-        )
+        val after =
+            app().confirmInstall(
+                tag = "2.0.0",
+                releaseId = 999L,
+                assetId = 998L,
+                assetDigest = "sha256:zzz",
+                assetName = "app-2.0.0.apk",
+                assetUrl = "https://dl/app-2.0.0.apk",
+                versionName = "2.0.0",
+                versionCode = 200L,
+                signingFingerprint = "AAAA",
+                at = 3000L,
+            )
         assertEquals(999L, after.installedReleaseId)
         assertEquals(998L, after.installedAssetId)
         assertEquals("sha256:zzz", after.installedAssetDigest)
@@ -207,11 +214,12 @@ class InstallBindingTest {
 
     @Test
     fun markPendingKeepsTheInstalledIdentityUntilTheBuildLands() {
-        val after = app().markPending(
-            releaseId = 7001L,
-            assetId = 7002L,
-            assetDigest = "sha256:aaa",
-        )
+        val after =
+            app().markPending(
+                releaseId = 7001L,
+                assetId = 7002L,
+                assetDigest = "sha256:aaa",
+            )
         assertEquals(9001L, after.installedReleaseId)
         assertEquals(9002L, after.installedAssetId)
         assertEquals("sha256:old", after.installedAssetDigest)
@@ -219,11 +227,12 @@ class InstallBindingTest {
 
     @Test
     fun markPendingParksTheTargetIdentity() {
-        val after = app().markPending(
-            releaseId = 7001L,
-            assetId = 7002L,
-            assetDigest = "sha256:aaa",
-        )
+        val after =
+            app().markPending(
+                releaseId = 7001L,
+                assetId = 7002L,
+                assetDigest = "sha256:aaa",
+            )
         assertEquals(7001L, after.pendingInstallReleaseId)
         assertEquals(7002L, after.pendingInstallAssetId)
         assertEquals("sha256:aaa", after.pendingInstallAssetDigest)
@@ -231,30 +240,32 @@ class InstallBindingTest {
 
     @Test
     fun resolvePendingMovesIdentityAcrossWhenTheBuildLanded() {
-        val parked = app(
-            installedVersion = "2.0.0",
-            installedVersionName = "2.0.0",
-            installedVersionCode = 200L,
-            installedReleaseId = null,
-            installedAssetId = null,
-            installedAssetDigest = null,
-            latestVersion = "2.0.0",
-            latestVersionCode = 200L,
-        ).copy(
-            isPendingInstall = true,
-            pendingInstallVersion = "2.0.0",
-            pendingInstallReleaseId = 7001L,
-            pendingInstallAssetId = 7002L,
-            pendingInstallAssetDigest = "sha256:aaa",
-        )
+        val parked =
+            app(
+                installedVersion = "2.0.0",
+                installedVersionName = "2.0.0",
+                installedVersionCode = 200L,
+                installedReleaseId = null,
+                installedAssetId = null,
+                installedAssetDigest = null,
+                latestVersion = "2.0.0",
+                latestVersionCode = 200L,
+            ).copy(
+                isPendingInstall = true,
+                pendingInstallVersion = "2.0.0",
+                pendingInstallReleaseId = 7001L,
+                pendingInstallAssetId = 7002L,
+                pendingInstallAssetDigest = "sha256:aaa",
+            )
 
-        val after = parked.resolvePendingFromSystem(
-            PendingInstallResolution.Reached(
-                resolvedTag = "2.0.0",
-                versionName = "2.0.0",
-                versionCode = 200L,
-            ),
-        )
+        val after =
+            parked.resolvePendingFromSystem(
+                PendingInstallResolution.Reached(
+                    resolvedTag = "2.0.0",
+                    versionName = "2.0.0",
+                    versionCode = 200L,
+                ),
+            )
 
         assertEquals(7001L, after.installedReleaseId)
         assertEquals(7002L, after.installedAssetId)
@@ -266,30 +277,32 @@ class InstallBindingTest {
 
     @Test
     fun resolvePendingDropsBothSidesWhenTheBuildNeverLanded() {
-        val parked = app(
-            installedVersion = "1.0.0",
-            installedVersionName = "1.0.0",
-            installedVersionCode = 100L,
-            installedReleaseId = null,
-            installedAssetId = null,
-            installedAssetDigest = null,
-            latestVersion = "2.0.0",
-            latestVersionCode = 200L,
-        ).copy(
-            isPendingInstall = true,
-            pendingInstallVersion = "2.0.0",
-            pendingInstallReleaseId = 7001L,
-            pendingInstallAssetId = 7002L,
-            pendingInstallAssetDigest = "sha256:aaa",
-        )
+        val parked =
+            app(
+                installedVersion = "1.0.0",
+                installedVersionName = "1.0.0",
+                installedVersionCode = 100L,
+                installedReleaseId = null,
+                installedAssetId = null,
+                installedAssetDigest = null,
+                latestVersion = "2.0.0",
+                latestVersionCode = 200L,
+            ).copy(
+                isPendingInstall = true,
+                pendingInstallVersion = "2.0.0",
+                pendingInstallReleaseId = 7001L,
+                pendingInstallAssetId = 7002L,
+                pendingInstallAssetDigest = "sha256:aaa",
+            )
 
-        val after = parked.resolvePendingFromSystem(
-            PendingInstallResolution.Reached(
-                resolvedTag = "1.0.0",
-                versionName = "1.5.0",
-                versionCode = 150L,
-            ),
-        )
+        val after =
+            parked.resolvePendingFromSystem(
+                PendingInstallResolution.Reached(
+                    resolvedTag = "1.0.0",
+                    versionName = "1.5.0",
+                    versionCode = 150L,
+                ),
+            )
 
         assertEquals(null, after.installedReleaseId)
         assertEquals(null, after.installedAssetId)
@@ -301,19 +314,21 @@ class InstallBindingTest {
 
     @Test
     fun resolvePendingKeepsTheInstalledIdentityWhenTheInstallWasCancelled() {
-        val parked = app().markPending(
-            releaseId = 7001L,
-            assetId = 7002L,
-            assetDigest = "sha256:aaa",
-        )
+        val parked =
+            app().markPending(
+                releaseId = 7001L,
+                assetId = 7002L,
+                assetDigest = "sha256:aaa",
+            )
 
-        val after = parked.resolvePendingFromSystem(
-            PendingInstallResolution.Reached(
-                resolvedTag = "1.0.0",
-                versionName = "1.0.0",
-                versionCode = 100L,
-            ),
-        )
+        val after =
+            parked.resolvePendingFromSystem(
+                PendingInstallResolution.Reached(
+                    resolvedTag = "1.0.0",
+                    versionName = "1.0.0",
+                    versionCode = 100L,
+                ),
+            )
 
         assertEquals(9001L, after.installedReleaseId)
         assertEquals(9002L, after.installedAssetId)
@@ -323,29 +338,32 @@ class InstallBindingTest {
 
     @Test
     fun resolvePendingNeverPromotesAParkedIdentityWithoutAKnownTarget() {
-        val parked = app(latestVersionCode = null).markPending(
-            releaseId = 7001L,
-            assetId = 7002L,
-            assetDigest = "sha256:aaa",
-        )
+        val parked =
+            app(latestVersionCode = null).markPending(
+                releaseId = 7001L,
+                assetId = 7002L,
+                assetDigest = "sha256:aaa",
+            )
 
-        val cancelled = parked.resolvePendingFromSystem(
-            PendingInstallResolution.Reached(
-                resolvedTag = "1.0.0",
-                versionName = "1.0.0",
-                versionCode = 100L,
-            ),
-        )
+        val cancelled =
+            parked.resolvePendingFromSystem(
+                PendingInstallResolution.Reached(
+                    resolvedTag = "1.0.0",
+                    versionName = "1.0.0",
+                    versionCode = 100L,
+                ),
+            )
         assertEquals(9001L, cancelled.installedReleaseId)
         assertEquals(9002L, cancelled.installedAssetId)
 
-        val moved = parked.resolvePendingFromSystem(
-            PendingInstallResolution.Reached(
-                resolvedTag = "1.0.0",
-                versionName = "2.0.0",
-                versionCode = 200L,
-            ),
-        )
+        val moved =
+            parked.resolvePendingFromSystem(
+                PendingInstallResolution.Reached(
+                    resolvedTag = "1.0.0",
+                    versionName = "2.0.0",
+                    versionCode = 200L,
+                ),
+            )
         assertEquals(null, moved.installedReleaseId)
         assertEquals(null, moved.installedAssetId)
         assertEquals(null, moved.installedAssetDigest)
@@ -353,19 +371,21 @@ class InstallBindingTest {
 
     @Test
     fun resolvePendingNeverBindsAParkedIdentityToADifferentBuild() {
-        val parked = app().markPending(
-            releaseId = 7001L,
-            assetId = 7002L,
-            assetDigest = "sha256:aaa",
-        )
+        val parked =
+            app().markPending(
+                releaseId = 7001L,
+                assetId = 7002L,
+                assetDigest = "sha256:aaa",
+            )
 
-        val after = parked.resolvePendingFromSystem(
-            PendingInstallResolution.Reached(
-                resolvedTag = "2.0.0",
-                versionName = "2.1.0",
-                versionCode = 210L,
-            ),
-        )
+        val after =
+            parked.resolvePendingFromSystem(
+                PendingInstallResolution.Reached(
+                    resolvedTag = "2.0.0",
+                    versionName = "2.1.0",
+                    versionCode = 210L,
+                ),
+            )
 
         assertEquals(null, after.installedReleaseId)
         assertEquals(null, after.installedAssetId)
@@ -398,12 +418,13 @@ class InstallBindingTest {
 
     @Test
     fun clearPendingDropsTheParkedTargetIdentity() {
-        val parked = app().copy(
-            isPendingInstall = true,
-            pendingInstallReleaseId = 7001L,
-            pendingInstallAssetId = 7002L,
-            pendingInstallAssetDigest = "sha256:aaa",
-        )
+        val parked =
+            app().copy(
+                isPendingInstall = true,
+                pendingInstallReleaseId = 7001L,
+                pendingInstallAssetId = 7002L,
+                pendingInstallAssetDigest = "sha256:aaa",
+            )
         val after = parked.clearPending()
         assertEquals(null, after.pendingInstallReleaseId)
         assertEquals(null, after.pendingInstallAssetId)

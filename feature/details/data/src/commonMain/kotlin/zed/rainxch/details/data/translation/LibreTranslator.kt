@@ -30,54 +30,64 @@ internal class LibreTranslator(
             )
         }
 
-        val target = mapTargetLanguageCode(targetLanguage)
-            ?: throw RuntimeException("LibreTranslate target language required (got '$targetLanguage')")
+        val target =
+            mapTargetLanguageCode(targetLanguage)
+                ?: throw RuntimeException("LibreTranslate target language required (got '$targetLanguage')")
         val source = mapSourceLanguageCode(sourceLanguage)
         val endpoint = baseUrl.trimEnd('/') + "/translate"
 
-        val response = httpClient().submitForm(
-            url = endpoint,
-            formParameters = Parameters.build {
-                append("q", text)
-                append("source", source)
-                append("target", target)
-                append("format", "text")
-                if (!apiKey.isNullOrBlank()) append("api_key", apiKey)
-            },
-        )
+        val response =
+            httpClient().submitForm(
+                url = endpoint,
+                formParameters =
+                    Parameters.build {
+                        append("q", text)
+                        append("source", source)
+                        append("target", target)
+                        append("format", "text")
+                        if (!apiKey.isNullOrBlank()) append("api_key", apiKey)
+                    },
+            )
 
         val body = response.bodyAsText()
         if (!response.status.isSuccess()) {
-
-            val message = runCatching {
-                json.parseToJsonElement(body).jsonObject["error"]?.jsonPrimitive?.content
-            }.getOrNull()
+            val message =
+                runCatching {
+                    json
+                        .parseToJsonElement(body)
+                        .jsonObject["error"]
+                        ?.jsonPrimitive
+                        ?.content
+                }.getOrNull()
             throw RuntimeException(
                 "LibreTranslate HTTP ${response.status.value}: ${message ?: body.take(200)}",
             )
         }
 
-        val root = try {
-            json.parseToJsonElement(body).jsonObject
-        } catch (e: SerializationException) {
-            throw RuntimeException(
-                "LibreTranslate returned non-JSON response: ${body.take(200)}",
-                e,
-            )
-        }
+        val root =
+            try {
+                json.parseToJsonElement(body).jsonObject
+            } catch (e: SerializationException) {
+                throw RuntimeException(
+                    "LibreTranslate returned non-JSON response: ${body.take(200)}",
+                    e,
+                )
+            }
 
         root["error"]?.jsonPrimitive?.content?.let { msg ->
             throw RuntimeException("LibreTranslate error: $msg")
         }
 
-        val translation = root["translatedText"]?.jsonPrimitive?.content
-            ?: throw RuntimeException("LibreTranslate response missing translatedText")
-        val detected = root["detectedLanguage"]
-            ?.jsonObject
-            ?.get("language")
-            ?.jsonPrimitive
-            ?.content
-            ?.takeIf { it.isNotBlank() }
+        val translation =
+            root["translatedText"]?.jsonPrimitive?.content
+                ?: throw RuntimeException("LibreTranslate response missing translatedText")
+        val detected =
+            root["detectedLanguage"]
+                ?.jsonObject
+                ?.get("language")
+                ?.jsonPrimitive
+                ?.content
+                ?.takeIf { it.isNotBlank() }
 
         return TranslationResult(
             translatedText = translation,

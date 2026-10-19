@@ -24,25 +24,23 @@ class DownloadNotificationObserver(
 
     fun start(scope: CoroutineScope) {
         if (job?.isActive == true) return
-        job = scope.launch {
-            try {
-                orchestrator.downloads.collect { snapshot ->
-                    try {
-                        reconcile(snapshot)
-                    } catch (t: Throwable) {
-
-                        Logger.w(t) { "DownloadNotificationObserver: reconcile failed, continuing" }
+        job =
+            scope.launch {
+                try {
+                    orchestrator.downloads.collect { snapshot ->
+                        try {
+                            reconcile(snapshot)
+                        } catch (t: Throwable) {
+                            Logger.w(t) { "DownloadNotificationObserver: reconcile failed, continuing" }
+                        }
                     }
+                } finally {
+                    job = null
                 }
-            } finally {
-
-                job = null
             }
-        }
     }
 
     private fun reconcile(snapshot: Map<String, OrchestratedDownload>) {
-
         val removed = lastStages.keys - snapshot.keys
         for (pkg in removed) {
             clearProgressSafely(pkg)
@@ -115,7 +113,6 @@ class DownloadNotificationObserver(
     }
 
     private companion object {
-
         const val PROGRESS_UPDATE_INTERVAL_MS = 400L
     }
 }

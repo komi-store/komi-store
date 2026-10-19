@@ -1,4 +1,5 @@
 package zed.rainxch.core.domain.model.installation
+
 data class InstalledApp(
     val packageName: String,
     val repoId: Long,
@@ -39,40 +40,24 @@ data class InstalledApp(
     val latestVersionCode: Long? = null,
     val latestReleasePublishedAt: String? = null,
     val includePreReleases: Boolean = false,
-
     val assetFilterRegex: String? = null,
-
     val fallbackToOlderReleases: Boolean = false,
-
     val preferredAssetVariant: String? = null,
-
     val preferredVariantStale: Boolean = false,
-
     val preferredAssetTokens: String? = null,
-
     val assetGlobPattern: String? = null,
-
     val pickedAssetIndex: Int? = null,
-
     val pickedAssetSiblingCount: Int? = null,
-
     val pendingInstallFilePath: String? = null,
-
     val pendingInstallVersion: String? = null,
-
     val pendingInstallAssetName: String? = null,
-
     val pendingInstallReleaseId: Long? = null,
-
     val pendingInstallAssetId: Long? = null,
-
     val pendingInstallAssetDigest: String? = null,
-
     val skippedReleaseTag: String? = null,
     val sourceHost: String? = null,
 )
 
 fun InstalledApp?.isReallyInstalled(): Boolean = this != null && !this.isPendingInstall
 
-fun InstalledApp?.hasActualUpdate(): Boolean =
-    this != null && this.isUpdateAvailable && !this.isPendingInstall
+fun InstalledApp?.hasActualUpdate(): Boolean = this != null && this.isUpdateAvailable && !this.isPendingInstall

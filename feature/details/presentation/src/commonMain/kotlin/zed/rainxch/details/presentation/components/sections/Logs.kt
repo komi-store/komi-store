@@ -26,9 +26,10 @@ fun LazyListScope.logs(state: DetailsState) {
         val colors = LocalPersonality.current.colors
         Spacer(Modifier.height(20.dp))
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 8.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 8.dp),
             verticalArrangement = Arrangement.spacedBy(2.dp),
         ) {
             KomiText(
@@ -52,11 +53,12 @@ fun LazyListScope.logs(state: DetailsState) {
             text = "> ${log.result.asText()}: ${log.assetName}",
             role = KomiTextRole.Mono,
             fontSize = 11.sp,
-            color = if (log.result is LogResult.Error) {
-                colors.error
-            } else {
-                colors.outline
-            },
+            color =
+                if (log.result is LogResult.Error) {
+                    colors.error
+                } else {
+                    colors.outline
+                },
         )
     }
 }

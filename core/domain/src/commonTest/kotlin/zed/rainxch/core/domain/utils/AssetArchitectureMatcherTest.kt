@@ -9,7 +9,6 @@ import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 class AssetArchitectureMatcherTest {
-
     private fun match(name: String) = AssetArchitectureMatcher.matchArchitecture(name)
 
     @Test

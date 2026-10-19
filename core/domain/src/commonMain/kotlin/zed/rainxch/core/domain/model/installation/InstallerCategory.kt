@@ -1,5 +1,8 @@
 package zed.rainxch.core.domain.model.installation
-enum class InstallerCategory(val sortPriority: Int) {
+
+enum class InstallerCategory(
+    val sortPriority: Int,
+) {
     SIDE_STORE(0),
     SIDELOADED(1),
     PLAY_STORE(2),

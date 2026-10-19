@@ -34,7 +34,6 @@ class DhizukuServiceManager(
         private set
 
     fun initialize() {
-
         runCatching { Dhizuku.init(context) }
             .onFailure { Logger.w(TAG) { "warm-up Dhizuku.init() threw: ${it.message}" } }
         refreshStatus()
@@ -50,22 +49,24 @@ class DhizukuServiceManager(
                 Logger.d(TAG) { "computeStatus() — Dhizuku package not installed" }
                 DhizukuStatus.NOT_INSTALLED
             } else {
-                val initialized = try {
-                    Dhizuku.init(context)
-                } catch (e: Exception) {
-                    Logger.w(TAG) { "Dhizuku.init() threw: ${e.message}" }
-                    false
-                }
+                val initialized =
+                    try {
+                        Dhizuku.init(context)
+                    } catch (e: Exception) {
+                        Logger.w(TAG) { "Dhizuku.init() threw: ${e.message}" }
+                        false
+                    }
                 Logger.d(TAG) { "computeStatus() — Dhizuku.init=$initialized" }
                 if (!initialized) {
                     DhizukuStatus.NOT_RUNNING
                 } else {
-                    val granted = try {
-                        Dhizuku.isPermissionGranted()
-                    } catch (e: Exception) {
-                        Logger.w(TAG) { "Dhizuku.isPermissionGranted() threw: ${e.message}" }
-                        false
-                    }
+                    val granted =
+                        try {
+                            Dhizuku.isPermissionGranted()
+                        } catch (e: Exception) {
+                            Logger.w(TAG) { "Dhizuku.isPermissionGranted() threw: ${e.message}" }
+                            false
+                        }
                     if (granted) {
                         Logger.d(TAG) { "computeStatus() — READY" }
                         DhizukuStatus.READY
@@ -100,15 +101,17 @@ class DhizukuServiceManager(
                 refreshStatus()
                 return
             }
-            Dhizuku.requestPermission(object : DhizukuRequestPermissionListener() {
-                @Throws(RemoteException::class)
-                override fun onRequestPermission(grantResult: Int) {
-                    Logger.d(TAG) {
-                        "Dhizuku permission result: granted=${grantResult == PackageManager.PERMISSION_GRANTED}"
+            Dhizuku.requestPermission(
+                object : DhizukuRequestPermissionListener() {
+                    @Throws(RemoteException::class)
+                    override fun onRequestPermission(grantResult: Int) {
+                        Logger.d(TAG) {
+                            "Dhizuku permission result: granted=${grantResult == PackageManager.PERMISSION_GRANTED}"
+                        }
+                        refreshStatus()
                     }
-                    refreshStatus()
-                }
-            })
+                },
+            )
         } catch (e: Exception) {
             Logger.w(TAG) { "Failed to request Dhizuku permission: ${e.message}" }
         }
@@ -146,32 +149,37 @@ class DhizukuServiceManager(
         return try {
             withTimeoutOrNull(BIND_TIMEOUT_MS) {
                 suspendCancellableCoroutine { continuation ->
-                    val componentName = ComponentName(
-                        context.packageName,
-                        DhizukuInstallerServiceImpl::class.java.name,
-                    )
+                    val componentName =
+                        ComponentName(
+                            context.packageName,
+                            DhizukuInstallerServiceImpl::class.java.name,
+                        )
                     Logger.d(TAG) { "bindService() — component: $componentName" }
 
                     val args = DhizukuUserServiceArgs(componentName)
 
-                    val connection = object : ServiceConnection {
-                        override fun onServiceConnected(name: ComponentName?, binder: IBinder?) {
-                            Logger.d(TAG) {
-                                "onServiceConnected() — name=$name, binderAlive=${binder?.pingBinder()}"
+                    val connection =
+                        object : ServiceConnection {
+                            override fun onServiceConnected(
+                                name: ComponentName?,
+                                binder: IBinder?,
+                            ) {
+                                Logger.d(TAG) {
+                                    "onServiceConnected() — name=$name, binderAlive=${binder?.pingBinder()}"
+                                }
+                                val service = IDhizukuInstallerService.Stub.asInterface(binder)
+                                installerService = service
+                                Logger.d(TAG) { "Dhizuku installer service connected and cached" }
+                                if (continuation.isActive) {
+                                    continuation.resume(service)
+                                }
                             }
-                            val service = IDhizukuInstallerService.Stub.asInterface(binder)
-                            installerService = service
-                            Logger.d(TAG) { "Dhizuku installer service connected and cached" }
-                            if (continuation.isActive) {
-                                continuation.resume(service)
-                            }
-                        }
 
-                        override fun onServiceDisconnected(name: ComponentName?) {
-                            installerService = null
-                            Logger.d(TAG) { "Dhizuku installer service disconnected: $name" }
+                            override fun onServiceDisconnected(name: ComponentName?) {
+                                installerService = null
+                                Logger.d(TAG) { "Dhizuku installer service disconnected: $name" }
+                            }
                         }
-                    }
 
                     serviceConnection = connection
 

@@ -22,10 +22,10 @@ import org.jetbrains.compose.resources.stringResource
 import zed.rainxch.core.presentation.components.text.KomiText
 import zed.rainxch.core.presentation.components.text.KomiTextRole
 import zed.rainxch.core.presentation.locals.LocalPersonality
-import zed.rainxch.core.presentation.personality.usesDecor
 import zed.rainxch.core.presentation.personality.ClassicPersonality
 import zed.rainxch.core.presentation.personality.MangaPersonality
 import zed.rainxch.core.presentation.personality.manga.decoration.hardShadow
+import zed.rainxch.core.presentation.personality.usesDecor
 import zed.rainxch.githubstore.core.presentation.res.Res
 import zed.rainxch.githubstore.core.presentation.res.home_chart_popular
 import zed.rainxch.githubstore.core.presentation.res.home_chart_popular_jp
@@ -42,9 +42,10 @@ fun HomeChartTabs(
     modifier: Modifier = Modifier,
 ) {
     Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(horizontal = 12.dp, vertical = 6.dp),
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .padding(horizontal = 12.dp, vertical = 6.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         ChartTab.entries.forEach { tab ->
@@ -73,38 +74,46 @@ private fun ChartTabSegment(
     val fg = if (selected) colors.onPrimary else colors.onSurface
     val kicker = if (selected) colors.onPrimary.copy(alpha = 0.85f) else colors.onSurfaceVariant
 
-    val borderWidth = when (personality) {
-        is MangaPersonality -> 2.5.dp
-        is ClassicPersonality -> 1.dp
-    }
-    val shadowModifier = when (personality) {
-        is MangaPersonality -> if (selected) {
-            Modifier.hardShadow(offset = DpOffset(3.dp, 3.dp), color = colors.shadow, shape = shape)
-        } else {
-            Modifier
+    val borderWidth =
+        when (personality) {
+            is MangaPersonality -> 2.5.dp
+            is ClassicPersonality -> 1.dp
+        }
+    val shadowModifier =
+        when (personality) {
+            is MangaPersonality -> {
+                if (selected) {
+                    Modifier.hardShadow(offset = DpOffset(3.dp, 3.dp), color = colors.shadow, shape = shape)
+                } else {
+                    Modifier
+                }
+            }
+
+            is ClassicPersonality -> {
+                Modifier
+            }
         }
 
-        is ClassicPersonality -> Modifier
-    }
-
     Column(
-        modifier = modifier
-            .then(shadowModifier)
-            .clip(shape)
-            .background(bg)
-            .border(BorderStroke(borderWidth, colors.outline), shape)
-            .clickable(onClick = onClick)
-            .padding(vertical = 8.dp, horizontal = 6.dp),
+        modifier =
+            modifier
+                .then(shadowModifier)
+                .clip(shape)
+                .background(bg)
+                .border(BorderStroke(borderWidth, colors.outline), shape)
+                .clickable(onClick = onClick)
+                .padding(vertical = 8.dp, horizontal = 6.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         KomiText(
-            text = stringResource(
-                when (tab) {
-                    ChartTab.Trending -> Res.string.home_chart_trending
-                    ChartTab.Releases -> Res.string.home_chart_releases
-                    ChartTab.Popular -> Res.string.home_chart_popular
-                },
-            ),
+            text =
+                stringResource(
+                    when (tab) {
+                        ChartTab.Trending -> Res.string.home_chart_trending
+                        ChartTab.Releases -> Res.string.home_chart_releases
+                        ChartTab.Popular -> Res.string.home_chart_popular
+                    },
+                ),
             role = KomiTextRole.Label,
             color = fg,
             fontSize = 13.sp,
@@ -114,13 +123,14 @@ private fun ChartTabSegment(
 
         if (personality.usesDecor) {
             KomiText(
-                text = stringResource(
-                    when (tab) {
-                        ChartTab.Trending -> Res.string.home_chart_trending_jp
-                        ChartTab.Releases -> Res.string.home_chart_releases_jp
-                        ChartTab.Popular -> Res.string.home_chart_popular_jp
-                    },
-                ),
+                text =
+                    stringResource(
+                        when (tab) {
+                            ChartTab.Trending -> Res.string.home_chart_trending_jp
+                            ChartTab.Releases -> Res.string.home_chart_releases_jp
+                            ChartTab.Popular -> Res.string.home_chart_popular_jp
+                        },
+                    ),
                 role = KomiTextRole.Label,
                 color = kicker,
                 fontSize = 9.sp,

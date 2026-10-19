@@ -22,7 +22,7 @@ expect fun InstalledAppIcon(
 internal fun FallbackAppIcon(
     appName: String,
     avatarFallbackUrl: String?,
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
 ) {
     val url = avatarFallbackUrl?.takeIf { it.isNotBlank() }
     if (url != null) {

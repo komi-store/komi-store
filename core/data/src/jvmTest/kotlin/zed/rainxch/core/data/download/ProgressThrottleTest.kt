@@ -1,5 +1,6 @@
 package zed.rainxch.core.data.download
 
+import zed.rainxch.core.domain.model.installation.DownloadProgress
 import kotlin.test.Test
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
@@ -7,7 +8,6 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.TimeMark
 import kotlin.time.TimeSource
-import zed.rainxch.core.domain.model.installation.DownloadProgress
 
 class ProgressThrottleTest {
     @Test

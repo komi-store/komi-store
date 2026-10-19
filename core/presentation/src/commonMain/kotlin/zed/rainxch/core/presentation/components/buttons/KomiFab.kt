@@ -1,5 +1,6 @@
 package zed.rainxch.core.presentation.components.buttons
 
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -13,7 +14,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FloatingActionButton
@@ -23,10 +23,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.graphics.vector.ImageVector
 import zed.rainxch.core.presentation.components.icon.KomiIcon
 import zed.rainxch.core.presentation.components.text.KomiText
 import zed.rainxch.core.presentation.components.text.KomiTextRole
@@ -45,8 +45,9 @@ fun KomiFab(
     label: String? = null,
 ) {
     when (val personality = LocalPersonality.current) {
-        is MangaPersonality ->
+        is MangaPersonality -> {
             MangaFab(personality, onClick, icon, contentDescription, modifier, label)
+        }
 
         is ClassicPersonality -> {
             val colors = personality.colors
@@ -79,7 +80,7 @@ private fun MangaFab(
     onClick: () -> Unit,
     icon: ImageVector,
     contentDescription: String,
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
     label: String?,
 ) {
     val colors = personality.colors

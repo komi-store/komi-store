@@ -62,72 +62,77 @@ class RootServiceManager(
     suspend fun installPackage(
         apkFile: File,
         installerPackageName: String?,
-    ): Int? = withContext(Dispatchers.IO) {
-        configureDefaultShell()
-        if (!isRootGranted()) {
-            Logger.w(TAG) { "installPackage() — root not granted, aborting" }
-            return@withContext null
-        }
-        val safeInstaller = installerPackageName?.takeIf { it.isNotBlank() }
-        if (safeInstaller != null && !PACKAGE_NAME_PATTERN.matches(safeInstaller)) {
-            Logger.w(TAG) {
-                "installPackage() — rejecting non-conformant installerPackageName='$safeInstaller'"
+    ): Int? =
+        withContext(Dispatchers.IO) {
+            configureDefaultShell()
+            if (!isRootGranted()) {
+                Logger.w(TAG) { "installPackage() — root not granted, aborting" }
+                return@withContext null
             }
-            return@withContext STATUS_FAILURE
-        }
-
-        val tmpPath = "/data/local/tmp/ghs_${System.currentTimeMillis()}_${(0..Int.MAX_VALUE).random()}.apk"
-        val srcPath = shellQuote(apkFile.absolutePath)
-        val tmpPathQuoted = shellQuote(tmpPath)
-
-        try {
-            val copyRes = Shell.cmd("cp $srcPath $tmpPathQuoted && chmod 644 $tmpPathQuoted").exec()
-            if (!copyRes.isSuccess) {
-                Logger.e(TAG) {
-                    "installPackage() — staging copy failed: exit=${copyRes.code} out='${copyRes.out.joinToString("\n")}' err='${copyRes.err.joinToString("\n")}'"
+            val safeInstaller = installerPackageName?.takeIf { it.isNotBlank() }
+            if (safeInstaller != null && !PACKAGE_NAME_PATTERN.matches(safeInstaller)) {
+                Logger.w(TAG) {
+                    "installPackage() — rejecting non-conformant installerPackageName='$safeInstaller'"
                 }
                 return@withContext STATUS_FAILURE
             }
 
-            val command = buildString {
-                append("pm install ")
-                if (safeInstaller != null) append("-i ").append(safeInstaller).append(' ')
-                append("-r ")
-                append(tmpPathQuoted)
-            }
-            Logger.d(TAG) { "installPackage() — executing: $command" }
-            val result = Shell.cmd(command).exec()
-            val stdout = result.out.joinToString("\n").trim()
-            val stderr = result.err.joinToString("\n").trim()
-            Logger.d(TAG) { "installPackage() — exit=${result.code} stdout='$stdout' stderr='$stderr'" }
-            if (result.isSuccess && stdout.contains("Success")) {
-                STATUS_SUCCESS
-            } else {
-                Logger.w(TAG) { "installPackage() — pm reported failure: stdout='$stdout' stderr='$stderr'" }
-                STATUS_FAILURE
-            }
-        } finally {
-            Shell.cmd("rm -f $tmpPathQuoted").submit()
-        }
-    }
+            val tmpPath = "/data/local/tmp/ghs_${System.currentTimeMillis()}_${(0..Int.MAX_VALUE).random()}.apk"
+            val srcPath = shellQuote(apkFile.absolutePath)
+            val tmpPathQuoted = shellQuote(tmpPath)
 
-    suspend fun uninstallPackage(packageName: String): Int? = withContext(Dispatchers.IO) {
-        configureDefaultShell()
-        if (!isRootGranted()) {
-            Logger.w(TAG) { "uninstallPackage() — root not granted, aborting" }
-            return@withContext null
-        }
-        if (!PACKAGE_NAME_PATTERN.matches(packageName)) {
-            Logger.w(TAG) {
-                "uninstallPackage() — rejecting non-conformant packageName='$packageName'"
+            try {
+                val copyRes = Shell.cmd("cp $srcPath $tmpPathQuoted && chmod 644 $tmpPathQuoted").exec()
+                if (!copyRes.isSuccess) {
+                    Logger.e(TAG) {
+                        "installPackage() — staging copy failed: exit=${copyRes.code} out='${copyRes.out.joinToString(
+                            "\n",
+                        )}' err='${copyRes.err.joinToString("\n")}'"
+                    }
+                    return@withContext STATUS_FAILURE
+                }
+
+                val command =
+                    buildString {
+                        append("pm install ")
+                        if (safeInstaller != null) append("-i ").append(safeInstaller).append(' ')
+                        append("-r ")
+                        append(tmpPathQuoted)
+                    }
+                Logger.d(TAG) { "installPackage() — executing: $command" }
+                val result = Shell.cmd(command).exec()
+                val stdout = result.out.joinToString("\n").trim()
+                val stderr = result.err.joinToString("\n").trim()
+                Logger.d(TAG) { "installPackage() — exit=${result.code} stdout='$stdout' stderr='$stderr'" }
+                if (result.isSuccess && stdout.contains("Success")) {
+                    STATUS_SUCCESS
+                } else {
+                    Logger.w(TAG) { "installPackage() — pm reported failure: stdout='$stdout' stderr='$stderr'" }
+                    STATUS_FAILURE
+                }
+            } finally {
+                Shell.cmd("rm -f $tmpPathQuoted").submit()
             }
-            return@withContext STATUS_FAILURE
         }
-        val result = Shell.cmd("pm uninstall $packageName").exec()
-        val stdout = result.out.joinToString("\n").trim()
-        Logger.d(TAG) { "uninstallPackage($packageName) — exit=${result.code} stdout='$stdout'" }
-        if (result.isSuccess && stdout.contains("Success")) STATUS_SUCCESS else STATUS_FAILURE
-    }
+
+    suspend fun uninstallPackage(packageName: String): Int? =
+        withContext(Dispatchers.IO) {
+            configureDefaultShell()
+            if (!isRootGranted()) {
+                Logger.w(TAG) { "uninstallPackage() — root not granted, aborting" }
+                return@withContext null
+            }
+            if (!PACKAGE_NAME_PATTERN.matches(packageName)) {
+                Logger.w(TAG) {
+                    "uninstallPackage() — rejecting non-conformant packageName='$packageName'"
+                }
+                return@withContext STATUS_FAILURE
+            }
+            val result = Shell.cmd("pm uninstall $packageName").exec()
+            val stdout = result.out.joinToString("\n").trim()
+            Logger.d(TAG) { "uninstallPackage($packageName) — exit=${result.code} stdout='$stdout'" }
+            if (result.isSuccess && stdout.contains("Success")) STATUS_SUCCESS else STATUS_FAILURE
+        }
 
     private fun refreshStatusBlocking() {
         val computed = computeStatus()
@@ -147,11 +152,14 @@ class RootServiceManager(
                 rememberGranted(true)
                 RootStatus.READY
             }
+
             // false/null on a fresh process (no shell created yet) is unreliable. If root
             // was granted before, trust the su manager's persistent grant instead of
             // re-prompting on every launch (GH#705). A real revoke is caught lazily when
             // an install actually spawns the shell (isRootGranted below).
-            else -> if (wasGrantedBefore()) RootStatus.READY else RootStatus.PERMISSION_NEEDED
+            else -> {
+                if (wasGrantedBefore()) RootStatus.READY else RootStatus.PERMISSION_NEEDED
+            }
         }
     }
 
@@ -174,7 +182,8 @@ class RootServiceManager(
             if (configured) return
             try {
                 Shell.setDefaultBuilder(
-                    Shell.Builder.create()
+                    Shell.Builder
+                        .create()
                         .setTimeout(SHELL_TIMEOUT_SECONDS),
                 )
             } catch (e: IllegalStateException) {

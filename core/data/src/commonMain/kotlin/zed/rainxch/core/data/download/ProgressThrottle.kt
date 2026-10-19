@@ -1,9 +1,9 @@
 package zed.rainxch.core.data.download
 
+import zed.rainxch.core.domain.model.installation.DownloadProgress
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.TimeSource
-import zed.rainxch.core.domain.model.installation.DownloadProgress
 
 internal class ProgressThrottle(
     private val minInterval: Duration = DEFAULT_INTERVAL,

@@ -34,13 +34,14 @@ fun LazyListScope.reportIssue(repoUrl: String) {
         val colors = LocalPersonality.current.colors
         val rowShape = RoundedCornerShape(LocalPersonality.current.shape.corner)
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(rowShape)
-                .border(width = 1.dp, color = colors.outline, shape = rowShape)
-                .background(colors.surface)
-                .clickable { uriHandler.openUri("${repoUrl.trimEnd('/')}/issues") }
-                .padding(horizontal = 14.dp, vertical = 12.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .clip(rowShape)
+                    .border(width = 1.dp, color = colors.outline, shape = rowShape)
+                    .background(colors.surface)
+                    .clickable { uriHandler.openUri("${repoUrl.trimEnd('/')}/issues") }
+                    .padding(horizontal = 14.dp, vertical = 12.dp),
             horizontalArrangement = Arrangement.spacedBy(12.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {

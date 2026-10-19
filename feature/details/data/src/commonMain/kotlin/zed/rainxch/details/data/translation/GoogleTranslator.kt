@@ -13,7 +13,6 @@ internal class GoogleTranslator(
     private val httpClient: () -> HttpClient,
     private val json: Json,
 ) : Translator {
-
     override val maxChunkSize: Int = 4500
 
     override suspend fun translate(

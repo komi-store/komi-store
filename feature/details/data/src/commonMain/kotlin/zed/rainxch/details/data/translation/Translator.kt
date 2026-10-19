@@ -12,4 +12,6 @@ internal interface Translator {
     val maxChunkSize: Int
 }
 
-internal class TranslationProviderNotConfiguredException(message: String) : RuntimeException(message)
+internal class TranslationProviderNotConfiguredException(
+    message: String,
+) : RuntimeException(message)

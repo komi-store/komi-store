@@ -1,7 +1,6 @@
 package zed.rainxch.core.data.services
 
 import co.touchlab.kermit.Logger
-import kotlin.coroutines.coroutineContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
@@ -17,17 +16,17 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
 import zed.rainxch.core.data.data_source.TokenStore
+import zed.rainxch.core.data.download.ContentRange
 import zed.rainxch.core.data.download.FinishedFileReuse
-import zed.rainxch.core.data.download.ProgressThrottle
 import zed.rainxch.core.data.download.OrphanPolicy
 import zed.rainxch.core.data.download.OrphanVerdict
 import zed.rainxch.core.data.download.PartialDisposal
 import zed.rainxch.core.data.download.PartialIdentity
 import zed.rainxch.core.data.download.PartialNaming
 import zed.rainxch.core.data.download.PartialOwnership
-import zed.rainxch.core.data.download.PartialReuse
 import zed.rainxch.core.data.download.PartialRetry
-import zed.rainxch.core.data.download.ContentRange
+import zed.rainxch.core.data.download.PartialReuse
+import zed.rainxch.core.data.download.ProgressThrottle
 import zed.rainxch.core.data.download.RangeDecision
 import zed.rainxch.core.data.download.RangeRequest
 import zed.rainxch.core.data.network.GithubAssetAuth
@@ -39,8 +38,8 @@ import zed.rainxch.core.domain.model.settings.ProxyScope
 import zed.rainxch.core.domain.network.AssetIdentity
 import zed.rainxch.core.domain.network.DigestVerifier
 import zed.rainxch.core.domain.network.Downloader
-import java.io.File
 import java.io.BufferedOutputStream
+import java.io.File
 import java.io.FileOutputStream
 import java.net.Authenticator
 import java.net.InetSocketAddress
@@ -52,6 +51,7 @@ import java.nio.file.StandardCopyOption
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.TimeUnit
+import kotlin.coroutines.coroutineContext
 
 class AndroidDownloader(
     private val files: FileLocationsProvider,
@@ -104,7 +104,6 @@ class AndroidDownloader(
                     }
 
                     is ProxyConfig.System -> {
-
                         proxy(resolveAndroidSystemProxy())
                     }
 
@@ -395,7 +394,10 @@ class AndroidDownloader(
         }
     }
 
-    private suspend fun buildRequest(url: String, rangeHeader: String?): Request =
+    private suspend fun buildRequest(
+        url: String,
+        rangeHeader: String?,
+    ): Request =
         Request
             .Builder()
             .url(url)
@@ -418,7 +420,10 @@ class AndroidDownloader(
             null
         }
 
-    private fun writeIdentity(metaFile: File, identity: PartialIdentity) {
+    private fun writeIdentity(
+        metaFile: File,
+        identity: PartialIdentity,
+    ) {
         try {
             metaFile.writeText(identity.serialize())
         } catch (e: Exception) {
@@ -426,7 +431,11 @@ class AndroidDownloader(
         }
     }
 
-    private fun totalBytes(response: Response, resumeFrom: Long, contentRange: ContentRange?): Long? {
+    private fun totalBytes(
+        response: Response,
+        resumeFrom: Long,
+        contentRange: ContentRange?,
+    ): Long? {
         val declared = contentRange?.total
         if (declared != null && declared > 0L) return declared
         val contentLength = response.body.contentLength()
@@ -436,14 +445,21 @@ class AndroidDownloader(
 
     private suspend fun githubToken(): String? =
         try {
-            tokenStore.currentToken()?.accessToken?.trim()?.takeIf { it.isNotEmpty() }
+            tokenStore
+                .currentToken()
+                ?.accessToken
+                ?.trim()
+                ?.takeIf { it.isNotEmpty() }
         } catch (e: kotlin.coroutines.cancellation.CancellationException) {
             throw e
         } catch (_: Exception) {
             null
         }
 
-    private fun moveAtomic(source: File, target: File) {
+    private fun moveAtomic(
+        source: File,
+        target: File,
+    ) {
         try {
             Files.move(
                 source.toPath(),
@@ -452,7 +468,6 @@ class AndroidDownloader(
                 StandardCopyOption.ATOMIC_MOVE,
             )
         } catch (_: AtomicMoveNotSupportedException) {
-
             Files.move(source.toPath(), target.toPath(), StandardCopyOption.REPLACE_EXISTING)
         }
     }
@@ -467,8 +482,10 @@ class AndroidDownloader(
             val legacyPartNames = names.filter { PartialNaming.isLegacyPartFile(it) }
             val metaNames = names.filter { PartialNaming.isMetaFile(it) }
             val assetNames =
-                (legacyPartNames.mapNotNull { PartialNaming.assetNameOfPart(it) } +
-                    metaNames.mapNotNull { PartialNaming.assetNameOfMeta(it) }).toSet()
+                (
+                    legacyPartNames.mapNotNull { PartialNaming.assetNameOfPart(it) } +
+                        metaNames.mapNotNull { PartialNaming.assetNameOfMeta(it) }
+                ).toSet()
 
             var removed = 0
             for (assetName in assetNames) {
@@ -493,7 +510,11 @@ class AndroidDownloader(
             removed
         }
 
-    private fun applyVerdict(verdict: OrphanVerdict, part: File, meta: File): Int {
+    private fun applyVerdict(
+        verdict: OrphanVerdict,
+        part: File,
+        meta: File,
+    ): Int {
         var removed = 0
         when (verdict) {
             OrphanVerdict.KEEP -> Unit
@@ -541,7 +562,6 @@ class AndroidDownloader(
 
     override suspend fun cancelDownload(fileName: String): Boolean =
         withContext(Dispatchers.IO) {
-
             val ids = idsByName.remove(fileName)?.toList().orEmpty()
             if (ids.isEmpty()) return@withContext false
 
@@ -566,7 +586,10 @@ class AndroidDownloader(
             }
         }
 
-    private fun deletePartialPair(dir: File, safeName: String): Boolean {
+    private fun deletePartialPair(
+        dir: File,
+        safeName: String,
+    ): Boolean {
         val partRemoved = File(dir, PartialNaming.part(safeName)).delete()
         val metaRemoved = File(dir, PartialNaming.meta(safeName)).delete()
         return partRemoved || metaRemoved
@@ -574,9 +597,13 @@ class AndroidDownloader(
 
     private class PartialRestart : Exception()
 
-    private class PartialTerminal(message: String) : Exception(message)
+    private class PartialTerminal(
+        message: String,
+    ) : Exception(message)
 
-    private class PartialAborted(cause: Throwable) : Exception(cause)
+    private class PartialAborted(
+        cause: Throwable,
+    ) : Exception(cause)
 
     private companion object {
         private const val BUFFER_SIZE = 64 * 1024

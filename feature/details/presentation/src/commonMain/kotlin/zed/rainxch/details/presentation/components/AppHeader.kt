@@ -1,12 +1,5 @@
 package zed.rainxch.details.presentation.components
 
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.snapshotFlow
-import androidx.compose.foundation.layout.PaddingValues
-import kotlinx.coroutines.flow.first
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
@@ -19,6 +12,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -27,6 +21,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.CallSplit
@@ -34,8 +31,10 @@ import androidx.compose.material.icons.filled.UnfoldMore
 import androidx.compose.material.icons.filled.Verified
 import androidx.compose.material.icons.outlined.History
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -49,12 +48,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.flow.first
 import org.jetbrains.compose.resources.stringResource
-import zed.rainxch.core.domain.model.repository.DiscoveryPlatform
 import zed.rainxch.core.domain.model.account.github.GithubRelease
 import zed.rainxch.core.domain.model.account.github.GithubRepoSummary
 import zed.rainxch.core.domain.model.account.github.GithubUserProfile
 import zed.rainxch.core.domain.model.installation.InstalledApp
+import zed.rainxch.core.domain.model.repository.DiscoveryPlatform
 import zed.rainxch.core.domain.utils.PlatformRelease
 import zed.rainxch.core.domain.utils.VersionMath
 import zed.rainxch.core.presentation.components.GitHubStoreImage
@@ -146,66 +146,69 @@ fun AppHeader(
     )
 
     Box(
-        modifier = modifier
-            .fillMaxWidth()
-            .clip(headerShape)
-            .drawBehind { drawRect(animatedSurface) }
-            .border(1.5.dp, borderColor, headerShape),
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .clip(headerShape)
+                .drawBehind { drawRect(animatedSurface) }
+                .border(1.5.dp, borderColor, headerShape),
     ) {
         Column(modifier = Modifier.fillMaxWidth()) {
             Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(76.dp)
-                    .clipToBounds()
-                    .drawBehind {
-                        val accent = animatedAccent
-                        val stripeBase =
-                            if (isDark) accent.copy(alpha = 0.18f) else accent.copy(alpha = 0.12f)
-                        val stripeLineThick =
-                            if (isDark) accent.copy(alpha = 0.45f) else accent.copy(alpha = 0.55f)
-                        val stripeLineThin =
-                            if (isDark) accent.copy(alpha = 0.22f) else accent.copy(alpha = 0.30f)
-                        drawRect(color = stripeBase)
-                        val thick = 9.dp.toPx()
-                        val thin = 2.5.dp.toPx()
-                        val gapAfterThick = 10.dp.toPx()
-                        val gapBetweenThin = 6.dp.toPx()
-                        val cycle =
-                            thick + gapAfterThick + thin + gapBetweenThin + thin + gapAfterThick
-                        var x = -size.height
-                        while (x < size.width + size.height) {
-                            drawLine(
-                                color = stripeLineThick,
-                                start = Offset(x, size.height),
-                                end = Offset(x + size.height, 0f),
-                                strokeWidth = thick,
-                                cap = StrokeCap.Round,
-                            )
-                            var xt = x + thick + gapAfterThick
-                            drawLine(
-                                color = stripeLineThin,
-                                start = Offset(xt, size.height),
-                                end = Offset(xt + size.height, 0f),
-                                strokeWidth = thin,
-                                cap = StrokeCap.Round,
-                            )
-                            xt += thin + gapBetweenThin
-                            drawLine(
-                                color = stripeLineThin,
-                                start = Offset(xt, size.height),
-                                end = Offset(xt + size.height, 0f),
-                                strokeWidth = thin,
-                                cap = StrokeCap.Round,
-                            )
-                            x += cycle
-                        }
-                    },
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .height(76.dp)
+                        .clipToBounds()
+                        .drawBehind {
+                            val accent = animatedAccent
+                            val stripeBase =
+                                if (isDark) accent.copy(alpha = 0.18f) else accent.copy(alpha = 0.12f)
+                            val stripeLineThick =
+                                if (isDark) accent.copy(alpha = 0.45f) else accent.copy(alpha = 0.55f)
+                            val stripeLineThin =
+                                if (isDark) accent.copy(alpha = 0.22f) else accent.copy(alpha = 0.30f)
+                            drawRect(color = stripeBase)
+                            val thick = 9.dp.toPx()
+                            val thin = 2.5.dp.toPx()
+                            val gapAfterThick = 10.dp.toPx()
+                            val gapBetweenThin = 6.dp.toPx()
+                            val cycle =
+                                thick + gapAfterThick + thin + gapBetweenThin + thin + gapAfterThick
+                            var x = -size.height
+                            while (x < size.width + size.height) {
+                                drawLine(
+                                    color = stripeLineThick,
+                                    start = Offset(x, size.height),
+                                    end = Offset(x + size.height, 0f),
+                                    strokeWidth = thick,
+                                    cap = StrokeCap.Round,
+                                )
+                                var xt = x + thick + gapAfterThick
+                                drawLine(
+                                    color = stripeLineThin,
+                                    start = Offset(xt, size.height),
+                                    end = Offset(xt + size.height, 0f),
+                                    strokeWidth = thin,
+                                    cap = StrokeCap.Round,
+                                )
+                                xt += thin + gapBetweenThin
+                                drawLine(
+                                    color = stripeLineThin,
+                                    start = Offset(xt, size.height),
+                                    end = Offset(xt + size.height, 0f),
+                                    strokeWidth = thin,
+                                    cap = StrokeCap.Round,
+                                )
+                                x += cycle
+                            }
+                        },
             )
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 130.dp, end = 20.dp, top = 12.dp),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(start = 130.dp, end = 20.dp, top = 12.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
@@ -216,9 +219,10 @@ fun AppHeader(
                     color = colors.onSurface.copy(alpha = 0.75f),
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier
-                        .weight(1f, fill = false)
-                        .clickable(onClick = onOwnerClick),
+                    modifier =
+                        Modifier
+                            .weight(1f, fill = false)
+                            .clickable(onClick = onOwnerClick),
                     uppercase = false,
                 )
                 if (isCurrentUserOwner) {
@@ -231,27 +235,30 @@ fun AppHeader(
                 }
             }
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 130.dp, end = 20.dp, top = 2.dp),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(start = 130.dp, end = 20.dp, top = 2.dp),
                 horizontalArrangement = Arrangement.spacedBy(10.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 androidx.compose.foundation.text.BasicText(
                     text = repository.name,
-                    style = LocalPersonality.current.type.display.copy(
-                        fontWeight = FontWeight.Black,
-                        fontSize = 30.sp,
-                        letterSpacing = (-0.4).sp,
-                        color = colors.onSurface,
-                    ),
+                    style =
+                        LocalPersonality.current.type.display.copy(
+                            fontWeight = FontWeight.Black,
+                            fontSize = 30.sp,
+                            letterSpacing = (-0.4).sp,
+                            color = colors.onSurface,
+                        ),
                     maxLines = 1,
                     softWrap = false,
-                    autoSize = androidx.compose.foundation.text.TextAutoSize.StepBased(
-                        minFontSize = 18.sp,
-                        maxFontSize = 30.sp,
-                        stepSize = 1.sp,
-                    ),
+                    autoSize =
+                        androidx.compose.foundation.text.TextAutoSize.StepBased(
+                            minFontSize = 18.sp,
+                            maxFontSize = 30.sp,
+                            stepSize = 1.sp,
+                        ),
                     modifier = Modifier.weight(1f, fill = false),
                 )
                 if (repository.isFork) {
@@ -268,9 +275,10 @@ fun AppHeader(
             if (lastPushLabel != null) {
                 Spacer(Modifier.height(10.dp))
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 20.dp),
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 20.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(6.dp),
                 ) {
@@ -315,16 +323,18 @@ fun AppHeader(
                 val selectedIndex =
                     switcherApps.indexOfFirst { it.packageName == installedApp?.packageName }
                 val rowState = rememberLazyListState()
-                val targetIndex = when {
-                    showAppLabel -> 0
-                    selectedIndex >= 0 -> firstChipIndex + selectedIndex
-                    else -> -1
-                }
+                val targetIndex =
+                    when {
+                        showAppLabel -> 0
+                        selectedIndex >= 0 -> firstChipIndex + selectedIndex
+                        else -> -1
+                    }
                 LaunchedEffect(targetIndex) {
                     if (targetIndex < 0) return@LaunchedEffect
                     val target = targetIndex
-                    val layout = snapshotFlow { rowState.layoutInfo }
-                        .first { it.visibleItemsInfo.isNotEmpty() }
+                    val layout =
+                        snapshotFlow { rowState.layoutInfo }
+                            .first { it.visibleItemsInfo.isNotEmpty() }
                     val item = layout.visibleItemsInfo.firstOrNull { it.index == target }
                     val fullyVisible =
                         item != null &&
@@ -364,9 +374,10 @@ fun AppHeader(
                                 InstalledAppIcon(
                                     packageName = app.packageName,
                                     appName = app.appName,
-                                    modifier = Modifier
-                                        .size(16.dp)
-                                        .clip(RoundedCornerShape(shape.cornerSmall)),
+                                    modifier =
+                                        Modifier
+                                            .size(16.dp)
+                                            .clip(RoundedCornerShape(shape.cornerSmall)),
                                 )
                             },
                             onClick = { onSelectInstalledApp(app.packageName) },
@@ -397,11 +408,12 @@ fun AppHeader(
                                     )
                                 }
                             },
-                            onClick = onPlatformClick?.let { handler ->
-                                {
-                                    handler(platform)
-                                }
-                            },
+                            onClick =
+                                onPlatformClick?.let { handler ->
+                                    {
+                                        handler(platform)
+                                    }
+                                },
                         )
                     }
                 }
@@ -415,10 +427,11 @@ fun AppHeader(
             downloadStage = downloadStage,
             accent = { animatedAccent },
             progress = { animatedProgress },
-            modifier = Modifier
-                .align(Alignment.TopStart)
-                .offset(x = 20.dp, y = 30.dp)
-                .size(100.dp),
+            modifier =
+                Modifier
+                    .align(Alignment.TopStart)
+                    .offset(x = 20.dp, y = 30.dp)
+                    .size(100.dp),
         )
     }
 }
@@ -435,14 +448,14 @@ private fun HeaderAvatar(
 ) {
     Box(modifier = modifier, contentAlignment = Alignment.Center) {
         Box(
-            modifier = Modifier
-                .size(100.dp)
-                .clip(cornerShape)
-                .drawBehind {
-                    val a = accent()
-                    drawRect(if (isDark) a.copy(alpha = 0.20f) else a.copy(alpha = 0.14f))
-                }
-                .border(2.5.dp, accent(), cornerShape),
+            modifier =
+                Modifier
+                    .size(100.dp)
+                    .clip(cornerShape)
+                    .drawBehind {
+                        val a = accent()
+                        drawRect(if (isDark) a.copy(alpha = 0.20f) else a.copy(alpha = 0.14f))
+                    }.border(2.5.dp, accent(), cornerShape),
             contentAlignment = Alignment.Center,
         ) {
             GitHubStoreImage(
@@ -482,19 +495,21 @@ private fun InstalledStatusPill(installedApp: InstalledApp) {
     val colors = LocalPersonality.current.colors
     val shape = RoundedCornerShape(LocalPersonality.current.shape.cornerSmall)
     Row(
-        modifier = Modifier
-            .clip(shape)
-            .border(width = 1.dp, color = colors.primary, shape = shape)
-            .padding(horizontal = 12.dp, vertical = 5.dp),
+        modifier =
+            Modifier
+                .clip(shape)
+                .border(width = 1.dp, color = colors.primary, shape = shape)
+                .padding(horizontal = 12.dp, vertical = 5.dp),
     ) {
         KomiText(
-            text = stringResource(
-                when {
-                    installedApp.isPendingInstall -> Res.string.pending_install
-                    installedApp.isUpdateAvailable -> Res.string.update_available
-                    else -> Res.string.installed
-                },
-            ),
+            text =
+                stringResource(
+                    when {
+                        installedApp.isPendingInstall -> Res.string.pending_install
+                        installedApp.isUpdateAvailable -> Res.string.update_available
+                        else -> Res.string.installed
+                    },
+                ),
             role = KomiTextRole.Label,
             fontWeight = FontWeight.SemiBold,
             fontSize = 12.sp,
@@ -504,7 +519,10 @@ private fun InstalledStatusPill(installedApp: InstalledApp) {
     }
 }
 
-private fun platformChipLabel(platformLabel: String, release: GithubRelease): String {
+private fun platformChipLabel(
+    platformLabel: String,
+    release: GithubRelease,
+): String {
     val version = VersionMath.normalizeVersion(release.tagName).ifBlank { release.tagName }
     val days = daysSinceIso(release.publishedAt)
     val year = release.publishedAt.take(4)

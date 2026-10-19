@@ -8,7 +8,6 @@ fun AssetNetwork.toDomain(): GithubAsset =
     GithubAsset(
         id = id,
         name = name,
-
         contentType = contentType ?: "application/octet-stream",
         size = size,
         downloadUrl = downloadUrl,

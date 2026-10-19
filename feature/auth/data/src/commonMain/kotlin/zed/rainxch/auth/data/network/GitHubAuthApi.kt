@@ -26,7 +26,6 @@ import zed.rainxch.core.data.dto.GithubDeviceStartDto
 import zed.rainxch.core.data.dto.GithubDeviceTokenErrorDto
 import zed.rainxch.core.data.dto.GithubDeviceTokenSuccessDto
 
-
 object GitHubAuthApi {
     private val json =
         Json {
@@ -195,7 +194,10 @@ object GitHubAuthApi {
                 error(
                     buildString {
                         append(err.error)
-                        err.errorDescription?.let { append(": "); append(it) }
+                        err.errorDescription?.let {
+                            append(": ")
+                            append(it)
+                        }
                         append(' ')
                         append(requestId.asRequestIdTag())
                     }.trim(),
@@ -267,37 +269,45 @@ object GitHubAuthApi {
         }
     }
 
-    suspend fun validatePersonalAccessToken(token: String): PatValidation {
-        return try {
-            val res = validationHttp.get("https://api.github.com/user") {
-                accept(ContentType.Application.Json)
-                header(HttpHeaders.Authorization, "Bearer $token")
-                header(HttpHeaders.UserAgent, "GithubStore/1.0 (PAT-validate)")
-            }
+    suspend fun validatePersonalAccessToken(token: String): PatValidation =
+        try {
+            val res =
+                validationHttp.get("https://api.github.com/user") {
+                    accept(ContentType.Application.Json)
+                    header(HttpHeaders.Authorization, "Bearer $token")
+                    header(HttpHeaders.UserAgent, "GithubStore/1.0 (PAT-validate)")
+                }
             val status = res.status
             when {
-                status.isSuccessLike() -> PatValidation.Valid
-                status == HttpStatusCode.Unauthorized ->
-                    PatValidation.Rejected(RejectedKind.BadCredentials)
-                status == HttpStatusCode.Forbidden ->
-                    PatValidation.Rejected(RejectedKind.InsufficientScope)
+                status.isSuccessLike() -> {
+                    PatValidation.Valid
+                }
 
-                status.value in 400..499 ->
+                status == HttpStatusCode.Unauthorized -> {
+                    PatValidation.Rejected(RejectedKind.BadCredentials)
+                }
+
+                status == HttpStatusCode.Forbidden -> {
+                    PatValidation.Rejected(RejectedKind.InsufficientScope)
+                }
+
+                status.value in 400..499 -> {
                     PatValidation.Rejected(RejectedKind.Other(status.value))
-                else -> PatValidation.Unreachable("HTTP ${status.value}")
+                }
+
+                else -> {
+                    PatValidation.Unreachable("HTTP ${status.value}")
+                }
             }
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
             PatValidation.Unreachable(e.message ?: "network error")
         }
-    }
 
-    private fun HttpStatusCode.isSuccessLike(): Boolean =
-        this in HttpStatusCode.OK..HttpStatusCode.MultipleChoices
+    private fun HttpStatusCode.isSuccessLike(): Boolean = this in HttpStatusCode.OK..HttpStatusCode.MultipleChoices
 
-    private fun String?.asRequestIdTag(): String =
-        if (this.isNullOrBlank()) "(X-Request-ID=<none>)" else "(X-Request-ID=$this)"
+    private fun String?.asRequestIdTag(): String = if (this.isNullOrBlank()) "(X-Request-ID=<none>)" else "(X-Request-ID=$this)"
 
     private const val HEADER_REQUEST_ID = "X-Request-ID"
 

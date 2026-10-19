@@ -54,11 +54,17 @@ class RecentlyViewedViewModel(
 
     fun onAction(action: RecentlyViewedAction) {
         when (action) {
-            RecentlyViewedAction.OnNavigateBackClick -> Unit
+            RecentlyViewedAction.OnNavigateBackClick -> {
+                Unit
+            }
 
-            is RecentlyViewedAction.OnRepositoryClick -> Unit
+            is RecentlyViewedAction.OnRepositoryClick -> {
+                Unit
+            }
 
-            is RecentlyViewedAction.OnDeveloperProfileClick -> Unit
+            is RecentlyViewedAction.OnDeveloperProfileClick -> {
+                Unit
+            }
 
             is RecentlyViewedAction.OnRemoveFromHistory -> {
                 viewModelScope.launch {

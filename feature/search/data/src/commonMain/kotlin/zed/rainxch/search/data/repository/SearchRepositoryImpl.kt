@@ -27,11 +27,11 @@ import zed.rainxch.core.data.network.BackendApiClient
 import zed.rainxch.core.data.network.GitHubClientProvider
 import zed.rainxch.core.data.network.executeRequest
 import zed.rainxch.core.data.network.shouldFallbackToGithubOrRethrow
-import zed.rainxch.core.domain.model.repository.DiscoveryPlatform
 import zed.rainxch.core.domain.model.account.github.GithubRepoSummary
-import zed.rainxch.core.domain.model.repository.PaginatedDiscoveryRepositories
-import zed.rainxch.core.domain.model.error.RateLimitException
 import zed.rainxch.core.domain.model.account.github.GithubUser
+import zed.rainxch.core.domain.model.error.RateLimitException
+import zed.rainxch.core.domain.model.repository.DiscoveryPlatform
+import zed.rainxch.core.domain.model.repository.PaginatedDiscoveryRepositories
 import zed.rainxch.domain.model.ExploreResult
 import zed.rainxch.domain.model.ProgrammingLanguage
 import zed.rainxch.domain.model.SortBy
@@ -165,9 +165,7 @@ class SearchRepositoryImpl(
         }
     }
 
-    private fun PaginatedDiscoveryRepositories.prepend(
-        extra: List<GithubRepoSummary>,
-    ): PaginatedDiscoveryRepositories {
+    private fun PaginatedDiscoveryRepositories.prepend(extra: List<GithubRepoSummary>): PaginatedDiscoveryRepositories {
         if (extra.isEmpty()) return this
         val existingIds = repos.mapTo(mutableSetOf()) { it.id }
         val deduped = extra.filter { it.id !in existingIds }
@@ -186,30 +184,34 @@ class SearchRepositoryImpl(
         val client = forgejoClientRegistry.clientFor(host)
         val result = client.searchRepositories(query = query, page = page, limit = PER_PAGE)
         val repos = result.getOrNull()?.data.orEmpty()
-        val summaries = repos.map { repo ->
-            GithubRepoSummary(
-                id = zed.rainxch.core.domain.utils.RepoIdCodec.encode(host, repo.id),
-                name = repo.name,
-                fullName = repo.fullName ?: "${repo.owner.login}/${repo.name}",
-                owner = GithubUser(
-                    id = repo.owner.id,
-                    login = repo.owner.login,
-                    avatarUrl = repo.owner.avatarUrl,
-                    htmlUrl = repo.owner.htmlUrl,
-                ),
-                description = repo.description,
-                defaultBranch = repo.defaultBranch ?: "main",
-                htmlUrl = repo.htmlUrl,
-                stargazersCount = repo.starsCount,
-                forksCount = repo.forksCount,
-                language = repo.language,
-                topics = null,
-                releasesUrl = "${repo.htmlUrl}/releases",
-                updatedAt = repo.updatedAt ?: "",
-                isFork = false,
-                sourceHost = host,
-            )
-        }
+        val summaries =
+            repos.map { repo ->
+                GithubRepoSummary(
+                    id =
+                        zed.rainxch.core.domain.utils.RepoIdCodec
+                            .encode(host, repo.id),
+                    name = repo.name,
+                    fullName = repo.fullName ?: "${repo.owner.login}/${repo.name}",
+                    owner =
+                        GithubUser(
+                            id = repo.owner.id,
+                            login = repo.owner.login,
+                            avatarUrl = repo.owner.avatarUrl,
+                            htmlUrl = repo.owner.htmlUrl,
+                        ),
+                    description = repo.description,
+                    defaultBranch = repo.defaultBranch ?: "main",
+                    htmlUrl = repo.htmlUrl,
+                    stargazersCount = repo.starsCount,
+                    forksCount = repo.forksCount,
+                    language = repo.language,
+                    topics = null,
+                    releasesUrl = "${repo.htmlUrl}/releases",
+                    updatedAt = repo.updatedAt ?: "",
+                    isFork = false,
+                    sourceHost = host,
+                )
+            }
         send(
             PaginatedDiscoveryRepositories(
                 repos = summaries,
@@ -231,32 +233,35 @@ class SearchRepositoryImpl(
 
         if (sortBy == SortBy.MostForks) return null
 
-        val platformSlug = when (platform) {
-            DiscoveryPlatform.Android -> "android"
-            DiscoveryPlatform.Windows -> "windows"
-            DiscoveryPlatform.Macos -> "macos"
-            DiscoveryPlatform.Linux -> "linux"
-            DiscoveryPlatform.Ios -> return null 
-            DiscoveryPlatform.All -> null
-        }
+        val platformSlug =
+            when (platform) {
+                DiscoveryPlatform.Android -> "android"
+                DiscoveryPlatform.Windows -> "windows"
+                DiscoveryPlatform.Macos -> "macos"
+                DiscoveryPlatform.Linux -> "linux"
+                DiscoveryPlatform.Ios -> return null
+                DiscoveryPlatform.All -> null
+            }
 
-        val sort = when (sortBy) {
-            SortBy.MostStars -> "stars"
-            SortBy.BestMatch -> "relevance"
-            SortBy.RecentlyUpdated -> "updated"
-            SortBy.RecentlyReleased -> "releases"
-            SortBy.MostForks -> null
-        }
+        val sort =
+            when (sortBy) {
+                SortBy.MostStars -> "stars"
+                SortBy.BestMatch -> "relevance"
+                SortBy.RecentlyUpdated -> "updated"
+                SortBy.RecentlyReleased -> "releases"
+                SortBy.MostForks -> null
+            }
 
         val signedIn = isSignedIn()
         val offset = (page - 1) * BACKEND_PAGE_SIZE
-        val result = backendApiClient.search(
-            query = query,
-            platform = platformSlug,
-            sort = sort,
-            limit = BACKEND_PAGE_SIZE,
-            offset = offset,
-        )
+        val result =
+            backendApiClient.search(
+                query = query,
+                platform = platformSlug,
+                sort = sort,
+                limit = BACKEND_PAGE_SIZE,
+                offset = offset,
+            )
 
         return result.fold(
             onSuccess = { searchResponse ->
@@ -572,20 +577,23 @@ class SearchRepositoryImpl(
         platform: DiscoveryPlatform,
         page: Int,
     ): ExploreResult {
-        val platformSlug = when (platform) {
-            DiscoveryPlatform.Android -> "android"
-            DiscoveryPlatform.Windows -> "windows"
-            DiscoveryPlatform.Macos -> "macos"
-            DiscoveryPlatform.Linux -> "linux"
-            DiscoveryPlatform.Ios -> "ios"
-            DiscoveryPlatform.All -> null
-        }
+        val platformSlug =
+            when (platform) {
+                DiscoveryPlatform.Android -> "android"
+                DiscoveryPlatform.Windows -> "windows"
+                DiscoveryPlatform.Macos -> "macos"
+                DiscoveryPlatform.Linux -> "linux"
+                DiscoveryPlatform.Ios -> "ios"
+                DiscoveryPlatform.All -> null
+            }
 
-        val response = backendApiClient.searchExplore(
-            query = query,
-            platform = platformSlug,
-            page = page,
-        ).getOrThrow()
+        val response =
+            backendApiClient
+                .searchExplore(
+                    query = query,
+                    platform = platformSlug,
+                    page = page,
+                ).getOrThrow()
 
         return ExploreResult(
             repos = response.items.map { it.toSummary() },

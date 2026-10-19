@@ -5,6 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -27,14 +28,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import zed.rainxch.core.presentation.components.GitHubStoreImage
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import org.jetbrains.compose.resources.stringResource
-import zed.rainxch.core.presentation.components.surfaces.KomiSurface
+import zed.rainxch.core.presentation.components.GitHubStoreImage
 import zed.rainxch.core.presentation.components.chips.KomiChip
 import zed.rainxch.core.presentation.components.chips.KomiChipKind
 import zed.rainxch.core.presentation.components.chips.KomiChipSize
 import zed.rainxch.core.presentation.components.icon.KomiIcon
+import zed.rainxch.core.presentation.components.surfaces.KomiSurface
 import zed.rainxch.core.presentation.components.text.KomiText
 import zed.rainxch.core.presentation.components.text.KomiTextRole
 import zed.rainxch.core.presentation.locals.LocalPersonality
@@ -62,19 +62,21 @@ fun FavouriteRepositoryItem(
             modifier = Modifier.fillMaxWidth().padding(16.dp),
         ) {
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(LocalPersonality.current.shape.cornerSmall))
-                    .clickable(onClick = onDevProfileClick)
-                    .padding(vertical = 2.dp),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(LocalPersonality.current.shape.cornerSmall))
+                        .clickable(onClick = onDevProfileClick)
+                        .padding(vertical = 2.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 GitHubStoreImage(
                     imageModel = { favouriteRepository.repoOwnerAvatarUrl },
-                    modifier = Modifier
-                        .size(28.dp)
-                        .clip(RoundedCornerShape(shape.cornerSmall)),
+                    modifier =
+                        Modifier
+                            .size(28.dp)
+                            .clip(RoundedCornerShape(shape.cornerSmall)),
                 )
 
                 KomiText(
@@ -201,22 +203,25 @@ private fun FavoriteToggle(
 ) {
     val colors = LocalPersonality.current.colors
     val shape = LocalPersonality.current.shape
-    val tint = if (favorited) {
-        colors.error
-    } else {
-        colors.onSurfaceVariant
-    }
-    val container = if (favorited) {
-        colors.error.copy(alpha = 0.45f)
-    } else {
-        colors.surfaceContainerHigh
-    }
+    val tint =
+        if (favorited) {
+            colors.error
+        } else {
+            colors.onSurfaceVariant
+        }
+    val container =
+        if (favorited) {
+            colors.error.copy(alpha = 0.45f)
+        } else {
+            colors.surfaceContainerHigh
+        }
     Box(
-        modifier = Modifier
-            .size(38.dp)
-            .clip(RoundedCornerShape(shape.cornerSmall))
-            .background(container)
-            .clickable(onClick = onClick),
+        modifier =
+            Modifier
+                .size(38.dp)
+                .clip(RoundedCornerShape(shape.cornerSmall))
+                .background(container)
+                .clickable(onClick = onClick),
         contentAlignment = Alignment.Center,
     ) {
         KomiIcon(

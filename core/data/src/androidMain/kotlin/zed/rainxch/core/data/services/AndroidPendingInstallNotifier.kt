@@ -32,7 +32,6 @@ class AndroidPendingInstallNotifier(
             if (safeOwner.isNotEmpty() && safeRepo.isNotEmpty()) {
                 "githubstore://repo/$safeOwner/$safeRepo"
             } else {
-
                 FALLBACK_URI
             }
         val deepLinkIntent =
@@ -79,8 +78,7 @@ class AndroidPendingInstallNotifier(
         ) == PackageManager.PERMISSION_GRANTED
     }
 
-    private fun notificationIdFor(packageName: String): Int =
-        NOTIFICATION_ID_BASE + (packageName.hashCode() and 0x00FFFFFF)
+    private fun notificationIdFor(packageName: String): Int = NOTIFICATION_ID_BASE + (packageName.hashCode() and 0x00FFFFFF)
 
     private fun sanitizeForUri(input: String): String {
         if (input.isBlank()) return ""

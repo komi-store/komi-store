@@ -108,14 +108,12 @@ class AndroidInstallerInfoExtractor(
         filePath: String,
     ): String? {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-
             val sigInfo = packageInfo.signingInfo
             if (sigInfo != null) {
                 val cert =
                     if (sigInfo.hasMultipleSigners()) {
                         sigInfo.apkContentsSigners?.firstOrNull()
                     } else {
-
                         sigInfo.signingCertificateHistory?.lastOrNull()
                     }
                 cert?.toByteArray()?.let { certBytes ->
@@ -123,11 +121,12 @@ class AndroidInstallerInfoExtractor(
                 }
             }
 
-            val sigOnly = getPackageArchiveInfoCompat(
-                packageManager,
-                filePath,
-                GET_SIGNING_CERTIFICATES,
-            )
+            val sigOnly =
+                getPackageArchiveInfoCompat(
+                    packageManager,
+                    filePath,
+                    GET_SIGNING_CERTIFICATES,
+                )
             val fallbackSigInfo = sigOnly?.signingInfo
             if (fallbackSigInfo != null) {
                 val certs =

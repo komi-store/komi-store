@@ -1,7 +1,6 @@
 package zed.rainxch.core.domain.system
 
 interface DownloadProgressNotifier {
-
     fun notifyProgress(
         packageName: String,
         appName: String,

@@ -14,12 +14,12 @@ import kotlinx.coroutines.launch
 import zed.rainxch.core.domain.getOsVersion
 import zed.rainxch.core.domain.getPlatform
 import zed.rainxch.core.domain.getSystemLocaleTag
+import zed.rainxch.core.domain.helpers.BrowserHelper
 import zed.rainxch.core.domain.model.installation.InstallerType
 import zed.rainxch.core.domain.model.system.Platform
 import zed.rainxch.core.domain.repository.TweaksRepository
 import zed.rainxch.core.domain.repository.UserSessionRepository
 import zed.rainxch.core.domain.system.AppVersionInfo
-import zed.rainxch.core.domain.helpers.BrowserHelper
 import zed.rainxch.tweaks.presentation.feedback.model.DiagnosticsInfo
 import zed.rainxch.tweaks.presentation.feedback.model.FeedbackChannel
 import zed.rainxch.tweaks.presentation.feedback.util.FeedbackComposer
@@ -44,31 +44,61 @@ class FeedbackViewModel(
 
     fun onAction(action: FeedbackAction) {
         when (action) {
-            is FeedbackAction.OnCategoryChange ->
+            is FeedbackAction.OnCategoryChange -> {
                 _state.update { it.copy(category = action.category) }
-            is FeedbackAction.OnTopicChange ->
+            }
+
+            is FeedbackAction.OnTopicChange -> {
                 _state.update { it.copy(topic = action.topic) }
-            is FeedbackAction.OnTitleChange ->
+            }
+
+            is FeedbackAction.OnTitleChange -> {
                 _state.update { it.copy(title = action.value) }
-            is FeedbackAction.OnDescriptionChange ->
+            }
+
+            is FeedbackAction.OnDescriptionChange -> {
                 _state.update { it.copy(description = action.value) }
-            is FeedbackAction.OnStepsToReproduceChange ->
+            }
+
+            is FeedbackAction.OnStepsToReproduceChange -> {
                 _state.update { it.copy(stepsToReproduce = action.value) }
-            is FeedbackAction.OnExpectedActualChange ->
+            }
+
+            is FeedbackAction.OnExpectedActualChange -> {
                 _state.update { it.copy(expectedActual = action.value) }
-            is FeedbackAction.OnUseCaseChange ->
+            }
+
+            is FeedbackAction.OnUseCaseChange -> {
                 _state.update { it.copy(useCase = action.value) }
-            is FeedbackAction.OnProposedSolutionChange ->
+            }
+
+            is FeedbackAction.OnProposedSolutionChange -> {
                 _state.update { it.copy(proposedSolution = action.value) }
-            is FeedbackAction.OnCurrentBehaviourChange ->
+            }
+
+            is FeedbackAction.OnCurrentBehaviourChange -> {
                 _state.update { it.copy(currentBehaviour = action.value) }
-            is FeedbackAction.OnDesiredBehaviourChange ->
+            }
+
+            is FeedbackAction.OnDesiredBehaviourChange -> {
                 _state.update { it.copy(desiredBehaviour = action.value) }
-            FeedbackAction.OnAttachDiagnosticsToggle ->
+            }
+
+            FeedbackAction.OnAttachDiagnosticsToggle -> {
                 _state.update { it.copy(attachDiagnostics = !it.attachDiagnostics) }
-            FeedbackAction.OnSendViaEmail -> send(FeedbackChannel.EMAIL)
-            FeedbackAction.OnSendViaGithub -> send(FeedbackChannel.GITHUB)
-            FeedbackAction.OnDismiss -> resetForm()
+            }
+
+            FeedbackAction.OnSendViaEmail -> {
+                send(FeedbackChannel.EMAIL)
+            }
+
+            FeedbackAction.OnSendViaGithub -> {
+                send(FeedbackChannel.GITHUB)
+            }
+
+            FeedbackAction.OnDismiss -> {
+                resetForm()
+            }
         }
     }
 
@@ -96,7 +126,6 @@ class FeedbackViewModel(
     }
 
     private fun resetForm() {
-
         _state.update { previous ->
             FeedbackState(diagnostics = previous.diagnostics)
         }
@@ -121,12 +150,13 @@ class FeedbackViewModel(
         val palette = tweaksRepository.getThemeColor().firstOrNull()
         val isDark = tweaksRepository.getIsDarkTheme().firstOrNull()
         val amoled = tweaksRepository.getAmoledTheme().firstOrNull() ?: false
-        val themeMode = when {
-            isDark == null -> "System"
-            isDark && amoled -> "AMOLED"
-            isDark -> "Dark"
-            else -> "Light"
-        }
+        val themeMode =
+            when {
+                isDark == null -> "System"
+                isDark && amoled -> "AMOLED"
+                isDark -> "Dark"
+                else -> "Light"
+            }
         return DiagnosticsInfo(
             appVersion = appVersionInfo.versionName,
             platform = platform.displayName(),

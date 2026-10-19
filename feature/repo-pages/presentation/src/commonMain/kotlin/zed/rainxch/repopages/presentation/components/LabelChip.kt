@@ -20,9 +20,10 @@ internal fun LabelChip(label: IssueLabel) {
     val shape = LocalPersonality.current.shape
     val color = parseLabelColor(label.color)
     Box(
-        modifier = Modifier
-            .background(color = color.copy(alpha = 0.18f), shape = RoundedCornerShape(shape.cornerSmall))
-            .padding(horizontal = 8.dp, vertical = 2.dp),
+        modifier =
+            Modifier
+                .background(color = color.copy(alpha = 0.18f), shape = RoundedCornerShape(shape.cornerSmall))
+                .padding(horizontal = 8.dp, vertical = 2.dp),
     ) {
         KomiText(
             text = label.name,

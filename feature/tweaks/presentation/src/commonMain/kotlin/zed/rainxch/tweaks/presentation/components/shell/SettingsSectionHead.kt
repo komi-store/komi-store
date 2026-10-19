@@ -41,18 +41,20 @@ fun SettingsSectionHead(
     val kicker = tweaksKicker(slot)
     val isManga = personality is MangaPersonality
     Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(top = 14.dp, bottom = 12.dp),
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .padding(top = 14.dp, bottom = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(10.dp),
     ) {
         if (isManga) {
             Box(
-                modifier = Modifier
-                    .size(width = 11.dp, height = 21.dp)
-                    .background(colors.primary, SkewedStamp)
-                    .border(2.dp, colors.outline, SkewedStamp),
+                modifier =
+                    Modifier
+                        .size(width = 11.dp, height = 21.dp)
+                        .background(colors.primary, SkewedStamp)
+                        .border(2.dp, colors.outline, SkewedStamp),
             )
         }
 
@@ -75,10 +77,11 @@ fun SettingsSectionHead(
         }
 
         Box(
-            modifier = Modifier
-                .weight(1f)
-                .height(if (isManga) 2.dp else 1.dp)
-                .background(if (isManga) colors.outline.copy(alpha = 0.3f) else colors.outlineVariant),
+            modifier =
+                Modifier
+                    .weight(1f)
+                    .height(if (isManga) 2.dp else 1.dp)
+                    .background(if (isManga) colors.outline.copy(alpha = 0.3f) else colors.outlineVariant),
         )
     }
 }

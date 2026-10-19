@@ -24,17 +24,16 @@ import zed.rainxch.details.presentation.components.StatItem
 import zed.rainxch.details.presentation.components.TextStatItem
 import zed.rainxch.githubstore.core.presentation.res.*
 
-fun LazyListScope.stats(
-    repoStats: RepoStats,
-) {
+fun LazyListScope.stats(repoStats: RepoStats) {
     item {
         val colors = LocalPersonality.current.colors
         Spacer(Modifier.height(20.dp))
 
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 10.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 10.dp),
             verticalArrangement = Arrangement.spacedBy(2.dp),
         ) {
             KomiText(

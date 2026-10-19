@@ -64,7 +64,7 @@ fun KomiHeadline(
 @Composable
 private fun MangaHeadline(
     text: String,
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
     role: KomiTextRole,
     color: Color,
     maxLines: Int,

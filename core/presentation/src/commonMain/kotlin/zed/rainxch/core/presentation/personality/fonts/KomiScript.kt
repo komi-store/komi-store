@@ -13,7 +13,8 @@ enum class KomiScript {
 
 fun komiScriptForLanguageTag(tag: String?): KomiScript {
     val language =
-        tag?.trim()
+        tag
+            ?.trim()
             ?.replace('_', '-')
             ?.substringBefore('-')
             ?.lowercase()

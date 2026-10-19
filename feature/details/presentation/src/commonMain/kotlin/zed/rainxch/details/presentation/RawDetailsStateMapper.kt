@@ -9,28 +9,32 @@ import zed.rainxch.details.domain.model.ReleaseCategory
 import zed.rainxch.details.presentation.utils.releaseLineLabel
 
 internal fun RawDetailsState.toView(): DetailsState {
-    val filteredReleases = when (selectedReleaseCategory) {
-        ReleaseCategory.STABLE -> allReleases.filter { !it.isEffectivelyPreRelease() }
-        ReleaseCategory.PRE_RELEASE -> allReleases.filter { it.isEffectivelyPreRelease() }
-        ReleaseCategory.ALL -> allReleases
-    }.toImmutableList()
-    val latestStableRelease = allReleases
-        .filter { !it.isEffectivelyPreRelease() }
-        .maxByOrNull { it.publishedAt }
+    val filteredReleases =
+        when (selectedReleaseCategory) {
+            ReleaseCategory.STABLE -> allReleases.filter { !it.isEffectivelyPreRelease() }
+            ReleaseCategory.PRE_RELEASE -> allReleases.filter { it.isEffectivelyPreRelease() }
+            ReleaseCategory.ALL -> allReleases
+        }.toImmutableList()
+    val latestStableRelease =
+        allReleases
+            .filter { !it.isEffectivelyPreRelease() }
+            .maxByOrNull { it.publishedAt }
     val canSwitchToStable = computeCanSwitchToStable(latestStableRelease)
     val isPendingInstallReady = computeIsPendingInstallReady()
     val selectedLine = selectedRelease?.let { releaseLines[it.id] }
     val appReleases =
         if (selectedLine == null) filteredReleases else filteredReleases.filter { releaseLines[it.id] == selectedLine }
-    val platformReleases = newestReleasePerPlatform(
-        releases = appReleases,
-        releasePlatforms = { releasePlatforms[it.id].orEmpty() },
-        devicePlatform = devicePlatform,
-    ).toImmutableList()
+    val platformReleases =
+        newestReleasePerPlatform(
+            releases = appReleases,
+            releasePlatforms = { releasePlatforms[it.id].orEmpty() },
+            devicePlatform = devicePlatform,
+        ).toImmutableList()
     val selectedHasDeviceBuild = selectedRelease?.let { it.id in deviceBuildReleaseIds } ?: true
-    val selectedIndex = selectedRelease?.let { selected ->
-        appReleases.indexOfFirst { it.id == selected.id }
-    } ?: -1
+    val selectedIndex =
+        selectedRelease?.let { selected ->
+            appReleases.indexOfFirst { it.id == selected.id }
+        } ?: -1
     val newerReleasesLackDeviceBuild =
         selectedHasDeviceBuild &&
             selectedIndex > 0 &&
@@ -138,9 +142,10 @@ private fun RawDetailsState.computeCanSwitchToStable(latestStable: GithubRelease
     val app = installedApp ?: return false
     val stable = latestStable ?: return false
     if (!latestStableHasInstallableAsset) return false
-    val installedIsPreRelease = allReleases
-        .firstOrNull { VersionMath.isSameVersion(it.tagName, app.installedVersion) }
-        ?.isEffectivelyPreRelease() == true
+    val installedIsPreRelease =
+        allReleases
+            .firstOrNull { VersionMath.isSameVersion(it.tagName, app.installedVersion) }
+            ?.isEffectivelyPreRelease() == true
     if (!installedIsPreRelease) return false
     return !VersionMath.isSameVersion(stable.tagName, app.installedVersion)
 }

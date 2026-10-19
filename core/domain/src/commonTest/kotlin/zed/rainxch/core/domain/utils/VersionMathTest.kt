@@ -270,7 +270,8 @@ class VersionMathTest {
     }
 
     @Test
-    fun timestamp_update_degrades_to_silent_when_either_side_is_unparseable() {        assertFalse(
+    fun timestamp_update_degrades_to_silent_when_either_side_is_unparseable() {
+        assertFalse(
             VersionMath.shouldReportTimestampUpdate(
                 matchedTag = "nightly",
                 matchedPublishedAt = "not-a-time",
@@ -347,30 +348,38 @@ class VersionMathTest {
 
     @Test
     fun release_identity_says_nothing_without_both_sides() {
-        assertTrue(VersionMath.releaseObjectChanged(
-            matchedReleaseId = 900L,
-            matchedAssetId = null,
-            storedReleaseId = 800L,
-            storedAssetId = null,
-        ))
-        assertTrue(VersionMath.releaseObjectChanged(
-            matchedReleaseId = null,
-            matchedAssetId = 999L,
-            storedReleaseId = null,
-            storedAssetId = 901L,
-        ))
-        assertFalse(VersionMath.releaseObjectChanged(
-            matchedReleaseId = 900L,
-            matchedAssetId = 901L,
-            storedReleaseId = null,
-            storedAssetId = null,
-        ))
-        assertFalse(VersionMath.releaseObjectChanged(
-            matchedReleaseId = null,
-            matchedAssetId = null,
-            storedReleaseId = 800L,
-            storedAssetId = 801L,
-        ))
+        assertTrue(
+            VersionMath.releaseObjectChanged(
+                matchedReleaseId = 900L,
+                matchedAssetId = null,
+                storedReleaseId = 800L,
+                storedAssetId = null,
+            ),
+        )
+        assertTrue(
+            VersionMath.releaseObjectChanged(
+                matchedReleaseId = null,
+                matchedAssetId = 999L,
+                storedReleaseId = null,
+                storedAssetId = 901L,
+            ),
+        )
+        assertFalse(
+            VersionMath.releaseObjectChanged(
+                matchedReleaseId = 900L,
+                matchedAssetId = 901L,
+                storedReleaseId = null,
+                storedAssetId = null,
+            ),
+        )
+        assertFalse(
+            VersionMath.releaseObjectChanged(
+                matchedReleaseId = null,
+                matchedAssetId = null,
+                storedReleaseId = 800L,
+                storedAssetId = 801L,
+            ),
+        )
     }
 
     @Test
@@ -409,30 +418,38 @@ class VersionMathTest {
 
     @Test
     fun asset_identity_falls_back_to_size_and_says_nothing_without_evidence() {
-        assertTrue(VersionMath.assetIdentityChanged(
-            matchedDigest = null,
-            matchedSize = 2_000L,
-            storedDigest = null,
-            storedSize = 1_000L,
-        ))
-        assertTrue(VersionMath.assetIdentityChanged(
-            matchedDigest = "sha256:bbbb",
-            matchedSize = 1_000L,
-            storedDigest = "sha256:aaaa",
-            storedSize = 1_000L,
-        ))
-        assertFalse(VersionMath.assetIdentityChanged(
-            matchedDigest = null,
-            matchedSize = null,
-            storedDigest = null,
-            storedSize = null,
-        ))
-        assertFalse(VersionMath.assetIdentityChanged(
-            matchedDigest = "sha256:aaaa",
-            matchedSize = null,
-            storedDigest = null,
-            storedSize = null,
-        ))
+        assertTrue(
+            VersionMath.assetIdentityChanged(
+                matchedDigest = null,
+                matchedSize = 2_000L,
+                storedDigest = null,
+                storedSize = 1_000L,
+            ),
+        )
+        assertTrue(
+            VersionMath.assetIdentityChanged(
+                matchedDigest = "sha256:bbbb",
+                matchedSize = 1_000L,
+                storedDigest = "sha256:aaaa",
+                storedSize = 1_000L,
+            ),
+        )
+        assertFalse(
+            VersionMath.assetIdentityChanged(
+                matchedDigest = null,
+                matchedSize = null,
+                storedDigest = null,
+                storedSize = null,
+            ),
+        )
+        assertFalse(
+            VersionMath.assetIdentityChanged(
+                matchedDigest = "sha256:aaaa",
+                matchedSize = null,
+                storedDigest = null,
+                storedSize = null,
+            ),
+        )
     }
 
     @Test

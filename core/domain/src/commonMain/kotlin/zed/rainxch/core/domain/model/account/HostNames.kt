@@ -12,8 +12,9 @@ object HostNames {
         return noAuth.removeSuffix(".").removePrefix("www.").removePrefix("api.")
     }
 
-    fun sanitizePastedToken(raw: String): String {
-        return raw.trim()
+    fun sanitizePastedToken(raw: String): String =
+        raw
+            .trim()
             .removePrefix("Bearer ")
             .removePrefix("bearer ")
             .removePrefix("Token ")
@@ -21,15 +22,15 @@ object HostNames {
             .removePrefix("Authorization: token ")
             .removePrefix("Authorization: Bearer ")
             .trim()
-    }
 
-    fun detectPatKind(token: String): String? = when {
-        token.startsWith("ghp_") -> "GitHub classic PAT"
-        token.startsWith("github_pat_") -> "GitHub fine-grained PAT"
-        token.startsWith("gho_") -> "GitHub OAuth token"
-        token.startsWith("ghs_") -> "GitHub server token"
-        else -> null
-    }
+    fun detectPatKind(token: String): String? =
+        when {
+            token.startsWith("ghp_") -> "GitHub classic PAT"
+            token.startsWith("github_pat_") -> "GitHub fine-grained PAT"
+            token.startsWith("gho_") -> "GitHub OAuth token"
+            token.startsWith("ghs_") -> "GitHub server token"
+            else -> null
+        }
 
     fun apiHostToTokenHost(apiHost: String): String {
         val normalized = normalize(apiHost)

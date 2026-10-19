@@ -4,9 +4,7 @@ import zed.rainxch.core.domain.model.repository.FavoriteRepo
 import zed.rainxch.core.presentation.utils.formatAddedAt
 import zed.rainxch.favourites.presentation.model.FavouriteRepository
 
-suspend fun FavoriteRepo.toFavouriteRepositoryUi(
-    isCurrentUserOwner: Boolean = false,
-): FavouriteRepository =
+suspend fun FavoriteRepo.toFavouriteRepositoryUi(isCurrentUserOwner: Boolean = false): FavouriteRepository =
     FavouriteRepository(
         repoId = repoId,
         repoName = repoName,

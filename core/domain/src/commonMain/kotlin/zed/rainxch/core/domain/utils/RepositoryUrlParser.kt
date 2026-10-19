@@ -4,18 +4,23 @@ import zed.rainxch.core.domain.model.repository.RepositoryReference
 import zed.rainxch.core.domain.model.repository.RepositorySource
 
 object RepositoryUrlParser {
-    private val urlRegex = Regex(
-        """^(?:https?://)?([^/\s]+)/([^/\s]+)/([^/\s?#]+)(?:[/?#].*)?$""",
-        RegexOption.IGNORE_CASE,
-    )
+    private val urlRegex =
+        Regex(
+            """^(?:https?://)?([^/\s]+)/([^/\s]+)/([^/\s?#]+)(?:[/?#].*)?$""",
+            RegexOption.IGNORE_CASE,
+        )
 
-    private val knownForgejoHosts = setOf(
-        "codeberg.org",
-        "git.disroot.org",
-        "gitea.com",
-    )
+    private val knownForgejoHosts =
+        setOf(
+            "codeberg.org",
+            "git.disroot.org",
+            "gitea.com",
+        )
 
-    fun parse(rawUrl: String, additionalForgejoHosts: Set<String> = emptySet()): RepositoryReference? {
+    fun parse(
+        rawUrl: String,
+        additionalForgejoHosts: Set<String> = emptySet(),
+    ): RepositoryReference? {
         val trimmed = rawUrl.trim().trimEnd('/')
         val match = urlRegex.matchEntire(trimmed) ?: return null
         val host = match.groupValues[1].lowercase()
@@ -25,13 +30,14 @@ object RepositoryUrlParser {
 
         val userHosts = additionalForgejoHosts.map { it.lowercase().trim() }.toSet()
 
-        val source = when {
-            host == "github.com" || host == "www.github.com" -> RepositorySource.GitHub
-            host in knownForgejoHosts -> RepositorySource.Forgejo(host)
-            host in userHosts -> RepositorySource.Forgejo(host)
-            looksLikeForgejoHost(host) -> RepositorySource.Forgejo(host)
-            else -> return null
-        }
+        val source =
+            when {
+                host == "github.com" || host == "www.github.com" -> RepositorySource.GitHub
+                host in knownForgejoHosts -> RepositorySource.Forgejo(host)
+                host in userHosts -> RepositorySource.Forgejo(host)
+                looksLikeForgejoHost(host) -> RepositorySource.Forgejo(host)
+                else -> return null
+            }
         return RepositoryReference(source, owner, repo)
     }
 

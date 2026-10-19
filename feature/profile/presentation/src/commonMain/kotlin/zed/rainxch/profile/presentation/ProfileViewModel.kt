@@ -14,7 +14,7 @@ import zed.rainxch.core.domain.model.account.SessionSnapshot
 import zed.rainxch.core.domain.repository.UserSessionRepository
 
 class ProfileViewModel(
-    private val userSessionRepository: UserSessionRepository
+    private val userSessionRepository: UserSessionRepository,
 ) : ViewModel() {
     private var userProfileJob: Job? = null
 
@@ -38,7 +38,8 @@ class ProfileViewModel(
 
     private fun observeLoggedInStatus() {
         viewModelScope.launch {
-            userSessionRepository.isUserLoggedIn()
+            userSessionRepository
+                .isUserLoggedIn()
                 .collect { isLoggedIn ->
                     if (isLoggedIn) {
                         if (_state.value.session !is ProfileSession.SignedIn) {
@@ -57,13 +58,14 @@ class ProfileViewModel(
     private fun loadUserProfile() {
         userProfileJob?.cancel()
 
-        userProfileJob = viewModelScope.launch {
-            userSessionRepository.getUser().collect { profile ->
-                if (profile != null) {
-                    setSession(ProfileSession.SignedIn(profile))
+        userProfileJob =
+            viewModelScope.launch {
+                userSessionRepository.getUser().collect { profile ->
+                    if (profile != null) {
+                        setSession(ProfileSession.SignedIn(profile))
+                    }
                 }
             }
-        }
     }
 
     fun onAction(action: ProfileAction) {
@@ -110,7 +112,10 @@ class ProfileViewModel(
             ProfileAction.OnWhatsNewClick,
             ProfileAction.OnAnnouncementsClick,
             ProfileAction.OnTweaksClick,
-            ProfileAction.OnAboutClick -> Unit
+            ProfileAction.OnAboutClick,
+            -> {
+                Unit
+            }
         }
     }
 }

@@ -101,32 +101,32 @@ fun VersionPicker(
             modifier = Modifier.padding(horizontal = 4.dp),
         )
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(rowShape)
-                .border(
-                    width = 1.dp,
-                    color = colors.outline,
-                    shape = rowShape,
-                )
-                .background(colors.surface)
-                .clickable(enabled = isPickerEnabled) {
-                    onAction(DetailsAction.ToggleVersionPicker)
-                }
-                .padding(horizontal = 14.dp, vertical = 10.dp)
-                .heightIn(min = 36.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .clip(rowShape)
+                    .border(
+                        width = 1.dp,
+                        color = colors.outline,
+                        shape = rowShape,
+                    ).background(colors.surface)
+                    .clickable(enabled = isPickerEnabled) {
+                        onAction(DetailsAction.ToggleVersionPicker)
+                    }.padding(horizontal = 14.dp, vertical = 10.dp)
+                    .heightIn(min = 36.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Column(modifier = Modifier.weight(1f)) {
                 KomiText(
-                    text = selectedRelease?.let { release ->
-                        if (selectedAppLabel != null) {
-                            VersionMath.normalizeVersion(release.tagName).ifBlank { release.tagName }
-                        } else {
-                            release.tagName
-                        }
-                    } ?: stringResource(Res.string.no_version_selected),
+                    text =
+                        selectedRelease?.let { release ->
+                            if (selectedAppLabel != null) {
+                                VersionMath.normalizeVersion(release.tagName).ifBlank { release.tagName }
+                            } else {
+                                release.tagName
+                            }
+                        } ?: stringResource(Res.string.no_version_selected),
                     role = KomiTextRole.Stamp,
                     fontWeight = FontWeight.SemiBold,
                     color = colors.onSurface,
@@ -157,16 +157,18 @@ fun VersionPicker(
     }
 
     if (isPickerVisible) {
-        val lines = remember(filteredReleases, releaseLines) {
-            filteredReleases.mapNotNull { releaseLines[it.id] }.distinct()
-        }
+        val lines =
+            remember(filteredReleases, releaseLines) {
+                filteredReleases.mapNotNull { releaseLines[it.id] }.distinct()
+            }
         var lineFilter by remember(selectedRelease?.id, lines) {
             mutableStateOf(selectedRelease?.let { releaseLines[it.id] }?.takeIf { it in lines })
         }
-        val visibleReleases = remember(filteredReleases, releaseLines, lineFilter) {
-            val line = lineFilter
-            if (line == null) filteredReleases else filteredReleases.filter { releaseLines[it.id] == line }
-        }
+        val visibleReleases =
+            remember(filteredReleases, releaseLines, lineFilter) {
+                val line = lineFilter
+                if (line == null) filteredReleases else filteredReleases.filter { releaseLines[it.id] == line }
+            }
         KomiSheet(
             onDismiss = { onAction(DetailsAction.ToggleVersionPicker) },
             placement = KomiSheetPlacement.Bottom,
@@ -227,9 +229,10 @@ fun VersionPicker(
                             isSelected = release.id == selectedRelease?.id,
                             isLatest = release.id == latestReleaseId,
                             onClick = { onAction(DetailsAction.SelectRelease(release)) },
-                            latestForPlatform = devicePlatform?.takeIf {
-                                release.id == latestDeviceBuildId && latestDeviceBuildId != latestReleaseId
-                            },
+                            latestForPlatform =
+                                devicePlatform?.takeIf {
+                                    release.id == latestDeviceBuildId && latestDeviceBuildId != latestReleaseId
+                                },
                             hasDeviceBuild =
                                 deviceBuildReleaseIds.isEmpty() || release.id in deviceBuildReleaseIds,
                             platforms = releasePlatforms[release.id].orEmpty(),
@@ -258,13 +261,13 @@ private fun VersionListItem(
     devicePlatform: DiscoveryPlatform? = null,
 ) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(
-                onClickLabel = stringResource(Res.string.select_version),
-                onClick = onClick,
-            )
-            .padding(horizontal = 4.dp, vertical = 12.dp),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .clickable(
+                    onClickLabel = stringResource(Res.string.select_version),
+                    onClick = onClick,
+                ).padding(horizontal = 4.dp, vertical = 12.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -279,11 +282,12 @@ private fun VersionListItem(
                     text = release.tagName,
                     role = KomiTextRole.Stamp,
                     fontWeight = if (isSelected) FontWeight.Bold else FontWeight.SemiBold,
-                    color = when {
-                        isSelected -> colors.primary
-                        hasDeviceBuild -> colors.onSurface
-                        else -> colors.onSurfaceVariant
-                    },
+                    color =
+                        when {
+                            isSelected -> colors.primary
+                            hasDeviceBuild -> colors.onSurface
+                            else -> colors.onSurfaceVariant
+                        },
                     uppercase = false,
                 )
                 if (isLatest) {
@@ -293,14 +297,14 @@ private fun VersionListItem(
                         fontWeight = FontWeight.Bold,
                         fontSize = 10.sp,
                         color = colors.primary,
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(shape.cornerSmall))
-                            .border(
-                                width = 1.dp,
-                                color = colors.primary,
-                                shape = RoundedCornerShape(shape.cornerSmall),
-                            )
-                            .padding(horizontal = 6.dp, vertical = 2.dp),
+                        modifier =
+                            Modifier
+                                .clip(RoundedCornerShape(shape.cornerSmall))
+                                .border(
+                                    width = 1.dp,
+                                    color = colors.primary,
+                                    shape = RoundedCornerShape(shape.cornerSmall),
+                                ).padding(horizontal = 6.dp, vertical = 2.dp),
                     )
                 }
                 latestForPlatform?.let { platform ->
@@ -314,14 +318,14 @@ private fun VersionListItem(
                         fontWeight = FontWeight.Bold,
                         fontSize = 10.sp,
                         color = colors.primary,
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(shape.cornerSmall))
-                            .border(
-                                width = 1.dp,
-                                color = colors.primary,
-                                shape = RoundedCornerShape(shape.cornerSmall),
-                            )
-                            .padding(horizontal = 6.dp, vertical = 2.dp),
+                        modifier =
+                            Modifier
+                                .clip(RoundedCornerShape(shape.cornerSmall))
+                                .border(
+                                    width = 1.dp,
+                                    color = colors.primary,
+                                    shape = RoundedCornerShape(shape.cornerSmall),
+                                ).padding(horizontal = 6.dp, vertical = 2.dp),
                     )
                 }
             }
@@ -338,11 +342,12 @@ private fun VersionListItem(
                 }
             }
             KomiText(
-                text = if (hasDeviceBuild) {
-                    formatIsoDateOrRaw(release.publishedAt)
-                } else {
-                    "${formatIsoDateOrRaw(release.publishedAt)} · ${stringResource(Res.string.no_build_for_this_device)}"
-                },
+                text =
+                    if (hasDeviceBuild) {
+                        formatIsoDateOrRaw(release.publishedAt)
+                    } else {
+                        "${formatIsoDateOrRaw(release.publishedAt)} · ${stringResource(Res.string.no_build_for_this_device)}"
+                    },
                 role = KomiTextRole.Label,
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Medium,
@@ -377,10 +382,11 @@ private fun VersionBadge(text: String) {
         fontSize = 10.sp,
         color = colors.primary,
         uppercase = false,
-        modifier = Modifier
-            .clip(shape)
-            .border(width = 1.dp, color = colors.primary, shape = shape)
-            .padding(horizontal = 6.dp, vertical = 2.dp),
+        modifier =
+            Modifier
+                .clip(shape)
+                .border(width = 1.dp, color = colors.primary, shape = shape)
+                .padding(horizontal = 6.dp, vertical = 2.dp),
     )
 }
 
@@ -390,10 +396,11 @@ private fun ReleasePlatformIcons(
     devicePlatform: DiscoveryPlatform?,
 ) {
     val colors = LocalPersonality.current.colors
-    val ordered = platforms.sortedWith(
-        compareBy<DiscoveryPlatform> { it != devicePlatform }
-            .thenBy { DiscoveryPlatform.selectablePlatforms.indexOf(it) },
-    )
+    val ordered =
+        platforms.sortedWith(
+            compareBy<DiscoveryPlatform> { it != devicePlatform }
+                .thenBy { DiscoveryPlatform.selectablePlatforms.indexOf(it) },
+        )
     Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
         ordered.forEach { platform ->
             platform.toIcon()?.let { icon ->

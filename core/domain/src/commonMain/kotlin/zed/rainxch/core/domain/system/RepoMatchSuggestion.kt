@@ -7,6 +7,5 @@ data class RepoMatchSuggestion(
     val source: RepoMatchSource,
     val stars: Int? = null,
     val description: String? = null,
-
     val sourceHost: String? = null,
 )

@@ -26,7 +26,9 @@ object KermitLogger : KomiStoreLogger {
     override fun withTag(tag: String): KomiStoreLogger = TaggedKermitLogger(Logger.withTag(tag))
 }
 
-private class TaggedKermitLogger(private val delegate: Logger) : KomiStoreLogger {
+private class TaggedKermitLogger(
+    private val delegate: Logger,
+) : KomiStoreLogger {
     override fun debug(message: String) {
         delegate.d(message)
     }
