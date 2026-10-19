@@ -1,12 +1,13 @@
 package zed.rainxch.core.data.local.db.migrations
 
 import androidx.room.migration.Migration
-import androidx.sqlite.db.SupportSQLiteDatabase
+import androidx.sqlite.SQLiteConnection
+import androidx.sqlite.execSQL
 
 val MIGRATION_2_3 =
     object : Migration(2, 3) {
-        override fun migrate(db: SupportSQLiteDatabase) {
-            db.execSQL(
+        override fun migrate(connection: SQLiteConnection) {
+            connection.execSQL(
                 """
                 CREATE TABLE starred_repos (
                     repoId INTEGER NOT NULL,
