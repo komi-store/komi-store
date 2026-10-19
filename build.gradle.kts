@@ -25,9 +25,15 @@ tasks.flatpakGradleGenerator {
 
 spotless {
     ratchetFrom("origin/main")
+    // Excludes sit on the tree so the walk skips them; targetExclude would subtract them only after walking
+    // every worktree under .claude/.
     kotlin {
-        target("**/*.kt")
-        targetExclude("**/build/**", "**/generated/**", ".claude/**")
+        target(
+            fileTree(rootDir) {
+                include("**/*.kt")
+                exclude(".git/**", ".gradle/**", "**/build/**", "**/generated/**", ".claude/**")
+            },
+        )
         ktlint(libs.versions.ktlint.get())
             .setEditorConfigPath("$rootDir/.editorconfig")
             .customRuleSets(listOf("io.nlopez.compose.rules:ktlint:${libs.versions.compose.rules.get()}"))
@@ -41,8 +47,12 @@ spotless {
         }
     }
     kotlinGradle {
-        target("**/*.gradle.kts")
-        targetExclude("**/build/**", ".claude/**")
+        target(
+            fileTree(rootDir) {
+                include("**/*.gradle.kts")
+                exclude(".git/**", ".gradle/**", "**/build/**", ".claude/**")
+            },
+        )
         ktlint(libs.versions.ktlint.get()).setEditorConfigPath("$rootDir/.editorconfig")
     }
 }
