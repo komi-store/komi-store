@@ -130,5 +130,3 @@ standard:package-name core/domain/src/commonMain/kotlin/zed/rainxch/core/domain/
 standard:package-name core/domain/src/jvmTest/kotlin/zed/rainxch/core/domain/use_cases/SyncInstalledAppsUseCaseParkTest.kt
 standard:package-name feature/home/data/src/commonMain/kotlin/zed/rainxch/home/data/data_source/CachedRepositoriesDataSource.kt
 standard:package-name feature/home/data/src/commonMain/kotlin/zed/rainxch/home/data/data_source/impl/CachedRepositoriesDataSourceImpl.kt
-standard:property-naming core/presentation/src/commonMain/kotlin/zed/rainxch/core/presentation/components/buttons/KomiActionRow.kt
-standard:property-naming core/presentation/src/commonMain/kotlin/zed/rainxch/core/presentation/components/lists/KomiList.kt

@@ -5,8 +5,9 @@
     <ID>CyclomaticComplexMethod:AuthenticationViewModel.kt$AuthenticationViewModel$fun onAction(action: AuthenticationAction)</ID>
     <ID>LargeClass:AuthenticationViewModel.kt$AuthenticationViewModel : ViewModel</ID>
     <ID>LongMethod:AuthenticationViewModel.kt$AuthenticationViewModel$fun onAction(action: AuthenticationAction)</ID>
-    <ID>LongMethod:AuthenticationViewModel.kt$AuthenticationViewModel$private fun consumeAuthHandoff(handoffId: String, state: String)</ID>
+    <ID>LongMethod:AuthenticationViewModel.kt$AuthenticationViewModel$private fun consumeAuthHandoff( handoffId: String, state: String, )</ID>
     <ID>LongMethod:AuthenticationViewModel.kt$AuthenticationViewModel$private fun startLogin()</ID>
+    <ID>LongMethod:AuthenticationViewModel.kt$AuthenticationViewModel$private fun submitPat()</ID>
     <ID>LongMethod:AuthenticationViewModel.kt$AuthenticationViewModel$private suspend fun doPoll(deviceCode: String)</ID>
     <ID>MagicNumber:AuthenticationViewModel.kt$AuthenticationViewModel$1000</ID>
     <ID>MagicNumber:AuthenticationViewModel.kt$AuthenticationViewModel$1000L</ID>
