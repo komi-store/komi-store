@@ -30,6 +30,16 @@ internal fun Project.configureKotlinAndroid(commonExtension: CommonExtension<*, 
             isCoreLibraryDesugaringEnabled = true
         }
 
+        lint {
+            baseline = file("lint-baseline.xml")
+            disable += setOf("NewerVersionAvailable", "GradleDependency", "AndroidGradlePluginVersion")
+            abortOnError = true
+            checkReleaseBuilds = false
+            htmlReport = true
+            xmlReport = true
+            sarifReport = true
+        }
+
         configureKotlin()
 
         dependencies {
@@ -41,9 +51,11 @@ internal fun Project.configureKotlinAndroid(commonExtension: CommonExtension<*, 
 }
 
 internal fun Project.configureKotlin() {
+    val warningsAsErrors = findProperty("komi.warningsAsErrors")?.toString()?.toBoolean() ?: true
     tasks.withType<KotlinCompile>().configureEach {
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_17)
+            allWarningsAsErrors.set(warningsAsErrors)
         }
     }
 }

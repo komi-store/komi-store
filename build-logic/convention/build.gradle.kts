@@ -14,11 +14,11 @@ dependencies {
     compileOnly(libs.kotlin.gradlePlugin)
     compileOnly(libs.compose.gradlePlugin)
     compileOnly(libs.androidx.room.gradle.plugin)
+    compileOnly(libs.detekt.gradlePlugin)
+    compileOnly(libs.stability.analyzer.gradlePlugin)
 
     implementation(libs.buildkonfig.gradlePlugin)
     implementation(libs.buildkonfig.compiler)
-
-    implementation(libs.ktlint.gradlePlugin)
 }
 
 java {
@@ -79,9 +79,9 @@ gradlePlugin {
             id = "zed.rainxch.convention.room"
             implementationClass = "RoomConventionPlugin"
         }
-        register("ktlint") {
-            id = "zed.rainxch.convention.ktlint"
-            implementationClass = "KtlintConventionPlugin"
+        register("quality") {
+            id = "zed.rainxch.convention.quality"
+            implementationClass = "QualityConventionPlugin"
         }
     }
 }

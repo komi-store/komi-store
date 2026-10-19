@@ -1,0 +1,9 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues/>
+  <CurrentIssues>
+    <ID>MagicNumber:StarredReposViewModel.kt$StarredReposViewModel$3_600_000</ID>
+    <ID>MagicNumber:StarredReposViewModel.kt$StarredReposViewModel$60_000</ID>
+    <ID>MagicNumber:StarredReposViewModel.kt$StarredReposViewModel$86_400_000</ID>
+  </CurrentIssues>
+</SmellBaseline>

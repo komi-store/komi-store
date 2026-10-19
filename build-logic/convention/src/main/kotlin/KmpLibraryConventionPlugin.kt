@@ -15,6 +15,7 @@ class KmpLibraryConventionPlugin : Plugin<Project> {
                 apply("com.android.library")
                 apply("org.jetbrains.kotlin.multiplatform")
                 apply("org.jetbrains.kotlin.plugin.serialization")
+                apply("zed.rainxch.convention.quality")
             }
 
             configureKotlinMultiplatform()

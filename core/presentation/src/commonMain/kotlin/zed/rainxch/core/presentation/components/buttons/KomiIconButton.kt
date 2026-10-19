@@ -15,7 +15,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Share
@@ -256,7 +256,7 @@ private fun ClassicIconButton(
 @Composable
 private fun PreviewIconRow() {
     Row(horizontalArrangement = Arrangement.spacedBy(Spacing.md)) {
-        KomiIconButton(Icons.Default.ArrowBack, "Back", {}, variant = KomiButtonVariant.Tonal)
+        KomiIconButton(Icons.AutoMirrored.Filled.ArrowBack, "Back", {}, variant = KomiButtonVariant.Tonal)
         KomiIconButton(Icons.Default.Star, "Star", {}, variant = KomiButtonVariant.Primary)
         KomiIconButton(Icons.Default.Share, "Share", {}, variant = KomiButtonVariant.Outline)
         KomiIconButton(Icons.Default.Close, "Clear", {}, variant = KomiButtonVariant.Text)

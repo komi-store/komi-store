@@ -10,6 +10,10 @@ plugins {
     alias(libs.plugins.kotlin.serialization) apply false
     alias(libs.plugins.ksp) apply false
     alias(libs.plugins.room) apply false
+    alias(libs.plugins.detekt) apply false
+    alias(libs.plugins.stability.analyzer) apply false
+    alias(libs.plugins.spotless)
+    alias(libs.plugins.kover)
 }
 
 tasks.flatpakGradleGenerator {
@@ -18,17 +22,29 @@ tasks.flatpakGradleGenerator {
     excludeConfigurations.set(listOf("testCompileClasspath", "testRuntimeClasspath"))
 }
 
-subprojects {
-    afterEvaluate {
-        tasks.configureEach {
-            when (name) {
-                "preBuild",
-                "compileKotlinJvm",
-                "compileKotlinAndroid",
-                -> {
-                    val ktlintFormat = tasks.findByName("ktlintFormat")
-                    if (ktlintFormat != null) dependsOn(ktlintFormat)
-                }
+spotless {
+    ratchetFrom("origin/main")
+    kotlin {
+        target("**/*.kt")
+        targetExclude("**/build/**", "**/generated/**", ".claude/**")
+        ktlint(libs.versions.ktlint.get()).setEditorConfigPath("$rootDir/.editorconfig")
+    }
+    kotlinGradle {
+        target("**/*.gradle.kts")
+        targetExclude("**/build/**", ".claude/**")
+        ktlint(libs.versions.ktlint.get()).setEditorConfigPath("$rootDir/.editorconfig")
+    }
+}
+
+dependencies {
+    subprojects.filter { it.buildFile.exists() }.forEach { kover(project(it.path)) }
+}
+
+kover {
+    reports {
+        filters {
+            excludes {
+                classes("*.BuildKonfig", "*_Impl", "*_Impl\$*", "*.generated.resources.*")
             }
         }
     }
