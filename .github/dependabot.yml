@@ -3,7 +3,9 @@ updates:
   - package-ecosystem: gradle
     directory: /
     schedule:
-      interval: weekly
+      interval: monthly
+    cooldown:
+      default-days: 7
     open-pull-requests-limit: 5
     ignore:
       # AGP 8.13 is tested up to Gradle 9.4.1, and 9.6 removed an internal API it uses; lift this with the AGP 9 upgrade.
@@ -48,7 +50,9 @@ updates:
   - package-ecosystem: github-actions
     directory: /
     schedule:
-      interval: weekly
+      interval: monthly
+    cooldown:
+      default-days: 7
     groups:
       github-actions:
         patterns:
