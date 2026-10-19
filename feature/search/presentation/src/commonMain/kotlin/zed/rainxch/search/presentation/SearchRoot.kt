@@ -243,6 +243,8 @@ fun SearchScreen(
     val focusRequester = remember { FocusRequester() }
     val listState = rememberLazyStaggeredGridState()
 
+    val currentState by rememberUpdatedState(state)
+
     val shouldLoadMore by remember {
         derivedStateOf {
             val layoutInfo = listState.layoutInfo
@@ -250,9 +252,9 @@ fun SearchScreen(
             val visibleItems = layoutInfo.visibleItemsInfo
 
             if (totalItems == 0 ||
-                state.isLoadingMore ||
-                state.isLoading ||
-                !state.hasMorePages
+                currentState.isLoadingMore ||
+                currentState.isLoading ||
+                !currentState.hasMorePages
             ) {
                 return@derivedStateOf false
             }
