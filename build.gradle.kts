@@ -28,7 +28,9 @@ spotless {
     kotlin {
         target("**/*.kt")
         targetExclude("**/build/**", "**/generated/**", ".claude/**")
-        ktlint(libs.versions.ktlint.get()).setEditorConfigPath("$rootDir/.editorconfig")
+        ktlint(libs.versions.ktlint.get())
+            .setEditorConfigPath("$rootDir/.editorconfig")
+            .customRuleSets(listOf("io.nlopez.compose.rules:ktlint:${libs.versions.compose.rules.get()}"))
     }
     kotlinGradle {
         target("**/*.gradle.kts")

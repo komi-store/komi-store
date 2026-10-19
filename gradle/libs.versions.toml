@@ -58,6 +58,7 @@ detekt = "1.23.8"
 kover = "0.9.11"
 stability-analyzer = "0.7.0"
 konsist = "0.18.1"
+compose-rules = "0.6.0"
 flatpak-gradle-generator = "1.7.0"
 
 projectApplicationId = "zed.rainxch.githubstore"
