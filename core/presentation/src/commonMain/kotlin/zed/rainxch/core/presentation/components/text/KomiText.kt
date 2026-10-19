@@ -9,15 +9,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextLayoutResult
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.isSpecified
 import zed.rainxch.core.presentation.locals.LocalPersonality
 import zed.rainxch.core.presentation.locals.appLocale
 import zed.rainxch.core.presentation.personality.classicPersonality
@@ -34,19 +30,12 @@ fun KomiText(
     maxLines: Int = Int.MAX_VALUE,
     overflow: TextOverflow = TextOverflow.Clip,
     textAlign: TextAlign? = null,
-    uppercase: Boolean? = null,
-    fontSize: TextUnit = TextUnit.Unspecified,
-    fontWeight: FontWeight? = null,
-    letterSpacing: TextUnit = TextUnit.Unspecified,
-    lineHeight: TextUnit = TextUnit.Unspecified,
     autoSize: TextAutoSize? = null,
     onTextLayout: ((TextLayoutResult) -> Unit)? = null,
 ) {
     val personality = LocalPersonality.current
-    val style = role.style(personality.type).withOverrides(fontSize, fontWeight, letterSpacing, lineHeight)
-    val resolvedUppercase = uppercase ?: role.case.isUpper(personality.type)
     Text(
-        text = if (resolvedUppercase) text.toUpperCase(appLocale()) else text,
+        text = if (role.case.isUpper(personality.type)) text.toUpperCase(appLocale()) else text,
         modifier = modifier,
         color = if (color != Color.Unspecified) color else personality.colors.onSurface,
         autoSize = autoSize,
@@ -54,7 +43,7 @@ fun KomiText(
         overflow = overflow,
         textAlign = textAlign,
         onTextLayout = onTextLayout ?: {},
-        style = style,
+        style = role.style(personality.type),
     )
 }
 
@@ -67,14 +56,9 @@ fun KomiText(
     maxLines: Int = Int.MAX_VALUE,
     overflow: TextOverflow = TextOverflow.Clip,
     textAlign: TextAlign? = null,
-    fontSize: TextUnit = TextUnit.Unspecified,
-    fontWeight: FontWeight? = null,
-    letterSpacing: TextUnit = TextUnit.Unspecified,
-    lineHeight: TextUnit = TextUnit.Unspecified,
     onTextLayout: ((TextLayoutResult) -> Unit)? = null,
 ) {
     val personality = LocalPersonality.current
-    val style = role.style(personality.type).withOverrides(fontSize, fontWeight, letterSpacing, lineHeight)
     Text(
         text = text,
         modifier = modifier,
@@ -83,22 +67,8 @@ fun KomiText(
         overflow = overflow,
         textAlign = textAlign,
         onTextLayout = onTextLayout ?: {},
-        style = style,
+        style = role.style(personality.type),
     )
-}
-
-private fun TextStyle.withOverrides(
-    fontSize: TextUnit,
-    fontWeight: FontWeight?,
-    letterSpacing: TextUnit,
-    lineHeight: TextUnit,
-): TextStyle {
-    var style = this
-    if (fontSize.isSpecified) style = style.copy(fontSize = fontSize)
-    if (fontWeight != null) style = style.copy(fontWeight = fontWeight)
-    if (letterSpacing.isSpecified) style = style.copy(letterSpacing = letterSpacing)
-    if (lineHeight.isSpecified) style = style.copy(lineHeight = lineHeight)
-    return style
 }
 
 @Composable

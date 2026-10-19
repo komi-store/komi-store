@@ -125,42 +125,5 @@ internal val ClassicType =
                 letterSpacing = (-0.02).em,
                 fontFeatureSettings = "tnum",
             ),
-        legacyDisplay =
-            TextStyle(
-                fontFamily = FontFamily.Default,
-                fontWeight = FontWeight.Bold,
-                fontSize = 28.sp,
-                lineHeight = 34.sp,
-                letterSpacing = (-0.02).em,
-            ),
-        legacyTitle =
-            TextStyle(
-                fontFamily = FontFamily.Default,
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 20.sp,
-                lineHeight = 26.sp,
-                letterSpacing = (-0.01).em,
-            ),
-        legacyStamp =
-            TextStyle(
-                fontFamily = FontFamily.Default,
-                fontWeight = FontWeight.Bold,
-                fontSize = 14.sp,
-                lineHeight = 18.sp,
-            ),
-        legacyBody =
-            TextStyle(
-                fontFamily = FontFamily.Default,
-                fontWeight = FontWeight.Normal,
-                fontSize = 14.sp,
-                lineHeight = 20.sp,
-            ),
-        legacyLabel =
-            TextStyle(
-                fontFamily = FontFamily.Default,
-                fontWeight = FontWeight.Medium,
-                fontSize = 12.sp,
-                lineHeight = 16.sp,
-            ),
         uppercaseHeadings = false,
     )

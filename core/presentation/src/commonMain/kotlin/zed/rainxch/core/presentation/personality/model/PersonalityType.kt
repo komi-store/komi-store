@@ -5,8 +5,6 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 
-// The legacy* styles keep today's look for call sites that still pass size, weight or case
-// overrides; each one moves to a job-named role and loses its overrides as it migrates.
 @Immutable
 data class PersonalityType(
     val display: TextStyle,
@@ -24,11 +22,6 @@ data class PersonalityType(
     val overline: TextStyle,
     val stamp: TextStyle,
     val numeral: TextStyle,
-    val legacyDisplay: TextStyle,
-    val legacyTitle: TextStyle,
-    val legacyStamp: TextStyle,
-    val legacyBody: TextStyle,
-    val legacyLabel: TextStyle,
     val uppercaseHeadings: Boolean,
 ) {
     fun withFamilies(
@@ -57,11 +50,6 @@ data class PersonalityType(
             overline = overline.inBody(),
             stamp = stamp.inDisplay(),
             numeral = numeral.inDisplay(),
-            legacyDisplay = legacyDisplay.inDisplay(),
-            legacyTitle = legacyTitle.inDisplay(),
-            legacyStamp = legacyStamp.inDisplay(),
-            legacyBody = legacyBody.inBody(),
-            legacyLabel = legacyLabel.inBody(),
         )
     }
 }

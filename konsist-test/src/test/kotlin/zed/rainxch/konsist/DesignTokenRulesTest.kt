@@ -29,9 +29,6 @@ class DesignTokenRulesTest {
     fun no_color_literals() = Rule.ColorLiteral.check()
 
     @Test
-    fun no_new_legacy_text_roles() = Rule.LegacyRole.check()
-
-    @Test
     fun no_raw_popups_outside_core_presentation() = Rule.Popup.check()
 
     private enum class Rule(
@@ -53,7 +50,6 @@ class DesignTokenRulesTest {
         Tween("tween", Regex("""\btween\(\s*(durationMillis\s*=\s*)?\d"""), false, "a personality motion token"),
         Alpha("alpha", Regex("""\.copy\(\s*alpha\s*=\s*\d"""), false, "a personality color token"),
         ColorLiteral("color-literal", Regex("""\bColor\(0x"""), false, "a personality color token"),
-        LegacyRole("legacy-role", Regex("""\bKomiTextRole\.Legacy[A-Za-z]+"""), false, "a job-named KomiTextRole"),
         Popup("popup", Regex("""\b(Popup|TooltipBox)\("""), true, "a core/presentation component"),
         ;
 

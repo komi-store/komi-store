@@ -76,8 +76,8 @@ import zed.rainxch.githubstore.core.presentation.res.obtainium_description
 import zed.rainxch.githubstore.core.presentation.res.open_in_obtainium
 import zed.rainxch.githubstore.core.presentation.res.open_with_external_installer
 import zed.rainxch.githubstore.core.presentation.res.architecture_compatible
-import zed.rainxch.githubstore.core.presentation.res.attestation_unverified_explainer
-import zed.rainxch.githubstore.core.presentation.res.attestation_verified_explainer
+import zed.rainxch.githubstore.core.presentation.res.details_attestation_unverified_explainer
+import zed.rainxch.githubstore.core.presentation.res.details_attestation_verified_explainer
 import zed.rainxch.githubstore.core.presentation.res.checking_attestation
 import zed.rainxch.githubstore.core.presentation.res.delete_task
 import zed.rainxch.githubstore.core.presentation.res.downloading
@@ -689,8 +689,8 @@ private fun AttestationBadge(attestationStatus: AttestationStatus) {
         }
         val explainer =
             when (attestationStatus) {
-                AttestationStatus.VERIFIED -> stringResource(Res.string.attestation_verified_explainer)
-                AttestationStatus.UNABLE_TO_VERIFY -> stringResource(Res.string.attestation_unverified_explainer)
+                AttestationStatus.VERIFIED -> stringResource(Res.string.details_attestation_verified_explainer)
+                AttestationStatus.UNABLE_TO_VERIFY -> stringResource(Res.string.details_attestation_unverified_explainer)
                 else -> null
             }
         val badge: @Composable () -> Unit = {

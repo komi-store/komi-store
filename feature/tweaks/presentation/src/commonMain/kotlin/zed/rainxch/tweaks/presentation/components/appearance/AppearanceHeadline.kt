@@ -29,12 +29,12 @@ import zed.rainxch.tweaks.presentation.components.shell.tweaksKicker
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 import zed.rainxch.githubstore.core.presentation.res.Res
-import zed.rainxch.githubstore.core.presentation.res.accent_cobalt
-import zed.rainxch.githubstore.core.presentation.res.accent_crimson
-import zed.rainxch.githubstore.core.presentation.res.accent_frost
-import zed.rainxch.githubstore.core.presentation.res.accent_mono
-import zed.rainxch.githubstore.core.presentation.res.accent_sun
-import zed.rainxch.githubstore.core.presentation.res.accent_wallpaper
+import zed.rainxch.githubstore.core.presentation.res.tweaks_accent_cobalt
+import zed.rainxch.githubstore.core.presentation.res.tweaks_accent_crimson
+import zed.rainxch.githubstore.core.presentation.res.tweaks_accent_frost
+import zed.rainxch.githubstore.core.presentation.res.tweaks_accent_mono
+import zed.rainxch.githubstore.core.presentation.res.tweaks_accent_sun
+import zed.rainxch.githubstore.core.presentation.res.tweaks_accent_wallpaper
 
 private val AccentOrder =
     listOf(
@@ -149,10 +149,10 @@ private fun AccentRow(
 private val AccentId.label: StringResource
     get() =
         when (this) {
-            AccentId.MONO -> Res.string.accent_mono
-            AccentId.CRIMSON -> Res.string.accent_crimson
-            AccentId.COBALT -> Res.string.accent_cobalt
-            AccentId.SUN -> Res.string.accent_sun
-            AccentId.FROST -> Res.string.accent_frost
-            AccentId.WALLPAPER -> Res.string.accent_wallpaper
+            AccentId.MONO -> Res.string.tweaks_accent_mono
+            AccentId.CRIMSON -> Res.string.tweaks_accent_crimson
+            AccentId.COBALT -> Res.string.tweaks_accent_cobalt
+            AccentId.SUN -> Res.string.tweaks_accent_sun
+            AccentId.FROST -> Res.string.tweaks_accent_frost
+            AccentId.WALLPAPER -> Res.string.tweaks_accent_wallpaper
         }

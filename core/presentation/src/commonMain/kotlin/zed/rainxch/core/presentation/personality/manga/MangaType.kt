@@ -142,47 +142,5 @@ internal val MangaType =
                 letterSpacing = 0.01.em,
                 fontSynthesis = SingleWeight,
             ),
-        legacyDisplay =
-            TextStyle(
-                fontFamily = MangaDisplayFamily,
-                fontWeight = FontWeight.Normal,
-                fontSize = 28.sp,
-                lineHeight = 28.sp,
-                letterSpacing = 0.02.em,
-                fontSynthesis = SingleWeight,
-            ),
-        legacyTitle =
-            TextStyle(
-                fontFamily = MangaDisplayFamily,
-                fontWeight = FontWeight.Normal,
-                fontSize = 22.sp,
-                lineHeight = 23.sp,
-                letterSpacing = 0.01.em,
-                fontSynthesis = SingleWeight,
-            ),
-        legacyStamp =
-            TextStyle(
-                fontFamily = MangaDisplayFamily,
-                fontWeight = FontWeight.Normal,
-                fontSize = 15.sp,
-                lineHeight = 15.sp,
-                letterSpacing = 0.06.em,
-                fontSynthesis = SingleWeight,
-            ),
-        legacyBody =
-            TextStyle(
-                fontFamily = MangaBodyFamily,
-                fontWeight = FontWeight.Medium,
-                fontSize = 13.5.sp,
-                lineHeight = 20.sp,
-            ),
-        legacyLabel =
-            TextStyle(
-                fontFamily = MangaBodyFamily,
-                fontWeight = FontWeight.Black,
-                fontSize = 12.sp,
-                lineHeight = 14.sp,
-                letterSpacing = 0.02.em,
-            ),
         uppercaseHeadings = true,
     )

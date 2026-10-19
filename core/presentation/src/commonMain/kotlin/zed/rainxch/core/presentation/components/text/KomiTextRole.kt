@@ -22,11 +22,6 @@ enum class KomiTextRole(
     Overline(PersonalityType::overline, KomiTextCase.Upper),
     Stamp(PersonalityType::stamp, KomiTextCase.Heading),
     Numeral(PersonalityType::numeral),
-    LegacyDisplay(PersonalityType::legacyDisplay, KomiTextCase.Heading),
-    LegacyTitle(PersonalityType::legacyTitle, KomiTextCase.Heading),
-    LegacyStamp(PersonalityType::legacyStamp, KomiTextCase.Heading),
-    LegacyBody(PersonalityType::legacyBody),
-    LegacyLabel(PersonalityType::legacyLabel, KomiTextCase.Heading),
 }
 
 internal enum class KomiTextCase {

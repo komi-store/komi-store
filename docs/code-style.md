@@ -108,6 +108,30 @@ class FooViewModel(
 - New core components dispatch on the personality with private Manga / Classic implementations, like [KomiButton.kt:70-123](https://github.com/komi-store/komi-store/blob/cfa6bd30e6b35cbbc369d78a4599182a9a66beac/core/presentation/src/commonMain/kotlin/zed/rainxch/core/presentation/components/buttons/KomiButton.kt#L70-L123). **[review]**
 - Public core components and stateless screens have a preview wrapped in `PersonalityPreview` ([PersonalityPreview.kt:16](https://github.com/komi-store/komi-store/blob/cfa6bd30e6b35cbbc369d78a4599182a9a66beac/core/presentation/src/commonMain/kotlin/zed/rainxch/core/presentation/personality/utils/PersonalityPreview.kt#L16)). **[review]**
 
+- Text goes through `KomiText(role = ...)`. The role sets size, weight, letter spacing and case; `KomiText` has no parameters to override them. Seven sizes: 11, 12, 14, 16, 20, 24, 32. **[Konsist]**
+
+  | Role | Size | Use it for |
+  |---|---|---|
+  | `Display` | 32 | Hero names, onboarding headlines |
+  | `ScreenTitle` | 24 | Top bar titles |
+  | `SectionTitle` | 20 | Page sections, empty-state titles |
+  | `CardTitle` | 16 | Card, sheet and dialog titles |
+  | `ItemTitle` | 16 | List rows, picker options |
+  | `Body` | 14 | Running text, row subtitles |
+  | `Reading` | 16 | Long-form text: release notes, descriptions |
+  | `Caption` | 12 | Meta: counts, dates, sizes |
+  | `Mono` | 12 | Versions, hashes, package names, logs |
+  | `LabelLarge`, `Label`, `LabelSmall` | 16 to 20, 14, 12 | Controls by size: large, medium and small buttons, chips, navigation |
+  | `Overline` | 11 | Kickers above a field or group, always in capitals |
+  | `Stamp` | 12 to 14 | Segmented tabs, badges, Manga stamps |
+  | `Numeral` | 24 | Stat values |
+
+- Case comes from the role. Manga sets `Display`, `ScreenTitle`, `SectionTitle`, `LabelLarge` and `Stamp` in capitals; everything else keeps the text's own case. A selected row shows its state with color or a check, not a heavier weight. **[review]**
+- Large text that must keep its own case or face (the repository name in Details, the device sign-in code) uses `BasicText` with a personality style resized from another role, such as `type.display` or `type.mono.copy(fontSize = type.screenTitle.fontSize)`. Never a literal size. **[Konsist]**
+- Tints come from `PersonalityColors`: `primaryTint`, `onPrimaryTint`, `errorTint`, `pressOverlay`, `disabledContent`, `disabledContainer`, `scrimOverlay` and `divider`. No `.copy(alpha = 0.x)` on personality colors. **[Konsist]**
+- Motion comes from `LocalPersonality.current.motion`: `fastSpatial()` and `defaultSpatial()` for movement, `fastEffects()`, `defaultEffects()` and `slowEffects()` for fades and color, `short()`, `medium()` and `long()` durations, `ambient()` for loops. Stop a loop when `motion.animates` is false. **[Konsist]**
+- Popups go through core components: `KomiTooltip`, `KomiRichTooltip` and `KomiCoachmark` for tips, `KomiDropdown` for menus, `KomiSheet` for sheets. **[Konsist]**
+
 ## 10. Strings and accessibility
 
 - All user-visible text comes from `Res.string`, content descriptions included. Bad: [KomiChip.kt:255](https://github.com/komi-store/komi-store/blob/cfa6bd30e6b35cbbc369d78a4599182a9a66beac/core/presentation/src/commonMain/kotlin/zed/rainxch/core/presentation/components/chips/KomiChip.kt#L255). **[review]**
