@@ -1,10 +1,3 @@
-compose:compositionlocal-allowlist core/presentation/src/commonMain/kotlin/zed/rainxch/core/presentation/locals/LocalAppLanguageTag.kt
-compose:compositionlocal-allowlist core/presentation/src/commonMain/kotlin/zed/rainxch/core/presentation/locals/LocalContentWidth.kt
-compose:compositionlocal-allowlist core/presentation/src/commonMain/kotlin/zed/rainxch/core/presentation/locals/LocalPersonality.kt
-compose:compositionlocal-allowlist core/presentation/src/commonMain/kotlin/zed/rainxch/core/presentation/locals/LocalScrollbarEnabled.kt
-compose:compositionlocal-allowlist core/presentation/src/commonMain/kotlin/zed/rainxch/core/presentation/locals/LocalStatusColors.kt
-compose:compositionlocal-allowlist core/presentation/src/commonMain/kotlin/zed/rainxch/core/presentation/locals/SharedTransitionLocals.kt
-compose:compositionlocal-allowlist feature/apps/presentation/src/commonMain/kotlin/zed/rainxch/apps/presentation/import/util/ReducedMotion.kt
 compose:content-slot-reused core/presentation/src/commonMain/kotlin/zed/rainxch/core/presentation/components/adaptive/AdaptiveListDetail.kt
 compose:content-slot-reused core/presentation/src/commonMain/kotlin/zed/rainxch/core/presentation/components/badge/KomiBadge.kt
 compose:content-slot-reused core/presentation/src/jvmMain/kotlin/zed/rainxch/core/presentation/components/ScrollbarContainer.jvm.kt

@@ -13,6 +13,9 @@ style:
   MagicNumber:
     ignorePropertyDeclaration: true
     ignoreAnnotated: ['Composable', 'Preview']
+  MaxLineLength:
+    # ktlint's default; Spotless joins lines up to this length
+    maxLineLength: 140
   UnusedPrivateMember:
     ignoreAnnotated: ['Preview']
   WildcardImport:

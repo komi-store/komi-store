@@ -6,11 +6,11 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.net.Uri
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import zed.rainxch.core.domain.system.PendingInstallNotifier
 
 class AndroidPendingInstallNotifier(
@@ -35,10 +35,13 @@ class AndroidPendingInstallNotifier(
                 FALLBACK_URI
             }
         val deepLinkIntent =
-            Intent(Intent.ACTION_VIEW, Uri.parse(uri)).apply {
-                setPackage(context.packageName)
-                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
-            }
+            context.packageManager
+                .getLaunchIntentForPackage(context.packageName)
+                ?.apply {
+                    action = Intent.ACTION_VIEW
+                    data = uri.toUri()
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+                } ?: return
         val pendingIntent =
             PendingIntent.getActivity(
                 context,

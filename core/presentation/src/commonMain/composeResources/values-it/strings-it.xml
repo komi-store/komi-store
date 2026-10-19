@@ -1045,6 +1045,8 @@
     <string name="adaptive_pick_repo_subtitle">Tocca una scheda a sinistra per vederne i dettagli qui.</string>
     <string name="adaptive_pick_repo_title">Scegli un repository</string>
     <string name="apps_section_pending_installs">Pronte da installare</string>
+    <string name="apps_section_in_progress">In corso</string>
+    <string name="download_failed">Scaricamento non riuscito</string>
     <string name="apps_updates_banner_hide">Nascondi elenco</string>
     <string name="apps_updates_banner_show">Vedi elenco</string>
     <string name="apps_updates_banner_subtitle">Esamina o aggiorna tutto in una volta.</string>

@@ -43,9 +43,6 @@
     <ID>MagicNumber:preprocessMarkdown.kt$32</ID>
     <ID>MagicNumber:preprocessMarkdown.kt$4</ID>
     <ID>MagicNumber:preprocessMarkdown.kt$6</ID>
-    <ID>MaxLineLength:DetailsRepositoryImpl.kt$DetailsRepositoryImpl$"""https://(?:raw\.githubusercontent\.com|github\.com)/([^/]+)/([^/]+)/(?:blob/)?([^/]+)/(.*)"""</ID>
-    <ID>MaxLineLength:DetailsRepositoryImpl.kt$DetailsRepositoryImpl$private</ID>
-    <ID>MaxLineLength:preprocessMarkdown.kt$"""&lt;pre[^&gt;]*&gt;\s*&lt;code(?:\s+[^&gt;]*?class\s*=\s*["'][^"']*?language-(\w+)[^"']*?["'])?[^&gt;]*&gt;(.*?)&lt;/code&gt;\s*&lt;/pre&gt;"""</ID>
     <ID>NestedBlockDepth:DetailsRepositoryImpl.kt$DetailsRepositoryImpl$override suspend fun fetchRawMarkdown(url: String): String?</ID>
     <ID>PrintStackTrace:InstallationManagerImpl.kt$InstallationManagerImpl$t</ID>
     <ID>ReturnCount:DetailsRepositoryImpl.kt$DetailsRepositoryImpl$@OptIn(ExperimentalEncodingApi::class) private fun processReadmeFromBackend( dto: GithubReadmeResponseDto, owner: String, repo: String, defaultBranch: String, ): Triple&lt;String, String?, String&gt;?</ID>

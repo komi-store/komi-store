@@ -4,12 +4,15 @@ on:
   release:
     types: [released]
 
+permissions:
+  contents: read
+
 jobs:
   publish-msi:
     name: Publish MSI to WinGet
     runs-on: ubuntu-latest
     steps:
-      - uses: vedantmgoyal9/winget-releaser@main
+      - uses: vedantmgoyal9/winget-releaser@b7370d4d152efdce803a26cc6ca9eee58cb2ad54 # v2
         with:
           identifier: zed.rainxch.githubstore
           installers-regex: '\.msi$'

@@ -14,7 +14,6 @@ import zed.rainxch.core.data.cache.CacheManager
 import zed.rainxch.core.data.data_source.TokenStore
 import zed.rainxch.core.data.data_source.impl.DefaultTokenStore
 import zed.rainxch.core.data.download.MultiSourceDownloaderImpl
-import zed.rainxch.core.data.download.SlowDownloadDetectorImpl
 import zed.rainxch.core.data.local.db.AppDatabase
 import zed.rainxch.core.data.local.db.dao.CacheDao
 import zed.rainxch.core.data.local.db.dao.ExternalLinkDao
@@ -66,7 +65,6 @@ import zed.rainxch.core.domain.model.settings.ProxyScope
 import zed.rainxch.core.domain.model.system.Platform
 import zed.rainxch.core.domain.network.MirrorLatencyProbe
 import zed.rainxch.core.domain.network.ProxyTester
-import zed.rainxch.core.domain.network.SlowDownloadDetector
 import zed.rainxch.core.domain.repository.AnnouncementsCacheStore
 import zed.rainxch.core.domain.repository.AnnouncementsRepository
 import zed.rainxch.core.domain.repository.BrowseFilterStore
@@ -299,13 +297,6 @@ val coreModule =
             )
         }
 
-        single<SlowDownloadDetector> {
-            SlowDownloadDetectorImpl(
-                ksafe = get(qualifier = named("prefs")),
-                appScope = get(),
-            )
-        }
-
         single<DownloadOrchestrator> {
             DefaultDownloadOrchestrator(
                 downloader = get(),
@@ -314,7 +305,6 @@ val coreModule =
                 installer = get(),
                 installedAppsRepository = get(),
                 pendingInstallNotifier = get(),
-                slowDownloadDetector = get(),
                 appScope = get(),
                 systemInstallSerializer = get(),
                 tokenStore = get(),

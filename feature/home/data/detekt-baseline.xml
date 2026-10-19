@@ -18,7 +18,6 @@
     <ID>MagicNumber:HomeRepositoryImpl.kt$HomeRepositoryImpl$5</ID>
     <ID>MagicNumber:HomeRepositoryImpl.kt$HomeRepositoryImpl$50</ID>
     <ID>MagicNumber:HomeRepositoryImpl.kt$HomeRepositoryImpl$8</ID>
-    <ID>MaxLineLength:BackendToCachedMapper.kt$fun</ID>
     <ID>PackageNaming:CachedRepositoriesDataSource.kt$package zed.rainxch.home.data.data_source</ID>
     <ID>PackageNaming:CachedRepositoriesDataSourceImpl.kt$package zed.rainxch.home.data.data_source.impl</ID>
     <ID>ReturnCount:CachedRepositoriesDataSourceImpl.kt$CachedRepositoriesDataSourceImpl$override suspend fun getCachedTopicRepos( topic: TopicCategory, platform: DiscoveryPlatform, ): CachedRepoResponse?</ID>

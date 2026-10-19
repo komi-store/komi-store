@@ -24,7 +24,6 @@ import zed.rainxch.core.domain.model.installation.withLatestSnapshot
 import zed.rainxch.core.domain.network.AssetIdentity
 import zed.rainxch.core.domain.network.DigestVerifier
 import zed.rainxch.core.domain.network.Downloader
-import zed.rainxch.core.domain.network.SlowDownloadDetector
 import zed.rainxch.core.domain.repository.InstalledAppsRepository
 import zed.rainxch.core.domain.system.DownloadOrchestrator
 import zed.rainxch.core.domain.system.DownloadSpec
@@ -48,7 +47,6 @@ class DefaultDownloadOrchestrator(
     private val installer: Installer,
     private val installedAppsRepository: InstalledAppsRepository,
     private val pendingInstallNotifier: PendingInstallNotifier,
-    private val slowDownloadDetector: SlowDownloadDetector,
     private val appScope: CoroutineScope,
     private val systemInstallSerializer: SystemInstallSerializer,
     private val tokenStore: TokenStore,
@@ -206,10 +204,6 @@ class DefaultDownloadOrchestrator(
 
         suspend fun streamProgress(flow: Flow<DownloadProgress>) {
             flow.collect { progress ->
-                if (progress.restart) {
-                    slowDownloadDetector.reset()
-                }
-                slowDownloadDetector.onProgress(progress)
                 updateEntry(spec.packageName) {
                     it.copy(
                         progressPercent = progress.percent,
@@ -245,7 +239,6 @@ class DefaultDownloadOrchestrator(
                 "Orchestrator: primary download failed for ${spec.asset.name}, " +
                     "retrying via authenticated GitHub asset API"
             }
-            slowDownloadDetector.reset()
             streamProgress(
                 downloader.download(apiUrl, scopedName, bypassMirror = true, identity = identity),
             )

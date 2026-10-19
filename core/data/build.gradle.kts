@@ -58,6 +58,7 @@ kotlin {
                 implementation(kotlin("test"))
                 implementation(libs.kotlinx.coroutines.core)
                 implementation(libs.ktor.client.mock)
+                implementation(libs.androidx.room.testing)
             }
         }
     }

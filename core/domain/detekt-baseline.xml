@@ -37,16 +37,6 @@
     <ID>MagicNumber:applyThemeAwareImages.kt$6</ID>
     <ID>MatchingDeclarationName:ExternalInstallVerdict.kt$VersionVerdict</ID>
     <ID>MatchingDeclarationName:ReleasePlatforms.kt$PlatformRelease</ID>
-    <ID>MaxLineLength:AssetArchitectureMatcher.kt$AssetArchitectureMatcher$fun detectArchitecture(assetName: String): SystemArchitecture?</ID>
-    <ID>MaxLineLength:AssetArchitectureMatcher.kt$AssetArchitectureMatcher$private fun boundary(vararg tokens: String): Regex</ID>
-    <ID>MaxLineLength:AssetMatchingReplayTest.kt$AssetMatchingReplayTest$println("=== asset replay: samples=$samples missed=$missed older=$older fellBack=$fellBack lostNewest=$lostNewest ===")</ID>
-    <ID>MaxLineLength:AssetOwnershipTest.kt$AssetOwnershipTest$release("26.05", listOf(asset("InstallerX-Revived-offline-26.05.apk"), asset("InstallerX-Revived-online-26.05.apk")))</ID>
-    <ID>MaxLineLength:AssetOwnershipTest.kt$AssetOwnershipTest$release("26.05.01", listOf(asset("InstallerX-Revived-offline-26.05.01.apk"), asset("InstallerX-Revived-online-26.05.01.apk")))</ID>
-    <ID>MaxLineLength:AssetSelector.kt$AssetSelector$private fun boundary(vararg tokens: String): Regex</ID>
-    <ID>MaxLineLength:InstalledAppUpdatesTest.kt$InstalledAppUpdatesTest$matched = UpdateVerdict.Matched(tag = "2.0.0", publishedAt = "2026-09-01T00:00:00Z", isPrerelease = false)</ID>
-    <ID>MaxLineLength:ReleasePlatforms.kt$fun GithubRelease.platforms(): Set&lt;DiscoveryPlatform&gt;</ID>
-    <ID>MaxLineLength:ReleaseVersionMatchingTest.kt$ReleaseVersionMatchingTest$assertFalse(AssetOwnership.isSameApp("ente-auth-v4.4.25.apk", "ente-photos-v1.3.64.apk", "auth-v4.4.25", "photos-v1.3.64"))</ID>
-    <ID>MaxLineLength:ReleaseVersionMatchingTest.kt$ReleaseVersionMatchingTest$assertTrue(AssetOwnership.isSameApp("ente-auth-v4.4.25.apk", "ente-auth-v4.4.24.apk", "auth-v4.4.25", "auth-v4.4.24"))</ID>
     <ID>NestedBlockDepth:SyncInstalledAppsUseCase.kt$SyncInstalledAppsUseCase$private suspend fun reconcileEnumerable(appsInDb: List&lt;InstalledApp&gt;)</ID>
     <ID>PackageNaming:MatchingPreview.kt$package zed.rainxch.core.domain.model.smart_detect</ID>
     <ID>PackageNaming:SyncInstalledAppsUseCase.kt$package zed.rainxch.core.domain.use_cases</ID>
