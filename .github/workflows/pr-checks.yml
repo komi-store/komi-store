@@ -38,6 +38,10 @@ jobs:
       - name: Unit tests and coverage
         run: ./gradlew jvmTest koverXmlReport koverHtmlReport --continue
 
+      - name: Architecture rules
+        if: always()
+        run: ./gradlew :konsist-test:test
+
       - name: Coverage summary
         if: always()
         run: |

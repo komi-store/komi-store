@@ -57,6 +57,7 @@ spotless = "8.10.4"
 detekt = "1.23.8"
 kover = "0.9.11"
 stability-analyzer = "0.7.0"
+konsist = "0.18.1"
 flatpak-gradle-generator = "1.7.0"
 
 projectApplicationId = "zed.rainxch.githubstore"
@@ -182,6 +183,7 @@ dhizuku-api = { module = "io.github.iamr0s:Dhizuku-API", version.ref = "dhizuku"
 
 detekt-gradlePlugin = { group = "io.gitlab.arturbosch.detekt", name = "detekt-gradle-plugin", version.ref = "detekt" }
 stability-analyzer-gradlePlugin = { group = "com.github.skydoves", name = "compose-stability-gradle", version.ref = "stability-analyzer" }
+konsist = { group = "com.lemonappdev", name = "konsist", version.ref = "konsist" }
 
 [plugins]
 
@@ -200,6 +202,7 @@ android-kotlin-multiplatform-library = { id = "com.android.kotlin.multiplatform.
 
 # Kotlin
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 
 # Compose
