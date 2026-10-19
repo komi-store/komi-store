@@ -110,11 +110,11 @@ GITHUB_CLIENT_ID=your-oauth-client-id-or-leave-blank-for-local
 # Full build check (compile + lint)
 ./gradlew build
 
-# Format check (ktlint)
-./gradlew ktlintCheck
+# Format check (ktlint through Spotless, files changed against main)
+./gradlew spotlessCheck
 
-# Auto-format
-./gradlew ktlintFormat
+# Auto-format the same files
+./gradlew spotlessApply
 ```
 
 The first build will pull a lot of dependencies. Subsequent builds reuse the Gradle build cache (enabled in `gradle.properties`).
@@ -150,7 +150,7 @@ The full architectural rundown lives in [CLAUDE.md](CLAUDE.md). Per-feature note
 
 ## Coding conventions
 
-We use Kotlin's official style (`kotlin.code.style=official`). CI lints every PR with ktlint. The big rules:
+We use Kotlin's official style (`kotlin.code.style=official`). CI lints every PR with ktlint through Spotless. The full rule set is in [`docs/code-style.md`](docs/code-style.md). The big rules:
 
 ### Architecture
 
@@ -238,7 +238,7 @@ We use Kotlin's official style (`kotlin.code.style=official`). CI lints every PR
 4. **Run the local checks:**
 
    ```bash
-   ./gradlew ktlintCheck build
+   ./gradlew spotlessApply build
    ```
 
    (Or the narrower module-specific tasks if you know the change is scoped.)
@@ -248,10 +248,9 @@ We use Kotlin's official style (`kotlin.code.style=official`). CI lints every PR
    - **How to test** — exact steps a reviewer can follow on a clean checkout.
    - **Screenshots** or screen recordings for any UI change. Mandatory for visual diffs.
    - **Linked issue:** `Closes #123` / `Fixes #123`.
-6. **Run the local checks yourself before review.** No CI runs against PRs — `./gradlew ktlintCheck build` is your safety net. Don't expect the merge button to catch a broken build.
-7. **Work through CodeRabbit's review.** Every PR gets an automated review from [CodeRabbit AI](https://coderabbit.ai). Read each comment, decide whether it's right, and either fix it or reply explaining why you're leaving it. "Looks fine to me" without engaging with the comments is not enough — a maintainer will ask you to address them before merging. CodeRabbit isn't always right; pushing back with reasoning is welcome.
-8. **Address human review comments** with follow-up commits (don't force-push during review unless the reviewer asks). Squash on merge happens automatically.
-9. **Merge** is performed by maintainers via GitHub's "Squash and merge". Your branch is deleted automatically.
+6. **Run the local checks yourself before review.** CI (`.github/workflows/pr-checks.yml`) builds and tests every PR and runs Spotless, detekt, Android Lint, the Compose stability check and Konsist. The commands are under Verification in `CLAUDE.md`; run them locally first instead of waiting for CI.
+7. **Address review comments** with follow-up commits (don't force-push during review unless the reviewer asks). Squash on merge happens automatically.
+8. **Merge** is performed by maintainers via GitHub's "Squash and merge". Your branch is deleted automatically.
 
 ### What gets a PR rejected
 
