@@ -41,8 +41,7 @@ class SkippedUpdatesViewModel(
                         isLoading = false,
                         items = items.toImmutableList(),
                     )
-            }
-            .launchIn(viewModelScope)
+            }.launchIn(viewModelScope)
     }
 
     fun onAction(action: SkippedUpdatesAction) {
@@ -52,8 +51,10 @@ class SkippedUpdatesViewModel(
     }
 
     private fun unskip(packageName: String) {
-
-        val appName = _state.value.items.firstOrNull { it.packageName == packageName }?.appName
+        val appName =
+            _state.value.items
+                .firstOrNull { it.packageName == packageName }
+                ?.appName
         viewModelScope.launch {
             try {
                 installedAppsRepository.setSkippedReleaseTag(packageName, null)

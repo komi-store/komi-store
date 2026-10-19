@@ -1,12 +1,11 @@
 package zed.rainxch.core.data.download
 
+import zed.rainxch.core.domain.system.DownloadStage
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
-import zed.rainxch.core.domain.system.DownloadStage
 
 class DownloadNotificationActionsTest {
-
     @Test
     fun a_live_download_offers_pause_and_delete() {
         assertEquals(

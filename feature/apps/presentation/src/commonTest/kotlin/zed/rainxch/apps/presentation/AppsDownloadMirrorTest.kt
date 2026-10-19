@@ -1,33 +1,35 @@
 package zed.rainxch.apps.presentation
 
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertFalse
-import kotlin.test.assertTrue
 import zed.rainxch.apps.presentation.model.UpdateState
 import zed.rainxch.core.domain.system.DownloadStage
 import zed.rainxch.core.domain.system.InstallPolicy
 import zed.rainxch.core.domain.system.OrchestratedDownload
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
 class AppsDownloadMirrorTest {
-
-    private fun entry(key: String, stage: DownloadStage, error: String? = null) =
-        OrchestratedDownload(
-            id = key,
-            packageName = key,
-            repoOwner = "owner",
-            repoName = "name",
-            displayAppName = "Name",
-            assetName = "name.apk",
-            assetSize = 10L,
-            downloadUrl = "https://example.invalid/name.apk",
-            releaseTag = "v1",
-            filePath = null,
-            installPolicy = InstallPolicy.DeferUntilUserAction,
-            stage = stage,
-            progressPercent = null,
-            errorMessage = error,
-        )
+    private fun entry(
+        key: String,
+        stage: DownloadStage,
+        error: String? = null,
+    ) = OrchestratedDownload(
+        id = key,
+        packageName = key,
+        repoOwner = "owner",
+        repoName = "name",
+        displayAppName = "Name",
+        assetName = "name.apk",
+        assetSize = 10L,
+        downloadUrl = "https://example.invalid/name.apk",
+        releaseTag = "v1",
+        filePath = null,
+        installPolicy = InstallPolicy.DeferUntilUserAction,
+        stage = stage,
+        progressPercent = null,
+        errorMessage = error,
+    )
 
     @Test
     fun aDownloadTheLibraryHasNoRowForBecomesATransientCard() {

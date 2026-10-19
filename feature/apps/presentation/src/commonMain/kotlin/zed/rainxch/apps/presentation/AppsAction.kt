@@ -1,10 +1,10 @@
 package zed.rainxch.apps.presentation
 
-import zed.rainxch.apps.presentation.model.InstalledAppUi
 import zed.rainxch.apps.presentation.model.AppSortRule
 import zed.rainxch.apps.presentation.model.DeviceAppUi
 import zed.rainxch.apps.presentation.model.GithubAssetUi
 import zed.rainxch.apps.presentation.model.ImportSummaryBucket
+import zed.rainxch.apps.presentation.model.InstalledAppUi
 
 sealed interface AppsAction {
     data object OnNavigateBackClick : AppsAction
@@ -75,59 +75,116 @@ sealed interface AppsAction {
         val app: InstalledAppUi,
     ) : AppsAction
 
-    data class OnUninstallConfirmed(val app: InstalledAppUi) : AppsAction
+    data class OnUninstallConfirmed(
+        val app: InstalledAppUi,
+    ) : AppsAction
+
     data object OnDismissUninstallDialog : AppsAction
 
     data object OnAddByLinkClick : AppsAction
+
     data object OnDismissLinkSheet : AppsAction
-    data class OnDeviceAppSearchChange(val query: String) : AppsAction
-    data class OnDeviceAppSelected(val app: DeviceAppUi) : AppsAction
+
+    data class OnDeviceAppSearchChange(
+        val query: String,
+    ) : AppsAction
+
+    data class OnDeviceAppSelected(
+        val app: DeviceAppUi,
+    ) : AppsAction
+
     data class OnLinkSuggestionSelected(
         val owner: String,
         val repo: String,
-
         val sourceHost: String? = null,
     ) : AppsAction
+
     data object OnLinkEnterUrlManually : AppsAction
+
     data object OnRetryLinkSearch : AppsAction
-    data class OnRepoUrlChanged(val url: String) : AppsAction
+
+    data class OnRepoUrlChanged(
+        val url: String,
+    ) : AppsAction
+
     data object OnValidateAndLinkRepo : AppsAction
+
     data object OnBackToAppPicker : AppsAction
+
     data object OnBackToSmartMatch : AppsAction
-    data class OnLinkAssetSelected(val asset: GithubAssetUi) : AppsAction
+
+    data class OnLinkAssetSelected(
+        val asset: GithubAssetUi,
+    ) : AppsAction
+
     data object OnBackToEnterUrl : AppsAction
 
-    data class OnLinkAssetFilterChanged(val filter: String) : AppsAction
+    data class OnLinkAssetFilterChanged(
+        val filter: String,
+    ) : AppsAction
 
-    data class OnLinkFallbackToggled(val enabled: Boolean) : AppsAction
+    data class OnLinkFallbackToggled(
+        val enabled: Boolean,
+    ) : AppsAction
 
-    data class OnTogglePreReleases(val packageName: String, val enabled: Boolean) : AppsAction
+    data class OnTogglePreReleases(
+        val packageName: String,
+        val enabled: Boolean,
+    ) : AppsAction
 
-    data class OnToggleUpdateCheck(val packageName: String, val enabled: Boolean) : AppsAction
+    data class OnToggleUpdateCheck(
+        val packageName: String,
+        val enabled: Boolean,
+    ) : AppsAction
 
-    data class OnSkipReleaseTag(val packageName: String, val tag: String) : AppsAction
+    data class OnSkipReleaseTag(
+        val packageName: String,
+        val tag: String,
+    ) : AppsAction
 
-    data class OnUnskipReleaseTag(val packageName: String) : AppsAction
+    data class OnUnskipReleaseTag(
+        val packageName: String,
+    ) : AppsAction
 
-    data class OnOpenAdvancedSettings(val app: InstalledAppUi) : AppsAction
+    data class OnOpenAdvancedSettings(
+        val app: InstalledAppUi,
+    ) : AppsAction
+
     data object OnDismissAdvancedSettings : AppsAction
-    data class OnAdvancedFilterChanged(val filter: String) : AppsAction
-    data class OnAdvancedFallbackToggled(val enabled: Boolean) : AppsAction
+
+    data class OnAdvancedFilterChanged(
+        val filter: String,
+    ) : AppsAction
+
+    data class OnAdvancedFallbackToggled(
+        val enabled: Boolean,
+    ) : AppsAction
+
     data object OnAdvancedSaveFilter : AppsAction
+
     data object OnAdvancedClearFilter : AppsAction
+
     data object OnAdvancedRefreshPreview : AppsAction
 
     data class OnOpenVariantPicker(
         val app: InstalledAppUi,
         val resumeUpdateAfterPick: Boolean = false,
     ) : AppsAction
+
     data object OnDismissVariantPicker : AppsAction
-    data class OnVariantSelected(val variant: String?) : AppsAction
+
+    data class OnVariantSelected(
+        val variant: String?,
+    ) : AppsAction
+
     data object OnResetVariantToAuto : AppsAction
 
     data object OnExportApps : AppsAction
+
     data object OnExportObtainium : AppsAction
+
     data object OnImportApps : AppsAction
+
     data object OnDismissImportSummary : AppsAction
 
     data class OnToggleImportSummaryBucket(
@@ -135,6 +192,7 @@ sealed interface AppsAction {
     ) : AppsAction
 
     data object OnDismissKaoBanner : AppsAction
+
     data object OnKaoLearnMore : AppsAction
 
     data class OnInstallPendingApp(

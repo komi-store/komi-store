@@ -147,7 +147,7 @@ private fun MangaChip(
             else -> colors.background
         }
     val hasShadow = selected && isFilter
-    val shape = remember(doSkew) { if (doSkew) chipStampShape(ChipSkewDegrees) else RectangleShape }
+    val shape = remember(doSkew) { if (doSkew) chipStampShape(CHIP_SKEW_DEGREES) else RectangleShape }
 
     val interaction = remember { MutableInteractionSource() }
     val pressed by interaction.collectIsPressedAsState()
@@ -314,7 +314,7 @@ private fun ClassicChip(
     }
 }
 
-private const val ChipSkewDegrees = 8f
+private const val CHIP_SKEW_DEGREES = 8f
 
 private fun chipStampShape(skewDegrees: Float): Shape =
     GenericShape { size, _ ->

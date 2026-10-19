@@ -124,13 +124,17 @@ class SilentInstallerDispatcher(
                     silentUninstall(packageName, backend)
                 }
             }
+
             Backend.DEFAULT -> {
                 androidInstaller.uninstall(packageName)
             }
         }
     }
 
-    private suspend fun trySilentInstall(filePath: String, backend: Backend): InstallOutcome? {
+    private suspend fun trySilentInstall(
+        filePath: String,
+        backend: Backend,
+    ): InstallOutcome? {
         Logger.d(TAG) { "Routing install through $backend" }
         val installerAttribution = cachedInstallerAttribution.resolvePackageName()
         return try {
@@ -161,7 +165,11 @@ class SilentInstallerDispatcher(
                     Logger.w(TAG) { "$backend service is null, will fall back" }
                     null
                 }
-                resolved == 0 -> InstallOutcome.COMPLETED
+
+                resolved == 0 -> {
+                    InstallOutcome.COMPLETED
+                }
+
                 else -> {
                     Logger.w(TAG) { "$backend install returned $resolved, will fall back" }
                     null
@@ -181,52 +189,72 @@ class SilentInstallerDispatcher(
         expectedVc: Long,
     ): Int? =
         when (backend) {
-            Backend.SHIZUKU ->
+            Backend.SHIZUKU -> {
                 ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY).use { pfd ->
                     val service = shizukuServiceManager.getService() ?: return@use null
                     service.installPackage(pfd, file.length(), installerAttribution)
                 }
-            Backend.DHIZUKU ->
+            }
+
+            Backend.DHIZUKU -> {
                 ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY).use { pfd ->
                     val service = dhizukuServiceManager.getService() ?: return@use null
                     service.installPackage(pfd, file.length(), expectedPkg, expectedVc, installerAttribution)
                 }
-            Backend.ROOT ->
+            }
 
+            Backend.ROOT -> {
                 rootServiceManager.installPackage(file, installerAttribution)
-            Backend.DEFAULT -> null
+            }
+
+            Backend.DEFAULT -> {
+                null
+            }
         }
 
     private fun readApkIdentity(filePath: String): Pair<String?, Long> {
-        val info = try {
-            androidContext.packageManager.getPackageArchiveInfo(filePath, 0)
-        } catch (e: Exception) {
-            Logger.w(TAG) { "getPackageArchiveInfo($filePath) failed: ${e.message}" }
-            null
-        } ?: return null to -1L
-        val versionCode = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
-            info.longVersionCode
-        } else {
-            @Suppress("DEPRECATION")
-            info.versionCode.toLong()
-        }
+        val info =
+            try {
+                androidContext.packageManager.getPackageArchiveInfo(filePath, 0)
+            } catch (e: Exception) {
+                Logger.w(TAG) { "getPackageArchiveInfo($filePath) failed: ${e.message}" }
+                null
+            } ?: return null to -1L
+        val versionCode =
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
+                info.longVersionCode
+            } else {
+                @Suppress("DEPRECATION")
+                info.versionCode.toLong()
+            }
         return info.packageName to versionCode
     }
 
-    private suspend fun silentUninstall(packageName: String, backend: Backend) {
+    private suspend fun silentUninstall(
+        packageName: String,
+        backend: Backend,
+    ) {
         try {
-            val result = when (backend) {
-                Backend.SHIZUKU -> {
-                    val service = shizukuServiceManager.getService()
-                    service?.uninstallPackage(packageName)
+            val result =
+                when (backend) {
+                    Backend.SHIZUKU -> {
+                        val service = shizukuServiceManager.getService()
+                        service?.uninstallPackage(packageName)
+                    }
+
+                    Backend.DHIZUKU -> {
+                        val service = dhizukuServiceManager.getService()
+                        service?.uninstallPackage(packageName)
+                    }
+
+                    Backend.ROOT -> {
+                        rootServiceManager.uninstallPackage(packageName)
+                    }
+
+                    Backend.DEFAULT -> {
+                        null
+                    }
                 }
-                Backend.DHIZUKU -> {
-                    val service = dhizukuServiceManager.getService()
-                    service?.uninstallPackage(packageName)
-                }
-                Backend.ROOT -> rootServiceManager.uninstallPackage(packageName)
-                Backend.DEFAULT -> null
-            }
             if (result == null || result != 0) {
                 Logger.w(TAG) { "$backend uninstall failed (result=$result), falling back" }
                 androidInstaller.uninstall(packageName)
@@ -237,24 +265,29 @@ class SilentInstallerDispatcher(
         }
     }
 
-    private fun resolveActiveBackend(): Backend = when (cachedInstallerType) {
-        InstallerType.SHIZUKU -> {
-            shizukuServiceManager.refreshStatus()
-            if (shizukuServiceManager.status.value == ShizukuStatus.READY) Backend.SHIZUKU else Backend.DEFAULT
-        }
-        InstallerType.DHIZUKU -> {
-            dhizukuServiceManager.refreshStatus()
-            if (dhizukuServiceManager.status.value == DhizukuStatus.READY) Backend.DHIZUKU else Backend.DEFAULT
-        }
-        InstallerType.ROOT -> {
-
-            if (rootServiceManager.status.value != RootStatus.READY) {
-                rootServiceManager.refreshStatus()
+    private fun resolveActiveBackend(): Backend =
+        when (cachedInstallerType) {
+            InstallerType.SHIZUKU -> {
+                shizukuServiceManager.refreshStatus()
+                if (shizukuServiceManager.status.value == ShizukuStatus.READY) Backend.SHIZUKU else Backend.DEFAULT
             }
-            if (rootServiceManager.status.value == RootStatus.READY) Backend.ROOT else Backend.DEFAULT
+
+            InstallerType.DHIZUKU -> {
+                dhizukuServiceManager.refreshStatus()
+                if (dhizukuServiceManager.status.value == DhizukuStatus.READY) Backend.DHIZUKU else Backend.DEFAULT
+            }
+
+            InstallerType.ROOT -> {
+                if (rootServiceManager.status.value != RootStatus.READY) {
+                    rootServiceManager.refreshStatus()
+                }
+                if (rootServiceManager.status.value == RootStatus.READY) Backend.ROOT else Backend.DEFAULT
+            }
+
+            InstallerType.DEFAULT -> {
+                Backend.DEFAULT
+            }
         }
-        InstallerType.DEFAULT -> Backend.DEFAULT
-    }
 
     private enum class Backend { DEFAULT, SHIZUKU, DHIZUKU, ROOT }
 }

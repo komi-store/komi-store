@@ -66,31 +66,26 @@ class PackageEventReceiver() :
 
     private fun getMonitor(): PackageMonitor = explicitMonitor ?: packageMonitorKoin
 
-    private fun getExternalImport(): ExternalImportRepository =
-        explicitExternalImport ?: externalImportRepositoryKoin
+    private fun getExternalImport(): ExternalImportRepository = explicitExternalImport ?: externalImportRepositoryKoin
 
-    private fun getExternalLinkDao(): ExternalLinkDao =
-        explicitExternalLinkDao ?: externalLinkDaoKoin
+    private fun getExternalLinkDao(): ExternalLinkDao = explicitExternalLinkDao ?: externalLinkDaoKoin
 
-    private fun getSystemInstallSerializer(): SystemInstallSerializer =
-        explicitSystemInstallSerializer ?: systemInstallSerializerKoin
+    private fun getSystemInstallSerializer(): SystemInstallSerializer = explicitSystemInstallSerializer ?: systemInstallSerializerKoin
 
-    private fun getBackstopScope(): CoroutineScope =
-
-        explicitAppScope ?: runCatching { appScopeKoin }.getOrElse { scope }
+    private fun getBackstopScope(): CoroutineScope = explicitAppScope ?: runCatching { appScopeKoin }.getOrElse { scope }
 
     override fun onReceive(
         context: Context?,
         intent: Intent?,
     ) {
-
-        val packageName = intent?.data?.schemeSpecificPart
-            ?: if (intent?.action == Intent.ACTION_MY_PACKAGE_REPLACED) {
-                context?.packageName
-            } else {
-                null
-            }
-            ?: return
+        val packageName =
+            intent?.data?.schemeSpecificPart
+                ?: if (intent?.action == Intent.ACTION_MY_PACKAGE_REPLACED) {
+                    context?.packageName
+                } else {
+                    null
+                }
+                ?: return
 
         Logger.d { "PackageEventReceiver: ${intent?.action} for $packageName" }
 
@@ -113,7 +108,6 @@ class PackageEventReceiver() :
     }
 
     private suspend fun onPackageInstalled(packageName: String) {
-
         getSystemInstallSerializer().markCompleted(packageName)
 
         try {
@@ -126,10 +120,11 @@ class PackageEventReceiver() :
                     val resolution =
                         app.pendingInstallResolution(monitor.getInstalledPackageInfo(packageName))
                     when (resolution) {
-                        PendingInstallResolution.Keep ->
+                        PendingInstallResolution.Keep -> {
                             Logger.i {
                                 "Kept parked install via broadcast (target not proven): $packageName"
                             }
+                        }
 
                         is PendingInstallResolution.Reached -> {
                             val settled = app.withSettledInstallIdentity(resolution.versionCode)
@@ -191,8 +186,9 @@ class PackageEventReceiver() :
     }
 
     private suspend fun shouldRescan(packageName: String): Boolean {
-        val tracked = runCatching { getRepository().getAppByPackage(packageName) }
-            .getOrNull()
+        val tracked =
+            runCatching { getRepository().getAppByPackage(packageName) }
+                .getOrNull()
         if (tracked != null) return false
         val link = runCatching { getExternalLinkDao().get(packageName) }.getOrNull()
         val state = link?.state ?: return true
@@ -228,7 +224,6 @@ class PackageEventReceiver() :
             when (verdict) {
                 VersionVerdict.UP_TO_DATE -> false
                 VersionVerdict.UPDATE_AVAILABLE -> true
-
                 VersionVerdict.UNKNOWN -> app.isUpdateAvailable
             }
 
@@ -279,7 +274,6 @@ class PackageEventReceiver() :
     }
 
     private suspend fun onPackageRemoved(packageName: String) {
-
         getSystemInstallSerializer().markCompleted(packageName)
 
         try {
@@ -287,14 +281,15 @@ class PackageEventReceiver() :
             val parkedPath = repo.getAppByPackage(packageName)?.pendingInstallFilePath
             var mayDropRow = parkedPath == null
             if (parkedPath != null) {
-                val disposal = try {
-                    repo.discardParkedInstall(packageName, parkedPath)
-                } catch (e: CancellationException) {
-                    throw e
-                } catch (e: Exception) {
-                    Logger.e(e) { "Parked file not discarded for $packageName; the row stays for the next sync" }
-                    null
-                }
+                val disposal =
+                    try {
+                        repo.discardParkedInstall(packageName, parkedPath)
+                    } catch (e: CancellationException) {
+                        throw e
+                    } catch (e: Exception) {
+                        Logger.e(e) { "Parked file not discarded for $packageName; the row stays for the next sync" }
+                        null
+                    }
                 mayDropRow = disposal == ParkedInstallDisposal.Discarded
                 if (disposal == ParkedInstallDisposal.Retained) {
                     Logger.w {
@@ -322,8 +317,7 @@ class PackageEventReceiver() :
                                 }.onFailure { e ->
                                     Logger.w(e) { "Post-retry delta scan failed for $packageName" }
                                 }
-                            }
-                            .onFailure { retryError ->
+                            }.onFailure { retryError ->
                                 Logger.w(retryError) {
                                     "External link cleanup final failure for $packageName; " +
                                         "row may persist until next periodic scan"

@@ -1,14 +1,13 @@
 package zed.rainxch.core.data.download
 
+import zed.rainxch.core.domain.network.AssetIdentity
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
-import zed.rainxch.core.domain.network.AssetIdentity
 
 class PartialDownloadLogicTest {
-
     @Test
     fun a_partial_is_named_from_the_deterministic_asset_name_with_no_uuid() {
         assertEquals("owner_repo_app.apk.part", PartialNaming.part("owner_repo_app.apk"))
@@ -436,7 +435,10 @@ class PartialDownloadLogicTest {
 
     @Test
     fun transient_failures_keep_the_bytes() {
-        assertFalse(PartialDisposal.shouldDiscardPartial(statusCode = null, explicitDiscard = false), "a timeout / cancellation has no status and must keep the partial")
+        assertFalse(
+            PartialDisposal.shouldDiscardPartial(statusCode = null, explicitDiscard = false),
+            "a timeout / cancellation has no status and must keep the partial",
+        )
         assertFalse(PartialDisposal.shouldDiscardPartial(statusCode = 408, explicitDiscard = false))
         assertFalse(PartialDisposal.shouldDiscardPartial(statusCode = 429, explicitDiscard = false))
         assertFalse(PartialDisposal.shouldDiscardPartial(statusCode = 500, explicitDiscard = false))

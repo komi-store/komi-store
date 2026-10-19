@@ -9,11 +9,11 @@ import zed.rainxch.core.data.network.TranslationClientProvider
 import zed.rainxch.core.data.services.LocalizationManager
 import zed.rainxch.core.domain.model.settings.TranslationProvider
 import zed.rainxch.core.domain.repository.TweaksRepository
-import zed.rainxch.details.data.translation.GoogleTranslator
-import zed.rainxch.details.data.translation.Translator
 import zed.rainxch.details.data.translation.DeeplTranslator
+import zed.rainxch.details.data.translation.GoogleTranslator
 import zed.rainxch.details.data.translation.LibreTranslator
 import zed.rainxch.details.data.translation.MicrosoftTranslator
+import zed.rainxch.details.data.translation.Translator
 import zed.rainxch.details.data.translation.YoudaoTranslator
 import zed.rainxch.details.domain.model.TranslationResult
 import zed.rainxch.details.domain.repository.TranslationRepository
@@ -95,50 +95,63 @@ class TranslationRepositoryImpl(
         val spans = mutableListOf<String>()
         var masked = text
 
-        masked = Regex("```[\\s\\S]*?```", RegexOption.MULTILINE).replace(masked) { match ->
-            replaceWithMarker(spans, match.value)
-        }
+        masked =
+            Regex("```[\\s\\S]*?```", RegexOption.MULTILINE).replace(masked) { match ->
+                replaceWithMarker(spans, match.value)
+            }
 
-        masked = Regex("<[^/!][a-zA-Z0-9]*[^>]*?/>").replace(masked) { match ->
-            replaceWithMarker(spans, match.value)
-        }
-        masked = Regex(
-            "<(a|img|picture|source|video|audio|svg)\\b[^>]*>[\\s\\S]*?</\\1>",
-            RegexOption.IGNORE_CASE,
-        ).replace(masked) { match ->
-            replaceWithMarker(spans, match.value)
-        }
-        masked = Regex("<img\\b[^>]*>", RegexOption.IGNORE_CASE).replace(masked) { match ->
-            replaceWithMarker(spans, match.value)
-        }
+        masked =
+            Regex("<[^/!][a-zA-Z0-9]*[^>]*?/>").replace(masked) { match ->
+                replaceWithMarker(spans, match.value)
+            }
+        masked =
+            Regex(
+                "<(a|img|picture|source|video|audio|svg)\\b[^>]*>[\\s\\S]*?</\\1>",
+                RegexOption.IGNORE_CASE,
+            ).replace(masked) { match ->
+                replaceWithMarker(spans, match.value)
+            }
+        masked =
+            Regex("<img\\b[^>]*>", RegexOption.IGNORE_CASE).replace(masked) { match ->
+                replaceWithMarker(spans, match.value)
+            }
 
-        masked = Regex("\\]\\(([^)]+)\\)").replace(masked) { match ->
-            val url = match.groupValues[1]
-            "](" + replaceWithMarker(spans, url) + ")"
-        }
+        masked =
+            Regex("\\]\\(([^)]+)\\)").replace(masked) { match ->
+                val url = match.groupValues[1]
+                "](" + replaceWithMarker(spans, url) + ")"
+            }
 
-        masked = Regex("https?://[^\\s<>\")]+").replace(masked) { match ->
-            replaceWithMarker(spans, match.value)
-        }
+        masked =
+            Regex("https?://[^\\s<>\")]+").replace(masked) { match ->
+                replaceWithMarker(spans, match.value)
+            }
 
-        masked = Regex(
-            "\\[!(?:NOTE|TIP|IMPORTANT|WARNING|CAUTION)\\]",
-            RegexOption.IGNORE_CASE,
-        ).replace(masked) { match ->
-            replaceWithMarker(spans, match.value)
-        }
+        masked =
+            Regex(
+                "\\[!(?:NOTE|TIP|IMPORTANT|WARNING|CAUTION)\\]",
+                RegexOption.IGNORE_CASE,
+            ).replace(masked) { match ->
+                replaceWithMarker(spans, match.value)
+            }
 
         return TranslationProtection(masked, spans)
     }
 
-    private fun replaceWithMarker(spans: MutableList<String>, value: String): String {
+    private fun replaceWithMarker(
+        spans: MutableList<String>,
+        value: String,
+    ): String {
         val idx = spans.size
         spans += value
 
         return "⟦TR_${idx}_END⟧"
     }
 
-    private fun restoreProtectedSpans(translated: String, spans: List<String>): String {
+    private fun restoreProtectedSpans(
+        translated: String,
+        spans: List<String>,
+    ): String {
         if (spans.isEmpty()) return translated
         var result = translated
         spans.forEachIndexed { i, original ->
@@ -159,7 +172,10 @@ class TranslationRepositoryImpl(
     private suspend fun resolveTranslator(): Translator {
         val provider = tweaksRepository.getTranslationProvider().first()
         return when (provider) {
-            TranslationProvider.GOOGLE -> googleTranslator
+            TranslationProvider.GOOGLE -> {
+                googleTranslator
+            }
+
             TranslationProvider.YOUDAO -> {
                 val appKey = tweaksRepository.getYoudaoAppKey().first()
                 val appSecret = tweaksRepository.getYoudaoAppSecret().first()
@@ -170,6 +186,7 @@ class TranslationRepositoryImpl(
                     appSecret = appSecret,
                 )
             }
+
             TranslationProvider.LIBRE_TRANSLATE -> {
                 val configured = tweaksRepository.getLibreTranslateBaseUrl().first()
                 val baseUrl = configured.takeIf { it.isNotBlank() } ?: LIBRE_TRANSLATE_DEFAULT_URL
@@ -181,6 +198,7 @@ class TranslationRepositoryImpl(
                     apiKey = apiKey,
                 )
             }
+
             TranslationProvider.DEEPL -> {
                 val authKey = tweaksRepository.getDeeplAuthKey().first()
                 DeeplTranslator(
@@ -189,6 +207,7 @@ class TranslationRepositoryImpl(
                     authKey = authKey,
                 )
             }
+
             TranslationProvider.MICROSOFT -> {
                 val key = tweaksRepository.getMicrosoftTranslatorKey().first()
                 val region = tweaksRepository.getMicrosoftTranslatorRegion().first()
@@ -202,7 +221,10 @@ class TranslationRepositoryImpl(
         }
     }
 
-    private fun chunkText(text: String, maxChunkSize: Int): List<Pair<String, String>> {
+    private fun chunkText(
+        text: String,
+        maxChunkSize: Int,
+    ): List<Pair<String, String>> {
         val paragraphs = text.split("\n\n")
         val chunks = mutableListOf<Pair<String, String>>()
         val currentChunk = StringBuilder()

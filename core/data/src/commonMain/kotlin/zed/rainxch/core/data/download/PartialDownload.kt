@@ -3,7 +3,6 @@ package zed.rainxch.core.data.download
 import zed.rainxch.core.domain.network.AssetIdentity
 
 object PartialNaming {
-
     const val PART_SUFFIX = ".part"
     const val META_SUFFIX = ".part.meta"
 
@@ -19,8 +18,7 @@ object PartialNaming {
 
     fun isMetaFile(fileName: String): Boolean = fileName.endsWith(META_SUFFIX)
 
-    fun isLegacyPartFile(fileName: String): Boolean =
-        !isMetaFile(fileName) && LEGACY_PART.containsMatchIn(fileName)
+    fun isLegacyPartFile(fileName: String): Boolean = !isMetaFile(fileName) && LEGACY_PART.containsMatchIn(fileName)
 
     fun assetNameOfPart(fileName: String): String? {
         if (isMetaFile(fileName)) return null
@@ -33,8 +31,7 @@ object PartialNaming {
         return base.takeIf { it.isNotEmpty() && it != fileName }
     }
 
-    fun assetNameOfMeta(fileName: String): String? =
-        if (isMetaFile(fileName)) fileName.removeSuffix(META_SUFFIX) else null
+    fun assetNameOfMeta(fileName: String): String? = if (isMetaFile(fileName)) fileName.removeSuffix(META_SUFFIX) else null
 }
 
 data class PartialIdentity(
@@ -83,7 +80,6 @@ enum class PartialReuse {
 }
 
 object PartialOwnership {
-
     fun decideReuse(
         partExists: Boolean,
         partLength: Long,
@@ -117,11 +113,12 @@ object PartialOwnership {
             partExists = partExists,
             partLength = partLength,
             meta = meta,
-            incoming = PartialIdentity(
-                assetId = incoming.assetId,
-                digest = incoming.digest,
-                size = incoming.size,
-            ),
+            incoming =
+                PartialIdentity(
+                    assetId = incoming.assetId,
+                    digest = incoming.digest,
+                    size = incoming.size,
+                ),
         )
     }
 }
@@ -136,7 +133,10 @@ enum class RangeDecision {
     UNEXPECTED,
 }
 
-data class ContentRange(val start: Long?, val total: Long?) {
+data class ContentRange(
+    val start: Long?,
+    val total: Long?,
+) {
     companion object {
         fun parse(value: String?): ContentRange? {
             val body = value?.trim()?.takeIf { it.isNotEmpty() } ?: return null
@@ -146,8 +146,11 @@ data class ContentRange(val start: Long?, val total: Long?) {
             val total = spec.substringAfterLast('/', "").trim().toLongOrNull()
             val range = spec.substringBefore('/').trim()
             val start =
-                if (range.startsWith("*")) null
-                else range.substringBefore('-').trim().toLongOrNull()
+                if (range.startsWith("*")) {
+                    null
+                } else {
+                    range.substringBefore('-').trim().toLongOrNull()
+                }
             if (start == null && total == null) return null
             return ContentRange(start = start, total = total)
         }
@@ -155,9 +158,7 @@ data class ContentRange(val start: Long?, val total: Long?) {
 }
 
 object RangeRequest {
-
-    fun headerValue(partLength: Long): String? =
-        if (partLength > 0L) "bytes=$partLength-" else null
+    fun headerValue(partLength: Long): String? = if (partLength > 0L) "bytes=$partLength-" else null
 
     fun decide(
         statusCode: Int,
@@ -181,7 +182,6 @@ enum class OrphanVerdict {
 }
 
 object OrphanPolicy {
-
     fun classify(
         partExists: Boolean,
         metaExists: Boolean,
@@ -198,27 +198,25 @@ object OrphanPolicy {
 }
 
 object PartialDisposal {
-
     private val TERMINAL_CLIENT_ERRORS = setOf(404, 410)
 
-    fun shouldDiscardPartial(statusCode: Int?, explicitDiscard: Boolean): Boolean =
-        explicitDiscard || (statusCode != null && statusCode in TERMINAL_CLIENT_ERRORS)
+    fun shouldDiscardPartial(
+        statusCode: Int?,
+        explicitDiscard: Boolean,
+    ): Boolean = explicitDiscard || (statusCode != null && statusCode in TERMINAL_CLIENT_ERRORS)
 }
 
 object PartialRetry {
-
     const val MAX_ATTEMPTS = 3
 
     private val BACKOFF_MILLIS = longArrayOf(1_000L, 4_000L, 16_000L)
 
     fun hasAttemptsLeft(attemptsMade: Int): Boolean = attemptsMade < MAX_ATTEMPTS
 
-    fun backoffMillis(attemptsMade: Int): Long =
-        BACKOFF_MILLIS[attemptsMade.coerceIn(0, BACKOFF_MILLIS.lastIndex)]
+    fun backoffMillis(attemptsMade: Int): Long = BACKOFF_MILLIS[attemptsMade.coerceIn(0, BACKOFF_MILLIS.lastIndex)]
 }
 
 object FinishedFileReuse {
-
     fun digestToVerify(
         destinationExists: Boolean,
         destinationLength: Long,

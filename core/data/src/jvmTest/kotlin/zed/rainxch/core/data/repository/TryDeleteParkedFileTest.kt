@@ -7,7 +7,6 @@ import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class TryDeleteParkedFileTest {
-
     @Test
     fun a_deleted_file_is_gone() {
         val file = Files.createTempFile("komi-parked", ".apk").toFile()

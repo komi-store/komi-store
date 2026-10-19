@@ -20,6 +20,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
@@ -43,9 +44,8 @@ import zed.rainxch.core.presentation.personality.utils.PersonalityPreview
 import zed.rainxch.core.presentation.spacing.Spacing
 import zed.rainxch.githubstore.core.presentation.res.Res
 import zed.rainxch.githubstore.core.presentation.res.cd_more_actions
-import androidx.compose.ui.tooling.preview.Preview
 
-private const val DividerHeightFraction = 0.66f
+private const val DIVIDER_HEIGHT_FRACTION = 0.66f
 
 @Composable
 fun KomiActionRow(
@@ -55,15 +55,17 @@ fun KomiActionRow(
     maxVisible: Int = Int.MAX_VALUE,
     showLabels: Boolean = false,
 ) {
-    val gap = when (LocalPersonality.current) {
-        is MangaPersonality -> if (showLabels) Spacing.lg else Spacing.md
-        is ClassicPersonality -> if (showLabels) Spacing.lg else Spacing.sm
-    }
-    val dividerHeight = size.metrics.box * DividerHeightFraction
-    val overflowVariant = when (LocalPersonality.current) {
-        is MangaPersonality -> KomiButtonVariant.Tonal
-        is ClassicPersonality -> KomiButtonVariant.Text
-    }
+    val gap =
+        when (LocalPersonality.current) {
+            is MangaPersonality -> if (showLabels) Spacing.lg else Spacing.md
+            is ClassicPersonality -> if (showLabels) Spacing.lg else Spacing.sm
+        }
+    val dividerHeight = size.metrics.box * DIVIDER_HEIGHT_FRACTION
+    val overflowVariant =
+        when (LocalPersonality.current) {
+            is MangaPersonality -> KomiButtonVariant.Tonal
+            is ClassicPersonality -> KomiButtonVariant.Text
+        }
 
     val (visible, overflow, danger) =
         remember(items, maxVisible, showLabels) {
@@ -154,7 +156,9 @@ private fun KomiActionTile(
             KomiText(
                 text = item.title,
                 role = KomiTextRole.Label,
-                color = LocalPersonality.current.colors.onSurfaceVariant.copy(alpha = if (item.enabled) 1f else 0.45f),
+                color =
+                    LocalPersonality.current.colors.onSurfaceVariant
+                        .copy(alpha = if (item.enabled) 1f else 0.45f),
                 fontSize = 11.sp,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
@@ -199,7 +203,7 @@ private val previewDestructiveActions =
             Icons.Default.Delete,
             "Delete",
             {},
-            variant = KomiButtonVariant.Destructive
+            variant = KomiButtonVariant.Destructive,
         ),
     )
 
@@ -228,8 +232,8 @@ private fun KomiActionRowMangaNightPreview() {
     PersonalityPreview(
         mangaPersonality(
             paper = MangaPaper.NIGHT,
-            accent = MangaAccent.SUN
-        )
+            accent = MangaAccent.SUN,
+        ),
     ) { PreviewStack() }
 }
 
@@ -239,8 +243,8 @@ private fun KomiActionRowMangaNordPreview() {
     PersonalityPreview(
         mangaPersonality(
             paper = MangaPaper.NORD,
-            accent = MangaAccent.FROST
-        )
+            accent = MangaAccent.FROST,
+        ),
     ) { PreviewStack() }
 }
 

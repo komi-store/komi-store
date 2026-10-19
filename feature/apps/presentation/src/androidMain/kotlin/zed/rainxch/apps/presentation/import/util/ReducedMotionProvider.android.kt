@@ -10,11 +10,12 @@ actual fun rememberSystemReducedMotion(): Boolean {
     val context = LocalContext.current
 
     return remember(context) {
-        val scale = Settings.Global.getFloat(
-            context.contentResolver,
-            Settings.Global.ANIMATOR_DURATION_SCALE,
-            1f,
-        )
+        val scale =
+            Settings.Global.getFloat(
+                context.contentResolver,
+                Settings.Global.ANIMATOR_DURATION_SCALE,
+                1f,
+            )
         scale == 0f
     }
 }

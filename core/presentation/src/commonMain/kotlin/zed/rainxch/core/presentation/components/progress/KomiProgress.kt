@@ -23,19 +23,21 @@ fun KomiCircularProgress(
     val personality = LocalPersonality.current
     val resolved = if (color != Color.Unspecified) color else personality.colors.primary
     when (personality) {
-        is MangaPersonality ->
+        is MangaPersonality -> {
             CircularProgressIndicator(
                 modifier = modifier,
                 color = resolved,
                 strokeWidth = 4.dp,
                 strokeCap = StrokeCap.Butt,
             )
+        }
 
-        is ClassicPersonality ->
+        is ClassicPersonality -> {
             CircularWavyProgressIndicator(
                 modifier = modifier,
                 color = resolved,
             )
+        }
     }
 }
 
@@ -64,19 +66,21 @@ fun KomiLinearProgress(
     val personality = LocalPersonality.current
     val resolved = if (color != Color.Unspecified) color else personality.colors.primary
     when (personality) {
-        is MangaPersonality ->
+        is MangaPersonality -> {
             LinearProgressIndicator(
                 modifier = modifier,
                 color = resolved,
                 trackColor = personality.colors.surfaceVariant,
                 strokeCap = StrokeCap.Butt,
             )
+        }
 
-        is ClassicPersonality ->
+        is ClassicPersonality -> {
             LinearWavyProgressIndicator(
                 modifier = modifier,
                 color = resolved,
             )
+        }
     }
 }
 

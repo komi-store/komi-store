@@ -7,7 +7,6 @@ import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class AssetPlatformTest {
-
     @Test
     fun alpine_nfpm_apks_are_not_android() {
         assertFalse(isAndroidApk("task_3.51.1_linux_arm64.apk"))

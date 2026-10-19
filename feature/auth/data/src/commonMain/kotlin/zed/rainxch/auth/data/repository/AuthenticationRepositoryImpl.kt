@@ -20,8 +20,8 @@ import zed.rainxch.auth.domain.repository.AuthenticationRepository
 import zed.rainxch.auth.domain.repository.DeviceFlowStart
 import zed.rainxch.auth.domain.repository.DevicePollResult
 import zed.rainxch.auth.domain.repository.PatRejectedException
-import zed.rainxch.auth.domain.repository.WebAuthRegistration
 import zed.rainxch.auth.domain.repository.PollOutcome
+import zed.rainxch.auth.domain.repository.WebAuthRegistration
 import zed.rainxch.core.data.data_source.TokenStore
 import zed.rainxch.core.data.dto.GithubDeviceTokenSuccessDto
 import zed.rainxch.core.data.mappers.toData
@@ -49,7 +49,9 @@ class AuthenticationRepositoryImpl(
 
             try {
                 val dto = GitHubAuthApi.startDeviceFlowViaBackend(BACKEND_ORIGIN)
-                logger.info("Device flow started via Backend. interval=${dto.intervalSec}s expires=${dto.expiresInSec}s completeUri=${dto.verificationUriComplete != null}")
+                logger.info(
+                    "Device flow started via Backend. interval=${dto.intervalSec}s expires=${dto.expiresInSec}s completeUri=${dto.verificationUriComplete != null}",
+                )
                 DeviceFlowStart(dto.toDomain(), AuthPath.Backend)
             } catch (e: CancellationException) {
                 throw e
@@ -297,9 +299,7 @@ class AuthenticationRepositoryImpl(
             PollOutcome(interpretPollResult(primaryResult), path)
         }
 
-    private suspend fun interpretPollResult(
-        res: Result<GithubDeviceTokenSuccessDto>,
-    ): DevicePollResult {
+    private suspend fun interpretPollResult(res: Result<GithubDeviceTokenSuccessDto>): DevicePollResult {
         val success = res.getOrNull()?.toDomain()
 
         if (success != null) {
@@ -366,7 +366,8 @@ class AuthenticationRepositoryImpl(
 
     override suspend fun exchangeWebAuthHandoff(handoffId: String): Result<String> =
         withContext(Dispatchers.IO) {
-            WebAuthApi.consumeHandoff(handoffId)
+            WebAuthApi
+                .consumeHandoff(handoffId)
                 .mapCatching { accessToken ->
                     val dto =
                         GithubDeviceTokenSuccessDto(
@@ -397,12 +398,14 @@ class AuthenticationRepositoryImpl(
                 is PatValidation.Valid -> {
                     logger.debug("PAT network-validated against GitHub /user")
                 }
+
                 is PatValidation.Rejected -> {
                     logger.warn("PAT rejected by GitHub: ${validation.kind}")
                     return@withContext Result.failure(
                         PatRejectedException(validation.kind),
                     )
                 }
+
                 is PatValidation.Unreachable -> {
                     logger.debug(
                         "PAT validation unreachable (${validation.reason}), saving optimistically",
@@ -410,15 +413,16 @@ class AuthenticationRepositoryImpl(
                 }
             }
 
-            val dto = GithubDeviceTokenSuccessDto(
-                accessToken = trimmed,
-                tokenType = "Bearer",
-                expiresIn = null,
-                scope = null,
-                refreshToken = null,
-                refreshTokenExpiresIn = null,
-                savedAtEpochMillis = System.currentTimeMillis(),
-            )
+            val dto =
+                GithubDeviceTokenSuccessDto(
+                    accessToken = trimmed,
+                    tokenType = "Bearer",
+                    expiresIn = null,
+                    scope = null,
+                    refreshToken = null,
+                    refreshTokenExpiresIn = null,
+                    savedAtEpochMillis = System.currentTimeMillis(),
+                )
 
             try {
                 saveTokenWithVerification(dto.toDomain())
@@ -444,7 +448,9 @@ class AuthenticationRepositoryImpl(
             is SocketTimeoutException,
             is ConnectTimeoutException,
             -> true
+
             is BackendHttpException -> statusCode in 500..599
+
             else -> isNetworkError((message ?: "").lowercase())
         }
 

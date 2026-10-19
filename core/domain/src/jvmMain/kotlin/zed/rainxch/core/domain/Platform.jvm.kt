@@ -1,8 +1,8 @@
 package zed.rainxch.core.domain
 
-import java.util.Locale
 import zed.rainxch.core.domain.model.system.Platform
 import zed.rainxch.core.domain.system.DesktopOs
+import java.util.Locale
 
 actual fun getPlatform(): Platform =
     when {
@@ -13,5 +13,4 @@ actual fun getPlatform(): Platform =
 
 actual fun getOsVersion(): String = System.getProperty("os.version") ?: "unknown"
 
-actual fun getSystemLocaleTag(): String =
-    Locale.getDefault().toLanguageTag().takeIf { it.isNotBlank() } ?: "und"
+actual fun getSystemLocaleTag(): String = Locale.getDefault().toLanguageTag().takeIf { it.isNotBlank() } ?: "und"

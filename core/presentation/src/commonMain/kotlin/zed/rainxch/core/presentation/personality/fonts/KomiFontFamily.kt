@@ -26,7 +26,6 @@ import zed.rainxch.githubstore.core.presentation.res.oswald
 import zed.rainxch.githubstore.core.presentation.res.zcool_qingke_huangyou
 
 object KomiFontFamily {
-
     @Composable
     fun anton(): FontFamily = FontFamily(Font(Res.font.anton_regular, FontWeight.Normal))
 

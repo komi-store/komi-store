@@ -58,38 +58,45 @@ fun AppsSectionHeader(
         label = "section-chevron",
     )
 
-    val rowSemantic = if (isExpanded) {
-        stringResource(Res.string.apps_section_collapse)
-    } else stringResource(Res.string.apps_section_expand)
+    val rowSemantic =
+        if (isExpanded) {
+            stringResource(Res.string.apps_section_collapse)
+        } else {
+            stringResource(Res.string.apps_section_expand)
+        }
     val collapsibleContentDescription =
         stringResource(Res.string.apps_section_header_cd, title, count, rowSemantic)
     val staticContentDescription =
         stringResource(Res.string.apps_section_header_static_cd, title, count)
 
     Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp)
-            .padding(top = 20.dp, bottom = 6.dp)
-            .let { base ->
-                if (collapsible) {
-                    base
-                        .clickable(onClick = onToggle)
-                        .semantics(mergeDescendants = true) {
-                            role = Role.Button
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp)
+                .padding(top = 20.dp, bottom = 6.dp)
+                .let { base ->
+                    if (collapsible) {
+                        base
+                            .clickable(onClick = onToggle)
+                            .semantics(mergeDescendants = true) {
+                                role = Role.Button
+                                heading()
+                                contentDescription = collapsibleContentDescription
+                                stateDescription =
+                                    if (isExpanded) {
+                                        expandedStateLabel
+                                    } else {
+                                        collapsedStateLabel
+                                    }
+                            }
+                    } else {
+                        base.semantics(mergeDescendants = true) {
                             heading()
-                            contentDescription = collapsibleContentDescription
-                            stateDescription = if (isExpanded) {
-                                expandedStateLabel
-                            } else collapsedStateLabel
+                            contentDescription = staticContentDescription
                         }
-                } else {
-                    base.semantics(mergeDescendants = true) {
-                        heading()
-                        contentDescription = staticContentDescription
                     }
-                }
-            },
+                },
         verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
         Row(
@@ -121,11 +128,12 @@ fun AppsSectionHeader(
                     imageVector = Icons.Default.ExpandMore,
                     contentDescription = null,
                     tint = colors.onSurfaceVariant,
-                    modifier = Modifier
-                        .size(22.dp)
-                        .graphicsLayer {
-                            rotationZ = rotation
-                        },
+                    modifier =
+                        Modifier
+                            .size(22.dp)
+                            .graphicsLayer {
+                                rotationZ = rotation
+                            },
                 )
             }
         }

@@ -11,7 +11,9 @@ sealed interface SearchSourceUi {
         override val label = "Codeberg"
     }
 
-    data class CustomForge(val host: String) : SearchSourceUi {
+    data class CustomForge(
+        val host: String,
+    ) : SearchSourceUi {
         override val label: String = host
     }
 }

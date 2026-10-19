@@ -16,7 +16,10 @@ class RateLimitRepositoryImpl : RateLimitRepository {
     private val _rateLimitExhaustedEvent = MutableSharedFlow<RateLimitInfo>(extraBufferCapacity = 1)
     override val rateLimitExhaustedEvent: SharedFlow<RateLimitInfo> = _rateLimitExhaustedEvent
 
-    override fun updateRateLimit(rateLimitInfo: RateLimitInfo?, notifyExhausted: Boolean) {
+    override fun updateRateLimit(
+        rateLimitInfo: RateLimitInfo?,
+        notifyExhausted: Boolean,
+    ) {
         _rateLimitState.value = rateLimitInfo
         if (notifyExhausted && rateLimitInfo != null) {
             _rateLimitExhaustedEvent.tryEmit(rateLimitInfo)

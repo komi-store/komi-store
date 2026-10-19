@@ -3,7 +3,6 @@ package zed.rainxch.core.data.services
 import java.util.Locale
 
 class DesktopLocalizationManager : LocalizationManager {
-
     private val systemDefault: Locale = Locale.getDefault()
 
     override fun getCurrentLanguageCode(): String {

@@ -12,9 +12,10 @@ suspend fun migrateDataStoreToKSafe(
     markerKey: String,
     entries: List<MigrationEntry>,
 ) {
-    val alreadyMigrated = runCatching {
-        ksafe.get(markerKey, false)
-    }.getOrDefault(false)
+    val alreadyMigrated =
+        runCatching {
+            ksafe.get(markerKey, false)
+        }.getOrDefault(false)
     if (alreadyMigrated) return
 
     val snapshotResult = runCatching { legacy.data.first() }
@@ -31,9 +32,10 @@ suspend fun migrateDataStoreToKSafe(
     }
 
     if (movedKeys.isNotEmpty()) {
-        val deleteResult = runCatching {
-            legacy.edit { prefs -> movedKeys.forEach { prefs.remove(it) } }
-        }
+        val deleteResult =
+            runCatching {
+                legacy.edit { prefs -> movedKeys.forEach { prefs.remove(it) } }
+            }
         if (deleteResult.isFailure) anyFailure = true
     }
 
@@ -46,33 +48,57 @@ class MigrationEntry(
     val legacyKeys: List<Preferences.Key<*>>,
     private val copyBlock: suspend (Preferences, KSafe) -> Boolean,
 ) {
-    suspend fun copy(snapshot: Preferences, ksafe: KSafe): Boolean = copyBlock(snapshot, ksafe)
+    suspend fun copy(
+        snapshot: Preferences,
+        ksafe: KSafe,
+    ): Boolean = copyBlock(snapshot, ksafe)
 
     companion object {
         operator fun invoke(
             legacyKey: Preferences.Key<*>,
             ksafeKey: String,
-        ): MigrationEntry = MigrationEntry(
-            legacyKeys = listOf(legacyKey),
-            copyBlock = { snapshot, ksafe ->
-                val value: Any = snapshot[legacyKey] ?: return@MigrationEntry false
-                when (value) {
-                    is Boolean -> ksafe.put<Boolean>(ksafeKey, value)
-                    is Int -> ksafe.put<Int>(ksafeKey, value)
-                    is Long -> ksafe.put<Long>(ksafeKey, value)
-                    is Float -> ksafe.put<Float>(ksafeKey, value)
-                    is Double -> ksafe.put<Double>(ksafeKey, value)
-                    is String -> ksafe.put<String>(ksafeKey, value)
-                    is Set<*> -> {
-                        @Suppress("UNCHECKED_CAST")
-                        val asStrings = (value as Set<String>).toList()
-                        ksafe.put<List<String>>(ksafeKey, asStrings)
-                    }
+        ): MigrationEntry =
+            MigrationEntry(
+                legacyKeys = listOf(legacyKey),
+                copyBlock = { snapshot, ksafe ->
+                    val value: Any = snapshot[legacyKey] ?: return@MigrationEntry false
+                    when (value) {
+                        is Boolean -> {
+                            ksafe.put<Boolean>(ksafeKey, value)
+                        }
 
-                    else -> return@MigrationEntry false
-                }
-                true
-            },
-        )
+                        is Int -> {
+                            ksafe.put<Int>(ksafeKey, value)
+                        }
+
+                        is Long -> {
+                            ksafe.put<Long>(ksafeKey, value)
+                        }
+
+                        is Float -> {
+                            ksafe.put<Float>(ksafeKey, value)
+                        }
+
+                        is Double -> {
+                            ksafe.put<Double>(ksafeKey, value)
+                        }
+
+                        is String -> {
+                            ksafe.put<String>(ksafeKey, value)
+                        }
+
+                        is Set<*> -> {
+                            @Suppress("UNCHECKED_CAST")
+                            val asStrings = (value as Set<String>).toList()
+                            ksafe.put<List<String>>(ksafeKey, asStrings)
+                        }
+
+                        else -> {
+                            return@MigrationEntry false
+                        }
+                    }
+                    true
+                },
+            )
     }
 }

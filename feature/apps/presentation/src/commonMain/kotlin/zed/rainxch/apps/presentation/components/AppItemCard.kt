@@ -1,6 +1,5 @@
 package zed.rainxch.apps.presentation.components
 
-import zed.rainxch.core.presentation.components.InstalledAppIcon
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -32,6 +31,7 @@ import org.jetbrains.compose.resources.stringResource
 import zed.rainxch.apps.presentation.model.AppItem
 import zed.rainxch.apps.presentation.model.UpdateState
 import zed.rainxch.core.presentation.components.GitHubStoreImage
+import zed.rainxch.core.presentation.components.InstalledAppIcon
 import zed.rainxch.core.presentation.components.buttons.KomiButton
 import zed.rainxch.core.presentation.components.buttons.KomiButtonVariant
 import zed.rainxch.core.presentation.components.buttons.KomiSoftIconButton
@@ -355,9 +355,10 @@ fun AppItemCard(
                 if (!app.isPendingInstall) {
                     val uninstallDescription = stringResource(Res.string.uninstall)
                     Box(
-                        modifier = Modifier
-                            .size(48.dp)
-                            .clickable(enabled = !appItem.isBusy, onClick = onUninstallClick),
+                        modifier =
+                            Modifier
+                                .size(48.dp)
+                                .clickable(enabled = !appItem.isBusy, onClick = onUninstallClick),
                         contentAlignment = Alignment.Center,
                     ) {
                         KomiIcon(
@@ -414,4 +415,3 @@ fun AppItemCard(
         }
     }
 }
-

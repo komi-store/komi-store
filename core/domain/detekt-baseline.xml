@@ -37,10 +37,14 @@
     <ID>MagicNumber:applyThemeAwareImages.kt$6</ID>
     <ID>MatchingDeclarationName:ExternalInstallVerdict.kt$VersionVerdict</ID>
     <ID>MatchingDeclarationName:ReleasePlatforms.kt$PlatformRelease</ID>
+    <ID>MaxLineLength:AssetArchitectureMatcher.kt$AssetArchitectureMatcher$fun detectArchitecture(assetName: String): SystemArchitecture?</ID>
+    <ID>MaxLineLength:AssetArchitectureMatcher.kt$AssetArchitectureMatcher$private fun boundary(vararg tokens: String): Regex</ID>
     <ID>MaxLineLength:AssetMatchingReplayTest.kt$AssetMatchingReplayTest$println("=== asset replay: samples=$samples missed=$missed older=$older fellBack=$fellBack lostNewest=$lostNewest ===")</ID>
     <ID>MaxLineLength:AssetOwnershipTest.kt$AssetOwnershipTest$release("26.05", listOf(asset("InstallerX-Revived-offline-26.05.apk"), asset("InstallerX-Revived-online-26.05.apk")))</ID>
     <ID>MaxLineLength:AssetOwnershipTest.kt$AssetOwnershipTest$release("26.05.01", listOf(asset("InstallerX-Revived-offline-26.05.01.apk"), asset("InstallerX-Revived-online-26.05.01.apk")))</ID>
+    <ID>MaxLineLength:AssetSelector.kt$AssetSelector$private fun boundary(vararg tokens: String): Regex</ID>
     <ID>MaxLineLength:InstalledAppUpdatesTest.kt$InstalledAppUpdatesTest$matched = UpdateVerdict.Matched(tag = "2.0.0", publishedAt = "2026-09-01T00:00:00Z", isPrerelease = false)</ID>
+    <ID>MaxLineLength:ReleasePlatforms.kt$fun GithubRelease.platforms(): Set&lt;DiscoveryPlatform&gt;</ID>
     <ID>MaxLineLength:ReleaseVersionMatchingTest.kt$ReleaseVersionMatchingTest$assertFalse(AssetOwnership.isSameApp("ente-auth-v4.4.25.apk", "ente-photos-v1.3.64.apk", "auth-v4.4.25", "photos-v1.3.64"))</ID>
     <ID>MaxLineLength:ReleaseVersionMatchingTest.kt$ReleaseVersionMatchingTest$assertTrue(AssetOwnership.isSameApp("ente-auth-v4.4.25.apk", "ente-auth-v4.4.24.apk", "auth-v4.4.25", "auth-v4.4.24"))</ID>
     <ID>NestedBlockDepth:SyncInstalledAppsUseCase.kt$SyncInstalledAppsUseCase$private suspend fun reconcileEnumerable(appsInDb: List&lt;InstalledApp&gt;)</ID>
@@ -50,8 +54,8 @@
     <ID>RethrowCaughtException:executeInTransaction.kt$throw e</ID>
     <ID>ReturnCount:AppTheme.kt$AppTheme.Companion$fun fromName(name: String?): AppTheme</ID>
     <ID>ReturnCount:AssetFilter.kt$AssetFilter.Companion$fun suggestFromAssetName(assetName: String): String?</ID>
-    <ID>ReturnCount:AssetMatchingReplayTest.kt$AssetMatchingReplayTest$fun belongsElsewhere(assetName: String, releaseTag: String, releaseAssets: List&lt;String&gt;): Boolean</ID>
-    <ID>ReturnCount:AssetOwnership.kt$AssetOwnership$fun canOwn(app: InstalledApp, assetName: String): Boolean</ID>
+    <ID>ReturnCount:AssetMatchingReplayTest.kt$AssetMatchingReplayTest$fun belongsElsewhere( assetName: String, releaseTag: String, releaseAssets: List&lt;String&gt;, ): Boolean</ID>
+    <ID>ReturnCount:AssetOwnership.kt$AssetOwnership$fun canOwn( app: InstalledApp, assetName: String, ): Boolean</ID>
     <ID>ReturnCount:AssetOwnership.kt$AssetOwnership$fun ownerOf( assetName: String, apps: List&lt;InstalledApp&gt;, releaseAssets: List&lt;GithubAsset&gt;, releaseHistory: List&lt;GithubRelease&gt;, releaseTag: String? = null, ): InstalledApp?</ID>
     <ID>ReturnCount:AssetOwnership.kt$AssetOwnership$private fun List&lt;InstalledApp&gt;.closestVersionLine(assetName: String): InstalledApp</ID>
     <ID>ReturnCount:AssetOwnership.kt$AssetOwnership$private fun isRename( fromAssetName: String, toAssetName: String, releaseHistory: List&lt;GithubRelease&gt;, ): Boolean</ID>
@@ -59,11 +63,11 @@
     <ID>ReturnCount:AssetVariant.kt$AssetVariant$fun fingerprintFromPickedAsset( pickedAssetName: String, siblingAssetCount: Int, releaseTag: String? = null, ): VariantFingerprint?</ID>
     <ID>ReturnCount:AssetVariant.kt$AssetVariant$fun resolveBySamePosition( assets: List&lt;GithubAsset&gt;, originalIndex: Int?, siblingCountAtPickTime: Int?, ): GithubAsset?</ID>
     <ID>ReturnCount:AssetVariant.kt$AssetVariant$fun resolvePreferredAsset( assets: List&lt;GithubAsset&gt;, pinnedVariant: String?, pinnedTokens: Set&lt;String&gt;? = null, pinnedGlob: String? = null, releaseTag: String? = null, ): GithubAsset?</ID>
-    <ID>ReturnCount:AssetVariant.kt$AssetVariant$fun tagGlob(assetName: String, releaseTag: String?): String?</ID>
+    <ID>ReturnCount:AssetVariant.kt$AssetVariant$fun tagGlob( assetName: String, releaseTag: String?, ): String?</ID>
     <ID>ReturnCount:AssetVariant.kt$AssetVariant$fun tagVersion(tag: String?): String?</ID>
-    <ID>ReturnCount:AssetVariant.kt$AssetVariant$private fun endsCleanly(lower: String, end: Int): Boolean</ID>
+    <ID>ReturnCount:AssetVariant.kt$AssetVariant$private fun endsCleanly( lower: String, end: Int, ): Boolean</ID>
     <ID>ReturnCount:AssetVariant.kt$AssetVariant$private fun isVersionLikeToken(token: String): Boolean</ID>
-    <ID>ReturnCount:AssetVariant.kt$AssetVariant$private fun startsCleanly(lower: String, at: Int): Boolean</ID>
+    <ID>ReturnCount:AssetVariant.kt$AssetVariant$private fun startsCleanly( lower: String, at: Int, ): Boolean</ID>
     <ID>ReturnCount:EmojiShortcodes.kt$EmojiShortcodes$fun render(input: String): String</ID>
     <ID>ReturnCount:ExternalInstallVerdict.kt$fun resolveExternalInstallVerdict( app: InstalledApp, newVersionName: String, newVersionCode: Long, ): VersionVerdict</ID>
     <ID>ReturnCount:ExternalInstallVerdict.kt$private fun compareAndDecide( systemVersion: String, latestVersion: String, ): VersionVerdict</ID>
@@ -71,18 +75,18 @@
     <ID>ReturnCount:InstalledAppUpdates.kt$fun InstalledApp.bindingStatusAgainst(local: SystemPackageInfo): BindingStatus</ID>
     <ID>ReturnCount:InstalledAppUpdates.kt$fun InstalledApp.pendingInstallResolution(systemInfo: SystemPackageInfo?): PendingInstallResolution</ID>
     <ID>ReturnCount:InstallerCategory.kt$InstallerCategory.Companion$fun classify( installerPackageName: String?, isUpdatedSystemApp: Boolean, packageName: String? = null, ): InstallerCategory</ID>
-    <ID>ReturnCount:RepositoryUrlParser.kt$RepositoryUrlParser$fun parse(rawUrl: String, additionalForgejoHosts: Set&lt;String&gt; = emptySet()): RepositoryReference?</ID>
+    <ID>ReturnCount:RepositoryUrlParser.kt$RepositoryUrlParser$fun parse( rawUrl: String, additionalForgejoHosts: Set&lt;String&gt; = emptySet(), ): RepositoryReference?</ID>
     <ID>ReturnCount:VersionMath.kt$VersionMath$fun assetIdentityChanged( matchedDigest: String?, matchedSize: Long?, storedDigest: String?, storedSize: Long?, ): Boolean</ID>
     <ID>ReturnCount:VersionMath.kt$VersionMath$fun detectScheme(version: String?): Scheme</ID>
-    <ID>ReturnCount:VersionMath.kt$VersionMath$fun isExactSameVersion(a: String?, b: String?): Boolean</ID>
+    <ID>ReturnCount:VersionMath.kt$VersionMath$fun isExactSameVersion( a: String?, b: String?, ): Boolean</ID>
     <ID>ReturnCount:VersionMath.kt$VersionMath$fun isTimestampTrackedTag(version: String?): Boolean</ID>
-    <ID>ReturnCount:VersionMath.kt$VersionMath$fun isVersionNewer(candidate: String?, current: String?): Boolean</ID>
+    <ID>ReturnCount:VersionMath.kt$VersionMath$fun isVersionNewer( candidate: String?, current: String?, ): Boolean</ID>
     <ID>ReturnCount:VersionMath.kt$VersionMath$fun normalizeVersion(version: String?): String</ID>
     <ID>ReturnCount:VersionMath.kt$VersionMath$fun preReleaseMarkerLabel(tag: String?): String?</ID>
     <ID>ReturnCount:VersionMath.kt$VersionMath$fun releaseObjectChanged( matchedReleaseId: Long?, matchedAssetId: Long?, storedReleaseId: Long?, storedAssetId: Long?, ): Boolean</ID>
-    <ID>ReturnCount:VersionMath.kt$VersionMath$fun versionsReconcilable(installed: String?, latest: String?): Boolean</ID>
-    <ID>ReturnCount:VersionMath.kt$VersionMath$internal fun isPublishedAtAfter(candidate: String?, baseline: String?): Boolean</ID>
-    <ID>ReturnCount:VersionMath.kt$VersionMath$private fun compareNormalized(a: String, b: String): Int</ID>
+    <ID>ReturnCount:VersionMath.kt$VersionMath$fun versionsReconcilable( installed: String?, latest: String?, ): Boolean</ID>
+    <ID>ReturnCount:VersionMath.kt$VersionMath$internal fun isPublishedAtAfter( candidate: String?, baseline: String?, ): Boolean</ID>
+    <ID>ReturnCount:VersionMath.kt$VersionMath$private fun compareNormalized( a: String, b: String, ): Int</ID>
     <ID>ReturnCount:VersionMath.kt$VersionMath$private fun insertHyphenBeforeKnownMarker(s: String): String</ID>
     <ID>ReturnCount:VersionMath.kt$VersionMath$private fun isBuildVariantMarker(preRelease: String): Boolean</ID>
     <ID>ReturnCount:VersionMath.kt$VersionMath$private fun isMarkerWithOpaqueSuffix(version: String): Boolean</ID>

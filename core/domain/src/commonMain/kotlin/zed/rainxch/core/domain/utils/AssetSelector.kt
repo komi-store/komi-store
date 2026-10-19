@@ -4,7 +4,6 @@ import zed.rainxch.core.domain.model.account.github.GithubAsset
 import zed.rainxch.core.domain.model.system.SystemArchitecture
 
 object AssetSelector {
-
     private const val ARCH_EXACT = 3
     private const val ARCH_UNIVERSAL = 2
     private const val ARCH_FALLBACK = 1
@@ -51,14 +50,21 @@ object AssetSelector {
         deviceArch: SystemArchitecture,
     ): Int =
         when (val match = AssetArchitectureMatcher.matchArchitecture(assetName)) {
-            AssetArchitectureMatcher.Match.Universal -> ARCH_UNIVERSAL
-            AssetArchitectureMatcher.Match.Foreign -> ARCH_INCOMPATIBLE
-            is AssetArchitectureMatcher.Match.Known ->
+            AssetArchitectureMatcher.Match.Universal -> {
+                ARCH_UNIVERSAL
+            }
+
+            AssetArchitectureMatcher.Match.Foreign -> {
+                ARCH_INCOMPATIBLE
+            }
+
+            is AssetArchitectureMatcher.Match.Known -> {
                 when {
                     match.arch == deviceArch -> ARCH_EXACT
                     isFallbackCompatible(match.arch, deviceArch) -> ARCH_FALLBACK
                     else -> ARCH_INCOMPATIBLE
                 }
+            }
         }
 
     private fun isFallbackCompatible(
@@ -101,6 +107,5 @@ object AssetSelector {
         return if (idx == -1) -1 else extensionPriority.size - idx
     }
 
-    private fun boundary(vararg tokens: String): Regex =
-        Regex("""(^|[^a-z0-9])(${tokens.joinToString("|")})([^a-z0-9]|$)""")
+    private fun boundary(vararg tokens: String): Regex = Regex("""(^|[^a-z0-9])(${tokens.joinToString("|")})([^a-z0-9]|$)""")
 }

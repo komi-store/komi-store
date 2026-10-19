@@ -90,9 +90,10 @@ fun SearchHistorySection(
                 )
 
                 Box(
-                    modifier = Modifier
-                        .size(24.dp)
-                        .clickable { onRemoveItem(query) },
+                    modifier =
+                        Modifier
+                            .size(24.dp)
+                            .clickable { onRemoveItem(query) },
                     contentAlignment = Alignment.Center,
                 ) {
                     KomiIcon(

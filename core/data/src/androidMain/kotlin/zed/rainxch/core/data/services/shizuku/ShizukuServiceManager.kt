@@ -93,8 +93,7 @@ class ShizukuServiceManager(
             ShizukuStatus.NOT_RUNNING
         }
 
-    private fun isShizukuOrSuiInstalled(): Boolean =
-        isPackageInstalled(SHIZUKU_PACKAGE) || isPackageInstalled(SUI_PACKAGE)
+    private fun isShizukuOrSuiInstalled(): Boolean = isPackageInstalled(SHIZUKU_PACKAGE) || isPackageInstalled(SUI_PACKAGE)
 
     private fun isPackageInstalled(packageName: String): Boolean =
         try {

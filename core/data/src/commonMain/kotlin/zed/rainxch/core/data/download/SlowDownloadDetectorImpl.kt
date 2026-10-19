@@ -9,12 +9,12 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import kotlin.time.Clock
 import zed.rainxch.core.data.network.ProxyManager
+import zed.rainxch.core.data.secure.safeGet
 import zed.rainxch.core.domain.model.installation.DownloadProgress
 import zed.rainxch.core.domain.model.mirror.TrafficKind
 import zed.rainxch.core.domain.network.SlowDownloadDetector
-import zed.rainxch.core.data.secure.safeGet
+import kotlin.time.Clock
 
 class SlowDownloadDetectorImpl(
     private val ksafe: KSafe,
@@ -29,11 +29,12 @@ class SlowDownloadDetectorImpl(
     private val samples: ArrayDeque<Pair<Long, Long>> = ArrayDeque()
     private val recentSlowEvents: ArrayDeque<Long> = ArrayDeque()
 
-    private val _suggestMirror = MutableSharedFlow<Unit>(
-        replay = 0,
-        extraBufferCapacity = 1,
-        onBufferOverflow = BufferOverflow.DROP_OLDEST,
-    )
+    private val _suggestMirror =
+        MutableSharedFlow<Unit>(
+            replay = 0,
+            extraBufferCapacity = 1,
+            onBufferOverflow = BufferOverflow.DROP_OLDEST,
+        )
 
     override val suggestMirror: Flow<Unit> = _suggestMirror.asSharedFlow()
 

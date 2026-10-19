@@ -7,12 +7,13 @@ class MockExternalMatchApi : ExternalMatchApi {
     override suspend fun match(request: ExternalMatchRequest): Result<ExternalMatchResponse> =
         Result.success(
             ExternalMatchResponse(
-                matches = request.candidates.map {
-                    ExternalMatchResponse.MatchEntry(
-                        packageName = it.packageName,
-                        candidates = emptyList(),
-                    )
-                },
+                matches =
+                    request.candidates.map {
+                        ExternalMatchResponse.MatchEntry(
+                            packageName = it.packageName,
+                            candidates = emptyList(),
+                        )
+                    },
             ),
         )
 }

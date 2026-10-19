@@ -1,4 +1,5 @@
 package zed.rainxch.core.domain.model.mirror
+
 enum class TrafficKind {
     RELEASE_ASSET,
     RAW_FILE,

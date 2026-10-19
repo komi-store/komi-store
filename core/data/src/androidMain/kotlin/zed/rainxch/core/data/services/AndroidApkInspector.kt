@@ -60,7 +60,6 @@ class AndroidApkInspector(
                 } catch (_: PackageManager.NameNotFoundException) {
                     null
                 } catch (t: Throwable) {
-
                     Logger.w(TAG) {
                         "inspectInstalled: PackageManager threw for $packageName: $t"
                     }
@@ -96,8 +95,12 @@ class AndroidApkInspector(
         val appInfo = info.applicationInfo
         val label = appInfo?.loadLabel(pm)?.toString().orEmpty()
         val versionCode =
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) info.longVersionCode
-            else @Suppress("DEPRECATION") info.versionCode.toLong()
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                info.longVersionCode
+            } else {
+                @Suppress("DEPRECATION")
+                info.versionCode.toLong()
+            }
 
         val permissions = info.requestedPermissions?.toList().orEmpty()
         val grantFlags = info.requestedPermissionsFlags
@@ -125,8 +128,11 @@ class AndroidApkInspector(
             versionCode = versionCode,
             signingFingerprint = SigningFingerprint.fromPackageInfo(info),
             minSdk =
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) appInfo?.minSdkVersion
-                else null,
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    appInfo?.minSdkVersion
+                } else {
+                    null
+                },
             targetSdk = appInfo?.targetSdkVersion,
             permissions = resolvedPermissions,
             mainActivity = mainActivity,
@@ -145,13 +151,15 @@ class AndroidApkInspector(
         granted: Boolean?,
         isInstalledPackage: Boolean,
     ): ApkPermission {
-
         val info =
             runCatching { pm.getPermissionInfo(name, 0) }.getOrNull()
         val protection = info?.let { resolveProtectionLevel(it) } ?: ProtectionLevel.UNKNOWN
         val display =
             info?.loadLabel(pm)?.toString()?.takeIf { it.isNotBlank() }
-                ?: name.substringAfterLast('.').replace('_', ' ').lowercase()
+                ?: name
+                    .substringAfterLast('.')
+                    .replace('_', ' ')
+                    .lowercase()
                     .replaceFirstChar { it.titlecase() }
         val description = info?.loadDescription(pm)?.toString()?.takeIf { it.isNotBlank() }
 
@@ -186,7 +194,10 @@ class AndroidApkInspector(
                 info.protectionLevel and PermissionInfo.PROTECTION_MASK_FLAGS
             }
         return when (base) {
-            PermissionInfo.PROTECTION_DANGEROUS -> ProtectionLevel.DANGEROUS
+            PermissionInfo.PROTECTION_DANGEROUS -> {
+                ProtectionLevel.DANGEROUS
+            }
+
             PermissionInfo.PROTECTION_SIGNATURE -> {
                 if ((flags and PermissionInfo.PROTECTION_FLAG_PRIVILEGED) != 0) {
                     ProtectionLevel.PRIVILEGED
@@ -194,8 +205,14 @@ class AndroidApkInspector(
                     ProtectionLevel.SIGNATURE
                 }
             }
-            PermissionInfo.PROTECTION_NORMAL -> ProtectionLevel.NORMAL
-            else -> ProtectionLevel.UNKNOWN
+
+            PermissionInfo.PROTECTION_NORMAL -> {
+                ProtectionLevel.NORMAL
+            }
+
+            else -> {
+                ProtectionLevel.UNKNOWN
+            }
         }
     }
 

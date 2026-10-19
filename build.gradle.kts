@@ -31,6 +31,14 @@ spotless {
         ktlint(libs.versions.ktlint.get())
             .setEditorConfigPath("$rootDir/.editorconfig")
             .customRuleSets(listOf("io.nlopez.compose.rules:ktlint:${libs.versions.compose.rules.get()}"))
+        file("config/ktlint/baseline.txt").readLines().filter { it.isNotBlank() }.forEach { line ->
+            val (rule, filePath) = line.trim().split(" ", limit = 2)
+            suppressLintsFor {
+                step = "ktlint"
+                shortCode = rule
+                path = filePath
+            }
+        }
     }
     kotlinGradle {
         target("**/*.gradle.kts")

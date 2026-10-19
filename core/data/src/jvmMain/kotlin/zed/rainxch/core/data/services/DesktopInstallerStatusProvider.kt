@@ -19,6 +19,8 @@ class DesktopInstallerStatusProvider : InstallerStatusProvider {
         MutableStateFlow(RootAvailability.UNAVAILABLE).asStateFlow()
 
     override fun requestShizukuPermission() = Unit
+
     override fun requestDhizukuPermission() = Unit
+
     override fun requestRootPermission() = Unit
 }

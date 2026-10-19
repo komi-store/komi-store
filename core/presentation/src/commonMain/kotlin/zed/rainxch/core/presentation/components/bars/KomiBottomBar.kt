@@ -84,7 +84,7 @@ private fun MangaBottomBar(
     items: ImmutableList<KomiNavItem>,
     selectedId: String,
     onSelect: (String) -> Unit,
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
 ) {
     val colors = personality.colors
     val pillShape =
@@ -160,7 +160,7 @@ private fun ClassicBottomBar(
     items: ImmutableList<KomiNavItem>,
     selectedId: String,
     onSelect: (String) -> Unit,
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
 ) {
     val colors = LocalPersonality.current.colors
 

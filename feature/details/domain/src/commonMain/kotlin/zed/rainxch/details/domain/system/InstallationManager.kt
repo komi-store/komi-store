@@ -8,7 +8,6 @@ import zed.rainxch.details.domain.model.SaveInstalledAppParams
 import zed.rainxch.details.domain.model.UpdateInstalledAppParams
 
 interface InstallationManager {
-
     suspend fun validateApk(
         filePath: String,
         isUpdate: Boolean,
