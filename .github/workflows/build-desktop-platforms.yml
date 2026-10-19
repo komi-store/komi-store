@@ -29,19 +29,19 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Validate Gradle wrapper
-        uses: gradle/actions/wrapper-validation@v4
+        uses: gradle/actions/wrapper-validation@v6
 
       - name: Set up JDK ${{ env.JAVA_VERSION }}
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v6
         with:
           distribution: ${{ env.JAVA_DISTRIBUTION }}
           java-version: ${{ env.JAVA_VERSION }}
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v6
         with:
           cache-read-only: false
           cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
@@ -83,7 +83,7 @@ jobs:
 
       - name: Upload Windows installers
         id: upload-windows
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: windows-installers
           path: windows-staging/*
@@ -110,7 +110,7 @@ jobs:
           Get-Item $zip | Format-List
 
       - name: Upload Windows portable
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: windows-portable
           path: windows-portable/*
@@ -158,7 +158,7 @@ jobs:
       # When bumping, look up the new SHA via:
       #   gh api repos/signpath/github-action-submit-signing-request/git/refs/tags/<tag>
       - name: Submit signing request
-        uses: signpath/github-action-submit-signing-request@b9d91eadd323de506c0c81cf0c7fe7438f3360fd # v2 (2025-10-23)
+        uses: signpath/github-action-submit-signing-request@f6d04783b4569d051e0c80105fe66e82819d0092 # v2 (2025-10-23)
         with:
           api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
           organization-id: ${{ secrets.SIGNPATH_ORGANIZATION_ID }}
@@ -170,7 +170,7 @@ jobs:
           output-artifact-directory: signed-artifacts
 
       - name: Upload signed Windows installers
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: windows-installers-signed
           path: signed-artifacts/*
@@ -206,19 +206,19 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Validate Gradle wrapper
-        uses: gradle/actions/wrapper-validation@v4
+        uses: gradle/actions/wrapper-validation@v6
 
       - name: Set up JDK ${{ env.JAVA_VERSION }}
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v6
         with:
           distribution: ${{ env.JAVA_DISTRIBUTION }}
           java-version: ${{ env.JAVA_VERSION }}
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v6
         with:
           cache-read-only: false
           cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
@@ -243,7 +243,7 @@ jobs:
         shell: bash
 
       - name: Upload macOS installers
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: macos-installers-${{ matrix.arch }}
           path: |
@@ -274,19 +274,19 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Validate Gradle wrapper
-        uses: gradle/actions/wrapper-validation@v4
+        uses: gradle/actions/wrapper-validation@v6
 
       - name: Set up JDK ${{ env.JAVA_VERSION }}
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v6
         with:
           distribution: ${{ env.JAVA_DISTRIBUTION }}
           java-version: ${{ env.JAVA_VERSION }}
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v6
         with:
           cache-read-only: false
           cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
@@ -514,7 +514,7 @@ jobs:
         shell: bash
 
       - name: Upload Linux installers
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: linux-installers-${{ matrix.label }}
           path: |
@@ -526,7 +526,7 @@ jobs:
 
       - name: Upload Linux AppImage
         if: matrix.label == 'modern'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: linux-appimage
           path: |
@@ -636,7 +636,7 @@ jobs:
 
       - name: Upload Arch Linux package
         if: matrix.label == 'modern'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: linux-arch
           path: composeApp/build/compose/binaries/main/arch/*.pkg.tar.zst
@@ -653,7 +653,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Read project version
         id: version
@@ -670,7 +670,7 @@ jobs:
         shell: bash
 
       - name: Download all build artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           path: artifacts
 
