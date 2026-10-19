@@ -31,3 +31,9 @@ Kotlin warnings are errors (`allWarningsAsErrors`). A module can opt out with `k
 ## Konsist
 
 The rules and their allowlists live in `konsist-test/src/test/kotlin/zed/rainxch/konsist/`. An allowlist can only shrink: the file-size test fails when an allowlisted file drops under the limit, so remove the entry in the same PR.
+
+`DocsRulesTest` reads `AGENTS.md`, `CLAUDE.md`, `CONTRIBUTING.md`, `docs/agents/*.md` and `feature/*/CLAUDE.md`. A backticked route such as `GithubStoreGraph.DetailsScreen` must exist in the graph, and any backticked name ending in Screen or Graph must still exist in production code. When you rename a route or screen, update the docs in the same PR.
+
+## Agent config
+
+The `Agent config` job runs [agnix](https://github.com/agent-sh/agnix) on `AGENTS.md`, the `CLAUDE.md` files and `.claude/`, and fails on broken agent configuration.
