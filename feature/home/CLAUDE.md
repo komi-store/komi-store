@@ -15,18 +15,7 @@ feature/home/
     └── categorylist/  CategoryListRoot / ViewModel
 ```
 
-## Key interface
-
-```kotlin
-interface HomeRepository {
-    fun getTrendingRepositories(platforms: Set<DiscoveryPlatform>, page: Int): Flow<PaginatedDiscoveryRepositories>
-    fun getHotReleaseRepositories(platforms: Set<DiscoveryPlatform>, page: Int): Flow<PaginatedDiscoveryRepositories>
-    fun getMostPopular(platforms: Set<DiscoveryPlatform>, page: Int): Flow<PaginatedDiscoveryRepositories>
-    /* searchByTopic / getTopicRepositories / getRepositoryById: implemented, no callers */
-}
-```
-
-Empty `platforms` means all platforms.
+`HomeRepository` takes a set of `DiscoveryPlatform`s; an empty set means all platforms. `searchByTopic`, `getTopicRepositories` and `getRepositoryById` are implemented but have no callers.
 
 ## Navigation
 

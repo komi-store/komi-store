@@ -31,7 +31,7 @@ CI runs these on every pull request. Existing findings live in committed baselin
 ./gradlew debugStabilityCheck            # its own invocation, after compileDebugKotlinAndroid
 ```
 
-In Claude Code, `/verify` runs the same steps. Details and baseline rules: `docs/agents/checks.md`.
+In Claude Code, `/verify` runs the same steps. CI also lints agent docs with agnix. Details and baseline rules: `docs/agents/checks.md`.
 
 ## Rules the tools don't check
 

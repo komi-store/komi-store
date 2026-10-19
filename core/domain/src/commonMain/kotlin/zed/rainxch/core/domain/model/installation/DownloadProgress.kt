@@ -4,5 +4,4 @@ data class DownloadProgress(
     val bytesDownloaded: Long,
     val totalBytes: Long?,
     val percent: Int?,
-    val restart: Boolean = false,
 )
