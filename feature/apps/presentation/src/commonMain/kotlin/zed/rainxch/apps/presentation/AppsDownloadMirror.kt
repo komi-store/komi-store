@@ -29,8 +29,7 @@ internal fun transientDownloads(
         .filter { (key, entry) ->
             val hasRow = key in knownPackages
             entry.stage in cardStages && (!hasRow || entry.stage in takeoverStages)
-        }
-        .values
+        }.values
         .toList()
 
 internal fun hiddenRowPackages(
@@ -43,7 +42,10 @@ internal fun hiddenRowPackages(
         .keys
         .toSet()
 
-internal fun isVersionDowngrade(installedVersion: String?, targetVersion: String?): Boolean {
+internal fun isVersionDowngrade(
+    installedVersion: String?,
+    targetVersion: String?,
+): Boolean {
     if (installedVersion.isNullOrBlank() || targetVersion.isNullOrBlank()) return false
     return VersionMath.compareVersions(targetVersion, installedVersion) < 0
 }
@@ -55,10 +57,7 @@ internal fun mirroredUpdateState(
 ): UpdateState =
     when (stage.phase) {
         DownloadStagePhase.Live -> UpdateState.Downloading
-
         DownloadStagePhase.Installing -> UpdateState.Installing
-
         DownloadStagePhase.Resting -> UpdateState.Idle
-
         DownloadStagePhase.Failed -> UpdateState.Error(errorMessage ?: failedFallback)
     }

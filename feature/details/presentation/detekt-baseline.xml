@@ -41,6 +41,7 @@
     <ID>LongMethod:Header.kt$fun LazyListScope.header( state: DetailsState, onAction: (DetailsAction) -&gt; Unit, )</ID>
     <ID>LongMethod:RawDetailsStateMapper.kt$internal fun RawDetailsState.toView(): DetailsState</ID>
     <ID>LongMethod:ReleaseChannel.kt$fun LazyListScope.releaseChannel( state: DetailsState, onAction: (DetailsAction) -&gt; Unit, )</ID>
+    <ID>LongMethod:Stats.kt$fun LazyListScope.stats(repoStats: RepoStats)</ID>
     <ID>LongMethod:WhatsNew.kt$fun LazyListScope.whatsNew( release: GithubRelease, isExpanded: Boolean, onToggleExpanded: () -&gt; Unit, collapsedHeight: Dp, measuredHeightPx: Float?, onMeasured: (Float) -&gt; Unit, onReadMore: (() -&gt; Unit)? = null, )</ID>
     <ID>LongParameterList:DetailsViewModel.kt$DetailsViewModel$( apkInfo: ApkPackageInfo, assetName: String, assetUrl: String, assetSize: Long, releaseTag: String, isUpdate: Boolean, installOutcome: InstallOutcome, parkedFilePath: String? = null, )</ID>
     <ID>LongParameterList:DetailsViewModel.kt$DetailsViewModel$( isUpdate: Boolean, filePath: String, assetName: String, downloadUrl: String, sizeBytes: Long, releaseTag: String, )</ID>
@@ -65,12 +66,7 @@
     <ID>MagicNumber:ReleaseChannel.kt$30</ID>
     <ID>MatchingDeclarationName:ReleasesStatusCard.kt$ReleasesStatus</ID>
     <ID>MatchingDeclarationName:ShowDowngradeWarning.kt$DowngradeWarning</ID>
-    <ID>MaxLineLength:DetailsAboutViewModel.kt$DetailsAboutViewModel$_state.update { it.copy(isLoading = false, errorMessage = e.message ?: getString(Res.string.failed_to_load)) }</ID>
-    <ID>MaxLineLength:DetailsWhatsNewViewModel.kt$DetailsWhatsNewViewModel$_state.update { it.copy(isLoading = false, errorMessage = e.message ?: getString(Res.string.failed_to_load)) }</ID>
-    <ID>MaxLineLength:LanguageLinkInterceptor.kt$&lt;no name provided&gt;$it.code.startsWith(normalizedCode, ignoreCase = true) || normalizedCode.startsWith(it.code, ignoreCase = true)</ID>
     <ID>MaxLineLength:LanguageLinkInterceptor.kt$&lt;no name provided&gt;$val isInternalMarkdown = Regex("""(?i)^https://(?:raw\.githubusercontent\.com|github\.com)/[^/]+/[^/]+/(?:blob/)?[^/]+/.+\.md(?:[#?].*)?$""").find(uri) != null</ID>
-    <ID>MaxLineLength:MarkdownViewerViewModel.kt$MarkdownViewerViewModel$_state.update { it.copy(isLoading = false, errorMessage = e.message ?: getString(Res.string.failed_to_load)) }</ID>
-    <ID>MaxLineLength:VersionPicker.kt$"${formatIsoDateOrRaw(release.publishedAt)} · ${stringResource(Res.string.no_build_for_this_device)}"</ID>
     <ID>NestedBlockDepth:DetailsViewModel.kt$DetailsViewModel$private fun openExternalInstaller()</ID>
     <ID>ReturnCount:DetailsViewModel.kt$DetailsViewModel$@OptIn(ExperimentalTime::class) fun onAction(action: DetailsAction)</ID>
     <ID>ReturnCount:DetailsViewModel.kt$DetailsViewModel$@OptIn(ExperimentalTime::class) private fun refresh()</ID>
@@ -79,7 +75,7 @@
     <ID>ReturnCount:DetailsViewModel.kt$DetailsViewModel$private fun persistPreferredVariantOnPick(picked: GithubAsset)</ID>
     <ID>ReturnCount:DetailsViewModel.kt$DetailsViewModel$private fun pickPrimaryInstalledApp( apps: List&lt;InstalledApp&gt;, primaryAssetName: String?, releaseAssets: List&lt;GithubAsset&gt;, releaseHistory: List&lt;GithubRelease&gt; = _state.value.allReleases, releaseTag: String? = null, ): InstalledApp?</ID>
     <ID>ReturnCount:LanguageLinkInterceptor.kt$&lt;no name provided&gt;$override fun openUri(uri: String)</ID>
-    <ID>ReturnCount:MarkdownTruncate.kt$fun truncateMarkdownPreview(content: String, maxChars: Int): String</ID>
+    <ID>ReturnCount:MarkdownTruncate.kt$fun truncateMarkdownPreview( content: String, maxChars: Int, ): String</ID>
     <ID>ReturnCount:RawDetailsStateMapper.kt$private fun RawDetailsState.computeCanSwitchToStable(latestStable: GithubRelease?): Boolean</ID>
     <ID>ReturnCount:RawDetailsStateMapper.kt$private fun RawDetailsState.computeIsPendingInstallReady(): Boolean</ID>
     <ID>ThrowsCount:DetailsViewModel.kt$DetailsViewModel$@OptIn(ExperimentalTime::class) private fun loadInitial()</ID>
@@ -92,8 +88,6 @@
     <ID>TooGenericExceptionCaught:DetailsViewModel.kt$DetailsViewModel$t: Throwable</ID>
     <ID>TooManyFunctions:ApkInspectSheet.kt$zed.rainxch.details.presentation.components.ApkInspectSheet.kt</ID>
     <ID>TooManyFunctions:DetailsViewModel.kt$DetailsViewModel : ViewModel</ID>
-    <ID>TopLevelPropertyNaming:AppHeader.kt$private const val STALE_PLATFORM_DAYS = 365</ID>
-    <ID>TopLevelPropertyNaming:MarkdownViewerViewModel.kt$private const val RENDER_ENTER_DELAY_MS = 350L</ID>
     <ID>UnusedParameter:AboutRoot.kt$onRetry: () -&gt; Unit</ID>
     <ID>UnusedParameter:AppHeader.kt$release: GithubRelease?</ID>
     <ID>UnusedParameter:DetailsRoot.kt$onNavigateToMarkdownViewer: (url: String) -&gt; Unit</ID>

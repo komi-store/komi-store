@@ -9,14 +9,14 @@ import android.provider.Settings
 import androidx.core.content.FileProvider
 import androidx.core.net.toUri
 import co.touchlab.kermit.Logger
-import zed.rainxch.core.domain.utils.AssetArchitectureMatcher
-import zed.rainxch.core.domain.utils.AssetSelector
-import zed.rainxch.core.domain.utils.isAndroidApk
 import zed.rainxch.core.domain.model.account.github.GithubAsset
 import zed.rainxch.core.domain.model.system.SystemArchitecture
 import zed.rainxch.core.domain.system.InstallOutcome
 import zed.rainxch.core.domain.system.Installer
 import zed.rainxch.core.domain.system.InstallerInfoExtractor
+import zed.rainxch.core.domain.utils.AssetArchitectureMatcher
+import zed.rainxch.core.domain.utils.AssetSelector
+import zed.rainxch.core.domain.utils.isAndroidApk
 import java.io.File
 
 class AndroidInstaller(

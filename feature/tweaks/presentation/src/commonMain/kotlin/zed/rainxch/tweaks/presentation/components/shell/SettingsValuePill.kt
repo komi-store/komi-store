@@ -37,13 +37,14 @@ fun SettingsValuePill(
         is MangaPersonality -> {
             val colors = personality.colors
             Row(
-                modifier = modifier
-                    .height(32.dp)
-                    .hardShadow(DpOffset(2.dp, 2.dp), colors.shadow)
-                    .background(colors.surface)
-                    .border(2.5.dp, colors.outline)
-                    .clickable(onClick = onClick)
-                    .padding(horizontal = 11.dp),
+                modifier =
+                    modifier
+                        .height(32.dp)
+                        .hardShadow(DpOffset(2.dp, 2.dp), colors.shadow)
+                        .background(colors.surface)
+                        .border(2.5.dp, colors.outline)
+                        .clickable(onClick = onClick)
+                        .padding(horizontal = 11.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
@@ -67,12 +68,13 @@ fun SettingsValuePill(
         is ClassicPersonality -> {
             val colors = personality.colors
             Row(
-                modifier = modifier
-                    .height(32.dp)
-                    .clip(RoundedCornerShape(personality.shape.cornerSmall))
-                    .background(colors.surfaceContainerHigh)
-                    .clickable(onClick = onClick)
-                    .padding(horizontal = 12.dp),
+                modifier =
+                    modifier
+                        .height(32.dp)
+                        .clip(RoundedCornerShape(personality.shape.cornerSmall))
+                        .background(colors.surfaceContainerHigh)
+                        .clickable(onClick = onClick)
+                        .padding(horizontal = 12.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(6.dp),
             ) {

@@ -18,5 +18,8 @@ interface ProxyRepository {
 
     fun getUseMaster(scope: ProxyScope): Flow<Boolean>
 
-    suspend fun setUseMaster(scope: ProxyScope, useMaster: Boolean)
+    suspend fun setUseMaster(
+        scope: ProxyScope,
+        useMaster: Boolean,
+    )
 }

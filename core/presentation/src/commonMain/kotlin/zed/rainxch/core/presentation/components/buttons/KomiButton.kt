@@ -127,7 +127,7 @@ private fun MangaButton(
     personality: MangaPersonality,
     onClick: () -> Unit,
     label: String,
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
     variant: KomiButtonVariant,
     size: KomiButtonSize,
     enabled: Boolean,
@@ -191,8 +191,7 @@ private fun MangaButton(
                 .inkFocusRing(
                     focused = { focused },
                     color = if (overrideColorsGiven) resolvedContentColor else colors.primary,
-                )
-                .then(pressModifier)
+                ).then(pressModifier)
                 .then(if (clipNeeded) Modifier.clip(shape) else Modifier)
                 .background(color = container.copy(alpha = container.alpha * alpha), shape = shape)
                 .then(
@@ -242,7 +241,7 @@ private fun ClassicButton(
     personality: ClassicPersonality,
     onClick: () -> Unit,
     label: String,
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
     variant: KomiButtonVariant,
     size: KomiButtonSize,
     enabled: Boolean,
@@ -267,28 +266,33 @@ private fun ClassicButton(
             when (variant) {
                 KomiButtonVariant.Primary,
                 KomiButtonVariant.Destructive,
-                -> ButtonDefaults.buttonColors(
-                    containerColor = containerColor,
-                    contentColor = contentColor,
-                )
+                -> {
+                    ButtonDefaults.buttonColors(
+                        containerColor = containerColor,
+                        contentColor = contentColor,
+                    )
+                }
 
-                KomiButtonVariant.Tonal ->
+                KomiButtonVariant.Tonal -> {
                     ButtonDefaults.filledTonalButtonColors(
                         containerColor = containerColor,
                         contentColor = contentColor,
                     )
+                }
 
-                KomiButtonVariant.Outline ->
+                KomiButtonVariant.Outline -> {
                     ButtonDefaults.outlinedButtonColors(
                         containerColor = containerColor,
                         contentColor = contentColor,
                     )
+                }
 
-                KomiButtonVariant.Text ->
+                KomiButtonVariant.Text -> {
                     ButtonDefaults.textButtonColors(
                         containerColor = containerColor,
                         contentColor = contentColor,
                     )
+                }
             }
         } else {
             null

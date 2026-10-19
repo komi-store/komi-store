@@ -1,18 +1,17 @@
 package zed.rainxch.core.data.services
 
+import kotlinx.coroutines.runBlocking
+import zed.rainxch.core.data.download.PartialNaming
+import zed.rainxch.core.data.network.DesktopDigestVerifier
+import zed.rainxch.core.domain.utils.AssetFileName
 import java.io.File
 import java.nio.file.Files
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
-import kotlinx.coroutines.runBlocking
-import zed.rainxch.core.data.download.PartialNaming
-import zed.rainxch.core.data.network.DesktopDigestVerifier
-import zed.rainxch.core.domain.utils.AssetFileName
 
 class OrphanSweepTest {
-
     private val body = ByteArray(64) { it.toByte() }
 
     @Test

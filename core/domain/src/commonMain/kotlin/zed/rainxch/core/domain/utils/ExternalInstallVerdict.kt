@@ -3,7 +3,6 @@ package zed.rainxch.core.domain.utils
 import zed.rainxch.core.domain.model.installation.InstalledApp
 
 enum class VersionVerdict {
-
     UP_TO_DATE,
 
     UPDATE_AVAILABLE,
@@ -16,7 +15,6 @@ fun resolveExternalInstallVerdict(
     newVersionName: String,
     newVersionCode: Long,
 ): VersionVerdict {
-
     val latestVersionCode = app.latestVersionCode ?: 0L
     if (latestVersionCode > 0L && newVersionCode > 0L) {
         return if (newVersionCode >= latestVersionCode) {

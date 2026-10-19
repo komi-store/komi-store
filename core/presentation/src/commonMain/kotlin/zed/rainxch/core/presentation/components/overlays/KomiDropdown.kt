@@ -108,7 +108,7 @@ private fun WideMenu(
     val personality = LocalPersonality.current
     val colors = personality.colors
     when (personality) {
-        is MangaPersonality ->
+        is MangaPersonality -> {
             DropdownMenu(
                 expanded = expanded,
                 onDismissRequest = onDismiss,
@@ -120,14 +120,16 @@ private fun WideMenu(
             ) {
                 MenuEntries(entries = entries, value = value, onPick = onPick)
             }
+        }
 
-        is ClassicPersonality ->
+        is ClassicPersonality -> {
             DropdownMenu(
                 expanded = expanded,
                 onDismissRequest = onDismiss,
             ) {
                 MenuEntries(entries = entries, value = value, onPick = onPick)
             }
+        }
     }
 }
 

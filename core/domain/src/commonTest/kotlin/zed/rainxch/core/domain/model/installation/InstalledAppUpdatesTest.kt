@@ -1,10 +1,10 @@
 package zed.rainxch.core.domain.model.installation
 
+import zed.rainxch.core.domain.utils.UpdateVerdict
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
-import zed.rainxch.core.domain.utils.UpdateVerdict
 
 class InstalledAppUpdatesTest {
     private fun app(
@@ -17,31 +17,33 @@ class InstalledAppUpdatesTest {
         isPendingInstall: Boolean = false,
         pendingFilePath: String? = "/data/parked.apk",
         skippedReleaseTag: String? = null,
-    ): InstalledApp = testInstalledApp(
-        installedVersion = installedVersion,
-        installedVersionName = "1.0.0",
-        installedVersionCode = installedVersionCode,
-        latestVersion = latestVersion,
-        latestVersionName = latestVersionName,
-        latestVersionCode = latestVersionCode,
-        isUpdateAvailable = isUpdateAvailable,
-        isPendingInstall = isPendingInstall,
-        pendingInstallFilePath = pendingFilePath,
-        latestReleasePublishedAt = "2026-08-01T00:00:00Z",
-        skippedReleaseTag = skippedReleaseTag,
-    )
+    ): InstalledApp =
+        testInstalledApp(
+            installedVersion = installedVersion,
+            installedVersionName = "1.0.0",
+            installedVersionCode = installedVersionCode,
+            latestVersion = latestVersion,
+            latestVersionName = latestVersionName,
+            latestVersionCode = latestVersionCode,
+            isUpdateAvailable = isUpdateAvailable,
+            isPendingInstall = isPendingInstall,
+            pendingInstallFilePath = pendingFilePath,
+            latestReleasePublishedAt = "2026-08-01T00:00:00Z",
+            skippedReleaseTag = skippedReleaseTag,
+        )
 
     @Test
     fun confirmInstallWritesInstallZone() {
-        val result = app().confirmInstall(
-            tag = "2.0.0",
-            assetName = "app-2.0.0.apk",
-            assetUrl = "https://dl/app-2.0.0.apk",
-            versionName = "2.0.0",
-            versionCode = 200L,
-            signingFingerprint = "SHA-NEW",
-            at = 9999L,
-        )
+        val result =
+            app().confirmInstall(
+                tag = "2.0.0",
+                assetName = "app-2.0.0.apk",
+                assetUrl = "https://dl/app-2.0.0.apk",
+                versionName = "2.0.0",
+                versionCode = 200L,
+                signingFingerprint = "SHA-NEW",
+                at = 9999L,
+            )
 
         assertEquals("2.0.0", result.installedVersion)
         assertEquals("app-2.0.0.apk", result.installedAssetName)
@@ -56,30 +58,32 @@ class InstalledAppUpdatesTest {
 
     @Test
     fun confirmInstallClearsUpdateFlagWhenLatestMatchesInstalled() {
-        val result = app().confirmInstall(
-            tag = "2.0.0",
-            assetName = "a",
-            assetUrl = "u",
-            versionName = "2.0.0",
-            versionCode = 200L,
-            signingFingerprint = null,
-            at = 1L,
-        )
+        val result =
+            app().confirmInstall(
+                tag = "2.0.0",
+                assetName = "a",
+                assetUrl = "u",
+                versionName = "2.0.0",
+                versionCode = 200L,
+                signingFingerprint = null,
+                at = 1L,
+            )
         assertFalse(result.isUpdateAvailable)
         assertEquals(200L, result.latestVersionCode)
     }
 
     @Test
     fun confirmInstallKeepsUpdateFlagWhenSnapshotStillNewer() {
-        val result = app(latestVersion = "3.0.0", latestVersionCode = 300L).confirmInstall(
-            tag = "2.0.0",
-            assetName = "a",
-            assetUrl = "u",
-            versionName = "2.0.0",
-            versionCode = 200L,
-            signingFingerprint = null,
-            at = 1L,
-        )
+        val result =
+            app(latestVersion = "3.0.0", latestVersionCode = 300L).confirmInstall(
+                tag = "2.0.0",
+                assetName = "a",
+                assetUrl = "u",
+                versionName = "2.0.0",
+                versionCode = 200L,
+                signingFingerprint = null,
+                at = 1L,
+            )
         assertTrue(result.isUpdateAvailable)
         assertEquals(300L, result.latestVersionCode)
     }
@@ -255,15 +259,16 @@ class InstalledAppUpdatesTest {
 
     @Test
     fun confirmInstallClearsUpdateFlagWhenSnapshotMissing() {
-        val result = app(latestVersion = null, latestVersionCode = null).confirmInstall(
-            tag = "1.0.0",
-            assetName = "a",
-            assetUrl = "u",
-            versionName = "1.0.0",
-            versionCode = 100L,
-            signingFingerprint = null,
-            at = 1L,
-        )
+        val result =
+            app(latestVersion = null, latestVersionCode = null).confirmInstall(
+                tag = "1.0.0",
+                assetName = "a",
+                assetUrl = "u",
+                versionName = "1.0.0",
+                versionCode = 100L,
+                signingFingerprint = null,
+                at = 1L,
+            )
         assertFalse(result.isUpdateAvailable)
         assertEquals(100L, result.latestVersionCode)
     }
@@ -286,16 +291,17 @@ class InstalledAppUpdatesTest {
 
     @Test
     fun confirmInstallPendingHandoffKeepsParkedMetadata() {
-        val result = app().confirmInstall(
-            tag = "2.0.0",
-            assetName = "a",
-            assetUrl = "u",
-            versionName = "2.0.0",
-            versionCode = 200L,
-            signingFingerprint = null,
-            isPending = true,
-            at = 1L,
-        )
+        val result =
+            app().confirmInstall(
+                tag = "2.0.0",
+                assetName = "a",
+                assetUrl = "u",
+                versionName = "2.0.0",
+                versionCode = 200L,
+                signingFingerprint = null,
+                isPending = true,
+                at = 1L,
+            )
         assertTrue(result.isPendingInstall)
         assertEquals("/data/parked.apk", result.pendingInstallFilePath)
         assertEquals("2.0.0", result.pendingInstallVersion)
@@ -303,15 +309,16 @@ class InstalledAppUpdatesTest {
 
     @Test
     fun confirmInstallDoesNotTouchCheckZoneSnapshot() {
-        val result = app().confirmInstall(
-            tag = "2.0.0",
-            assetName = "a",
-            assetUrl = "u",
-            versionName = "2.0.0",
-            versionCode = 200L,
-            signingFingerprint = null,
-            at = 1L,
-        )
+        val result =
+            app().confirmInstall(
+                tag = "2.0.0",
+                assetName = "a",
+                assetUrl = "u",
+                versionName = "2.0.0",
+                versionCode = 200L,
+                signingFingerprint = null,
+                at = 1L,
+            )
         assertEquals("2.0.0", result.latestVersion)
         assertEquals("app-2.0.0.apk", result.latestAssetName)
         assertEquals("2026-08-01T00:00:00Z", result.latestReleasePublishedAt)
@@ -344,8 +351,7 @@ class InstalledAppUpdatesTest {
                     installedReleaseId = 7001L,
                     installedAssetId = 7002L,
                     installedAssetDigest = "sha256:x",
-                )
-                .resolvePendingFromSystem(
+                ).resolvePendingFromSystem(
                     PendingInstallResolution.Reached(
                         resolvedTag = "2.0.0",
                         versionName = "2.0.0",
@@ -380,8 +386,7 @@ class InstalledAppUpdatesTest {
                     installedReleaseId = 7001L,
                     installedAssetId = 7002L,
                     installedAssetDigest = "sha256:x",
-                )
-                .resolvePendingFromSystem(
+                ).resolvePendingFromSystem(
                     PendingInstallResolution.Reached(
                         resolvedTag = "2.0.0",
                         versionName = "2.0.0",
@@ -429,10 +434,11 @@ class InstalledAppUpdatesTest {
 
     @Test
     fun observeExternalInstallKeepsInstalledTagBelowTheSnapshot() {
-        val result = app().observeExternalInstall(
-            versionName = "1.2.0",
-            versionCode = 120L,
-        )
+        val result =
+            app().observeExternalInstall(
+                versionName = "1.2.0",
+                versionCode = 120L,
+            )
         assertEquals("1.0.0", result.installedVersion)
         assertEquals("1.2.0", result.installedVersionName)
         assertEquals(120L, result.installedVersionCode)
@@ -441,10 +447,11 @@ class InstalledAppUpdatesTest {
 
     @Test
     fun observeExternalInstallAdoptsSnapshotTagOnceObservationReachesIt() {
-        val result = app().observeExternalInstall(
-            versionName = "2.0.0",
-            versionCode = 200L,
-        )
+        val result =
+            app().observeExternalInstall(
+                versionName = "2.0.0",
+                versionCode = 200L,
+            )
         assertEquals("2.0.0", result.installedVersion)
         assertEquals("2.0.0", result.installedVersionName)
         assertEquals(200L, result.installedVersionCode)
@@ -453,28 +460,31 @@ class InstalledAppUpdatesTest {
 
     @Test
     fun observeExternalInstallAdoptsSnapshotTagByNameWhenTheCodeWasCleared() {
-        val result = app(latestVersionCode = null).observeExternalInstall(
-            versionName = "2.0.0",
-            versionCode = 200L,
-        )
+        val result =
+            app(latestVersionCode = null).observeExternalInstall(
+                versionName = "2.0.0",
+                versionCode = 200L,
+            )
         assertEquals("2.0.0", result.installedVersion)
     }
 
     @Test
     fun observeExternalInstallKeepsTagForABuildTheSnapshotDoesNotName() {
-        val result = app(latestVersionCode = null).observeExternalInstall(
-            versionName = "2.1.0-dev",
-            versionCode = 210L,
-        )
+        val result =
+            app(latestVersionCode = null).observeExternalInstall(
+                versionName = "2.1.0-dev",
+                versionCode = 210L,
+            )
         assertEquals("1.0.0", result.installedVersion)
     }
 
     @Test
     fun scanAfterAdoptedExternalUpdateIsQuiet() {
-        val observed = app(latestVersionCode = null).observeExternalInstall(
-            versionName = "2.0.0",
-            versionCode = 200L,
-        )
+        val observed =
+            app(latestVersionCode = null).observeExternalInstall(
+                versionName = "2.0.0",
+                versionCode = 200L,
+            )
         val verdict =
             UpdateVerdict.decide(
                 installed = UpdateVerdict.Installed(observed.installedVersion, observed.installedVersionCode),
@@ -493,20 +503,22 @@ class InstalledAppUpdatesTest {
 
     @Test
     fun observeExternalInstallDetectsDowngradeAsUpdateAvailable() {
-        val result = app(latestVersionCode = 200L).observeExternalInstall(
-            versionName = "0.9.0",
-            versionCode = 50L,
-        )
+        val result =
+            app(latestVersionCode = 200L).observeExternalInstall(
+                versionName = "0.9.0",
+                versionCode = 50L,
+            )
         assertTrue(result.isUpdateAvailable)
     }
 
     @Test
     fun markAndClearPendingTouchOnlyPendingFlag() {
-        val marked = app().markPending(
-            releaseId = 7001L,
-            assetId = 7002L,
-            assetDigest = "sha256:aaa",
-        )
+        val marked =
+            app().markPending(
+                releaseId = 7001L,
+                assetId = 7002L,
+                assetDigest = "sha256:aaa",
+            )
         assertTrue(marked.isPendingInstall)
         assertEquals("/data/parked.apk", marked.pendingInstallFilePath)
 
@@ -516,13 +528,14 @@ class InstalledAppUpdatesTest {
 
     @Test
     fun withLatestSnapshotWritesOnlyCheckZone() {
-        val result = app().withLatestSnapshot(
-            version = "nightly",
-            assetName = "app-nightly.apk",
-            assetUrl = "https://dl/app-nightly.apk",
-            versionName = "26.09.01",
-            versionCode = 999L,
-        )
+        val result =
+            app().withLatestSnapshot(
+                version = "nightly",
+                assetName = "app-nightly.apk",
+                assetUrl = "https://dl/app-nightly.apk",
+                versionName = "26.09.01",
+                versionCode = 999L,
+            )
         assertEquals("nightly", result.latestVersion)
         assertEquals("app-nightly.apk", result.latestAssetName)
         assertEquals("https://dl/app-nightly.apk", result.latestAssetUrl)
@@ -535,19 +548,19 @@ class InstalledAppUpdatesTest {
 
     @Test
     fun chainedPreInstallHandoffCombinesBothZones() {
-        val result = app()
-            .markPending(
-                releaseId = 7001L,
-                assetId = 7002L,
-                assetDigest = "sha256:aaa",
-            )
-            .withLatestSnapshot(
-                version = "3.0.0",
-                assetName = "a3",
-                assetUrl = "u3",
-                versionName = "3.0.0",
-                versionCode = 300L,
-            )
+        val result =
+            app()
+                .markPending(
+                    releaseId = 7001L,
+                    assetId = 7002L,
+                    assetDigest = "sha256:aaa",
+                ).withLatestSnapshot(
+                    version = "3.0.0",
+                    assetName = "a3",
+                    assetUrl = "u3",
+                    versionName = "3.0.0",
+                    versionCode = 300L,
+                )
         assertTrue(result.isPendingInstall)
         assertEquals("3.0.0", result.latestVersion)
         assertEquals("1.0.0", result.installedVersion)
@@ -555,10 +568,11 @@ class InstalledAppUpdatesTest {
 
     @Test
     fun migratedVersionInfoAlignsBothSides() {
-        val result = app().withMigratedVersionInfo(
-            versionName = "1.5.0",
-            versionCode = 150L,
-        )
+        val result =
+            app().withMigratedVersionInfo(
+                versionName = "1.5.0",
+                versionCode = 150L,
+            )
         assertEquals("1.5.0", result.installedVersionName)
         assertEquals(150L, result.installedVersionCode)
         assertEquals("1.5.0", result.latestVersionName)
@@ -645,17 +659,19 @@ class InstalledAppUpdatesTest {
         val afterExternalInstall =
             app(installedVersion = "1.0.0", latestVersion = "2.0.0", latestVersionCode = null)
 
-        val preFix = UpdateVerdict.decide(
-            installed = UpdateVerdict.Installed("1.0.0", 200L),
-            stored = UpdateVerdict.Stored(
-                latestTag = "2.0.0",
-                latestVersionCode = null,
-                publishedAt = "2026-08-01T00:00:00Z",
-                wasUpdateAvailable = false,
-            ),
-            matched = UpdateVerdict.Matched("2.0.0", "2026-08-01T00:00:00Z", false),
-            skippedTag = null,
-        )
+        val preFix =
+            UpdateVerdict.decide(
+                installed = UpdateVerdict.Installed("1.0.0", 200L),
+                stored =
+                    UpdateVerdict.Stored(
+                        latestTag = "2.0.0",
+                        latestVersionCode = null,
+                        publishedAt = "2026-08-01T00:00:00Z",
+                        wasUpdateAvailable = false,
+                    ),
+                matched = UpdateVerdict.Matched("2.0.0", "2026-08-01T00:00:00Z", false),
+                skippedTag = null,
+            )
         assertTrue(preFix.isUpdateAvailable)
 
         assertFalse(
@@ -700,4 +716,3 @@ class InstalledAppUpdatesTest {
         )
     }
 }
-

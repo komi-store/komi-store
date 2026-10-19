@@ -7,13 +7,13 @@
     <ID>ComplexCondition:TimeFormatters.kt$s.contains('T') &amp;&amp; n &gt;= 3 &amp;&amp; (s[n - 3] == '+' || s[n - 3] == '-') &amp;&amp; s[n - 2].isDigit() &amp;&amp; s[n - 1].isDigit()</ID>
     <ID>CyclomaticComplexMethod:KomiActionRow.kt$@Composable fun KomiActionRow( items: ImmutableList&lt;KomiActionRowItem&gt;, modifier: Modifier = Modifier, size: KomiIconButtonSize = KomiIconButtonSize.Md, maxVisible: Int = Int.MAX_VALUE, showLabels: Boolean = false, )</ID>
     <ID>CyclomaticComplexMethod:KomiBadge.kt$@Composable fun KomiBadge( modifier: Modifier = Modifier, count: Int? = null, dot: Boolean = false, tone: KomiBadgeTone = KomiBadgeTone.Alert, size: KomiBadgeSize = KomiBadgeSize.Sm, max: Int = 99, tilt: Boolean = false, animate: Boolean = false, contentDescription: String? = null, )</ID>
-    <ID>CyclomaticComplexMethod:KomiButton.kt$@Composable private fun ClassicButton( personality: ClassicPersonality, onClick: () -&gt; Unit, label: String, modifier: Modifier, variant: KomiButtonVariant, size: KomiButtonSize, enabled: Boolean, loading: Boolean, fullWidth: Boolean, leadingIcon: ImageVector?, trailingIcon: ImageVector?, containerColor: Color, contentColor: Color, )</ID>
-    <ID>CyclomaticComplexMethod:KomiButton.kt$@Composable private fun MangaButton( personality: MangaPersonality, onClick: () -&gt; Unit, label: String, modifier: Modifier, variant: KomiButtonVariant, size: KomiButtonSize, enabled: Boolean, loading: Boolean, emphasized: Boolean, fullWidth: Boolean, leadingIcon: ImageVector?, trailingIcon: ImageVector?, containerColor: Color, contentColor: Color, )</ID>
+    <ID>CyclomaticComplexMethod:KomiButton.kt$@Composable private fun ClassicButton( personality: ClassicPersonality, onClick: () -&gt; Unit, label: String, modifier: Modifier = Modifier, variant: KomiButtonVariant, size: KomiButtonSize, enabled: Boolean, loading: Boolean, fullWidth: Boolean, leadingIcon: ImageVector?, trailingIcon: ImageVector?, containerColor: Color, contentColor: Color, )</ID>
+    <ID>CyclomaticComplexMethod:KomiButton.kt$@Composable private fun MangaButton( personality: MangaPersonality, onClick: () -&gt; Unit, label: String, modifier: Modifier = Modifier, variant: KomiButtonVariant, size: KomiButtonSize, enabled: Boolean, loading: Boolean, emphasized: Boolean, fullWidth: Boolean, leadingIcon: ImageVector?, trailingIcon: ImageVector?, containerColor: Color, contentColor: Color, )</ID>
     <ID>CyclomaticComplexMethod:KomiChip.kt$@Composable private fun MangaChip( personality: MangaPersonality, label: String, modifier: Modifier, kind: KomiChipKind, size: KomiChipSize, selected: Boolean, index: Int, tilt: Boolean, leadingIcon: ImageVector?, leadingContent: (@Composable () -&gt; Unit)?, count: Int?, onClick: (() -&gt; Unit)?, onRemove: (() -&gt; Unit)?, )</ID>
     <ID>CyclomaticComplexMethod:KomiDropdown.kt$@Composable private fun KomiMenuRow( item: KomiMenuItem, selected: Boolean, onClick: () -&gt; Unit, )</ID>
     <ID>CyclomaticComplexMethod:KomiList.kt$@OptIn(ExperimentalFoundationApi::class) @Composable fun KomiListRow( title: String, modifier: Modifier = Modifier, subtitle: String? = null, icon: ImageVector? = null, onClick: (() -&gt; Unit)? = null, onLongClick: (() -&gt; Unit)? = null, strong: Boolean = false, destructive: Boolean = false, selected: Boolean = false, enabled: Boolean = true, showDivider: Boolean = false, trailing: @Composable (() -&gt; Unit)? = null, )</ID>
     <ID>CyclomaticComplexMethod:KomiRepoCard.kt$@OptIn(ExperimentalLayoutApi::class) @Composable fun KomiRepoCard( name: String, owner: String, language: String, description: String, platforms: ImmutableList&lt;DiscoveryPlatform&gt;, stars: Int, downloads: Int, releasedAgoDays: Int, onOpen: () -&gt; Unit, modifier: Modifier = Modifier, onLongPress: (() -&gt; Unit)? = null, monogram: String? = null, imageUrl: String? = null, feed: KomiRepoCardFeed = KomiRepoCardFeed.Plain, rank: Int = 1, version: String? = null, dailyStars: Int = 0, compact: Boolean = false, index: Int = 0, tilt: Boolean = false, releasedAt: String? = null, )</ID>
-    <ID>CyclomaticComplexMethod:KomiSurface.kt$@OptIn(ExperimentalFoundationApi::class) @Composable private fun MangaSurface( personality: MangaPersonality, modifier: Modifier, elevation: KomiSurfaceElevation, paper: KomiSurfacePaper, screentone: KomiScreentone, screentoneBoost: Float, onClick: (() -&gt; Unit)?, onLongClick: (() -&gt; Unit)?, hoverEnabled: Boolean?, tilt: Float, topEdgeOnly: Boolean, contentPadding: PaddingValues, content: @Composable () -&gt; Unit, )</ID>
+    <ID>CyclomaticComplexMethod:KomiSurface.kt$@OptIn(ExperimentalFoundationApi::class) @Composable private fun MangaSurface( personality: MangaPersonality, modifier: Modifier = Modifier, elevation: KomiSurfaceElevation, paper: KomiSurfacePaper, screentone: KomiScreentone, screentoneBoost: Float, onClick: (() -&gt; Unit)?, onLongClick: (() -&gt; Unit)?, hoverEnabled: Boolean?, tilt: Float, topEdgeOnly: Boolean, contentPadding: PaddingValues, content: @Composable () -&gt; Unit, )</ID>
     <ID>CyclomaticComplexMethod:KomiTextField.kt$@Composable private fun ClassicTextField( value: String, onValueChange: (String) -&gt; Unit, modifier: Modifier, label: String?, helper: String?, error: String?, placeholder: String?, leadingIcon: ImageVector?, trailing: @Composable (() -&gt; Unit)?, clearable: Boolean, multiline: Boolean, rows: Int, required: Boolean, enabled: Boolean, password: Boolean, keyboardType: KeyboardType, onCommit: (() -&gt; Unit)?, )</ID>
     <ID>CyclomaticComplexMethod:KomiTextField.kt$@Composable private fun MangaTextField( personality: MangaPersonality, value: String, onValueChange: (String) -&gt; Unit, modifier: Modifier, label: String?, helper: String?, error: String?, placeholder: String?, leadingIcon: ImageVector?, trailing: @Composable (() -&gt; Unit)?, clearable: Boolean, multiline: Boolean, rows: Int, required: Boolean, size: KomiTextFieldSize, enabled: Boolean, password: Boolean, keyboardType: KeyboardType, onCommit: (() -&gt; Unit)?, )</ID>
     <ID>CyclomaticComplexMethod:SyntaxHighlightedCode.kt$private fun languageOf(hint: String): SyntaxLanguage</ID>
@@ -135,18 +135,6 @@
     <ID>MagicNumber:TimeFormatters.kt$4</ID>
     <ID>MagicNumber:TimeFormatters.kt$7</ID>
     <ID>MatchingDeclarationName:AlertBlockQuote.kt$GithubAlertKind</ID>
-    <ID>MaxLineLength:GridColumnsTest.kt$GridColumnsTest$val padded = widthCappedCellWidths(density, availableSize = 1110, spacing = 10, maxCardWidth = 550.dp, contentPaddingHorizontal = 12.dp)</ID>
-    <ID>MaxLineLength:GridColumnsTest.kt$GridColumnsTest$val unpadded = widthCappedCellWidths(density, availableSize = 1134, spacing = 10, maxCardWidth = 550.dp, contentPaddingHorizontal = 0.dp)</ID>
-    <ID>MaxLineLength:GridPaper.kt$drawLine(color = color, start = Offset(0f, y), end = Offset(size.width, y), strokeWidth = stroke, alpha = opacity)</ID>
-    <ID>MaxLineLength:GridPaper.kt$drawLine(color = color, start = Offset(x, 0f), end = Offset(x, size.height), strokeWidth = stroke, alpha = opacity)</ID>
-    <ID>MaxLineLength:KomiActionRow.kt$tone = if (item.variant == KomiButtonVariant.Destructive) KomiMenuTone.Danger else KomiMenuTone.Default</ID>
-    <ID>MaxLineLength:KomiChip.kt$Icon(imageVector = Icons.Default.Close, contentDescription = "Remove", modifier = Modifier.size(iconSize), tint = color)</ID>
-    <ID>MaxLineLength:KomiChip.kt$Icon(imageVector = leadingIcon, contentDescription = null, modifier = Modifier.size(metrics.icon), tint = fg)</ID>
-    <ID>MaxLineLength:KomiChip.kt$style = TextStyle(fontFamily = type.mono.fontFamily, fontWeight = FontWeight.Bold, fontSize = (fontSizeSp - 1.5f).sp)</ID>
-    <ID>MaxLineLength:KomiDropdown.kt$trigger = { onClick -&gt; KomiIconButton(Icons.Default.MoreVert, "More", onClick, variant = KomiButtonVariant.Outline) }</ID>
-    <ID>MaxLineLength:KomiRepoCard.kt$description = "High-performance self-hosted photo and video management. Back up and browse your library from any device."</ID>
-    <ID>MaxLineLength:KomiTextField.kt$imageVector = if (passwordVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility</ID>
-    <ID>MaxLineLength:KomiToast.kt$data = KomiToastData(id = 4, message = "Download failed.", tone = KomiToastTone.Danger, actionLabel = "Retry", onAction = {})</ID>
     <ID>ReturnCount:AlertBlockQuote.kt$GithubAlertKind.Companion$fun parse(blockquoteText: String): Match?</ID>
     <ID>ReturnCount:GithubStoreMarkdownComponents.kt$private fun findChildRecursive( node: ASTNode, type: IElementType, ): ASTNode?</ID>
     <ID>ReturnCount:GithubStoreMarkdownComponents.kt$private fun findEnclosingLinkDestination( imageNode: ASTNode, content: String, ): String?</ID>
@@ -170,13 +158,6 @@
     <ID>TooManyFunctions:KomiTextField.kt$zed.rainxch.core.presentation.components.inputs.KomiTextField.kt</ID>
     <ID>TooManyFunctions:KomiToast.kt$zed.rainxch.core.presentation.components.overlays.KomiToast.kt</ID>
     <ID>TooManyFunctions:KomiTopBar.kt$zed.rainxch.core.presentation.components.bars.KomiTopBar.kt</ID>
-    <ID>TopLevelPropertyNaming:ArrowKeyScroll.kt$private const val ARROW_STEP_PX = 120f</ID>
-    <ID>TopLevelPropertyNaming:ArrowKeyScroll.kt$private const val PAGE_STEP_FRACTION = 0.9f</ID>
-    <ID>TopLevelPropertyNaming:ColorContrast.kt$private const val MIN_BODY_CONTRAST = 4.5f</ID>
-    <ID>TopLevelPropertyNaming:ExpandableDetails.kt$private const val DETAILS_INFO_PREFIX = "ghs-details"</ID>
-    <ID>TopLevelPropertyNaming:GridColumns.kt$private const val MAX_COLUMNS = 16</ID>
-    <ID>TopLevelPropertyNaming:GridColumns.kt$private const val MIN_POSITIVE = 1e-3f</ID>
-    <ID>TopLevelPropertyNaming:SyntaxHighlightedCode.kt$private const val MAX_HIGHLIGHTABLE_CHARS = 16_000</ID>
     <ID>UnusedPrivateMember:SyntaxHighlightedCode.kt$@Suppress("UnusedReceiverParameter") private fun MarkdownElementTypes.placeholder(): Nothing</ID>
   </CurrentIssues>
 </SmellBaseline>

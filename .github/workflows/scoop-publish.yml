@@ -5,6 +5,9 @@ on:
     types: [released]
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   trigger-bucket:
     name: Trigger Scoop bucket update

@@ -23,19 +23,22 @@ private data class AdditionalSettingsParse(
 
 fun ObtainiumApp.toExportedAppOrSkip(json: Json): ObtainiumMapResult {
     val rawUrl = url.trim()
-    val (owner, repo) = parseGithubOwnerRepo(rawUrl)
-        ?: return ObtainiumMapResult(
-            exported = null,
-            nonGitHubLabel = (name?.takeIf { it.isNotBlank() } ?: id.ifBlank { rawUrl }) +
-                if (rawUrl.isNotEmpty()) " ($rawUrl)" else "",
-            unsupportedFailureLabel = null,
-        )
+    val (owner, repo) =
+        parseGithubOwnerRepo(rawUrl)
+            ?: return ObtainiumMapResult(
+                exported = null,
+                nonGitHubLabel =
+                    (name?.takeIf { it.isNotBlank() } ?: id.ifBlank { rawUrl }) +
+                        if (rawUrl.isNotEmpty()) " ($rawUrl)" else "",
+                unsupportedFailureLabel = null,
+            )
 
-    val packageName = id.trim().takeIf { it.isNotBlank() } ?: return ObtainiumMapResult(
-        exported = null,
-        nonGitHubLabel = null,
-        unsupportedFailureLabel = "$owner/$repo (missing package id)",
-    )
+    val packageName =
+        id.trim().takeIf { it.isNotBlank() } ?: return ObtainiumMapResult(
+            exported = null,
+            nonGitHubLabel = null,
+            unsupportedFailureLabel = "$owner/$repo (missing package id)",
+        )
 
     val canonicalUrl = "https://github.com/$owner/$repo"
     val parsed = parseAdditionalSettings(additionalSettingsRaw, json)
@@ -48,19 +51,20 @@ fun ObtainiumApp.toExportedAppOrSkip(json: Json): ObtainiumMapResult {
     }
 
     return ObtainiumMapResult(
-        exported = ExportedApp(
-            packageName = packageName,
-            repoOwner = owner,
-            repoName = repo,
-            repoUrl = canonicalUrl,
-            assetFilterRegex = parsed.filter,
-            fallbackToOlderReleases = parsed.fallbackToOlderReleases,
-            preferredAssetVariant = null,
-            preferredAssetTokens = null,
-            assetGlobPattern = null,
-            pickedAssetIndex = preferredApkIndex,
-            pickedAssetSiblingCount = null,
-        ),
+        exported =
+            ExportedApp(
+                packageName = packageName,
+                repoOwner = owner,
+                repoName = repo,
+                repoUrl = canonicalUrl,
+                assetFilterRegex = parsed.filter,
+                fallbackToOlderReleases = parsed.fallbackToOlderReleases,
+                preferredAssetVariant = null,
+                preferredAssetTokens = null,
+                assetGlobPattern = null,
+                pickedAssetIndex = preferredApkIndex,
+                pickedAssetSiblingCount = null,
+            ),
         nonGitHubLabel = null,
         unsupportedFailureLabel = null,
     )
@@ -70,15 +74,17 @@ private fun parseGithubOwnerRepo(rawUrl: String): Pair<String, String>? {
     if (rawUrl.isBlank()) return null
     val trimmed = rawUrl.substringBefore('?').substringBefore('#').trimEnd('/')
     val withoutScheme = trimmed.removePrefix("https://").removePrefix("http://")
-    val withoutHost = withoutScheme
-        .removePrefix("www.")
-        .removePrefix("github.com/")
+    val withoutHost =
+        withoutScheme
+            .removePrefix("www.")
+            .removePrefix("github.com/")
     if (withoutScheme == withoutHost && !withoutScheme.startsWith("github.com")) return null
-    val cleaned = if (withoutScheme.startsWith("github.com")) {
-        withoutScheme.removePrefix("github.com").trimStart('/')
-    } else {
-        withoutHost
-    }
+    val cleaned =
+        if (withoutScheme.startsWith("github.com")) {
+            withoutScheme.removePrefix("github.com").trimStart('/')
+        } else {
+            withoutHost
+        }
     val parts = cleaned.split('/')
     if (parts.size < 2) return null
     val owner = parts[0]
@@ -93,12 +99,18 @@ private fun parseAdditionalSettings(
     json: Json,
 ): AdditionalSettingsParse {
     if (additional == null) return AdditionalSettingsParse(null, false, false)
-    val obj = when (additional) {
-        is JsonPrimitive -> additional.contentOrNull?.let {
-            runCatching { json.parseToJsonElement(it).jsonObject }.getOrNull()
-        }
-        else -> runCatching { additional.jsonObject }.getOrNull()
-    } ?: return AdditionalSettingsParse(null, false, false)
+    val obj =
+        when (additional) {
+            is JsonPrimitive -> {
+                additional.contentOrNull?.let {
+                    runCatching { json.parseToJsonElement(it).jsonObject }.getOrNull()
+                }
+            }
+
+            else -> {
+                runCatching { additional.jsonObject }.getOrNull()
+            }
+        } ?: return AdditionalSettingsParse(null, false, false)
 
     val filter = obj["apkFilterRegEx"]?.jsonPrimitive?.contentOrNull?.takeIf { it.isNotBlank() }
     val invertFilter = obj["invertAPKFilter"]?.jsonPrimitive?.runCatching { boolean }?.getOrNull() == true

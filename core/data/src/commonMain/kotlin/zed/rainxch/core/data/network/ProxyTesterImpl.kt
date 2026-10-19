@@ -16,10 +16,12 @@ import kotlin.coroutines.cancellation.CancellationException
 import kotlin.time.TimeSource
 
 class ProxyTesterImpl : ProxyTester {
-    override suspend fun test(config: ProxyConfig): ProxyTestOutcome =
-        test(config, TEST_URL)
+    override suspend fun test(config: ProxyConfig): ProxyTestOutcome = test(config, TEST_URL)
 
-    override suspend fun test(config: ProxyConfig, url: String): ProxyTestOutcome {
+    override suspend fun test(
+        config: ProxyConfig,
+        url: String,
+    ): ProxyTestOutcome {
         val client =
             createPlatformHttpClient(config).config {
                 install(HttpTimeout) {
@@ -36,14 +38,17 @@ class ProxyTesterImpl : ProxyTester {
             val elapsed = started.elapsedNow().inWholeMilliseconds
 
             when {
-                response.status.value == 407 ->
+                response.status.value == 407 -> {
                     ProxyTestOutcome.Failure.ProxyAuthRequired
+                }
 
-                response.status.value in 200..299 ->
+                response.status.value in 200..299 -> {
                     ProxyTestOutcome.Success(latencyMs = elapsed)
+                }
 
-                else ->
+                else -> {
                     ProxyTestOutcome.Failure.UnexpectedResponse(response.status.value)
+                }
             }
         } catch (e: CancellationException) {
             throw e

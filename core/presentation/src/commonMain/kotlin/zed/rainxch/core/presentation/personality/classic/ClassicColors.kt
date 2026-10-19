@@ -11,31 +11,56 @@ private data class ClassicPrimary(
     val onPrimaryContainer: Color,
 )
 
-private fun classicPrimary(accent: AccentId, dark: Boolean): ClassicPrimary =
+private fun classicPrimary(
+    accent: AccentId,
+    dark: Boolean,
+): ClassicPrimary =
     when (accent) {
-        AccentId.COBALT ->
-            if (dark) ClassicPrimary(Color(0xFFB6C4FF), Color(0xFF00257A), Color(0xFF2C44A8), Color(0xFFDCE1FF))
-            else ClassicPrimary(Color(0xFF3B5BDB), Color(0xFFFFFFFF), Color(0xFFDCE1FF), Color(0xFF00164E))
+        AccentId.COBALT -> {
+            if (dark) {
+                ClassicPrimary(Color(0xFFB6C4FF), Color(0xFF00257A), Color(0xFF2C44A8), Color(0xFFDCE1FF))
+            } else {
+                ClassicPrimary(Color(0xFF3B5BDB), Color(0xFFFFFFFF), Color(0xFFDCE1FF), Color(0xFF00164E))
+            }
+        }
 
-        AccentId.CRIMSON ->
-            if (dark) ClassicPrimary(Color(0xFFFFB4AB), Color(0xFF690005), Color(0xFF93000A), Color(0xFFFFDAD6))
-            else ClassicPrimary(Color(0xFFB3261E), Color(0xFFFFFFFF), Color(0xFFF9DEDC), Color(0xFF410E0B))
+        AccentId.CRIMSON -> {
+            if (dark) {
+                ClassicPrimary(Color(0xFFFFB4AB), Color(0xFF690005), Color(0xFF93000A), Color(0xFFFFDAD6))
+            } else {
+                ClassicPrimary(Color(0xFFB3261E), Color(0xFFFFFFFF), Color(0xFFF9DEDC), Color(0xFF410E0B))
+            }
+        }
 
-        AccentId.SUN ->
-            if (dark) ClassicPrimary(Color(0xFFF4BE48), Color(0xFF3F2E00), Color(0xFF5B4300), Color(0xFFFFDEA8))
-            else ClassicPrimary(Color(0xFF7A5900), Color(0xFFFFFFFF), Color(0xFFFFDEA8), Color(0xFF261900))
+        AccentId.SUN -> {
+            if (dark) {
+                ClassicPrimary(Color(0xFFF4BE48), Color(0xFF3F2E00), Color(0xFF5B4300), Color(0xFFFFDEA8))
+            } else {
+                ClassicPrimary(Color(0xFF7A5900), Color(0xFFFFFFFF), Color(0xFFFFDEA8), Color(0xFF261900))
+            }
+        }
 
-        AccentId.FROST ->
-            if (dark) ClassicPrimary(Color(0xFF4DD9E3), Color(0xFF00363A), Color(0xFF004F54), Color(0xFF6FF6FE))
-            else ClassicPrimary(Color(0xFF00696E), Color(0xFFFFFFFF), Color(0xFF6FF6FE), Color(0xFF002022))
+        AccentId.FROST -> {
+            if (dark) {
+                ClassicPrimary(Color(0xFF4DD9E3), Color(0xFF00363A), Color(0xFF004F54), Color(0xFF6FF6FE))
+            } else {
+                ClassicPrimary(Color(0xFF00696E), Color(0xFFFFFFFF), Color(0xFF6FF6FE), Color(0xFF002022))
+            }
+        }
 
-        AccentId.MONO ->
-            if (dark) ClassicPrimary(Color(0xFFC7C7C7), Color(0xFF2E2E2E), Color(0xFF474747), Color(0xFFE4E4E4))
-            else ClassicPrimary(Color(0xFF4A4A4A), Color(0xFFFFFFFF), Color(0xFFE2E2E2), Color(0xFF1A1A1A))
+        AccentId.MONO -> {
+            if (dark) {
+                ClassicPrimary(Color(0xFFC7C7C7), Color(0xFF2E2E2E), Color(0xFF474747), Color(0xFFE4E4E4))
+            } else {
+                ClassicPrimary(Color(0xFF4A4A4A), Color(0xFFFFFFFF), Color(0xFFE2E2E2), Color(0xFF1A1A1A))
+            }
+        }
     }
 
-fun classicAccentSwatch(accent: AccentId, dark: Boolean): Pair<Color, Color> =
-    classicPrimary(accent, dark).let { it.primary to it.onPrimary }
+fun classicAccentSwatch(
+    accent: AccentId,
+    dark: Boolean,
+): Pair<Color, Color> = classicPrimary(accent, dark).let { it.primary to it.onPrimary }
 
 private data class ClassicNeutral(
     val background: Color,

@@ -2,10 +2,10 @@ package zed.rainxch.core.data.utils
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import zed.rainxch.core.domain.helpers.AppLauncher
 import zed.rainxch.core.domain.logging.KomiStoreLogger
 import zed.rainxch.core.domain.model.installation.InstalledApp
 import zed.rainxch.core.domain.model.system.Platform
-import zed.rainxch.core.domain.helpers.AppLauncher
 import java.io.File
 
 class DesktopAppLauncher(

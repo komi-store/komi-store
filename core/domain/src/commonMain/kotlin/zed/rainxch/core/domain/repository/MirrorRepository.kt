@@ -6,7 +6,6 @@ import zed.rainxch.core.domain.model.mirror.MirrorPreference
 import zed.rainxch.core.domain.model.mirror.MirrorRemoved
 
 interface MirrorRepository {
-
     fun observeCatalog(): Flow<List<MirrorConfig>>
 
     suspend fun refreshCatalog(): Result<Unit>
@@ -20,8 +19,4 @@ interface MirrorRepository {
     suspend fun measureLatencies(): Result<Map<String, Int>>
 
     fun observeRemovedNotices(): Flow<MirrorRemoved>
-
-    suspend fun snoozeAutoSuggest(forMs: Long)
-
-    suspend fun dismissAutoSuggestPermanently()
 }

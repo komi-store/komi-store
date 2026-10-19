@@ -36,11 +36,12 @@ fun StatItem(
     val colors = LocalPersonality.current.colors
     val rowShape = RoundedCornerShape(LocalPersonality.current.shape.corner)
     Column(
-        modifier = modifier
-            .clip(rowShape)
-            .border(width = 1.dp, color = colors.outline, shape = rowShape)
-            .background(colors.surface)
-            .padding(horizontal = 14.dp, vertical = 10.dp),
+        modifier =
+            modifier
+                .clip(rowShape)
+                .border(width = 1.dp, color = colors.outline, shape = rowShape)
+                .background(colors.surface)
+                .padding(horizontal = 14.dp, vertical = 10.dp),
     ) {
         KomiText(
             text = label,
@@ -74,11 +75,12 @@ fun TextStatItem(
     val colors = LocalPersonality.current.colors
     val rowShape = RoundedCornerShape(LocalPersonality.current.shape.corner)
     Column(
-        modifier = modifier
-            .clip(rowShape)
-            .border(width = 1.dp, color = colors.outline, shape = rowShape)
-            .background(colors.surface)
-            .padding(horizontal = 14.dp, vertical = 10.dp),
+        modifier =
+            modifier
+                .clip(rowShape)
+                .border(width = 1.dp, color = colors.outline, shape = rowShape)
+                .background(colors.surface)
+                .padding(horizontal = 14.dp, vertical = 10.dp),
     ) {
         KomiText(
             text = label,

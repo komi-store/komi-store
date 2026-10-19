@@ -4,7 +4,6 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class DownloadStagePhaseTest {
-
     @Test
     fun everyStageMapsToExactlyOneClass() {
         val byClass =

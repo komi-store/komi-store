@@ -70,18 +70,19 @@ class AndroidDownloadProgressNotifier(
                 .setOnlyAlertOnce(true)
                 .setProgress(100, percent ?: 0, indeterminate)
                 .addAction(
-                    NotificationCompat.Action.Builder(
-                        primaryIcon,
-                        primaryLabel,
-                        primaryPendingIntent,
-                    ).build(),
-                )
-                .addAction(
-                    NotificationCompat.Action.Builder(
-                        android.R.drawable.ic_menu_delete,
-                        deleteLabel,
-                        discardPendingIntent,
-                    ).build(),
+                    NotificationCompat.Action
+                        .Builder(
+                            primaryIcon,
+                            primaryLabel,
+                            primaryPendingIntent,
+                        ).build(),
+                ).addAction(
+                    NotificationCompat.Action
+                        .Builder(
+                            android.R.drawable.ic_menu_delete,
+                            deleteLabel,
+                            discardPendingIntent,
+                        ).build(),
                 )
 
         NotificationManagerCompat
@@ -123,8 +124,7 @@ class AndroidDownloadProgressNotifier(
         ) == PackageManager.PERMISSION_GRANTED
     }
 
-    private fun notificationIdFor(packageName: String): Int =
-        NOTIFICATION_ID_BASE + (packageName.hashCode() and 0x00FFFFFF)
+    private fun notificationIdFor(packageName: String): Int = NOTIFICATION_ID_BASE + (packageName.hashCode() and 0x00FFFFFF)
 
     private fun formatProgressText(
         versionTag: String,

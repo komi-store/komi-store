@@ -58,7 +58,7 @@ fun BottomNavigation(
 
 @Preview
 @Composable
-fun BottomNavigationPreview() {
+private fun BottomNavigationPreview() {
     PersonalityPreview {
         BottomNavigation(
             currentScreen = GithubStoreGraph.ExploreScreen,

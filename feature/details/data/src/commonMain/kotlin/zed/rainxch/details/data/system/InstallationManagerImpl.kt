@@ -32,8 +32,9 @@ class InstallationManagerImpl(
         isUpdate: Boolean,
         trackedPackageName: String?,
     ): ApkValidationResult {
-        val apkInfo = installer.getApkInfoExtractor().extractPackageInfo(filePath)
-            ?: return ApkValidationResult.ExtractionFailed
+        val apkInfo =
+            installer.getApkInfoExtractor().extractPackageInfo(filePath)
+                ?: return ApkValidationResult.ExtractionFailed
 
         if (isUpdate && trackedPackageName != null && apkInfo.packageName != trackedPackageName) {
             return ApkValidationResult.PackageMismatch(
@@ -99,7 +100,6 @@ class InstallationManagerImpl(
                     installedReleaseId = params.releaseId,
                     installedAssetId = params.assetId,
                     installedAssetDigest = params.assetDigest,
-
                     latestVersion = null,
                     latestAssetName = null,
                     latestAssetUrl = null,

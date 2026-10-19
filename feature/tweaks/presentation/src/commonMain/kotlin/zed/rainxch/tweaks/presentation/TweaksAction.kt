@@ -106,7 +106,9 @@ sealed interface TweaksAction {
 
     data object OnInstallerAttributionCustomToggleExpanded : TweaksAction
 
-    data class OnInstallerAttributionCustomChanged(val value: String) : TweaksAction
+    data class OnInstallerAttributionCustomChanged(
+        val value: String,
+    ) : TweaksAction
 
     data object OnInstallerAttributionCustomSave : TweaksAction
 
@@ -152,7 +154,9 @@ sealed interface TweaksAction {
 
     data object OnLanguagePickerDismiss : TweaksAction
 
-    data class OnLanguageQueryChange(val query: String) : TweaksAction
+    data class OnLanguageQueryChange(
+        val query: String,
+    ) : TweaksAction
 
     data object OnTranslationProviderExpandToggle : TweaksAction
 
@@ -166,9 +170,13 @@ sealed interface TweaksAction {
 
     data object OnConnectionMasterExpandToggle : TweaksAction
 
-    data class OnProxyScopeExpandToggle(val scope: ProxyScope) : TweaksAction
+    data class OnProxyScopeExpandToggle(
+        val scope: ProxyScope,
+    ) : TweaksAction
 
-    data class OnDesktopSectionSelected(val section: DesktopSection) : TweaksAction
+    data class OnDesktopSectionSelected(
+        val section: DesktopSection,
+    ) : TweaksAction
 
     data object OnMirrorPickerClick : TweaksAction
 
@@ -243,26 +251,59 @@ sealed interface TweaksAction {
     data object OnReevaluateBatteryOptimizationCard : TweaksAction
 
     data object OnOpenCustomForgesDialog : TweaksAction
-    data object OnDismissCustomForgesDialog : TweaksAction
-    data class OnCustomForgeDraftChanged(val draft: String) : TweaksAction
-    data object OnAddCustomForge : TweaksAction
-    data class OnRemoveCustomForge(val host: String) : TweaksAction
 
-    data class OnMasterProxyTypeSelected(val type: ProxyType) : TweaksAction
-    data class OnMasterProxyHostChanged(val host: String) : TweaksAction
-    data class OnMasterProxyPortChanged(val port: String) : TweaksAction
-    data class OnMasterProxyUsernameChanged(val username: String) : TweaksAction
-    data class OnMasterProxyPasswordChanged(val password: String) : TweaksAction
+    data object OnDismissCustomForgesDialog : TweaksAction
+
+    data class OnCustomForgeDraftChanged(
+        val draft: String,
+    ) : TweaksAction
+
+    data object OnAddCustomForge : TweaksAction
+
+    data class OnRemoveCustomForge(
+        val host: String,
+    ) : TweaksAction
+
+    data class OnMasterProxyTypeSelected(
+        val type: ProxyType,
+    ) : TweaksAction
+
+    data class OnMasterProxyHostChanged(
+        val host: String,
+    ) : TweaksAction
+
+    data class OnMasterProxyPortChanged(
+        val port: String,
+    ) : TweaksAction
+
+    data class OnMasterProxyUsernameChanged(
+        val username: String,
+    ) : TweaksAction
+
+    data class OnMasterProxyPasswordChanged(
+        val password: String,
+    ) : TweaksAction
+
     data object OnMasterProxyPasswordVisibilityToggle : TweaksAction
+
     data object OnMasterProxySave : TweaksAction
+
     data object OnMasterProxyTest : TweaksAction
 
-    data class OnProxyPasteUrlChanged(val value: String) : TweaksAction
+    data class OnProxyPasteUrlChanged(
+        val value: String,
+    ) : TweaksAction
+
     data object OnProxyPasteUrlSubmit : TweaksAction
 
-    data class OnScopeUseMainToggled(val scope: ProxyScope, val useMain: Boolean) : TweaksAction
+    data class OnScopeUseMainToggled(
+        val scope: ProxyScope,
+        val useMain: Boolean,
+    ) : TweaksAction
 
     data object OnClearSeenHistoryRequest : TweaksAction
+
     data object OnClearSeenHistoryDismiss : TweaksAction
+
     data object OnClearSeenHistoryConfirm : TweaksAction
 }

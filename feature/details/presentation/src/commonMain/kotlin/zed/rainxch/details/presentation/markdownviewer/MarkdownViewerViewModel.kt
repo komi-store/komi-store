@@ -29,14 +29,14 @@ class MarkdownViewerViewModel(
     private val detailsRepository: DetailsRepository,
     private val translationRepository: TranslationRepository,
 ) : ViewModel() {
-
-    private val _state = MutableStateFlow(
-        MarkdownViewerState(
-            url = url,
-            filename = url.substringAfterLast("/", "Document").substringBefore("?"),
-            deviceLanguageCode = translationRepository.getDeviceLanguageCode(),
-        ),
-    )
+    private val _state =
+        MutableStateFlow(
+            MarkdownViewerState(
+                url = url,
+                filename = url.substringAfterLast("/", "Document").substringBefore("?"),
+                deviceLanguageCode = translationRepository.getDeviceLanguageCode(),
+            ),
+        )
     val state = _state.asStateFlow()
 
     private var renderJob: Job? = null
@@ -55,12 +55,13 @@ class MarkdownViewerViewModel(
         val displayName = SupportedLanguages.all.firstOrNull { it.code == targetLanguageCode }?.displayName
         _state.update {
             it.copy(
-                translation = it.translation.copy(
-                    isTranslating = true,
-                    targetLanguageCode = targetLanguageCode,
-                    targetLanguageDisplayName = displayName,
-                    error = null,
-                ),
+                translation =
+                    it.translation.copy(
+                        isTranslating = true,
+                        targetLanguageCode = targetLanguageCode,
+                        targetLanguageDisplayName = displayName,
+                        error = null,
+                    ),
             )
         }
         viewModelScope.launch {
@@ -69,23 +70,25 @@ class MarkdownViewerViewModel(
             }.onSuccess { result ->
                 _state.update {
                     it.copy(
-                        translation = it.translation.copy(
-                            isTranslating = false,
-                            translatedText = result.translatedText,
-                            isShowingTranslation = true,
-                            detectedSourceLanguage = result.detectedSourceLanguage,
-                            error = null,
-                        ),
+                        translation =
+                            it.translation.copy(
+                                isTranslating = false,
+                                translatedText = result.translatedText,
+                                isShowingTranslation = true,
+                                detectedSourceLanguage = result.detectedSourceLanguage,
+                                error = null,
+                            ),
                     )
                 }
                 recompose()
             }.onFailure { e ->
                 _state.update {
                     it.copy(
-                        translation = it.translation.copy(
-                            isTranslating = false,
-                            error = e.message ?: getString(Res.string.translation_failed),
-                        ),
+                        translation =
+                            it.translation.copy(
+                                isTranslating = false,
+                                error = e.message ?: getString(Res.string.translation_failed),
+                            ),
                     )
                 }
             }
@@ -95,9 +98,10 @@ class MarkdownViewerViewModel(
     fun toggleTranslation() {
         _state.update {
             it.copy(
-                translation = it.translation.copy(
-                    isShowingTranslation = !it.translation.isShowingTranslation,
-                ),
+                translation =
+                    it.translation.copy(
+                        isShowingTranslation = !it.translation.isShowingTranslation,
+                    ),
             )
         }
         recompose()
@@ -125,14 +129,15 @@ class MarkdownViewerViewModel(
     }
 
     fun onLanguageQueryChange(query: String) {
-        val filtered = if (query.isBlank()) {
-            SupportedLanguages.all
-        } else {
-            SupportedLanguages.all.filter {
-                it.displayName.contains(query, ignoreCase = true) ||
-                    it.code.contains(query, ignoreCase = true)
+        val filtered =
+            if (query.isBlank()) {
+                SupportedLanguages.all
+            } else {
+                SupportedLanguages.all.filter {
+                    it.displayName.contains(query, ignoreCase = true) ||
+                        it.code.contains(query, ignoreCase = true)
+                }
             }
-        }
         _state.update { it.copy(languagePickerQuery = query, filteredLanguages = filtered.toImmutableList()) }
     }
 
@@ -161,26 +166,29 @@ class MarkdownViewerViewModel(
 
     private fun recompose() {
         renderJob?.cancel()
-        renderJob = viewModelScope.launch {
-            val translation = _state.value.translation
-            val displayed = if (translation.isShowingTranslation && translation.translatedText != null) {
-                translation.translatedText
-            } else {
-                _state.value.markdown
+        renderJob =
+            viewModelScope.launch {
+                val translation = _state.value.translation
+                val displayed =
+                    if (translation.isShowingTranslation && translation.translatedText != null) {
+                        translation.translatedText
+                    } else {
+                        _state.value.markdown
+                    }
+                val chunks =
+                    if (displayed.isEmpty()) {
+                        emptyList()
+                    } else {
+                        withContext(Dispatchers.Default) { chunkMarkdown(displayed) }
+                    }
+                _state.update {
+                    it.copy(markdownChunks = chunks.toImmutableList(), isReadyToRender = false)
+                }
+                if (displayed.isNotEmpty()) {
+                    delay(RENDER_ENTER_DELAY_MS)
+                    _state.update { it.copy(isReadyToRender = true) }
+                }
             }
-            val chunks = if (displayed.isEmpty()) {
-                emptyList()
-            } else {
-                withContext(Dispatchers.Default) { chunkMarkdown(displayed) }
-            }
-            _state.update {
-                it.copy(markdownChunks = chunks.toImmutableList(), isReadyToRender = false)
-            }
-            if (displayed.isNotEmpty()) {
-                delay(RENDER_ENTER_DELAY_MS)
-                _state.update { it.copy(isReadyToRender = true) }
-            }
-        }
     }
 
     private fun chunkMarkdown(markdown: String): List<String> {

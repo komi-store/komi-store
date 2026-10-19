@@ -6,17 +6,16 @@ import zed.rainxch.core.domain.model.repository.DiscoveryPlatform
 import zed.rainxch.home.data.dto.CachedGithubOwner
 import zed.rainxch.home.data.dto.CachedGithubRepoSummary
 
-fun BackendRepoResponse.toCachedGithubRepoSummary(
-    platform: DiscoveryPlatform = DiscoveryPlatform.All,
-): CachedGithubRepoSummary =
+fun BackendRepoResponse.toCachedGithubRepoSummary(platform: DiscoveryPlatform = DiscoveryPlatform.All): CachedGithubRepoSummary =
     CachedGithubRepoSummary(
         id = id,
         name = name,
         fullName = fullName,
-        owner = CachedGithubOwner(
-            login = owner.login,
-            avatarUrl = owner.avatarUrl ?: "",
-        ),
+        owner =
+            CachedGithubOwner(
+                login = owner.login,
+                avatarUrl = owner.avatarUrl ?: "",
+            ),
         description = description,
         defaultBranch = defaultBranch ?: "main",
         htmlUrl = htmlUrl,
@@ -30,11 +29,12 @@ fun BackendRepoResponse.toCachedGithubRepoSummary(
         trendingScore = trendingScore,
         popularityScore = popularityScore?.toInt(),
         dailyStars = dailyStars,
-        availablePlatforms = buildList {
-            if (hasInstallersAndroid) add(DiscoveryPlatform.Android)
-            if (hasInstallersWindows) add(DiscoveryPlatform.Windows)
-            if (hasInstallersMacos) add(DiscoveryPlatform.Macos)
-            if (hasInstallersLinux) add(DiscoveryPlatform.Linux)
-        },
+        availablePlatforms =
+            buildList {
+                if (hasInstallersAndroid) add(DiscoveryPlatform.Android)
+                if (hasInstallersWindows) add(DiscoveryPlatform.Windows)
+                if (hasInstallersMacos) add(DiscoveryPlatform.Macos)
+                if (hasInstallersLinux) add(DiscoveryPlatform.Linux)
+            },
         downloadCount = downloadCount,
     )

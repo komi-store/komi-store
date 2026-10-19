@@ -5,6 +5,24 @@ updates:
     schedule:
       interval: weekly
     open-pull-requests-limit: 5
+    ignore:
+      # AGP 8.13 is tested up to Gradle 9.4.1, and 9.6 removed an internal API it uses; lift this with the AGP 9 upgrade.
+      - dependency-name: gradle-wrapper
+        versions: ["[9.5,)"]
+      # Newer releases need compileSdk 37 and AGP 9.1 (AndroidX Compose 1.12, lifecycle 2.11, OkHttp 5.5); lift with the AGP 9 upgrade. Patches still come through.
+      - dependency-name: "org.jetbrains.androidx.lifecycle:*"
+        update-types: ["version-update:semver-minor", "version-update:semver-major"]
+      - dependency-name: "io.ktor:*"
+        update-types: ["version-update:semver-minor", "version-update:semver-major"]
+      - dependency-name: "io.coil-kt.coil3:*"
+        update-types: ["version-update:semver-minor", "version-update:semver-major"]
+      - dependency-name: "com.mikepenz:multiplatform-markdown-renderer*"
+        update-types: ["version-update:semver-minor", "version-update:semver-major"]
+      - dependency-name: "io.github.iamr0s:Dhizuku-API"
+        update-types: ["version-update:semver-minor", "version-update:semver-major"]
+      # Kermit 2.2 deprecates the tag-first log overloads used across the codebase, and warnings are errors; lift with the logging cleanup (D7 in docs/quality/findings.md).
+      - dependency-name: "co.touchlab:kermit*"
+        update-types: ["version-update:semver-minor", "version-update:semver-major"]
     groups:
       kotlin-toolchain:
         patterns:
@@ -12,10 +30,20 @@ updates:
           - "com.google.devtools.ksp*"
           - "*compose.stability*"
           - "com.github.skydoves:compose-stability*"
+          - "org.jetbrains.compose*"
+          - "com.codingfeline.buildkonfig*"
       gradle-minor-and-patch:
         update-types:
           - minor
           - patch
+        # Kotlin-coupled libraries move only with the kotlin-toolchain group; #1078 bundled Kotlin 2.4 here and broke build-logic.
+        exclude-patterns:
+          - "org.jetbrains.kotlin*"
+          - "com.google.devtools.ksp*"
+          - "*compose.stability*"
+          - "com.github.skydoves:compose-stability*"
+          - "org.jetbrains.compose*"
+          - "com.codingfeline.buildkonfig*"
 
   - package-ecosystem: github-actions
     directory: /

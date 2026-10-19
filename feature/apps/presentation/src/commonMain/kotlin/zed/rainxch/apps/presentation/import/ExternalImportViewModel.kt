@@ -111,26 +111,37 @@ class ExternalImportViewModel(
                 startScanIfIdle(force = true)
             }
 
-            is ExternalImportAction.OnSkipCard -> skipPackage(action.packageName, neverAsk = false)
+            is ExternalImportAction.OnSkipCard -> {
+                skipPackage(action.packageName, neverAsk = false)
+            }
 
-            is ExternalImportAction.OnSkipForever -> skipPackage(action.packageName, neverAsk = true)
+            is ExternalImportAction.OnSkipForever -> {
+                skipPackage(action.packageName, neverAsk = true)
+            }
 
-            ExternalImportAction.OnSkipRemaining -> skipRemaining()
+            ExternalImportAction.OnSkipRemaining -> {
+                skipRemaining()
+            }
 
-            ExternalImportAction.OnSkipLongScan -> skipLongScan()
+            ExternalImportAction.OnSkipLongScan -> {
+                skipLongScan()
+            }
 
-            is ExternalImportAction.OnPickSuggestion ->
+            is ExternalImportAction.OnPickSuggestion -> {
                 pickSuggestion(action.packageName, action.suggestion)
+            }
 
-            is ExternalImportAction.OnLinkCard -> linkCardWithPreselected(action.packageName)
+            is ExternalImportAction.OnLinkCard -> {
+                linkCardWithPreselected(action.packageName)
+            }
 
-            is ExternalImportAction.OnToggleCardExpanded -> toggleCardExpanded(action.packageName)
+            is ExternalImportAction.OnToggleCardExpanded -> {
+                toggleCardExpanded(action.packageName)
+            }
 
             is ExternalImportAction.OnSearchOverrideChanged -> {
-
                 _state.update {
                     if (it.activeSearchPackage != action.packageName) {
-
                         it.copy(
                             activeSearchPackage = action.packageName,
                             searchQuery = action.query,
@@ -144,9 +155,13 @@ class ExternalImportViewModel(
                 }
             }
 
-            is ExternalImportAction.OnSearchOverrideSubmit -> submitSearchOverride(action.packageName)
+            is ExternalImportAction.OnSearchOverrideSubmit -> {
+                submitSearchOverride(action.packageName)
+            }
 
-            ExternalImportAction.OnUndoLast -> undoLast()
+            ExternalImportAction.OnUndoLast -> {
+                undoLast()
+            }
 
             ExternalImportAction.OnExit -> {
                 viewModelScope.launch {
@@ -158,9 +173,13 @@ class ExternalImportViewModel(
                 _state.update { it.copy(showCompletionToast = false) }
             }
 
-            ExternalImportAction.OnAutoSummaryContinue -> autoSummaryContinue()
+            ExternalImportAction.OnAutoSummaryContinue -> {
+                autoSummaryContinue()
+            }
 
-            ExternalImportAction.OnAutoSummaryUndoAll -> autoSummaryUndoAll()
+            ExternalImportAction.OnAutoSummaryUndoAll -> {
+                autoSummaryUndoAll()
+            }
 
             ExternalImportAction.OnAddManually -> {
                 viewModelScope.launch {
@@ -198,114 +217,116 @@ class ExternalImportViewModel(
         if (scanJob?.isActive == true) return
 
         skipRevealJob?.cancel()
-        skipRevealJob = viewModelScope.launch {
-            kotlinx.coroutines.delay(SKIP_REVEAL_DELAY_MS)
-            _state.update { it.copy(isSkipAvailable = true) }
-        }
-        scanJob = viewModelScope.launch {
-            try {
-                _state.update {
-                    it.copy(
-                        phase = ImportPhase.Scanning,
-                        errorMessage = null,
-                        scanStartedAtMs = System.currentTimeMillis(),
-                        isSkipAvailable = false,
-                    )
-                }
-
-                externalImportRepository.runFullScan(includeUnverified = true)
-
-                val candidates = externalImportRepository.pendingCandidatesFlow().first()
-                candidatesByPackage = candidates.associateBy { it.packageName }
-
-                _state.update {
-                    it.copy(
-                        phase = ImportPhase.AutoImporting,
-                        totalCandidates = candidates.size,
-                    )
-                }
-
-                val matches = externalImportRepository.resolveMatches(candidates)
-                lastResolvedMatches = matches
-                val autoLinked = autoMaterialize(matches)
-                val autoLinkedPackages = autoLinked.toSet()
-
-                val reviewCandidates =
-                    candidates.filter { it.packageName !in autoLinkedPackages }
-                val reviewMatchesByPkg =
-                    matches.associateBy { it.packageName }
-
-                val cards =
-                    reviewCandidates
-                        .mapNotNull { candidate ->
-                            val match = reviewMatchesByPkg[candidate.packageName]
-                            buildCard(candidate, match)
-                        }.toImmutableList()
-
-                skipRevealJob?.cancel()
-                skipRevealJob = null
-
-                if (autoLinked.isNotEmpty()) {
-
-                    val autoLinkedLabels = autoLinked.mapNotNull { pkg ->
-                        candidatesByPackage[pkg]?.appLabel
-                    }
-                    _state.update {
-                        it.copy(
-                            phase = ImportPhase.AutoImportSummary,
-                            cards = cards,
-                            autoImported = autoLinked.size,
-                            autoLinkedPackages = autoLinked.toPersistentList(),
-                            autoLinkedLabels = autoLinkedLabels.toPersistentList(),
-                            scanStartedAtMs = null,
-                            isSkipAvailable = false,
-                        )
-                    }
-                } else if (cards.isEmpty()) {
-                    _state.update {
-                        it.copy(
-                            phase = ImportPhase.Done,
-                            cards = persistentListOf(),
-                            autoImported = 0,
-                            showCompletionToast = true,
-                            scanStartedAtMs = null,
-                            isSkipAvailable = false,
-                            confettiPlayCount = it.confettiPlayCount + 1,
-                        )
-                    }
-                } else {
-                    _state.update {
-                        it.copy(
-                            phase = ImportPhase.AwaitingReview,
-                            cards = cards,
-                            autoImported = 0,
-                            scanStartedAtMs = null,
-                            isSkipAvailable = false,
-                        )
-                    }
-                }
-            } catch (e: CancellationException) {
-                throw e
-            } catch (e: Exception) {
-                logger.error("External import scan failed: ${e.message}")
-                _state.update {
-                    it.copy(
-                        phase = ImportPhase.Idle,
-                        errorMessage = e.message,
-                        scanStartedAtMs = null,
-                        isSkipAvailable = false,
-                    )
-                }
-                _events.send(
-                    ExternalImportEvent.ShowError(
-                        e.message ?: getString(Res.string.external_import_error_scan_failed_default),
-                    ),
-                )
-            } finally {
-                skipRevealJob?.cancel()
-                skipRevealJob = null
+        skipRevealJob =
+            viewModelScope.launch {
+                kotlinx.coroutines.delay(SKIP_REVEAL_DELAY_MS)
+                _state.update { it.copy(isSkipAvailable = true) }
             }
-        }
+        scanJob =
+            viewModelScope.launch {
+                try {
+                    _state.update {
+                        it.copy(
+                            phase = ImportPhase.Scanning,
+                            errorMessage = null,
+                            scanStartedAtMs = System.currentTimeMillis(),
+                            isSkipAvailable = false,
+                        )
+                    }
+
+                    externalImportRepository.runFullScan(includeUnverified = true)
+
+                    val candidates = externalImportRepository.pendingCandidatesFlow().first()
+                    candidatesByPackage = candidates.associateBy { it.packageName }
+
+                    _state.update {
+                        it.copy(
+                            phase = ImportPhase.AutoImporting,
+                            totalCandidates = candidates.size,
+                        )
+                    }
+
+                    val matches = externalImportRepository.resolveMatches(candidates)
+                    lastResolvedMatches = matches
+                    val autoLinked = autoMaterialize(matches)
+                    val autoLinkedPackages = autoLinked.toSet()
+
+                    val reviewCandidates =
+                        candidates.filter { it.packageName !in autoLinkedPackages }
+                    val reviewMatchesByPkg =
+                        matches.associateBy { it.packageName }
+
+                    val cards =
+                        reviewCandidates
+                            .mapNotNull { candidate ->
+                                val match = reviewMatchesByPkg[candidate.packageName]
+                                buildCard(candidate, match)
+                            }.toImmutableList()
+
+                    skipRevealJob?.cancel()
+                    skipRevealJob = null
+
+                    if (autoLinked.isNotEmpty()) {
+                        val autoLinkedLabels =
+                            autoLinked.mapNotNull { pkg ->
+                                candidatesByPackage[pkg]?.appLabel
+                            }
+                        _state.update {
+                            it.copy(
+                                phase = ImportPhase.AutoImportSummary,
+                                cards = cards,
+                                autoImported = autoLinked.size,
+                                autoLinkedPackages = autoLinked.toPersistentList(),
+                                autoLinkedLabels = autoLinkedLabels.toPersistentList(),
+                                scanStartedAtMs = null,
+                                isSkipAvailable = false,
+                            )
+                        }
+                    } else if (cards.isEmpty()) {
+                        _state.update {
+                            it.copy(
+                                phase = ImportPhase.Done,
+                                cards = persistentListOf(),
+                                autoImported = 0,
+                                showCompletionToast = true,
+                                scanStartedAtMs = null,
+                                isSkipAvailable = false,
+                                confettiPlayCount = it.confettiPlayCount + 1,
+                            )
+                        }
+                    } else {
+                        _state.update {
+                            it.copy(
+                                phase = ImportPhase.AwaitingReview,
+                                cards = cards,
+                                autoImported = 0,
+                                scanStartedAtMs = null,
+                                isSkipAvailable = false,
+                            )
+                        }
+                    }
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (e: Exception) {
+                    logger.error("External import scan failed: ${e.message}")
+                    _state.update {
+                        it.copy(
+                            phase = ImportPhase.Idle,
+                            errorMessage = e.message,
+                            scanStartedAtMs = null,
+                            isSkipAvailable = false,
+                        )
+                    }
+                    _events.send(
+                        ExternalImportEvent.ShowError(
+                            e.message ?: getString(Res.string.external_import_error_scan_failed_default),
+                        ),
+                    )
+                } finally {
+                    skipRevealJob?.cancel()
+                    skipRevealJob = null
+                }
+            }
     }
 
     private fun skipLongScan() {
@@ -319,11 +340,11 @@ class ExternalImportViewModel(
         val partialCandidates = candidatesByPackage.values.toList()
         val partialMatchesByPkg = lastResolvedMatches.associateBy { it.packageName }
         viewModelScope.launch {
-            val cards = partialCandidates
-                .mapNotNull { candidate ->
-                    buildCard(candidate, partialMatchesByPkg[candidate.packageName])
-                }
-                .toImmutableList()
+            val cards =
+                partialCandidates
+                    .mapNotNull { candidate ->
+                        buildCard(candidate, partialMatchesByPkg[candidate.packageName])
+                    }.toImmutableList()
             _state.update {
                 it.copy(
                     phase = if (cards.isEmpty()) ImportPhase.Done else ImportPhase.AwaitingReview,
@@ -377,78 +398,95 @@ class ExternalImportViewModel(
 
         searchJob?.cancel()
         _state.update { it.copy(isSearching = true, searchError = null) }
-        searchJob = viewModelScope.launch {
-            val customHosts = runCatching {
-                tweaksRepository.getCustomForgeHosts().first()
-            }.getOrElse { emptySet() }
-            val parsed = RepositoryUrlParser.parse(query, customHosts)
-            if (parsed != null) {
-                val sourceHost = when (val src = parsed.source) {
-                    RepositorySource.GitHub -> null
-                    is RepositorySource.Forgejo -> src.host
+        searchJob =
+            viewModelScope.launch {
+                val customHosts =
+                    runCatching {
+                        tweaksRepository.getCustomForgeHosts().first()
+                    }.getOrElse { emptySet() }
+                val parsed = RepositoryUrlParser.parse(query, customHosts)
+                if (parsed != null) {
+                    val sourceHost =
+                        when (val src = parsed.source) {
+                            RepositorySource.GitHub -> null
+                            is RepositorySource.Forgejo -> src.host
+                        }
+                    _state.update {
+                        if (it.activeSearchPackage != packageName) {
+                            it
+                        } else {
+                            it.copy(
+                                isSearching = false,
+                                searchError = null,
+                                searchResults =
+                                    persistentListOf(
+                                        RepoSuggestionUi(
+                                            owner = parsed.owner,
+                                            repo = parsed.repo,
+                                            confidence = 1.0,
+                                            source = SuggestionSource.MANUAL,
+                                            stars = null,
+                                            description = null,
+                                            sourceHost = sourceHost,
+                                        ),
+                                    ),
+                            )
+                        }
+                    }
+                    return@launch
                 }
-                _state.update {
-                    if (it.activeSearchPackage != packageName) it
-                    else it.copy(
-                        isSearching = false,
-                        searchError = null,
-                        searchResults = persistentListOf(
-                            RepoSuggestionUi(
-                                owner = parsed.owner,
-                                repo = parsed.repo,
-                                confidence = 1.0,
-                                source = SuggestionSource.MANUAL,
-                                stars = null,
-                                description = null,
-                                sourceHost = sourceHost,
-                            ),
-                        ),
-                    )
-                }
-                return@launch
-            }
 
-            val result = runCatching { externalImportRepository.searchRepos(query) }
-                .getOrElse { e ->
-                    if (e is CancellationException) throw e
-                    Result.failure(e)
-                }
-            result.fold(
-                onSuccess = { suggestions ->
-                    _state.update {
-                        if (it.activeSearchPackage != packageName) it
-                        else it.copy(
-                            isSearching = false,
-                            searchError = null,
-                            searchResults =
-                                suggestions.map { s -> s.toUi() }.toImmutableList(),
-                        )
-                    }
-                },
-                onFailure = { e ->
-                    if (e is CancellationException) throw e
-                    logger.error("Search override failed for '$query': ${e.message}")
-                    val fallback = getString(Res.string.external_import_search_error_default)
-                    _state.update {
-                        if (it.activeSearchPackage != packageName) it
-                        else it.copy(
-                            isSearching = false,
-                            searchError = e.message ?: fallback,
-                            searchResults = persistentListOf(),
-                        )
-                    }
-                },
-            )
-        }
+                val result =
+                    runCatching { externalImportRepository.searchRepos(query) }
+                        .getOrElse { e ->
+                            if (e is CancellationException) throw e
+                            Result.failure(e)
+                        }
+                result.fold(
+                    onSuccess = { suggestions ->
+                        _state.update {
+                            if (it.activeSearchPackage != packageName) {
+                                it
+                            } else {
+                                it.copy(
+                                    isSearching = false,
+                                    searchError = null,
+                                    searchResults =
+                                        suggestions.map { s -> s.toUi() }.toImmutableList(),
+                                )
+                            }
+                        }
+                    },
+                    onFailure = { e ->
+                        if (e is CancellationException) throw e
+                        logger.error("Search override failed for '$query': ${e.message}")
+                        val fallback = getString(Res.string.external_import_search_error_default)
+                        _state.update {
+                            if (it.activeSearchPackage != packageName) {
+                                it
+                            } else {
+                                it.copy(
+                                    isSearching = false,
+                                    searchError = e.message ?: fallback,
+                                    searchResults = persistentListOf(),
+                                )
+                            }
+                        }
+                    },
+                )
+            }
     }
 
-    private fun skipPackage(packageName: String, neverAsk: Boolean) {
+    private fun skipPackage(
+        packageName: String,
+        neverAsk: Boolean,
+    ) {
         val card = _state.value.cards.firstOrNull { it.packageName == packageName } ?: return
         viewModelScope.launch {
-
-            val snapshotResult = runCatching {
-                externalImportRepository.snapshotDecision(packageName)
-            }
+            val snapshotResult =
+                runCatching {
+                    externalImportRepository.snapshotDecision(packageName)
+                }
             if (snapshotResult.isFailure) {
                 logger.error("Snapshot read failed for $packageName: ${snapshotResult.exceptionOrNull()?.message}")
                 _events.send(
@@ -461,15 +499,16 @@ class ExternalImportViewModel(
             val snapshot = snapshotResult.getOrNull()
             val hadInstalledRow = installedAppsRepository.getAppByPackage(packageName) != null
 
-            val ok = try {
-                externalImportRepository.skipPackage(packageName, neverAsk = neverAsk)
-                true
-            } catch (e: CancellationException) {
-                throw e
-            } catch (e: Exception) {
-                logger.error("Skip failed for $packageName: ${e.message}")
-                false
-            }
+            val ok =
+                try {
+                    externalImportRepository.skipPackage(packageName, neverAsk = neverAsk)
+                    true
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (e: Exception) {
+                    logger.error("Skip failed for $packageName: ${e.message}")
+                    false
+                }
             if (!ok) {
                 _events.send(
                     ExternalImportEvent.ShowError(
@@ -481,12 +520,13 @@ class ExternalImportViewModel(
 
             removeCardFromState(packageName) { it.copy(skipped = it.skipped + 1) }
 
-            pendingUndo = PendingUndo(
-                card = card,
-                snapshot = snapshot,
-                hadInstalledAppRowBefore = hadInstalledRow,
-                kind = PendingUndo.Kind.Skip,
-            )
+            pendingUndo =
+                PendingUndo(
+                    card = card,
+                    snapshot = snapshot,
+                    hadInstalledAppRowBefore = hadInstalledRow,
+                    kind = PendingUndo.Kind.Skip,
+                )
             _events.send(
                 ExternalImportEvent.ShowUndoSnackbar(
                     getString(Res.string.external_import_undo_skipped, card.appLabel),
@@ -495,7 +535,10 @@ class ExternalImportViewModel(
         }
     }
 
-    private fun pickSuggestion(packageName: String, suggestion: RepoSuggestionUi) {
+    private fun pickSuggestion(
+        packageName: String,
+        suggestion: RepoSuggestionUi,
+    ) {
         val card = _state.value.cards.firstOrNull { it.packageName == packageName } ?: return
         val preselected = card.preselectedSuggestion
         val source = if (suggestion == preselected) "preselected" else "alternative"
@@ -512,9 +555,10 @@ class ExternalImportViewModel(
                 return@launch
             }
 
-            val snapshotResult = runCatching {
-                externalImportRepository.snapshotDecision(packageName)
-            }
+            val snapshotResult =
+                runCatching {
+                    externalImportRepository.snapshotDecision(packageName)
+                }
             if (snapshotResult.isFailure) {
                 logger.error("Snapshot read failed for $packageName: ${snapshotResult.exceptionOrNull()?.message}")
                 _events.send(
@@ -527,13 +571,14 @@ class ExternalImportViewModel(
             val snapshot = snapshotResult.getOrNull()
             val hadInstalledRow = installedAppsRepository.getAppByPackage(packageName) != null
 
-            val materialized = materializeAndMark(
-                candidate,
-                suggestion.owner,
-                suggestion.repo,
-                source,
-                suggestion.sourceHost,
-            )
+            val materialized =
+                materializeAndMark(
+                    candidate,
+                    suggestion.owner,
+                    suggestion.repo,
+                    source,
+                    suggestion.sourceHost,
+                )
             if (!materialized) {
                 _events.send(
                     ExternalImportEvent.ShowError(
@@ -544,12 +589,13 @@ class ExternalImportViewModel(
             }
             removeCardFromState(packageName) { it.copy(manuallyLinked = it.manuallyLinked + 1) }
 
-            pendingUndo = PendingUndo(
-                card = card,
-                snapshot = snapshot,
-                hadInstalledAppRowBefore = hadInstalledRow,
-                kind = PendingUndo.Kind.Link,
-            )
+            pendingUndo =
+                PendingUndo(
+                    card = card,
+                    snapshot = snapshot,
+                    hadInstalledAppRowBefore = hadInstalledRow,
+                    kind = PendingUndo.Kind.Link,
+                )
             _events.send(
                 ExternalImportEvent.ShowUndoSnackbar(
                     getString(Res.string.external_import_undo_linked, card.appLabel),
@@ -564,7 +610,6 @@ class ExternalImportViewModel(
         if (preselect != null) {
             pickSuggestion(packageName, preselect)
         } else {
-
             toggleCardExpanded(packageName)
         }
     }
@@ -574,7 +619,6 @@ class ExternalImportViewModel(
 
         viewModelScope.launch {
             try {
-
                 if (undo.kind == PendingUndo.Kind.Link && !undo.hadInstalledAppRowBefore) {
                     installedAppsRepository.deleteInstalledApp(undo.packageName)
                 }
@@ -590,16 +634,20 @@ class ExternalImportViewModel(
                     if (current.cards.any { it.packageName == undo.packageName }) {
                         current
                     } else {
-                        val tally = when (undo.kind) {
-                            PendingUndo.Kind.Link ->
-                                current.copy(
-                                    manuallyLinked = (current.manuallyLinked - 1).coerceAtLeast(0),
-                                )
-                            PendingUndo.Kind.Skip ->
-                                current.copy(
-                                    skipped = (current.skipped - 1).coerceAtLeast(0),
-                                )
-                        }
+                        val tally =
+                            when (undo.kind) {
+                                PendingUndo.Kind.Link -> {
+                                    current.copy(
+                                        manuallyLinked = (current.manuallyLinked - 1).coerceAtLeast(0),
+                                    )
+                                }
+
+                                PendingUndo.Kind.Skip -> {
+                                    current.copy(
+                                        skipped = (current.skipped - 1).coerceAtLeast(0),
+                                    )
+                                }
+                            }
                         tally.copy(
                             cards = (listOf(undo.card) + current.cards).toImmutableList(),
                             phase = ImportPhase.AwaitingReview,
@@ -653,7 +701,6 @@ class ExternalImportViewModel(
         val preSnapshots = autoLinkedPreSnapshots
 
         viewModelScope.launch {
-
             try {
                 packages.forEach { pkg ->
                     val preSnapshot = preSnapshots[pkg]
@@ -664,7 +711,6 @@ class ExternalImportViewModel(
                     if (preSnapshot != null) {
                         externalImportRepository.restoreDecision(preSnapshot)
                     } else {
-
                         externalImportRepository.unlink(pkg)
                     }
                 }
@@ -685,15 +731,17 @@ class ExternalImportViewModel(
             autoLinkedPreSnapshots = emptyMap()
 
             val matchesByPkg = lastResolvedMatches.associateBy { it.packageName }
-            val restoredCards = packages.mapNotNull { pkg ->
-                val candidate = candidatesByPackage[pkg] ?: return@mapNotNull null
-                buildCard(candidate, matchesByPkg[pkg])
-            }
+            val restoredCards =
+                packages.mapNotNull { pkg ->
+                    val candidate = candidatesByPackage[pkg] ?: return@mapNotNull null
+                    buildCard(candidate, matchesByPkg[pkg])
+                }
 
             _state.update { state ->
-                val merged = (restoredCards + state.cards)
-                    .distinctBy { it.packageName }
-                    .toImmutableList()
+                val merged =
+                    (restoredCards + state.cards)
+                        .distinctBy { it.packageName }
+                        .toImmutableList()
                 state.copy(
                     phase = if (merged.isEmpty()) ImportPhase.Done else ImportPhase.AwaitingReview,
                     cards = merged,
@@ -701,11 +749,12 @@ class ExternalImportViewModel(
                     autoLinkedPackages = persistentListOf(),
                     autoLinkedLabels = persistentListOf(),
                     showCompletionToast = merged.isEmpty(),
-                    confettiPlayCount = if (merged.isEmpty()) {
-                        state.confettiPlayCount + 1
-                    } else {
-                        state.confettiPlayCount
-                    },
+                    confettiPlayCount =
+                        if (merged.isEmpty()) {
+                            state.confettiPlayCount + 1
+                        } else {
+                            state.confettiPlayCount
+                        },
                 )
             }
         }
@@ -718,7 +767,6 @@ class ExternalImportViewModel(
         if (remaining.isEmpty()) return
 
         viewModelScope.launch {
-
             val successes = mutableSetOf<String>()
             val failures = mutableListOf<String>()
             remaining.forEach { card ->
@@ -749,11 +797,12 @@ class ExternalImportViewModel(
                     phase = if (allSucceeded && keptCards.isEmpty()) ImportPhase.Done else state.phase,
                     skipped = state.skipped + successes.size,
                     showCompletionToast = allSucceeded && keptCards.isEmpty(),
-                    confettiPlayCount = if (allSucceeded) {
-                        state.confettiPlayCount + 1
-                    } else {
-                        state.confettiPlayCount
-                    },
+                    confettiPlayCount =
+                        if (allSucceeded) {
+                            state.confettiPlayCount + 1
+                        } else {
+                            state.confettiPlayCount
+                        },
                 )
             }
 
@@ -776,9 +825,10 @@ class ExternalImportViewModel(
             if (top.confidence < AUTO_LINK_THRESHOLD) return@forEach
             val candidate = candidatesByPackage[result.packageName] ?: return@forEach
 
-            val snapshotResult = runCatching {
-                externalImportRepository.snapshotDecision(result.packageName)
-            }
+            val snapshotResult =
+                runCatching {
+                    externalImportRepository.snapshotDecision(result.packageName)
+                }
             if (snapshotResult.isFailure) {
                 logger.warn(
                     "Skip auto-link for ${result.packageName}: " +
@@ -787,9 +837,10 @@ class ExternalImportViewModel(
                 return@forEach
             }
             val preSnapshot = snapshotResult.getOrNull()
-            val pre = runCatching {
-                installedAppsRepository.getAppByPackage(result.packageName) != null
-            }.getOrDefault(false)
+            val pre =
+                runCatching {
+                    installedAppsRepository.getAppByPackage(result.packageName) != null
+                }.getOrDefault(false)
 
             val ok =
                 materializeAndMark(
@@ -859,7 +910,6 @@ class ExternalImportViewModel(
                 "external_links upsert failed for ${candidate.packageName}: " +
                     "${linkResult.exceptionOrNull()?.message}",
             )
-
         }
         return true
     }
@@ -877,18 +927,18 @@ class ExternalImportViewModel(
         packageName: String,
         tally: (ExternalImportState) -> ExternalImportState,
     ) {
-
         _state.update { current ->
             val newCards = current.cards.filterNot { it.packageName == packageName }.toImmutableList()
-            val tallied = tally(current).copy(
-                cards = newCards,
-                expandedPackages = current.expandedPackages.toPersistentSet().remove(packageName),
-                activeSearchPackage = if (current.activeSearchPackage == packageName) null else current.activeSearchPackage,
-                searchQuery = if (current.activeSearchPackage == packageName) "" else current.searchQuery,
-                searchResults = if (current.activeSearchPackage == packageName) persistentListOf() else current.searchResults,
-                isSearching = if (current.activeSearchPackage == packageName) false else current.isSearching,
-                searchError = if (current.activeSearchPackage == packageName) null else current.searchError,
-            )
+            val tallied =
+                tally(current).copy(
+                    cards = newCards,
+                    expandedPackages = current.expandedPackages.toPersistentSet().remove(packageName),
+                    activeSearchPackage = if (current.activeSearchPackage == packageName) null else current.activeSearchPackage,
+                    searchQuery = if (current.activeSearchPackage == packageName) "" else current.searchQuery,
+                    searchResults = if (current.activeSearchPackage == packageName) persistentListOf() else current.searchResults,
+                    isSearching = if (current.activeSearchPackage == packageName) false else current.isSearching,
+                    searchError = if (current.activeSearchPackage == packageName) null else current.searchError,
+                )
             if (newCards.isEmpty()) {
                 tallied.copy(
                     phase = ImportPhase.Done,
@@ -912,7 +962,6 @@ class ExternalImportViewModel(
                     RepoMatchSource.SEARCH -> SuggestionSource.SEARCH
                     RepoMatchSource.FINGERPRINT -> SuggestionSource.FINGERPRINT
                     RepoMatchSource.MANUAL -> SuggestionSource.MANUAL
-
                     RepoMatchSource.FORGEJO_SEARCH -> SuggestionSource.SEARCH
                     RepoMatchSource.STARRED -> SuggestionSource.STARRED
                 },
@@ -925,10 +974,15 @@ class ExternalImportViewModel(
 
         when (this) {
             InstallerKind.STORE_OBTAINIUM -> getString(Res.string.external_import_installer_obtainium)
+
             InstallerKind.STORE_FDROID -> getString(Res.string.external_import_installer_fdroid)
+
             InstallerKind.BROWSER -> getString(Res.string.external_import_installer_browser)
+
             InstallerKind.SIDELOAD -> getString(Res.string.external_import_installer_sideload)
+
             InstallerKind.GITHUB_STORE_SELF -> getString(Res.string.external_import_installer_self)
+
             InstallerKind.UNKNOWN,
             InstallerKind.STORE_PLAY,
             InstallerKind.STORE_AURORA,

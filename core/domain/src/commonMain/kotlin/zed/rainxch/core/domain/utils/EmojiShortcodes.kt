@@ -1,10 +1,8 @@
 package zed.rainxch.core.domain.utils
 
 object EmojiShortcodes {
-
     private val TABLE: Map<String, String> =
         mapOf(
-
             "rocket" to "🚀",
             "sparkles" to "✨",
             "tada" to "🎉",
@@ -32,7 +30,6 @@ object EmojiShortcodes {
             "point_left" to "👈",
             "point_up" to "☝️",
             "point_down" to "👇",
-
             "warning" to "⚠️",
             "white_check_mark" to "✅",
             "heavy_check_mark" to "✔️",
@@ -50,7 +47,6 @@ object EmojiShortcodes {
             "grey_question" to "❔",
             "grey_exclamation" to "❕",
             "information_source" to "ℹ️",
-
             "heart" to "❤️",
             "yellow_heart" to "💛",
             "green_heart" to "💚",
@@ -63,7 +59,6 @@ object EmojiShortcodes {
             "broken_heart" to "💔",
             "heart_eyes" to "😍",
             "hearts" to "♥️",
-
             "smile" to "😄",
             "smiley" to "😃",
             "grin" to "😁",
@@ -102,7 +97,6 @@ object EmojiShortcodes {
             "poop" to "💩",
             "hankey" to "💩",
             "shit" to "💩",
-
             "computer" to "💻",
             "iphone" to "📱",
             "watch" to "⌚",
@@ -136,7 +130,6 @@ object EmojiShortcodes {
             "mute" to "🔇",
             "mega" to "📣",
             "loudspeaker" to "📢",
-
             "hammer" to "🔨",
             "wrench" to "🔧",
             "screwdriver" to "🪛",
@@ -155,7 +148,6 @@ object EmojiShortcodes {
             "magnet" to "🧲",
             "balance_scale" to "⚖️",
             "scales" to "⚖️",
-
             "bug" to "🐛",
             "ant" to "🐜",
             "bulb" to "💡",
@@ -204,7 +196,6 @@ object EmojiShortcodes {
             "earth_africa" to "🌍",
             "earth_asia" to "🌏",
             "globe_with_meridians" to "🌐",
-
             "octocat" to "🐙",
             "cat" to "🐱",
             "dog" to "🐶",
@@ -230,7 +221,6 @@ object EmojiShortcodes {
             "see_no_evil" to "🙈",
             "hear_no_evil" to "🙉",
             "speak_no_evil" to "🙊",
-
             "coffee" to "☕",
             "tea" to "🍵",
             "beer" to "🍺",
@@ -295,7 +285,6 @@ object EmojiShortcodes {
             "wilted_flower" to "🥀",
             "bouquet" to "💐",
             "cherry_blossom" to "🌸",
-
             "airplane" to "✈️",
             "rocket_ship" to "🚀",
             "car" to "🚗",
@@ -342,7 +331,10 @@ object EmojiShortcodes {
             TABLE[key] ?: match.value
         }
 
-    private data class Chunk(val content: String, val isCode: Boolean)
+    private data class Chunk(
+        val content: String,
+        val isCode: Boolean,
+    )
 
     private fun splitOutCodeRegions(input: String): List<Chunk> {
         val fence = "```"

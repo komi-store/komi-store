@@ -19,13 +19,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
-import zed.rainxch.core.presentation.components.buttons.KomiButton
-import zed.rainxch.core.presentation.components.buttons.KomiButtonSize
-import zed.rainxch.core.presentation.components.buttons.KomiButtonVariant
-import zed.rainxch.core.presentation.components.icon.KomiIcon
-import zed.rainxch.core.presentation.components.text.KomiText
-import zed.rainxch.core.presentation.components.text.KomiTextRole
-import zed.rainxch.core.presentation.locals.LocalPersonality
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -38,6 +31,13 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import org.jetbrains.compose.resources.stringResource
+import zed.rainxch.core.presentation.components.buttons.KomiButton
+import zed.rainxch.core.presentation.components.buttons.KomiButtonSize
+import zed.rainxch.core.presentation.components.buttons.KomiButtonVariant
+import zed.rainxch.core.presentation.components.icon.KomiIcon
+import zed.rainxch.core.presentation.components.text.KomiText
+import zed.rainxch.core.presentation.components.text.KomiTextRole
+import zed.rainxch.core.presentation.locals.LocalPersonality
 import zed.rainxch.githubstore.core.presentation.res.Res
 import zed.rainxch.githubstore.core.presentation.res.apk_inspect_button_label
 import zed.rainxch.githubstore.core.presentation.res.apk_inspect_coachmark_body
@@ -58,16 +58,16 @@ fun InspectApkButton(
 
     Box(modifier = modifier) {
         Box(
-            modifier = Modifier
-                .size(52.dp)
-                .graphicsLayer {
-                    scaleX = pulse
-                    scaleY = pulse
-                    rotationZ = tilt
-                }
-                .clip(buttonShape)
-                .background(colors.surfaceContainerHigh)
-                .clickable(onClick = onClick),
+            modifier =
+                Modifier
+                    .size(52.dp)
+                    .graphicsLayer {
+                        scaleX = pulse
+                        scaleY = pulse
+                        rotationZ = tilt
+                    }.clip(buttonShape)
+                    .background(colors.surfaceContainerHigh)
+                    .clickable(onClick = onClick),
             contentAlignment = Alignment.Center,
         ) {
             KomiIcon(
@@ -90,10 +90,11 @@ private fun rememberPulse(active: Boolean) =
         .animateFloat(
             initialValue = if (active) 1f else 1f,
             targetValue = if (active) 1.08f else 1f,
-            animationSpec = infiniteRepeatable(
-                animation = tween(durationMillis = 900),
-                repeatMode = RepeatMode.Reverse,
-            ),
+            animationSpec =
+                infiniteRepeatable(
+                    animation = tween(durationMillis = 900),
+                    repeatMode = RepeatMode.Reverse,
+                ),
             label = "inspect-pulse-scale",
         )
 
@@ -103,10 +104,11 @@ private fun rememberTilt(active: Boolean) =
         .animateFloat(
             initialValue = if (active) -6f else 0f,
             targetValue = if (active) 6f else 0f,
-            animationSpec = infiniteRepeatable(
-                animation = tween(durationMillis = 1300),
-                repeatMode = RepeatMode.Reverse,
-            ),
+            animationSpec =
+                infiniteRepeatable(
+                    animation = tween(durationMillis = 1300),
+                    repeatMode = RepeatMode.Reverse,
+                ),
             label = "inspect-tilt-deg",
         )
 
@@ -115,21 +117,24 @@ private fun Coachmark(onDismiss: () -> Unit) {
     val colors = LocalPersonality.current.colors
     Popup(
         alignment = Alignment.TopEnd,
-
-        offset = androidx.compose.ui.unit.IntOffset(x = 0, y = -260),
-        properties = PopupProperties(
-            focusable = false,
-            dismissOnBackPress = true,
-            dismissOnClickOutside = false,
-        ),
+        offset =
+            androidx.compose.ui.unit
+                .IntOffset(x = 0, y = -260),
+        properties =
+            PopupProperties(
+                focusable = false,
+                dismissOnBackPress = true,
+                dismissOnClickOutside = false,
+            ),
         onDismissRequest = onDismiss,
     ) {
         Column(horizontalAlignment = Alignment.End) {
             Box(
-                modifier = Modifier
-                    .width(260.dp)
-                    .clip(RoundedCornerShape(LocalPersonality.current.shape.corner))
-                    .background(colors.primary),
+                modifier =
+                    Modifier
+                        .width(260.dp)
+                        .clip(RoundedCornerShape(LocalPersonality.current.shape.corner))
+                        .background(colors.primary),
             ) {
                 Column(
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 14.dp),
@@ -175,10 +180,11 @@ private fun Coachmark(onDismiss: () -> Unit) {
             }
 
             Box(
-                modifier = Modifier
-                    .padding(end = 24.dp)
-                    .size(width = 16.dp, height = 8.dp)
-                    .arrowDown(colors.primary),
+                modifier =
+                    Modifier
+                        .padding(end = 24.dp)
+                        .size(width = 16.dp, height = 8.dp)
+                        .arrowDown(colors.primary),
             )
         }
     }
@@ -190,9 +196,10 @@ private fun Modifier.arrowDown(color: androidx.compose.ui.graphics.Color): Modif
         shape = TriangleDownShape,
     )
 
-private val TriangleDownShape = androidx.compose.foundation.shape.GenericShape { size, _ ->
-    moveTo(0f, 0f)
-    lineTo(size.width, 0f)
-    lineTo(size.width / 2f, size.height)
-    close()
-}
+private val TriangleDownShape =
+    androidx.compose.foundation.shape.GenericShape { size, _ ->
+        moveTo(0f, 0f)
+        lineTo(size.width, 0f)
+        lineTo(size.width / 2f, size.height)
+        close()
+    }

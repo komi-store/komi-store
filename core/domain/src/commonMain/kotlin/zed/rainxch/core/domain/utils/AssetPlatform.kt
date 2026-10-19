@@ -20,17 +20,33 @@ fun isAndroidApk(assetName: String): Boolean {
 fun assetPlatformOf(assetName: String): DiscoveryPlatform? {
     val lower = assetName.lowercase()
     return when {
-        lower.endsWith(".apk") ->
+        lower.endsWith(".apk") -> {
             if (isAndroidApk(assetName)) DiscoveryPlatform.Android else DiscoveryPlatform.Linux
-        lower.endsWith(".ipa") -> DiscoveryPlatform.Ios
-        lower.endsWith(".exe") || lower.endsWith(".msi") -> DiscoveryPlatform.Windows
-        lower.endsWith(".dmg") || lower.endsWith(".pkg") -> DiscoveryPlatform.Macos
+        }
+
+        lower.endsWith(".ipa") -> {
+            DiscoveryPlatform.Ios
+        }
+
+        lower.endsWith(".exe") || lower.endsWith(".msi") -> {
+            DiscoveryPlatform.Windows
+        }
+
+        lower.endsWith(".dmg") || lower.endsWith(".pkg") -> {
+            DiscoveryPlatform.Macos
+        }
+
         lower.endsWith(".deb") ||
             lower.endsWith(".rpm") ||
             lower.endsWith(".appimage") ||
             lower.endsWith(".pkg.tar.zst") ||
             lower.endsWith(".snap") ||
-            lower.endsWith(".flatpakref") -> DiscoveryPlatform.Linux
-        else -> null
+            lower.endsWith(".flatpakref") -> {
+            DiscoveryPlatform.Linux
+        }
+
+        else -> {
+            null
+        }
     }
 }

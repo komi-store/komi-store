@@ -28,10 +28,10 @@ class DetailsWhatsNewViewModel(
     private val detailsRepository: DetailsRepository,
     private val translationRepository: TranslationRepository,
 ) : ViewModel() {
-
-    private val _state = MutableStateFlow(
-        DetailsWhatsNewState(deviceLanguageCode = translationRepository.getDeviceLanguageCode()),
-    )
+    private val _state =
+        MutableStateFlow(
+            DetailsWhatsNewState(deviceLanguageCode = translationRepository.getDeviceLanguageCode()),
+        )
     val state = _state.asStateFlow()
 
     private var rawReleases: List<GithubRelease> = emptyList()
@@ -51,12 +51,13 @@ class DetailsWhatsNewViewModel(
         val displayName = SupportedLanguages.all.firstOrNull { it.code == targetLanguageCode }?.displayName
         _state.update {
             it.copy(
-                translation = it.translation.copy(
-                    isTranslating = true,
-                    targetLanguageCode = targetLanguageCode,
-                    targetLanguageDisplayName = displayName,
-                    error = null,
-                ),
+                translation =
+                    it.translation.copy(
+                        isTranslating = true,
+                        targetLanguageCode = targetLanguageCode,
+                        targetLanguageDisplayName = displayName,
+                        error = null,
+                    ),
             )
         }
         viewModelScope.launch {
@@ -65,23 +66,25 @@ class DetailsWhatsNewViewModel(
             }.onSuccess { result ->
                 _state.update {
                     it.copy(
-                        translation = it.translation.copy(
-                            isTranslating = false,
-                            translatedText = result.translatedText,
-                            isShowingTranslation = true,
-                            detectedSourceLanguage = result.detectedSourceLanguage,
-                            error = null,
-                        ),
+                        translation =
+                            it.translation.copy(
+                                isTranslating = false,
+                                translatedText = result.translatedText,
+                                isShowingTranslation = true,
+                                detectedSourceLanguage = result.detectedSourceLanguage,
+                                error = null,
+                            ),
                     )
                 }
                 rebuild()
             }.onFailure { e ->
                 _state.update {
                     it.copy(
-                        translation = it.translation.copy(
-                            isTranslating = false,
-                            error = e.message ?: getString(Res.string.translation_failed),
-                        ),
+                        translation =
+                            it.translation.copy(
+                                isTranslating = false,
+                                error = e.message ?: getString(Res.string.translation_failed),
+                            ),
                     )
                 }
             }
@@ -91,9 +94,10 @@ class DetailsWhatsNewViewModel(
     fun toggleTranslation() {
         _state.update {
             it.copy(
-                translation = it.translation.copy(
-                    isShowingTranslation = !it.translation.isShowingTranslation,
-                ),
+                translation =
+                    it.translation.copy(
+                        isShowingTranslation = !it.translation.isShowingTranslation,
+                    ),
             )
         }
         rebuild()
@@ -119,14 +123,15 @@ class DetailsWhatsNewViewModel(
     }
 
     fun onLanguageQueryChange(query: String) {
-        val filtered = if (query.isBlank()) {
-            SupportedLanguages.all
-        } else {
-            SupportedLanguages.all.filter {
-                it.displayName.contains(query, ignoreCase = true) ||
-                    it.code.contains(query, ignoreCase = true)
+        val filtered =
+            if (query.isBlank()) {
+                SupportedLanguages.all
+            } else {
+                SupportedLanguages.all.filter {
+                    it.displayName.contains(query, ignoreCase = true) ||
+                        it.code.contains(query, ignoreCase = true)
+                }
             }
-        }
         _state.update { it.copy(languagePickerQuery = query, filteredLanguages = filtered.toImmutableList()) }
     }
 
@@ -135,17 +140,19 @@ class DetailsWhatsNewViewModel(
             _state.update { it.copy(isLoading = true, errorMessage = null) }
             if (noReleaseNotes.isBlank()) noReleaseNotes = getString(Res.string.no_release_notes)
             runCatching {
-                val resolved = if (owner.isNotBlank() && repo.isNotBlank()) {
-                    detailsRepository.getRepositoryByOwnerAndName(owner, repo, sourceHost)
-                } else {
-                    detailsRepository.getRepositoryById(repositoryId)
-                }
-                val releases = detailsRepository.getAllReleases(
-                    owner = resolved.owner.login,
-                    repo = resolved.name,
-                    defaultBranch = resolved.defaultBranch,
-                    sourceHost = sourceHost,
-                )
+                val resolved =
+                    if (owner.isNotBlank() && repo.isNotBlank()) {
+                        detailsRepository.getRepositoryByOwnerAndName(owner, repo, sourceHost)
+                    } else {
+                        detailsRepository.getRepositoryById(repositoryId)
+                    }
+                val releases =
+                    detailsRepository.getAllReleases(
+                        owner = resolved.owner.login,
+                        repo = resolved.name,
+                        defaultBranch = resolved.defaultBranch,
+                        sourceHost = sourceHost,
+                    )
                 resolved to releases
             }.onSuccess { (resolved, releases) ->
                 rawReleases = releases
@@ -159,20 +166,24 @@ class DetailsWhatsNewViewModel(
 
     private fun rebuild() {
         val translation = _state.value.translation
-        val releases = rawReleases.mapIndexed { index, release ->
-            val isLatest = index == 0
-            val translated = translation.translatedText
-                ?.takeIf { isLatest && translation.isShowingTranslation }
-            val body = translated
-                ?: release.description?.takeIf { it.isNotBlank() }
-                ?: noReleaseNotes
-            WhatsNewReleaseUi(
-                id = release.id,
-                tagName = release.tagName,
-                publishedDate = formatIsoDateOrRaw(release.publishedAt),
-                body = body,
-            )
-        }.toImmutableList()
+        val releases =
+            rawReleases
+                .mapIndexed { index, release ->
+                    val isLatest = index == 0
+                    val translated =
+                        translation.translatedText
+                            ?.takeIf { isLatest && translation.isShowingTranslation }
+                    val body =
+                        translated
+                            ?: release.description?.takeIf { it.isNotBlank() }
+                            ?: noReleaseNotes
+                    WhatsNewReleaseUi(
+                        id = release.id,
+                        tagName = release.tagName,
+                        publishedDate = formatIsoDateOrRaw(release.publishedAt),
+                        body = body,
+                    )
+                }.toImmutableList()
         _state.update { it.copy(releases = releases) }
     }
 }

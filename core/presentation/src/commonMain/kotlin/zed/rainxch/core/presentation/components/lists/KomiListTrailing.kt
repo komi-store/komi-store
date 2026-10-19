@@ -10,9 +10,13 @@ sealed interface KomiListTrailing {
 
     data object UnreadDot : KomiListTrailing
 
-    data class Value(val text: String) : KomiListTrailing
+    data class Value(
+        val text: String,
+    ) : KomiListTrailing
 
-    data class Badge(val count: Int) : KomiListTrailing
+    data class Badge(
+        val count: Int,
+    ) : KomiListTrailing
 
     data class Toggle(
         val checked: Boolean,

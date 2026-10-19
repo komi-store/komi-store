@@ -7,12 +7,9 @@ data class ExportedApp(
     val repoOwner: String,
     val repoName: String,
     val repoUrl: String,
-
     val assetFilterRegex: String? = null,
     val fallbackToOlderReleases: Boolean = false,
-
     val preferredAssetVariant: String? = null,
-
     val preferredAssetTokens: String? = null,
     val assetGlobPattern: String? = null,
     val pickedAssetIndex: Int? = null,

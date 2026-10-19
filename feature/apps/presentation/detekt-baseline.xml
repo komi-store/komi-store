@@ -6,7 +6,7 @@
     <ID>CyclomaticComplexMethod:AppsRoot.kt$@Composable fun AppsRoot( onNavigateBack: () -&gt; Unit, onNavigateToRepo: (repoId: Long, sourceHost: String?, owner: String?, repo: String?, packageName: String?) -&gt; Unit, onNavigateToExternalImport: () -&gt; Unit, onNavigateToStarredPicker: () -&gt; Unit, viewModel: AppsViewModel = koinViewModel(), state: AppsState, )</ID>
     <ID>CyclomaticComplexMethod:AppsRoot.kt$@Composable fun AppsScreen( state: AppsState, onAction: (AppsAction) -&gt; Unit, toastState: KomiToastState, )</ID>
     <ID>CyclomaticComplexMethod:AppsViewModel.kt$AppsViewModel$fun onAction(action: AppsAction)</ID>
-    <ID>CyclomaticComplexMethod:AppsViewModel.kt$AppsViewModel$private fun updateSingleApp(app: InstalledAppUi, waitForInstallGate: Boolean = false)</ID>
+    <ID>CyclomaticComplexMethod:AppsViewModel.kt$AppsViewModel$private fun updateSingleApp( app: InstalledAppUi, waitForInstallGate: Boolean = false, )</ID>
     <ID>CyclomaticComplexMethod:AppsViewModel.kt$AppsViewModel$private fun validateAndLinkRepo()</ID>
     <ID>CyclomaticComplexMethod:CompactAppRow.kt$@Composable fun CompactAppRow( appItem: AppItem, onOpenClick: () -&gt; Unit, onInstallPendingClick: () -&gt; Unit, onDiscardPendingClick: () -&gt; Unit, onAdvancedSettingsClick: () -&gt; Unit, onPickVariantClick: () -&gt; Unit, onUninstallClick: () -&gt; Unit, onTogglePreReleases: (Boolean) -&gt; Unit, onToggleUpdateCheck: (Boolean) -&gt; Unit, onUnskipVersionClick: () -&gt; Unit, onRowClick: () -&gt; Unit, modifier: Modifier = Modifier, framed: Boolean = true, )</ID>
     <ID>CyclomaticComplexMethod:ExternalImportRoot.kt$@Composable fun ExternalImportRoot( onNavigateBack: () -&gt; Unit, onNavigateToDetails: (repoId: Long) -&gt; Unit, onAddManually: () -&gt; Unit, viewModel: ExternalImportViewModel = koinViewModel(), )</ID>
@@ -17,14 +17,18 @@
     <ID>LargeClass:ExternalImportViewModel.kt$ExternalImportViewModel : ViewModel</ID>
     <ID>LongMethod:AppsViewModel.kt$AppsViewModel$fun onAction(action: AppsAction)</ID>
     <ID>LongMethod:AppsViewModel.kt$AppsViewModel$private fun openVariantPicker( app: InstalledAppUi, resumeUpdateAfterPick: Boolean, )</ID>
+    <ID>LongMethod:AppsViewModel.kt$AppsViewModel$private fun redownloadPendingApp(app: InstalledAppUi)</ID>
     <ID>LongMethod:AppsViewModel.kt$AppsViewModel$private fun refreshAdvancedPreview()</ID>
     <ID>LongMethod:AppsViewModel.kt$AppsViewModel$private fun updateAllApps()</ID>
-    <ID>LongMethod:AppsViewModel.kt$AppsViewModel$private fun updateSingleApp(app: InstalledAppUi, waitForInstallGate: Boolean = false)</ID>
+    <ID>LongMethod:AppsViewModel.kt$AppsViewModel$private fun updateSingleApp( app: InstalledAppUi, waitForInstallGate: Boolean = false, )</ID>
     <ID>LongMethod:AppsViewModel.kt$AppsViewModel$private fun validateAndLinkRepo()</ID>
     <ID>LongMethod:AppsViewModel.kt$AppsViewModel$private fun validateWithAsset(asset: GithubAssetUi)</ID>
+    <ID>LongMethod:ExternalImportViewModel.kt$ExternalImportViewModel$fun onAction(action: ExternalImportAction)</ID>
     <ID>LongMethod:ExternalImportViewModel.kt$ExternalImportViewModel$private fun autoSummaryUndoAll()</ID>
+    <ID>LongMethod:ExternalImportViewModel.kt$ExternalImportViewModel$private fun pickSuggestion( packageName: String, suggestion: RepoSuggestionUi, )</ID>
     <ID>LongMethod:ExternalImportViewModel.kt$ExternalImportViewModel$private fun startScanIfIdle(force: Boolean = false)</ID>
     <ID>LongMethod:ExternalImportViewModel.kt$ExternalImportViewModel$private fun submitSearchOverride(packageName: String)</ID>
+    <ID>LongMethod:StatusDotCluster.kt$private fun DrawScope.drawShape( shape: DotShape, color: Color, )</ID>
     <ID>LongParameterList:AppsViewModel.kt$AppsViewModel$( private val appsRepository: AppsRepository, private val installer: Installer, private val downloader: Downloader, private val installedAppsRepository: InstalledAppsRepository, private val syncInstalledAppsUseCase: SyncInstalledAppsUseCase, private val logger: KomiStoreLogger, private val shareManager: ShareManager, private val tweaksRepository: TweaksRepository, private val downloadOrchestrator: DownloadOrchestrator, private val externalImportRepository: ExternalImportRepository, private val systemInstallSerializer: SystemInstallSerializer, private val browserHelper: BrowserHelper, )</ID>
     <ID>MagicNumber:AppsViewModel.kt$AppsViewModel$100</ID>
     <ID>MagicNumber:AppsViewModel.kt$AppsViewModel$1000</ID>
@@ -38,16 +42,6 @@
     <ID>MagicNumber:StatusDotCluster.kt$0.4f</ID>
     <ID>MagicNumber:StatusDotCluster.kt$0.75f</ID>
     <ID>MatchingDeclarationName:VersionLine.kt$VersionLineTarget</ID>
-    <ID>MaxLineLength:AppsViewModel.kt$AppsViewModel$logger.debug("Deleted mismatched existing file ($normalizedExisting != $normalizedLatest): $deleted")</ID>
-    <ID>MaxLineLength:AppsViewModel.kt$AppsViewModel$logger.debug("Launched installer for ${app.appName} $latestVersion, waiting for system confirmation")</ID>
-    <ID>MaxLineLength:ExternalImportViewModel.kt$ExternalImportViewModel$activeSearchPackage = if (current.activeSearchPackage == packageName) null else current.activeSearchPackage</ID>
-    <ID>MaxLineLength:ExternalImportViewModel.kt$ExternalImportViewModel$searchResults = if (current.activeSearchPackage == packageName) persistentListOf() else current.searchResults</ID>
-    <ID>MaxLineLength:LinkAppBottomSheet.kt$InstallerCategory.SYSTEM_UPDATE -&gt; stringResource(Res.string.installer_category_system_update)</ID>
-    <ID>MaxLineLength:StarredCandidateRow.kt$private</ID>
-    <ID>MaxLineLength:StarredPickerRoot.kt$onClick = { onAction(StarredPickerAction.OnSortRuleSelected(StarredPickerSortRule.Alphabetical)) }</ID>
-    <ID>MaxLineLength:StarredPickerRoot.kt$onClick = { onAction(StarredPickerAction.OnSortRuleSelected(StarredPickerSortRule.MostStars)) }</ID>
-    <ID>MaxLineLength:StarredPickerRoot.kt$onClick = { onAction(StarredPickerAction.OnSortRuleSelected(StarredPickerSortRule.RecentlyStarred)) }</ID>
-    <ID>MaxLineLength:UpdatesBanner.kt$progress = { updateAllProgress.current.toFloat() / updateAllProgress.total.coerceAtLeast(1) }</ID>
     <ID>ReturnCount:AppsViewModel.kt$AppsViewModel$fun tryCandidate(rawToken: String): String?</ID>
     <ID>ReturnCount:AppsViewModel.kt$AppsViewModel$private fun parseGithubUrl(input: String): Pair&lt;String, String&gt;?</ID>
     <ID>ReturnCount:AppsViewModel.kt$AppsViewModel$private fun suggestFilterForLink( deviceAppName: String, packageName: String, firstAssetName: String?, ): String?</ID>
@@ -55,7 +49,7 @@
     <ID>ReturnCount:ExternalImportViewModel.kt$ExternalImportViewModel$private suspend fun materializeAndMark( candidate: ExternalAppCandidate, owner: String, repo: String, source: String, sourceHost: String? = null, ): Boolean</ID>
     <ID>SwallowedException:AppsViewModel.kt$AppsViewModel$e: Exception</ID>
     <ID>SwallowedException:StarredPickerViewModel.kt$StarredPickerViewModel$e: Exception</ID>
-    <ID>ThrowsCount:AppsViewModel.kt$AppsViewModel$private fun updateSingleApp(app: InstalledAppUi, waitForInstallGate: Boolean = false)</ID>
+    <ID>ThrowsCount:AppsViewModel.kt$AppsViewModel$private fun updateSingleApp( app: InstalledAppUi, waitForInstallGate: Boolean = false, )</ID>
     <ID>ThrowsCount:AppsViewModel.kt$AppsViewModel$private fun validateAndLinkRepo()</ID>
     <ID>ThrowsCount:AppsViewModel.kt$AppsViewModel$private suspend fun lookUpUpdateTarget(app: InstalledAppUi): UpdateTarget</ID>
     <ID>ThrowsCount:ExternalImportViewModel.kt$ExternalImportViewModel$private suspend fun materializeAndMark( candidate: ExternalAppCandidate, owner: String, repo: String, source: String, sourceHost: String? = null, ): Boolean</ID>
@@ -66,10 +60,6 @@
     <ID>TooGenericExceptionCaught:StarredPickerViewModel.kt$StarredPickerViewModel$e: Exception</ID>
     <ID>TooManyFunctions:AppsViewModel.kt$AppsViewModel : ViewModel</ID>
     <ID>TooManyFunctions:ExternalImportViewModel.kt$ExternalImportViewModel : ViewModel</ID>
-    <ID>TopLevelPropertyNaming:AutoImportSummaryScreen.kt$private const val MAX_VISIBLE_CHIPS = 5</ID>
-    <ID>TopLevelPropertyNaming:ExternalImportRoot.kt$const val EXTERNAL_IMPORT_OPEN_LINK_SHEET_KEY = "external_import_open_link_sheet"</ID>
-    <ID>TopLevelPropertyNaming:PackageVisibilityRequester.android.kt$private const val GRANT_THRESHOLD = 30</ID>
-    <ID>TopLevelPropertyNaming:RepoSuggestionUi.kt$private const val CHIP_PRIMARY_MIN = 0.5</ID>
     <ID>UnusedPrivateMember:AppsViewModel.kt$AppsViewModel$private fun parseGithubUrl(input: String): Pair&lt;String, String&gt;?</ID>
     <ID>UseCheckOrError:AppsViewModel.kt$AppsViewModel$throw IllegalStateException("Could not determine primary asset")</ID>
     <ID>UseCheckOrError:AppsViewModel.kt$AppsViewModel$throw IllegalStateException("Failed to fetch latest release: ${e.message}")</ID>

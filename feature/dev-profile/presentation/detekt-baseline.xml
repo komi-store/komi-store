@@ -13,10 +13,6 @@
     <ID>MagicNumber:ContributionCalendar.kt$5</ID>
     <ID>MagicNumber:ContributionCalendar.kt$6</ID>
     <ID>MagicNumber:ContributionCalendar.kt$7</ID>
-    <ID>MaxLineLength:DeveloperRepoItem.kt$description = "An amazing Kotlin Multiplatform application that demonstrates modern Android development"</ID>
-    <ID>MaxLineLength:ProfileInfoCard.kt$Metric(value = formatCount(followers), label = stringResource(Res.string.followers), modifier = Modifier.weight(1f))</ID>
-    <ID>MaxLineLength:ProfileInfoCard.kt$Metric(value = formatCount(following), label = stringResource(Res.string.following), modifier = Modifier.weight(1f))</ID>
-    <ID>MaxLineLength:ProfileInfoCard.kt$Metric(value = formatCount(repos), label = stringResource(Res.string.profile_repos), modifier = Modifier.weight(1f))</ID>
     <ID>ReturnCount:ContributionCalendar.kt$private fun dateToDayOfWeek(iso: String): Int</ID>
     <ID>TooGenericExceptionCaught:DeveloperProfileViewModel.kt$DeveloperProfileViewModel$e: Exception</ID>
   </CurrentIssues>

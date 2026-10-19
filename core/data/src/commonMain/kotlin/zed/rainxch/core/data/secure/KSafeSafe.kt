@@ -10,7 +10,10 @@ import kotlinx.coroutines.flow.flow
 @PublishedApi
 internal val ksafeSafeLogger = Logger.withTag("KSafeSafe")
 
-suspend inline fun <reified T> KSafe.safeGet(key: String, defaultValue: T): T =
+suspend inline fun <reified T> KSafe.safeGet(
+    key: String,
+    defaultValue: T,
+): T =
     try {
         get(key, defaultValue)
     } catch (ce: CancellationException) {
@@ -20,15 +23,19 @@ suspend inline fun <reified T> KSafe.safeGet(key: String, defaultValue: T): T =
         defaultValue
     }
 
-inline fun <reified T> KSafe.safeGetFlow(key: String, defaultValue: T): Flow<T> {
-    val upstream = try {
-        getFlow(key, defaultValue)
-    } catch (ce: CancellationException) {
-        throw ce
-    } catch (t: Throwable) {
-        ksafeSafeLogger.w(t) { "safeGetFlow($key) build failed; emitting default" }
-        return flow { emit(defaultValue) }
-    }
+inline fun <reified T> KSafe.safeGetFlow(
+    key: String,
+    defaultValue: T,
+): Flow<T> {
+    val upstream =
+        try {
+            getFlow(key, defaultValue)
+        } catch (ce: CancellationException) {
+            throw ce
+        } catch (t: Throwable) {
+            ksafeSafeLogger.w(t) { "safeGetFlow($key) build failed; emitting default" }
+            return flow { emit(defaultValue) }
+        }
     return upstream.catch { e ->
         if (e is CancellationException) throw e
         ksafeSafeLogger.w(e) { "safeGetFlow($key) downstream error; emitting default" }
@@ -36,7 +43,10 @@ inline fun <reified T> KSafe.safeGetFlow(key: String, defaultValue: T): Flow<T> 
     }
 }
 
-suspend inline fun <reified T> KSafe.safePut(key: String, value: T): Boolean =
+suspend inline fun <reified T> KSafe.safePut(
+    key: String,
+    value: T,
+): Boolean =
     try {
         put(key, value)
         true

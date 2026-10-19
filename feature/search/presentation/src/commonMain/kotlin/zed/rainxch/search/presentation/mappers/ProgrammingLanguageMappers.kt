@@ -4,8 +4,8 @@ import zed.rainxch.domain.model.ProgrammingLanguage
 import zed.rainxch.domain.model.ProgrammingLanguage.*
 import zed.rainxch.search.presentation.model.ProgrammingLanguageUi
 
-fun ProgrammingLanguageUi.toDomain(): ProgrammingLanguage {
-    return when (this) {
+fun ProgrammingLanguageUi.toDomain(): ProgrammingLanguage =
+    when (this) {
         ProgrammingLanguageUi.All -> All
         ProgrammingLanguageUi.Kotlin -> Kotlin
         ProgrammingLanguageUi.Java -> Java
@@ -22,4 +22,3 @@ fun ProgrammingLanguageUi.toDomain(): ProgrammingLanguage {
         ProgrammingLanguageUi.Ruby -> Ruby
         ProgrammingLanguageUi.PHP -> PHP
     }
-}

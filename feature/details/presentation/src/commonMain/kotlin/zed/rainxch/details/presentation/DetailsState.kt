@@ -94,7 +94,6 @@ data class DetailsState(
     val isApkInspectCoachmarkPending: Boolean = false,
     val isChannelChipCoachmarkPending: Boolean = false,
     val showAllPlatforms: Boolean = false,
-
     val filteredReleases: ImmutableList<GithubRelease> = persistentListOf(),
     val latestStableRelease: GithubRelease? = null,
     val canSwitchToStable: Boolean = false,

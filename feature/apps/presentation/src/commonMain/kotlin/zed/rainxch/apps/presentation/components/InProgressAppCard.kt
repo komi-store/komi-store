@@ -342,7 +342,9 @@ fun InProgressAppCard(
 
                 DownloadStage.Completed,
                 DownloadStage.Cancelled,
-                -> Unit
+                -> {
+                    Unit
+                }
             }
         }
     }
@@ -372,7 +374,10 @@ private fun StageLine(
 }
 
 @Composable
-private fun VersionLine(installedVersion: String?, targetVersion: String) {
+private fun VersionLine(
+    installedVersion: String?,
+    targetVersion: String,
+) {
     val colors = LocalPersonality.current.colors
     val isDowngrade = isVersionDowngrade(installedVersion, targetVersion)
     val text =

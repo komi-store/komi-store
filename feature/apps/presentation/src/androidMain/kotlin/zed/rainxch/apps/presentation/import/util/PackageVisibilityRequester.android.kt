@@ -19,7 +19,6 @@ actual fun rememberPackageVisibilityRequester(): PackageVisibilityRequester {
 private class AndroidPackageVisibilityRequester(
     private val context: Context,
 ) : PackageVisibilityRequester {
-
     override suspend fun isGranted(): Boolean =
         withContext(Dispatchers.IO) {
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) return@withContext true
@@ -28,8 +27,5 @@ private class AndroidPackageVisibilityRequester(
             visible.size >= GRANT_THRESHOLD
         }
 
-    override suspend fun requestOrOpenSettings(): Boolean {
-
-        return false
-    }
+    override suspend fun requestOrOpenSettings(): Boolean = false
 }

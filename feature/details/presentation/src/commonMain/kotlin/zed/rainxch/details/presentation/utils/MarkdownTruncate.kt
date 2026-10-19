@@ -1,6 +1,9 @@
 package zed.rainxch.details.presentation.utils
 
-fun truncateMarkdownPreview(content: String, maxChars: Int): String {
+fun truncateMarkdownPreview(
+    content: String,
+    maxChars: Int,
+): String {
     if (content.length <= maxChars) return content
     val window = content.substring(0, maxChars)
 
@@ -16,12 +19,16 @@ fun truncateMarkdownPreview(content: String, maxChars: Int): String {
     return window.trimEnd() + "…"
 }
 
-fun splitMarkdownIntoChunks(content: String, targetChunkChars: Int): List<String> {
+fun splitMarkdownIntoChunks(
+    content: String,
+    targetChunkChars: Int,
+): List<String> {
     if (content.length <= targetChunkChars) return listOf(content)
     val chunks = mutableListOf<String>()
     val current = StringBuilder()
     var inFence = false
     val lines = content.split('\n')
+
     fun flush() {
         if (current.isNotEmpty()) {
             chunks += current.toString()

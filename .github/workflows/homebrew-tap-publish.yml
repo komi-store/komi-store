@@ -9,6 +9,9 @@ on:
         description: 'Release tag (e.g. v1.8.3)'
         required: true
 
+permissions:
+  contents: read
+
 jobs:
   update-cask:
     name: Update Homebrew Cask
@@ -59,7 +62,7 @@ jobs:
           echo "x64=$SHA_X64"
 
       - name: Checkout tap repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           repository: komi-store/homebrew-komi-store
           token: ${{ secrets.HOMEBREW_TAP_TOKEN }}

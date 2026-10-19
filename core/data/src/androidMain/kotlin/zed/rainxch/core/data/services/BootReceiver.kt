@@ -10,14 +10,21 @@ import org.koin.core.context.GlobalContext
 import zed.rainxch.core.domain.repository.TweaksRepository
 
 class BootReceiver : BroadcastReceiver() {
-    override fun onReceive(context: Context, intent: Intent?) {
+    override fun onReceive(
+        context: Context,
+        intent: Intent?,
+    ) {
         if (intent?.action != Intent.ACTION_BOOT_COMPLETED) return
         val pendingResult = goAsync()
         try {
             val enabled =
                 runCatching {
                     runBlocking {
-                        GlobalContext.get().get<TweaksRepository>().getUpdateCheckEnabled().first()
+                        GlobalContext
+                            .get()
+                            .get<TweaksRepository>()
+                            .getUpdateCheckEnabled()
+                            .first()
                     }
                 }.getOrElse {
                     Logger.w(it) { "BootReceiver: Failed to read update-check flag, defaulting to enabled" }
@@ -28,7 +35,11 @@ class BootReceiver : BroadcastReceiver() {
                 val intervalHours =
                     runCatching {
                         runBlocking {
-                            GlobalContext.get().get<TweaksRepository>().getUpdateCheckInterval().first()
+                            GlobalContext
+                                .get()
+                                .get<TweaksRepository>()
+                                .getUpdateCheckInterval()
+                                .first()
                         }
                     }.getOrNull()
                 if (intervalHours != null) {
@@ -41,7 +52,6 @@ class BootReceiver : BroadcastReceiver() {
                 UpdateScheduler.cancel(context)
             }
         } catch (t: Throwable) {
-
             Logger.e(t) { "BootReceiver: scheduling failed; dropped" }
         } finally {
             pendingResult.finish()

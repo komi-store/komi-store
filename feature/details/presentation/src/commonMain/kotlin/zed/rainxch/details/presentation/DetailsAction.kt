@@ -1,9 +1,9 @@
 package zed.rainxch.details.presentation
 
 import org.jetbrains.compose.resources.StringResource
-import zed.rainxch.core.domain.model.repository.DiscoveryPlatform
 import zed.rainxch.core.domain.model.account.github.GithubAsset
 import zed.rainxch.core.domain.model.account.github.GithubRelease
+import zed.rainxch.core.domain.model.repository.DiscoveryPlatform
 import zed.rainxch.details.domain.model.ReleaseCategory
 import zed.rainxch.details.presentation.model.TranslationTarget
 
@@ -39,12 +39,17 @@ sealed interface DetailsAction {
     data object OnOverrideSigningKeyWarning : DetailsAction
 
     data object UninstallApp : DetailsAction
+
     data object OnRequestUninstall : DetailsAction
+
     data object OnDismissUninstallConfirmation : DetailsAction
+
     data object OnConfirmUninstall : DetailsAction
 
     data object OnUnlinkExternalApp : DetailsAction
+
     data object OnDismissUnlinkConfirmation : DetailsAction
+
     data object OnConfirmUnlinkExternalApp : DetailsAction
 
     data class DownloadAsset(
@@ -109,9 +114,13 @@ sealed interface DetailsAction {
 
     data object ToggleWhatsNewExpanded : DetailsAction
 
-    data class OnAboutMeasured(val heightPx: Float) : DetailsAction
+    data class OnAboutMeasured(
+        val heightPx: Float,
+    ) : DetailsAction
 
-    data class OnWhatsNewMeasured(val heightPx: Float) : DetailsAction
+    data class OnWhatsNewMeasured(
+        val heightPx: Float,
+    ) : DetailsAction
 
     data class TranslateAbout(
         val targetLanguageCode: String,
@@ -155,7 +164,9 @@ sealed interface DetailsAction {
 
     data object OnAcknowledgeChannelChipCoachmark : DetailsAction
 
-    data class OnToggleShowAllPlatforms(val enabled: Boolean) : DetailsAction
+    data class OnToggleShowAllPlatforms(
+        val enabled: Boolean,
+    ) : DetailsAction
 
     data class OnDownloadForTransfer(
         val assetUrl: String,

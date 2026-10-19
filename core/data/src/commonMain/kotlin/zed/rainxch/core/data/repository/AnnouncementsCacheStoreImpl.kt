@@ -16,11 +16,11 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import zed.rainxch.core.domain.repository.AnnouncementsCacheStore
 import zed.rainxch.core.data.secure.safeDelete
 import zed.rainxch.core.data.secure.safeGet
 import zed.rainxch.core.data.secure.safeGetFlow
 import zed.rainxch.core.data.secure.safePut
+import zed.rainxch.core.domain.repository.AnnouncementsCacheStore
 
 class AnnouncementsCacheStoreImpl(
     private val ksafe: KSafe,
@@ -39,12 +39,13 @@ class AnnouncementsCacheStoreImpl(
         }
     }
 
-    override fun getCachedPayload(): Flow<String?> = flow {
-        migrationDeferred.await()
-        emitAll(
-            ksafe.safeGetFlow<String?>(K_CACHED_PAYLOAD, null).map { it?.takeIf { v -> v.isNotEmpty() } },
-        )
-    }
+    override fun getCachedPayload(): Flow<String?> =
+        flow {
+            migrationDeferred.await()
+            emitAll(
+                ksafe.safeGetFlow<String?>(K_CACHED_PAYLOAD, null).map { it?.takeIf { v -> v.isNotEmpty() } },
+            )
+        }
 
     override suspend fun setCachedPayload(payload: String?) {
         migrationDeferred.await()
@@ -62,13 +63,13 @@ class AnnouncementsCacheStoreImpl(
             migrated = true
             return
         }
-        val legacy = runCatching {
-            legacyDataStore.data.first()[stringPreferencesKey("announcements_cached_payload")]
-        }.getOrNull()
+        val legacy =
+            runCatching {
+                legacyDataStore.data.first()[stringPreferencesKey("announcements_cached_payload")]
+            }.getOrNull()
         if (!legacy.isNullOrEmpty()) {
             val putOk = ksafe.safePut(K_CACHED_PAYLOAD, legacy)
             if (!putOk) {
-
                 return
             }
             runCatching {

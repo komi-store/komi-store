@@ -2,9 +2,9 @@ package zed.rainxch.core.data.mappers
 
 import zed.rainxch.core.data.dto.BackendPlatformRelease
 import zed.rainxch.core.data.dto.BackendRepoResponse
-import zed.rainxch.core.domain.model.repository.DiscoveryPlatform
 import zed.rainxch.core.domain.model.account.github.GithubRepoSummary
 import zed.rainxch.core.domain.model.account.github.GithubUser
+import zed.rainxch.core.domain.model.repository.DiscoveryPlatform
 import kotlin.time.Clock
 import kotlin.time.Duration.Companion.days
 import kotlin.time.ExperimentalTime
@@ -14,12 +14,13 @@ fun BackendRepoResponse.toSummary(platform: DiscoveryPlatform = DiscoveryPlatfor
         id = id,
         name = name,
         fullName = fullName,
-        owner = GithubUser(
-            id = 0,
-            login = owner.login,
-            avatarUrl = owner.avatarUrl ?: "",
-            htmlUrl = "https://github.com/${owner.login}",
-        ),
+        owner =
+            GithubUser(
+                id = 0,
+                login = owner.login,
+                avatarUrl = owner.avatarUrl ?: "",
+                htmlUrl = "https://github.com/${owner.login}",
+            ),
         description = description,
         defaultBranch = defaultBranch ?: "main",
         htmlUrl = htmlUrl,
@@ -47,8 +48,7 @@ fun BackendRepoResponse.releaseDateFor(platform: DiscoveryPlatform): String? =
         ?: releaseRecency?.takeIf { it >= 0 }?.let { releaseDateFromRecencyDays(it) }
 
 @OptIn(ExperimentalTime::class)
-fun releaseDateFromRecencyDays(days: Int): String =
-    (Clock.System.now() - days.days).toString()
+fun releaseDateFromRecencyDays(days: Int): String = (Clock.System.now() - days.days).toString()
 
 private fun BackendRepoResponse.buildAvailablePlatforms(): List<DiscoveryPlatform> =
     buildList {

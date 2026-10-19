@@ -10,8 +10,7 @@ import zed.rainxch.core.domain.repository.HiddenReposRepository
 class HiddenReposRepositoryImpl(
     private val hiddenRepoDao: HiddenRepoDao,
 ) : HiddenReposRepository {
-    override fun getAllHiddenRepoIds(): Flow<Set<Long>> =
-        hiddenRepoDao.getAllHiddenRepoIds().map { it.toSet() }
+    override fun getAllHiddenRepoIds(): Flow<Set<Long>> = hiddenRepoDao.getAllHiddenRepoIds().map { it.toSet() }
 
     override fun getAllHiddenRepos(): Flow<List<HiddenRepo>> =
         hiddenRepoDao.getAllHiddenRepos().map { entities ->

@@ -1,4 +1,5 @@
 package zed.rainxch.core.domain.model.repository
+
 sealed interface RepositorySource {
     val host: String
 
@@ -6,5 +7,7 @@ sealed interface RepositorySource {
         override val host: String = "github.com"
     }
 
-    data class Forgejo(override val host: String) : RepositorySource
+    data class Forgejo(
+        override val host: String,
+    ) : RepositorySource
 }

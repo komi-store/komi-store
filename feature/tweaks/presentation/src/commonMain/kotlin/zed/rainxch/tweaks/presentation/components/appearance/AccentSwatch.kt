@@ -47,8 +47,7 @@ fun AccentSwatch(
                     width = if (isManga || selected) 2.5.dp else 1.5.dp,
                     color = if (!isManga && selected) colors.primary else colors.outline,
                     shape = shape,
-                )
-                .clickable(onClick = onClick),
+                ).clickable(onClick = onClick),
         contentAlignment = Alignment.Center,
     ) {
         if (mono) {

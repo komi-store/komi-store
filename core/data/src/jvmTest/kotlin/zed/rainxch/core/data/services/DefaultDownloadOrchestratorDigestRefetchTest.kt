@@ -1,8 +1,5 @@
 package zed.rainxch.core.data.services
 
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertTrue
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
@@ -22,7 +19,6 @@ import zed.rainxch.core.domain.model.system.SystemArchitecture
 import zed.rainxch.core.domain.network.AssetIdentity
 import zed.rainxch.core.domain.network.DigestVerifier
 import zed.rainxch.core.domain.network.Downloader
-import zed.rainxch.core.domain.network.SlowDownloadDetector
 import zed.rainxch.core.domain.repository.InstalledAppsRepository
 import zed.rainxch.core.domain.system.DownloadSpec
 import zed.rainxch.core.domain.system.DownloadStage
@@ -33,9 +29,11 @@ import zed.rainxch.core.domain.system.InstallerInfoExtractor
 import zed.rainxch.core.domain.system.MultiSourceDownloader
 import zed.rainxch.core.domain.system.PendingInstallNotifier
 import zed.rainxch.core.domain.system.SystemInstallSerializer
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 class DefaultDownloadOrchestratorDigestRefetchTest {
-
     private val digest =
         "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
 
@@ -71,7 +69,6 @@ class DefaultDownloadOrchestratorDigestRefetchTest {
         installer = StubInstaller,
         installedAppsRepository = StubInstalledAppsRepository(),
         pendingInstallNotifier = StubNotifier,
-        slowDownloadDetector = StubSlowDownloadDetector,
         appScope = scope,
         systemInstallSerializer = StubInstallSerializer,
         tokenStore = StubTokenStore,
@@ -103,32 +100,36 @@ class DefaultDownloadOrchestratorDigestRefetchTest {
         }
 
     @Test
-    fun a_source_refetch_that_still_mismatches_is_an_integrity_failure() = runBlocking {
-        val downloader = TrackingDownloader()
-        val multi = TrackingMultiSource()
-        val verifier = HandedVerifier("Digest mismatch (mirror bytes)", "still mismatched")
+    fun a_source_refetch_that_still_mismatches_is_an_integrity_failure() =
+        runBlocking {
+            val downloader = TrackingDownloader()
+            val multi = TrackingMultiSource()
+            val verifier = HandedVerifier("Digest mismatch (mirror bytes)", "still mismatched")
 
-        val orchestrator = orchestrator(downloader, multi, verifier, scope = this)
-        orchestrator.enqueue(spec())
+            val orchestrator = orchestrator(downloader, multi, verifier, scope = this)
+            orchestrator.enqueue(spec())
 
-        val entry =
-            withTimeout(AWAIT_MS) {
-                orchestrator.downloads.first {
-                    it["net.cozic.joplin"]?.stage == DownloadStage.Failed
-                }
-            }["net.cozic.joplin"]!!
+            val entry =
+                withTimeout(AWAIT_MS) {
+                    orchestrator.downloads.first {
+                        it["net.cozic.joplin"]?.stage == DownloadStage.Failed
+                    }
+                }["net.cozic.joplin"]!!
 
-        assertEquals(1, downloader.calls.size, "the source is tried exactly once")
-        assertEquals(2, verifier.calls.size)
-        assertEquals("Checksum mismatch — file may have been tampered with", entry.errorMessage)
-    }
+            assertEquals(1, downloader.calls.size, "the source is tried exactly once")
+            assertEquals(2, verifier.calls.size)
+            assertEquals("Checksum mismatch — file may have been tampered with", entry.errorMessage)
+        }
 
     private companion object {
         const val AWAIT_MS = 10_000L
     }
 
     private class TrackingDownloader : Downloader {
-        data class Call(val url: String, val bypassMirror: Boolean)
+        data class Call(
+            val url: String,
+            val bypassMirror: Boolean,
+        )
 
         val calls = mutableListOf<Call>()
         val discardedPartials = mutableListOf<String>()
@@ -145,11 +146,12 @@ class DefaultDownloadOrchestratorDigestRefetchTest {
             )
         }
 
-        override suspend fun saveToFile(url: String, suggestedFileName: String?): String =
-            error("saveToFile is not part of this path")
+        override suspend fun saveToFile(
+            url: String,
+            suggestedFileName: String?,
+        ): String = error("saveToFile is not part of this path")
 
-        override suspend fun getDownloadedFilePath(fileName: String): String =
-            "/tmp/komi-refetch-test/$fileName"
+        override suspend fun getDownloadedFilePath(fileName: String): String = "/tmp/komi-refetch-test/$fileName"
 
         override suspend fun cancelDownload(fileName: String): Boolean = false
 
@@ -176,11 +178,16 @@ class DefaultDownloadOrchestratorDigestRefetchTest {
         }
     }
 
-    private class HandedVerifier(vararg results: String?) : DigestVerifier {
+    private class HandedVerifier(
+        vararg results: String?,
+    ) : DigestVerifier {
         private val queue = ArrayDeque(results.toList())
         val calls = mutableListOf<String>()
 
-        override suspend fun verify(filePath: String, expectedDigest: String): String? {
+        override suspend fun verify(
+            filePath: String,
+            expectedDigest: String,
+        ): String? {
             calls += filePath
             return queue.removeFirstOrNull()
         }
@@ -189,11 +196,12 @@ class DefaultDownloadOrchestratorDigestRefetchTest {
     private object StubInstaller : Installer {
         override suspend fun isSupported(extOrMime: String): Boolean = false
 
-        override suspend fun ensurePermissionsOrThrow(extOrMime: String) =
-            error("a deferred download must not install")
+        override suspend fun ensurePermissionsOrThrow(extOrMime: String) = error("a deferred download must not install")
 
-        override suspend fun install(filePath: String, extOrMime: String): InstallOutcome =
-            error("a deferred download must not install")
+        override suspend fun install(
+            filePath: String,
+            extOrMime: String,
+        ): InstallOutcome = error("a deferred download must not install")
 
         override fun uninstall(packageName: String) = Unit
 
@@ -213,7 +221,10 @@ class DefaultDownloadOrchestratorDigestRefetchTest {
 
         override fun isAppManagerInstalled(): Boolean = false
 
-        override fun openInAppManager(filePath: String, onOpenInstaller: () -> Unit) = Unit
+        override fun openInAppManager(
+            filePath: String,
+            onOpenInstaller: () -> Unit,
+        ) = Unit
 
         override fun getApkInfoExtractor(): InstallerInfoExtractor = NoOpExtractor
 
@@ -241,8 +252,10 @@ class DefaultDownloadOrchestratorDigestRefetchTest {
             assetName: String?,
         ) = Unit
 
-        override suspend fun discardParkedInstall(packageName: String, expectedPath: String?) =
-            ParkedInstallDisposal.Discarded
+        override suspend fun discardParkedInstall(
+            packageName: String,
+            expectedPath: String?,
+        ) = ParkedInstallDisposal.Discarded
 
         override fun getAllInstalledApps(): Flow<List<InstalledApp>> = emptyFlow()
 
@@ -296,11 +309,20 @@ class DefaultDownloadOrchestratorDigestRefetchTest {
             isUpdateAvailable: Boolean,
         ) = Unit
 
-        override suspend fun updatePendingStatus(packageName: String, isPending: Boolean) = Unit
+        override suspend fun updatePendingStatus(
+            packageName: String,
+            isPending: Boolean,
+        ) = Unit
 
-        override suspend fun setIncludePreReleases(packageName: String, enabled: Boolean) = Unit
+        override suspend fun setIncludePreReleases(
+            packageName: String,
+            enabled: Boolean,
+        ) = Unit
 
-        override suspend fun setUpdateCheckEnabled(packageName: String, enabled: Boolean) = Unit
+        override suspend fun setUpdateCheckEnabled(
+            packageName: String,
+            enabled: Boolean,
+        ) = Unit
 
         override suspend fun setAssetFilter(
             packageName: String,
@@ -319,7 +341,10 @@ class DefaultDownloadOrchestratorDigestRefetchTest {
 
         override suspend fun clearPreferredVariant(packageName: String) = Unit
 
-        override suspend fun setSkippedReleaseTag(packageName: String, tag: String?) = Unit
+        override suspend fun setSkippedReleaseTag(
+            packageName: String,
+            tag: String?,
+        ) = Unit
 
         override fun getAppsWithSkippedReleaseTag(): Flow<List<InstalledApp>> = emptyFlow()
 
@@ -346,16 +371,11 @@ class DefaultDownloadOrchestratorDigestRefetchTest {
         override fun clearPending(packageName: String) = Unit
     }
 
-    private object StubSlowDownloadDetector : SlowDownloadDetector {
-        override val suggestMirror: Flow<Unit> = emptyFlow()
-
-        override suspend fun onProgress(progress: DownloadProgress) = Unit
-
-        override suspend fun reset() = Unit
-    }
-
     private object StubInstallSerializer : SystemInstallSerializer {
-        override suspend fun awaitFreeAndMarkPending(packageName: String, timeoutMs: Long) = Unit
+        override suspend fun awaitFreeAndMarkPending(
+            packageName: String,
+            timeoutMs: Long,
+        ) = Unit
 
         override fun markCompleted(packageName: String) = Unit
     }

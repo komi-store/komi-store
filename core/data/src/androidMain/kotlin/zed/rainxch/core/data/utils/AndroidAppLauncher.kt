@@ -4,9 +4,9 @@ import android.content.Context
 import android.content.Intent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import zed.rainxch.core.domain.helpers.AppLauncher
 import zed.rainxch.core.domain.logging.KomiStoreLogger
 import zed.rainxch.core.domain.model.installation.InstalledApp
-import zed.rainxch.core.domain.helpers.AppLauncher
 
 class AndroidAppLauncher(
     private val context: Context,

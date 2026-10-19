@@ -27,10 +27,6 @@
     <ID>MagicNumber:NavigationUtils.kt$3</ID>
     <ID>MagicNumber:NavigationUtils.kt$4</ID>
     <ID>MagicNumber:WindowsDarkTitleBar.kt$4</ID>
-    <ID>MaxLineLength:AdaptiveDetailPaneContent.kt$"whatsnew|${current.repositoryId}|${current.owner}|${current.repo}|${current.sourceHost.orEmpty()}"</ID>
-    <ID>MaxLineLength:AppNavigation.kt$appsViewModel.onAction(zed.rainxch.apps.presentation.AppsAction.OnAddByLinkClick)</ID>
-    <ID>MaxLineLength:AppNavigation.kt$if (showBottomBar) Modifier.consumeWindowInsets(PaddingValues(bottom = bottomBarHeight)) else Modifier</ID>
-    <ID>MaxLineLength:DesktopDeepLink.kt$DesktopDeepLink$println("DeepLink: Windows scheme registration failed (reg import): ${result?.output?.trim().orEmpty()}")</ID>
     <ID>MaxLineLength:GithubStoreApp.kt$GithubStoreApp$"Resolved self-update pending install: ${resolution.versionName} (code=${resolution.versionCode}, tag=${resolution.resolvedTag})"</ID>
     <ID>NestedBlockDepth:DeepLinkParser.kt$DeepLinkParser$private fun urlDecode(value: String): String</ID>
     <ID>NestedBlockDepth:GithubStoreApp.kt$GithubStoreApp$private suspend fun resolveSelfPendingInstall( existing: InstalledApp, repo: InstalledAppsRepository, )</ID>
@@ -52,14 +48,5 @@
     <ID>TooManyFunctions:DesktopDeepLink.kt$DesktopDeepLink</ID>
     <ID>TooManyFunctions:DesktopSidebar.kt$zed.rainxch.githubstore.app.navigation.DesktopSidebar.kt</ID>
     <ID>TooManyFunctions:GithubStoreApp.kt$GithubStoreApp : Application</ID>
-    <ID>TopLevelPropertyNaming:DesktopApp.kt$private const val PRIVACY_POLICY_URL = "https://komistore.app/privacy-policy"</ID>
-    <ID>TopLevelPropertyNaming:StartupPreferences.kt$internal const val STARTUP_PREFERENCE_TIMEOUT_MS: Long = 2000L</ID>
-    <ID>TopLevelPropertyNaming:WindowsDarkTitleBar.kt$private const val DARK_TITLE_BAR_COLORREF = 0x001E1E1E</ID>
-    <ID>TopLevelPropertyNaming:WindowsDarkTitleBar.kt$private const val DWMWA_BORDER_COLOR = 34</ID>
-    <ID>TopLevelPropertyNaming:WindowsDarkTitleBar.kt$private const val DWMWA_CAPTION_COLOR = 35</ID>
-    <ID>TopLevelPropertyNaming:WindowsDarkTitleBar.kt$private const val DWMWA_COLOR_DEFAULT = -1</ID>
-    <ID>TopLevelPropertyNaming:WindowsDarkTitleBar.kt$private const val DWMWA_USE_IMMERSIVE_DARK_MODE = 20</ID>
-    <ID>TopLevelPropertyNaming:WindowsDarkTitleBar.kt$private const val DWMWA_USE_IMMERSIVE_DARK_MODE_PRE_20H1 = 19</ID>
-    <ID>TopLevelPropertyNaming:WindowsDarkTitleBar.kt$private const val S_OK = 0</ID>
   </CurrentIssues>
 </SmellBaseline>

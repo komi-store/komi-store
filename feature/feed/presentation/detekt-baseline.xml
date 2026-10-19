@@ -7,11 +7,6 @@
     <ID>LongMethod:FeedViewModel.kt$FeedViewModel$fun onAction(action: FeedAction)</ID>
     <ID>LongParameterList:FeedRepoCardMapper.kt$( isInstalled: Boolean, isUpdateAvailable: Boolean, isFavourite: Boolean, isStarred: Boolean, isSeen: Boolean, isCurrentUserOwner: Boolean, )</ID>
     <ID>LongParameterList:FeedViewModel.kt$FeedViewModel$( private val feedRepository: FeedRepository, private val installedAppsRepository: InstalledAppsRepository, private val favouritesRepository: FavouritesRepository, private val starredRepository: StarredRepository, private val seenReposRepository: SeenReposRepository, private val hiddenReposRepository: HiddenReposRepository, private val userSessionRepository: UserSessionRepository, private val tweaksRepository: TweaksRepository, private val browseFilterStore: BrowseFilterStore, private val logger: KomiStoreLogger, private val shareManager: ShareManager, )</ID>
-    <ID>MaxLineLength:FeedPlatformBar.kt$label = if (platform == DiscoveryPlatform.All) stringResource(Res.string.feed_platform_all) else platform.toLabel()</ID>
-    <ID>MaxLineLength:FeedPlatformPicker.kt$text = if (platform == DiscoveryPlatform.All) stringResource(Res.string.feed_platform_all) else platform.toLabel()</ID>
-    <ID>MaxLineLength:FeedPlatformPicker.kt$val content = if (isSelected) LocalPersonality.current.colors.onPrimary else LocalPersonality.current.colors.onSurface</ID>
-    <ID>MaxLineLength:FeedRoot.kt$label = if (platform == DiscoveryPlatform.All) stringResource(Res.string.feed_platform_all) else platform.toLabel()</ID>
-    <ID>MaxLineLength:FeedRoot.kt$subtitle = if (LocalPersonality.current.usesDecor) stringResource(Res.string.feed_masthead_subtitle) else null</ID>
     <ID>ThrowsCount:FeedViewModel.kt$FeedViewModel$fun onAction(action: FeedAction)</ID>
     <ID>TooGenericExceptionCaught:FeedViewModel.kt$FeedViewModel$e: Throwable</ID>
     <ID>TooManyFunctions:FeedViewModel.kt$FeedViewModel : ViewModel</ID>

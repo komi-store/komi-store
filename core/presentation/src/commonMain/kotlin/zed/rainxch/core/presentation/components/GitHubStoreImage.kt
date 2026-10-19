@@ -54,7 +54,7 @@ fun GitHubStoreImage(
     val resolvedModifier = modifier.then(sizeResolver)
 
     when (state) {
-        is AsyncImagePainter.State.Success ->
+        is AsyncImagePainter.State.Success -> {
             Image(
                 painter = painter,
                 contentDescription = contentDescription,
@@ -62,8 +62,9 @@ fun GitHubStoreImage(
                 contentScale = contentScale,
                 colorFilter = colorFilter,
             )
+        }
 
-        is AsyncImagePainter.State.Error ->
+        is AsyncImagePainter.State.Error -> {
             Box(modifier = resolvedModifier, contentAlignment = Alignment.Center) {
                 Icon(
                     imageVector = Icons.Default.Warning,
@@ -72,13 +73,16 @@ fun GitHubStoreImage(
                     modifier = Modifier.fillMaxSize(.5f),
                 )
             }
+        }
 
-        is AsyncImagePainter.State.Loading ->
+        is AsyncImagePainter.State.Loading -> {
             Box(modifier = resolvedModifier, contentAlignment = Alignment.Center) {
                 if (showLoadingIndicator) CircularWavyProgressIndicator()
             }
+        }
 
-        is AsyncImagePainter.State.Empty ->
+        is AsyncImagePainter.State.Empty -> {
             Box(modifier = resolvedModifier)
+        }
     }
 }

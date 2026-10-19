@@ -114,7 +114,7 @@ fun SmartInstallButton(
     val selectedIsLatestRelease =
         normSelected != null &&
             (installedApp?.latestVersion.isNullOrBlank() ||
-                VersionMath.isExactSameVersion(normSelected, installedApp?.latestVersion))
+                VersionMath.isExactSameVersion(normSelected, installedApp.latestVersion))
     val isSameVersionInstalled =
         isInstalled &&
             normInstalled != null &&
@@ -122,7 +122,7 @@ fun SmartInstallButton(
             VersionMath.isExactSameVersion(normInstalled, normSelected) &&
             !(
                 selectedIsTimestampTracked &&
-                    installedApp?.isUpdateAvailable == true &&
+                    installedApp.isUpdateAvailable &&
                     selectedIsLatestRelease
             )
     val showUpdateAffordance = isUpdateAvailable && selectedIsLatestRelease

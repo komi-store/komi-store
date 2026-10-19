@@ -14,21 +14,23 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.getString
 import zed.rainxch.apps.domain.repository.AppsRepository
-import zed.rainxch.apps.presentation.mappers.toDomain
-import zed.rainxch.apps.presentation.mappers.toUi
 import zed.rainxch.apps.presentation.mappers.computeIsBusy
 import zed.rainxch.apps.presentation.mappers.groupedByRepo
 import zed.rainxch.apps.presentation.mappers.toAppItem
+import zed.rainxch.apps.presentation.mappers.toDomain
+import zed.rainxch.apps.presentation.mappers.toUi
 import zed.rainxch.apps.presentation.model.AdvancedPreviewMessage
 import zed.rainxch.apps.presentation.model.AppItem
 import zed.rainxch.apps.presentation.model.AppSortRule
@@ -41,38 +43,36 @@ import zed.rainxch.apps.presentation.model.UpdateAllProgress
 import zed.rainxch.apps.presentation.model.UpdateState
 import zed.rainxch.apps.presentation.model.VariantOption
 import zed.rainxch.apps.presentation.model.VariantPickerError
+import zed.rainxch.core.domain.helpers.BrowserHelper
+import zed.rainxch.core.domain.helpers.ShareManager
 import zed.rainxch.core.domain.logging.KomiStoreLogger
+import zed.rainxch.core.domain.model.account.github.GithubAsset
+import zed.rainxch.core.domain.model.error.RateLimitException
 import zed.rainxch.core.domain.model.installation.InstalledApp
 import zed.rainxch.core.domain.model.installation.InstallerType
 import zed.rainxch.core.domain.model.installation.markPending
 import zed.rainxch.core.domain.model.installation.withLatestSnapshot
-import zed.rainxch.core.domain.model.account.github.GithubAsset
-import zed.rainxch.core.domain.model.error.RateLimitException
 import zed.rainxch.core.domain.network.Downloader
 import zed.rainxch.core.domain.repository.ExternalImportRepository
 import zed.rainxch.core.domain.repository.InstalledAppsRepository
 import zed.rainxch.core.domain.repository.TweaksRepository
 import zed.rainxch.core.domain.system.DownloadOrchestrator
 import zed.rainxch.core.domain.system.DownloadSpec
-import zed.rainxch.core.domain.system.DownloadStage as OrchestratorStage
+import zed.rainxch.core.domain.system.DownloadStagePhase
 import zed.rainxch.core.domain.system.InstallPolicy
 import zed.rainxch.core.domain.system.Installer
-import zed.rainxch.core.domain.system.DownloadStagePhase
 import zed.rainxch.core.domain.system.OrchestratedDownload
-import zed.rainxch.core.domain.system.phase
 import zed.rainxch.core.domain.system.SystemInstallSerializer
+import zed.rainxch.core.domain.system.phase
 import zed.rainxch.core.domain.use_cases.SyncInstalledAppsUseCase
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.onEach
 import zed.rainxch.core.domain.utils.AssetFilter
 import zed.rainxch.core.domain.utils.AssetVariant
-import zed.rainxch.core.domain.helpers.BrowserHelper
-import zed.rainxch.core.domain.helpers.ShareManager
 import zed.rainxch.core.presentation.utils.TimeZoneChangeSignal
 import zed.rainxch.core.presentation.utils.formatFileSize
 import zed.rainxch.githubstore.core.presentation.res.*
 import java.io.File
 import kotlin.time.Duration.Companion.milliseconds
+import zed.rainxch.core.domain.system.DownloadStage as OrchestratorStage
 
 class AppsViewModel(
     private val appsRepository: AppsRepository,
@@ -119,8 +119,7 @@ class AppsViewModel(
                     observeKaoBannerDismissed()
                     hasLoadedInitialData = true
                 }
-            }
-            .map { it.withDerived() }
+            }.map { it.withDerived() }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(5_000L),
@@ -132,42 +131,53 @@ class AppsViewModel(
     }
 
     private fun AppsState.withDerived(): AppsState {
-        val searchedDevice = if (deviceAppSearchQuery.isBlank()) {
-            deviceApps
-        } else {
-            deviceApps.filter {
-                it.appName.contains(deviceAppSearchQuery, ignoreCase = true) ||
-                    it.packageName.contains(deviceAppSearchQuery, ignoreCase = true)
+        val searchedDevice =
+            if (deviceAppSearchQuery.isBlank()) {
+                deviceApps
+            } else {
+                deviceApps.filter {
+                    it.appName.contains(deviceAppSearchQuery, ignoreCase = true) ||
+                        it.packageName.contains(deviceAppSearchQuery, ignoreCase = true)
+                }
             }
-        }
-        val sortedDevice = searchedDevice.sortedWith(
-            compareBy<DeviceAppUi> { it.installerCategory.sortPriority }
-                .thenBy { it.appName.lowercase() }
-                .thenBy { it.packageName },
-        ).toImmutableList()
+        val sortedDevice =
+            searchedDevice
+                .sortedWith(
+                    compareBy<DeviceAppUi> { it.installerCategory.sortPriority }
+                        .thenBy { it.appName.lowercase() }
+                        .thenBy { it.packageName },
+                ).toImmutableList()
 
-        val linkAssets = run {
-            val raw = linkAssetFilter.trim()
-            if (raw.isEmpty()) return@run linkInstallableAssets
-            val regex = runCatching { Regex(raw, RegexOption.IGNORE_CASE) }.getOrNull()
-                ?: return@run linkInstallableAssets
-            linkInstallableAssets.filter { regex.containsMatchIn(it.name) }.toImmutableList()
-        }
+        val linkAssets =
+            run {
+                val raw = linkAssetFilter.trim()
+                if (raw.isEmpty()) return@run linkInstallableAssets
+                val regex =
+                    runCatching { Regex(raw, RegexOption.IGNORE_CASE) }.getOrNull()
+                        ?: return@run linkInstallableAssets
+                linkInstallableAssets.filter { regex.containsMatchIn(it.name) }.toImmutableList()
+            }
 
         val visibleApps = filteredApps.filterNot { it.installedApp.packageName in hiddenRowPackages }
 
-        val pending = visibleApps.filter {
-            it.installedApp.isPendingInstall && it.installedApp.pendingInstallFilePath != null
-        }.toImmutableList()
-        val updates = visibleApps.filter {
-            it.installedApp.isUpdateAvailable &&
-                it.installedApp.updateCheckEnabled &&
-                !it.installedApp.isPendingInstall
-        }.toImmutableList()
-        val idle = visibleApps.filter {
-            (!it.installedApp.isUpdateAvailable || !it.installedApp.updateCheckEnabled) &&
-                !it.installedApp.isPendingInstall
-        }.toImmutableList()
+        val pending =
+            visibleApps
+                .filter {
+                    it.installedApp.isPendingInstall && it.installedApp.pendingInstallFilePath != null
+                }.toImmutableList()
+        val updates =
+            visibleApps
+                .filter {
+                    it.installedApp.isUpdateAvailable &&
+                        it.installedApp.updateCheckEnabled &&
+                        !it.installedApp.isPendingInstall
+                }.toImmutableList()
+        val idle =
+            visibleApps
+                .filter {
+                    (!it.installedApp.isUpdateAvailable || !it.installedApp.updateCheckEnabled) &&
+                        !it.installedApp.isPendingInstall
+                }.toImmutableList()
 
         return copy(
             filteredDeviceApps = sortedDevice,
@@ -191,11 +201,11 @@ class AppsViewModel(
 
     private fun observePendingExternalImports() {
         viewModelScope.launch {
-            externalImportRepository.pendingCandidateCountFlow()
+            externalImportRepository
+                .pendingCandidateCountFlow()
                 .combine(tweaksRepository.getExternalImportBannerDismissedAtCount()) { count, dismissedAt ->
                     count to dismissedAt
-                }
-                .collect { (count, dismissedAt) ->
+                }.collect { (count, dismissedAt) ->
 
                     val effectiveDismissedAt = maxOf(dismissedAt, localBannerDismissedAtCount)
                     val shouldShow = count >= BANNER_THRESHOLD && count > effectiveDismissedAt
@@ -294,7 +304,6 @@ class AppsViewModel(
 
     private fun checkAllForUpdates() {
         viewModelScope.launch {
-
             lastAutoCheckTimestamp = System.currentTimeMillis()
             _state.update { it.copy(isCheckingForUpdates = true) }
             try {
@@ -371,7 +380,6 @@ class AppsViewModel(
             }
 
             is AppsAction.OnUpdateApp -> {
-
                 if (action.app.preferredVariantStale) {
                     openVariantPicker(action.app, resumeUpdateAfterPick = true)
                 } else {
@@ -746,7 +754,6 @@ class AppsViewModel(
             }
 
             AppsAction.OnRescanForGithubApps -> {
-
                 localBannerDismissedAtCount = 0
                 _state.update { it.copy(showImportProposalBanner = false) }
                 viewModelScope.launch {
@@ -786,23 +793,29 @@ class AppsViewModel(
     private fun appComparator(sortRule: AppSortRule): Comparator<AppItem> {
         val updatesFirst = compareByDescending<AppItem> { it.installedApp.isUpdateAvailable }
         return when (sortRule) {
-            AppSortRule.UpdatesFirst ->
+            AppSortRule.UpdatesFirst -> {
                 updatesFirst
                     .thenByDescending { it.installedApp.latestReleasePublishedAt ?: "" }
                     .thenBy { it.installedApp.appName.lowercase() }
+            }
 
-            AppSortRule.RecentlyUpdated ->
+            AppSortRule.RecentlyUpdated -> {
                 compareByDescending<AppItem> { it.installedApp.lastUpdatedAt }
                     .thenByDescending { it.installedApp.isUpdateAvailable }
                     .thenBy { it.installedApp.appName.lowercase() }
+            }
 
-            AppSortRule.Name ->
+            AppSortRule.Name -> {
                 compareBy<AppItem> { it.installedApp.appName.lowercase() }
                     .thenByDescending { it.installedApp.isUpdateAvailable }
+            }
         }
     }
 
-    private fun togglePreReleases(packageName: String, enabled: Boolean) {
+    private fun togglePreReleases(
+        packageName: String,
+        enabled: Boolean,
+    ) {
         viewModelScope.launch {
             try {
                 installedAppsRepository.setIncludePreReleases(packageName, enabled)
@@ -815,7 +828,10 @@ class AppsViewModel(
         }
     }
 
-    private fun toggleUpdateCheck(packageName: String, enabled: Boolean) {
+    private fun toggleUpdateCheck(
+        packageName: String,
+        enabled: Boolean,
+    ) {
         viewModelScope.launch {
             try {
                 installedAppsRepository.setUpdateCheckEnabled(packageName, enabled)
@@ -827,7 +843,10 @@ class AppsViewModel(
         }
     }
 
-    private fun skipReleaseTag(packageName: String, tag: String) {
+    private fun skipReleaseTag(
+        packageName: String,
+        tag: String,
+    ) {
         val trimmed = tag.trim()
         if (trimmed.isEmpty()) return
         viewModelScope.launch {
@@ -890,7 +909,8 @@ class AppsViewModel(
 
     private fun schedulePreviewRefresh() {
         advancedPreviewJob?.cancel()
-        advancedPreviewJob = viewModelScope.launch {
+        advancedPreviewJob =
+            viewModelScope.launch {
                 delay(350.milliseconds)
                 refreshAdvancedPreview()
             }
@@ -916,7 +936,8 @@ class AppsViewModel(
         }
 
         advancedPreviewJob?.cancel()
-        advancedPreviewJob = viewModelScope.launch {
+        advancedPreviewJob =
+            viewModelScope.launch {
                 _state.update { it.copy(advancedPreviewLoading = true) }
                 try {
                     val preview =
@@ -995,11 +1016,12 @@ class AppsViewModel(
                                     VariantOption(
                                         assetId = asset.id,
                                         variant = variant,
-                                        subtitle = getString(
-                                            Res.string.apps_variant_subtitle,
-                                            asset.name,
-                                            formatFileSize(asset.size),
-                                        ),
+                                        subtitle =
+                                            getString(
+                                                Res.string.apps_variant_subtitle,
+                                                asset.name,
+                                                formatFileSize(asset.size),
+                                            ),
                                     ),
                                 )
                             }
@@ -1061,7 +1083,6 @@ class AppsViewModel(
             }
 
             if (resume) {
-
                 val refreshed =
                     runCatching { installedAppsRepository.getAppByPackage(app.packageName) }
                         .getOrNull()
@@ -1087,7 +1108,6 @@ class AppsViewModel(
         viewModelScope.launch {
             _state.update { it.copy(advancedSavingFilter = true) }
             try {
-
                 installedAppsRepository.setAssetFilter(
                     packageName = app.packageName,
                     regex = draftFilter.takeIf { it.isNotEmpty() },
@@ -1263,7 +1283,10 @@ class AppsViewModel(
         )
     }
 
-    private fun updateSingleApp(app: InstalledAppUi, waitForInstallGate: Boolean = false) {
+    private fun updateSingleApp(
+        app: InstalledAppUi,
+        waitForInstallGate: Boolean = false,
+    ) {
         if (activeUpdates.containsKey(app.packageName)) {
             logger.debug("Update already in progress for ${app.packageName}")
             return
@@ -1351,25 +1374,31 @@ class AppsViewModel(
                         waitForOrchestratorReady(app.packageName) { progress ->
                             updateAppProgress(app.packageName, progress)
                         }
-                    val filePath = when (orchestratorResult) {
-                        is OrchestratorResult.Ready -> orchestratorResult.filePath
-                        is OrchestratorResult.AlreadyInstalled -> {
-                            updateAppState(app.packageName, UpdateState.Idle)
-                            return@launch
+                    val filePath =
+                        when (orchestratorResult) {
+                            is OrchestratorResult.Ready -> {
+                                orchestratorResult.filePath
+                            }
+
+                            is OrchestratorResult.AlreadyInstalled -> {
+                                updateAppState(app.packageName, UpdateState.Idle)
+                                return@launch
+                            }
+
+                            is OrchestratorResult.Cancelled -> {
+                                updateAppState(app.packageName, UpdateState.Idle)
+                                return@launch
+                            }
+
+                            is OrchestratorResult.Failed -> {
+                                if (target.fromStoredMatch) storedMatchFailures += app.packageName
+                                updateAppState(
+                                    app.packageName,
+                                    UpdateState.Error(orchestratorResult.message ?: "Download failed"),
+                                )
+                                return@launch
+                            }
                         }
-                        is OrchestratorResult.Cancelled -> {
-                            updateAppState(app.packageName, UpdateState.Idle)
-                            return@launch
-                        }
-                        is OrchestratorResult.Failed -> {
-                            if (target.fromStoredMatch) storedMatchFailures += app.packageName
-                            updateAppState(
-                                app.packageName,
-                                UpdateState.Error(orchestratorResult.message ?: "Download failed"),
-                            )
-                            return@launch
-                        }
-                    }
 
                     val apkInfo =
                         installer.getApkInfoExtractor().extractPackageInfo(filePath)
@@ -1382,8 +1411,7 @@ class AppsViewModel(
                                     releaseId = target.releaseId,
                                     assetId = primaryAsset.id,
                                     assetDigest = primaryAsset.digest,
-                                )
-                                .withLatestSnapshot(
+                                ).withLatestSnapshot(
                                     version = latestVersion,
                                     assetName = latestAssetName,
                                     assetUrl = latestAssetUrl,
@@ -1481,7 +1509,8 @@ class AppsViewModel(
             return
         }
 
-        updateAllJob = viewModelScope.launch {
+        updateAllJob =
+            viewModelScope.launch {
                 try {
                     _state.update { it.copy(isUpdatingAll = true) }
 
@@ -1567,7 +1596,10 @@ class AppsViewModel(
 
     private fun retryInProgressDownload(key: String) {
         if (activeUpdates.containsKey(key)) return
-        val app = _state.value.apps.firstOrNull { it.installedApp.packageName == key }?.installedApp
+        val app =
+            _state.value.apps
+                .firstOrNull { it.installedApp.packageName == key }
+                ?.installedApp
         when {
             app == null -> runOrchestratorAction("retry", key) { downloadOrchestrator.retry(it) }
             app.pendingInstallFilePath != null -> redownloadPendingApp(app)
@@ -1648,7 +1680,6 @@ class AppsViewModel(
         packageName: String,
         progress: Int?,
     ) {
-
         _state.update { currentState ->
             currentState.copy(
                 apps =
@@ -1754,10 +1785,17 @@ class AppsViewModel(
     }
 
     private sealed interface OrchestratorResult {
-        data class Ready(val filePath: String) : OrchestratorResult
+        data class Ready(
+            val filePath: String,
+        ) : OrchestratorResult
+
         data object AlreadyInstalled : OrchestratorResult
+
         data object Cancelled : OrchestratorResult
-        data class Failed(val message: String?) : OrchestratorResult
+
+        data class Failed(
+            val message: String?,
+        ) : OrchestratorResult
     }
 
     private suspend fun waitForOrchestratorReady(
@@ -1771,8 +1809,7 @@ class AppsViewModel(
                     if (entry != null) {
                         entry.progressPercent?.let(onProgress)
                     }
-                }
-                .first { entry ->
+                }.first { entry ->
                     entry == null ||
                         entry.stage == OrchestratorStage.AwaitingInstall ||
                         entry.stage == OrchestratorStage.Completed ||
@@ -1780,13 +1817,26 @@ class AppsViewModel(
                         entry.stage == OrchestratorStage.Failed
                 }
         return when {
-            terminal == null -> OrchestratorResult.Cancelled
-            terminal.stage == OrchestratorStage.AwaitingInstall ->
+            terminal == null -> {
+                OrchestratorResult.Cancelled
+            }
+
+            terminal.stage == OrchestratorStage.AwaitingInstall -> {
                 terminal.filePath?.let { OrchestratorResult.Ready(it) }
                     ?: OrchestratorResult.Failed("Downloaded file path missing")
-            terminal.stage == OrchestratorStage.Completed -> OrchestratorResult.AlreadyInstalled
-            terminal.stage == OrchestratorStage.Failed -> OrchestratorResult.Failed(terminal.errorMessage)
-            else -> OrchestratorResult.Cancelled
+            }
+
+            terminal.stage == OrchestratorStage.Completed -> {
+                OrchestratorResult.AlreadyInstalled
+            }
+
+            terminal.stage == OrchestratorStage.Failed -> {
+                OrchestratorResult.Failed(terminal.errorMessage)
+            }
+
+            else -> {
+                OrchestratorResult.Cancelled
+            }
         }
     }
 
@@ -1834,7 +1884,11 @@ class AppsViewModel(
                         "Downloading ${app.packageName} again: ${target.tag} ${target.asset.name}, " +
                             "stored match: ${target.fromStoredMatch}",
                     )
-                    installer.ensurePermissionsOrThrow(target.asset.name.substringAfterLast('.', "").lowercase())
+                    installer.ensurePermissionsOrThrow(
+                        target.asset.name
+                            .substringAfterLast('.', "")
+                            .lowercase(),
+                    )
 
                     updateAppState(app.packageName, UpdateState.Downloading)
                     downloadOrchestrator.enqueue(
@@ -1858,7 +1912,10 @@ class AppsViewModel(
                             updateAppProgress(app.packageName, progress)
                         }
                     when (result) {
-                        is OrchestratorResult.Ready -> installParked(app)
+                        is OrchestratorResult.Ready -> {
+                            installParked(app)
+                        }
+
                         is OrchestratorResult.Failed -> {
                             if (target.fromStoredMatch) storedMatchFailures += app.packageName
                             updateAppState(
@@ -1866,7 +1923,10 @@ class AppsViewModel(
                                 UpdateState.Error(result.message ?: "Download failed"),
                             )
                         }
-                        else -> updateAppState(app.packageName, UpdateState.Idle)
+
+                        else -> {
+                            updateAppState(app.packageName, UpdateState.Idle)
+                        }
                     }
                 } catch (e: CancellationException) {
                     updateAppState(app.packageName, UpdateState.Idle)
@@ -1907,7 +1967,6 @@ class AppsViewModel(
             } catch (e: CancellationException) {
                 throw e
             } catch (t: Throwable) {
-
                 logger.error(
                     "discardPendingInstall: row delete failed for ${app.packageName}: ${t.message}",
                 )
@@ -1955,46 +2014,50 @@ class AppsViewModel(
                 fetchedRepoInfo = null,
             )
         }
-        smartMatchJob = viewModelScope.launch {
-            try {
-                val candidate =
-                    zed.rainxch.core.domain.system.ExternalAppCandidate(
-                        packageName = app.packageName,
-                        appLabel = app.appName,
-                        versionName = app.versionName,
-                        versionCode = app.versionCode,
-                        signingFingerprint = app.signingFingerprint,
-                        installerKind = zed.rainxch.core.domain.system.InstallerKind.UNKNOWN,
-                        manifestHint = null,
-                        firstSeenAt = kotlin.time.Clock.System.now().toEpochMilliseconds(),
-                    )
-                val results = externalImportRepository.resolveMatches(listOf(candidate))
-                val suggestions =
-                    results
-                        .firstOrNull()
-                        ?.suggestions
-                        ?.sortedByDescending { it.confidence }
-                        ?.take(8)
-                        .orEmpty()
-                        .toImmutableList()
-                _state.update {
-                    it.copy(
-                        linkSearchLoading = false,
-                        linkSuggestions = suggestions,
-                    )
-                }
-            } catch (e: CancellationException) {
-                throw e
-            } catch (e: Exception) {
-                logger.warn("Smart match failed for ${app.packageName}: ${e.message}")
-                _state.update {
-                    it.copy(
-                        linkSearchLoading = false,
-                        linkSearchError = e.message ?: "search failed",
-                    )
+        smartMatchJob =
+            viewModelScope.launch {
+                try {
+                    val candidate =
+                        zed.rainxch.core.domain.system.ExternalAppCandidate(
+                            packageName = app.packageName,
+                            appLabel = app.appName,
+                            versionName = app.versionName,
+                            versionCode = app.versionCode,
+                            signingFingerprint = app.signingFingerprint,
+                            installerKind = zed.rainxch.core.domain.system.InstallerKind.UNKNOWN,
+                            manifestHint = null,
+                            firstSeenAt =
+                                kotlin.time.Clock.System
+                                    .now()
+                                    .toEpochMilliseconds(),
+                        )
+                    val results = externalImportRepository.resolveMatches(listOf(candidate))
+                    val suggestions =
+                        results
+                            .firstOrNull()
+                            ?.suggestions
+                            ?.sortedByDescending { it.confidence }
+                            ?.take(8)
+                            .orEmpty()
+                            .toImmutableList()
+                    _state.update {
+                        it.copy(
+                            linkSearchLoading = false,
+                            linkSuggestions = suggestions,
+                        )
+                    }
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (e: Exception) {
+                    logger.warn("Smart match failed for ${app.packageName}: ${e.message}")
+                    _state.update {
+                        it.copy(
+                            linkSearchLoading = false,
+                            linkSearchError = e.message ?: "search failed",
+                        )
+                    }
                 }
             }
-        }
     }
 
     private fun openLinkSheet() {
@@ -2063,7 +2126,6 @@ class AppsViewModel(
     }
 
     private fun onLinkAssetFilterChanged(value: String) {
-
         val parseResult = AssetFilter.parse(value)
         val error =
             parseResult?.exceptionOrNull()?.let { _ ->
@@ -2113,10 +2175,13 @@ class AppsViewModel(
         val url = _state.value.repoUrl.trim()
 
         viewModelScope.launch {
-            val customHosts = runCatching {
-                tweaksRepository.getCustomForgeHosts().first()
-            }.getOrElse { emptySet() }
-            val parsedRef = zed.rainxch.core.domain.utils.RepositoryUrlParser.parse(url, customHosts)
+            val customHosts =
+                runCatching {
+                    tweaksRepository.getCustomForgeHosts().first()
+                }.getOrElse { emptySet() }
+            val parsedRef =
+                zed.rainxch.core.domain.utils.RepositoryUrlParser
+                    .parse(url, customHosts)
             if (parsedRef == null) {
                 _state.update { it.copy(repoValidationError = getString(Res.string.invalid_github_url)) }
                 return@launch
@@ -2124,10 +2189,11 @@ class AppsViewModel(
 
             val owner = parsedRef.owner
             val repo = parsedRef.repo
-            val sourceHost: String? = when (val src = parsedRef.source) {
-                zed.rainxch.core.domain.model.repository.RepositorySource.GitHub -> null
-                is zed.rainxch.core.domain.model.repository.RepositorySource.Forgejo -> src.host
-            }
+            val sourceHost: String? =
+                when (val src = parsedRef.source) {
+                    zed.rainxch.core.domain.model.repository.RepositorySource.GitHub -> null
+                    is zed.rainxch.core.domain.model.repository.RepositorySource.Forgejo -> src.host
+                }
             _state.update {
                 it.copy(
                     isValidatingRepo = true,

@@ -1,4 +1,5 @@
 package zed.rainxch.core.domain.model.settings
+
 enum class TranslationProvider {
     GOOGLE,
     YOUDAO,
@@ -10,7 +11,6 @@ enum class TranslationProvider {
     companion object {
         val Default: TranslationProvider = GOOGLE
 
-        fun fromName(name: String?): TranslationProvider =
-            entries.firstOrNull { it.name == name } ?: Default
+        fun fromName(name: String?): TranslationProvider = entries.firstOrNull { it.name == name } ?: Default
     }
 }

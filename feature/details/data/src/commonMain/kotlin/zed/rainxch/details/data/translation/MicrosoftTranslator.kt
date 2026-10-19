@@ -42,72 +42,86 @@ internal class MicrosoftTranslator(
         val target = mapLanguageCode(targetLanguage)
         val source = mapSourceLanguageCode(sourceLanguage)
         val sourceQuery = source?.let { "&from=$it" }.orEmpty()
-        val url = "https://api.cognitive.microsofttranslator.com/translate" +
-            "?api-version=3.0&to=$target$sourceQuery"
+        val url =
+            "https://api.cognitive.microsofttranslator.com/translate" +
+                "?api-version=3.0&to=$target$sourceQuery"
 
-        val requestBody: JsonArray = buildJsonArray {
-            addJsonObject {
-                put("Text", text)
+        val requestBody: JsonArray =
+            buildJsonArray {
+                addJsonObject {
+                    put("Text", text)
+                }
             }
-        }
 
-        val response = httpClient().post(url) {
-            header("Ocp-Apim-Subscription-Key", subscriptionKey)
-            if (subscriptionRegion.isNotBlank() && !subscriptionRegion.equals("global", ignoreCase = true)) {
-                header("Ocp-Apim-Subscription-Region", subscriptionRegion.lowercase())
+        val response =
+            httpClient().post(url) {
+                header("Ocp-Apim-Subscription-Key", subscriptionKey)
+                if (subscriptionRegion.isNotBlank() && !subscriptionRegion.equals("global", ignoreCase = true)) {
+                    header("Ocp-Apim-Subscription-Region", subscriptionRegion.lowercase())
+                }
+                contentType(ContentType.Application.Json)
+                setBody(requestBody.toString())
             }
-            contentType(ContentType.Application.Json)
-            setBody(requestBody.toString())
-        }
 
         val body = response.bodyAsText()
         if (!response.status.isSuccess()) {
-            val errorMsg = runCatching {
-                json.parseToJsonElement(body)
-                    .jsonObject["error"]
-                    ?.jsonObject
-                    ?.get("message")
-                    ?.jsonPrimitive
-                    ?.content
-            }.getOrNull()
+            val errorMsg =
+                runCatching {
+                    json
+                        .parseToJsonElement(body)
+                        .jsonObject["error"]
+                        ?.jsonObject
+                        ?.get("message")
+                        ?.jsonPrimitive
+                        ?.content
+                }.getOrNull()
             throw RuntimeException(
                 "Microsoft Translator HTTP ${response.status.value}: ${errorMsg ?: body.take(200)}",
             )
         }
 
-        val parsed = try {
-            json.parseToJsonElement(body)
-        } catch (e: SerializationException) {
-            throw RuntimeException(
-                "Microsoft Translator returned non-JSON response: ${body.take(200)}",
-                e,
-            )
-        }
+        val parsed =
+            try {
+                json.parseToJsonElement(body)
+            } catch (e: SerializationException) {
+                throw RuntimeException(
+                    "Microsoft Translator returned non-JSON response: ${body.take(200)}",
+                    e,
+                )
+            }
 
         if (parsed is JsonObject) {
-            val errorMsg = parsed["error"]?.jsonObject?.get("message")?.jsonPrimitive?.content
+            val errorMsg =
+                parsed["error"]
+                    ?.jsonObject
+                    ?.get("message")
+                    ?.jsonPrimitive
+                    ?.content
             throw RuntimeException("Microsoft Translator error: ${errorMsg ?: body}")
         }
 
-        val first = parsed.jsonArray.firstOrNull()?.jsonObject
-            ?: throw RuntimeException("Microsoft Translator response empty")
+        val first =
+            parsed.jsonArray.firstOrNull()?.jsonObject
+                ?: throw RuntimeException("Microsoft Translator response empty")
 
-        val translation = first["translations"]
-            ?.jsonArray
-            ?.firstOrNull()
-            ?.jsonObject
-            ?.get("text")
-            ?.jsonPrimitive
-            ?.content
-            ?: throw RuntimeException("Microsoft Translator response missing translation text")
+        val translation =
+            first["translations"]
+                ?.jsonArray
+                ?.firstOrNull()
+                ?.jsonObject
+                ?.get("text")
+                ?.jsonPrimitive
+                ?.content
+                ?: throw RuntimeException("Microsoft Translator response missing translation text")
 
-        val detected = first["detectedLanguage"]
-            ?.jsonObject
-            ?.get("language")
-            ?.jsonPrimitive
-            ?.content
-            ?.lowercase()
-            ?.takeIf { it.isNotBlank() }
+        val detected =
+            first["detectedLanguage"]
+                ?.jsonObject
+                ?.get("language")
+                ?.jsonPrimitive
+                ?.content
+                ?.lowercase()
+                ?.takeIf { it.isNotBlank() }
 
         return TranslationResult(
             translatedText = translation,

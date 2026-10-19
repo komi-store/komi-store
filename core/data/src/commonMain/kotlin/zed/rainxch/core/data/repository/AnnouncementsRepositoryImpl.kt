@@ -5,7 +5,6 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
-import kotlin.time.Clock
 import kotlinx.serialization.json.Json
 import zed.rainxch.core.data.dto.AnnouncementsResponseDto
 import zed.rainxch.core.data.mappers.toDomain
@@ -20,6 +19,7 @@ import zed.rainxch.core.domain.repository.AnnouncementsCacheStore
 import zed.rainxch.core.domain.repository.AnnouncementsRepository
 import zed.rainxch.core.domain.repository.TweaksRepository
 import zed.rainxch.core.domain.system.AppVersionInfo
+import kotlin.time.Clock
 
 class AnnouncementsRepositoryImpl(
     private val backendApiClient: BackendApiClient,
@@ -32,23 +32,25 @@ class AnnouncementsRepositoryImpl(
 
     private val json = Json { ignoreUnknownKeys = true }
 
-    private val platformTag: String = when (getPlatform()) {
-        Platform.ANDROID -> "ANDROID"
-        Platform.WINDOWS, Platform.MACOS, Platform.LINUX -> "DESKTOP"
-    }
+    private val platformTag: String =
+        when (getPlatform()) {
+            Platform.ANDROID -> "ANDROID"
+            Platform.WINDOWS, Platform.MACOS, Platform.LINUX -> "DESKTOP"
+        }
 
     private val lastRefreshFailed = MutableStateFlow(false)
 
     override fun observeFeed(): Flow<AnnouncementsFeedSnapshot> {
-        val persistedFlow = combine(
-            cacheStore.getCachedPayload(),
-            tweaksRepository.getAnnouncementsDismissedIds(),
-            tweaksRepository.getAnnouncementsAcknowledgedIds(),
-            tweaksRepository.getAnnouncementsMutedCategories(),
-            tweaksRepository.getAnnouncementsLastFetchedAt(),
-        ) { payload, dismissed, acknowledged, mutedCategories, lastFetched ->
-            PersistedFeedState(payload, dismissed, acknowledged, mutedCategories, lastFetched)
-        }
+        val persistedFlow =
+            combine(
+                cacheStore.getCachedPayload(),
+                tweaksRepository.getAnnouncementsDismissedIds(),
+                tweaksRepository.getAnnouncementsAcknowledgedIds(),
+                tweaksRepository.getAnnouncementsMutedCategories(),
+                tweaksRepository.getAnnouncementsLastFetchedAt(),
+            ) { payload, dismissed, acknowledged, mutedCategories, lastFetched ->
+                PersistedFeedState(payload, dismissed, acknowledged, mutedCategories, lastFetched)
+            }
         return combine(
             persistedFlow,
             lastRefreshFailed,
@@ -118,7 +120,10 @@ class AnnouncementsRepositoryImpl(
         }
     }
 
-    override suspend fun setMuted(category: AnnouncementCategory, muted: Boolean) {
+    override suspend fun setMuted(
+        category: AnnouncementCategory,
+        muted: Boolean,
+    ) {
         if (!category.isMutable) return
         try {
             tweaksRepository.setAnnouncementCategoryMuted(category, muted)
@@ -128,14 +133,18 @@ class AnnouncementsRepositoryImpl(
         }
     }
 
-    private fun parseAndFilter(payload: String?, installerTypeTag: String): List<Announcement> {
+    private fun parseAndFilter(
+        payload: String?,
+        installerTypeTag: String,
+    ): List<Announcement> {
         if (payload.isNullOrBlank()) return emptyList()
-        val parsed = runCatching {
-            json.decodeFromString(AnnouncementsResponseDto.serializer(), payload)
-        }.getOrElse {
-            logger.w("Failed to parse cached announcements payload: ${it.message}")
-            return emptyList()
-        }
+        val parsed =
+            runCatching {
+                json.decodeFromString(AnnouncementsResponseDto.serializer(), payload)
+            }.getOrElse {
+                logger.w("Failed to parse cached announcements payload: ${it.message}")
+                return emptyList()
+            }
         val full = localizationManager.getCurrentLanguageCode()
         val primary = localizationManager.getPrimaryLanguageCode()
         val now = Clock.System.now()
@@ -154,8 +163,7 @@ class AnnouncementsRepositoryImpl(
                 val platformOk = item.platforms?.contains(platformTag) ?: true
                 val installerOk = item.installerTypes?.contains(installerTypeTag) ?: true
                 !expired && publishedOk && versionFloorOk && versionCeilingOk && platformOk && installerOk
-            }
-            .sortedByDescending { it.publishedAt }
+            }.sortedByDescending { it.publishedAt }
             .toList()
     }
 

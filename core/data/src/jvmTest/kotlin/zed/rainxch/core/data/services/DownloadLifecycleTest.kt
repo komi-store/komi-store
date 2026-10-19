@@ -1,13 +1,5 @@
 package zed.rainxch.core.data.services
 
-import java.io.File
-import kotlin.io.path.createTempDirectory
-import kotlin.test.AfterTest
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertFalse
-import kotlin.test.assertNotEquals
-import kotlin.test.assertNull
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
@@ -26,7 +18,6 @@ import zed.rainxch.core.domain.model.system.SystemArchitecture
 import zed.rainxch.core.domain.network.AssetIdentity
 import zed.rainxch.core.domain.network.DigestVerifier
 import zed.rainxch.core.domain.network.Downloader
-import zed.rainxch.core.domain.network.SlowDownloadDetector
 import zed.rainxch.core.domain.repository.InstalledAppsRepository
 import zed.rainxch.core.domain.system.DownloadSpec
 import zed.rainxch.core.domain.system.DownloadStage
@@ -37,6 +28,14 @@ import zed.rainxch.core.domain.system.InstallerInfoExtractor
 import zed.rainxch.core.domain.system.MultiSourceDownloader
 import zed.rainxch.core.domain.system.PendingInstallNotifier
 import zed.rainxch.core.domain.system.SystemInstallSerializer
+import java.io.File
+import kotlin.io.path.createTempDirectory
+import kotlin.test.AfterTest
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertNotEquals
+import kotlin.test.assertNull
 
 class DownloadLifecycleTest {
     private val dir = createTempDirectory("komi-lifecycle").toFile()
@@ -102,7 +101,10 @@ class DownloadLifecycleTest {
 
             orchestrator.enqueue(spec())
             awaitStage(orchestrator, DownloadStage.AwaitingInstall)
-            val path = orchestrator.downloads.value.getValue(PACKAGE).filePath!!
+            val path =
+                orchestrator.downloads.value
+                    .getValue(PACKAGE)
+                    .filePath!!
             orchestrator.discard(PACKAGE)
 
             assertNull(orchestrator.downloads.value[PACKAGE])
@@ -132,13 +134,15 @@ class DownloadLifecycleTest {
             installer = HandOffInstaller,
             installedAppsRepository = StubInstalledAppsRepository,
             pendingInstallNotifier = StubNotifier,
-            slowDownloadDetector = StubSlowDownloadDetector,
             appScope = this,
             systemInstallSerializer = StubInstallSerializer,
             tokenStore = FakeTokenStore(),
         )
 
-    private suspend fun awaitStage(orchestrator: DefaultDownloadOrchestrator, stage: DownloadStage) {
+    private suspend fun awaitStage(
+        orchestrator: DefaultDownloadOrchestrator,
+        stage: DownloadStage,
+    ) {
         withTimeout(AWAIT_MS) {
             orchestrator.downloads.first { it[PACKAGE]?.stage == stage }
         }
@@ -164,7 +168,9 @@ class DownloadLifecycleTest {
             releaseId = RELEASE_ID,
         )
 
-    private class FileWritingSource(private val dir: File) : MultiSourceDownloader {
+    private class FileWritingSource(
+        private val dir: File,
+    ) : MultiSourceDownloader {
         var calls = 0
         var gate: CompletableDeferred<Unit>? = null
         var failNext = false
@@ -189,7 +195,9 @@ class DownloadLifecycleTest {
             }
     }
 
-    private class DirDownloader(private val dir: File) : Downloader {
+    private class DirDownloader(
+        private val dir: File,
+    ) : Downloader {
         override fun download(
             url: String,
             suggestedFileName: String?,
@@ -197,10 +205,12 @@ class DownloadLifecycleTest {
             identity: AssetIdentity?,
         ): Flow<DownloadProgress> = throw java.io.IOException("no fallback source in this test")
 
-        override suspend fun saveToFile(url: String, suggestedFileName: String?): String = error("unused")
+        override suspend fun saveToFile(
+            url: String,
+            suggestedFileName: String?,
+        ): String = error("unused")
 
-        override suspend fun getDownloadedFilePath(fileName: String): String? =
-            File(dir, fileName).takeIf { it.exists() }?.absolutePath
+        override suspend fun getDownloadedFilePath(fileName: String): String? = File(dir, fileName).takeIf { it.exists() }?.absolutePath
 
         override suspend fun cancelDownload(fileName: String): Boolean = false
 
@@ -210,8 +220,10 @@ class DownloadLifecycleTest {
     }
 
     private object UnusedVerifier : DigestVerifier {
-        override suspend fun verify(filePath: String, expectedDigest: String): String? =
-            error("an asset without a digest is not verified")
+        override suspend fun verify(
+            filePath: String,
+            expectedDigest: String,
+        ): String? = error("an asset without a digest is not verified")
     }
 
     private object HandOffInstaller : Installer {
@@ -219,8 +231,10 @@ class DownloadLifecycleTest {
 
         override suspend fun ensurePermissionsOrThrow(extOrMime: String) = Unit
 
-        override suspend fun install(filePath: String, extOrMime: String): InstallOutcome =
-            InstallOutcome.DELEGATED_TO_SYSTEM
+        override suspend fun install(
+            filePath: String,
+            extOrMime: String,
+        ): InstallOutcome = InstallOutcome.DELEGATED_TO_SYSTEM
 
         override fun uninstall(packageName: String) = Unit
 
@@ -240,7 +254,10 @@ class DownloadLifecycleTest {
 
         override fun isAppManagerInstalled(): Boolean = false
 
-        override fun openInAppManager(filePath: String, onOpenInstaller: () -> Unit) = Unit
+        override fun openInAppManager(
+            filePath: String,
+            onOpenInstaller: () -> Unit,
+        ) = Unit
 
         override fun getApkInfoExtractor(): InstallerInfoExtractor = NoOpExtractor
 
@@ -268,8 +285,10 @@ class DownloadLifecycleTest {
             assetName: String?,
         ) = Unit
 
-        override suspend fun discardParkedInstall(packageName: String, expectedPath: String?) =
-            ParkedInstallDisposal.Discarded
+        override suspend fun discardParkedInstall(
+            packageName: String,
+            expectedPath: String?,
+        ) = ParkedInstallDisposal.Discarded
 
         override fun getAllInstalledApps(): Flow<List<InstalledApp>> = emptyFlow()
 
@@ -323,11 +342,20 @@ class DownloadLifecycleTest {
             isUpdateAvailable: Boolean,
         ) = Unit
 
-        override suspend fun updatePendingStatus(packageName: String, isPending: Boolean) = Unit
+        override suspend fun updatePendingStatus(
+            packageName: String,
+            isPending: Boolean,
+        ) = Unit
 
-        override suspend fun setIncludePreReleases(packageName: String, enabled: Boolean) = Unit
+        override suspend fun setIncludePreReleases(
+            packageName: String,
+            enabled: Boolean,
+        ) = Unit
 
-        override suspend fun setUpdateCheckEnabled(packageName: String, enabled: Boolean) = Unit
+        override suspend fun setUpdateCheckEnabled(
+            packageName: String,
+            enabled: Boolean,
+        ) = Unit
 
         override suspend fun setAssetFilter(
             packageName: String,
@@ -346,7 +374,10 @@ class DownloadLifecycleTest {
 
         override suspend fun clearPreferredVariant(packageName: String) = Unit
 
-        override suspend fun setSkippedReleaseTag(packageName: String, tag: String?) = Unit
+        override suspend fun setSkippedReleaseTag(
+            packageName: String,
+            tag: String?,
+        ) = Unit
 
         override fun getAppsWithSkippedReleaseTag(): Flow<List<InstalledApp>> = emptyFlow()
 
@@ -373,16 +404,11 @@ class DownloadLifecycleTest {
         override fun clearPending(packageName: String) = Unit
     }
 
-    private object StubSlowDownloadDetector : SlowDownloadDetector {
-        override val suggestMirror: Flow<Unit> = emptyFlow()
-
-        override suspend fun onProgress(progress: DownloadProgress) = Unit
-
-        override suspend fun reset() = Unit
-    }
-
     private object StubInstallSerializer : SystemInstallSerializer {
-        override suspend fun awaitFreeAndMarkPending(packageName: String, timeoutMs: Long) = Unit
+        override suspend fun awaitFreeAndMarkPending(
+            packageName: String,
+            timeoutMs: Long,
+        ) = Unit
 
         override fun markCompleted(packageName: String) = Unit
     }
