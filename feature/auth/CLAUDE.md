@@ -19,24 +19,7 @@ feature/auth/
     AuthDeepLinkBus.kt                          # SharedFlow bridge from app-level deep-link parser to VM
 ```
 
-## Key interface
-
-```kotlin
-interface AuthenticationRepository {
-    val accessTokenFlow: Flow<String?>
-
-    suspend fun startDeviceFlow(): DeviceFlowStart
-    suspend fun awaitDeviceToken(start: GithubDeviceStart): GithubDeviceTokenSuccess // no callers
-    suspend fun pollDeviceTokenOnce(deviceCode: String, path: AuthPath): PollOutcome
-
-    suspend fun signInWithPat(token: String): Result<Unit>
-
-    suspend fun registerWebAuth(): Result<WebAuthRegistration>
-    suspend fun exchangeWebAuthHandoff(handoffId: String): Result<String>
-}
-
-enum class AuthPath { Backend, Direct }
-```
+`AuthenticationRepository.awaitDeviceToken` has no callers; the VM polls with `pollDeviceTokenOnce`.
 
 ## Navigation
 
