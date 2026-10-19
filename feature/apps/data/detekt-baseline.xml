@@ -11,8 +11,6 @@
     <ID>MagicNumber:AppsRepositoryImpl.kt$AppsRepositoryImpl$10</ID>
     <ID>MagicNumber:AppsRepositoryImpl.kt$AppsRepositoryImpl$1000</ID>
     <ID>MagicNumber:AppsRepositoryImpl.kt$AppsRepositoryImpl$5</ID>
-    <ID>MaxLineLength:AppsRepositoryImpl.kt$AppsRepositoryImpl$"${backendStart.elapsedNow().inWholeMilliseconds} ms (${error.message}), asking GitHub directly"</ID>
-    <ID>MaxLineLength:AppsRepositoryImpl.kt$AppsRepositoryImpl$if</ID>
     <ID>ReturnCount:AppsRepositoryImpl.kt$AppsRepositoryImpl$override suspend fun fetchRepoInfo( owner: String, repo: String, sourceHost: String?, ): GithubRepoInfo?</ID>
     <ID>ReturnCount:AppsRepositoryImpl.kt$AppsRepositoryImpl$override suspend fun getLatestRelease( owner: String, repo: String, includePreReleases: Boolean, sourceHost: String?, ): GithubRelease?</ID>
     <ID>ReturnCount:AppsRepositoryImpl.kt$AppsRepositoryImpl$private fun detectFormat(element: kotlinx.serialization.json.JsonElement): ImportFormat</ID>

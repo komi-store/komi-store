@@ -31,8 +31,6 @@
     <ID>MagicNumber:WebAuthApi.kt$WebAuthApi$299</ID>
     <ID>MaxLineLength:AuthenticationRepositoryImpl.kt$AuthenticationRepositoryImpl$"Device flow started via Backend. interval=${dto.intervalSec}s expires=${dto.expiresInSec}s completeUri=${dto.verificationUriComplete != null}"</ID>
     <ID>MaxLineLength:AuthenticationRepositoryImpl.kt$AuthenticationRepositoryImpl$"Direct device/start ALSO failed. backendClass=$backendClass backendStatus=$backendStatus backendMsg=$backendMsg | directClass=$innerClass directMsg=$innerMsg"</ID>
-    <ID>MaxLineLength:AuthenticationRepositoryImpl.kt$AuthenticationRepositoryImpl$logger.debug("⚠️ Rate limited. New interval: ${pollingInterval}ms (slowdown #$slowDownCount)")</ID>
-    <ID>MaxLineLength:GitHubAuthApi.kt$GitHubAuthApi$private fun String?.asRequestIdTag(): String</ID>
     <ID>ReturnCount:AuthenticationRepositoryImpl.kt$AuthenticationRepositoryImpl$private fun looksLikePat(token: String): Boolean</ID>
     <ID>ThrowsCount:AuthenticationRepositoryImpl.kt$AuthenticationRepositoryImpl$private suspend fun saveTokenWithVerification(token: GithubDeviceTokenSuccess)</ID>
     <ID>TooGenericExceptionCaught:AuthenticationRepositoryImpl.kt$AuthenticationRepositoryImpl$e: Exception</ID>

@@ -1,6 +1,6 @@
 # Recently Viewed Feature
 
-Local "recently viewed" history — every repo whose Details screen was opened. **Presentation-only**, backed by `SeenReposRepository` (same pipeline that drives "Hide seen" filter on Home/Search).
+Local "recently viewed" history. **Presentation-only**, backed by `SeenReposRepository`, the same table that drives the "Hide seen" filter on Home / Search / Feed.
 
 ## Structure
 
@@ -17,6 +17,6 @@ feature/recently-viewed/presentation/
 
 ## Notes
 
-- Visited timestamps come from `seenRepoDao.insert(...)` calls in `DetailsViewModel` on screen open.
-- No network. `seenReposRepository.clearAll()` wipes table; `removeFromHistory(repoId)` for single-row.
-- Koin in `composeApp/.../app/di/ViewModelsModule.kt` (no `data/di/`).
+- Rows come from `SeenReposRepository.markAsSeen`: `DetailsViewModel` calls it when a repo loads, and the "Mark as seen" card action on Home / Search / Feed writes the same table. So the list is not only repos whose Details was opened.
+- No network. Rows are removed one at a time (`removeFromHistory(repoId)`). `OnClearAllHistory` exists but nothing in the UI sends it; clearing all seen history is in Tweaks (Privacy & data).
+- `SeenRepo` stores no `sourceHost`; the Details link recovers it with `RepoIdCodec.sourceHostOf(repoId, repoUrl)`.

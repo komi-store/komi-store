@@ -1,44 +1,33 @@
 # Home Feature
 
-Main discovery — Trending, Hot Releases, Most Popular. Infinite-scroll pagination. Integrates installed-app / favourite / starred status badges.
+Top Charts: Trending / Releases / Popular tabs (`ChartTab`) over backend category lists, with installed / update / favourite / starred / seen badges. Also holds the category list screen (`categorylist/`).
 
 ## Structure
 
 ```
 feature/home/
 ├── domain/    # HomeRepository + HomeCategory (TRENDING / HOT_RELEASE / MOST_POPULAR), TopicCategory
-├── data/      # HomeRepositoryImpl, CachedRepositoriesDataSource (per-category 7-day TTL), dto, mappers, di
+├── data/      # HomeRepositoryImpl, CachedRepositoriesDataSource (backend + offline mirror, 1h in-memory cache), dto, mappers, di
 └── presentation/
     ├── HomeViewModel / State / Action / Event / Root
-    ├── components/HomeFilterChips
-    ├── locals/LocalHomeTopBarLiquid
-    └── utils/HomeCategoryMapper
+    ├── components/    HomeChartTabs, HomePlatformPicker, RepositoryActionsSheet
+    ├── model/         ChartTab, HomeRepoCardUi + mapper
+    └── categorylist/  CategoryListRoot / ViewModel
 ```
 
-## Key interface
-
-```kotlin
-interface HomeRepository {
-    fun getTrendingRepositories(page: Int): Flow<PaginatedDiscoveryRepositories>
-    fun getHotReleaseRepositories(page: Int): Flow<PaginatedDiscoveryRepositories>
-    fun getMostPopular(page: Int): Flow<PaginatedDiscoveryRepositories>
-}
-```
+`HomeRepository` takes a set of `DiscoveryPlatform`s; an empty set means all platforms. `searchByTopic`, `getTopicRepositories` and `getRepositoryById` are implemented but have no callers.
 
 ## Navigation
 
-`GithubStoreGraph.ChartsScreen` (bottom-nav label "Top Charts"). The `ExploreScreen` route renders the feed feature, not this one.
-
-## VM injects
-
-`HomeRepository`, `InstalledAppsRepository`, `Platform`, `SyncInstalledAppsUseCase`, `FavouritesRepository`, `StarredRepository`, `GitHubStoreLogger`, `ShareManager`, `TweaksRepository`, `SeenReposRepository`, `HiddenReposRepository`, `ProfileRepository`.
+`GithubStoreGraph.ChartsScreen` (bottom-nav label "Top Charts"). The `ExploreScreen` route renders the feed feature, not this one. `CategoryListScreen(category)` is registered (`HomeCategory.valueOf`, falls back to HOT_RELEASE) but nothing navigates to it.
 
 ## Notes
 
-- `Semaphore` in `HomeRepositoryImpl` for concurrent request control. 7-day per-category cache. Pagination via `nextPageIndex`, dedupe by `fullName`.
-- `HomeRoot.visibleRepos` derives display list — filters by `hiddenRepoIds` (E11) and `seenRepoIds` when `isHideSeenEnabled`.
-- Apps section in bottom nav: `Platform.ANDROID` only.
-- Long-press on `RepositoryCard` opens `RepositoryActionsBottomSheet` (Share / Open on GitHub / Mark seen / Hide).
-- `DiscoveryRepositoryUi.isCurrentUserOwner` flipped by `observeCurrentUser` (E20).
-- State uses `onStart` + `stateIn(WhileSubscribed)`.
+- Page 1 of a chart: `CachedRepositoriesDataSource` (backend category list, offline mirror JSON under `OFFLINE_MIRROR_BASE` if the backend fails) -> `CacheManager` copy (`HOME_REPOS`, 24h) -> direct GitHub `/search/repositories`, checking candidates for installers under a `Semaphore`. Later pages skip the data source. Backend / mirror lists come as one page (`hasMore = false`); only the GitHub search path paginates.
+- Platform comes from the shared `BrowseFilterStore` (`core`, in-memory, starts at the device platform; also set by Feed and the Desktop sidebar). A change clears every chart and reloads the selected one. The VM passes one platform or none. `HomePlatformPicker` is hidden on Desktop, where the sidebar sets the platform.
+- Each tab keeps its own repos / page / hasMore in the VM's `ChartCache`, so switching back to a loaded tab does not refetch. Load-more dedupes by `id`.
+- `HomeViewModel.filterVisible` drops hidden ids and, when hide-seen is on, seen ids.
+- Long-press on a `DiscoveryRepoCard` opens `RepositoryActionsSheet` (Share / Open on GitHub / Mark seen or unseen / Hide).
+- `HomeRepoCardUi.isCurrentUserOwner` set from `observeCurrentUser` (login match on `UserSessionRepository.getUser()`).
+- `categorylist/`: one `HomeCategory` across all platforms, no installed / favourite / starred badges.
 - Per-platform release date: a list filtered to one platform shows that platform's newest build date (`BackendRepoResponse.platformReleases` via `releaseDateFor(platform)` in `toCachedGithubRepoSummary(platform)`); `All` keeps the newest release overall. Feed and Search do the same through `toSummary(platform)`. Matters for repos that release desktop and mobile separately.

@@ -9,8 +9,6 @@
     <ID>LongMethod:HomeViewModel.kt$HomeViewModel$fun onAction(action: HomeAction)</ID>
     <ID>LongParameterList:HomeRepoCardMapper.kt$( repo: GithubRepoSummary, isInstalled: Boolean, isUpdateAvailable: Boolean, isFavourite: Boolean, isStarred: Boolean, isSeen: Boolean, isCurrentUserOwner: Boolean, )</ID>
     <ID>LongParameterList:HomeViewModel.kt$HomeViewModel$( private val homeRepository: HomeRepository, private val installedAppsRepository: InstalledAppsRepository, private val syncInstalledAppsUseCase: SyncInstalledAppsUseCase, private val favouritesRepository: FavouritesRepository, private val starredRepository: StarredRepository, private val tweaksRepository: TweaksRepository, private val seenReposRepository: SeenReposRepository, private val hiddenReposRepository: HiddenReposRepository, private val userSessionRepository: UserSessionRepository, private val browseFilterStore: BrowseFilterStore, private val logger: KomiStoreLogger, private val shareManager: ShareManager, )</ID>
-    <ID>MaxLineLength:CategoryListRoot.kt$maxCardWidth = if (state.isGridLayout) CardGridSpec.ChartCompactMaxCardWidth else CardGridSpec.InfoMaxCardWidth</ID>
-    <ID>MaxLineLength:HomeRoot.kt$maxCardWidth = if (state.isGridLayout) CardGridSpec.ChartCompactMaxCardWidth else CardGridSpec.InfoMaxCardWidth</ID>
     <ID>ThrowsCount:HomeViewModel.kt$HomeViewModel$fun onAction(action: HomeAction)</ID>
     <ID>TooGenericExceptionCaught:HomeViewModel.kt$HomeViewModel$e: Exception</ID>
     <ID>TooGenericExceptionCaught:HomeViewModel.kt$HomeViewModel$e: Throwable</ID>
