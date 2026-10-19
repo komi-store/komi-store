@@ -417,45 +417,6 @@ class ExternalImportRepositoryImpl(
         )
     }
 
-    private fun starredMatches(
-        candidate: ExternalAppCandidate,
-        starred: List<zed.rainxch.core.domain.model.repository.StarredRepository>,
-    ): List<RepoMatchSuggestion> {
-        if (starred.isEmpty()) return emptyList()
-        val label = normalizeMatchToken(candidate.appLabel)
-        val pkgTail = normalizeMatchToken(candidate.packageName.substringAfterLast('.'))
-        val needles =
-            listOf(label, pkgTail)
-                .filter { it.length >= MIN_MATCH_TOKEN_LEN && it !in GENERIC_MATCH_TOKENS }
-        if (needles.isEmpty()) return emptyList()
-
-        return starred.mapNotNull { repo ->
-            if (repo.latestReleaseUrl.isNullOrBlank()) return@mapNotNull null
-            val repoName = normalizeMatchToken(repo.repoName)
-            if (repoName.length < MIN_MATCH_TOKEN_LEN || repoName in GENERIC_MATCH_TOKENS) return@mapNotNull null
-            val confidence =
-                needles.maxOf { needle ->
-                    when {
-                        needle == repoName -> STARRED_EXACT_CONFIDENCE
-                        needle.contains(repoName) || repoName.contains(needle) -> STARRED_CONTAINS_CONFIDENCE
-                        else -> 0.0
-                    }
-                }
-            if (confidence <= 0.0) return@mapNotNull null
-            RepoMatchSuggestion(
-                owner = repo.repoOwner,
-                repo = repo.repoName,
-                confidence = confidence,
-                source = RepoMatchSource.STARRED,
-                stars = repo.stargazersCount,
-                description = repo.repoDescription,
-                sourceHost = null,
-            )
-        }
-    }
-
-    private fun normalizeMatchToken(value: String): String = value.lowercase().filter { it.isLetterOrDigit() }
-
     override suspend fun linkManually(
         packageName: String,
         owner: String,
@@ -685,45 +646,6 @@ class ExternalImportRepositoryImpl(
         return runCatching { signingFingerprintDao.lookup(fp) != null }.getOrDefault(false)
     }
 
-    private fun mergeCandidate(
-        existing: ExternalLinkEntity?,
-        candidate: ExternalAppCandidate,
-        now: Long,
-    ): ExternalLinkEntity {
-        if (existing != null && shouldPreserveDecision(existing, now)) {
-            return existing.copy(
-                signingFingerprint = candidate.signingFingerprint ?: existing.signingFingerprint,
-                installerKind = candidate.installerKind.name,
-            )
-        }
-
-        val hint = candidate.manifestHint
-        return ExternalLinkEntity(
-            packageName = candidate.packageName,
-            state = ExternalLinkState.PENDING_REVIEW.name,
-            repoOwner = hint?.owner ?: existing?.repoOwner,
-            repoName = hint?.repo ?: existing?.repoName,
-            matchSource = if (hint != null) RepoMatchSource.MANIFEST.name else existing?.matchSource,
-            matchConfidence = hint?.confidence ?: existing?.matchConfidence,
-            signingFingerprint = candidate.signingFingerprint,
-            installerKind = candidate.installerKind.name,
-            firstSeenAt = existing?.firstSeenAt ?: now,
-            lastReviewedAt = now,
-            skipExpiresAt = null,
-        )
-    }
-
-    private fun shouldPreserveDecision(
-        existing: ExternalLinkEntity,
-        now: Long,
-    ): Boolean =
-        when (existing.state) {
-            ExternalLinkState.MATCHED.name -> true
-            ExternalLinkState.NEVER_ASK.name -> true
-            ExternalLinkState.SKIPPED.name -> (existing.skipExpiresAt ?: 0) > now
-            else -> false
-        }
-
     private fun nowMillis(): Long = Clock.System.now().toEpochMilliseconds()
 
     private suspend fun forgejoSearchHosts(): List<String> {
@@ -801,30 +723,6 @@ class ExternalImportRepositoryImpl(
                 RepoMatchSource.STARRED,
                 RepoMatchSource.MANIFEST,
                 RepoMatchSource.FINGERPRINT,
-            )
-        private const val STARRED_EXACT_CONFIDENCE = 0.78
-        private const val STARRED_CONTAINS_CONFIDENCE = 0.6
-        private const val MIN_MATCH_TOKEN_LEN = 4
-
-        private val GENERIC_MATCH_TOKENS =
-            setOf(
-                "android",
-                "application",
-                "mobile",
-                "client",
-                "free",
-                "lite",
-                "beta",
-                "alpha",
-                "debug",
-                "release",
-                "demo",
-                "sample",
-                "test",
-                "plus",
-                "apps",
-                "main",
-                "core",
             )
         private const val MATCH_BATCH_SIZE = 25
         private const val FINGERPRINT_CONFIDENCE = 0.92
