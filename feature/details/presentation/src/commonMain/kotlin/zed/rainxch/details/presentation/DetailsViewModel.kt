@@ -2055,7 +2055,7 @@ class DetailsViewModel(
         val packageName = state.installedApp?.packageName
         if (packageName != null) return packageName
         val owner = state.repository?.owner?.login ?: return NO_ORCHESTRATOR_KEY
-        val name = state.repository?.name ?: return NO_ORCHESTRATOR_KEY
+        val name = state.repository.name
         return "$owner/$name"
     }
 

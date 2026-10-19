@@ -349,10 +349,10 @@ fun AppHeader(
                     contentPadding = PaddingValues(horizontal = 20.dp),
                     modifier = Modifier.fillMaxWidth(),
                 ) {
-                    if (showStatusPill && installedApp != null) {
+                    if (showStatusPill) {
                         item(key = "status") { InstalledStatusPill(installedApp = installedApp) }
                     }
-                    if (showAppLabel && appLabel != null) {
+                    if (showAppLabel) {
                         item(key = "app") {
                             KomiChip(
                                 label = appLabel,
