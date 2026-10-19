@@ -75,11 +75,8 @@ fun WizardList(
                         cards.size,
                         cards.size,
                     ),
-                    role = KomiTextRole.LegacyLabel,
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Medium,
+                    role = KomiTextRole.LabelSmall,
                     color = colors.onSurfaceVariant,
-                    uppercase = false,
                     modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
                 )
             }

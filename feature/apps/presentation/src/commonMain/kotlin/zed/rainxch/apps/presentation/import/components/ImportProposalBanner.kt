@@ -73,16 +73,13 @@ fun ImportProposalBanner(
                         pendingCount,
                         pendingCount,
                     ),
-                role = KomiTextRole.LegacyStamp,
-                fontWeight = FontWeight.SemiBold,
+                role = KomiTextRole.CardTitle,
                 color = colors.onPrimaryContainer,
-                uppercase = false,
             )
 
             KomiText(
                 text = stringResource(Res.string.external_import_proposal_banner_body),
-                role = KomiTextRole.LegacyBody,
-                fontSize = 13.sp,
+                role = KomiTextRole.Body,
                 color = colors.onPrimaryContainer,
             )
         }

@@ -121,9 +121,8 @@ private fun StarredPickerScreen(
                             } else {
                                 stringResource(Res.string.starred_picker_empty)
                             },
-                            role = KomiTextRole.LegacyBody,
+                            role = KomiTextRole.Body,
                             color = colors.onSurfaceVariant,
-                            uppercase = false,
                         )
                     }
                 }
@@ -141,9 +140,8 @@ private fun StarredPickerScreen(
                                 state.apkCount,
                                 state.trackedCount,
                             ),
-                            role = KomiTextRole.LegacyBody,
+                            role = KomiTextRole.Body,
                             color = colors.onSurfaceVariant,
-                            uppercase = false,
                         )
 
                         if (state.phase == StarredPickerState.Phase.ScanningReleases) {
@@ -165,10 +163,8 @@ private fun StarredPickerScreen(
                                         state.scanProgress,
                                         state.scanTotal,
                                     ),
-                                    role = KomiTextRole.LegacyLabel,
-                                    fontSize = 11.sp,
+                                    role = KomiTextRole.Caption,
                                     color = colors.onSurfaceVariant,
-                                    uppercase = false,
                                 )
                             }
                         }
@@ -185,11 +181,9 @@ private fun StarredPickerScreen(
                             ) {
                                 KomiText(
                                     text = stringResource(Res.string.starred_picker_rate_limited),
-                                    role = KomiTextRole.LegacyBody,
-                                    fontSize = 13.sp,
+                                    role = KomiTextRole.Body,
                                     color = colors.error,
                                     modifier = Modifier.weight(1f),
-                                    uppercase = false,
                                 )
 
                                 KomiButton(
@@ -248,11 +242,9 @@ private fun StarredPickerScreen(
                         ) {
                             KomiText(
                                 text = stringResource(Res.string.starred_picker_filter_show_all),
-                                role = KomiTextRole.LegacyBody,
-                                fontSize = 13.sp,
+                                role = KomiTextRole.Body,
                                 color = colors.onSurfaceVariant,
                                 modifier = Modifier.weight(1f),
-                                uppercase = false,
                             )
 
                             KomiSwitch(
@@ -265,10 +257,8 @@ private fun StarredPickerScreen(
 
                         KomiText(
                             text = stringResource(Res.string.starred_picker_star_dedup_tooltip),
-                            role = KomiTextRole.LegacyLabel,
-                            fontSize = 11.sp,
+                            role = KomiTextRole.Caption,
                             color = colors.onSurfaceVariant,
-                            uppercase = false,
                         )
 
                         if (state.visibleCandidates.isEmpty()) {
@@ -278,9 +268,8 @@ private fun StarredPickerScreen(
                             ) {
                                 KomiText(
                                     text = stringResource(Res.string.starred_picker_no_match),
-                                    role = KomiTextRole.LegacyBody,
+                                    role = KomiTextRole.Body,
                                     color = colors.onSurfaceVariant,
-                                    uppercase = false,
                                 )
                             }
                         } else {

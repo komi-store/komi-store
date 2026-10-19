@@ -1,11 +1,5 @@
 3 composeApp/src/commonMain/kotlin/zed/rainxch/githubstore/app/navigation/DesktopSidebar.kt
 1 core/presentation/src/commonMain/kotlin/zed/rainxch/core/presentation/components/cards/KomiRepoCard.kt
-3 feature/apps/presentation/src/commonMain/kotlin/zed/rainxch/apps/presentation/components/AdvancedAppSettingsBottomSheet.kt
-2 feature/apps/presentation/src/commonMain/kotlin/zed/rainxch/apps/presentation/components/AppsTopbar.kt
-1 feature/apps/presentation/src/commonMain/kotlin/zed/rainxch/apps/presentation/components/CompactAppRow.kt
-4 feature/apps/presentation/src/commonMain/kotlin/zed/rainxch/apps/presentation/components/LinkAppBottomSheet.kt
-5 feature/apps/presentation/src/commonMain/kotlin/zed/rainxch/apps/presentation/components/UpdatesBanner.kt
-1 feature/apps/presentation/src/commonMain/kotlin/zed/rainxch/apps/presentation/components/VariantPickerDialog.kt
 1 feature/apps/presentation/src/commonMain/kotlin/zed/rainxch/apps/presentation/starred/components/StarredCandidateRow.kt
 4 feature/auth/presentation/src/commonMain/kotlin/zed/rainxch/auth/presentation/AuthenticationRoot.kt
 1 feature/details/presentation/src/commonMain/kotlin/zed/rainxch/details/presentation/components/ApkInspectSheet.kt

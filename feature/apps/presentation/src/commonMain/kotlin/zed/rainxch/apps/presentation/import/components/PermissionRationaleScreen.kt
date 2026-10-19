@@ -60,15 +60,14 @@ fun PermissionRationaleScreen(
 
             KomiText(
                 text = stringResource(Res.string.external_import_permission_title),
-                role = KomiTextRole.LegacyDisplay,
-                fontWeight = FontWeight.SemiBold,
+                role = KomiTextRole.Display,
                 color = colors.onSurface,
                 textAlign = TextAlign.Center,
             )
 
             KomiText(
                 text = stringResource(Res.string.external_import_permission_body),
-                role = KomiTextRole.LegacyBody,
+                role = KomiTextRole.Body,
                 color = colors.onSurfaceVariant,
                 textAlign = TextAlign.Start,
             )

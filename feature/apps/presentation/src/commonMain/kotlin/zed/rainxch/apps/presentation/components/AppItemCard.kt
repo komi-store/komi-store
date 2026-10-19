@@ -108,12 +108,10 @@ fun AppItemCard(
                 Column(modifier = Modifier.weight(1f).fillMaxWidth()) {
                     KomiText(
                         text = app.appName,
-                        role = KomiTextRole.LegacyTitle,
+                        role = KomiTextRole.CardTitle,
                         color = colors.onSurface,
-                        fontWeight = FontWeight.Bold,
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis,
-                        uppercase = false,
                     )
 
                     Row(
@@ -132,9 +130,7 @@ fun AppItemCard(
 
                         KomiText(
                             text = app.repoOwner,
-                            role = KomiTextRole.LegacyBody,
-                            fontSize = 13.sp,
-                            uppercase = false,
+                            role = KomiTextRole.Body,
                             color = colors.onSurfaceVariant,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
@@ -152,11 +148,8 @@ fun AppItemCard(
                         app.pendingInstallFilePath != null -> {
                             KomiText(
                                 text = stringResource(Res.string.ready_to_install),
-                                role = KomiTextRole.LegacyBody,
-                                fontSize = 13.sp,
-                                uppercase = false,
+                                role = KomiTextRole.Label,
                                 color = colors.primary,
-                                fontWeight = FontWeight.SemiBold,
                             )
 
                             if (appItem.versionTargetVersion != null) {
@@ -164,9 +157,7 @@ fun AppItemCard(
 
                                 KomiText(
                                     text = appItem.versionLabel,
-                                    role = KomiTextRole.LegacyBody,
-                                    fontSize = 13.sp,
-                                    uppercase = false,
+                                    role = KomiTextRole.Body,
                                     color =
                                         if (appItem.isVersionDowngrade) {
                                             DowngradeWarningColor
@@ -182,9 +173,7 @@ fun AppItemCard(
                         app.isPendingInstall -> {
                             KomiText(
                                 text = stringResource(Res.string.pending_install),
-                                role = KomiTextRole.LegacyBody,
-                                fontSize = 13.sp,
-                                uppercase = false,
+                                role = KomiTextRole.Body,
                                 color = colors.primary,
                             )
                         }
@@ -192,9 +181,7 @@ fun AppItemCard(
                         app.preferredVariantStale -> {
                             KomiText(
                                 text = stringResource(Res.string.variant_stale_hint),
-                                role = KomiTextRole.LegacyBody,
-                                fontSize = 13.sp,
-                                uppercase = false,
+                                role = KomiTextRole.Body,
                                 color = colors.error,
                                 modifier =
                                     Modifier.clickable(
@@ -207,9 +194,7 @@ fun AppItemCard(
                         app.isUpdateAvailable -> {
                             KomiText(
                                 text = appItem.versionLabel,
-                                role = KomiTextRole.LegacyBody,
-                                fontSize = 13.sp,
-                                uppercase = false,
+                                role = KomiTextRole.Body,
                                 color = colors.primary,
                                 maxLines = 2,
                                 overflow = TextOverflow.Ellipsis,
@@ -222,9 +207,7 @@ fun AppItemCard(
                                             Res.string.variant_label_inline,
                                             app.preferredAssetVariant,
                                         ),
-                                    role = KomiTextRole.LegacyLabel,
-                                    fontSize = 11.sp,
-                                    uppercase = false,
+                                    role = KomiTextRole.Caption,
                                     color = colors.onSurfaceVariant,
                                     maxLines = 1,
                                     overflow = TextOverflow.Ellipsis,
@@ -235,9 +218,7 @@ fun AppItemCard(
                         else -> {
                             KomiText(
                                 text = appItem.idleVersionLabel,
-                                role = KomiTextRole.LegacyBody,
-                                fontSize = 13.sp,
-                                uppercase = false,
+                                role = KomiTextRole.Body,
                                 color = colors.onSurfaceVariant,
                                 maxLines = 2,
                                 overflow = TextOverflow.Ellipsis,
@@ -252,8 +233,7 @@ fun AppItemCard(
 
                 KomiText(
                     text = app.repoDescription,
-                    role = KomiTextRole.LegacyBody,
-                    uppercase = false,
+                    role = KomiTextRole.Body,
                     color = colors.onSurfaceVariant,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
@@ -286,8 +266,7 @@ fun AppItemCard(
 
                         KomiText(
                             text = stringResource(Res.string.installing),
-                            role = KomiTextRole.LegacyBody,
-                            fontSize = 13.sp,
+                            role = KomiTextRole.Body,
                             color = colors.onSurface,
                         )
                     }
@@ -304,8 +283,7 @@ fun AppItemCard(
 
                         KomiText(
                             text = stringResource(Res.string.checking),
-                            role = KomiTextRole.LegacyBody,
-                            fontSize = 13.sp,
+                            role = KomiTextRole.Body,
                             color = colors.onSurface,
                         )
                     }
@@ -325,8 +303,7 @@ fun AppItemCard(
 
                         KomiText(
                             text = stringResource(Res.string.updated_successfully),
-                            role = KomiTextRole.LegacyBody,
-                            fontSize = 13.sp,
+                            role = KomiTextRole.Body,
                             color = colors.primary,
                         )
                     }
@@ -335,9 +312,7 @@ fun AppItemCard(
                 is UpdateState.Error -> {
                     KomiText(
                         text = stringResource(Res.string.error_with_message, state.message),
-                        role = KomiTextRole.LegacyBody,
-                        fontSize = 13.sp,
-                        uppercase = false,
+                        role = KomiTextRole.Body,
                         color = colors.error,
                     )
                 }

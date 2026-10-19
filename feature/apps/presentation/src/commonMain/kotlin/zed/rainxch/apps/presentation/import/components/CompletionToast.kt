@@ -59,20 +59,17 @@ fun CompletionToast(
                         trackedCount,
                         trackedCount,
                     ),
-                role = KomiTextRole.LegacyTitle,
-                fontWeight = FontWeight.SemiBold,
+                role = KomiTextRole.CardTitle,
                 color = colors.onSurface,
                 textAlign = TextAlign.Center,
-                uppercase = false,
             )
 
             if (skipped > 0) {
                 KomiText(
                     text = stringResource(Res.string.external_import_completion_skipped_subline, skipped),
-                    role = KomiTextRole.LegacyBody,
+                    role = KomiTextRole.Body,
                     color = colors.onSurfaceVariant,
                     textAlign = TextAlign.Center,
-                    uppercase = false,
                 )
             }
 

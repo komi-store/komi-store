@@ -53,10 +53,7 @@ fun AppGroupHeader(
 
         KomiText(
             text = "${app.repoOwner}/${app.repoName}",
-            role = KomiTextRole.LegacyLabel,
-            fontSize = 12.sp,
-            fontWeight = FontWeight.Medium,
-            uppercase = false,
+            role = KomiTextRole.LabelSmall,
             color = colors.onSurfaceVariant,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,

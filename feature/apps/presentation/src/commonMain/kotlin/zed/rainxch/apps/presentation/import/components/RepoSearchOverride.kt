@@ -89,8 +89,7 @@ fun RepoSearchOverride(
         } else if (query.isNotBlank() && !isSearching) {
             KomiText(
                 text = stringResource(Res.string.external_import_search_empty),
-                role = KomiTextRole.LegacyBody,
-                fontSize = 13.sp,
+                role = KomiTextRole.Body,
                 color = colors.onSurfaceVariant,
             )
         }

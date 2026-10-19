@@ -53,7 +53,7 @@ fun PendingUninstallSheet(
     ) {
         KomiText(
             text = stringResource(Res.string.confirm_uninstall_message, app.appName),
-            role = KomiTextRole.LegacyBody,
+            role = KomiTextRole.Body,
         )
     }
 }

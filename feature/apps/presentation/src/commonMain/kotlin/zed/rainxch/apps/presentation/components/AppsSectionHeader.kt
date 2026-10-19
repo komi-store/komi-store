@@ -105,19 +105,13 @@ fun AppsSectionHeader(
         ) {
             KomiText(
                 text = title,
-                role = KomiTextRole.LegacyStamp,
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 22.sp,
-                uppercase = false,
+                role = KomiTextRole.SectionTitle,
                 color = colors.onBackground,
             )
 
             KomiText(
                 text = stringResource(Res.string.apps_section_count_suffix, count),
-                role = KomiTextRole.LegacyLabel,
-                fontWeight = FontWeight.Medium,
-                fontSize = 13.sp,
-                uppercase = false,
+                role = KomiTextRole.Label,
                 color = colors.onSurfaceVariant,
                 modifier = Modifier.weight(1f),
             )

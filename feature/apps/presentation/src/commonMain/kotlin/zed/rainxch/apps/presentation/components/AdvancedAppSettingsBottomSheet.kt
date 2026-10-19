@@ -82,16 +82,13 @@ fun AdvancedAppSettingsBottomSheet(
                 Column(modifier = Modifier.weight(1f)) {
                     KomiText(
                         text = stringResource(Res.string.advanced_settings_title),
-                        role = KomiTextRole.LegacyTitle,
+                        role = KomiTextRole.CardTitle,
                         color = colors.onSurface,
-                        fontWeight = FontWeight.Bold,
                     )
 
                     KomiText(
                         text = "${app.repoOwner}/${app.repoName}",
-                        role = KomiTextRole.LegacyBody,
-                        fontSize = 13.sp,
-                        uppercase = false,
+                        role = KomiTextRole.Body,
                         color = colors.onSurfaceVariant,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
@@ -103,7 +100,7 @@ fun AdvancedAppSettingsBottomSheet(
 
             KomiText(
                 text = stringResource(Res.string.advanced_settings_description),
-                role = KomiTextRole.LegacyBody,
+                role = KomiTextRole.Body,
                 color = colors.onSurfaceVariant,
             )
 
@@ -147,15 +144,13 @@ fun AdvancedAppSettingsBottomSheet(
                 Column(modifier = Modifier.weight(1f)) {
                     KomiText(
                         text = stringResource(Res.string.fallback_older_releases_title),
-                        role = KomiTextRole.LegacyBody,
+                        role = KomiTextRole.Label,
                         color = colors.onSurface,
-                        fontWeight = FontWeight.Medium,
                     )
 
                     KomiText(
                         text = stringResource(Res.string.fallback_older_releases_description),
-                        role = KomiTextRole.LegacyBody,
-                        fontSize = 13.sp,
+                        role = KomiTextRole.Body,
                         color = colors.onSurfaceVariant,
                     )
                 }
@@ -170,15 +165,14 @@ fun AdvancedAppSettingsBottomSheet(
             Spacer(Modifier.height(16.dp))
 
             KomiHorizontalDivider(
-                color = colors.outlineVariant.copy(alpha = 0.4f),
+                color = colors.divider,
             )
 
             Spacer(Modifier.height(16.dp))
 
             KomiText(
                 text = stringResource(Res.string.advanced_filter_variant_relation),
-                role = KomiTextRole.LegacyBody,
-                fontSize = 13.sp,
+                role = KomiTextRole.Body,
                 color = colors.onSurfaceVariant,
             )
 
@@ -193,7 +187,7 @@ fun AdvancedAppSettingsBottomSheet(
             Spacer(Modifier.height(16.dp))
 
             KomiHorizontalDivider(
-                color = colors.outlineVariant.copy(alpha = 0.4f),
+                color = colors.divider,
             )
 
             Spacer(Modifier.height(16.dp))
@@ -256,10 +250,8 @@ private fun PreviewSection(
 
         KomiText(
             text = stringResource(Res.string.advanced_preview_title),
-            role = KomiTextRole.LegacyTitle,
-            fontSize = 14.sp,
+            role = KomiTextRole.CardTitle,
             color = colors.onSurface,
-            fontWeight = FontWeight.SemiBold,
             modifier = Modifier.weight(1f),
         )
 
@@ -274,7 +266,7 @@ private fun PreviewSection(
             KomiIcon(
                 imageVector = Icons.Default.Refresh,
                 contentDescription = null,
-                tint = if (isLoading) colors.onSurfaceVariant.copy(alpha = 0.38f) else colors.onSurfaceVariant,
+                tint = if (isLoading) colors.disabledContent else colors.onSurfaceVariant,
             )
         }
     }
@@ -298,7 +290,7 @@ private fun PreviewSection(
         message == AdvancedPreviewMessage.NoMatch -> {
             KomiText(
                 text = stringResource(Res.string.advanced_preview_no_match),
-                role = KomiTextRole.LegacyBody,
+                role = KomiTextRole.Body,
                 color = colors.error,
                 modifier = Modifier.padding(vertical = 8.dp),
             )
@@ -307,7 +299,7 @@ private fun PreviewSection(
         message == AdvancedPreviewMessage.PreviewFailed || message == AdvancedPreviewMessage.SaveFailed -> {
             KomiText(
                 text = stringResource(Res.string.advanced_preview_failed),
-                role = KomiTextRole.LegacyBody,
+                role = KomiTextRole.Body,
                 color = colors.error,
                 modifier = Modifier.padding(vertical = 8.dp),
             )
@@ -316,7 +308,7 @@ private fun PreviewSection(
         matchedAssets.isEmpty() -> {
             KomiText(
                 text = stringResource(Res.string.advanced_preview_pending),
-                role = KomiTextRole.LegacyBody,
+                role = KomiTextRole.Body,
                 color = colors.onSurfaceVariant,
                 modifier = Modifier.padding(vertical = 8.dp),
             )
@@ -332,11 +324,8 @@ private fun PreviewSection(
                             matchedTag,
                             matchedAssets.size,
                         ),
-                    role = KomiTextRole.LegacyBody,
-                    fontSize = 13.sp,
-                    uppercase = false,
+                    role = KomiTextRole.Label,
                     color = colors.primary,
-                    fontWeight = FontWeight.Medium,
                 )
 
                 Spacer(Modifier.height(6.dp))
@@ -365,9 +354,7 @@ private fun PreviewSection(
 
                         KomiText(
                             text = asset.name,
-                            role = KomiTextRole.LegacyBody,
-                            fontSize = 13.sp,
-                            uppercase = false,
+                            role = KomiTextRole.Body,
                             color = colors.onSurface,
                             modifier = Modifier.weight(1f),
                             maxLines = 1,
@@ -376,9 +363,7 @@ private fun PreviewSection(
 
                         KomiText(
                             text = formatFileSize(asset.size),
-                            role = KomiTextRole.LegacyLabel,
-                            fontSize = 11.sp,
-                            uppercase = false,
+                            role = KomiTextRole.Caption,
                             color = colors.onSurfaceVariant,
                         )
                     }
@@ -419,10 +404,8 @@ private fun VariantRow(
         Column(modifier = Modifier.weight(1f)) {
             KomiText(
                 text = stringResource(Res.string.variant_picker_title),
-                role = KomiTextRole.LegacyBody,
+                role = KomiTextRole.Label,
                 color = colors.onSurface,
-                fontWeight = FontWeight.Medium,
-                uppercase = false,
             )
 
             KomiText(
@@ -435,9 +418,7 @@ private fun VariantRow(
                         else ->
                             stringResource(Res.string.variant_picker_pinned, pinnedVariant)
                     },
-                role = KomiTextRole.LegacyBody,
-                fontSize = 13.sp,
-                uppercase = false,
+                role = KomiTextRole.Body,
                 color =
                     if (isStale) {
                         colors.error

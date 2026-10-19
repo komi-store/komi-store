@@ -66,11 +66,9 @@ fun ImportProgressScreen(
 
             KomiText(
                 text = headline,
-                role = KomiTextRole.LegacyTitle,
-                fontWeight = FontWeight.SemiBold,
+                role = KomiTextRole.CardTitle,
                 color = colors.onSurface,
                 textAlign = TextAlign.Center,
-                uppercase = false,
                 modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite },
             )
 
@@ -81,7 +79,7 @@ fun ImportProgressScreen(
                         totalCandidates,
                         totalCandidates,
                     ),
-                role = KomiTextRole.LegacyBody,
+                role = KomiTextRole.Body,
                 color = colors.onSurfaceVariant,
                 textAlign = TextAlign.Center,
             )

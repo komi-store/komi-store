@@ -112,22 +112,18 @@ fun CandidateCard(
                 ) {
                     KomiText(
                         text = candidate.appLabel,
-                        role = KomiTextRole.LegacyTitle,
-                        fontWeight = FontWeight.SemiBold,
+                        role = KomiTextRole.CardTitle,
                         color = colors.onSurface,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
-                        uppercase = false,
                     )
 
                     KomiText(
                         text = candidate.packageName,
-                        role = KomiTextRole.LegacyBody,
-                        fontSize = 13.sp,
+                        role = KomiTextRole.Body,
                         color = colors.onSurfaceVariant,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
-                        uppercase = false,
                     )
 
                     Box(
@@ -140,10 +136,8 @@ fun CandidateCard(
                                 Res.string.external_import_card_installer_chip,
                                 candidate.installerLabel,
                             ),
-                            role = KomiTextRole.LegacyLabel,
-                            fontSize = 11.sp,
+                            role = KomiTextRole.Caption,
                             color = colors.onPrimaryContainer,
-                            uppercase = false,
                             modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
                         )
                     }
@@ -260,9 +254,8 @@ private fun PreselectedRow(suggestion: RepoSuggestionUi?) {
         if (suggestion == null) {
             KomiText(
                 text = stringResource(Res.string.external_import_card_preselect_unknown),
-                role = KomiTextRole.LegacyBody,
+                role = KomiTextRole.Body,
                 color = contentColor,
-                uppercase = false,
                 modifier = Modifier.padding(horizontal = 12.dp, vertical = 12.dp),
             )
         } else {
@@ -272,19 +265,16 @@ private fun PreselectedRow(suggestion: RepoSuggestionUi?) {
             ) {
                 KomiText(
                     text = stringResource(Res.string.external_import_card_preselect_known_prefix),
-                    role = KomiTextRole.LegacyLabel,
-                    fontSize = 11.sp,
+                    role = KomiTextRole.Overline,
                     color = contentColor,
                 )
 
                 KomiText(
                     text = suggestion.repo,
-                    role = KomiTextRole.LegacyTitle,
-                    fontWeight = FontWeight.SemiBold,
+                    role = KomiTextRole.CardTitle,
                     color = contentColor,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    uppercase = false,
                 )
 
                 Row(
@@ -296,12 +286,10 @@ private fun PreselectedRow(suggestion: RepoSuggestionUi?) {
                             Res.string.external_import_card_owner_byline,
                             suggestion.owner,
                         ),
-                        role = KomiTextRole.LegacyBody,
-                        fontSize = 13.sp,
+                        role = KomiTextRole.Body,
                         color = contentColor,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
-                        uppercase = false,
                         modifier = Modifier.weight(1f, fill = false),
                     )
 
@@ -310,10 +298,8 @@ private fun PreselectedRow(suggestion: RepoSuggestionUi?) {
                             Res.string.external_import_match_confidence_chip,
                             suggestion.confidencePercent,
                         ),
-                        role = KomiTextRole.LegacyLabel,
-                        fontSize = 11.sp,
+                        role = KomiTextRole.Caption,
                         color = contentColor,
-                        uppercase = false,
                     )
                 }
             }

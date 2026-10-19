@@ -136,10 +136,8 @@ fun CompactAppRow(
         Column(modifier = Modifier.weight(1f)) {
             KomiText(
                 text = app.appName,
-                role = KomiTextRole.LegacyTitle,
-                fontSize = 13.sp,
+                role = KomiTextRole.ItemTitle,
                 color = colors.onSurface,
-                uppercase = false,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
@@ -154,8 +152,7 @@ fun CompactAppRow(
 
                 KomiText(
                     text = if (showVersionMigration) appItem.versionLabel else app.installedVersion,
-                    role = KomiTextRole.LegacyBody,
-                    fontSize = 13.sp,
+                    role = KomiTextRole.Body,
                     color =
                         if (showVersionMigration && appItem.isVersionDowngrade) {
                             DowngradeWarningColor
@@ -179,9 +176,7 @@ fun CompactAppRow(
                             Res.string.error_with_message,
                             appItem.error ?: stringResource(Res.string.download_failed),
                         ),
-                    role = KomiTextRole.LegacyBody,
-                    fontSize = 13.sp,
-                    uppercase = false,
+                    role = KomiTextRole.Body,
                     color = colors.error,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
@@ -337,7 +332,7 @@ private fun CompactRowOverflow(
                 KomiIcon(
                     imageVector = Icons.Outlined.MoreVert,
                     contentDescription = null,
-                    tint = if (isBusy) colors.onSurfaceVariant.copy(alpha = 0.38f) else colors.onSurfaceVariant,
+                    tint = if (isBusy) colors.disabledContent else colors.onSurfaceVariant,
                 )
             }
         },

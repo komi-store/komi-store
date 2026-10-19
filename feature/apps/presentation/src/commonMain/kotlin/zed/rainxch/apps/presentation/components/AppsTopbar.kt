@@ -105,7 +105,7 @@ fun AppsTopbar(
                 Box(
                     modifier = Modifier
                         .size(1.dp, 20.dp)
-                        .background(colors.outline.copy(alpha = 0.5f)),
+                        .background(colors.divider),
                 )
 
                 Box(
@@ -125,7 +125,7 @@ fun AppsTopbar(
                 Box(
                     modifier = Modifier
                         .size(1.dp, 20.dp)
-                        .background(colors.outline.copy(alpha = 0.5f)),
+                        .background(colors.divider),
                 )
 
                 KomiDropdown(

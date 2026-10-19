@@ -275,8 +275,7 @@ fun AppsScreen(
 
                             KomiText(
                                 text = stringResource(Res.string.checking_for_updates),
-                                role = KomiTextRole.LegacyBody,
-                                fontSize = 13.sp,
+                                role = KomiTextRole.Body,
                                 color = colors.onSurfaceVariant,
                             )
                         }
@@ -287,9 +286,7 @@ fun AppsScreen(
                                     Res.string.last_checked,
                                     formatLastChecked(state.lastCheckedTimestamp),
                                 ),
-                            role = KomiTextRole.LegacyBody,
-                            fontSize = 13.sp,
-                            uppercase = false,
+                            role = KomiTextRole.Body,
                             color = colors.onSurfaceVariant,
                             modifier = Modifier
                                 .drivesPullToRefresh()
@@ -326,7 +323,7 @@ fun AppsScreen(
                             ) {
                                 KomiText(
                                     text = stringResource(Res.string.no_apps_found),
-                                    role = KomiTextRole.LegacyTitle,
+                                    role = KomiTextRole.SectionTitle,
                                     color = colors.onBackground,
                                 )
                             }
