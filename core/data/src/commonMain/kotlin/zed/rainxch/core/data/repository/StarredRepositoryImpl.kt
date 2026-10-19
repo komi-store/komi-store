@@ -85,7 +85,7 @@ class StarredRepositoryImpl(
                     }
                 }
             } catch (e: RateLimitException) {
-                throw e
+                Result.failure(e)
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
@@ -175,7 +175,7 @@ class StarredRepositoryImpl(
 
                 Result.success(results)
             } catch (e: RateLimitException) {
-                throw e
+                Result.failure(e)
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
@@ -283,7 +283,7 @@ class StarredRepositoryImpl(
 
                 Result.success(Unit)
             } catch (e: RateLimitException) {
-                throw e
+                Result.failure(e)
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {

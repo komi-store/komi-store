@@ -8,7 +8,7 @@ on:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 permissions:
   contents: read
@@ -173,3 +173,16 @@ jobs:
           name: lint-reports
           path: '**/build/reports/lint-results-debug.*'
           if-no-files-found: ignore
+
+  agent-config:
+    name: Agent config
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: agnix
+        uses: agent-sh/agnix@cc559089a2e5fec8b84229c810827ff8d4685a22 # v0.59.0
+        with:
+          target: claude-code
+          version: v0.59.0

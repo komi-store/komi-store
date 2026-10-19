@@ -1005,6 +1005,8 @@
     <string name="adaptive_pick_repo_subtitle">左側のカードをタップすると詳細がここに表示されます。</string>
     <string name="adaptive_pick_repo_title">リポジトリを選択</string>
     <string name="apps_section_pending_installs">インストール待ち</string>
+    <string name="apps_section_in_progress">進行中</string>
+    <string name="download_failed">ダウンロードに失敗しました</string>
     <string name="apps_updates_banner_hide">リストを隠す</string>
     <string name="apps_updates_banner_show">リストを見る</string>
     <string name="apps_updates_banner_subtitle">すべてをまとめて確認・更新できます。</string>

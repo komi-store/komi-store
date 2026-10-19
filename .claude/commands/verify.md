@@ -9,6 +9,8 @@ Run the checks that `.github/workflows/pr-checks.yml` runs, in this order, from 
 3. `./gradlew lintDebug --continue`
 4. `./gradlew debugStabilityCheck` in its own invocation, after the Android compile in step 2.
 
+CI also runs an `Agent config` job (agnix); there is no local step for it.
+
 Then report each step as passed or failed, with the first lines of each failure and the file and line it points at.
 
 - Fix what this change caused. If a failure comes from code the change didn't touch, say so instead of fixing it.
