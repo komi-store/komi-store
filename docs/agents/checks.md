@@ -16,7 +16,7 @@ CodeQL (`codeql.yml`) and Dependabot (`dependabot.yml`) run separately.
 
 ## Spotless
 
-Spotless checks only files changed against `origin/main`, but it checks the whole file. Until the one-time format of the codebase lands, touching an old file means formatting all of it in that PR; keep such PRs small or format the file in a separate commit. Compose rule findings (missing `modifier`, parameter order, naming) are not auto-fixable and have to be fixed by hand in files you touch.
+Spotless checks only files changed against `origin/main`, but it checks the whole file. The codebase was formatted once in #1080 (listed in `.git-blame-ignore-revs`). Compose rule findings (missing `modifier`, parameter order, naming) are not auto-fixable and have to be fixed by hand in files you touch.
 
 ## Baselines
 
@@ -31,3 +31,9 @@ Kotlin warnings are errors (`allWarningsAsErrors`). A module can opt out with `k
 ## Konsist
 
 The rules and their allowlists live in `konsist-test/src/test/kotlin/zed/rainxch/konsist/`. An allowlist can only shrink: the file-size test fails when an allowlisted file drops under the limit, so remove the entry in the same PR.
+
+`DocsRulesTest` reads `AGENTS.md`, `CLAUDE.md`, `CONTRIBUTING.md`, `docs/agents/*.md` and `feature/*/CLAUDE.md`. A backticked route such as `GithubStoreGraph.DetailsScreen` must exist in the graph, and any backticked name ending in Screen or Graph must still exist in production code. When you rename a route or screen, update the docs in the same PR.
+
+## Agent config
+
+The `Agent config` job runs [agnix](https://github.com/agent-sh/agnix) over the repository (`AGENTS.md`, the `CLAUDE.md` files, `.claude/` and the rest) with its default rules, and fails only on errors. It runs in CI only.

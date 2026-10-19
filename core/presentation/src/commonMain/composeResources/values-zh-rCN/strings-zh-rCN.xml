@@ -1017,6 +1017,8 @@
     <string name="adaptive_pick_repo_subtitle">点按左侧任意卡片，在此查看详情。</string>
     <string name="adaptive_pick_repo_title">选择一个仓库</string>
     <string name="apps_section_pending_installs">可以安装</string>
+    <string name="apps_section_in_progress">进行中</string>
+    <string name="download_failed">下载失败</string>
     <string name="apps_updates_banner_hide">隐藏列表</string>
     <string name="apps_updates_banner_show">查看列表</string>
     <string name="apps_updates_banner_subtitle">逐个审查或一键全部更新。</string>

@@ -28,14 +28,14 @@ kotlinx-datetime = "0.7.1"
 kotlinx-collections-immutable = "0.4.0"
 
 # Third party
-koin = "4.1.1"
-ktor = "3.4.0"
+koin = "4.2.2"
+ktor = "3.4.3"
 room = "2.8.4"
-slf4jSimple = "2.0.17"
-jna = "5.14.0"
+slf4jSimple = "2.0.20"
+jna = "5.19.1"
 sqlite = "2.6.2"
 datastore = "1.2.0"
-ksafe = "2.0.0"
+ksafe = "3.3.0"
 compose-jetbrains = "1.10.3"
 compose-jetbrains-material-you = "1.11.0-alpha03"
 jetbrains-savedstate = "1.4.0"
@@ -43,7 +43,7 @@ moko = "0.20.1"
 buildkonfig = "0.17.1"
 markdownRenderer = "0.39.2"
 coil3 = "3.3.0"
-highlights = "1.0.0"
+highlights = "1.1.0"
 shizuku = "13.1.5"
 libsu = "6.0.0"
 dhizuku = "2.5.4"
@@ -59,7 +59,7 @@ kover = "0.9.11"
 stability-analyzer = "0.7.0"
 konsist = "0.18.1"
 compose-rules = "0.6.0"
-flatpak-gradle-generator = "1.7.0"
+flatpak-gradle-generator = "1.8.0"
 
 projectApplicationId = "zed.rainxch.githubstore"
 projectVersionName = "1.9.3"
@@ -106,6 +106,7 @@ ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "kto
 ktor-client-cio = { module = "io.ktor:ktor-client-cio", version.ref = "ktor" }
 ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
 ktor-client-logging = { module = "io.ktor:ktor-client-logging", version.ref = "ktor" }
+ktor-client-mock = { module = "io.ktor:ktor-client-mock", version.ref = "ktor" }
 ktor-client-auth = { module = "io.ktor:ktor-client-auth", version.ref = "ktor" }
 ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
 
@@ -119,6 +120,7 @@ ksafe = { module = "eu.anifantakis:ksafe", version.ref = "ksafe" }
 # Room
 androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
 androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
+androidx-room-testing = { module = "androidx.room:room-testing", version.ref = "room" }
 slf4j-simple = { module = "org.slf4j:slf4j-simple", version.ref = "slf4jSimple" }
 jna-platform = { module = "net.java.dev.jna:jna-platform", version.ref = "jna" }
 sqlite-bundled = { module = "androidx.sqlite:sqlite-bundled", version.ref = "sqlite" }

@@ -20,7 +20,6 @@ import zed.rainxch.core.domain.model.system.SystemArchitecture
 import zed.rainxch.core.domain.network.AssetIdentity
 import zed.rainxch.core.domain.network.DigestVerifier
 import zed.rainxch.core.domain.network.Downloader
-import zed.rainxch.core.domain.network.SlowDownloadDetector
 import zed.rainxch.core.domain.repository.InstalledAppsRepository
 import zed.rainxch.core.domain.system.DownloadSpec
 import zed.rainxch.core.domain.system.DownloadStage
@@ -70,7 +69,6 @@ class DefaultDownloadOrchestratorParkTest {
         installer = installer,
         installedAppsRepository = repository,
         pendingInstallNotifier = notifier,
-        slowDownloadDetector = FakeSlowDownloadDetector,
         appScope = scope,
         systemInstallSerializer = serializer,
         tokenStore = FakeTokenStore,
@@ -530,14 +528,6 @@ class DefaultDownloadOrchestratorParkTest {
         }
 
         override fun clearPending(packageName: String) = Unit
-    }
-
-    private object FakeSlowDownloadDetector : SlowDownloadDetector {
-        override val suggestMirror: Flow<Unit> = emptyFlow()
-
-        override suspend fun onProgress(progress: DownloadProgress) = Unit
-
-        override suspend fun reset() = Unit
     }
 
     private object FakeSystemInstallSerializer : SystemInstallSerializer {

@@ -33,7 +33,7 @@
 
 ## Project Overview 🗺️
 
-Komi Store is a cross-platform app store for GitHub releases, designed to simplify discovering and installing open-source software.
+Komi Store is a cross-platform app store for releases on GitHub, Codeberg and other Forgejo or Gitea forges, designed to simplify discovering and installing open-source software.
 
 </div>
 
@@ -70,7 +70,7 @@ Komi Store is a cross-platform app store for GitHub releases, designed to simpli
 </p>
 
 > [!IMPORTANT]
-> **macOS Users:** You may see a warning that Apple cannot verify Komi Store. This happens because the app is distributed outside the App Store and is not notarized yet. Allow it via System Settings → Privacy & Security → Open Anyway.
+> **macOS Users:** You may see a warning that Apple cannot verify Komi Store. This happens because the app is distributed outside the App Store and is not notarized yet. Allow it via System Settings → Privacy & Security → Open Anyway, or run `xattr -dr com.apple.quarantine /Applications/Komi-Store.app` after installing.
 
 **Scoop**
 
@@ -204,7 +204,7 @@ If you're interested in working together, reach out:
 ### Disclaimer
 
 Komi Store only helps you discover and download release assets that are already published on
-GitHub by third‑party developers.
+GitHub, Codeberg and other forges by third‑party developers.
 The contents, safety, and behavior of those downloads are entirely the responsibility of their
 respective authors and distributors, not this project.
 

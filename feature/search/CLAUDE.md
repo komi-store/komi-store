@@ -16,29 +16,11 @@ feature/search/
 
 Platform filter type is `DiscoveryPlatform` (core/domain).
 
-## Key interface
-
-```kotlin
-interface SearchRepository {
-    fun searchRepositories(
-        query: String,
-        platform: DiscoveryPlatform,
-        language: ProgrammingLanguage,
-        sortBy: SortBy,
-        sortOrder: SortOrder,
-        page: Int,
-        source: SearchSource = SearchSource.GitHub,
-    ): Flow<PaginatedDiscoveryRepositories>
-
-    suspend fun exploreFromGithub(query, platform, page): ExploreResult
-}
-
-sealed interface SearchSource { object GitHub; data class Forgejo(host); /* Codeberg = Forgejo("codeberg.org") */ }
-```
+`SearchSource` is `GitHub` or `Forgejo(host)`; Codeberg is `Forgejo("codeberg.org")`.
 
 ## Navigation
 
-`GithubStoreGraph.SearchScreen(initialPlatform: String?)`. The name is parsed to `DiscoveryPlatform` and passed to the VM via `parametersOf`.
+`GithubStoreGraph.SearchScreen(initialPlatform: String?)`. The name is parsed to `DiscoveryPlatform` and passed to the VM via `parametersOf`. No caller sets it today. On Desktop the VM follows the sidebar's `BrowseFilterStore.platform` instead (`observeBrowseFilter`).
 
 ## Notes
 
