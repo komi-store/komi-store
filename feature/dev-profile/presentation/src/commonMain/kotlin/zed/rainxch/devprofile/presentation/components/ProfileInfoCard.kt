@@ -83,12 +83,10 @@ fun ProfileInfoCard(
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         KomiText(
                             text = profile.name ?: profile.login,
-                            role = KomiTextRole.LegacyTitle,
-                            fontWeight = FontWeight.SemiBold,
+                            role = KomiTextRole.CardTitle,
                             color = colors.onSurface,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
-                            uppercase = false,
                             modifier = Modifier.weight(1f, fill = false),
                         )
 
@@ -101,11 +99,10 @@ fun ProfileInfoCard(
 
                     KomiText(
                         text = "@${profile.login}",
-                        role = KomiTextRole.LegacyLabel,
+                        role = KomiTextRole.Caption,
                         color = colors.onSurfaceVariant,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
-                        uppercase = false,
                     )
                 }
             }
@@ -160,7 +157,7 @@ private fun BioText(bio: String, onMention: (String) -> Unit) {
     }
     KomiText(
         text = annotated,
-        role = KomiTextRole.LegacyBody,
+        role = KomiTextRole.Body,
         color = colors.onSurfaceVariant,
         maxLines = 5,
         overflow = TextOverflow.Ellipsis,
@@ -196,21 +193,16 @@ private fun Metric(value: String, label: String, modifier: Modifier = Modifier) 
     ) {
         KomiText(
             text = value,
-            role = KomiTextRole.LegacyTitle,
-            fontWeight = FontWeight.SemiBold,
-            fontSize = 18.sp,
+            role = KomiTextRole.CardTitle,
             color = colors.onSurface,
             maxLines = 1,
-            uppercase = false,
         )
 
         KomiText(
             text = label,
-            role = KomiTextRole.LegacyLabel,
-            fontSize = 11.sp,
+            role = KomiTextRole.Caption,
             color = colors.onSurfaceVariant,
             maxLines = 1,
-            uppercase = false,
         )
     }
 }
@@ -222,7 +214,7 @@ private fun MetricDivider() {
         modifier = Modifier
             .width(1.dp)
             .height(28.dp)
-            .background(colors.outlineVariant.copy(alpha = 0.55f)),
+            .background(colors.divider),
     )
 }
 
@@ -237,9 +229,7 @@ private fun OrgPill() {
     ) {
         KomiText(
             text = stringResource(Res.string.dev_profile_org_badge),
-            role = KomiTextRole.LegacyLabel,
-            fontSize = 11.sp,
-            fontWeight = FontWeight.SemiBold,
+            role = KomiTextRole.Overline,
             color = colors.onPrimaryContainer,
             modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
         )
@@ -321,7 +311,7 @@ private fun StaticChip(icon: ImageVector, text: String) {
             .background(colors.surfaceContainerHigh)
             .border(
                 width = 1.dp,
-                color = colors.outlineVariant.copy(alpha = 0.5f),
+                color = colors.divider,
                 shape = RoundedCornerShape(shape.cornerSmall),
             ),
     ) {
@@ -339,13 +329,10 @@ private fun StaticChip(icon: ImageVector, text: String) {
 
             KomiText(
                 text = text,
-                role = KomiTextRole.LegacyLabel,
-                fontSize = 12.sp,
-                fontWeight = FontWeight.Medium,
+                role = KomiTextRole.LabelSmall,
                 color = colors.onSurface,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
-                uppercase = false,
             )
         }
     }
@@ -358,7 +345,7 @@ private fun LinkChip(icon: ImageVector, text: String, onClick: () -> Unit) {
     Box(
         modifier = Modifier
             .clip(RoundedCornerShape(shape.cornerSmall))
-            .background(colors.primary.copy(alpha = 0.12f))
+            .background(colors.primaryTint)
             .border(
                 width = 1.dp,
                 color = colors.primary.copy(alpha = 0.4f),
@@ -380,13 +367,10 @@ private fun LinkChip(icon: ImageVector, text: String, onClick: () -> Unit) {
 
             KomiText(
                 text = text,
-                role = KomiTextRole.LegacyLabel,
-                fontSize = 12.sp,
-                fontWeight = FontWeight.SemiBold,
+                role = KomiTextRole.LabelSmall,
                 color = colors.primary,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
-                uppercase = false,
             )
         }
     }

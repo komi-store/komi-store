@@ -27,10 +27,8 @@ internal fun LabelChip(label: IssueLabel) {
     ) {
         KomiText(
             text = label.name,
-            role = KomiTextRole.LegacyLabel,
-            fontSize = 11.sp,
+            role = KomiTextRole.Caption,
             color = colors.onSurface,
-            uppercase = false,
         )
     }
 }

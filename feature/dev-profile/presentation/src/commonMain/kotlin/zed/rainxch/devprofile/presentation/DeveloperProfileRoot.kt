@@ -242,9 +242,8 @@ fun DeveloperProfileScreen(
                     ) {
                         KomiText(
                             text = state.errorMessage,
-                            role = KomiTextRole.LegacyBody,
+                            role = KomiTextRole.Body,
                             color = colors.onSurface,
-                            uppercase = false,
                             modifier = Modifier.weight(1f),
                         )
 
@@ -297,7 +296,7 @@ private fun EmptyReposContent(
             imageVector = Icons.Default.FolderOff,
             contentDescription = null,
             modifier = Modifier.size(48.dp),
-            tint = colors.onSurfaceVariant.copy(alpha = 0.6f),
+            tint = colors.onSurfaceVariant,
         )
 
         Spacer(modifier = Modifier.height(12.dp))
@@ -305,10 +304,9 @@ private fun EmptyReposContent(
         KomiText(
             text = message,
             maxLines = 2,
-            role = KomiTextRole.LegacyBody,
+            role = KomiTextRole.Body,
             color = colors.onSurfaceVariant,
             textAlign = TextAlign.Center,
-            uppercase = false,
         )
     }
 }
@@ -366,10 +364,9 @@ private fun ErrorContent(
         KomiText(
             text = stringResource(Res.string.error_generic, message),
             maxLines = 3,
-            role = KomiTextRole.LegacyTitle,
+            role = KomiTextRole.CardTitle,
             color = colors.onSurface,
             textAlign = TextAlign.Center,
-            uppercase = false,
         )
 
         Spacer(modifier = Modifier.height(16.dp))

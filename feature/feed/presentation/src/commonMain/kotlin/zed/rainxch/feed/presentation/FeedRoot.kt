@@ -260,7 +260,7 @@ private fun FeedContent(
                         item(key = "feed_offline", span = StaggeredGridItemSpan.FullLine) {
                             KomiText(
                                 text = stringResource(Res.string.feed_offline),
-                                role = KomiTextRole.LegacyLabel,
+                                role = KomiTextRole.Overline,
                                 color = colors.onSurfaceVariant,
                                 modifier = Modifier.fillMaxWidth()
                                     .padding(vertical = 2.dp),
@@ -328,13 +328,13 @@ private fun FeedEndCap() {
         KomiHorizontalDivider(
             modifier = Modifier.weight(1f),
             thickness = 2.dp,
-            color = LocalPersonality.current.colors.outline.copy(alpha = 0.4f),
+            color = LocalPersonality.current.colors.divider,
         )
 
         if (LocalPersonality.current.usesDecor) {
             KomiText(
                 text = stringResource(Res.string.feed_end_cap),
-                role = KomiTextRole.LegacyLabel,
+                role = KomiTextRole.Overline,
                 color = LocalPersonality.current.colors.onSurfaceVariant,
             )
         }
@@ -342,7 +342,7 @@ private fun FeedEndCap() {
         KomiHorizontalDivider(
             modifier = Modifier.weight(1f),
             thickness = 2.dp,
-            color = LocalPersonality.current.colors.outline.copy(alpha = 0.4f),
+            color = LocalPersonality.current.colors.divider,
         )
     }
 }
@@ -361,7 +361,7 @@ private fun FeedLoading() {
 
             KomiText(
                 text = stringResource(Res.string.feed_loading),
-                role = KomiTextRole.LegacyBody,
+                role = KomiTextRole.Body,
                 color = LocalPersonality.current.colors.onSurfaceVariant,
             )
         }
@@ -383,13 +383,13 @@ private fun FeedError(
         ) {
             KomiText(
                 text = stringResource(Res.string.feed_failed_to_load),
-                role = KomiTextRole.LegacyTitle,
+                role = KomiTextRole.SectionTitle,
                 textAlign = TextAlign.Center,
             )
 
             KomiText(
                 text = message,
-                role = KomiTextRole.LegacyBody,
+                role = KomiTextRole.Body,
                 color = LocalPersonality.current.colors.onSurfaceVariant,
                 textAlign = TextAlign.Center,
             )
@@ -419,7 +419,7 @@ private fun FeedEmpty(
         ) {
             KomiText(
                 text = stringResource(Res.string.feed_empty_title),
-                role = KomiTextRole.LegacyTitle,
+                role = KomiTextRole.SectionTitle,
                 textAlign = TextAlign.Center,
             )
 
@@ -429,7 +429,7 @@ private fun FeedEmpty(
                     category.toLabel(),
                     platform.toLabel(),
                 ),
-                role = KomiTextRole.LegacyBody,
+                role = KomiTextRole.Body,
                 color = LocalPersonality.current.colors.onSurfaceVariant,
                 textAlign = TextAlign.Center,
             )

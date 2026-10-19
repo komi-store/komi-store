@@ -72,7 +72,7 @@ fun LazyListScope.profileSections(
         if (state.isUserLoggedIn) {
             KomiText(
                 text = stringResource(Res.string.profile_section_library),
-                role = KomiTextRole.LegacyTitle,
+                role = KomiTextRole.SectionTitle,
             )
         }
 
@@ -118,7 +118,7 @@ fun LazyListScope.profileSections(
 
         KomiText(
             text = stringResource(Res.string.profile_section_updates),
-            role = KomiTextRole.LegacyTitle,
+            role = KomiTextRole.SectionTitle,
         )
 
         Spacer(Modifier.height(8.dp))
@@ -148,7 +148,7 @@ fun LazyListScope.profileSections(
 
         KomiText(
             text = stringResource(Res.string.section_app_block),
-            role = KomiTextRole.LegacyTitle,
+            role = KomiTextRole.SectionTitle,
         )
 
         Spacer(Modifier.height(8.dp))
@@ -178,7 +178,7 @@ fun LazyListScope.profileSections(
 
             KomiText(
                 text = stringResource(Res.string.profile_section_account),
-                role = KomiTextRole.LegacyTitle,
+                role = KomiTextRole.SectionTitle,
             )
 
             Spacer(Modifier.height(8.dp))
@@ -249,16 +249,13 @@ private fun SignedOutContent(onAction: (ProfileAction) -> Unit) {
         Spacer(Modifier.height(4.dp))
         KomiText(
             text = stringResource(Res.string.profile_sign_in_title),
-            role = KomiTextRole.LegacyTitle,
-            fontSize = 22.sp,
-            fontWeight = FontWeight.SemiBold,
+            role = KomiTextRole.SectionTitle,
             color = colors.onSurface,
             textAlign = TextAlign.Center,
-            uppercase = false,
         )
         KomiText(
             text = stringResource(Res.string.profile_sign_in_description),
-            role = KomiTextRole.LegacyBody,
+            role = KomiTextRole.Body,
             color = colors.onSurfaceVariant,
             textAlign = TextAlign.Center,
         )
@@ -320,31 +317,26 @@ private fun SignedInContent(
                 val displayName = profile.name.takeIf { it.isNotBlank() } ?: profile.username
                 KomiText(
                     text = displayName,
-                    role = KomiTextRole.LegacyTitle,
-                    fontWeight = FontWeight.SemiBold,
+                    role = KomiTextRole.CardTitle,
                     color = colors.onSurface,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    uppercase = false,
                 )
                 KomiText(
                     text = "@${profile.username}",
-                    role = KomiTextRole.LegacyLabel,
+                    role = KomiTextRole.Caption,
                     color = colors.onSurfaceVariant,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    uppercase = false,
                 )
                 profile.bio?.takeIf { it.isNotBlank() }?.let { bio ->
                     Spacer(Modifier.height(2.dp))
                     KomiText(
                         text = bio,
-                        role = KomiTextRole.LegacyBody,
-                        fontSize = 13.sp,
+                        role = KomiTextRole.Body,
                         color = colors.onSurfaceVariant,
                         maxLines = 3,
                         overflow = TextOverflow.Ellipsis,
-                        uppercase = false,
                     )
                 }
             }
@@ -432,18 +424,14 @@ private fun Metric(
     ) {
         KomiText(
             text = value,
-            role = KomiTextRole.LegacyTitle,
-            fontSize = 18.sp,
-            fontWeight = FontWeight.SemiBold,
+            role = KomiTextRole.CardTitle,
             color = colors.onSurface,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
-            uppercase = false,
         )
         KomiText(
             text = label,
-            role = KomiTextRole.LegacyLabel,
-            fontSize = 11.sp,
+            role = KomiTextRole.Overline,
             color = colors.onSurfaceVariant,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
@@ -458,6 +446,6 @@ private fun MetricDivider() {
         modifier = Modifier
             .width(1.dp)
             .height(28.dp)
-            .background(colors.outlineVariant.copy(alpha = 0.55f)),
+            .background(colors.divider),
     )
 }

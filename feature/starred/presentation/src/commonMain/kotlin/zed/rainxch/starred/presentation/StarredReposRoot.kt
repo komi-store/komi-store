@@ -247,9 +247,8 @@ fun StarredReposScreen(
                     ) {
                         KomiText(
                             text = message,
-                            role = KomiTextRole.LegacyBody,
+                            role = KomiTextRole.Body,
                             color = colors.onSurface,
-                            uppercase = false,
                             modifier = Modifier.weight(1f),
                         )
                         KomiButton(
@@ -383,27 +382,25 @@ private fun EmptyStateContent(
             imageVector = icon,
             contentDescription = null,
             modifier = Modifier.size(64.dp),
-            tint = colors.onSurfaceVariant.copy(alpha = 0.6f),
+            tint = colors.onSurfaceVariant,
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
         KomiText(
             text = title,
-            role = KomiTextRole.LegacyTitle,
+            role = KomiTextRole.CardTitle,
             color = colors.onSurface,
             textAlign = TextAlign.Center,
-            uppercase = false,
         )
 
         Spacer(modifier = Modifier.height(8.dp))
 
         KomiText(
             text = message,
-            role = KomiTextRole.LegacyBody,
+            role = KomiTextRole.Body,
             color = colors.onSurfaceVariant,
             textAlign = TextAlign.Center,
-            uppercase = false,
         )
 
         if (actionText != null && onActionClick != null) {
@@ -457,9 +454,8 @@ private fun NotInstallableHint(
                     count,
                     count,
                 ),
-            role = KomiTextRole.LegacyBody,
+            role = KomiTextRole.Body,
             color = colors.onSurfaceVariant,
-            uppercase = false,
             modifier = Modifier.weight(1f),
         )
         KomiButton(

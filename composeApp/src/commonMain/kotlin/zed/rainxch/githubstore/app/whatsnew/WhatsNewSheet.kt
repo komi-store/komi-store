@@ -76,10 +76,8 @@ private fun SheetHeader(entry: WhatsNewEntry) {
     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
         KomiText(
             text = stringResource(Res.string.whats_new_sheet_heading, entry.versionName),
-            role = KomiTextRole.LegacyTitle,
-            fontWeight = FontWeight.Bold,
+            role = KomiTextRole.CardTitle,
             color = colors.onSurface,
-            uppercase = false,
         )
         KomiText(
             text =
@@ -88,10 +86,8 @@ private fun SheetHeader(entry: WhatsNewEntry) {
                     entry.versionName,
                     entry.releaseDate,
                 ),
-            role = KomiTextRole.LegacyLabel,
-            fontSize = 12.sp,
+            role = KomiTextRole.Caption,
             color = colors.onSurfaceVariant,
-            uppercase = false,
         )
     }
 }

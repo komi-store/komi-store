@@ -36,7 +36,7 @@ fun RepoPagesError(
         ) {
             KomiText(
                 text = message,
-                role = KomiTextRole.LegacyBody,
+                role = KomiTextRole.Body,
                 color = colors.onSurfaceVariant,
                 textAlign = TextAlign.Center,
             )

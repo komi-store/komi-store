@@ -90,7 +90,7 @@ private fun FeedPlatformRow(
 
             KomiText(
                 text = if (platform == DiscoveryPlatform.All) stringResource(Res.string.feed_platform_all) else platform.toLabel(),
-                role = KomiTextRole.LegacyTitle,
+                role = KomiTextRole.ItemTitle,
                 color = content,
                 modifier = Modifier.weight(1f),
             )

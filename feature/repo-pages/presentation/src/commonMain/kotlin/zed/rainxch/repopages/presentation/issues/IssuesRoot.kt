@@ -328,13 +328,10 @@ private fun IssueRow(
             ) {
                 KomiText(
                     text = issue.title,
-                    role = KomiTextRole.LegacyTitle,
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.SemiBold,
+                    role = KomiTextRole.ItemTitle,
                     color = colors.onSurface,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
-                    uppercase = false,
                 )
 
                 KomiText(
@@ -343,12 +340,10 @@ private fun IssueRow(
                                 Res.string.repo_pages_issue_opened_by,
                                 issue.authorLogin
                             ),
-                    role = KomiTextRole.LegacyBody,
-                    fontSize = 13.sp,
+                    role = KomiTextRole.Body,
                     color = colors.onSurfaceVariant,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    uppercase = false,
                 )
 
                 if (issue.labels.isNotEmpty()) {

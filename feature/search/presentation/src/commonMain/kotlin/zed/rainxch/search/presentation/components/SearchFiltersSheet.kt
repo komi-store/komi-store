@@ -87,9 +87,7 @@ fun SearchFiltersSheet(
             ) {
                 KomiText(
                     text = stringResource(Res.string.search_filters_title),
-                    role = KomiTextRole.LegacyTitle,
-                    fontWeight = FontWeight.SemiBold,
-                    fontSize = 22.sp,
+                    role = KomiTextRole.CardTitle,
                     modifier = Modifier.weight(1f),
                 )
                 KomiButton(
@@ -169,9 +167,7 @@ private fun FilterSection(
     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
         KomiText(
             text = title,
-            role = KomiTextRole.LegacyLabel,
-            fontWeight = FontWeight.SemiBold,
-            fontSize = 13.sp,
+            role = KomiTextRole.Label,
             color = colors.onSurfaceVariant,
         )
 
@@ -200,7 +196,7 @@ private fun SelectableChip(
     val border = if (selected) {
         BorderStroke(0.dp, colors.primary)
     } else {
-        BorderStroke(1.dp, colors.outlineVariant.copy(alpha = 0.5f))
+        BorderStroke(1.dp, colors.divider)
     }
     Box(
         modifier = Modifier
@@ -226,10 +222,8 @@ private fun SelectableChip(
 
             KomiText(
                 text = text,
-                role = KomiTextRole.LegacyLabel,
-                fontWeight = FontWeight.Medium,
+                role = KomiTextRole.LabelSmall,
                 color = content,
-                uppercase = false,
             )
         }
     }
@@ -249,7 +243,7 @@ private fun NavRow(
             .clip(RoundedCornerShape(shape.corner))
             .border(
                 width = 1.dp,
-                color = colors.outlineVariant.copy(alpha = 0.5f),
+                color = colors.divider,
                 shape = RoundedCornerShape(shape.corner),
             )
             .clickable(onClick = onClick)
@@ -270,10 +264,8 @@ private fun NavRow(
 
             KomiText(
                 text = value,
-                role = KomiTextRole.LegacyBody,
-                fontWeight = FontWeight.SemiBold,
+                role = KomiTextRole.Label,
                 color = colors.onSurface,
-                uppercase = false,
                 modifier = Modifier.weight(1f),
             )
 

@@ -91,9 +91,8 @@ fun AnnouncementsScreen(
                                     Res.string.announcements_empty
                                 },
                             ),
-                        role = KomiTextRole.LegacyBody,
+                        role = KomiTextRole.Body,
                         color = colors.onSurfaceVariant,
-                        uppercase = false,
                     )
                 }
             } else {
@@ -106,10 +105,8 @@ fun AnnouncementsScreen(
                         item {
                             KomiText(
                                 text = stringResource(Res.string.announcements_refresh_failed),
-                                role = KomiTextRole.LegacyLabel,
-                                fontSize = 11.sp,
+                                role = KomiTextRole.Caption,
                                 color = colors.onSurfaceVariant,
-                                uppercase = false,
                             )
                         }
                     }

@@ -72,7 +72,7 @@ private fun ChartTabSegment(
 
     val bg = if (selected) colors.primary else colors.surface
     val fg = if (selected) colors.onPrimary else colors.onSurface
-    val kicker = if (selected) colors.onPrimary.copy(alpha = 0.85f) else colors.onSurfaceVariant
+    val kicker = if (selected) colors.onPrimary else colors.onSurfaceVariant
 
     val borderWidth =
         when (personality) {
@@ -114,10 +114,8 @@ private fun ChartTabSegment(
                         ChartTab.Popular -> Res.string.home_chart_popular
                     },
                 ),
-            role = KomiTextRole.LegacyLabel,
+            role = KomiTextRole.Label,
             color = fg,
-            fontSize = 13.sp,
-            fontWeight = FontWeight.W800,
             maxLines = 1,
         )
 
@@ -131,10 +129,8 @@ private fun ChartTabSegment(
                             ChartTab.Popular -> Res.string.home_chart_popular_jp
                         },
                     ),
-                role = KomiTextRole.LegacyLabel,
+                role = KomiTextRole.Caption,
                 color = kicker,
-                fontSize = 9.sp,
-                uppercase = false,
                 maxLines = 1,
             )
         }

@@ -173,10 +173,8 @@ private fun IssueDetailContent(
             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 KomiText(
                     text = detail.title,
-                    role = KomiTextRole.LegacyTitle,
-                    fontWeight = FontWeight.SemiBold,
+                    role = KomiTextRole.CardTitle,
                     color = colors.onBackground,
-                    uppercase = false,
                 )
 
                 KomiText(
@@ -186,10 +184,8 @@ private fun IssueDetailContent(
                                 Res.string.repo_pages_issue_opened_by,
                                 detail.authorLogin,
                             ),
-                    role = KomiTextRole.LegacyBody,
-                    fontSize = 13.sp,
+                    role = KomiTextRole.Body,
                     color = colors.onSurfaceVariant,
-                    uppercase = false,
                 )
             }
         }
@@ -205,7 +201,7 @@ private fun IssueDetailContent(
                     if (detail.bodyMarkdown.isBlank()) {
                         KomiText(
                             text = stringResource(Res.string.repo_pages_issue_no_body),
-                            role = KomiTextRole.LegacyBody,
+                            role = KomiTextRole.Body,
                             color = colors.onSurfaceVariant,
                         )
                     } else {
@@ -230,10 +226,8 @@ private fun IssueDetailContent(
 
                 KomiText(
                     text = stringResource(Res.string.repo_pages_issue_comments_section),
-                    role = KomiTextRole.LegacyTitle,
-                    fontWeight = FontWeight.SemiBold,
+                    role = KomiTextRole.CardTitle,
                     color = colors.onBackground,
-                    uppercase = false,
                     modifier = Modifier.padding(top = 8.dp),
                 )
             }
@@ -265,10 +259,8 @@ private fun CommentCard(
         ) {
             KomiText(
                 text = comment.authorLogin,
-                role = KomiTextRole.LegacyLabel,
-                fontWeight = FontWeight.SemiBold,
+                role = KomiTextRole.LabelSmall,
                 color = colors.onSurface,
-                uppercase = false,
             )
 
             RepoMarkdown(content = comment.bodyMarkdown, modifier = Modifier.fillMaxWidth())
@@ -304,10 +296,8 @@ private fun ThumbChip(
             if (count > 0) {
                 KomiText(
                     text = count.toString(),
-                    role = KomiTextRole.LegacyLabel,
-                    fontSize = 12.sp,
+                    role = KomiTextRole.Caption,
                     color = colors.onSurfaceVariant,
-                    uppercase = false,
                 )
             }
         }
@@ -338,7 +328,7 @@ private fun CommentComposer(
             if (!isLoggedIn) {
                 KomiText(
                     text = stringResource(Res.string.repo_pages_comment_sign_in),
-                    role = KomiTextRole.LegacyBody,
+                    role = KomiTextRole.Body,
                     color = colors.onSurfaceVariant,
                     modifier = Modifier.padding(8.dp),
                 )

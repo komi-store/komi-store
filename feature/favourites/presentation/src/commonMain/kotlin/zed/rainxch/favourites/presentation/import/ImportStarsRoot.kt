@@ -136,7 +136,7 @@ private fun UsernameInputPanel(
     ) {
         KomiText(
             text = stringResource(Res.string.import_stars_subtitle),
-            role = KomiTextRole.LegacyBody,
+            role = KomiTextRole.Body,
             color = colors.onSurfaceVariant,
         )
 
@@ -150,8 +150,7 @@ private fun UsernameInputPanel(
         if (state.errorMessage != null) {
             KomiText(
                 text = state.errorMessage,
-                role = KomiTextRole.LegacyBody,
-                fontSize = 13.sp,
+                role = KomiTextRole.Body,
                 color = colors.error,
             )
         }
@@ -190,9 +189,8 @@ private fun ResultsPanel(
                     state.importedUsername ?: "",
                     state.candidates.size,
                 ),
-                role = KomiTextRole.LegacyBody,
+                role = KomiTextRole.Body,
                 color = colors.onSurfaceVariant,
-                uppercase = false,
                 modifier = Modifier.weight(1f),
             )
             KomiButton(
@@ -252,9 +250,8 @@ private fun ResultsPanel(
                     } else {
                         stringResource(Res.string.import_stars_no_match)
                     },
-                    role = KomiTextRole.LegacyBody,
+                    role = KomiTextRole.Body,
                     color = colors.onSurfaceVariant,
-                    uppercase = false,
                 )
             }
         } else {
@@ -299,19 +296,15 @@ private fun CandidateRow(
         Column(modifier = Modifier.weight(1f)) {
             KomiText(
                 text = "${candidate.owner}/${candidate.name}",
-                role = KomiTextRole.LegacyTitle,
-                fontWeight = FontWeight.SemiBold,
+                role = KomiTextRole.CardTitle,
                 color = colors.onBackground,
-                uppercase = false,
             )
 
             if (!candidate.description.isNullOrBlank()) {
                 KomiText(
                     text = candidate.description,
-                    role = KomiTextRole.LegacyBody,
-                    fontSize = 13.sp,
+                    role = KomiTextRole.Body,
                     color = colors.onSurfaceVariant,
-                    uppercase = false,
                     maxLines = 2,
                 )
             }

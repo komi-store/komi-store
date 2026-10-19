@@ -52,7 +52,7 @@ fun SortByBottomSheet(
         title = {
             KomiText(
                 text = stringResource(Res.string.sort_by),
-                role = KomiTextRole.LegacyTitle,
+                role = KomiTextRole.CardTitle,
             )
         },
         text = {

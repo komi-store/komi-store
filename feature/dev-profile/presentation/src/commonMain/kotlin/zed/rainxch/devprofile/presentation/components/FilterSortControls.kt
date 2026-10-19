@@ -130,10 +130,8 @@ fun FilterSortControls(
                 stringResource(Res.string.showing_x_of_y_repositories, repoCount, totalCount)
             },
             maxLines = 1,
-            role = KomiTextRole.LegacyBody,
-            fontSize = 13.sp,
+            role = KomiTextRole.Body,
             color = colors.onSurfaceVariant,
-            uppercase = false,
         )
     }
 }
@@ -173,12 +171,9 @@ private fun FilterPill(
     ) {
         KomiText(
             text = label,
-            role = KomiTextRole.LegacyLabel,
-            fontSize = 12.sp,
-            fontWeight = FontWeight.SemiBold,
+            role = KomiTextRole.LabelSmall,
             color = content,
             maxLines = 1,
-            uppercase = false,
         )
     }
 }

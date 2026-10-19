@@ -94,7 +94,7 @@ private fun HomePlatformRow(
                 } else {
                     platform.toLabel()
                 },
-                role = KomiTextRole.LegacyTitle,
+                role = KomiTextRole.ItemTitle,
                 color = content,
                 modifier = Modifier.weight(1f),
             )

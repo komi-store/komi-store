@@ -329,19 +329,19 @@ private fun HomeEndCap() {
         KomiHorizontalDivider(
             modifier = Modifier.weight(1f),
             thickness = 2.dp,
-            color = LocalPersonality.current.colors.outline.copy(alpha = 0.4f),
+            color = LocalPersonality.current.colors.divider,
         )
         if (LocalPersonality.current.usesDecor) {
             KomiText(
                 text = stringResource(Res.string.feed_end_cap),
-                role = KomiTextRole.LegacyLabel,
+                role = KomiTextRole.Overline,
                 color = LocalPersonality.current.colors.onSurfaceVariant,
             )
         }
         KomiHorizontalDivider(
             modifier = Modifier.weight(1f),
             thickness = 2.dp,
-            color = LocalPersonality.current.colors.outline.copy(alpha = 0.4f),
+            color = LocalPersonality.current.colors.divider,
         )
     }
 }
@@ -354,7 +354,7 @@ private fun HomeEmpty() {
     ) {
         KomiText(
             text = stringResource(Res.string.feed_empty_title),
-            role = KomiTextRole.LegacyTitle,
+            role = KomiTextRole.SectionTitle,
             color = LocalPersonality.current.colors.onSurfaceVariant,
             textAlign = TextAlign.Center,
         )
@@ -374,7 +374,7 @@ private fun HomeLoading() {
 
             KomiText(
                 text = stringResource(Res.string.home_finding_repositories),
-                role = KomiTextRole.LegacyTitle,
+                role = KomiTextRole.SectionTitle,
                 color = LocalPersonality.current.colors.onSurfaceVariant,
             )
         }
@@ -396,9 +396,8 @@ private fun HomeError(
         ) {
             KomiText(
                 text = message,
-                role = KomiTextRole.LegacyBody,
+                role = KomiTextRole.Body,
                 color = LocalPersonality.current.colors.onSurface,
-                uppercase = false,
             )
 
             KomiButton(

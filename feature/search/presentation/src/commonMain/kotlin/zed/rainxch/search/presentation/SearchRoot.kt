@@ -415,10 +415,8 @@ fun SearchScreen(
                             Res.string.results_found,
                             state.totalCount,
                         ),
-                        role = KomiTextRole.LegacyLabel,
-                        fontWeight = FontWeight.SemiBold,
+                        role = KomiTextRole.LabelSmall,
                         color = colors.onSurfaceVariant,
-                        uppercase = false,
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(bottom = 6.dp),
@@ -462,8 +460,7 @@ fun SearchScreen(
                             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                 KomiText(
                                     text = state.errorMessage,
-                                    role = KomiTextRole.LegacyBody,
-                                    uppercase = false,
+                                    role = KomiTextRole.Body,
                                 )
 
                                 Spacer(Modifier.height(8.dp))
@@ -492,8 +489,7 @@ fun SearchScreen(
                             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                 KomiText(
                                     text = stringResource(Res.string.no_repositories_found),
-                                    role = KomiTextRole.LegacyBody,
-                                    uppercase = false,
+                                    role = KomiTextRole.Body,
                                 )
 
                                 if (state.passthroughAttempted != true) {
@@ -523,9 +519,8 @@ fun SearchScreen(
 
                                 KomiText(
                                     text = stringResource(Res.string.searching_for_unseen_repos),
-                                    role = KomiTextRole.LegacyBody,
+                                    role = KomiTextRole.Body,
                                     color = colors.outline,
-                                    uppercase = false,
                                 )
                             }
                         }
@@ -543,8 +538,7 @@ fun SearchScreen(
                             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                 KomiText(
                                     text = stringResource(Res.string.search_results_hidden_by_seen_filter),
-                                    role = KomiTextRole.LegacyBody,
-                                    uppercase = false,
+                                    role = KomiTextRole.Body,
                                 )
 
                                 Spacer(Modifier.height(8.dp))
@@ -682,7 +676,7 @@ fun PlatformPicker(
                     .clip(shape)
                     .background(
                         if (state.selectedSearchPlatform == platform) {
-                            colors.primary.copy(alpha = 0.12f)
+                            colors.primaryTint
                         } else colors.surface,
                         shape = shape
                     )
@@ -706,11 +700,8 @@ fun PlatformPicker(
 
                 KomiText(
                     text = platform.toLabel(),
-                    role = KomiTextRole.LegacyLabel,
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.SemiBold,
+                    role = KomiTextRole.LabelSmall,
                     color = colors.primary,
-                    uppercase = false,
                 )
             }
         }
@@ -739,10 +730,8 @@ private fun ClipboardBanner(
             ) {
                 KomiText(
                     text = stringResource(Res.string.clipboard_link_detected),
-                    role = KomiTextRole.LegacyLabel,
-                    fontSize = 12.sp,
+                    role = KomiTextRole.Overline,
                     color = colors.onSurfaceVariant,
-                    fontWeight = FontWeight.SemiBold,
                 )
 
                 Box(
@@ -782,10 +771,8 @@ private fun ClipboardBanner(
 
                     KomiText(
                         text = "${link.owner}/${link.repo}",
-                        role = KomiTextRole.LegacyBody,
+                        role = KomiTextRole.Label,
                         color = colors.onSurface,
-                        fontWeight = FontWeight.SemiBold,
-                        uppercase = false,
                         modifier = Modifier.weight(1f),
                     )
 
@@ -814,10 +801,8 @@ private fun DetectedLinksSection(
     ) {
         KomiText(
             text = stringResource(Res.string.detected_links),
-            role = KomiTextRole.LegacyLabel,
-            fontSize = 12.sp,
+            role = KomiTextRole.Overline,
             color = colors.onSurfaceVariant,
-            fontWeight = FontWeight.SemiBold,
             modifier = Modifier.padding(bottom = 6.dp),
         )
 
@@ -843,19 +828,15 @@ private fun DetectedLinksSection(
 
                     KomiText(
                         text = "${link.owner}/${link.repo}",
-                        role = KomiTextRole.LegacyBody,
+                        role = KomiTextRole.Label,
                         color = colors.onSurface,
-                        fontWeight = FontWeight.SemiBold,
-                        uppercase = false,
                         modifier = Modifier.weight(1f),
                     )
 
                     KomiText(
                         text = stringResource(Res.string.open_in_app),
-                        role = KomiTextRole.LegacyLabel,
-                        fontSize = 12.sp,
+                        role = KomiTextRole.Overline,
                         color = colors.primary,
-                        fontWeight = FontWeight.SemiBold,
                     )
                 }
             }
@@ -953,10 +934,8 @@ private fun FiltersPillButton(
         if (activeCount > 0) {
             KomiText(
                 text = activeCount.toString(),
-                role = KomiTextRole.LegacyLabel,
-                fontWeight = FontWeight.SemiBold,
+                role = KomiTextRole.LabelSmall,
                 color = content,
-                uppercase = false,
             )
         }
     }
@@ -1034,7 +1013,7 @@ private fun ActiveFilterChip(
     Row(
         modifier = Modifier
             .clip(shape)
-            .background(colors.primary.copy(alpha = 0.12f), shape)
+            .background(colors.primaryTint, shape)
             .border(1.dp, colors.primary.copy(alpha = 0.4f), shape)
             .clickable(onClick = onRemove)
             .padding(start = 12.dp, end = 8.dp, top = 6.dp, bottom = 6.dp),
@@ -1052,11 +1031,8 @@ private fun ActiveFilterChip(
 
         KomiText(
             text = label,
-            role = KomiTextRole.LegacyLabel,
-            fontSize = 12.sp,
-            fontWeight = FontWeight.SemiBold,
+            role = KomiTextRole.LabelSmall,
             color = colors.primary,
-            uppercase = false,
         )
 
         KomiIcon(
@@ -1102,9 +1078,8 @@ private fun ExploreFromGithubButton(
             SearchState.ExploreStatus.EXHAUSTED -> {
                 KomiText(
                     text = stringResource(Res.string.no_more_github_results),
-                    role = KomiTextRole.LegacyBody,
+                    role = KomiTextRole.Body,
                     color = LocalPersonality.current.colors.outline,
-                    uppercase = false,
                 )
             }
         }

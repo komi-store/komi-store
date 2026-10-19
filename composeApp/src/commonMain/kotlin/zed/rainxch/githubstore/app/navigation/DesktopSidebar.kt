@@ -222,19 +222,15 @@ private fun SidebarSideHeading(
         ) {
             KomiText(
                 text = title,
-                role = KomiTextRole.LegacyLabel,
+                role = KomiTextRole.Overline,
                 color = colors.onSurfaceVariant,
-                fontSize = 11.sp,
-                fontWeight = FontWeight.W800,
                 maxLines = 1,
             )
             if (LocalPersonality.current.usesDecor) {
                 KomiText(
                     text = jp,
-                    role = KomiTextRole.LegacyLabel,
-                    color = colors.onSurfaceVariant.copy(alpha = 0.7f),
-                    fontSize = 9.5.sp,
-                    uppercase = false,
+                    role = KomiTextRole.Caption,
+                    color = colors.onSurfaceVariant,
                     maxLines = 1,
                 )
             }
@@ -294,20 +290,16 @@ private fun SidebarNavRow(
             NavIcon(icon, fg, badgeCount)
             KomiText(
                 text = label,
-                role = KomiTextRole.LegacyLabel,
+                role = KomiTextRole.Label,
                 color = fg,
-                fontSize = 14.sp,
-                fontWeight = FontWeight.W800,
                 maxLines = 1,
                 modifier = Modifier.weight(1f),
             )
             kicker?.takeIf { LocalPersonality.current.usesDecor }?.let {
                 KomiText(
                     text = it,
-                    role = KomiTextRole.LegacyLabel,
+                    role = KomiTextRole.Caption,
                     color = fg.copy(alpha = 0.8f),
-                    fontSize = 9.5.sp,
-                    uppercase = false,
                     maxLines = 1,
                 )
             }
@@ -391,10 +383,8 @@ private fun SidebarPlatformRow(
             } else {
                 KomiText(
                     text = label,
-                    role = KomiTextRole.LegacyLabel,
+                    role = KomiTextRole.Overline,
                     color = colors.onSurface,
-                    fontSize = 9.sp,
-                    fontWeight = FontWeight.W800,
                     maxLines = 1,
                 )
             }
@@ -424,11 +414,8 @@ private fun SidebarPlatformRow(
             }
             KomiText(
                 text = label,
-                role = KomiTextRole.LegacyLabel,
+                role = KomiTextRole.Label,
                 color = colors.onSurface,
-                fontSize = 12.5.sp,
-                fontWeight = if (selected) FontWeight.W900 else FontWeight.W700,
-                uppercase = false,
                 maxLines = 1,
             )
         }
@@ -486,11 +473,8 @@ private fun SidebarCategoryRow(
             InkDiamond(filled = selected)
             KomiText(
                 text = stringResource(category.sidebarLabelRes()),
-                role = KomiTextRole.LegacyLabel,
+                role = KomiTextRole.Label,
                 color = if (selected) colors.onSurface else colors.onSurfaceVariant,
-                fontSize = 12.5.sp,
-                fontWeight = if (selected) FontWeight.W900 else FontWeight.W700,
-                uppercase = false,
                 maxLines = 1,
             )
         }

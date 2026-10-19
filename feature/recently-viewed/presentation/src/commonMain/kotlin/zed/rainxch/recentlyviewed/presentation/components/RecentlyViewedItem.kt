@@ -79,10 +79,8 @@ fun RecentlyViewedItem(
 
                 KomiText(
                     text = repo.repoOwner,
-                    role = KomiTextRole.LegacyLabel,
+                    role = KomiTextRole.LabelSmall,
                     color = colors.onSurfaceVariant,
-                    fontWeight = FontWeight.Medium,
-                    uppercase = false,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.weight(1f),
@@ -99,10 +97,8 @@ fun RecentlyViewedItem(
                 Column(modifier = Modifier.weight(1f)) {
                     KomiText(
                         text = repo.repoName,
-                        role = KomiTextRole.LegacyTitle,
+                        role = KomiTextRole.CardTitle,
                         color = colors.onSurface,
-                        fontWeight = FontWeight.SemiBold,
-                        uppercase = false,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                     )
@@ -112,9 +108,8 @@ fun RecentlyViewedItem(
 
                         KomiText(
                             text = it,
-                            role = KomiTextRole.LegacyBody,
+                            role = KomiTextRole.Body,
                             color = colors.onSurfaceVariant,
-                            fontSize = 13.sp,
                             maxLines = 2,
                             overflow = TextOverflow.Ellipsis,
                         )

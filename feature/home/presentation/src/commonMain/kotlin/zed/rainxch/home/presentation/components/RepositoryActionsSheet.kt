@@ -69,23 +69,19 @@ fun RepositoryActionsSheet(
             Column(modifier = Modifier.weight(1f)) {
                 KomiText(
                     text = repository.fullName,
-                    role = KomiTextRole.LegacyTitle,
-                    fontWeight = FontWeight.SemiBold,
+                    role = KomiTextRole.CardTitle,
                     color = colors.onSurface,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    uppercase = false,
                 )
 
                 repository.description?.let {
                     KomiText(
                         text = it,
-                        role = KomiTextRole.LegacyBody,
-                        fontSize = 13.sp,
+                        role = KomiTextRole.Body,
                         color = colors.onSurfaceVariant,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
-                        uppercase = false,
                     )
                 }
             }
@@ -144,7 +140,7 @@ private fun SheetRow(
 
         KomiText(
             text = label,
-            role = KomiTextRole.LegacyBody,
+            role = KomiTextRole.Body,
             color = tint,
         )
     }

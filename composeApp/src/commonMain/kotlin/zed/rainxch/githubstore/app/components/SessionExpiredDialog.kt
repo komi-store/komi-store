@@ -37,10 +37,8 @@ fun SessionExpiredDialog(
         title = {
             KomiText(
                 text = stringResource(Res.string.session_expired_title),
-                role = KomiTextRole.LegacyTitle,
-                fontWeight = FontWeight.Black,
+                role = KomiTextRole.CardTitle,
                 color = colors.onSurface,
-                uppercase = false,
             )
         },
         text = {
@@ -49,17 +47,14 @@ fun SessionExpiredDialog(
             ) {
                 KomiText(
                     text = stringResource(Res.string.session_expired_message),
-                    role = KomiTextRole.LegacyBody,
+                    role = KomiTextRole.Body,
                     color = colors.outline,
-                    uppercase = false,
                 )
 
                 KomiText(
                     text = stringResource(Res.string.session_expired_hint),
-                    role = KomiTextRole.LegacyBody,
-                    fontSize = 13.sp,
+                    role = KomiTextRole.Body,
                     color = colors.primary,
-                    uppercase = false,
                 )
             }
         },

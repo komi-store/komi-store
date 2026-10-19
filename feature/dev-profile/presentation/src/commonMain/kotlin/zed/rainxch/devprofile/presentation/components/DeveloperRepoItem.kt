@@ -74,11 +74,9 @@ fun DeveloperRepoItem(
                     KomiText(
                         text = repository.name,
                         maxLines = 1,
-                        role = KomiTextRole.LegacyTitle,
-                        fontWeight = FontWeight.SemiBold,
+                        role = KomiTextRole.CardTitle,
                         overflow = TextOverflow.Ellipsis,
                         color = colors.onSurface,
-                        uppercase = false,
                     )
 
                     val releaseDate = repository.latestReleaseAt
@@ -92,12 +90,10 @@ fun DeveloperRepoItem(
                         text =
                             stringResource(label, formatRelativeLong(dateString))
                                 .replaceFirstChar { it.uppercase() },
-                        role = KomiTextRole.LegacyLabel,
-                        fontSize = 12.sp,
+                        role = KomiTextRole.Caption,
                         overflow = TextOverflow.Ellipsis,
                         color = colors.onSurfaceVariant,
                         maxLines = 1,
-                        uppercase = false,
                     )
                 }
 
@@ -114,11 +110,9 @@ fun DeveloperRepoItem(
                 KomiText(
                     text = description,
                     maxLines = 2,
-                    role = KomiTextRole.LegacyBody,
-                    fontSize = 13.sp,
+                    role = KomiTextRole.Body,
                     color = colors.onSurfaceVariant,
                     overflow = TextOverflow.Ellipsis,
-                    uppercase = false,
                 )
             }
 
@@ -207,7 +201,7 @@ fun DeveloperRepoItem(
                             text =
                                 repository.latestVersion
                                     ?: stringResource(Res.string.has_release),
-                            container = colors.primary.copy(alpha = 0.14f),
+                            container = colors.primaryTint,
                             content = colors.primary,
                         )
                     } else if (repository.hasReleases) {
@@ -222,7 +216,7 @@ fun DeveloperRepoItem(
                     if (repository.isInstalled) {
                         TonalBadge(
                             text = stringResource(Res.string.installed),
-                            container = colors.primary.copy(alpha = 0.18f),
+                            container = colors.primaryTint,
                             content = colors.primary,
                         )
                     }
@@ -240,7 +234,7 @@ private fun FavoriteToggle(
     val colors = LocalPersonality.current.colors
     val container =
         if (isFavorite) {
-            colors.error.copy(alpha = 0.18f)
+            colors.errorTint
         } else {
             colors.surfaceContainerHigh
         }
@@ -291,12 +285,9 @@ private fun TonalBadge(
     ) {
         KomiText(
             text = text,
-            role = KomiTextRole.LegacyLabel,
-            fontSize = 12.sp,
-            fontWeight = FontWeight.SemiBold,
+            role = KomiTextRole.LabelSmall,
             color = content,
             modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
-            uppercase = false,
         )
     }
 }

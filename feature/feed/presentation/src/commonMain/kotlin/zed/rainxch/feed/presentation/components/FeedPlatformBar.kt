@@ -35,7 +35,7 @@ fun FeedPlatformBar(
     ) {
         KomiText(
             text = stringResource(Res.string.feed_browsing),
-            role = KomiTextRole.LegacyTitle,
+            role = KomiTextRole.Label,
         )
 
         KomiButton(

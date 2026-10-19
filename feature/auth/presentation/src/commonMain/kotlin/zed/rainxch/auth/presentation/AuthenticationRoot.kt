@@ -14,6 +14,7 @@ import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -245,11 +246,9 @@ private fun StateLoggedOut(
     ) {
         KomiText(
             text = stringResource(Res.string.unlock_full_experience),
-            role = KomiTextRole.LegacyDisplay,
-            fontWeight = FontWeight.SemiBold,
+            role = KomiTextRole.Display,
             color = colors.onBackground,
             textAlign = TextAlign.Center,
-            uppercase = false,
         )
 
         Spacer(Modifier.height(20.dp))
@@ -335,7 +334,7 @@ private fun BenefitsCard() {
                 modifier = Modifier
                     .size(40.dp)
                     .clip(RoundedCornerShape(shape.corner))
-                    .background(colors.primary.copy(alpha = 0.14f)),
+                    .background(colors.primaryTint),
                 contentAlignment = Alignment.Center,
             ) {
                 KomiIcon(
@@ -352,18 +351,14 @@ private fun BenefitsCard() {
             ) {
                 KomiText(
                     text = stringResource(Res.string.more_requests),
-                    role = KomiTextRole.LegacyTitle,
-                    fontWeight = FontWeight.SemiBold,
+                    role = KomiTextRole.CardTitle,
                     color = colors.onSurface,
-                    uppercase = false,
                 )
 
                 KomiText(
                     text = stringResource(Res.string.more_requests_description),
-                    role = KomiTextRole.LegacyBody,
-                    fontSize = 13.sp,
+                    role = KomiTextRole.Body,
                     color = colors.onSurfaceVariant,
-                    uppercase = false,
                 )
             }
         }
@@ -395,9 +390,8 @@ private fun StateDevicePrompt(
             ) {
                 KomiText(
                     text = stringResource(Res.string.enter_code_on_github),
-                    role = KomiTextRole.LegacyLabel,
+                    role = KomiTextRole.Caption,
                     color = colors.onSurfaceVariant,
-                    uppercase = false,
                 )
 
                 Spacer(Modifier.height(14.dp))
@@ -407,13 +401,16 @@ private fun StateDevicePrompt(
                     horizontalArrangement = Arrangement.Center,
                     modifier = Modifier.fillMaxWidth(),
                 ) {
-                    KomiText(
+                    val type = LocalPersonality.current.type
+                    // Typed by hand on another device, so it stays monospace at screen-title size.
+                    BasicText(
                         text = authState.start.userCode,
-                        role = KomiTextRole.Mono,
-                        fontSize = 28.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = colors.onSurface,
-                        uppercase = false,
+                        style =
+                            type.mono.copy(
+                                fontSize = type.screenTitle.fontSize,
+                                lineHeight = type.screenTitle.lineHeight,
+                                color = colors.onSurface,
+                            ),
                     )
 
                     Spacer(Modifier.width(12.dp))
@@ -422,7 +419,7 @@ private fun StateDevicePrompt(
                         modifier = Modifier
                             .size(40.dp)
                             .clip(RoundedCornerShape(shape.corner))
-                            .background(colors.primary.copy(alpha = 0.14f))
+                            .background(colors.primaryTint)
                             .clickable {
                                 onAction(AuthenticationAction.CopyCode(authState.start))
                             },
@@ -452,12 +449,9 @@ private fun StateDevicePrompt(
 
                     KomiText(
                         text = info,
-                        role = KomiTextRole.LegacyBody,
-                        fontSize = 13.sp,
-                        fontWeight = FontWeight.Medium,
+                        role = KomiTextRole.Label,
                         color = colors.primary,
                         textAlign = TextAlign.Center,
-                        uppercase = false,
                     )
                 }
 
@@ -497,10 +491,7 @@ private fun StateDevicePrompt(
                         KomiText(
                             text = authState.formattedTimer,
                             role = KomiTextRole.Mono,
-                            fontSize = 12.sp,
-                            fontWeight = FontWeight.Medium,
                             color = timerColor,
-                            uppercase = false,
                         )
                     }
                 }
@@ -540,10 +531,8 @@ private fun StateDevicePrompt(
 
             KomiText(
                 text = stringResource(Res.string.auth_rate_limited, state.pollIntervalSec),
-                role = KomiTextRole.LegacyLabel,
-                fontSize = 11.sp,
+                role = KomiTextRole.Caption,
                 color = colors.onSurfaceVariant,
-                uppercase = false,
             )
         }
 
@@ -566,10 +555,9 @@ private fun StatePending() {
 
         KomiText(
             text = stringResource(Res.string.waiting_for_authorization),
-            role = KomiTextRole.LegacyTitle,
+            role = KomiTextRole.CardTitle,
             color = colors.onSurfaceVariant,
             textAlign = TextAlign.Center,
-            uppercase = false,
         )
     }
 }
@@ -594,7 +582,7 @@ private fun StateLoggedIn() {
                 modifier = Modifier
                     .size(80.dp)
                     .clip(RoundedCornerShape(shape.cornerSmall))
-                    .background(colors.primary.copy(alpha = 0.14f)),
+                    .background(colors.primaryTint),
                 contentAlignment = Alignment.Center,
             ) {
                 KomiIcon(
@@ -610,19 +598,16 @@ private fun StateLoggedIn() {
 
         KomiText(
             text = stringResource(Res.string.signed_in),
-            role = KomiTextRole.LegacyTitle,
-            fontWeight = FontWeight.SemiBold,
+            role = KomiTextRole.CardTitle,
             color = colors.onBackground,
-            uppercase = false,
         )
 
         Spacer(Modifier.height(6.dp))
 
         KomiText(
             text = stringResource(Res.string.redirecting_message),
-            role = KomiTextRole.LegacyBody,
+            role = KomiTextRole.Body,
             color = colors.onSurfaceVariant,
-            uppercase = false,
         )
     }
 }
@@ -647,7 +632,7 @@ private fun StateError(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(colors.error.copy(alpha = 0.12f))
+                    .background(colors.errorTint)
                     .padding(20.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
@@ -662,22 +647,18 @@ private fun StateError(
 
                 KomiText(
                     text = stringResource(authState.error.titleRes()),
-                    role = KomiTextRole.LegacyTitle,
-                    fontWeight = FontWeight.SemiBold,
+                    role = KomiTextRole.CardTitle,
                     color = colors.onSurface,
                     textAlign = TextAlign.Center,
-                    uppercase = false,
                 )
 
                 Spacer(Modifier.height(6.dp))
 
                 KomiText(
                     text = stringResource(authState.error.hintRes()),
-                    role = KomiTextRole.LegacyBody,
-                    fontSize = 13.sp,
+                    role = KomiTextRole.Body,
                     color = colors.onSurfaceVariant,
                     textAlign = TextAlign.Center,
-                    uppercase = false,
                 )
             }
         }
@@ -745,18 +726,14 @@ private fun PatSignInSheet(
         ) {
             KomiText(
                 text = stringResource(Res.string.pat_sheet_title),
-                role = KomiTextRole.LegacyTitle,
-                fontWeight = FontWeight.SemiBold,
+                role = KomiTextRole.CardTitle,
                 color = colors.onSurface,
-                uppercase = false,
             )
 
             KomiText(
                 text = stringResource(Res.string.pat_sheet_description),
-                role = KomiTextRole.LegacyBody,
-                fontSize = 13.sp,
+                role = KomiTextRole.Body,
                 color = colors.onSurfaceVariant,
-                uppercase = false,
             )
 
             KomiButton(

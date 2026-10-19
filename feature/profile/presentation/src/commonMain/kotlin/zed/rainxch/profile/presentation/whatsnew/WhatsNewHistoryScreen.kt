@@ -66,9 +66,8 @@ fun WhatsNewHistoryScreen(
             ) {
                 KomiText(
                     text = stringResource(Res.string.whats_new_history_empty),
-                    role = KomiTextRole.LegacyBody,
+                    role = KomiTextRole.Body,
                     color = colors.onSurfaceVariant,
-                    uppercase = false,
                 )
             }
         } else {
@@ -104,17 +103,13 @@ fun WhatsNewEntryCard(entry: WhatsNewEntry) {
             Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
                 KomiText(
                     text = entry.versionName,
-                    role = KomiTextRole.LegacyTitle,
-                    fontWeight = FontWeight.Bold,
+                    role = KomiTextRole.CardTitle,
                     color = colors.onSurface,
-                    uppercase = false,
                 )
                 KomiText(
                     text = entry.releaseDate,
-                    role = KomiTextRole.LegacyLabel,
-                    fontSize = 12.sp,
+                    role = KomiTextRole.Caption,
                     color = colors.onSurfaceVariant,
-                    uppercase = false,
                 )
             }
 

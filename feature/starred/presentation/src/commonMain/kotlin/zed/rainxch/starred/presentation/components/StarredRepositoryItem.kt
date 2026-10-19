@@ -88,12 +88,10 @@ fun StarredRepositoryItem(
                 ) {
                     KomiText(
                         text = repository.repoName,
-                        role = KomiTextRole.LegacyTitle,
-                        fontWeight = FontWeight.SemiBold,
+                        role = KomiTextRole.CardTitle,
                         color = colors.onSurface,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
-                        uppercase = false,
                     )
 
                     Row(
@@ -102,12 +100,10 @@ fun StarredRepositoryItem(
                     ) {
                         KomiText(
                             text = repository.repoOwner,
-                            role = KomiTextRole.LegacyBody,
-                            fontSize = 13.sp,
+                            role = KomiTextRole.Body,
                             color = colors.onSurfaceVariant,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
-                            uppercase = false,
                             modifier = Modifier.weight(1f, fill = false),
                         )
 
@@ -132,12 +128,10 @@ fun StarredRepositoryItem(
                 Spacer(Modifier.height(10.dp))
                 KomiText(
                     text = description,
-                    role = KomiTextRole.LegacyBody,
-                    fontSize = 13.sp,
+                    role = KomiTextRole.Body,
                     color = colors.onSurfaceVariant,
                     maxLines = 3,
                     overflow = TextOverflow.Ellipsis,
-                    uppercase = false,
                 )
             }
 
@@ -175,7 +169,7 @@ fun StarredRepositoryItem(
                 if (repository.isInstalled) {
                     TonalBadge(
                         text = stringResource(Res.string.installed),
-                        container = colors.primary.copy(alpha = 0.18f),
+                        container = colors.primaryTint,
                         content = colors.primary,
                     )
                 }
@@ -183,7 +177,7 @@ fun StarredRepositoryItem(
                 repository.latestRelease?.let { version ->
                     TonalBadge(
                         text = version,
-                        container = colors.primary.copy(alpha = 0.14f),
+                        container = colors.primaryTint,
                         content = colors.primary,
                     )
                 }
@@ -228,11 +222,8 @@ private fun TonalBadge(
     ) {
         KomiText(
             text = text,
-            role = KomiTextRole.LegacyLabel,
-            fontSize = 12.sp,
-            fontWeight = FontWeight.SemiBold,
+            role = KomiTextRole.LabelSmall,
             color = content,
-            uppercase = false,
         )
     }
 }

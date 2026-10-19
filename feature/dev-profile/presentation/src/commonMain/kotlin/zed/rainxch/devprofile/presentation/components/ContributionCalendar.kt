@@ -63,8 +63,7 @@ fun ContributionCalendarCard(
             ) {
                 KomiText(
                     text = stringResource(Res.string.dev_profile_contribution_activity),
-                    role = KomiTextRole.LegacyTitle,
-                    fontWeight = FontWeight.SemiBold,
+                    role = KomiTextRole.SectionTitle,
                     color = colors.onSurface,
                 )
 
@@ -72,9 +71,7 @@ fun ContributionCalendarCard(
                     KomiText(
                         text = stringResource(Res.string.dev_profile_contributions_this_year, it.totalLastYear),
                         role = KomiTextRole.Mono,
-                        fontSize = 11.sp,
                         color = colors.onSurfaceVariant,
-                        uppercase = false,
                     )
                 }
             }
@@ -85,16 +82,14 @@ fun ContributionCalendarCard(
                 isLoading && contributions == null -> {
                     KomiText(
                         text = stringResource(Res.string.loading),
-                        role = KomiTextRole.LegacyBody,
-                        fontSize = 13.sp,
+                        role = KomiTextRole.Body,
                         color = colors.onSurfaceVariant,
                     )
                 }
                 contributions == null -> {
                     KomiText(
                         text = stringResource(Res.string.dev_profile_contributions_load_failed),
-                        role = KomiTextRole.LegacyBody,
-                        fontSize = 13.sp,
+                        role = KomiTextRole.Body,
                         color = colors.onSurfaceVariant,
                     )
                 }
@@ -169,8 +164,7 @@ private fun CalendarGrid(days: List<ContributionDay>) {
     ) {
         KomiText(
             text = stringResource(Res.string.dev_profile_contributions_less),
-            role = KomiTextRole.LegacyLabel,
-            fontSize = 11.sp,
+            role = KomiTextRole.Overline,
             color = colors.onSurfaceVariant,
         )
 
@@ -185,8 +179,7 @@ private fun CalendarGrid(days: List<ContributionDay>) {
 
         KomiText(
             text = stringResource(Res.string.dev_profile_contributions_more),
-            role = KomiTextRole.LegacyLabel,
-            fontSize = 11.sp,
+            role = KomiTextRole.Overline,
             color = colors.onSurfaceVariant,
         )
     }

@@ -50,10 +50,8 @@ fun MuteSettingsBottomSheet(
         ) {
             KomiText(
                 text = stringResource(Res.string.announcements_mute_settings_title),
-                role = KomiTextRole.LegacyTitle,
-                fontWeight = FontWeight.SemiBold,
+                role = KomiTextRole.CardTitle,
                 color = colors.onSurface,
-                uppercase = false,
             )
 
             AnnouncementCategory.entries.forEach { category ->
@@ -103,10 +101,9 @@ private fun CategoryRow(
     ) {
         KomiText(
             text = label,
-            role = KomiTextRole.LegacyBody,
+            role = KomiTextRole.Body,
             color = colors.onSurface,
             modifier = Modifier.weight(1f),
-            uppercase = false,
         )
         if (locked) {
             KomiIcon(
