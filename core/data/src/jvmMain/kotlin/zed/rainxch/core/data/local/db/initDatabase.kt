@@ -8,7 +8,6 @@ import zed.rainxch.core.data.local.db.migrations.MIGRATIONS
 import java.io.File
 
 fun initDatabase(): AppDatabase {
-
     DesktopAppDataPaths.migrateFromTmpIfNeeded("github_store.db-wal")
     DesktopAppDataPaths.migrateFromTmpIfNeeded("github_store.db-shm")
     DesktopAppDataPaths.migrateFromTmpIfNeeded("github_store.db")
@@ -16,6 +15,7 @@ fun initDatabase(): AppDatabase {
     return buildDatabase(File(DesktopAppDataPaths.appDataDir(), "github_store.db"))
 }
 
+@Suppress("SpreadOperator")
 internal fun buildDatabase(dbFile: File): AppDatabase =
     Room
         .databaseBuilder<AppDatabase>(

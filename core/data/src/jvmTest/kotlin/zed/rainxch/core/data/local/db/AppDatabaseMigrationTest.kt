@@ -4,6 +4,11 @@ import androidx.room.testing.MigrationTestHelper
 import androidx.sqlite.SQLiteConnection
 import androidx.sqlite.driver.bundled.BundledSQLiteDriver
 import androidx.sqlite.execSQL
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
+import org.junit.Rule
+import org.junit.rules.TemporaryFolder
+import zed.rainxch.core.domain.model.installation.InstallSource
 import java.io.File
 import kotlin.io.path.Path
 import kotlin.io.path.listDirectoryEntries
@@ -12,11 +17,6 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.runBlocking
-import org.junit.Rule
-import org.junit.rules.TemporaryFolder
-import zed.rainxch.core.domain.model.installation.InstallSource
 
 class AppDatabaseMigrationTest {
     @get:Rule
@@ -83,21 +83,23 @@ class AppDatabaseMigrationTest {
         version: Int,
     ): SQLiteConnection =
         when (version) {
-            1, 2 ->
+            1, 2 -> {
                 BundledSQLiteDriver().open(file.path).also { connection ->
                     connection.execSQL(if (version == 1) INSTALLED_APPS_V1 else INSTALLED_APPS_V2)
                     connection.execSQL(FAVORITE_REPOS_V1)
                     connection.execSQL(UPDATE_HISTORY_V1)
                     connection.execSQL("PRAGMA user_version = $version")
                 }
+            }
 
-            else ->
+            else -> {
                 MigrationTestHelper(
                     schemaDirectoryPath = schemaDir,
                     databasePath = file.toPath(),
                     driver = BundledSQLiteDriver(),
                     databaseClass = AppDatabase::class,
                 ).createDatabase(version)
+            }
         }
 
     private fun SQLiteConnection.insertRows() {
