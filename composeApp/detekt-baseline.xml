@@ -31,8 +31,9 @@
     <ID>MaxLineLength:AppNavigation.kt$appsViewModel.onAction(zed.rainxch.apps.presentation.AppsAction.OnAddByLinkClick)</ID>
     <ID>MaxLineLength:AppNavigation.kt$if (showBottomBar) Modifier.consumeWindowInsets(PaddingValues(bottom = bottomBarHeight)) else Modifier</ID>
     <ID>MaxLineLength:DesktopDeepLink.kt$DesktopDeepLink$println("DeepLink: Windows scheme registration failed (reg import): ${result?.output?.trim().orEmpty()}")</ID>
-    <ID>MaxLineLength:GithubStoreApp.kt$GithubStoreApp$"Resolved self-update pending install: ${systemInfo.versionName} (code=${systemInfo.versionCode}, tag=$resolvedTag)"</ID>
+    <ID>MaxLineLength:GithubStoreApp.kt$GithubStoreApp$"Resolved self-update pending install: ${resolution.versionName} (code=${resolution.versionCode}, tag=${resolution.resolvedTag})"</ID>
     <ID>NestedBlockDepth:DeepLinkParser.kt$DeepLinkParser$private fun urlDecode(value: String): String</ID>
+    <ID>NestedBlockDepth:GithubStoreApp.kt$GithubStoreApp$private suspend fun resolveSelfPendingInstall( existing: InstalledApp, repo: InstalledAppsRepository, )</ID>
     <ID>ReturnCount:DeepLinkParser.kt$DeepLinkParser$private fun extractQueryParam( uri: String, key: String, ): String?</ID>
     <ID>ReturnCount:DeepLinkParser.kt$DeepLinkParser$private fun isStrictlyValidOwnerRepo( owner: String, repo: String, ): Boolean</ID>
     <ID>ReturnCount:DeepLinkParser.kt$DeepLinkParser$private fun parseAuthCallback(uri: String): DeepLinkDestination</ID>

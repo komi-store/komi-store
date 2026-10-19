@@ -9,7 +9,9 @@
     <ID>LongParameterList:AppsRepositoryImpl.kt$AppsRepositoryImpl$( private val appLauncher: AppLauncher, private val appsRepository: InstalledAppsRepository, private val logger: KomiStoreLogger, private val clientProvider: GitHubClientProvider, private val backendApiClient: BackendApiClient, private val packageMonitor: PackageMonitor, private val tweaksRepository: TweaksRepository, private val forgejoClientRegistry: zed.rainxch.core.data.network.ForgejoClientRegistry, )</ID>
     <ID>LoopWithTooManyJumpStatements:AppsRepositoryImpl.kt$AppsRepositoryImpl$for</ID>
     <ID>MagicNumber:AppsRepositoryImpl.kt$AppsRepositoryImpl$10</ID>
+    <ID>MagicNumber:AppsRepositoryImpl.kt$AppsRepositoryImpl$1000</ID>
     <ID>MagicNumber:AppsRepositoryImpl.kt$AppsRepositoryImpl$5</ID>
+    <ID>MaxLineLength:AppsRepositoryImpl.kt$AppsRepositoryImpl$"${backendStart.elapsedNow().inWholeMilliseconds} ms (${error.message}), asking GitHub directly"</ID>
     <ID>MaxLineLength:AppsRepositoryImpl.kt$AppsRepositoryImpl$if</ID>
     <ID>ReturnCount:AppsRepositoryImpl.kt$AppsRepositoryImpl$override suspend fun fetchRepoInfo( owner: String, repo: String, sourceHost: String?, ): GithubRepoInfo?</ID>
     <ID>ReturnCount:AppsRepositoryImpl.kt$AppsRepositoryImpl$override suspend fun getLatestRelease( owner: String, repo: String, includePreReleases: Boolean, sourceHost: String?, ): GithubRelease?</ID>
@@ -17,5 +19,6 @@
     <ID>ReturnCount:AppsRepositoryImpl.kt$AppsRepositoryImpl$private suspend fun resolveLatestTagViaReleases( owner: String, repo: String, includePreReleases: Boolean, ): String?</ID>
     <ID>TooGenericExceptionCaught:AppsRepositoryImpl.kt$AppsRepositoryImpl$e: Exception</ID>
     <ID>TooManyFunctions:AppsRepositoryImpl.kt$AppsRepositoryImpl : AppsRepository</ID>
+    <ID>UseCheckOrError:AppsRepositoryImpl.kt$AppsRepositoryImpl$throw IllegalStateException("GitHub did not answer within ${DIRECT_RELEASES_TIMEOUT_MS / 1000} s")</ID>
   </CurrentIssues>
 </SmellBaseline>

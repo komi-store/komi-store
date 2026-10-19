@@ -2,23 +2,26 @@
 <SmellBaseline>
   <ManuallySuppressedIssues/>
   <CurrentIssues>
-    <ID>ComplexCondition:DefaultDownloadOrchestrator.kt$DefaultDownloadOrchestrator$existing != null &amp;&amp; existing.stage != DownloadStage.Failed &amp;&amp; existing.stage != DownloadStage.Cancelled &amp;&amp; !existing.lostItsFile()</ID>
+    <ID>ComplexCondition:AndroidDownloader.kt$AndroidDownloader$decision == RangeDecision.APPEND &amp;&amp; resumeFrom &gt; 0L &amp;&amp; stored != null &amp;&amp; stored.size &gt; 0L &amp;&amp; total != null &amp;&amp; stored.size != total</ID>
+    <ID>ComplexCondition:DefaultDownloadOrchestrator.kt$DefaultDownloadOrchestrator$existing != null &amp;&amp; existing.stage != DownloadStage.Failed &amp;&amp; existing.stage != DownloadStage.Cancelled &amp;&amp; existing.stage != DownloadStage.Paused &amp;&amp; existing.stage != DownloadStage.Completed &amp;&amp; !existing.lostItsFile()</ID>
+    <ID>ComplexCondition:DesktopDownloader.kt$DesktopDownloader$decision == RangeDecision.APPEND &amp;&amp; resumeFrom &gt; 0L &amp;&amp; stored != null &amp;&amp; stored.size &gt; 0L &amp;&amp; total != null &amp;&amp; stored.size != total</ID>
     <ID>ComplexCondition:DesktopInstaller.kt$DesktopInstaller$id in listOf( "fedora", "rhel", "centos", "rocky", "almalinux", "opensuse", "suse", ) || idLike.contains("fedora") || idLike.contains("rhel") || idLike.contains("suse") || idLike.contains("centos")</ID>
     <ID>ComplexCondition:DesktopInstaller.kt$DesktopInstaller$id in listOf("fedora", "rhel", "centos", "rocky", "almalinux", "opensuse", "suse") || idLike.contains("fedora") || idLike.contains("rhel") || idLike.contains("suse") || idLike.contains("centos")</ID>
-    <ID>CyclomaticComplexMethod:AndroidDownloader.kt$AndroidDownloader$override fun download( url: String, suggestedFileName: String?, bypassMirror: Boolean, ): Flow&lt;DownloadProgress&gt;</ID>
+    <ID>CyclomaticComplexMethod:AndroidDownloader.kt$AndroidDownloader$override fun download( url: String, suggestedFileName: String?, bypassMirror: Boolean, identity: AssetIdentity?, ): Flow&lt;DownloadProgress&gt;</ID>
+    <ID>CyclomaticComplexMethod:AndroidDownloader.kt$AndroidDownloader$private suspend fun downloadAttempt( client: OkHttpClient, url: String, partFile: File, metaFile: File, destination: File, downloadId: String, identity: AssetIdentity?, emit: suspend (DownloadProgress) -&gt; Unit, )</ID>
     <ID>CyclomaticComplexMethod:AutoUpdateWorker.kt$AutoUpdateWorker$@SuppressLint("MissingPermission") private fun showSummaryNotification( successfulApps: List&lt;String&gt;, failedApps: List&lt;String&gt;, )</ID>
     <ID>CyclomaticComplexMethod:AutoUpdateWorker.kt$AutoUpdateWorker$private suspend fun updateApp(app: InstalledApp)</ID>
     <ID>CyclomaticComplexMethod:DefaultDownloadOrchestrator.kt$DefaultDownloadOrchestrator$private suspend fun runDownload(spec: DownloadSpec)</ID>
     <ID>CyclomaticComplexMethod:DesktopAppLauncher.kt$DesktopAppLauncher$private fun launchLinuxApp(installedApp: InstalledApp)</ID>
     <ID>CyclomaticComplexMethod:DesktopAppLauncher.kt$DesktopAppLauncher$private fun launchWindowsApp(installedApp: InstalledApp)</ID>
-    <ID>CyclomaticComplexMethod:DesktopDownloader.kt$DesktopDownloader$override fun download( url: String, suggestedFileName: String?, bypassMirror: Boolean, ): Flow&lt;DownloadProgress&gt;</ID>
+    <ID>CyclomaticComplexMethod:DesktopDownloader.kt$DesktopDownloader$override fun download( url: String, suggestedFileName: String?, bypassMirror: Boolean, identity: AssetIdentity?, ): Flow&lt;DownloadProgress&gt;</ID>
+    <ID>CyclomaticComplexMethod:DesktopDownloader.kt$DesktopDownloader$private suspend fun downloadAttempt( client: OkHttpClient, url: String, partFile: File, metaFile: File, destination: File, downloadId: String, identity: AssetIdentity?, emit: suspend (DownloadProgress) -&gt; Unit, )</ID>
     <ID>CyclomaticComplexMethod:DesktopInstaller.kt$DesktopInstaller$override fun choosePrimaryAsset(assets: List&lt;GithubAsset&gt;): GithubAsset?</ID>
     <ID>CyclomaticComplexMethod:DesktopInstaller.kt$DesktopInstaller$private fun determineLinuxPackageType(): LinuxPackageType</ID>
     <ID>CyclomaticComplexMethod:DhizukuInstallerServiceImpl.kt$DhizukuInstallerServiceImpl$override fun installPackage( pfd: ParcelFileDescriptor, fileSize: Long, expectedPackageName: String?, expectedVersionCode: Long, installerPackageName: String?, ): Int</ID>
     <ID>CyclomaticComplexMethod:ExternalImportRepositoryImpl.kt$ExternalImportRepositoryImpl$override suspend fun resolveMatches(candidates: List&lt;ExternalAppCandidate&gt;): List&lt;RepoMatchResult&gt;</ID>
     <ID>CyclomaticComplexMethod:InstalledAppsRepositoryImpl.kt$InstalledAppsRepositoryImpl$override suspend fun checkForUpdates(packageName: String): Boolean</ID>
     <ID>CyclomaticComplexMethod:InstalledAppsRepositoryImpl.kt$InstalledAppsRepositoryImpl$private fun resolveTrackedRelease( releases: List&lt;GithubRelease&gt;, filter: AssetFilter?, fallbackToOlderReleases: Boolean, preferredVariant: String?, preferredTokens: Set&lt;String&gt;, preferredGlob: String?, pickedIndex: Int?, pickedSiblingCount: Int?, trackedPackageName: String, installedAssetName: String?, repoApps: List&lt;InstalledApp&gt;, ): ResolvedRelease?</ID>
-    <ID>CyclomaticComplexMethod:PackageEventReceiver.kt$PackageEventReceiver$private suspend fun onPackageInstalled(packageName: String)</ID>
     <ID>CyclomaticComplexMethod:ProxyRepositoryImpl.kt$ProxyRepositoryImpl$private suspend fun migrateIfNeeded()</ID>
     <ID>CyclomaticComplexMethod:RateLimitInterceptor.kt$RateLimitInterceptor.Plugin$private fun parseRateLimitFromHeaders(headers: Headers): RateLimitInfo?</ID>
     <ID>CyclomaticComplexMethod:StarredRepositoryImpl.kt$StarredRepositoryImpl$override suspend fun fetchStarredForUsername( username: String, ): Result&lt;List&lt;zed.rainxch.core.domain.model.repository.StarredRepository&gt;&gt;</ID>
@@ -30,19 +33,23 @@
     <ID>EmptyFunctionBlock:DesktopInstaller.kt$DesktopInstaller${ }</ID>
     <ID>EmptyFunctionBlock:DesktopUpdateScheduleManager.kt$DesktopUpdateScheduleManager${ }</ID>
     <ID>InstanceOfCheckForException:AnnouncementsRepositoryImpl.kt$AnnouncementsRepositoryImpl$t is CancellationException</ID>
+    <ID>LargeClass:DefaultDownloadOrchestrator.kt$DefaultDownloadOrchestrator : DownloadOrchestrator</ID>
     <ID>LargeClass:DesktopInstaller.kt$DesktopInstaller : Installer</ID>
     <ID>LargeClass:ExternalImportRepositoryImpl.kt$ExternalImportRepositoryImpl : ExternalImportRepository</ID>
     <ID>LargeClass:InstalledAppsRepositoryImpl.kt$InstalledAppsRepositoryImpl : InstalledAppsRepository</ID>
-    <ID>LongMethod:AndroidDownloader.kt$AndroidDownloader$override fun download( url: String, suggestedFileName: String?, bypassMirror: Boolean, ): Flow&lt;DownloadProgress&gt;</ID>
+    <ID>LongMethod:AndroidDownloader.kt$AndroidDownloader$override fun download( url: String, suggestedFileName: String?, bypassMirror: Boolean, identity: AssetIdentity?, ): Flow&lt;DownloadProgress&gt;</ID>
+    <ID>LongMethod:AndroidDownloader.kt$AndroidDownloader$private suspend fun downloadAttempt( client: OkHttpClient, url: String, partFile: File, metaFile: File, destination: File, downloadId: String, identity: AssetIdentity?, emit: suspend (DownloadProgress) -&gt; Unit, )</ID>
     <ID>LongMethod:AutoUpdateWorker.kt$AutoUpdateWorker$@SuppressLint("MissingPermission") private fun showSummaryNotification( successfulApps: List&lt;String&gt;, failedApps: List&lt;String&gt;, )</ID>
     <ID>LongMethod:AutoUpdateWorker.kt$AutoUpdateWorker$private suspend fun runAutoUpdate(): Result</ID>
     <ID>LongMethod:AutoUpdateWorker.kt$AutoUpdateWorker$private suspend fun updateApp(app: InstalledApp)</ID>
     <ID>LongMethod:DefaultDownloadOrchestrator.kt$DefaultDownloadOrchestrator$override suspend fun downgradeToDeferred(packageName: String)</ID>
     <ID>LongMethod:DefaultDownloadOrchestrator.kt$DefaultDownloadOrchestrator$override suspend fun enqueue(spec: DownloadSpec): String</ID>
+    <ID>LongMethod:DefaultDownloadOrchestrator.kt$DefaultDownloadOrchestrator$private suspend fun adoptUntrackedDownload( entry: OrchestratedDownload?, filePath: String, outcome: InstallOutcome, )</ID>
     <ID>LongMethod:DefaultDownloadOrchestrator.kt$DefaultDownloadOrchestrator$private suspend fun runDownload(spec: DownloadSpec)</ID>
     <ID>LongMethod:DesktopAppLauncher.kt$DesktopAppLauncher$private fun launchLinuxApp(installedApp: InstalledApp)</ID>
     <ID>LongMethod:DesktopAppLauncher.kt$DesktopAppLauncher$private fun launchWindowsApp(installedApp: InstalledApp)</ID>
-    <ID>LongMethod:DesktopDownloader.kt$DesktopDownloader$override fun download( url: String, suggestedFileName: String?, bypassMirror: Boolean, ): Flow&lt;DownloadProgress&gt;</ID>
+    <ID>LongMethod:DesktopDownloader.kt$DesktopDownloader$override fun download( url: String, suggestedFileName: String?, bypassMirror: Boolean, identity: AssetIdentity?, ): Flow&lt;DownloadProgress&gt;</ID>
+    <ID>LongMethod:DesktopDownloader.kt$DesktopDownloader$private suspend fun downloadAttempt( client: OkHttpClient, url: String, partFile: File, metaFile: File, destination: File, downloadId: String, identity: AssetIdentity?, emit: suspend (DownloadProgress) -&gt; Unit, )</ID>
     <ID>LongMethod:DesktopInstaller.kt$DesktopInstaller$private fun determineLinuxPackageType(): LinuxPackageType</ID>
     <ID>LongMethod:DesktopInstaller.kt$DesktopInstaller$private fun installFromFlatpak( file: File, ext: String, )</ID>
     <ID>LongMethod:DesktopInstaller.kt$DesktopInstaller$private fun openTerminalForAlienConversion(filePath: String)</ID>
@@ -58,7 +65,9 @@
     <ID>LongMethod:StarredRepositoryImpl.kt$StarredRepositoryImpl$override suspend fun fetchStarredForUsername( username: String, ): Result&lt;List&lt;zed.rainxch.core.domain.model.repository.StarredRepository&gt;&gt;</ID>
     <ID>LongMethod:StarredRepositoryImpl.kt$StarredRepositoryImpl$override suspend fun syncStarredRepos(forceRefresh: Boolean): Result&lt;Unit&gt;</ID>
     <ID>LongMethod:UserSessionRepositoryImpl.kt$UserSessionRepositoryImpl$override fun getUser(): Flow&lt;UserProfile?&gt;</ID>
+    <ID>LongParameterList:AndroidDownloader.kt$AndroidDownloader$( client: OkHttpClient, url: String, partFile: File, metaFile: File, destination: File, downloadId: String, identity: AssetIdentity?, emit: suspend (DownloadProgress) -&gt; Unit, )</ID>
     <ID>LongParameterList:DefaultDownloadOrchestrator.kt$DefaultDownloadOrchestrator$( private val downloader: Downloader, private val multiSourceDownloader: MultiSourceDownloader, private val digestVerifier: DigestVerifier, private val installer: Installer, private val installedAppsRepository: InstalledAppsRepository, private val pendingInstallNotifier: PendingInstallNotifier, private val slowDownloadDetector: SlowDownloadDetector, private val appScope: CoroutineScope, private val systemInstallSerializer: SystemInstallSerializer, private val tokenStore: TokenStore, )</ID>
+    <ID>LongParameterList:DesktopDownloader.kt$DesktopDownloader$( client: OkHttpClient, url: String, partFile: File, metaFile: File, destination: File, downloadId: String, identity: AssetIdentity?, emit: suspend (DownloadProgress) -&gt; Unit, )</ID>
     <ID>LongParameterList:ExternalImportRepositoryImpl.kt$ExternalImportRepositoryImpl$( private val scanner: ExternalAppScanner, private val externalLinkDao: ExternalLinkDao, private val installedAppDao: InstalledAppDao, private val signingFingerprintDao: SigningFingerprintDao, private val ksafe: KSafe, private val legacyDataStore: DataStore&lt;Preferences&gt;, private val externalMatchApi: ExternalMatchApi, private val backendClient: BackendApiClient, private val forgejoClientRegistry: ForgejoClientRegistry, private val tweaksRepository: TweaksRepository, private val starredRepository: StarredRepository, )</ID>
     <ID>LongParameterList:InstalledAppDao.kt$InstalledAppDao$( packageName: String, available: Boolean, version: String?, assetName: String?, assetUrl: String?, assetSize: Long?, releaseId: Long?, assetId: Long?, assetDigest: String?, releaseNotes: String?, timestamp: Long, latestVersionName: String?, latestVersionCode: Long?, latestReleasePublishedAt: String?, )</ID>
     <ID>LongParameterList:InstalledAppDao.kt$InstalledAppDao$( packageName: String, variant: String?, tokens: String?, glob: String?, pickedIndex: Int?, siblingCount: Int?, )</ID>
@@ -68,6 +77,7 @@
     <ID>LoopWithTooManyJumpStatements:ExternalImportRepositoryImpl.kt$ExternalImportRepositoryImpl$while</ID>
     <ID>LoopWithTooManyJumpStatements:InstalledAppsRepositoryImpl.kt$InstalledAppsRepositoryImpl$for</ID>
     <ID>LoopWithTooManyJumpStatements:ManifestHintExtractor.kt$ManifestHintExtractor$for</ID>
+    <ID>LoopWithTooManyJumpStatements:PartialDownload.kt$PartialIdentity.Companion$for</ID>
     <ID>LoopWithTooManyJumpStatements:StarredRepositoryImpl.kt$StarredRepositoryImpl$while</ID>
     <ID>MagicNumber:AndroidDigestVerifier.kt$AndroidDigestVerifier$1024</ID>
     <ID>MagicNumber:AndroidDigestVerifier.kt$AndroidDigestVerifier$8</ID>
@@ -77,9 +87,9 @@
     <ID>MagicNumber:AndroidDownloadProgressNotifier.kt$AndroidDownloadProgressNotifier$1024.0</ID>
     <ID>MagicNumber:AndroidDownloader.kt$AndroidDownloader$100</ID>
     <ID>MagicNumber:AndroidDownloader.kt$AndroidDownloader$100L</ID>
+    <ID>MagicNumber:AndroidDownloader.kt$AndroidDownloader$206</ID>
     <ID>MagicNumber:AndroidDownloader.kt$AndroidDownloader$30</ID>
     <ID>MagicNumber:AndroidDownloader.kt$AndroidDownloader$60</ID>
-    <ID>MagicNumber:AndroidDownloader.kt$AndroidDownloader$8192</ID>
     <ID>MagicNumber:AndroidPendingInstallNotifier.kt$AndroidPendingInstallNotifier$0x00FFFFFF</ID>
     <ID>MagicNumber:BackendApiClient.kt$BackendApiClient$15_000</ID>
     <ID>MagicNumber:BackendApiClient.kt$BackendApiClient$200</ID>
@@ -102,6 +112,7 @@
     <ID>MagicNumber:DesktopDigestVerifier.kt$DesktopDigestVerifier$8</ID>
     <ID>MagicNumber:DesktopDownloader.kt$DesktopDownloader$100</ID>
     <ID>MagicNumber:DesktopDownloader.kt$DesktopDownloader$100L</ID>
+    <ID>MagicNumber:DesktopDownloader.kt$DesktopDownloader$206</ID>
     <ID>MagicNumber:DesktopInstaller.kt$DesktopInstaller$1000</ID>
     <ID>MagicNumber:DownloadNotificationObserver.kt$DownloadNotificationObserver$100</ID>
     <ID>MagicNumber:ExternalImportRepositoryImpl.kt$ExternalImportRepositoryImpl$0.05</ID>
@@ -118,6 +129,9 @@
     <ID>MagicNumber:MirrorRewriter.kt$MirrorRewriter$5</ID>
     <ID>MagicNumber:ObtainiumImportMapper.kt$100</ID>
     <ID>MagicNumber:ObtainiumImportMapper.kt$39</ID>
+    <ID>MagicNumber:PartialDownload.kt$RangeRequest$200</ID>
+    <ID>MagicNumber:PartialDownload.kt$RangeRequest$206</ID>
+    <ID>MagicNumber:PartialDownload.kt$RangeRequest$416</ID>
     <ID>MagicNumber:ProxyRepositoryImpl.kt$ProxyRepositoryImpl$65535</ID>
     <ID>MagicNumber:ProxyTesterImpl.kt$ProxyTesterImpl$200</ID>
     <ID>MagicNumber:ProxyTesterImpl.kt$ProxyTesterImpl$299</ID>
@@ -138,8 +152,10 @@
     <ID>MagicNumber:UpdateCheckWorker.kt$UpdateCheckWorker$3</ID>
     <ID>MagicNumber:UpdateScheduler.kt$UpdateScheduler$15</ID>
     <ID>MagicNumber:UpdateScheduler.kt$UpdateScheduler$30</ID>
+    <ID>MatchingDeclarationName:DownloadNotificationActions.kt$DownloadNotificationAction</ID>
     <ID>MatchingDeclarationName:ObtainiumImportMapper.kt$ObtainiumMapResult</ID>
     <ID>MatchingDeclarationName:OsTrustManager.kt$OsTrustChain</ID>
+    <ID>MaxLineLength:AndroidDownloader.kt$AndroidDownloader$"The partial cannot be resumed (server refused the range, or served a span we did not ask for); restarting from zero"</ID>
     <ID>MaxLineLength:AndroidPackageMonitor.kt$AndroidPackageMonitor$val isUpdatedSystem = (pkg.applicationInfo?.flags ?: 0) and ApplicationInfo.FLAG_UPDATED_SYSTEM_APP != 0</ID>
     <ID>MaxLineLength:AutoUpdateWorker.kt$AutoUpdateWorker$"AutoUpdateWorker: Conditions not met (autoUpdate=$autoUpdateEnabled, installer=$installerType, silentReady=$silentReady), skipping"</ID>
     <ID>MaxLineLength:AutoUpdateWorker.kt$AutoUpdateWorker$Logger.d { "AutoUpdateWorker: Install command completed for ${app.appName}, waiting for system confirmation via broadcast" }</ID>
@@ -148,6 +164,7 @@
     <ID>MaxLineLength:DefaultSystemInstallSerializer.kt$DefaultSystemInstallSerializer$"SystemInstallSerializer: timed out waiting for ${pending.value} to clear; force-claiming for $packageName"</ID>
     <ID>MaxLineLength:DesktopAppLauncher.kt$DesktopAppLauncher$"Get-ItemProperty HKLM:\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\* | Where-Object { \$_.DisplayName -eq '$displayName' } | Select-Object -First 1 -ExpandProperty InstallLocation"</ID>
     <ID>MaxLineLength:DesktopAppLauncher.kt$DesktopAppLauncher$"Get-ItemProperty HKLM:\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\* | Where-Object { \$_.DisplayName -like '*$searchName*' } | Select-Object -First 1 -ExpandProperty DisplayName"</ID>
+    <ID>MaxLineLength:DesktopDownloader.kt$DesktopDownloader$"The partial cannot be resumed (server refused the range, or served a span we did not ask for); restarting from zero"</ID>
     <ID>MaxLineLength:DesktopInstaller.kt$DesktopInstaller$"This is an Arch Linux package (.pkg.tar.zst) — not supported on your distribution. Look for a .deb, .rpm, or .AppImage in the release."</ID>
     <ID>MaxLineLength:DhizukuInstallerServiceImpl.kt$DhizukuInstallerServiceImpl$log("installPackage() called — fileSize=$fileSize, expected=$expectedPackageName@$expectedVersionCode, installer=$installerPackageName")</ID>
     <ID>MaxLineLength:DhizukuInstallerServiceImpl.kt$DhizukuInstallerServiceImpl.&lt;no name provided&gt;$logW("install requires user action (Android 14+ update-ownership gate) — installerAttribution=$installerPackageName")</ID>
@@ -156,8 +173,8 @@
     <ID>MaxLineLength:HttpClientFactory.kt$suspend inline</ID>
     <ID>MaxLineLength:InstalledAppsRepositoryImpl.kt$InstalledAppsRepositoryImpl$AssetOwnership.narrowToApp(installableForApp, installedAssetName, release.tagName, self?.installedVersion)</ID>
     <ID>MaxLineLength:InstallerSourceClassifier.kt$InstallerSourceClassifier$fun classifyByInstaller(installerPackageName: String?): InstallerKind</ID>
-    <ID>MaxLineLength:PackageEventReceiver.kt$PackageEventReceiver$Logger.i { "Update confirmed via broadcast: $packageName (v${systemInfo.versionName}, tag=$installedTag)" }</ID>
     <ID>MaxLineLength:PackageEventReceiver.kt$PackageEventReceiver$installedVersion = refreshed.tagForObservedBuild(systemInfo.versionName, systemInfo.versionCode)</ID>
+    <ID>MaxLineLength:PartialDownloadLogicTest.kt$PartialDownloadLogicTest$assertFalse(PartialDisposal.shouldDiscardPartial(statusCode = null, explicitDiscard = false), "a timeout / cancellation has no status and must keep the partial")</ID>
     <ID>MaxLineLength:RootServiceManager.kt$RootServiceManager$"installPackage() — staging copy failed: exit=${copyRes.code} out='${copyRes.out.joinToString("\n")}' err='${copyRes.err.joinToString("\n")}'"</ID>
     <ID>MaxLineLength:ShizukuServiceManager.kt$ShizukuServiceManager.&lt;no name provided&gt;$"onServiceConnected() — name=$name, binder=${binder?.javaClass?.name}, binderAlive=${binder?.pingBinder()}"</ID>
     <ID>MaxLineLength:SilentInstallerDispatcher.kt$SilentInstallerDispatcher$"Dhizuku returned PENDING_USER_ACTION with attribution=$installerAttribution; retrying without attribution"</ID>
@@ -190,10 +207,12 @@
     <ID>MaxLineLength:UpdateCheckWorker.kt$UpdateCheckWorker$"UpdateCheckWorker: Auto-update enabled with $installerType, scheduling AutoUpdateWorker for ${appsWithUpdates.size} apps"</ID>
     <ID>MaxLineLength:UpdateCheckWorker.kt$UpdateCheckWorker$private</ID>
     <ID>MaxLineLength:createDataStore.kt$context.filesDir.resolve(_root_ide_package_.zed.rainxch.core.data.local.data_store.dataStoreFileName).absolutePath</ID>
+    <ID>NestedBlockDepth:AndroidDownloader.kt$AndroidDownloader$private suspend fun downloadAttempt( client: OkHttpClient, url: String, partFile: File, metaFile: File, destination: File, downloadId: String, identity: AssetIdentity?, emit: suspend (DownloadProgress) -&gt; Unit, )</ID>
+    <ID>NestedBlockDepth:DefaultDownloadOrchestrator.kt$DefaultDownloadOrchestrator$override suspend fun discard(packageName: String)</ID>
     <ID>NestedBlockDepth:DesktopAppLauncher.kt$DesktopAppLauncher$private fun launchWindowsApp(installedApp: InstalledApp)</ID>
+    <ID>NestedBlockDepth:DesktopDownloader.kt$DesktopDownloader$private suspend fun downloadAttempt( client: OkHttpClient, url: String, partFile: File, metaFile: File, destination: File, downloadId: String, identity: AssetIdentity?, emit: suspend (DownloadProgress) -&gt; Unit, )</ID>
     <ID>NestedBlockDepth:DesktopFileLocationsProvider.kt$DesktopFileLocationsProvider$private fun getXdgDownloadsDir(): String?</ID>
     <ID>NestedBlockDepth:DhizukuServiceManager.kt$DhizukuServiceManager$private fun computeStatus(): DhizukuStatus</ID>
-    <ID>NestedBlockDepth:DownloadNotificationObserver.kt$DownloadNotificationObserver$private fun reconcile(snapshot: Map&lt;String, OrchestratedDownload&gt;)</ID>
     <ID>NestedBlockDepth:PackageEventReceiver.kt$PackageEventReceiver$private suspend fun onPackageInstalled(packageName: String)</ID>
     <ID>PackageNaming:DefaultTokenStore.kt$package zed.rainxch.core.data.data_source.impl</ID>
     <ID>PackageNaming:TokenStore.kt$package zed.rainxch.core.data.data_source</ID>
@@ -204,6 +223,8 @@
     <ID>PrintStackTrace:DesktopInstaller.kt$DesktopInstaller$e</ID>
     <ID>ReturnCount:AndroidClipboardHelper.kt$AndroidClipboardHelper$override fun getText(): String?</ID>
     <ID>ReturnCount:AndroidDownloadProgressNotifier.kt$AndroidDownloadProgressNotifier$private fun formatBytes(bytes: Long): String</ID>
+    <ID>ReturnCount:AndroidDownloader.kt$AndroidDownloader$private fun downloadClient(): OkHttpClient</ID>
+    <ID>ReturnCount:AndroidDownloader.kt$AndroidDownloader$private fun totalBytes(response: Response, resumeFrom: Long, contentRange: ContentRange?): Long?</ID>
     <ID>ReturnCount:AndroidFileLocationsProvider.kt$AndroidFileLocationsProvider$override fun appDownloadsDir(): String</ID>
     <ID>ReturnCount:AndroidFileLocationsProvider.kt$AndroidFileLocationsProvider$private fun ensureUsable(dir: File): File?</ID>
     <ID>ReturnCount:AndroidInstaller.kt$AndroidInstaller$override fun choosePrimaryAsset(assets: List&lt;GithubAsset&gt;): GithubAsset?</ID>
@@ -217,12 +238,15 @@
     <ID>ReturnCount:BackendRateLimitTracker.kt$BackendRateLimitTracker$fun shouldPreempt(): Boolean</ID>
     <ID>ReturnCount:CacheManager.kt$CacheManager$suspend inline fun &lt;reified T&gt; get(key: String): T?</ID>
     <ID>ReturnCount:DefaultDownloadOrchestrator.kt$DefaultDownloadOrchestrator$override suspend fun installPending(packageName: String): InstallOutcome?</ID>
+    <ID>ReturnCount:DefaultDownloadOrchestrator.kt$DefaultDownloadOrchestrator$private suspend fun adoptUntrackedDownload( entry: OrchestratedDownload?, filePath: String, outcome: InstallOutcome, )</ID>
     <ID>ReturnCount:DefaultDownloadOrchestrator.kt$DefaultDownloadOrchestrator$private suspend fun authenticatedGithubAssetUrl(spec: DownloadSpec): String?</ID>
     <ID>ReturnCount:DefaultDownloadOrchestrator.kt$DefaultDownloadOrchestrator$private suspend fun parkTargetIdentity(spec: DownloadSpec, filePath: String): Boolean</ID>
     <ID>ReturnCount:DefaultTokenStore.kt$DefaultTokenStore$override suspend fun isTokenExpired(): Boolean</ID>
     <ID>ReturnCount:DesktopAppDataPaths.kt$DesktopAppDataPaths$fun migrateFromTmpIfNeeded(filename: String): Boolean</ID>
     <ID>ReturnCount:DesktopAppLauncher.kt$DesktopAppLauncher$private fun launchLinuxApp(installedApp: InstalledApp)</ID>
     <ID>ReturnCount:DesktopAppLauncher.kt$DesktopAppLauncher$private fun launchMacOSApp(installedApp: InstalledApp)</ID>
+    <ID>ReturnCount:DesktopDownloader.kt$DesktopDownloader$private fun downloadClient(): OkHttpClient</ID>
+    <ID>ReturnCount:DesktopDownloader.kt$DesktopDownloader$private fun totalBytes(response: Response, resumeFrom: Long, contentRange: ContentRange?): Long?</ID>
     <ID>ReturnCount:DesktopInstaller.kt$DesktopInstaller$private fun detectHostLinuxPackageType(): LinuxPackageType</ID>
     <ID>ReturnCount:DesktopInstaller.kt$DesktopInstaller$private fun determineLinuxPackageType(): LinuxPackageType</ID>
     <ID>ReturnCount:DesktopInstaller.kt$DesktopInstaller$private fun determineSystemArchitecture(): SystemArchitecture</ID>
@@ -245,22 +269,31 @@
     <ID>ReturnCount:ManifestHintExtractor.kt$ManifestHintExtractor$fun extract(metaData: Bundle?): ManifestHint?</ID>
     <ID>ReturnCount:ManifestHintExtractor.kt$ManifestHintExtractor$fun parseGithubUrl(raw: String): Pair&lt;String, String&gt;?</ID>
     <ID>ReturnCount:ManifestHintExtractor.kt$ManifestHintExtractor$fun parseOwnerRepoLiteral(raw: String): Pair&lt;String, String&gt;?</ID>
+    <ID>ReturnCount:MirrorLatencyProbeImpl.kt$MirrorLatencyProbeImpl$private suspend fun bestOfTwo(url: String): Int?</ID>
     <ID>ReturnCount:MirrorRewriter.kt$MirrorRewriter$private fun decompose(githubUrl: String): Decomposed?</ID>
-    <ID>ReturnCount:MultiSourceDownloaderImpl.kt$MultiSourceDownloaderImpl$override fun download( githubUrl: String, suggestedFileName: String?, ): Flow&lt;DownloadProgress&gt;</ID>
+    <ID>ReturnCount:MultiSourceDownloaderImpl.kt$MultiSourceDownloaderImpl$override fun download( githubUrl: String, suggestedFileName: String?, identity: AssetIdentity?, ): Flow&lt;DownloadProgress&gt;</ID>
     <ID>ReturnCount:ObtainiumImportMapper.kt$fun ObtainiumApp.toExportedAppOrSkip(json: Json): ObtainiumMapResult</ID>
     <ID>ReturnCount:ObtainiumImportMapper.kt$private fun parseAdditionalSettings( additional: kotlinx.serialization.json.JsonElement?, json: Json, ): AdditionalSettingsParse</ID>
     <ID>ReturnCount:ObtainiumImportMapper.kt$private fun parseGithubOwnerRepo(rawUrl: String): Pair&lt;String, String&gt;?</ID>
     <ID>ReturnCount:PackageEventReceiver.kt$PackageEventReceiver$private suspend fun shouldRescan(packageName: String): Boolean</ID>
+    <ID>ReturnCount:PartialDownload.kt$ContentRange.Companion$fun parse(value: String?): ContentRange?</ID>
+    <ID>ReturnCount:PartialDownload.kt$FinishedFileReuse$fun digestToVerify( destinationExists: Boolean, destinationLength: Long, expectedDigest: String?, expectedSize: Long, ): String?</ID>
+    <ID>ReturnCount:PartialDownload.kt$OrphanPolicy$fun classify( partExists: Boolean, metaExists: Boolean, isClaimed: Boolean, ): OrphanVerdict</ID>
+    <ID>ReturnCount:PartialDownload.kt$PartialIdentity.Companion$fun parse(text: String): PartialIdentity?</ID>
+    <ID>ReturnCount:PartialDownload.kt$PartialOwnership$fun decideReuse( partExists: Boolean, partLength: Long, meta: PartialIdentity?, incoming: PartialIdentity, ): PartialReuse</ID>
     <ID>ReturnCount:ProxyRepositoryImpl.kt$ProxyRepositoryImpl$private suspend fun migrateIfNeeded()</ID>
     <ID>ReturnCount:RateLimitInterceptor.kt$RateLimitInterceptor.Plugin$private fun parseRateLimitFromHeaders(headers: Headers): RateLimitInfo?</ID>
+    <ID>ReturnCount:ResumeAgainstServerTest.kt$ResumeAgainstServerTest.RangeServer$private fun respond(exchange: HttpExchange)</ID>
     <ID>ReturnCount:ShizukuInstallerServiceImpl.kt$ShizukuInstallerServiceImpl$override fun installPackage( pfd: ParcelFileDescriptor, fileSize: Long, installerPackageName: String?, ): Int</ID>
     <ID>ReturnCount:SigningFingerprint.kt$SigningFingerprint$fun fromPackageInfo(info: PackageInfo): String?</ID>
     <ID>ReturnCount:SlowDownloadDetectorImpl.kt$SlowDownloadDetectorImpl$private suspend fun recordSlowEvent(timestampMs: Long)</ID>
     <ID>ReturnCount:StarredRepositoryImpl.kt$StarredRepositoryImpl$private suspend fun checkForValidAssets( owner: String, repo: String, matcher: (String) -&gt; Boolean = ::matchesPlatform, ): StableReleaseInfo?</ID>
     <ID>SwallowedException:AndroidAppLauncher.kt$AndroidAppLauncher$e: Exception</ID>
+    <ID>SwallowedException:AndroidDownloader.kt$AndroidDownloader$e: PartialRestart</ID>
     <ID>SwallowedException:AndroidInstaller.kt$AndroidInstaller$e: Exception</ID>
     <ID>SwallowedException:AndroidShareManager.kt$AndroidShareManager$e: Exception</ID>
     <ID>SwallowedException:DesktopAppLauncher.kt$DesktopAppLauncher$e: Exception</ID>
+    <ID>SwallowedException:DesktopDownloader.kt$DesktopDownloader$e: PartialRestart</ID>
     <ID>SwallowedException:DesktopFileLocationsProvider.kt$DesktopFileLocationsProvider$e2: Exception</ID>
     <ID>SwallowedException:DesktopFileLocationsProvider.kt$DesktopFileLocationsProvider$e: Exception</ID>
     <ID>SwallowedException:DesktopShareManager.kt$DesktopShareManager$e: Exception</ID>
@@ -270,8 +303,10 @@
     <ID>SwallowedException:ProxyTesterImpl.kt$ProxyTesterImpl$e: UnknownHostException</ID>
     <ID>SwallowedException:ProxyTesterImpl.kt$ProxyTesterImpl$e: UnresolvedAddressException</ID>
     <ID>SwallowedException:RootServiceManager.kt$RootServiceManager$e: IllegalStateException</ID>
+    <ID>ThrowsCount:AndroidDownloader.kt$AndroidDownloader$private suspend fun downloadAttempt( client: OkHttpClient, url: String, partFile: File, metaFile: File, destination: File, downloadId: String, identity: AssetIdentity?, emit: suspend (DownloadProgress) -&gt; Unit, )</ID>
     <ID>ThrowsCount:AutoUpdateWorker.kt$AutoUpdateWorker$private suspend fun updateApp(app: InstalledApp)</ID>
     <ID>ThrowsCount:DefaultDownloadOrchestrator.kt$DefaultDownloadOrchestrator$private suspend fun runDownload(spec: DownloadSpec)</ID>
+    <ID>ThrowsCount:DesktopDownloader.kt$DesktopDownloader$private suspend fun downloadAttempt( client: OkHttpClient, url: String, partFile: File, metaFile: File, destination: File, downloadId: String, identity: AssetIdentity?, emit: suspend (DownloadProgress) -&gt; Unit, )</ID>
     <ID>ThrowsCount:DesktopInstaller.kt$DesktopInstaller$private fun installAppImage(file: File)</ID>
     <ID>TooGenericExceptionCaught:AndroidApkInspector.kt$AndroidApkInspector$t: Throwable</ID>
     <ID>TooGenericExceptionCaught:AndroidAppLauncher.kt$AndroidAppLauncher$e: Exception</ID>
@@ -306,6 +341,7 @@
     <ID>TooGenericExceptionCaught:HttpClientFactory.kt$e: Exception</ID>
     <ID>TooGenericExceptionCaught:InstalledAppsRepositoryImpl.kt$InstalledAppsRepositoryImpl$e: Exception</ID>
     <ID>TooGenericExceptionCaught:KSafeSafe.kt$t: Throwable</ID>
+    <ID>TooGenericExceptionCaught:MirrorRepositoryImpl.kt$MirrorRepositoryImpl$e: Exception</ID>
     <ID>TooGenericExceptionCaught:MultiSourceDownloaderImpl.kt$MultiSourceDownloaderImpl$t: Throwable</ID>
     <ID>TooGenericExceptionCaught:OsTrustManager.kt$CompositeX509TrustManager$t: Throwable</ID>
     <ID>TooGenericExceptionCaught:PackageEventReceiver.kt$PackageEventReceiver$e: Exception</ID>
@@ -323,14 +359,17 @@
     <ID>TooGenericExceptionThrown:DesktopAppLauncher.kt$DesktopAppLauncher$throw Exception("Could not find executable for ${installedApp.appName}")</ID>
     <ID>TooGenericExceptionThrown:DesktopAppLauncher.kt$DesktopAppLauncher$throw Exception("Could not launch ${installedApp.appName}")</ID>
     <ID>TooGenericExceptionThrown:DesktopAppLauncher.kt$DesktopAppLauncher$throw Exception("Unsupported platform: $platform")</ID>
+    <ID>TooManyFunctions:AndroidDownloader.kt$AndroidDownloader : Downloader</ID>
     <ID>TooManyFunctions:AndroidInstaller.kt$AndroidInstaller : Installer</ID>
     <ID>TooManyFunctions:BackendApiClient.kt$BackendApiClient</ID>
     <ID>TooManyFunctions:DefaultDownloadOrchestrator.kt$DefaultDownloadOrchestrator : DownloadOrchestrator</ID>
     <ID>TooManyFunctions:DesktopAppLauncher.kt$DesktopAppLauncher : AppLauncher</ID>
+    <ID>TooManyFunctions:DesktopDownloader.kt$DesktopDownloader : Downloader</ID>
     <ID>TooManyFunctions:DesktopInstaller.kt$DesktopInstaller : Installer</ID>
     <ID>TooManyFunctions:ExternalImportRepositoryImpl.kt$ExternalImportRepositoryImpl : ExternalImportRepository</ID>
     <ID>TooManyFunctions:InstalledAppDao.kt$InstalledAppDao</ID>
     <ID>TooManyFunctions:InstalledAppsRepositoryImpl.kt$InstalledAppsRepositoryImpl : InstalledAppsRepository</ID>
+    <ID>TooManyFunctions:MirrorRepositoryImpl.kt$MirrorRepositoryImpl : MirrorRepository</ID>
     <ID>TooManyFunctions:PackageEventReceiver.kt$PackageEventReceiver : BroadcastReceiverKoinComponent</ID>
     <ID>TooManyFunctions:ProxyRepositoryImpl.kt$ProxyRepositoryImpl : ProxyRepository</ID>
     <ID>TooManyFunctions:RootServiceManager.kt$RootServiceManager</ID>
@@ -348,7 +387,7 @@
     <ID>TopLevelPropertyNaming:createDataStoreCore.kt$internal const val dataStoreFileName = "github_store.preferences_pb"</ID>
     <ID>UnusedPrivateMember:ShizukuInstallerServiceImpl.kt$ShizukuInstallerServiceImpl.Companion$private fun logW(msg: String)</ID>
     <ID>UnusedPrivateProperty:SlowDownloadDetectorImpl.kt$SlowDownloadDetectorImpl$private val appScope: CoroutineScope</ID>
-    <ID>UseCheckOrError:AndroidDownloader.kt$AndroidDownloader$throw IllegalStateException( "Download produced empty file: ${tempFile.absolutePath} (contentLength=$contentLength)", )</ID>
+    <ID>UseCheckOrError:AndroidDownloader.kt$AndroidDownloader$throw IllegalStateException( "Download produced empty file: ${partFile.absolutePath}", )</ID>
     <ID>UseCheckOrError:AndroidInstaller.kt$AndroidInstaller$throw IllegalStateException("APK file not found: $filePath")</ID>
     <ID>UseCheckOrError:AndroidInstaller.kt$AndroidInstaller$throw IllegalStateException("No installer available on this device")</ID>
     <ID>UseCheckOrError:AndroidInstaller.kt$AndroidInstaller$throw IllegalStateException("Please enable 'Install unknown apps' for this app in Settings and try again.")</ID>
@@ -358,8 +397,9 @@
     <ID>UseCheckOrError:AutoUpdateWorker.kt$AutoUpdateWorker$throw IllegalStateException("No asset URL for ${app.appName}")</ID>
     <ID>UseCheckOrError:AutoUpdateWorker.kt$AutoUpdateWorker$throw IllegalStateException("No asset name for ${app.appName}")</ID>
     <ID>UseCheckOrError:AutoUpdateWorker.kt$AutoUpdateWorker$throw IllegalStateException("No latest version for ${app.appName}")</ID>
+    <ID>UseCheckOrError:DefaultDownloadOrchestrator.kt$DefaultDownloadOrchestrator$throw IllegalStateException( "Downloaded file missing after re-fetch: $scopedName", )</ID>
     <ID>UseCheckOrError:DefaultDownloadOrchestrator.kt$DefaultDownloadOrchestrator$throw IllegalStateException("Downloaded file missing: $scopedName")</ID>
-    <ID>UseCheckOrError:DesktopDownloader.kt$DesktopDownloader$throw IllegalStateException( "Download produced empty file: ${tempFile.absolutePath} (contentLength=$contentLength)", )</ID>
+    <ID>UseCheckOrError:DesktopDownloader.kt$DesktopDownloader$throw IllegalStateException( "Download produced empty file: ${partFile.absolutePath}", )</ID>
     <ID>UseCheckOrError:DesktopInstaller.kt$DesktopInstaller$throw IllegalStateException("Could not generate unique filename")</ID>
     <ID>UseCheckOrError:DesktopInstaller.kt$DesktopInstaller$throw IllegalStateException("Failed to make AppImage executable")</ID>
     <ID>UseCheckOrError:DesktopInstaller.kt$DesktopInstaller$throw IllegalStateException("File not found: $filePath")</ID>

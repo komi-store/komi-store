@@ -2,12 +2,13 @@
 <SmellBaseline>
   <ManuallySuppressedIssues/>
   <CurrentIssues>
-    <ID>CyclomaticComplexMethod:AppItemCard.kt$@Composable fun AppItemCard( appItem: AppItem, onOpenClick: () -&gt; Unit, onUpdateClick: () -&gt; Unit, onCancelClick: () -&gt; Unit, onUninstallClick: () -&gt; Unit, onRepoClick: () -&gt; Unit, onTogglePreReleases: (Boolean) -&gt; Unit, onToggleUpdateCheck: (Boolean) -&gt; Unit, onAdvancedSettingsClick: () -&gt; Unit, onPickVariantClick: () -&gt; Unit, onInstallPendingClick: () -&gt; Unit, onDiscardPendingClick: () -&gt; Unit, onSkipVersionClick: () -&gt; Unit, onUnskipVersionClick: () -&gt; Unit, modifier: Modifier = Modifier, )</ID>
+    <ID>CyclomaticComplexMethod:AppItemCard.kt$@Composable fun AppItemCard( appItem: AppItem, onOpenClick: () -&gt; Unit, onUpdateClick: () -&gt; Unit, onUninstallClick: () -&gt; Unit, onRepoClick: () -&gt; Unit, onTogglePreReleases: (Boolean) -&gt; Unit, onToggleUpdateCheck: (Boolean) -&gt; Unit, onAdvancedSettingsClick: () -&gt; Unit, onPickVariantClick: () -&gt; Unit, onInstallPendingClick: () -&gt; Unit, onDiscardPendingClick: () -&gt; Unit, onSkipVersionClick: () -&gt; Unit, onUnskipVersionClick: () -&gt; Unit, modifier: Modifier = Modifier, )</ID>
     <ID>CyclomaticComplexMethod:AppsRoot.kt$@Composable fun AppsRoot( onNavigateBack: () -&gt; Unit, onNavigateToRepo: (repoId: Long, sourceHost: String?, owner: String?, repo: String?, packageName: String?) -&gt; Unit, onNavigateToExternalImport: () -&gt; Unit, onNavigateToStarredPicker: () -&gt; Unit, viewModel: AppsViewModel = koinViewModel(), state: AppsState, )</ID>
     <ID>CyclomaticComplexMethod:AppsRoot.kt$@Composable fun AppsScreen( state: AppsState, onAction: (AppsAction) -&gt; Unit, toastState: KomiToastState, )</ID>
     <ID>CyclomaticComplexMethod:AppsViewModel.kt$AppsViewModel$fun onAction(action: AppsAction)</ID>
     <ID>CyclomaticComplexMethod:AppsViewModel.kt$AppsViewModel$private fun updateSingleApp(app: InstalledAppUi, waitForInstallGate: Boolean = false)</ID>
     <ID>CyclomaticComplexMethod:AppsViewModel.kt$AppsViewModel$private fun validateAndLinkRepo()</ID>
+    <ID>CyclomaticComplexMethod:CompactAppRow.kt$@Composable fun CompactAppRow( appItem: AppItem, onOpenClick: () -&gt; Unit, onInstallPendingClick: () -&gt; Unit, onDiscardPendingClick: () -&gt; Unit, onAdvancedSettingsClick: () -&gt; Unit, onPickVariantClick: () -&gt; Unit, onUninstallClick: () -&gt; Unit, onTogglePreReleases: (Boolean) -&gt; Unit, onToggleUpdateCheck: (Boolean) -&gt; Unit, onUnskipVersionClick: () -&gt; Unit, onRowClick: () -&gt; Unit, modifier: Modifier = Modifier, framed: Boolean = true, )</ID>
     <ID>CyclomaticComplexMethod:ExternalImportRoot.kt$@Composable fun ExternalImportRoot( onNavigateBack: () -&gt; Unit, onNavigateToDetails: (repoId: Long) -&gt; Unit, onAddManually: () -&gt; Unit, viewModel: ExternalImportViewModel = koinViewModel(), )</ID>
     <ID>CyclomaticComplexMethod:ExternalImportViewModel.kt$ExternalImportViewModel$fun onAction(action: ExternalImportAction)</ID>
     <ID>CyclomaticComplexMethod:LinkAppBottomSheet.kt$@Composable private fun DeviceAppItem( app: DeviceAppUi, onClick: () -&gt; Unit, )</ID>
@@ -36,6 +37,7 @@
     <ID>MagicNumber:StatusDotCluster.kt$0.2f</ID>
     <ID>MagicNumber:StatusDotCluster.kt$0.4f</ID>
     <ID>MagicNumber:StatusDotCluster.kt$0.75f</ID>
+    <ID>MatchingDeclarationName:VersionLine.kt$VersionLineTarget</ID>
     <ID>MaxLineLength:AppsViewModel.kt$AppsViewModel$logger.debug("Deleted mismatched existing file ($normalizedExisting != $normalizedLatest): $deleted")</ID>
     <ID>MaxLineLength:AppsViewModel.kt$AppsViewModel$logger.debug("Launched installer for ${app.appName} $latestVersion, waiting for system confirmation")</ID>
     <ID>MaxLineLength:ExternalImportViewModel.kt$ExternalImportViewModel$activeSearchPackage = if (current.activeSearchPackage == packageName) null else current.activeSearchPackage</ID>
@@ -49,11 +51,13 @@
     <ID>ReturnCount:AppsViewModel.kt$AppsViewModel$fun tryCandidate(rawToken: String): String?</ID>
     <ID>ReturnCount:AppsViewModel.kt$AppsViewModel$private fun parseGithubUrl(input: String): Pair&lt;String, String&gt;?</ID>
     <ID>ReturnCount:AppsViewModel.kt$AppsViewModel$private fun suggestFilterForLink( deviceAppName: String, packageName: String, firstAssetName: String?, ): String?</ID>
+    <ID>ReturnCount:AppsViewModel.kt$AppsViewModel$private suspend fun storedUpdateTarget(packageName: String): UpdateTarget?</ID>
     <ID>ReturnCount:ExternalImportViewModel.kt$ExternalImportViewModel$private suspend fun materializeAndMark( candidate: ExternalAppCandidate, owner: String, repo: String, source: String, sourceHost: String? = null, ): Boolean</ID>
     <ID>SwallowedException:AppsViewModel.kt$AppsViewModel$e: Exception</ID>
     <ID>SwallowedException:StarredPickerViewModel.kt$StarredPickerViewModel$e: Exception</ID>
     <ID>ThrowsCount:AppsViewModel.kt$AppsViewModel$private fun updateSingleApp(app: InstalledAppUi, waitForInstallGate: Boolean = false)</ID>
     <ID>ThrowsCount:AppsViewModel.kt$AppsViewModel$private fun validateAndLinkRepo()</ID>
+    <ID>ThrowsCount:AppsViewModel.kt$AppsViewModel$private suspend fun lookUpUpdateTarget(app: InstalledAppUi): UpdateTarget</ID>
     <ID>ThrowsCount:ExternalImportViewModel.kt$ExternalImportViewModel$private suspend fun materializeAndMark( candidate: ExternalAppCandidate, owner: String, repo: String, source: String, sourceHost: String? = null, ): Boolean</ID>
     <ID>TooGenericExceptionCaught:AppsViewModel.kt$AppsViewModel$clearEx: Exception</ID>
     <ID>TooGenericExceptionCaught:AppsViewModel.kt$AppsViewModel$e: Exception</ID>
