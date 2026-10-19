@@ -97,10 +97,10 @@ private fun MangaIconButton(
     icon: ImageVector,
     contentDescription: String,
     onClick: () -> Unit,
-    modifier: Modifier,
     variant: KomiButtonVariant,
     size: KomiIconButtonSize,
     enabled: Boolean,
+    modifier: Modifier = Modifier,
 ) {
     val colors = personality.colors
     val metrics = size.metrics
@@ -184,10 +184,10 @@ private fun ClassicIconButton(
     icon: ImageVector,
     contentDescription: String,
     onClick: () -> Unit,
-    modifier: Modifier,
     variant: KomiButtonVariant,
     size: KomiIconButtonSize,
     enabled: Boolean,
+    modifier: Modifier = Modifier,
 ) {
     val colors = LocalPersonality.current.colors
     val metrics = size.metrics
