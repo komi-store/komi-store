@@ -19,12 +19,15 @@ import zed.rainxch.core.data.dto.ForgejoRepoNetworkModel
 import zed.rainxch.core.data.dto.ForgejoSearchResponse
 import zed.rainxch.core.data.dto.GithubReadmeResponseDto
 import zed.rainxch.core.data.dto.ReleaseNetwork
+import zed.rainxch.core.data.network.interceptor.HostTokenInterceptor
 import zed.rainxch.core.domain.model.settings.ProxyConfig
+import zed.rainxch.core.domain.repository.HostTokenRepository
 import java.io.IOException
 
 class ForgejoApiClient(
     host: String,
     proxyConfig: ProxyConfig = ProxyConfig.System,
+    hostTokenRepository: HostTokenRepository,
 ) {
     private val baseUrl: String = "https://$host/api/v1"
 
@@ -48,6 +51,7 @@ class ForgejoApiClient(
             exponentialDelay()
         }
         install(HttpRedirect) { checkHttpMethod = false }
+        install(HostTokenInterceptor) { repository = hostTokenRepository }
         expectSuccess = false
         defaultRequest {
             url(baseUrl)

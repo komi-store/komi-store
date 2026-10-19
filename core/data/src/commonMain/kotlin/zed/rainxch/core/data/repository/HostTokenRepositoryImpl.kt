@@ -90,7 +90,7 @@ class HostTokenRepositoryImpl(
         return try {
             val response = httpClient.get(buildUserUrl(key)) {
                 accept(ContentType.Application.Json)
-                header(HttpHeaders.Authorization, "Bearer $token")
+                header(HttpHeaders.Authorization, "token $token")
                 header(HttpHeaders.UserAgent, "GithubStore/1.0 (host-token-validate)")
             }
             Result.success(mapValidation(response))

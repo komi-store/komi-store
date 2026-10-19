@@ -123,6 +123,7 @@ val coreModule =
         single<ForgejoClientRegistry> {
             ForgejoClientRegistry(
                 proxyConfigFlow = ProxyManager.configFlow(ProxyScope.DISCOVERY),
+                hostTokenRepository = get(),
             )
         }
 
@@ -332,6 +333,7 @@ val networkModule =
                 tokenStore = get(),
                 rateLimitRepository = get(),
                 userSessionRepository = get(),
+                hostTokenRepository = get(),
                 proxyConfigFlow = ProxyManager.configFlow(ProxyScope.DISCOVERY),
             )
         }

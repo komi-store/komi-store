@@ -12,10 +12,12 @@ import io.ktor.serialization.kotlinx.json.*
 import io.ktor.util.network.UnresolvedAddressException
 import kotlinx.serialization.json.Json
 import zed.rainxch.core.data.data_source.TokenStore
+import zed.rainxch.core.data.network.interceptor.HostTokenInterceptor
 import zed.rainxch.core.data.network.interceptor.RateLimitInterceptor
 import zed.rainxch.core.data.network.interceptor.UnauthorizedInterceptor
 import zed.rainxch.core.domain.model.settings.ProxyConfig
 import zed.rainxch.core.domain.model.error.RateLimitException
+import zed.rainxch.core.domain.repository.HostTokenRepository
 import zed.rainxch.core.domain.repository.UserSessionRepository
 import zed.rainxch.core.domain.repository.RateLimitRepository
 import java.io.IOException
@@ -27,6 +29,7 @@ fun createGitHubHttpClient(
     tokenStore: TokenStore,
     rateLimitRepository: RateLimitRepository,
     userSessionRepository: UserSessionRepository? = null,
+    hostTokenRepository: HostTokenRepository? = null,
     proxyConfig: ProxyConfig = ProxyConfig.System,
 ): HttpClient {
     val json =
@@ -76,6 +79,12 @@ fun createGitHubHttpClient(
 
         install(HttpRedirect) {
             checkHttpMethod = false
+        }
+
+        if (hostTokenRepository != null) {
+            install(HostTokenInterceptor) {
+                repository = hostTokenRepository
+            }
         }
 
         expectSuccess = false
