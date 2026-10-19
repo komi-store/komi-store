@@ -16,5 +16,11 @@ kotlin {
                 implementation(libs.jetbrains.compose.components.resources)
             }
         }
+
+        commonTest {
+            dependencies {
+                implementation(kotlin("test"))
+            }
+        }
     }
 }

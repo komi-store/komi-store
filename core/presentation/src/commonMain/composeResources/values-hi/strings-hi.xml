@@ -41,7 +41,6 @@
     <string name="try_again">पुनः प्रयास करें</string>
 
     <!-- Errors -->
-    <string name="auth_error_with_message">गलती: %1$s</string>
 
     <!-- Device flow -->
     <string name="enter_code_on_github">यह कोड GitHub पर डालें:</string>

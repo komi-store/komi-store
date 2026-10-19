@@ -33,7 +33,6 @@
     <string name="redirecting_message">現在可以使用應用。正在跳轉…</string>
     <string name="try_again">重試</string>
 
-    <string name="auth_error_with_message">錯誤：%1$s</string>
 
     <string name="enter_code_on_github">請在 GitHub 上輸入此程式碼：</string>
     <string name="copy_code">複製程式碼</string>

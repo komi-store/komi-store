@@ -22,11 +22,13 @@ import org.jetbrains.compose.resources.getString
 import zed.rainxch.auth.domain.repository.AuthPath
 import zed.rainxch.auth.domain.repository.AuthenticationRepository
 import zed.rainxch.auth.domain.repository.DevicePollResult
-import zed.rainxch.auth.domain.repository.PatRejectedException
-import zed.rainxch.auth.domain.repository.RejectedKind
+import zed.rainxch.auth.presentation.mapper.toAuthError
+import zed.rainxch.auth.presentation.mapper.toPatError
 import zed.rainxch.auth.presentation.mapper.toUi
+import zed.rainxch.auth.presentation.model.AuthError
 import zed.rainxch.auth.presentation.model.AuthLoginState
 import zed.rainxch.auth.presentation.model.GithubDeviceStartUi
+import zed.rainxch.auth.presentation.model.PatError
 import zed.rainxch.core.domain.helpers.BrowserHelper
 import zed.rainxch.core.domain.helpers.ClipboardHelper
 import zed.rainxch.core.domain.logging.KomiStoreLogger
@@ -193,11 +195,7 @@ class AuthenticationViewModel(
         if (_state.value.isPatSubmitting) return
         val input = _state.value.patInput.trim()
         if (input.isEmpty()) {
-            viewModelScope.launch {
-                _state.update {
-                    it.copy(patError = getString(Res.string.pat_error_empty))
-                }
-            }
+            _state.update { it.copy(patError = PatError.Empty) }
             return
         }
 
@@ -221,36 +219,10 @@ class AuthenticationViewModel(
                             _events.trySend(AuthenticationEvents.OnNavigateToMain)
                         }.onFailure { t ->
                             logger.debug("PAT sign-in failed: ${t.message}")
-                            val message =
-                                when (t) {
-                                    is IllegalArgumentException -> {
-                                        getString(Res.string.pat_error_invalid_format)
-                                    }
-
-                                    is PatRejectedException -> {
-                                        when (t.kind) {
-                                            is RejectedKind.BadCredentials -> {
-                                                getString(Res.string.pat_error_bad_credentials)
-                                            }
-
-                                            is RejectedKind.InsufficientScope -> {
-                                                getString(Res.string.pat_error_insufficient_scope)
-                                            }
-
-                                            is RejectedKind.Other -> {
-                                                getString(Res.string.pat_error_generic)
-                                            }
-                                        }
-                                    }
-
-                                    else -> {
-                                        getString(Res.string.pat_error_generic)
-                                    }
-                                }
                             _state.update {
                                 it.copy(
                                     isPatSubmitting = false,
-                                    patError = message,
+                                    patError = t.toPatError(),
                                 )
                             }
                         }
@@ -295,19 +267,11 @@ class AuthenticationViewModel(
                         logger.warn("Failed to open auth URL: $error")
                         webAuthWatchdogJob?.cancel()
                         savedStateHandle.remove<String>(KEY_WEB_AUTH_STATE)
-                        viewModelScope.launch {
-                            val (message, hint) =
-                                categorizeError(IllegalStateException(error))
-                            _state.update {
-                                it.copy(
-                                    isWebAuthInFlight = false,
-                                    loginState =
-                                        AuthLoginState.Error(
-                                            message = message,
-                                            recoveryHint = hint,
-                                        ),
-                                )
-                            }
+                        _state.update {
+                            it.copy(
+                                isWebAuthInFlight = false,
+                                loginState = AuthLoginState.Error(AuthError.BrowserUnavailable),
+                            )
                         }
                     }
                     _state.update { it.copy(isWebAuthInFlight = false) }
@@ -319,15 +283,10 @@ class AuthenticationViewModel(
                         "registerWebAuth failed. class=$rootClass msg=$rootMsg",
                         error,
                     )
-                    val (message, hint) = categorizeError(error)
                     _state.update {
                         it.copy(
                             isWebAuthInFlight = false,
-                            loginState =
-                                AuthLoginState.Error(
-                                    message = message,
-                                    recoveryHint = hint,
-                                ),
+                            loginState = AuthLoginState.Error(error.toAuthError()),
                         )
                     }
                 }
@@ -348,17 +307,7 @@ class AuthenticationViewModel(
             logger.warn(
                 "Web-auth handoff state mismatch. expected=${expected.take(8)} got=${state.take(8)}",
             )
-            viewModelScope.launch {
-                _state.update {
-                    it.copy(
-                        loginState =
-                            AuthLoginState.Error(
-                                message = getString(Res.string.error_unknown),
-                                recoveryHint = getString(Res.string.auth_hint_try_again),
-                            ),
-                    )
-                }
-            }
+            _state.update { it.copy(loginState = AuthLoginState.Error(AuthError.Unknown)) }
             return
         }
         webAuthWatchdogJob?.cancel()
@@ -388,15 +337,10 @@ class AuthenticationViewModel(
                         "exchangeWebAuthHandoff failed. class=$rootClass msg=$rootMsg",
                         error,
                     )
-                    val (message, hint) = categorizeError(error)
                     _state.update {
                         it.copy(
                             isWebAuthInFlight = false,
-                            loginState =
-                                AuthLoginState.Error(
-                                    message = message,
-                                    recoveryHint = hint,
-                                ),
+                            loginState = AuthLoginState.Error(error.toAuthError()),
                         )
                     }
                 }
@@ -422,17 +366,11 @@ class AuthenticationViewModel(
         webAuthWatchdogJob?.cancel()
         savedStateHandle.remove<String>(KEY_WEB_AUTH_STATE)
         logger.warn("Web-auth flow returned error: $reason")
-        viewModelScope.launch {
-            _state.update {
-                it.copy(
-                    isWebAuthInFlight = false,
-                    loginState =
-                        AuthLoginState.Error(
-                            message = getString(Res.string.error_unknown),
-                            recoveryHint = getString(Res.string.auth_hint_try_again),
-                        ),
-                )
-            }
+        _state.update {
+            it.copy(
+                isWebAuthInFlight = false,
+                loginState = AuthLoginState.Error(AuthError.Unknown),
+            )
         }
     }
 
@@ -448,11 +386,7 @@ class AuthenticationViewModel(
                 _state.update {
                     it.copy(
                         isWebAuthInFlight = false,
-                        loginState =
-                            AuthLoginState.Error(
-                                message = getString(Res.string.error_unknown),
-                                recoveryHint = getString(Res.string.auth_hint_try_again),
-                            ),
+                        loginState = AuthLoginState.Error(AuthError.Unknown),
                     )
                 }
             }
@@ -508,15 +442,7 @@ class AuthenticationViewModel(
 
                 pollingJob?.cancel()
                 clearSavedState()
-                _state.update {
-                    it.copy(
-                        loginState =
-                            AuthLoginState.Error(
-                                message = getString(Res.string.auth_error_code_expired),
-                                recoveryHint = getString(Res.string.auth_hint_try_again),
-                            ),
-                    )
-                }
+                _state.update { it.copy(loginState = AuthLoginState.Error(AuthError.CodeExpired)) }
             }
     }
 
@@ -600,17 +526,8 @@ class AuthenticationViewModel(
                     "startDeviceFlow failed. topClass=${t::class.simpleName} topMsg=${t.message} | rootClass=$rootClass rootMsg=$rootMsg",
                     t,
                 )
-                val (message, hint) = categorizeError(t)
                 withContext(Dispatchers.Main.immediate) {
-                    _state.update {
-                        it.copy(
-                            loginState =
-                                AuthLoginState.Error(
-                                    message = message,
-                                    recoveryHint = hint,
-                                ),
-                        )
-                    }
+                    _state.update { it.copy(loginState = AuthLoginState.Error(t.toAuthError())) }
                 }
             }
         }
@@ -711,11 +628,9 @@ class AuthenticationViewModel(
                     pollingJob?.cancel()
                     countdownJob?.cancel()
                     clearSavedState()
-                    val (message, hint) = categorizeError(result.error)
                     _state.update {
                         it.copy(
-                            loginState =
-                                AuthLoginState.Error(message = message, recoveryHint = hint),
+                            loginState = AuthLoginState.Error(result.error.toAuthError()),
                             isPolling = false,
                         )
                     }
@@ -791,32 +706,6 @@ class AuthenticationViewModel(
         startCountdown(remainingSec)
         startPolling(deviceCode)
         pollOnce(deviceCode)
-    }
-
-    private suspend fun categorizeError(t: Throwable): Pair<String, String?> {
-        val msg = t.message ?: return getString(Res.string.error_unknown) to null
-        val lowerMsg = msg.lowercase()
-        return when {
-            "timeout" in lowerMsg || "timed out" in lowerMsg -> {
-                msg to getString(Res.string.auth_hint_check_connection)
-            }
-
-            "network" in lowerMsg || "unresolvedaddress" in lowerMsg || "connect" in lowerMsg -> {
-                msg to getString(Res.string.auth_hint_check_connection)
-            }
-
-            "expired" in lowerMsg || "expire" in lowerMsg -> {
-                msg to getString(Res.string.auth_hint_try_again)
-            }
-
-            "denied" in lowerMsg || "access_denied" in lowerMsg -> {
-                msg to getString(Res.string.auth_hint_denied)
-            }
-
-            else -> {
-                msg to null
-            }
-        }
     }
 
     override fun onCleared() {

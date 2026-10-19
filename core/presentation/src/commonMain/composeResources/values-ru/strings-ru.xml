@@ -33,7 +33,6 @@
     <string name="redirecting_message">Теперь ты можешь использовать приложение. Перенаправление…</string>
     <string name="try_again">Попробовать снова</string>
 
-    <string name="auth_error_with_message">Ошибка: %1$s</string>
 
     <string name="enter_code_on_github">Введи этот код на GitHub:</string>
     <string name="copy_code">Скопировать код</string>

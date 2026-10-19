@@ -44,7 +44,6 @@
     <string name="try_again">Try again</string>
 
     <!-- Errors -->
-    <string name="auth_error_with_message">Error: %1$s</string>
 
     <!-- Device flow -->
     <string name="enter_code_on_github">Enter this code on GitHub:</string>
@@ -523,6 +522,12 @@
     <string name="auth_check_status">I already authorized</string>
     <string name="auth_polling_status">Checking…</string>
     <string name="auth_rate_limited">Rate limited — retrying in %1$ds</string>
+    <string name="auth_error_unreachable">Couldn't connect to GitHub</string>
+    <string name="auth_error_rate_limited">Too many sign-in attempts</string>
+    <string name="auth_hint_wait">Wait a few minutes, then try again.</string>
+    <string name="auth_error_denied">Authorization was denied</string>
+    <string name="auth_error_browser">Couldn't open the browser</string>
+    <string name="auth_hint_other_method">Use a device code or a personal access token instead.</string>
 
     <!-- Read More / Show Less -->
     <string name="read_more">Read More</string>

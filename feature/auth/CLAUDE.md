@@ -6,12 +6,13 @@ Three GitHub sign-in paths, picked per session: **web OAuth + PKCE + handoff** (
 
 ```text
 feature/auth/
-  domain/repository/   # AuthenticationRepository + AuthPath, DeviceFlowStart, PollOutcome, DevicePollResult, WebAuthRegistration, PatRejectedException / RejectedKind
+  domain/repository/   # AuthenticationRepository + AuthPath, DeviceFlowStart, PollOutcome, DevicePollResult, WebAuthRegistration, AuthException, PatRejectedException / RejectedKind
   data/
     crypto/PkceGenerator.kt                     # SHA-256 PKCE triplet (state + verifier + challenge)
     network/GitHubAuthApi.kt                    # direct + backend-proxied device-flow endpoints, PAT validation
     network/WebAuthApi.kt                       # web-OAuth register + handoff consume
     repository/AuthenticationRepositoryImpl.kt
+    repository/AuthErrors.kt                    # toAuthException(), infra-error checks behind the Direct fallback
     di
   presentation/
     AuthenticationViewModel / State / Action / Events / Root
@@ -71,6 +72,7 @@ User picks it ("Use device code instead") when the web flow can't complete (brow
 
 ## Notes
 
+- Errors: the repository fails with `AuthException` (`Unreachable` for I/O, timeouts, proxy failures and backend 5xx; `RateLimited` for a 429; `Denied`; `CodeExpired`; `Failed`) and `PatRejectedException` for the PAT path. The ViewModel keeps `AuthError` / `PatError` in state and the Root picks the string, so no exception text reaches the screen.
 - Token stored via `TokenStore` (`DefaultTokenStore`: KSafe-encrypted, migrates the legacy DataStore entry once). Only `AuthenticationViewModel` collects `accessTokenFlow`, on the injected app `CoroutineScope`.
 - `GitHubAuthApi` and `WebAuthApi` are Koin singles. Their clients come from `createPlatformHttpClient` with the `ProxyScope.DISCOVERY` proxy ("Search & metadata" in Tweaks) and are rebuilt when it changes, so every sign-in path follows the user's proxy.
 - `GITHUB_CLIENT_ID` in `local.properties` for builds; must match the OAuth App registered on the backend and used by the Worker.

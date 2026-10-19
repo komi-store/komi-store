@@ -40,7 +40,6 @@
     <string name="try_again">다시 시도</string>
 
     <!-- Errors -->
-    <string name="auth_error_with_message">오류: %1$s</string>
 
     <!-- Device flow -->
     <string name="enter_code_on_github">GitHub에 다음 코드를 입력하세요:</string>

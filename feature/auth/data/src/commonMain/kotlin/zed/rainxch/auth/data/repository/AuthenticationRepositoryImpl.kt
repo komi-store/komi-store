@@ -1,8 +1,5 @@
 package zed.rainxch.auth.data.repository
 
-import io.ktor.client.network.sockets.ConnectTimeoutException
-import io.ktor.client.network.sockets.SocketTimeoutException
-import io.ktor.client.plugins.HttpRequestTimeoutException
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -15,6 +12,7 @@ import zed.rainxch.auth.data.network.BackendHttpException
 import zed.rainxch.auth.data.network.GitHubAuthApi
 import zed.rainxch.auth.data.network.PatValidation
 import zed.rainxch.auth.data.network.WebAuthApi
+import zed.rainxch.auth.domain.repository.AuthException
 import zed.rainxch.auth.domain.repository.AuthPath
 import zed.rainxch.auth.domain.repository.AuthenticationRepository
 import zed.rainxch.auth.domain.repository.DeviceFlowStart
@@ -79,11 +77,7 @@ class AuthenticationRepositoryImpl(
                             "Direct device/start ALSO failed. backendClass=$backendClass backendStatus=$backendStatus backendMsg=$backendMsg | directClass=$innerClass directMsg=$innerMsg",
                             inner,
                         )
-                        throw Exception(
-                            "Failed to start GitHub authentication. " +
-                                "Please check your internet connection and try again.",
-                            inner,
-                        )
+                        throw inner.toAuthException()
                     }
                 } else {
                     logger.error(
@@ -91,11 +85,7 @@ class AuthenticationRepositoryImpl(
                             "class=$backendClass status=$backendStatus origin=$BACKEND_ORIGIN msg=$backendMsg",
                         e,
                     )
-                    throw Exception(
-                        "Failed to start GitHub authentication. " +
-                            "Please check your internet connection and try again.",
-                        e,
-                    )
+                    throw e.toAuthException()
                 }
             }
         }
@@ -324,30 +314,19 @@ class AuthenticationRepositoryImpl(
             }
 
             "access_denied" in errorMsg -> {
-                DevicePollResult.Failed(
-                    Exception("Authentication was denied. Please try again if this was a mistake."),
-                )
+                DevicePollResult.Failed(AuthException.Denied())
             }
 
             "expired_token" in errorMsg ||
                 "expired_device_code" in errorMsg ||
                 "token_expired" in errorMsg -> {
-                DevicePollResult.Failed(
-                    Exception("Authorization code expired. Please try again."),
-                )
-            }
-
-            "bad_verification_code" in errorMsg ||
-                "incorrect_device_code" in errorMsg -> {
-                DevicePollResult.Failed(
-                    Exception("Invalid verification code. Please restart authentication."),
-                )
+                DevicePollResult.Failed(AuthException.CodeExpired())
             }
 
             else -> {
                 logger.debug("❌ Single poll unrecognized error — surfacing as Failed: $errorMsg")
                 DevicePollResult.Failed(
-                    error ?: Exception("Authentication failed: unknown error"),
+                    (error ?: IllegalStateException("Poll failed without an error")).toAuthException(),
                 )
             }
         }
@@ -356,34 +335,42 @@ class AuthenticationRepositoryImpl(
     override suspend fun registerWebAuth(): Result<WebAuthRegistration> =
         withContext(Dispatchers.IO) {
             val pkce = PkceGenerator.generate()
-            webAuthApi
-                .register(
-                    state = pkce.state,
-                    codeChallenge = pkce.codeChallenge,
-                    codeVerifier = pkce.codeVerifier,
-                ).map { authUrl ->
-                    WebAuthRegistration(state = pkce.state, authUrl = authUrl)
-                }
+            try {
+                val authUrl =
+                    webAuthApi.register(
+                        state = pkce.state,
+                        codeChallenge = pkce.codeChallenge,
+                        codeVerifier = pkce.codeVerifier,
+                    )
+                Result.success(WebAuthRegistration(state = pkce.state, authUrl = authUrl))
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                Result.failure(e.toAuthException())
+            }
         }
 
     override suspend fun exchangeWebAuthHandoff(handoffId: String): Result<String> =
         withContext(Dispatchers.IO) {
-            webAuthApi
-                .consumeHandoff(handoffId)
-                .mapCatching { accessToken ->
-                    val dto =
-                        GithubDeviceTokenSuccessDto(
-                            accessToken = accessToken,
-                            tokenType = "Bearer",
-                            expiresIn = null,
-                            scope = null,
-                            refreshToken = null,
-                            refreshTokenExpiresIn = null,
-                            savedAtEpochMillis = System.currentTimeMillis(),
-                        )
-                    saveTokenWithVerification(dto.toDomain())
-                    accessToken
-                }
+            try {
+                val accessToken = webAuthApi.consumeHandoff(handoffId)
+                val dto =
+                    GithubDeviceTokenSuccessDto(
+                        accessToken = accessToken,
+                        tokenType = "Bearer",
+                        expiresIn = null,
+                        scope = null,
+                        refreshToken = null,
+                        refreshTokenExpiresIn = null,
+                        savedAtEpochMillis = System.currentTimeMillis(),
+                    )
+                saveTokenWithVerification(dto.toDomain())
+                Result.success(accessToken)
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                Result.failure(e.toAuthException())
+            }
         }
 
     override suspend fun signInWithPat(token: String): Result<Unit> =
@@ -444,33 +431,8 @@ class AuthenticationRepositoryImpl(
         return token.startsWith("ghp_") || token.startsWith("github_pat_")
     }
 
-    private fun Throwable.isAuthInfrastructureError(): Boolean =
-        when (this) {
-            is HttpRequestTimeoutException,
-            is SocketTimeoutException,
-            is ConnectTimeoutException,
-            -> true
-
-            is BackendHttpException -> statusCode in 500..599
-
-            else -> isNetworkError((message ?: "").lowercase())
-        }
-
     private fun Throwable.isBackendStartFallbackEligible(): Boolean {
         if (isAuthInfrastructureError()) return true
         return this is BackendHttpException && statusCode == 429
     }
-
-    private fun isNetworkError(errorMsg: String): Boolean =
-        errorMsg.contains("unable to resolve") ||
-            errorMsg.contains("no address") ||
-            errorMsg.contains("failed to connect") ||
-            errorMsg.contains("connection refused") ||
-            errorMsg.contains("network is unreachable") ||
-            errorMsg.contains("timeout") ||
-            errorMsg.contains("timed out") ||
-            errorMsg.contains("connection reset") ||
-            errorMsg.contains("broken pipe") ||
-            errorMsg.contains("host unreachable") ||
-            errorMsg.contains("network error")
 }

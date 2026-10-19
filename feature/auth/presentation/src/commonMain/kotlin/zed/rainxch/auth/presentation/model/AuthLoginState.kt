@@ -16,7 +16,6 @@ sealed class AuthLoginState {
     data object LoggedIn : AuthLoginState()
 
     data class Error(
-        val message: String,
-        val recoveryHint: String? = null,
+        val error: AuthError,
     ) : AuthLoginState()
 }

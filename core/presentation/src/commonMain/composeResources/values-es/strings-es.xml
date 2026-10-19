@@ -31,7 +31,6 @@
     <string name="redirecting_message">Ya puedes usar la aplicación. Redirigiendo…</string>
     <string name="try_again">Intentar de nuevo</string>
 
-    <string name="auth_error_with_message">Error: %1$s</string>
 
     <string name="enter_code_on_github">Introduce este código en GitHub:</string>
     <string name="copy_code">Copiar código</string>

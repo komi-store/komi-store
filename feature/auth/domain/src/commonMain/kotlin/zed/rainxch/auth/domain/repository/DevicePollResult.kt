@@ -12,6 +12,6 @@ sealed interface DevicePollResult {
     data object SlowDown : DevicePollResult
 
     data class Failed(
-        val error: Throwable,
+        val error: AuthException,
     ) : DevicePollResult
 }

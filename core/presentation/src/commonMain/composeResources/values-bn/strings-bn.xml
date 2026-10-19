@@ -41,7 +41,6 @@
     <string name="try_again">আবার চেষ্টা করুন</string>
 
     <!-- Errors -->
-    <string name="auth_error_with_message">ত্রুটি: %1$s</string>
 
     <!-- Device flow -->
     <string name="enter_code_on_github">GitHub-এ এই কোডটি লিখুন:</string>

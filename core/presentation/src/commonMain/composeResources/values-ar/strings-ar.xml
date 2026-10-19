@@ -41,7 +41,6 @@
     <string name="try_again">حاول مرة أخرى</string>
 
     <!-- Errors -->
-    <string name="auth_error_with_message">خطأ: %1$s</string>
 
     <!-- Device flow -->
     <string name="enter_code_on_github">أدخل هذا الرمز على GitHub:</string>

@@ -59,6 +59,10 @@ import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.vectorResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
+import zed.rainxch.auth.presentation.mapper.hintRes
+import zed.rainxch.auth.presentation.mapper.messageRes
+import zed.rainxch.auth.presentation.mapper.titleRes
+import zed.rainxch.auth.presentation.model.AuthError
 import zed.rainxch.auth.presentation.model.AuthLoginState
 import zed.rainxch.auth.presentation.model.GithubDeviceStartUi
 import zed.rainxch.core.presentation.components.buttons.KomiButton
@@ -84,7 +88,6 @@ import zed.rainxch.githubstore.core.presentation.res.Res
 import zed.rainxch.githubstore.core.presentation.res.auth_use_device_code_instead
 import zed.rainxch.githubstore.core.presentation.res.app_icon
 import zed.rainxch.githubstore.core.presentation.res.auth_check_status
-import zed.rainxch.githubstore.core.presentation.res.auth_error_with_message
 import zed.rainxch.githubstore.core.presentation.res.auth_polling_status
 import zed.rainxch.githubstore.core.presentation.res.auth_rate_limited
 import zed.rainxch.githubstore.core.presentation.res.auth_hide_signin_options
@@ -228,7 +231,7 @@ fun AuthenticationScreen(
             if (state.isPatSheetVisible) {
                 PatSignInSheet(
                     input = state.patInput,
-                    error = state.patError,
+                    error = state.patError?.let { stringResource(it.messageRes()) },
                     isSubmitting = state.isPatSubmitting,
                     onAction = onAction,
                 )
@@ -665,7 +668,7 @@ private fun StateError(
                 Spacer(Modifier.height(12.dp))
 
                 KomiText(
-                    text = stringResource(Res.string.auth_error_with_message, authState.message),
+                    text = stringResource(authState.error.titleRes()),
                     role = KomiTextRole.Title,
                     fontWeight = FontWeight.SemiBold,
                     color = colors.onSurface,
@@ -673,18 +676,16 @@ private fun StateError(
                     uppercase = false,
                 )
 
-                authState.recoveryHint?.let { hint ->
-                    Spacer(Modifier.height(6.dp))
+                Spacer(Modifier.height(6.dp))
 
-                    KomiText(
-                        text = hint,
-                        role = KomiTextRole.Body,
-                        fontSize = 13.sp,
-                        color = colors.onSurfaceVariant,
-                        textAlign = TextAlign.Center,
-                        uppercase = false,
-                    )
-                }
+                KomiText(
+                    text = stringResource(authState.error.hintRes()),
+                    role = KomiTextRole.Body,
+                    fontSize = 13.sp,
+                    color = colors.onSurfaceVariant,
+                    textAlign = TextAlign.Center,
+                    uppercase = false,
+                )
             }
         }
 
@@ -823,10 +824,7 @@ private fun PreviewError() {
     PersonalityPreview {
         AuthenticationScreen(
             state = AuthenticationState(
-                loginState = AuthLoginState.Error(
-                    message = "Network timeout",
-                    recoveryHint = "Check your internet connection",
-                ),
+                loginState = AuthLoginState.Error(AuthError.Unreachable),
             ),
             onAction = {},
         )

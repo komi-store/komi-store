@@ -41,7 +41,6 @@
     <string name="try_again">Tekrar dene</string>
 
     <!-- Errors -->
-    <string name="auth_error_with_message">Hata: %1$s</string>
 
     <!-- Device flow -->
     <string name="enter_code_on_github">Kodu GitHub'da gir</string>

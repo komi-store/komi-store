@@ -31,7 +31,6 @@
     <string name="redirecting_message">アプリを使用できます。リダイレクト中…</string>
     <string name="try_again">再試行</string>
 
-    <string name="auth_error_with_message">エラー：%1$s</string>
 
     <string name="enter_code_on_github">GitHubでこのコードを入力してください：</string>
     <string name="copy_code">コードをコピー</string>

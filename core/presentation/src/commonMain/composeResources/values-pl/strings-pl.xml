@@ -33,7 +33,6 @@
     <string name="redirecting_message">Możesz już korzystać z aplikacji. Przekierowywanie…</string>
     <string name="try_again">Spróbuj ponownie</string>
 
-    <string name="auth_error_with_message">Błąd: %1$s</string>
 
     <string name="enter_code_on_github">Wprowadź ten kod na GitHubie:</string>
     <string name="copy_code">Kopiuj kod</string>
