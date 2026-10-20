@@ -1,6 +1,11 @@
 package zed.rainxch.search.presentation
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.material.icons.rounded.FilterList
+import zed.rainxch.core.presentation.components.buttons.KomiIconButton
+import zed.rainxch.core.presentation.components.badge.KomiBadgedBox
+import zed.rainxch.core.presentation.components.badge.KomiBadgeTone
+import zed.rainxch.core.presentation.components.badge.KomiBadge
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -873,50 +878,32 @@ private fun SearchTopbar(
             multiline = false
         )
 
-        FiltersPillButton(
+        FiltersButton(
             activeCount = state.activeFilterCount,
             onClick = { onAction(SearchAction.OnToggleFiltersSheet) },
         )
     }
 }
 
+// The search field's filters on the core icon button (a press morph and tooltip in Classic, the
+// ink box in Manga): filled once a filter is on, with how many as a badge.
 @Composable
-private fun FiltersPillButton(
+private fun FiltersButton(
     activeCount: Int,
     onClick: () -> Unit,
 ) {
-    val colors = LocalPersonality.current.colors
-    val shape = RoundedCornerShape(LocalPersonality.current.shape.cornerSmall)
-    val container =
-        if (activeCount > 0) colors.primary
-        else colors.surface
-    val content =
-        if (activeCount > 0) colors.onPrimary
-        else colors.onSurface
-    Row(
-        modifier = Modifier
-            .height(48.dp)
-            .clip(shape)
-            .background(container, shape)
-            .clickable(onClick = onClick)
-            .padding(horizontal = 14.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(6.dp),
+    KomiBadgedBox(
+        badge = {
+            if (activeCount > 0) KomiBadge(count = activeCount, tone = KomiBadgeTone.Neutral)
+        },
     ) {
-        KomiIcon(
-            imageVector = Icons.Default.FilterList,
+        KomiIconButton(
+            icon = Icons.Rounded.FilterList,
             contentDescription = stringResource(Res.string.search_filters_button),
-            modifier = Modifier.size(18.dp),
-            tint = content,
+            onClick = onClick,
+            variant = if (activeCount > 0) KomiButtonVariant.Primary else KomiButtonVariant.Tonal,
+            size = KomiIconButtonSize.Lg,
         )
-
-        if (activeCount > 0) {
-            KomiText(
-                text = activeCount.toString(),
-                role = KomiTextRole.LabelSmall,
-                color = content,
-            )
-        }
     }
 }
 
