@@ -26,6 +26,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
+import zed.rainxch.core.presentation.components.bars.LocalInBar
 import zed.rainxch.core.presentation.components.icon.KomiIcon
 import zed.rainxch.core.presentation.components.text.KomiText
 import zed.rainxch.core.presentation.components.text.KomiTextRole
@@ -50,7 +51,16 @@ fun KomiFab(
 
         is ClassicPersonality -> {
             val colors = personality.colors
-            if (label != null) {
+            if (label == null && LocalInBar.current) {
+                KomiCookieButton(
+                    icon = icon,
+                    contentDescription = contentDescription,
+                    onClick = onClick,
+                    containerColor = colors.primaryContainer,
+                    contentColor = colors.onPrimaryContainer,
+                    modifier = modifier,
+                )
+            } else if (label != null) {
                 ExtendedFloatingActionButton(
                     onClick = onClick,
                     modifier = modifier,

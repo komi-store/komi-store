@@ -22,6 +22,7 @@ private fun mangaMotion(
         level = level,
         fastSpatialSpring = KomiSpring(dampingRatio = 0.9f, stiffness = 1400f),
         defaultSpatialSpring = KomiSpring(dampingRatio = 0.9f, stiffness = 700f),
+        bouncySpatialSpring = KomiSpring(dampingRatio = 0.9f, stiffness = 1400f),
         fastEffectsSpring = KomiSpring(dampingRatio = 1f, stiffness = 3800f),
         defaultEffectsSpring = KomiSpring(dampingRatio = 1f, stiffness = 1600f),
         slowEffectsSpring = KomiSpring(dampingRatio = 1f, stiffness = 800f),

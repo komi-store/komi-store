@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
@@ -131,10 +132,23 @@ private fun ClassicMenuItem(
                 )
             }
         }
+    // A pick-one option without an icon keeps an empty slot where its check appears: Material's
+    // item otherwise under-reports its width and a long label is cut off in a popup.
     val leadingIcon: (@Composable () -> Unit)? =
-        item.icon?.let { icon ->
-            @Composable { Icon(imageVector = icon, contentDescription = null, modifier = Modifier.size(MenuIconSize)) }
+        when {
+            item.icon != null -> {
+                { Icon(imageVector = item.icon, contentDescription = null, modifier = Modifier.size(MenuIconSize)) }
+            }
+
+            selectable -> {
+                { Spacer(modifier = Modifier.size(MenuIconSize)) }
+            }
+
+            else -> {
+                null
+            }
         }
+
     if (selectable) {
         DropdownMenuItem(
             selected = selected,

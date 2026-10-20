@@ -15,16 +15,19 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuPopup
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
+import zed.rainxch.core.presentation.components.bars.LocalInBar
 import zed.rainxch.core.presentation.components.buttons.KomiButtonVariant
 import zed.rainxch.core.presentation.components.buttons.KomiIconButton
 import zed.rainxch.core.presentation.layout.currentFormFactor
@@ -47,15 +50,19 @@ fun KomiDropdown(
     trigger: @Composable (onClick: () -> Unit) -> Unit,
 ) {
     var expanded by remember { mutableStateOf(false) }
-    val compact = currentFormFactor().isCompact
+    // In a bar the menu opens as a popup above its button, as on desktop, so the button can show
+    // that its menu is open; elsewhere a phone gets a sheet.
+    val sheet = currentFormFactor().isCompact && !LocalInBar.current
     val onPick: (KomiMenuItem) -> Unit = { item ->
         expanded = false
         onSelect(item)
     }
 
     Box(modifier = modifier) {
-        trigger { expanded = !expanded }
-        if (!compact) {
+        CompositionLocalProvider(LocalMenuOpen provides expanded) {
+            trigger { expanded = !expanded }
+        }
+        if (!sheet) {
             WideMenu(
                 expanded = expanded,
                 onDismiss = { expanded = false },
@@ -66,7 +73,7 @@ fun KomiDropdown(
         }
     }
 
-    if (compact && expanded) {
+    if (sheet && expanded) {
         KomiSheet(
             onDismiss = { expanded = false },
             placement = KomiSheetPlacement.Bottom,
@@ -75,6 +82,9 @@ fun KomiDropdown(
         }
     }
 }
+
+// Whether the menu of the trigger being drawn is open; a bar's KomiIconButton shows a close mark.
+internal val LocalMenuOpen = staticCompositionLocalOf { false }
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable

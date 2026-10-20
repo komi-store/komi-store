@@ -1,19 +1,12 @@
 package zed.rainxch.core.presentation.components.bars
 
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Sort
@@ -24,34 +17,18 @@ import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FloatingToolbarDefaults
 import androidx.compose.material3.HorizontalFloatingToolbar
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialShapes
-import androidx.compose.material3.ripple
-import androidx.compose.material3.toPath
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Matrix
-import androidx.compose.ui.graphics.Outline
-import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Density
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import androidx.graphics.shapes.Morph
 import org.jetbrains.compose.resources.stringResource
 import zed.rainxch.core.presentation.components.buttons.KomiButtonVariant
+import zed.rainxch.core.presentation.components.buttons.KomiCookieButton
 import zed.rainxch.core.presentation.components.buttons.KomiFab
 import zed.rainxch.core.presentation.components.buttons.KomiIconButton
-import zed.rainxch.core.presentation.components.overlays.KomiTooltip
 import zed.rainxch.core.presentation.locals.LocalPersonality
 import zed.rainxch.core.presentation.personality.ClassicPersonality
 import zed.rainxch.core.presentation.personality.MangaPersonality
@@ -84,7 +61,14 @@ fun KomiActionBar(
         onBack?.let { back ->
             when (personality) {
                 is ClassicPersonality -> {
-                    CookieBackButton(onClick = back)
+                    val colors = personality.colors
+                    KomiCookieButton(
+                        icon = Icons.AutoMirrored.Rounded.ArrowBack,
+                        contentDescription = stringResource(Res.string.navigate_back),
+                        onClick = back,
+                        containerColor = colors.surfaceContainerHigh,
+                        contentColor = colors.onSurface,
+                    )
                 }
 
                 is MangaPersonality -> {
@@ -112,74 +96,10 @@ fun KomiActionBar(
                 }
             }
         }
-        floatingActionButton?.invoke()
-    }
-}
-
-// A tonal cookie instead of an arrow in the top bar. Pressed, it rounds into a circle, turns and
-// dips on the personality's spring; its ripple and shadow follow the shape.
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
-@Composable
-private fun CookieBackButton(onClick: () -> Unit) {
-    val personality = LocalPersonality.current
-    val colors = personality.colors
-    val label = stringResource(Res.string.navigate_back)
-    val interaction = remember { MutableInteractionSource() }
-    val pressed by interaction.collectIsPressedAsState()
-    val press by animateFloatAsState(
-        targetValue = if (pressed) 1f else 0f,
-        animationSpec = personality.motion.fastSpatial(),
-        label = "cookiePress",
-    )
-    val morph = remember { Morph(MaterialShapes.Cookie9Sided, MaterialShapes.Circle) }
-    val shape = remember(morph, press) { MorphShape(morph, press) }
-    KomiTooltip(text = label) {
-        Box(
-            modifier =
-                Modifier
-                    .size(BackButtonSize)
-                    .graphicsLayer {
-                        scaleX = 1f - PRESS_DIP * press
-                        scaleY = 1f - PRESS_DIP * press
-                    }.shadow(FloatingElevation, shape)
-                    .clip(shape)
-                    .background(colors.surfaceContainerHigh)
-                    .clickable(
-                        interactionSource = interaction,
-                        indication = ripple(color = colors.onSurface),
-                        role = Role.Button,
-                        onClick = onClick,
-                    ),
-            contentAlignment = Alignment.Center,
-        ) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
-                contentDescription = label,
-                tint = colors.onSurface,
-            )
+        // In a Classic bar the screen's FAB turns into a cookie too (KomiFab reads LocalInBar).
+        floatingActionButton?.let { fab ->
+            CompositionLocalProvider(LocalInBar provides (personality is ClassicPersonality), content = fab)
         }
-    }
-}
-
-// A Morph at one point of its progress, turned with the press around its center. A spring can
-// overshoot, so the outline itself stays between the two shapes.
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
-private class MorphShape(
-    private val morph: Morph,
-    private val progress: Float,
-) : Shape {
-    override fun createOutline(
-        size: Size,
-        layoutDirection: LayoutDirection,
-        density: Density,
-    ): Outline {
-        val path = morph.toPath(progress = progress.coerceIn(0f, 1f))
-        val center = path.getBounds().center
-        path.translate(-center)
-        path.transform(Matrix().apply { rotateZ(PRESS_TURN * progress) })
-        path.translate(center)
-        path.transform(Matrix().apply { scale(x = size.width, y = size.height) })
-        return Outline.Generic(path)
     }
 }
 
@@ -201,13 +121,7 @@ private fun ClassicActions(content: @Composable RowScope.() -> Unit) {
     }
 }
 
-private val BackButtonSize = 56.dp
-
-private const val PRESS_DIP = 0.1f
-
-private const val PRESS_TURN = 90f
-
-// Material's level 3, a FAB's: both float over the content.
+// Material's level 3, a FAB's: the pill floats over the content like the cookies beside it.
 private val FloatingElevation = 6.dp
 
 @Composable

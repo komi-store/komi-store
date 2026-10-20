@@ -22,6 +22,7 @@ data class PersonalityMotion(
     val level: MotionLevel,
     val fastSpatialSpring: KomiSpring,
     val defaultSpatialSpring: KomiSpring,
+    val bouncySpatialSpring: KomiSpring,
     val fastEffectsSpring: KomiSpring,
     val defaultEffectsSpring: KomiSpring,
     val slowEffectsSpring: KomiSpring,
@@ -32,15 +33,18 @@ data class PersonalityMotion(
 ) {
     val animates: Boolean get() = level != MotionLevel.OFF
 
-    fun <T> fastSpatial(): FiniteAnimationSpec<T> = fastSpatialSpring.spec()
+    fun <T> fastSpatial(): FiniteAnimationSpec<T> = fastSpatialSpring.spec(animates)
 
-    fun <T> defaultSpatial(): FiniteAnimationSpec<T> = defaultSpatialSpring.spec()
+    fun <T> defaultSpatial(): FiniteAnimationSpec<T> = defaultSpatialSpring.spec(animates)
 
-    fun <T> fastEffects(): FiniteAnimationSpec<T> = fastEffectsSpring.spec()
+    // A press or a swap that should feel alive: softer and springier than fastSpatial.
+    fun <T> bouncySpatial(): FiniteAnimationSpec<T> = bouncySpatialSpring.spec(animates)
 
-    fun <T> defaultEffects(): FiniteAnimationSpec<T> = defaultEffectsSpring.spec()
+    fun <T> fastEffects(): FiniteAnimationSpec<T> = fastEffectsSpring.spec(animates)
 
-    fun <T> slowEffects(): FiniteAnimationSpec<T> = slowEffectsSpring.spec()
+    fun <T> defaultEffects(): FiniteAnimationSpec<T> = defaultEffectsSpring.spec(animates)
+
+    fun <T> slowEffects(): FiniteAnimationSpec<T> = slowEffectsSpring.spec(animates)
 
     fun <T> short(
         delayMillis: Int = 0,
@@ -59,7 +63,7 @@ data class PersonalityMotion(
 
     // For looping decoration (pulses, shimmer); callers stop the loop when nothing animates.
     fun <T> ambient(easing: Easing = FastOutSlowInEasing): TweenSpec<T> = tween(ambientMs, easing = easing)
-
-    private fun <T> KomiSpring.spec(): FiniteAnimationSpec<T> =
-        if (animates) spring(dampingRatio = dampingRatio, stiffness = stiffness) else snap()
 }
+
+private fun <T> KomiSpring.spec(animates: Boolean): FiniteAnimationSpec<T> =
+    if (animates) spring(dampingRatio = dampingRatio, stiffness = stiffness) else snap()
