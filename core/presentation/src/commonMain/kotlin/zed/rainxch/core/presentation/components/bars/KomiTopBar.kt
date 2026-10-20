@@ -17,10 +17,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
-import androidx.compose.material3.MediumFlexibleTopAppBar
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarColors
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -204,6 +201,9 @@ private fun mangaTitle(
     }
 }
 
+// One row on the page itself: the title right under the status bar, with no container and no
+// tint when content scrolls under it. Inside a KomiScaffold it slides away as the content scrolls
+// down and returns on the way up.
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ClassicTopBar(
@@ -217,19 +217,26 @@ private fun ClassicTopBar(
     modifier: Modifier = Modifier,
 ) {
     val windowInsets = if (insets) TopAppBarDefaults.windowInsets else WindowInsets(0, 0, 0, 0)
-    // The bar is part of the page: no container, and no tint when content scrolls under it.
-    val colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent, scrolledContainerColor = Color.Transparent)
     // With nothing to show (Details hands everything to the action bar), only the status bar inset.
     val hasTitle = title.isNotBlank() || subtitle != null
     if (!hasTitle && leading == null && actions == null) {
         Spacer(modifier = modifier.windowInsetsTopHeight(windowInsets))
         return
     }
+    val chrome = LocalScaffoldChrome.current
+    if (chrome != null) {
+        DisposableEffect(chrome) {
+            chrome.barAttached.value = true
+            onDispose { chrome.barAttached.value = false }
+        }
+    }
+    val colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent, scrolledContainerColor = Color.Transparent)
+    val titleRole = if (size == KomiTopBarSize.Masthead) KomiTextRole.Display else KomiTextRole.ScreenTitle
     val titleContent: @Composable () -> Unit = {
         Column {
             KomiText(
                 text = title,
-                role = KomiTextRole.ScreenTitle,
+                role = titleRole,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
@@ -259,25 +266,14 @@ private fun ClassicTopBar(
         }
     }
 
-    // Without a title (Details) a masthead is only a row of actions, so it stays one row.
-    if (size == KomiTopBarSize.Masthead && title.isNotBlank()) {
-        ClassicMasthead(
-            title = title,
-            subtitle = subtitle,
-            navigationIcon = navigationIcon,
-            actions = actionsContent,
-            centerTitle = centerTitle,
-            colors = colors,
-            windowInsets = windowInsets,
-            modifier = modifier,
-        )
-    } else if (centerTitle) {
+    if (centerTitle) {
         CenterAlignedTopAppBar(
             title = titleContent,
             navigationIcon = navigationIcon,
             actions = actionsContent,
             colors = colors,
             windowInsets = windowInsets,
+            scrollBehavior = chrome?.behavior,
             modifier = modifier,
         )
     } else {
@@ -287,43 +283,10 @@ private fun ClassicTopBar(
             actions = actionsContent,
             colors = colors,
             windowInsets = windowInsets,
+            scrollBehavior = chrome?.behavior,
             modifier = modifier,
         )
     }
-}
-
-// Material 3 Expressive's flexible bar: the screen title at headlineMedium, collapsing to
-// titleLarge as the content scrolls. Material's Text picks up the bar's interpolated style.
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
-@Composable
-private fun ClassicMasthead(
-    title: String,
-    subtitle: String?,
-    navigationIcon: @Composable () -> Unit,
-    actions: @Composable RowScope.() -> Unit,
-    centerTitle: Boolean,
-    colors: TopAppBarColors,
-    windowInsets: WindowInsets,
-    modifier: Modifier = Modifier,
-) {
-    val chrome = LocalScaffoldChrome.current
-    if (chrome != null) {
-        DisposableEffect(chrome) {
-            chrome.mastheadAttached.value = true
-            onDispose { chrome.mastheadAttached.value = false }
-        }
-    }
-    MediumFlexibleTopAppBar(
-        title = { MaterialText(text = title, maxLines = 1, overflow = TextOverflow.Ellipsis) },
-        subtitle = subtitle?.let { text -> { MaterialText(text = text, maxLines = 1, overflow = TextOverflow.Ellipsis) } },
-        navigationIcon = navigationIcon,
-        actions = actions,
-        titleHorizontalAlignment = if (centerTitle) Alignment.CenterHorizontally else Alignment.Start,
-        colors = colors,
-        windowInsets = windowInsets,
-        scrollBehavior = chrome?.behavior,
-        modifier = modifier,
-    )
 }
 
 @Composable

@@ -26,6 +26,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
@@ -103,16 +104,17 @@ fun KomiActionBar(
 private fun CookieBackButton(onClick: () -> Unit) {
     val colors = LocalPersonality.current.colors
     val label = stringResource(Res.string.navigate_back)
+    val shape = MaterialShapes.Cookie9Sided.toShape()
     KomiTooltip(text = label) {
         FilledTonalIconButton(
             onClick = onClick,
-            shape = MaterialShapes.Cookie9Sided.toShape(),
+            shape = shape,
             colors =
                 IconButtonDefaults.filledTonalIconButtonColors(
                     containerColor = colors.surfaceContainerHigh,
                     contentColor = colors.onSurface,
                 ),
-            modifier = Modifier.size(BackButtonSize),
+            modifier = Modifier.shadow(FloatingElevation, shape).size(BackButtonSize),
         ) {
             Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = label)
         }
@@ -131,12 +133,16 @@ private fun ClassicActions(content: @Composable RowScope.() -> Unit) {
                 toolbarContainerColor = colors.surfaceContainerHigh,
                 toolbarContentColor = colors.onSurface,
             ),
+        expandedShadowElevation = FloatingElevation,
     ) {
         CompositionLocalProvider(LocalInBar provides true) { content() }
     }
 }
 
 private val BackButtonSize = 56.dp
+
+// Material's level 3, a FAB's: both float over the content.
+private val FloatingElevation = 6.dp
 
 @Composable
 private fun PreviewActionBar() {

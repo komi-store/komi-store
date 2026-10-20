@@ -162,7 +162,8 @@ private fun ClassicBottomBar(
     onSelect: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    ShortNavigationBar(modifier = modifier) {
+    // On the page itself, like the top bar: the selected item's indicator is enough.
+    ShortNavigationBar(modifier = modifier, containerColor = LocalPersonality.current.colors.background) {
         items.forEach { item ->
             val selected = item.id == selectedId
             ShortNavigationBarItem(
