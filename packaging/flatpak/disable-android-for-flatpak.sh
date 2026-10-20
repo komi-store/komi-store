@@ -181,6 +181,9 @@ KOTLIN
 # ─────────────────────────────────────────────────────────────────────
 echo "[6/7] Removing android {} blocks from module build.gradle.kts files"
 
+# :core:data-aidl is Android-only (the Shizuku and Dhizuku AIDL interfaces)
+sed -i -e '/include(":core:data-aidl")/d' settings.gradle.kts
+
 # composeApp — remove android {} block and its contents
 python3 -c "
 import re, sys
@@ -284,6 +287,17 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 
 class AndroidApplicationConventionPlugin : Plugin<Project> {
+    override fun apply(target: Project) {
+        // No-op: Android disabled for Flatpak build
+    }
+}
+KOTLIN
+
+cat > "$CONVENTION_DIR/AndroidLibraryConventionPlugin.kt" << 'KOTLIN'
+import org.gradle.api.Plugin
+import org.gradle.api.Project
+
+class AndroidLibraryConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         // No-op: Android disabled for Flatpak build
     }

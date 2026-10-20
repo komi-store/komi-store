@@ -42,6 +42,7 @@ plugins {
 include(":composeApp")
 include(":core:domain")
 include(":core:data")
+include(":core:data-aidl")
 include(":core:presentation")
 include(":feature:apps:data")
 include(":feature:apps:domain")

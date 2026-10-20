@@ -58,7 +58,10 @@ spotless {
 }
 
 dependencies {
-    subprojects.filter { it.buildFile.exists() && it.path != ":konsist-test" }.forEach { kover(project(it.path)) }
+    // :core:data-aidl has no Kotlin and no Kover plugin
+    subprojects
+        .filter { it.buildFile.exists() && it.path !in setOf(":konsist-test", ":core:data-aidl") }
+        .forEach { kover(project(it.path)) }
 }
 
 kover {

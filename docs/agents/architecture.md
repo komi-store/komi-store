@@ -8,6 +8,7 @@ Clean Architecture with MVVM. **Domain** holds contracts, models and pure logic.
 composeApp/            entry points, navigation, DI wiring (commonMain / androidMain / jvmMain)
 core/domain            interfaces, models, use cases (no framework deps)
 core/data              repositories, Ktor, Room, Koin, platform implementations
+core/data-aidl         the Shizuku and Dhizuku installer AIDL interfaces (Android only)
 core/presentation      Personality design system (Classic / Manga), Komi* components, 14-locale strings
 feature/               apps auth details dev-profile favourites feed home profile recently-viewed repo-pages search starred tweaks
 konsist-test/          architecture rules
@@ -37,7 +38,7 @@ System interfaces with Android and Desktop implementations: `Installer`, `Instal
 
 ## Convention plugins (`build-logic/convention/`)
 
-`convention.kmp.library` (domain and data), `convention.cmp.library` (core/presentation), `convention.cmp.feature` (feature presentation), `convention.cmp.application` (the app), `convention.room`, `convention.buildkonfig`, `convention.quality` (detekt and Kover, applied by the library and app conventions). The Compose conventions also apply the stability analyzer; Android Lint is configured in `configureKotlinAndroid`.
+`convention.kmp.library` (domain and data), `convention.cmp.library` (core/presentation), `convention.cmp.feature` (feature presentation), `convention.cmp.application` (the app), `convention.android.library` (core/data-aidl), `convention.room`, `convention.buildkonfig`, `convention.quality` (detekt and Kover, applied by the library and app conventions). The Compose conventions also apply the stability analyzer; Android Lint is configured in `configureKotlinAndroid`.
 
 ## Adding a feature
 
