@@ -14,10 +14,14 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import zed.rainxch.core.presentation.components.bars.LocalTopBarScroll
+import zed.rainxch.core.presentation.components.bars.collapsesTopBar
+import zed.rainxch.core.presentation.components.bars.rememberTopBarScroll
 import zed.rainxch.core.presentation.components.buttons.KomiButtonVariant
 import zed.rainxch.core.presentation.components.buttons.KomiIconButton
 import zed.rainxch.core.presentation.components.overlays.KomiToastHost
@@ -51,16 +55,19 @@ fun KomiScaffold(
     val colors = LocalPersonality.current.colors
     val isManga = LocalPersonality.current is MangaPersonality
     val inkDividers = isManga && dividers
+    val topBarScroll = rememberTopBarScroll(enabled = !isManga && topBar != null)
 
-    Box(modifier = modifier.fillMaxSize()) {
+    Box(modifier = modifier.fillMaxSize().collapsesTopBar(topBarScroll)) {
         Scaffold(
             containerColor = colors.background,
             contentColor = colors.onBackground,
             topBar = {
                 topBar?.let { bar ->
-                    Column {
-                        bar()
-                        if (inkDividers) HorizontalDivider(thickness = 3.dp, color = colors.outline)
+                    CompositionLocalProvider(LocalTopBarScroll provides topBarScroll) {
+                        Column {
+                            bar()
+                            if (inkDividers) HorizontalDivider(thickness = 3.dp, color = colors.outline)
+                        }
                     }
                 }
             },

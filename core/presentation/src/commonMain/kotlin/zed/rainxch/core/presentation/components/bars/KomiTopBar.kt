@@ -15,9 +15,13 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.MediumFlexibleTopAppBar
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -81,6 +85,7 @@ fun KomiTopBar(
                 subtitle = subtitle,
                 leading = leading,
                 actions = actions,
+                size = size,
                 centerTitle = centerTitle,
                 insets = insets,
                 modifier = modifier,
@@ -187,6 +192,7 @@ private fun ClassicTopBar(
     subtitle: String?,
     leading: (@Composable () -> Unit)?,
     actions: (@Composable RowScope.() -> Unit)?,
+    size: KomiTopBarSize,
     centerTitle: Boolean,
     insets: Boolean,
     modifier: Modifier = Modifier,
@@ -211,18 +217,33 @@ private fun ClassicTopBar(
             }
         }
     }
-    val navigationIcon: @Composable () -> Unit = { leading?.invoke() }
+    val navigationIcon: @Composable () -> Unit = {
+        leading?.let { CompositionLocalProvider(LocalInTopBar provides true, content = it) }
+    }
     val actionsContent: @Composable RowScope.() -> Unit = {
         actions?.let {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                content = it,
-            )
+            CompositionLocalProvider(LocalInTopBar provides true) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    content = it,
+                )
+            }
         }
     }
 
-    if (centerTitle) {
+    // Without a title (Details) a masthead is only a row of actions, so it stays one row.
+    if (size == KomiTopBarSize.Masthead && title.isNotBlank()) {
+        ClassicMasthead(
+            title = title,
+            subtitle = subtitle,
+            navigationIcon = navigationIcon,
+            actions = actionsContent,
+            centerTitle = centerTitle,
+            windowInsets = windowInsets,
+            modifier = modifier,
+        )
+    } else if (centerTitle) {
         CenterAlignedTopAppBar(
             title = titleContent,
             navigationIcon = navigationIcon,
@@ -239,6 +260,38 @@ private fun ClassicTopBar(
             modifier = modifier,
         )
     }
+}
+
+// Material 3 Expressive's flexible bar: the screen title at headlineMedium, collapsing to
+// titleLarge as the content scrolls. Material's Text picks up the bar's interpolated style.
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+private fun ClassicMasthead(
+    title: String,
+    subtitle: String?,
+    navigationIcon: @Composable () -> Unit,
+    actions: @Composable RowScope.() -> Unit,
+    centerTitle: Boolean,
+    windowInsets: WindowInsets,
+    modifier: Modifier = Modifier,
+) {
+    val scroll = LocalTopBarScroll.current
+    if (scroll != null) {
+        DisposableEffect(scroll) {
+            scroll.attached.value = true
+            onDispose { scroll.attached.value = false }
+        }
+    }
+    MediumFlexibleTopAppBar(
+        title = { MaterialText(text = title, maxLines = 1, overflow = TextOverflow.Ellipsis) },
+        subtitle = subtitle?.let { text -> { MaterialText(text = text, maxLines = 1, overflow = TextOverflow.Ellipsis) } },
+        navigationIcon = navigationIcon,
+        actions = actions,
+        titleHorizontalAlignment = if (centerTitle) Alignment.CenterHorizontally else Alignment.Start,
+        windowInsets = windowInsets,
+        scrollBehavior = scroll?.behavior,
+        modifier = modifier,
+    )
 }
 
 @Composable

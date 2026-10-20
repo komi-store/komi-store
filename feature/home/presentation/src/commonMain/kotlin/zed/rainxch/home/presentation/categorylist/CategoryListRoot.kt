@@ -37,6 +37,7 @@ import zed.rainxch.core.presentation.components.buttons.RepoLayoutToggle
 import zed.rainxch.core.presentation.components.cards.DiscoveryRepoCard
 import zed.rainxch.core.presentation.components.cards.KomiRepoCardFeed
 import zed.rainxch.core.presentation.components.progress.KomiCircularProgress
+import zed.rainxch.core.presentation.components.progress.KomiLoadingIndicator
 import zed.rainxch.core.presentation.components.scaffold.KomiScaffold
 import zed.rainxch.core.presentation.utils.ObserveAsEvents
 import zed.rainxch.home.domain.model.HomeCategory
@@ -123,7 +124,7 @@ private fun CategoryListScreen(
         ) {
             if (state.isLoading && state.cards.isEmpty()) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    KomiCircularProgress()
+                    KomiLoadingIndicator()
                 }
             } else {
                 val gridPadding = PaddingValues(horizontal = 12.dp, vertical = 12.dp)

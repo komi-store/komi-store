@@ -39,6 +39,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import zed.rainxch.core.presentation.components.bars.LocalInTopBar
 import zed.rainxch.core.presentation.components.overlays.KomiTooltip
 import zed.rainxch.core.presentation.locals.LocalPersonality
 import zed.rainxch.core.presentation.personality.ClassicPersonality
@@ -202,8 +203,14 @@ private fun ClassicIconButton(
             modifier = Modifier.size(metrics.icon),
         )
     }
+    val resolved =
+        if (LocalInTopBar.current && (variant == KomiButtonVariant.Tonal || variant == KomiButtonVariant.Outline)) {
+            KomiButtonVariant.Text
+        } else {
+            variant
+        }
 
-    when (variant) {
+    when (resolved) {
         KomiButtonVariant.Primary -> {
             FilledIconButton(
                 onClick = onClick,

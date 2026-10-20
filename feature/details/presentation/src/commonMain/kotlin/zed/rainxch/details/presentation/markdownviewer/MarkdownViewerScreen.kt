@@ -35,6 +35,7 @@ import zed.rainxch.core.presentation.components.markdown.githubStoreMarkdownComp
 import zed.rainxch.core.presentation.components.markdown.rememberMarkdownColors
 import zed.rainxch.core.presentation.components.markdown.rememberMarkdownTypography
 import zed.rainxch.core.presentation.components.progress.KomiCircularProgress
+import zed.rainxch.core.presentation.components.progress.KomiLoadingIndicator
 import zed.rainxch.core.presentation.components.scaffold.KomiScaffold
 import zed.rainxch.core.presentation.components.text.KomiText
 import zed.rainxch.core.presentation.components.text.KomiTextRole
@@ -112,7 +113,7 @@ private fun MarkdownViewerScreen(
                     Box(
                         modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center,
-                    ) { KomiCircularProgress() }
+                    ) { KomiLoadingIndicator() }
                 }
 
                 state.errorMessage != null -> {
