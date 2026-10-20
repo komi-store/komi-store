@@ -1,5 +1,7 @@
 package zed.rainxch.feed.presentation.components
 
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Devices
 import androidx.compose.runtime.Composable
 import kotlinx.collections.immutable.toImmutableList
 import org.jetbrains.compose.resources.stringResource
@@ -38,7 +40,7 @@ fun FeedPlatformPicker(
                         KomiMenuItem(
                             id = platform.name,
                             label = if (platform == DiscoveryPlatform.All) allLabel else platform.toLabel(),
-                            icon = platform.toIcon(),
+                            icon = platform.toIcon() ?: Icons.Rounded.Devices,
                         )
                     }.toImmutableList(),
             onSelect = { item -> onSelect(DiscoveryPlatform.valueOf(item.id)) },

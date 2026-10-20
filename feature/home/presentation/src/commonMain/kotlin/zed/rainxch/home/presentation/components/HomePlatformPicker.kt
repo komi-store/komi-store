@@ -1,5 +1,7 @@
 package zed.rainxch.home.presentation.components
 
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Devices
 import androidx.compose.runtime.Composable
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
@@ -37,7 +39,7 @@ fun HomePlatformPicker(
                         KomiMenuItem(
                             id = platform.name,
                             label = if (platform == DiscoveryPlatform.All) allLabel else platform.toLabel(),
-                            icon = platform.toIcon(),
+                            icon = platform.toIcon() ?: Icons.Rounded.Devices,
                         )
                     }.toImmutableList(),
             onSelect = { item -> onSelect(DiscoveryPlatform.valueOf(item.id)) },

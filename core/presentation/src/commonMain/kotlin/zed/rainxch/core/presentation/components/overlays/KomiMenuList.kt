@@ -132,7 +132,9 @@ private fun ClassicMenuItem(
             }
         }
     val leadingIcon: (@Composable () -> Unit)? =
-        item.icon?.let { icon -> @Composable { Icon(imageVector = icon, contentDescription = null) } }
+        item.icon?.let { icon ->
+            @Composable { Icon(imageVector = icon, contentDescription = null, modifier = Modifier.size(MenuIconSize)) }
+        }
     if (selectable) {
         DropdownMenuItem(
             selected = selected,
@@ -266,3 +268,6 @@ private fun MangaMenuRow(
         }
     }
 }
+
+// Material's menu icon size; custom vectors would otherwise draw at their own size.
+private val MenuIconSize = 24.dp
