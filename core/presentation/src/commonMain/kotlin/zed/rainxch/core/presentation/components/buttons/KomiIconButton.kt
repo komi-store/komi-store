@@ -56,6 +56,8 @@ import kotlin.math.roundToInt
 
 private val MinTouchTarget = 44.dp
 
+private val BarIconSize = 24.dp
+
 @Composable
 fun KomiIconButton(
     icon: ImageVector,
@@ -195,16 +197,17 @@ private fun ClassicIconButton(
 ) {
     val colors = LocalPersonality.current.colors
     val metrics = size.metrics
-    val sizeModifier = Modifier.size(maxOf(metrics.box, MinTouchTarget))
+    val inBar = LocalInBar.current
+    // In a bar, Material's own icon button: its 40dp shape in a 48dp target, with a 24dp icon.
+    val sizeModifier = if (inBar) Modifier else Modifier.size(maxOf(metrics.box, MinTouchTarget))
     val content: @Composable () -> Unit = {
         Icon(
             imageVector = icon,
             contentDescription = contentDescription,
-            modifier = Modifier.size(metrics.icon),
+            modifier = Modifier.size(if (inBar) BarIconSize else metrics.icon),
         )
     }
-    val resolved =
-        if (LocalInBar.current && variant != KomiButtonVariant.Destructive) KomiButtonVariant.Text else variant
+    val resolved = if (inBar && variant != KomiButtonVariant.Destructive) KomiButtonVariant.Text else variant
 
     when (resolved) {
         KomiButtonVariant.Primary -> {

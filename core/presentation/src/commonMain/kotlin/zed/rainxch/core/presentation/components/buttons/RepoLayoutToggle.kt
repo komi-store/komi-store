@@ -1,8 +1,8 @@
 package zed.rainxch.core.presentation.components.buttons
 
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ViewList
-import androidx.compose.material.icons.filled.GridView
+import androidx.compose.material.icons.automirrored.rounded.ViewList
+import androidx.compose.material.icons.rounded.GridView
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import org.jetbrains.compose.resources.stringResource
@@ -18,7 +18,7 @@ fun RepoLayoutToggle(
     size: KomiIconButtonSize = KomiIconButtonSize.Md,
 ) {
     KomiIconButton(
-        icon = if (isGridLayout) Icons.AutoMirrored.Filled.ViewList else Icons.Default.GridView,
+        icon = if (isGridLayout) Icons.AutoMirrored.Rounded.ViewList else Icons.Rounded.GridView,
         contentDescription =
             stringResource(
                 if (isGridLayout) Res.string.feed_layout_description_list else Res.string.feed_layout_description_grid,

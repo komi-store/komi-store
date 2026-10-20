@@ -17,7 +17,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.FolderOff
-import androidx.compose.material.icons.filled.OpenInBrowser
+import androidx.compose.material.icons.rounded.OpenInBrowser
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
 import zed.rainxch.core.presentation.components.icon.KomiIcon
@@ -323,7 +323,7 @@ fun DevProfileTopbar(
         actions = if (profileUrl != null) {
             {
                 KomiIconButton(
-                    icon = Icons.Default.OpenInBrowser,
+                    icon = Icons.Rounded.OpenInBrowser,
                     contentDescription = stringResource(Res.string.open_repository),
                     onClick = { onAction(DeveloperProfileAction.OnOpenLink(profileUrl)) },
                     variant = KomiButtonVariant.Tonal,

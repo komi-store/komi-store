@@ -17,7 +17,7 @@ import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridItemSpan
 import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Sort
+import androidx.compose.material.icons.automirrored.rounded.Sort
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Star
@@ -318,7 +318,7 @@ private fun StarredTopBar(
                         },
                         trigger = { onClick ->
                             KomiIconButton(
-                                icon = Icons.AutoMirrored.Filled.Sort,
+                                icon = Icons.AutoMirrored.Rounded.Sort,
                                 contentDescription = stringResource(Res.string.sort_label),
                                 onClick = onClick,
                                 variant = KomiButtonVariant.Tonal,

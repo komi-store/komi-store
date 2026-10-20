@@ -4,7 +4,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.MoreVert
+import androidx.compose.material.icons.rounded.MoreVert
 import zed.rainxch.core.presentation.components.overlays.KomiDropdown
 import zed.rainxch.core.presentation.components.overlays.KomiMenuItem
 import zed.rainxch.core.presentation.components.overlays.rememberKomiToastState
@@ -113,7 +113,7 @@ fun ExternalImportRoot(
                                 },
                                 trigger = { onClick ->
                                     KomiIconButton(
-                                        icon = Icons.Outlined.MoreVert,
+                                        icon = Icons.Rounded.MoreVert,
                                         contentDescription = stringResource(Res.string.external_import_overflow_more),
                                         onClick = onClick,
                                         variant = KomiButtonVariant.Tonal,

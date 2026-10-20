@@ -13,10 +13,10 @@ import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Sort
+import androidx.compose.material.icons.automirrored.rounded.Sort
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.PersonAdd
+import androidx.compose.material.icons.rounded.PersonAdd
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -183,7 +183,7 @@ private fun FavouritesTopbar(
         onBack = { onAction(FavouritesAction.OnNavigateBackClick) },
         actions = {
             KomiIconButton(
-                icon = Icons.Filled.PersonAdd,
+                icon = Icons.Rounded.PersonAdd,
                 contentDescription = stringResource(Res.string.import_stars_entry),
                 onClick = { onAction(FavouritesAction.OnImportStarsClick) },
                 variant = KomiButtonVariant.Tonal,
@@ -214,7 +214,7 @@ private fun FavouritesTopbar(
                     value = sortRule.name,
                     trigger = { onClick ->
                         KomiIconButton(
-                            icon = Icons.AutoMirrored.Filled.Sort,
+                            icon = Icons.AutoMirrored.Rounded.Sort,
                             contentDescription = sortContentDescription,
                             onClick = onClick,
                             variant = KomiButtonVariant.Tonal,

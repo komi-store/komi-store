@@ -21,14 +21,14 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.FavoriteBorder
-import androidx.compose.material.icons.filled.LinkOff
-import androidx.compose.material.icons.filled.OpenInBrowser
-import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material.icons.filled.Share
-import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.filled.StarBorder
+import androidx.compose.material.icons.rounded.Favorite
+import androidx.compose.material.icons.rounded.FavoriteBorder
+import androidx.compose.material.icons.rounded.LinkOff
+import androidx.compose.material.icons.rounded.OpenInBrowser
+import androidx.compose.material.icons.rounded.Refresh
+import androidx.compose.material.icons.rounded.Share
+import androidx.compose.material.icons.rounded.Star
+import androidx.compose.material.icons.rounded.StarBorder
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -730,7 +730,7 @@ private fun DetailsActions(
     val items = buildList {
         add(
             KomiActionRowItem(
-                icon = Icons.Default.OpenInBrowser,
+                icon = Icons.Rounded.OpenInBrowser,
                 title = openLabel,
                 onClick = {
                     onAction(DetailsAction.OpenRepoInBrowser)
@@ -739,7 +739,7 @@ private fun DetailsActions(
         )
         add(
             KomiActionRowItem(
-                icon = if (state.isStarred) Icons.Default.Star else Icons.Default.StarBorder,
+                icon = if (state.isStarred) Icons.Rounded.Star else Icons.Rounded.StarBorder,
                 title = starLabel,
                 onClick = {
                     onAction(DetailsAction.OnToggleStar)
@@ -748,7 +748,7 @@ private fun DetailsActions(
         )
         add(
             KomiActionRowItem(
-                icon = if (state.isFavourite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                icon = if (state.isFavourite) Icons.Rounded.Favorite else Icons.Rounded.FavoriteBorder,
                 title = favouriteLabel,
                 onClick = {
                     onAction(DetailsAction.OnToggleFavorite)
@@ -758,7 +758,7 @@ private fun DetailsActions(
         if (state.repository?.htmlUrl != null) {
             add(
                 KomiActionRowItem(
-                    icon = Icons.Default.Share,
+                    icon = Icons.Rounded.Share,
                     title = shareLabel,
                     onClick = {
                         onAction(DetailsAction.OnShareClick)
@@ -768,7 +768,7 @@ private fun DetailsActions(
         }
         add(
             KomiActionRowItem(
-                icon = Icons.Default.Refresh,
+                icon = Icons.Rounded.Refresh,
                 title = refreshLabel,
                 onClick = {
                     onAction(DetailsAction.Refresh)
@@ -779,7 +779,7 @@ private fun DetailsActions(
         if (state.installedApp?.installSource == InstallSource.MANUAL) {
             add(
                 KomiActionRowItem(
-                    icon = Icons.Default.LinkOff,
+                    icon = Icons.Rounded.LinkOff,
                     title = stringResource(Res.string.details_unlink_external_app_menu),
                     onClick = {
                         onAction(DetailsAction.OnUnlinkExternalApp)

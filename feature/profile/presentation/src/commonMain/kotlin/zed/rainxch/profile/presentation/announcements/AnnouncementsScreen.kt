@@ -8,7 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Tune
+import androidx.compose.material.icons.rounded.Tune
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
@@ -50,7 +50,7 @@ fun AnnouncementsScreen(
                 onBack = onNavigateBack,
                 actions = {
                     KomiIconButton(
-                        icon = Icons.Filled.Tune,
+                        icon = Icons.Rounded.Tune,
                         contentDescription = stringResource(Res.string.announcements_open_mute_settings),
                         onClick = { onAction(AnnouncementsAction.OnOpenMuteSheet) },
                         variant = KomiButtonVariant.Tonal,

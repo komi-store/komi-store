@@ -20,7 +20,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -226,7 +226,7 @@ fun AppsScreen(
         },
         floatingActionButton = {
             KomiFab(
-                icon = Icons.Default.Add,
+                icon = Icons.Rounded.Add,
                 contentDescription = stringResource(Res.string.add_by_link),
                 onClick = {
                     onAction(AppsAction.OnAddByLinkClick)

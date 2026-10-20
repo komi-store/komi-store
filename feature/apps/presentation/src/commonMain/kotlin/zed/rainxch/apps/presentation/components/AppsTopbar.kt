@@ -10,12 +10,15 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Sort
+import androidx.compose.material.icons.automirrored.rounded.Sort
 import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.outlined.FileDownload
-import androidx.compose.material.icons.outlined.FileUpload
+import androidx.compose.material.icons.rounded.Refresh
+import androidx.compose.material.icons.rounded.Star
+import androidx.compose.material.icons.rounded.FileDownload
+import androidx.compose.material.icons.rounded.FileUpload
 import androidx.compose.material.icons.outlined.MoreVert
-import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material.icons.rounded.MoreVert
+import androidx.compose.material.icons.rounded.Search
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -75,27 +78,27 @@ fun AppsTopbar(
         KomiMenuItem(
             id = "export_apps",
             label = stringResource(Res.string.export_apps),
-            icon = Icons.Outlined.FileUpload,
+            icon = Icons.Rounded.FileUpload,
         ),
         KomiMenuItem(
             id = "export_obtainium",
             label = stringResource(Res.string.export_apps_obtainium),
-            icon = Icons.Outlined.FileUpload,
+            icon = Icons.Rounded.FileUpload,
         ),
         KomiMenuItem(
             id = "import_apps",
             label = stringResource(Res.string.import_apps),
-            icon = Icons.Outlined.FileDownload,
+            icon = Icons.Rounded.FileDownload,
         ),
         KomiMenuItem(
             id = "rescan",
             label = stringResource(Res.string.external_import_rescan_menu),
-            icon = Icons.Outlined.Search,
+            icon = Icons.Rounded.Search,
         ),
         KomiMenuItem(
             id = "add_from_starred",
             label = stringResource(Res.string.add_from_starred_title),
-            icon = Icons.Filled.Star,
+            icon = Icons.Rounded.Star,
         ),
     )
     val onMoreSelected: (KomiMenuItem) -> Unit = { item ->
@@ -198,11 +201,11 @@ fun AppsTopbar(
                     onSelect = onSortSelected,
                     value = state.sortRule.name,
                     trigger = { onClick ->
-                        KomiIconButton(icon = Icons.AutoMirrored.Filled.Sort, contentDescription = sortLabel, onClick = onClick)
+                        KomiIconButton(icon = Icons.AutoMirrored.Rounded.Sort, contentDescription = sortLabel, onClick = onClick)
                     },
                 )
                 KomiIconButton(
-                    icon = Icons.Default.Refresh,
+                    icon = Icons.Rounded.Refresh,
                     contentDescription = checkLabel,
                     onClick = { onAction(AppsAction.OnCheckAllForUpdates) },
                 )
@@ -211,7 +214,7 @@ fun AppsTopbar(
                     onSelect = onMoreSelected,
                     trigger = { onClick ->
                         KomiIconButton(
-                            icon = Icons.Outlined.MoreVert,
+                            icon = Icons.Rounded.MoreVert,
                             contentDescription = stringResource(Res.string.cd_more_actions),
                             onClick = onClick,
                         )
