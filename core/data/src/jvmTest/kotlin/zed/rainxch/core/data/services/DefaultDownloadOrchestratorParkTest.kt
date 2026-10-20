@@ -261,6 +261,11 @@ class DefaultDownloadOrchestratorParkTest {
     )
 
     private class RecordingInstalledAppsRepository : InstalledAppsRepository {
+        override suspend fun checkForUpdatesWithReleases(
+            packageName: String,
+            releases: List<zed.rainxch.core.domain.model.account.github.GithubRelease>,
+        ): Boolean = false
+
         override suspend fun resolveTrackedRelease(packageName: String): zed.rainxch.core.domain.utils.ResolvedRelease? = null
 
         val awaitingInstallWrites = mutableListOf<ParkWrite>()

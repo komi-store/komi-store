@@ -1990,7 +1990,6 @@ class DetailsViewModel(
 
                     observeOrchestratorEntry(
                         packageKey = packageKey,
-                        downloadUrl = downloadUrl,
                         assetName = assetName,
                         sizeBytes = sizeBytes,
                         releaseTag = releaseTag,
@@ -2117,7 +2116,6 @@ class DetailsViewModel(
     @OptIn(ExperimentalCoroutinesApi::class)
     private suspend fun observeOrchestratorEntry(
         packageKey: String,
-        downloadUrl: String,
         assetName: String,
         sizeBytes: Long,
         releaseTag: String,
@@ -2183,9 +2181,9 @@ class DetailsViewModel(
                                 isUpdate = isUpdate,
                                 filePath = filePath,
                                 assetName = assetName,
-                                downloadUrl = downloadUrl,
+                                downloadUrl = entry.downloadUrl,
                                 sizeBytes = sizeBytes,
-                                releaseTag = releaseTag,
+                                releaseTag = entry.releaseTag,
                             )
 
                             downloadOrchestrator.dismiss(packageKey)
@@ -2239,9 +2237,9 @@ class DetailsViewModel(
                                         saveInstalledAppToDatabase(
                                             apkInfo = validation.apkInfo,
                                             assetName = assetName,
-                                            assetUrl = downloadUrl,
+                                            assetUrl = entry.downloadUrl,
                                             assetSize = sizeBytes,
-                                            releaseTag = releaseTag,
+                                            releaseTag = entry.releaseTag,
                                             isUpdate = isUpdate,
                                             installOutcome = resolvedOutcome,
                                             parkedFilePath = filePath,
@@ -2604,7 +2602,6 @@ class DetailsViewModel(
                     )
                     observeOrchestratorEntry(
                         packageKey = packageKey,
-                        downloadUrl = downloadUrl,
                         assetName = assetName,
                         sizeBytes = sizeBytes,
                         releaseTag = releaseTag,
@@ -3204,6 +3201,10 @@ class DetailsViewModel(
                         stats = freshStats ?: current.stats,
                     )
                 }
+
+                freshReleases
+                    ?.takeIf { it.isNotEmpty() }
+                    ?.let { syncLibraryUpdateState(it) }
             } catch (e: CancellationException) {
                 throw e
             } catch (e: RefreshException) {
@@ -3240,6 +3241,25 @@ class DetailsViewModel(
                     DetailsEvent.OnRefreshError(kind = RefreshError.GENERIC),
                 )
             }
+        }
+    }
+
+    // Best-effort: a failed sync must not fail the refresh that read these releases.
+    private suspend fun syncLibraryUpdateState(freshReleases: List<GithubRelease>) {
+        val installed = _state.value.installedApp ?: return
+        try {
+            installedAppsRepository
+                .getAppsByRepoId(installed.repoId)
+                .forEach { app ->
+                    installedAppsRepository.checkForUpdatesWithReleases(
+                        packageName = app.packageName,
+                        releases = freshReleases,
+                    )
+                }
+        } catch (e: CancellationException) {
+            throw e
+        } catch (t: Throwable) {
+            logger.warn("Refresh: library update sync failed: ${t.message}")
         }
     }
 

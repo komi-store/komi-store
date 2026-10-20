@@ -1,6 +1,8 @@
 package zed.rainxch.apps.presentation
 
 import zed.rainxch.apps.presentation.model.UpdateState
+import zed.rainxch.core.domain.model.installation.InstallSource
+import zed.rainxch.core.domain.model.installation.InstalledApp
 import zed.rainxch.core.domain.system.DownloadStage
 import zed.rainxch.core.domain.system.InstallPolicy
 import zed.rainxch.core.domain.system.OrchestratedDownload
@@ -171,4 +173,54 @@ class AppsDownloadMirrorTest {
             mirroredUpdateState(DownloadStage.Installing, errorMessage = null, failedFallback = "f"),
         )
     }
+
+    @Test
+    fun anUpdateIsRecordedAsTheReleaseTheOrchestratorDownloaded() {
+        val recovered =
+            entry("com.app", DownloadStage.AwaitingInstall).copy(
+                assetId = 43L,
+                assetDigest = "sha256:new",
+                downloadUrl = "https://example.invalid/v2/name.apk",
+                releaseTag = "v2",
+                releaseId = 99L,
+            )
+
+        val marked = installedApp().markDownloadedUpdate(recovered, versionName = null, versionCode = null)
+
+        assertTrue(marked.isPendingInstall)
+        assertEquals(99L, marked.pendingInstallReleaseId)
+        assertEquals(43L, marked.pendingInstallAssetId)
+        assertEquals("sha256:new", marked.pendingInstallAssetDigest)
+        assertEquals("v2", marked.latestVersion)
+        assertEquals("https://example.invalid/v2/name.apk", marked.latestAssetUrl)
+        assertEquals("v2", marked.latestVersionName)
+    }
+
+    private fun installedApp() =
+        InstalledApp(
+            packageName = "com.app",
+            repoId = 1L,
+            repoName = "name",
+            repoOwner = "owner",
+            repoOwnerAvatarUrl = "",
+            repoDescription = null,
+            primaryLanguage = null,
+            repoUrl = "https://example.invalid/owner/name",
+            installedVersion = "v1",
+            installedAssetName = "name.apk",
+            installedAssetUrl = null,
+            latestVersion = "v1.99",
+            latestAssetName = "name.apk",
+            latestAssetUrl = "https://example.invalid/v1.99/name.apk",
+            latestAssetSize = 10L,
+            appName = "Name",
+            installSource = InstallSource.THIS_APP,
+            installedAt = 0L,
+            lastCheckedAt = 0L,
+            lastUpdatedAt = 0L,
+            isUpdateAvailable = true,
+            signingFingerprint = null,
+            systemArchitecture = "arm64-v8a",
+            fileExtension = "apk",
+        )
 }
