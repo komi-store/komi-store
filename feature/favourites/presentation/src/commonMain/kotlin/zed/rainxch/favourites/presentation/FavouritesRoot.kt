@@ -13,7 +13,6 @@ import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Sort
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
@@ -181,14 +180,7 @@ private fun FavouritesTopbar(
     KomiTopBar(
         title = stringResource(Res.string.favourites),
         size = KomiTopBarSize.Compact,
-        leading = {
-            KomiIconButton(
-                icon = Icons.AutoMirrored.Filled.ArrowBack,
-                contentDescription = stringResource(Res.string.navigate_back),
-                onClick = { onAction(FavouritesAction.OnNavigateBackClick) },
-                variant = KomiButtonVariant.Tonal,
-            )
-        },
+        onBack = { onAction(FavouritesAction.OnNavigateBackClick) },
         actions = {
             KomiIconButton(
                 icon = Icons.Filled.PersonAdd,

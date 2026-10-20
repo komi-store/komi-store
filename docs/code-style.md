@@ -130,6 +130,7 @@ class FooViewModel(
 - Large text that must keep its own case or face (the repository name in Details, the device sign-in code) uses `BasicText` with a personality style resized from another role, such as `type.display` or `type.mono.copy(fontSize = type.screenTitle.fontSize)`. Never a literal size. **[Konsist]**
 - Tints come from `PersonalityColors`: `primaryTint`, `onPrimaryTint`, `errorTint`, `pressOverlay`, `disabledContent`, `disabledContainer`, `scrimOverlay` and `divider`. No `.copy(alpha = 0.x)` on personality colors. **[Konsist]**
 - Motion comes from `LocalPersonality.current.motion`: `fastSpatial()` and `defaultSpatial()` for movement, `fastEffects()`, `defaultEffects()` and `slowEffects()` for fades and color, `short()`, `medium()` and `long()` durations, `ambient()` for loops. Stop a loop when `motion.animates` is false. **[Konsist]**
+- A screen with a back action passes `onBack` to `KomiTopBar`, not an arrow in `leading`. Classic draws it as a cookie button at the bottom-left, Manga as the ink button at the top-left. **[review]**
 - Popups go through core components: `KomiTooltip`, `KomiRichTooltip` and `KomiCoachmark` for tips, `KomiDropdown` for menus, `KomiSheet` for sheets. **[Konsist]**
 
 ## 10. Strings and accessibility

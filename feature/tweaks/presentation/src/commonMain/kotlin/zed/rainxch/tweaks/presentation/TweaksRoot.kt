@@ -11,8 +11,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
@@ -33,7 +31,6 @@ import zed.rainxch.core.domain.isAndroid
 import zed.rainxch.core.domain.isDesktop
 import zed.rainxch.core.domain.model.settings.AppLanguages
 import zed.rainxch.core.presentation.components.bars.KomiTopBar
-import zed.rainxch.core.presentation.components.buttons.KomiIconButton
 import zed.rainxch.core.presentation.components.icon.KomiIcon
 import zed.rainxch.core.presentation.components.overlays.rememberKomiToastState
 import zed.rainxch.core.presentation.components.scaffold.KomiScaffold
@@ -201,13 +198,7 @@ fun TweaksRoot(
                 KomiTopBar(
                     title = stringResource(Res.string.tweaks_title),
                     titleAccent = tweaksKicker(TweaksDecorSlot.Settings),
-                    leading = {
-                        KomiIconButton(
-                            icon = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(Res.string.navigate_back),
-                            onClick = onNavigateBack,
-                        )
-                    }
+                    onBack = onNavigateBack,
                 )
             },
             toastState = toastState,

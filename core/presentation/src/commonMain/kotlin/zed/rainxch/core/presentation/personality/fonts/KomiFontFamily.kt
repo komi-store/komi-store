@@ -10,7 +10,6 @@ import zed.rainxch.githubstore.core.presentation.res.anton_regular
 import zed.rainxch.githubstore.core.presentation.res.baloo_da_2
 import zed.rainxch.githubstore.core.presentation.res.black_han_sans
 import zed.rainxch.githubstore.core.presentation.res.dela_gothic_one
-import zed.rainxch.githubstore.core.presentation.res.geist
 import zed.rainxch.githubstore.core.presentation.res.geist_mono
 import zed.rainxch.githubstore.core.presentation.res.jetbrains_mono
 import zed.rainxch.githubstore.core.presentation.res.khand
@@ -22,6 +21,7 @@ import zed.rainxch.githubstore.core.presentation.res.noto_sans_devanagari
 import zed.rainxch.githubstore.core.presentation.res.noto_sans_jp
 import zed.rainxch.githubstore.core.presentation.res.noto_sans_kr
 import zed.rainxch.githubstore.core.presentation.res.noto_sans_sc
+import zed.rainxch.githubstore.core.presentation.res.nunito
 import zed.rainxch.githubstore.core.presentation.res.oswald
 import zed.rainxch.githubstore.core.presentation.res.zcool_qingke_huangyou
 
@@ -33,12 +33,13 @@ object KomiFontFamily {
     fun jetBrainsMono(): FontFamily = FontFamily(Font(Res.font.jetbrains_mono, FontWeight.Normal))
 
     @Composable
-    fun geist(): FontFamily =
+    fun nunito(): FontFamily =
         FontFamily(
-            Font(Res.font.geist, FontWeight.Normal),
-            Font(Res.font.geist, FontWeight.Medium),
-            Font(Res.font.geist, FontWeight.SemiBold),
-            Font(Res.font.geist, FontWeight.Bold),
+            Font(Res.font.nunito, FontWeight.Normal),
+            Font(Res.font.nunito, FontWeight.Medium),
+            Font(Res.font.nunito, FontWeight.SemiBold),
+            Font(Res.font.nunito, FontWeight.Bold),
+            Font(Res.font.nunito, FontWeight.ExtraBold),
         )
 
     @Composable

@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.outlined.Construction
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -17,15 +16,12 @@ import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
 import zed.rainxch.core.presentation.components.bars.KomiTopBar
 import zed.rainxch.core.presentation.components.bars.KomiTopBarSize
-import zed.rainxch.core.presentation.components.buttons.KomiButtonVariant
-import zed.rainxch.core.presentation.components.buttons.KomiIconButton
 import zed.rainxch.core.presentation.components.icon.KomiIcon
 import zed.rainxch.core.presentation.components.scaffold.KomiScaffold
 import zed.rainxch.core.presentation.components.text.KomiText
 import zed.rainxch.core.presentation.components.text.KomiTextRole
 import zed.rainxch.core.presentation.locals.LocalPersonality
 import zed.rainxch.githubstore.core.presentation.res.Res
-import zed.rainxch.githubstore.core.presentation.res.back_cd
 import zed.rainxch.githubstore.core.presentation.res.tweaks_stub_coming_soon_body
 import zed.rainxch.githubstore.core.presentation.res.tweaks_stub_coming_soon_title
 
@@ -39,14 +35,7 @@ fun TweaksStubScreen(
             KomiTopBar(
                 title = title,
                 size = KomiTopBarSize.Compact,
-                leading = {
-                    KomiIconButton(
-                        icon = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = stringResource(Res.string.back_cd),
-                        onClick = onNavigateBack,
-                        variant = KomiButtonVariant.Tonal,
-                    )
-                },
+                onBack = onNavigateBack,
             )
         },
     ) { innerPadding ->

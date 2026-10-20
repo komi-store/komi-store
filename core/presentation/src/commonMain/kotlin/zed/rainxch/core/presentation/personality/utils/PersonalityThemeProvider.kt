@@ -121,7 +121,7 @@ private fun Personality.emphasized(style: TextStyle): TextStyle {
     return if (step in 0 until weights.lastIndex) style.copy(fontWeight = weights[step + 1]) else style
 }
 
-private val ClassicWeights = listOf(FontWeight.Normal, FontWeight.Medium, FontWeight.SemiBold)
+private val ClassicWeights = listOf(FontWeight.Medium, FontWeight.Bold, FontWeight.ExtraBold)
 private val MangaWeights = listOf(FontWeight.Normal, FontWeight.SemiBold, FontWeight.Bold)
 
 private fun PersonalityColors.toMaterialColorScheme(): ColorScheme {

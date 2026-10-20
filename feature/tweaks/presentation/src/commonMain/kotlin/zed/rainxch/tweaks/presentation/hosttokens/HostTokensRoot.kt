@@ -17,7 +17,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Info
@@ -96,7 +95,6 @@ import zed.rainxch.githubstore.core.presentation.res.host_tokens_row_validate
 import zed.rainxch.githubstore.core.presentation.res.host_tokens_title
 import zed.rainxch.githubstore.core.presentation.res.host_tokens_undo_action
 import zed.rainxch.githubstore.core.presentation.res.host_tokens_undo_snackbar
-import zed.rainxch.githubstore.core.presentation.res.navigate_back
 import zed.rainxch.tweaks.presentation.components.shell.tweaksKicker
 
 @Composable
@@ -135,13 +133,7 @@ fun HostTokensRoot(
             KomiTopBar(
                 title = stringResource(Res.string.host_tokens_title),
                 titleAccent = tweaksKicker(TweaksDecorSlot.Tokens),
-                leading = {
-                    KomiIconButton(
-                        icon = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = stringResource(Res.string.navigate_back),
-                        onClick = onNavigateBack
-                    )
-                }
+                onBack = onNavigateBack,
             )
         },
         toastState = toastState,

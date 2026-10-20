@@ -1062,7 +1062,6 @@
     <string name="apps_updates_banner_subtitle">Tümünü tek seferde incele veya güncelle.</string>
     <string name="apps_updates_banner_title_one">1 güncelleme mevcut</string>
     <string name="apps_updates_banner_title_other">%1$d güncelleme mevcut</string>
-    <string name="back_cd">Geri</string>
     <string name="cd_back">Geri</string>
     <string name="cd_image">Resim</string>
     <string name="common_see_all">Tümünü gör ›</string>

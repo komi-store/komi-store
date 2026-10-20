@@ -1036,7 +1036,6 @@
     <string name="apps_updates_banner_subtitle">Просмотри или обнови всё сразу.</string>
     <string name="apps_updates_banner_title_one">Доступно 1 обновление</string>
     <string name="apps_updates_banner_title_other">Доступно обновлений: %1$d</string>
-    <string name="back_cd">Назад</string>
     <string name="cd_back">Назад</string>
     <string name="cd_image">Изображение</string>
     <string name="common_see_all">Все ›</string>

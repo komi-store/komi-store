@@ -8,24 +8,35 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.MaterialShapes
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.toShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import zed.rainxch.core.presentation.components.bars.LocalTopBarScroll
+import org.jetbrains.compose.resources.stringResource
+import zed.rainxch.core.presentation.components.bars.LocalScaffoldChrome
 import zed.rainxch.core.presentation.components.bars.collapsesTopBar
-import zed.rainxch.core.presentation.components.bars.rememberTopBarScroll
+import zed.rainxch.core.presentation.components.bars.rememberScaffoldChrome
 import zed.rainxch.core.presentation.components.buttons.KomiButtonVariant
 import zed.rainxch.core.presentation.components.buttons.KomiIconButton
 import zed.rainxch.core.presentation.components.overlays.KomiToastHost
 import zed.rainxch.core.presentation.components.overlays.KomiToastState
+import zed.rainxch.core.presentation.components.overlays.KomiTooltip
 import zed.rainxch.core.presentation.components.surfaces.KomiSurface
 import zed.rainxch.core.presentation.components.surfaces.KomiSurfaceElevation
 import zed.rainxch.core.presentation.components.text.KomiText
@@ -38,6 +49,8 @@ import zed.rainxch.core.presentation.personality.manga.decoration.screentoneFill
 import zed.rainxch.core.presentation.personality.mangaPersonality
 import zed.rainxch.core.presentation.personality.utils.PersonalityPreview
 import zed.rainxch.core.presentation.spacing.Spacing
+import zed.rainxch.githubstore.core.presentation.res.Res
+import zed.rainxch.githubstore.core.presentation.res.navigate_back
 
 @Composable
 fun KomiScaffold(
@@ -55,15 +68,15 @@ fun KomiScaffold(
     val colors = LocalPersonality.current.colors
     val isManga = LocalPersonality.current is MangaPersonality
     val inkDividers = isManga && dividers
-    val topBarScroll = rememberTopBarScroll(enabled = !isManga && topBar != null)
+    val chrome = rememberScaffoldChrome(enabled = !isManga && topBar != null)
 
-    Box(modifier = modifier.fillMaxSize().collapsesTopBar(topBarScroll)) {
+    Box(modifier = modifier.fillMaxSize().collapsesTopBar(chrome)) {
         Scaffold(
             containerColor = colors.background,
             contentColor = colors.onBackground,
             topBar = {
                 topBar?.let { bar ->
-                    CompositionLocalProvider(LocalTopBarScroll provides topBarScroll) {
+                    CompositionLocalProvider(LocalScaffoldChrome provides chrome) {
                         Column {
                             bar()
                             if (inkDividers) HorizontalDivider(thickness = 3.dp, color = colors.outline)
@@ -72,12 +85,7 @@ fun KomiScaffold(
                 }
             },
             bottomBar = {
-                bottomBar?.let { bar ->
-                    Column {
-                        if (inkDividers) HorizontalDivider(thickness = 3.dp, color = colors.outline)
-                        bar()
-                    }
-                }
+                ScaffoldBottom(back = chrome?.onBack?.value, bottomBar = bottomBar, inkDividers = inkDividers)
             },
             floatingActionButton = { floatingActionButton?.invoke() },
         ) { innerPadding ->
@@ -106,6 +114,54 @@ fun KomiScaffold(
         overlay?.invoke()
     }
 }
+
+@Composable
+private fun ScaffoldBottom(
+    back: (() -> Unit)?,
+    bottomBar: (@Composable () -> Unit)?,
+    inkDividers: Boolean,
+) {
+    if (back == null && bottomBar == null) return
+    val colors = LocalPersonality.current.colors
+    Column {
+        back?.let { ClassicBackButton(onClick = it) }
+        bottomBar?.let { bar ->
+            if (inkDividers) HorizontalDivider(thickness = 3.dp, color = colors.outline)
+            bar()
+        }
+    }
+}
+
+// A tonal cookie at the bottom-left, within thumb reach, instead of an arrow in the top bar.
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+private fun ClassicBackButton(onClick: () -> Unit) {
+    val colors = LocalPersonality.current.colors
+    val label = stringResource(Res.string.navigate_back)
+    Box(
+        modifier =
+            Modifier
+                .navigationBarsPadding()
+                .padding(start = Spacing.lg, bottom = Spacing.md),
+    ) {
+        KomiTooltip(text = label) {
+            FilledTonalIconButton(
+                onClick = onClick,
+                shape = MaterialShapes.Cookie9Sided.toShape(),
+                colors =
+                    IconButtonDefaults.filledTonalIconButtonColors(
+                        containerColor = colors.surfaceContainerHigh,
+                        contentColor = colors.onSurface,
+                    ),
+                modifier = Modifier.size(BackButtonSize),
+            ) {
+                Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = label)
+            }
+        }
+    }
+}
+
+private val BackButtonSize = 56.dp
 
 @Composable
 private fun PreviewScaffold() {

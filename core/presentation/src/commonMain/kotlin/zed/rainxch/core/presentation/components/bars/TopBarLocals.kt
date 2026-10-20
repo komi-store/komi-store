@@ -15,26 +15,30 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 // Classic top bars hold Material's standard icon buttons, so KomiIconButton drops its fill there.
 internal val LocalInTopBar = staticCompositionLocalOf { false }
 
-internal val LocalTopBarScroll = staticCompositionLocalOf<TopBarScroll?> { null }
+internal val LocalScaffoldChrome = staticCompositionLocalOf<ScaffoldChrome?> { null }
 
-// The scaffold collapses a Classic masthead as its content scrolls. It scrolls the bar only once a
-// masthead has attached: until a bar measures it, the behavior would swallow every upward scroll.
+// What a Classic KomiScaffold draws around its top bar: it collapses a masthead as the content
+// scrolls, and draws the back button the top bar hands it at the bottom-left. It scrolls the bar
+// only once a masthead has attached: until a bar measures it, the behavior would swallow every
+// upward scroll.
 @OptIn(ExperimentalMaterial3Api::class)
 @Stable
-internal class TopBarScroll(
+internal class ScaffoldChrome(
     val behavior: TopAppBarScrollBehavior,
-    val attached: MutableState<Boolean>,
+    val mastheadAttached: MutableState<Boolean>,
+    val onBack: MutableState<(() -> Unit)?>,
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-internal fun rememberTopBarScroll(enabled: Boolean): TopBarScroll? {
+internal fun rememberScaffoldChrome(enabled: Boolean): ScaffoldChrome? {
     val attached = remember { mutableStateOf(false) }
+    val onBack = remember { mutableStateOf<(() -> Unit)?>(null) }
     val canScroll = remember { { attached.value } }
     val behavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(canScroll = canScroll)
-    return remember(behavior, enabled) { if (enabled) TopBarScroll(behavior, attached) else null }
+    return remember(behavior, enabled) { if (enabled) ScaffoldChrome(behavior, attached, onBack) else null }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
-internal fun Modifier.collapsesTopBar(scroll: TopBarScroll?): Modifier =
-    if (scroll == null) this else nestedScroll(scroll.behavior.nestedScrollConnection)
+internal fun Modifier.collapsesTopBar(chrome: ScaffoldChrome?): Modifier =
+    if (chrome == null) this else nestedScroll(chrome.behavior.nestedScrollConnection)

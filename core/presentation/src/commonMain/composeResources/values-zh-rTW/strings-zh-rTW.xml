@@ -1021,7 +1021,6 @@
     <string name="apps_updates_banner_subtitle">逐個審查或一鍵全部更新。</string>
     <string name="apps_updates_banner_title_one">1 個可用更新</string>
     <string name="apps_updates_banner_title_other">%1$d 個可用更新</string>
-    <string name="back_cd">返回</string>
     <string name="cd_back">返回</string>
     <string name="cd_image">圖片</string>
     <string name="common_see_all">檢視全部 ›</string>

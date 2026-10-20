@@ -15,7 +15,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Search
@@ -35,7 +34,6 @@ import zed.rainxch.core.presentation.components.bars.KomiTopBarSize
 import zed.rainxch.core.presentation.components.buttons.KomiButton
 import zed.rainxch.core.presentation.components.buttons.KomiButtonVariant
 import zed.rainxch.core.presentation.components.buttons.KomiButtonSize
-import zed.rainxch.core.presentation.components.buttons.KomiIconButton
 import zed.rainxch.core.presentation.components.icon.KomiIcon
 import zed.rainxch.core.presentation.components.inputs.KomiTextField
 import zed.rainxch.core.presentation.components.scaffold.KomiScaffold
@@ -57,7 +55,6 @@ import zed.rainxch.githubstore.core.presentation.res.import_stars_search_hint
 import zed.rainxch.githubstore.core.presentation.res.import_stars_subtitle
 import zed.rainxch.githubstore.core.presentation.res.import_stars_title
 import zed.rainxch.githubstore.core.presentation.res.import_stars_try_another
-import zed.rainxch.githubstore.core.presentation.res.navigate_back
 
 @Composable
 fun ImportStarsRoot(
@@ -89,14 +86,7 @@ private fun ImportStarsScreen(
             KomiTopBar(
                 title = stringResource(Res.string.import_stars_title),
                 size = KomiTopBarSize.Compact,
-                leading = {
-                    KomiIconButton(
-                        icon = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = stringResource(Res.string.navigate_back),
-                        onClick = { onAction(ImportStarsAction.OnNavigateBack) },
-                        variant = KomiButtonVariant.Tonal,
-                    )
-                },
+                onBack = { onAction(ImportStarsAction.OnNavigateBack) },
             )
         },
     ) { padding ->

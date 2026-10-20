@@ -1039,7 +1039,6 @@
     <string name="apps_updates_banner_subtitle">한 번에 검토하거나 모두 업데이트하세요.</string>
     <string name="apps_updates_banner_title_one">1개 업데이트 사용 가능</string>
     <string name="apps_updates_banner_title_other">%1$d개 업데이트 사용 가능</string>
-    <string name="back_cd">뒤로</string>
     <string name="cd_back">뒤로</string>
     <string name="cd_image">이미지</string>
     <string name="common_see_all">전체 보기 ›</string>

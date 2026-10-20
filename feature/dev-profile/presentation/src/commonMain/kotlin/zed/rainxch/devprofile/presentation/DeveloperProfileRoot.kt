@@ -14,7 +14,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.FolderOff
@@ -319,14 +318,7 @@ fun DevProfileTopbar(
     KomiTopBar(
         title = state.username,
         size = KomiTopBarSize.Compact,
-        leading = {
-            KomiIconButton(
-                icon = Icons.AutoMirrored.Filled.ArrowBack,
-                contentDescription = stringResource(Res.string.navigate_back),
-                onClick = { onAction(DeveloperProfileAction.OnNavigateBackClick) },
-                variant = KomiButtonVariant.Tonal,
-            )
-        },
+        onBack = { onAction(DeveloperProfileAction.OnNavigateBackClick) },
         actions = {
             state.profile?.htmlUrl?.let {
                 KomiIconButton(

@@ -22,7 +22,9 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
@@ -35,6 +37,7 @@ import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import org.jetbrains.compose.resources.stringResource
 import zed.rainxch.core.presentation.components.buttons.KomiButtonVariant
 import zed.rainxch.core.presentation.components.buttons.KomiIconButton
 import zed.rainxch.core.presentation.components.text.KomiText
@@ -49,6 +52,8 @@ import zed.rainxch.core.presentation.personality.manga.MangaPaper
 import zed.rainxch.core.presentation.personality.manga.decoration.speedLineWash
 import zed.rainxch.core.presentation.personality.mangaPersonality
 import zed.rainxch.core.presentation.personality.utils.PersonalityPreview
+import zed.rainxch.githubstore.core.presentation.res.Res
+import zed.rainxch.githubstore.core.presentation.res.navigate_back
 import androidx.compose.material3.Text as MaterialText
 
 @Composable
@@ -58,19 +63,28 @@ fun KomiTopBar(
     titleAccent: String? = null,
     subtitle: String? = null,
     leading: (@Composable () -> Unit)? = null,
+    onBack: (() -> Unit)? = null,
     actions: (@Composable RowScope.() -> Unit)? = null,
     size: KomiTopBarSize = KomiTopBarSize.Masthead,
     centerTitle: Boolean = false,
     insets: Boolean = true,
 ) {
-    when (val personality = LocalPersonality.current) {
+    val personality = LocalPersonality.current
+    val chrome = LocalScaffoldChrome.current
+    // Classic hands the back action to its KomiScaffold, which draws it at the bottom-left.
+    val scaffoldChrome = if (personality is ClassicPersonality) chrome else null
+    if (onBack != null && scaffoldChrome != null) HandBackToScaffold(chrome = scaffoldChrome, onBack = onBack)
+    val topBarBack: (@Composable () -> Unit)? =
+        onBack?.takeIf { scaffoldChrome == null }?.let { back -> @Composable { TopBarBack(back) } }
+    val resolvedLeading = leading ?: topBarBack
+    when (personality) {
         is MangaPersonality -> {
             MangaTopBar(
                 personality = personality,
                 title = title,
                 titleAccent = titleAccent,
                 subtitle = subtitle,
-                leading = leading,
+                leading = resolvedLeading,
                 actions = actions,
                 size = size,
                 centerTitle = centerTitle,
@@ -83,7 +97,7 @@ fun KomiTopBar(
             ClassicTopBar(
                 title = title,
                 subtitle = subtitle,
-                leading = leading,
+                leading = resolvedLeading,
                 actions = actions,
                 size = size,
                 centerTitle = centerTitle,
@@ -275,11 +289,11 @@ private fun ClassicMasthead(
     windowInsets: WindowInsets,
     modifier: Modifier = Modifier,
 ) {
-    val scroll = LocalTopBarScroll.current
-    if (scroll != null) {
-        DisposableEffect(scroll) {
-            scroll.attached.value = true
-            onDispose { scroll.attached.value = false }
+    val chrome = LocalScaffoldChrome.current
+    if (chrome != null) {
+        DisposableEffect(chrome) {
+            chrome.mastheadAttached.value = true
+            onDispose { chrome.mastheadAttached.value = false }
         }
     }
     MediumFlexibleTopAppBar(
@@ -289,8 +303,29 @@ private fun ClassicMasthead(
         actions = actions,
         titleHorizontalAlignment = if (centerTitle) Alignment.CenterHorizontally else Alignment.Start,
         windowInsets = windowInsets,
-        scrollBehavior = scroll?.behavior,
+        scrollBehavior = chrome?.behavior,
         modifier = modifier,
+    )
+}
+
+@Composable
+private fun HandBackToScaffold(
+    chrome: ScaffoldChrome,
+    onBack: () -> Unit,
+) {
+    val currentOnBack by rememberUpdatedState(onBack)
+    DisposableEffect(chrome) {
+        chrome.onBack.value = { currentOnBack() }
+        onDispose { chrome.onBack.value = null }
+    }
+}
+
+@Composable
+private fun TopBarBack(onBack: () -> Unit) {
+    KomiIconButton(
+        icon = Icons.AutoMirrored.Filled.ArrowBack,
+        contentDescription = stringResource(Res.string.navigate_back),
+        onClick = onBack,
     )
 }
 

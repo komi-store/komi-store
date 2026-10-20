@@ -1191,7 +1191,6 @@
     <string name="tweaks_install_method_desktop_empty_body">Silent installers and installer attribution are Android features. Desktop installs go through the OS package manager.</string>
     <string name="tweaks_stub_coming_soon_title">Coming in a follow-up</string>
     <string name="tweaks_stub_coming_soon_body">This screen is part of the in-progress redesign. The settings still work — they're just being moved here from the old layout.</string>
-    <string name="back_cd">Back</string>
     <string name="menubar_file_menu">File</string>
     <string name="menubar_go_menu">Go</string>
     <string name="menubar_file_quit">Quit</string>

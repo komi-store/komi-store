@@ -18,7 +18,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.automirrored.outlined.OpenInNew
@@ -52,12 +51,10 @@ import zed.rainxch.githubstore.core.presentation.res.app_icon
 import zed.rainxch.core.presentation.components.buttons.KomiButton
 import zed.rainxch.core.presentation.components.buttons.KomiButtonVariant
 import zed.rainxch.core.presentation.components.buttons.KomiButtonSize
-import zed.rainxch.core.presentation.components.buttons.KomiIconButton
 import zed.rainxch.core.presentation.components.scaffold.KomiScaffold
 import zed.rainxch.core.presentation.components.text.KomiText
 import zed.rainxch.core.presentation.components.text.KomiTextRole
 import zed.rainxch.core.presentation.utils.constrainedContentWidth
-import zed.rainxch.githubstore.core.presentation.res.navigate_back
 import zed.rainxch.githubstore.core.presentation.res.tweaks_app_info_app_name
 import zed.rainxch.githubstore.core.presentation.res.tweaks_app_info_community_business_cta
 import zed.rainxch.githubstore.core.presentation.res.tweaks_app_info_community_business_subtitle
@@ -98,13 +95,7 @@ fun AppInfoRoot(
         topBar = {
             KomiTopBar(
                 title = stringResource(Res.string.tweaks_entry_app_info),
-                leading = {
-                    KomiIconButton(
-                        icon = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = stringResource(Res.string.navigate_back),
-                        onClick = onNavigateBack,
-                    )
-                }
+                onBack = onNavigateBack,
             )
         },
         grid = true,
