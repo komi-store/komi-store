@@ -79,10 +79,10 @@
     <string name="sort_by">Sort by</string>
     <string name="close">Close</string>
 
-    <string name="sort_most_stars">Most Stars</string>
-    <string name="sort_most_forks">Most Forks</string>
-    <string name="sort_best_match">Best Match</string>
-    <string name="sort_recently_released">Recently Released</string>
+    <string name="sort_most_stars">Most stars</string>
+    <string name="sort_most_forks">Most forks</string>
+    <string name="sort_best_match">Best match</string>
+    <string name="sort_recently_released">Recently released</string>
 
     <string name="sort_order_descending">Descending</string>
     <string name="sort_order_ascending">Ascending</string>
@@ -432,7 +432,7 @@
     <string name="filter_installed">Installed</string>
     <string name="filter_favorites">Favorites</string>
     <string name="sort">Sort</string>
-    <string name="sort_recently_updated">Recently Updated</string>
+    <string name="sort_recently_updated">Recently updated</string>
     <string name="sort_name">Name</string>
     <string name="sort_recently_added">Recently added</string>
     <string name="sort_selected">Selected</string>
@@ -1527,7 +1527,7 @@
     <string name="feed_cd_profile">Profile</string>
     <string name="feed_platform_picker_title">Choose your OS</string>
     <string name="feed_platform_picker_title_jp">対応</string>
-    <string name="feed_platform_all">All Platforms</string>
+    <string name="feed_platform_all">All platforms</string>
     <string name="feed_loading">Loading the latest…</string>
     <string name="feed_empty_title">Nothing here yet</string>
     <string name="feed_empty_subtitle">No %1$s apps for %2$s yet.</string>
