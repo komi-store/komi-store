@@ -321,7 +321,8 @@ private fun SfxKicker(
                 alpha = alphaAnim.value
                 rotationZ = -8f
             },
-        style = personality.type.labelLarge,
+        // A comic sound effect, so it stays in Anton; buttons no longer are.
+        style = personality.type.sectionTitle,
         color = color,
     )
 }

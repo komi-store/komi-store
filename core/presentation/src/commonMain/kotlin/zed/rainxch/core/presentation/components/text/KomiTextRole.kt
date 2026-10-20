@@ -16,7 +16,7 @@ enum class KomiTextRole(
     Reading(PersonalityType::reading),
     Caption(PersonalityType::caption),
     Mono(PersonalityType::mono),
-    LabelLarge(PersonalityType::labelLarge, KomiTextCase.Heading),
+    LabelLarge(PersonalityType::labelLarge),
     Label(PersonalityType::label),
     LabelSmall(PersonalityType::labelSmall),
     Overline(PersonalityType::overline, KomiTextCase.Upper),

@@ -121,12 +121,12 @@ class FooViewModel(
   | `Reading` | 16 | Long-form text: release notes, descriptions |
   | `Caption` | 12 | Meta: counts, dates, sizes |
   | `Mono` | 12 | Versions, hashes, package names, logs |
-  | `LabelLarge`, `Label`, `LabelSmall` | 16 to 20, 14, 12 | Controls by size: large, medium and small buttons, chips, navigation |
+  | `LabelLarge`, `Label`, `LabelSmall` | 16, 14, 12 | Controls by size: large, medium and small buttons, chips, navigation |
   | `Overline` | 11 | Kickers above a field or group, always in capitals |
   | `Stamp` | 12 to 14 | Segmented tabs, badges, Manga stamps |
   | `Numeral` | 24 | Stat values |
 
-- Case comes from the role. Manga sets `Display`, `ScreenTitle`, `SectionTitle`, `LabelLarge` and `Stamp` in capitals; everything else keeps the text's own case. A selected row shows its state with color or a check, not a heavier weight. **[review]**
+- Case comes from the role. Manga sets `Display`, `ScreenTitle`, `SectionTitle` and `Stamp` in capitals; everything else keeps the text's own case. A selected row shows its state with color or a check, not a heavier weight. **[review]**
 - Large text that must keep its own case or face (the repository name in Details, the device sign-in code) uses `BasicText` with a personality style resized from another role, such as `type.display` or `type.mono.copy(fontSize = type.screenTitle.fontSize)`. Never a literal size. **[Konsist]**
 - Tints come from `PersonalityColors`: `primaryTint`, `onPrimaryTint`, `errorTint`, `pressOverlay`, `disabledContent`, `disabledContainer`, `scrimOverlay` and `divider`. No `.copy(alpha = 0.x)` on personality colors. **[Konsist]**
 - Motion comes from `LocalPersonality.current.motion`: `fastSpatial()` and `defaultSpatial()` for movement, `fastEffects()`, `defaultEffects()` and `slowEffects()` for fades and color, `short()`, `medium()` and `long()` durations, `ambient()` for loops. Stop a loop when `motion.animates` is false. **[Konsist]**

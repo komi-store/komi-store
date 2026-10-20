@@ -44,7 +44,7 @@ data class PersonalityType(
             reading = reading.inBody(),
             caption = caption.inBody(),
             mono = this.mono.copy(fontFamily = mono),
-            labelLarge = labelLarge.inDisplay(),
+            labelLarge = labelLarge.inBody(),
             label = label.inBody(),
             labelSmall = labelSmall.inBody(),
             overline = overline.inBody(),
