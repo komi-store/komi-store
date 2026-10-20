@@ -327,6 +327,11 @@ class DefaultDownloadOrchestratorAssetRefetchTest {
 
         override suspend fun resolveTrackedRelease(packageName: String): zed.rainxch.core.domain.utils.ResolvedRelease? = null
 
+        override suspend fun checkForUpdatesWithReleases(
+            packageName: String,
+            releases: List<zed.rainxch.core.domain.model.account.github.GithubRelease>,
+        ): Boolean = false
+
         override suspend fun markAwaitingInstall(
             packageName: String,
             path: String,
