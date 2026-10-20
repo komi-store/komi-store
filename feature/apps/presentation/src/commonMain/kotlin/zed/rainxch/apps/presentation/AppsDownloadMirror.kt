@@ -1,6 +1,9 @@
 package zed.rainxch.apps.presentation
 
 import zed.rainxch.apps.presentation.model.UpdateState
+import zed.rainxch.core.domain.model.installation.InstalledApp
+import zed.rainxch.core.domain.model.installation.markPending
+import zed.rainxch.core.domain.model.installation.withLatestSnapshot
 import zed.rainxch.core.domain.system.DownloadStage
 import zed.rainxch.core.domain.system.DownloadStagePhase
 import zed.rainxch.core.domain.system.OrchestratedDownload
@@ -41,6 +44,25 @@ internal fun hiddenRowPackages(
         .filter { (key, entry) -> key in knownPackages && entry.stage in takeoverStages }
         .keys
         .toSet()
+
+// Recorded from the orchestrator's entry, not the target the update asked for: a refetch can
+// move the download to a newer release.
+internal fun InstalledApp.markDownloadedUpdate(
+    download: OrchestratedDownload,
+    versionName: String?,
+    versionCode: Long?,
+): InstalledApp =
+    markPending(
+        releaseId = download.releaseId,
+        assetId = download.assetId,
+        assetDigest = download.assetDigest,
+    ).withLatestSnapshot(
+        version = download.releaseTag,
+        assetName = download.assetName,
+        assetUrl = download.downloadUrl,
+        versionName = versionName ?: download.releaseTag,
+        versionCode = versionCode ?: 0L,
+    )
 
 internal fun isVersionDowngrade(
     installedVersion: String?,

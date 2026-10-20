@@ -16,7 +16,15 @@ CodeQL (`codeql.yml`) and Dependabot (`dependabot.yml`) run separately.
 
 ## Spotless
 
-Spotless checks only files changed against `origin/main`, but it checks the whole file. The codebase was formatted once in #1080 (listed in `.git-blame-ignore-revs`). Compose rule findings (missing `modifier`, parameter order, naming) are not auto-fixable and have to be fixed by hand in files you touch.
+Spotless checks only files changed against `origin/main`, but it checks the whole file. The codebase was formatted once in #1080 (listed in `.git-blame-ignore-revs`). Compose rule findings (missing `modifier`, parameter order, naming) are not auto-fixable and have to be fixed by hand in files you touch. A new `CompositionLocal` goes into `compose_allowed_composition_locals` in `.editorconfig`.
+
+After editing `.editorconfig`, Spotless can keep reporting results from before the edit, because Gradle's build cache restores the `spotlessKotlin` lint output. To see the real result:
+
+```bash
+./gradlew --stop
+rm -rf build/spotless-clean build/spotless-lints .gradle/configuration-cache
+./gradlew spotlessApply --no-build-cache
+```
 
 ## Baselines
 

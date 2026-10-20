@@ -1,6 +1,7 @@
 package zed.rainxch.core.domain.repository
 
 import kotlinx.coroutines.flow.Flow
+import zed.rainxch.core.domain.model.account.github.GithubRelease
 import zed.rainxch.core.domain.model.installation.InstalledApp
 import zed.rainxch.core.domain.model.installation.ParkedInstallDisposal
 import zed.rainxch.core.domain.model.smart_detect.MatchingPreview
@@ -30,6 +31,13 @@ interface InstalledAppsRepository {
     suspend fun deleteInstalledApp(packageName: String)
 
     suspend fun checkForUpdates(packageName: String): Boolean
+
+    // checkForUpdates on a release list the caller already read. A list without this app's
+    // release changes nothing.
+    suspend fun checkForUpdatesWithReleases(
+        packageName: String,
+        releases: List<GithubRelease>,
+    ): Boolean
 
     suspend fun resolveTrackedRelease(packageName: String): ResolvedRelease?
 
