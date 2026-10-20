@@ -1,7 +1,3 @@
-// Suppressed rather than allowlisted: compose-rules lowercases compose_allowed_composition_locals
-// and then compares names case-sensitively, so no Local* name can match that list.
-@file:Suppress("ktlint:compose:compositionlocal-allowlist")
-
 package zed.rainxch.core.presentation.components.bars
 
 import androidx.compose.material3.ExperimentalMaterial3Api
