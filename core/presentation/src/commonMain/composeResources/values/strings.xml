@@ -89,7 +89,7 @@
     <string name="sort_label">Sort</string>
 
     <!-- Programming languages -->
-    <string name="language_all">All Languages</string>
+    <string name="language_all">All languages</string>
     <string name="language_kotlin">Kotlin</string>
     <string name="language_java">Java</string>
     <string name="language_javascript">JavaScript</string>
@@ -545,8 +545,8 @@
     <string name="auth_hint_other_method">Use a device code or a personal access token instead.</string>
 
     <!-- Read More / Show Less -->
-    <string name="read_more">Read More</string>
-    <string name="show_less">Show Less</string>
+    <string name="read_more">Read more</string>
+    <string name="show_less">Show less</string>
 
     <string name="share_repository">Share repository</string>
     <string name="failed_to_share_link">Failed to share link</string>
