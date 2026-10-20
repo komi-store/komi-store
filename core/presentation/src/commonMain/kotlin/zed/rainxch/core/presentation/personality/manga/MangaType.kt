@@ -93,12 +93,11 @@ internal val MangaType =
             ),
         labelLarge =
             TextStyle(
-                fontFamily = MangaDisplayFamily,
-                fontWeight = FontWeight.Normal,
-                fontSize = 20.sp,
+                fontFamily = MangaBodyFamily,
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 16.sp,
                 lineHeight = 24.sp,
-                letterSpacing = 0.03.em,
-                fontSynthesis = SingleWeight,
+                letterSpacing = 0.01.em,
             ),
         label =
             TextStyle(
