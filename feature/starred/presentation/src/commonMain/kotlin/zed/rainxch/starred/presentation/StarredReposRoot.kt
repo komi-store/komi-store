@@ -303,28 +303,32 @@ private fun StarredTopBar(
         subtitle = subtitle,
         size = KomiTopBarSize.Compact,
         onBack = { onAction(StarredReposAction.OnNavigateBackClick) },
-        actions = {
-            if (isSyncing) {
-                KomiCircularProgress(modifier = Modifier.size(24.dp))
-            }
+        actions = if (isSyncing || hasRepos) {
+            {
+                if (isSyncing) {
+                    KomiCircularProgress(modifier = Modifier.size(24.dp))
+                }
 
-            if (hasRepos) {
-                KomiDropdown(
-                    entries = sortEntries,
-                    value = sortRule.name,
-                    onSelect = { item ->
-                        onAction(StarredReposAction.OnSortRuleSelected(StarredSortRule.valueOf(item.id)))
-                    },
-                    trigger = { onClick ->
-                        KomiIconButton(
-                            icon = Icons.AutoMirrored.Filled.Sort,
-                            contentDescription = stringResource(Res.string.sort_label),
-                            onClick = onClick,
-                            variant = KomiButtonVariant.Tonal,
-                        )
-                    },
-                )
+                if (hasRepos) {
+                    KomiDropdown(
+                        entries = sortEntries,
+                        value = sortRule.name,
+                        onSelect = { item ->
+                            onAction(StarredReposAction.OnSortRuleSelected(StarredSortRule.valueOf(item.id)))
+                        },
+                        trigger = { onClick ->
+                            KomiIconButton(
+                                icon = Icons.AutoMirrored.Filled.Sort,
+                                contentDescription = stringResource(Res.string.sort_label),
+                                onClick = onClick,
+                                variant = KomiButtonVariant.Tonal,
+                            )
+                        },
+                    )
+                }
             }
+        } else {
+            null
         },
     )
 }

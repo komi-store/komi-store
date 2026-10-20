@@ -153,7 +153,6 @@ private fun FeedScreen(
                         size = KomiButtonSize.Sm,
                         leadingIcon = if (platform == DiscoveryPlatform.All) null else platform.toIcon(),
                         trailingIcon = Icons.Rounded.KeyboardArrowDown,
-                        modifier = Modifier.padding(end = 12.dp),
                     )
                 },
             )

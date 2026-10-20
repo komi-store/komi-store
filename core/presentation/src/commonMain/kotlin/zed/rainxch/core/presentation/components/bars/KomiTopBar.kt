@@ -5,11 +5,13 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.windowInsetsTopHeight
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Search
@@ -71,12 +73,14 @@ fun KomiTopBar(
 ) {
     val personality = LocalPersonality.current
     val chrome = LocalScaffoldChrome.current
-    // Classic hands the back action to its KomiScaffold, which draws it at the bottom-left.
+    // Classic hands the back action and the actions to its KomiScaffold, which draws them in a
+    // KomiActionBar at the bottom, so the top bar keeps only the title.
     val scaffoldChrome = if (personality is ClassicPersonality) chrome else null
-    if (onBack != null && scaffoldChrome != null) HandBackToScaffold(chrome = scaffoldChrome, onBack = onBack)
+    if (scaffoldChrome != null) HandToScaffold(chrome = scaffoldChrome, onBack = onBack, actions = actions)
     val topBarBack: (@Composable () -> Unit)? =
         onBack?.takeIf { scaffoldChrome == null }?.let { back -> @Composable { TopBarBack(back) } }
     val resolvedLeading = leading ?: topBarBack
+    val topBarActions = actions.takeIf { scaffoldChrome == null }
     when (personality) {
         is MangaPersonality -> {
             MangaTopBar(
@@ -98,7 +102,7 @@ fun KomiTopBar(
                 title = title,
                 subtitle = subtitle,
                 leading = resolvedLeading,
-                actions = actions,
+                actions = topBarActions,
                 size = size,
                 centerTitle = centerTitle,
                 insets = insets,
@@ -212,6 +216,12 @@ private fun ClassicTopBar(
     modifier: Modifier = Modifier,
 ) {
     val windowInsets = if (insets) TopAppBarDefaults.windowInsets else WindowInsets(0, 0, 0, 0)
+    // With nothing to show (Details hands everything to the action bar), only the status bar inset.
+    val hasTitle = title.isNotBlank() || subtitle != null
+    if (!hasTitle && leading == null && actions == null) {
+        Spacer(modifier = modifier.windowInsetsTopHeight(windowInsets))
+        return
+    }
     val titleContent: @Composable () -> Unit = {
         Column {
             KomiText(
@@ -232,11 +242,11 @@ private fun ClassicTopBar(
         }
     }
     val navigationIcon: @Composable () -> Unit = {
-        leading?.let { CompositionLocalProvider(LocalInTopBar provides true, content = it) }
+        leading?.let { CompositionLocalProvider(LocalInBar provides true, content = it) }
     }
     val actionsContent: @Composable RowScope.() -> Unit = {
         actions?.let {
-            CompositionLocalProvider(LocalInTopBar provides true) {
+            CompositionLocalProvider(LocalInBar provides true) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -309,14 +319,22 @@ private fun ClassicMasthead(
 }
 
 @Composable
-private fun HandBackToScaffold(
+private fun HandToScaffold(
     chrome: ScaffoldChrome,
-    onBack: () -> Unit,
+    onBack: (() -> Unit)?,
+    actions: (@Composable RowScope.() -> Unit)?,
 ) {
     val currentOnBack by rememberUpdatedState(onBack)
-    DisposableEffect(chrome) {
-        chrome.onBack.value = { currentOnBack() }
-        onDispose { chrome.onBack.value = null }
+    val currentActions by rememberUpdatedState(actions)
+    val hasBack = onBack != null
+    val hasActions = actions != null
+    DisposableEffect(chrome, hasBack, hasActions) {
+        chrome.onBack.value = if (hasBack) ({ currentOnBack?.invoke() }) else null
+        chrome.actions.value = if (hasActions) ({ currentActions?.invoke(this) }) else null
+        onDispose {
+            chrome.onBack.value = null
+            chrome.actions.value = null
+        }
     }
 }
 

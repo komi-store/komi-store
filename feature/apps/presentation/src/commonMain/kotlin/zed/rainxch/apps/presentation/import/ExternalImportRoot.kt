@@ -96,8 +96,8 @@ fun ExternalImportRoot(
                     title = stringResource(Res.string.external_import_top_bar_title),
                     size = KomiTopBarSize.Compact,
                     onBack = { viewModel.onAction(ExternalImportAction.OnExit) },
-                    actions = {
-                        if (state.phase == ImportPhase.AwaitingReview && state.cards.size > 1) {
+                    actions = if (state.phase == ImportPhase.AwaitingReview && state.cards.size > 1) {
+                        {
                             KomiDropdown(
                                 entries = persistentListOf(
                                     KomiMenuItem(
@@ -121,6 +121,8 @@ fun ExternalImportRoot(
                                 },
                             )
                         }
+                    } else {
+                        null
                     },
                 )
             },

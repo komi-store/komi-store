@@ -315,19 +315,22 @@ fun DevProfileTopbar(
     state: DeveloperProfileState,
     onAction: (DeveloperProfileAction) -> Unit,
 ) {
+    val profileUrl = state.profile?.htmlUrl
     KomiTopBar(
         title = state.username,
         size = KomiTopBarSize.Compact,
         onBack = { onAction(DeveloperProfileAction.OnNavigateBackClick) },
-        actions = {
-            state.profile?.htmlUrl?.let {
+        actions = if (profileUrl != null) {
+            {
                 KomiIconButton(
                     icon = Icons.Default.OpenInBrowser,
                     contentDescription = stringResource(Res.string.open_repository),
-                    onClick = { onAction(DeveloperProfileAction.OnOpenLink(it)) },
+                    onClick = { onAction(DeveloperProfileAction.OnOpenLink(profileUrl)) },
                     variant = KomiButtonVariant.Tonal,
                 )
             }
+        } else {
+            null
         },
     )
 }

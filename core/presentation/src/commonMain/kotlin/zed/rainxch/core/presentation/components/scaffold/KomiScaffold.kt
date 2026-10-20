@@ -5,30 +5,22 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
-import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButtonDefaults
-import androidx.compose.material3.MaterialShapes
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.toShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import org.jetbrains.compose.resources.stringResource
+import zed.rainxch.core.presentation.components.bars.KomiActionBar
 import zed.rainxch.core.presentation.components.bars.LocalScaffoldChrome
 import zed.rainxch.core.presentation.components.bars.collapsesTopBar
 import zed.rainxch.core.presentation.components.bars.rememberScaffoldChrome
@@ -36,7 +28,6 @@ import zed.rainxch.core.presentation.components.buttons.KomiButtonVariant
 import zed.rainxch.core.presentation.components.buttons.KomiIconButton
 import zed.rainxch.core.presentation.components.overlays.KomiToastHost
 import zed.rainxch.core.presentation.components.overlays.KomiToastState
-import zed.rainxch.core.presentation.components.overlays.KomiTooltip
 import zed.rainxch.core.presentation.components.surfaces.KomiSurface
 import zed.rainxch.core.presentation.components.surfaces.KomiSurfaceElevation
 import zed.rainxch.core.presentation.components.text.KomiText
@@ -49,8 +40,6 @@ import zed.rainxch.core.presentation.personality.manga.decoration.screentoneFill
 import zed.rainxch.core.presentation.personality.mangaPersonality
 import zed.rainxch.core.presentation.personality.utils.PersonalityPreview
 import zed.rainxch.core.presentation.spacing.Spacing
-import zed.rainxch.githubstore.core.presentation.res.Res
-import zed.rainxch.githubstore.core.presentation.res.navigate_back
 
 @Composable
 fun KomiScaffold(
@@ -69,6 +58,10 @@ fun KomiScaffold(
     val isManga = LocalPersonality.current is MangaPersonality
     val inkDividers = isManga && dividers
     val chrome = rememberScaffoldChrome(enabled = !isManga && topBar != null)
+    val back = chrome?.onBack?.value
+    val actions = chrome?.actions?.value
+    // The FAB joins the action bar when there is one, instead of floating above it.
+    val fabInBar = back != null || actions != null
 
     Box(modifier = modifier.fillMaxSize().collapsesTopBar(chrome)) {
         Scaffold(
@@ -85,9 +78,15 @@ fun KomiScaffold(
                 }
             },
             bottomBar = {
-                ScaffoldBottom(back = chrome?.onBack?.value, bottomBar = bottomBar, inkDividers = inkDividers)
+                ScaffoldBottom(
+                    back = back,
+                    actions = actions,
+                    floatingActionButton = floatingActionButton.takeIf { fabInBar },
+                    bottomBar = bottomBar,
+                    inkDividers = inkDividers,
+                )
             },
-            floatingActionButton = { floatingActionButton?.invoke() },
+            floatingActionButton = { if (!fabInBar) floatingActionButton?.invoke() },
         ) { innerPadding ->
             Box(modifier = Modifier.fillMaxSize()) {
                 if (isManga && grid) {
@@ -118,50 +117,24 @@ fun KomiScaffold(
 @Composable
 private fun ScaffoldBottom(
     back: (() -> Unit)?,
+    actions: (@Composable RowScope.() -> Unit)?,
+    floatingActionButton: (@Composable () -> Unit)?,
     bottomBar: (@Composable () -> Unit)?,
     inkDividers: Boolean,
 ) {
-    if (back == null && bottomBar == null) return
+    val hasActionBar = back != null || actions != null
+    if (!hasActionBar && bottomBar == null) return
     val colors = LocalPersonality.current.colors
     Column {
-        back?.let { ClassicBackButton(onClick = it) }
+        if (hasActionBar) {
+            KomiActionBar(onBack = back, floatingActionButton = floatingActionButton, actions = actions)
+        }
         bottomBar?.let { bar ->
             if (inkDividers) HorizontalDivider(thickness = 3.dp, color = colors.outline)
             bar()
         }
     }
 }
-
-// A tonal cookie at the bottom-left, within thumb reach, instead of an arrow in the top bar.
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
-@Composable
-private fun ClassicBackButton(onClick: () -> Unit) {
-    val colors = LocalPersonality.current.colors
-    val label = stringResource(Res.string.navigate_back)
-    Box(
-        modifier =
-            Modifier
-                .navigationBarsPadding()
-                .padding(start = Spacing.lg, bottom = Spacing.md),
-    ) {
-        KomiTooltip(text = label) {
-            FilledTonalIconButton(
-                onClick = onClick,
-                shape = MaterialShapes.Cookie9Sided.toShape(),
-                colors =
-                    IconButtonDefaults.filledTonalIconButtonColors(
-                        containerColor = colors.surfaceContainerHigh,
-                        contentColor = colors.onSurface,
-                    ),
-                modifier = Modifier.size(BackButtonSize),
-            ) {
-                Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = label)
-            }
-        }
-    }
-}
-
-private val BackButtonSize = 56.dp
 
 @Composable
 private fun PreviewScaffold() {

@@ -523,11 +523,11 @@ fun DetailsScreen(
             KomiTopBar(
                 title = "",
                 onBack = { onAction(DetailsAction.OnNavigateBackClick) },
-                actions = {
-                    if (state.repository != null) {
-                        DetailsActions(state = state, onAction = onAction)
-                    }
-                }
+                actions = if (state.repository != null) {
+                    { DetailsActions(state = state, onAction = onAction) }
+                } else {
+                    null
+                },
             )
         },
         toastState = toastState
