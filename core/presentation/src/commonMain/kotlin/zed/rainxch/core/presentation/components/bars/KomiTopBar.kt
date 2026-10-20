@@ -20,6 +20,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.MediumFlexibleTopAppBar
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarColors
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -216,6 +217,8 @@ private fun ClassicTopBar(
     modifier: Modifier = Modifier,
 ) {
     val windowInsets = if (insets) TopAppBarDefaults.windowInsets else WindowInsets(0, 0, 0, 0)
+    // The bar is part of the page: no container, and no tint when content scrolls under it.
+    val colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent, scrolledContainerColor = Color.Transparent)
     // With nothing to show (Details hands everything to the action bar), only the status bar inset.
     val hasTitle = title.isNotBlank() || subtitle != null
     if (!hasTitle && leading == null && actions == null) {
@@ -264,6 +267,7 @@ private fun ClassicTopBar(
             navigationIcon = navigationIcon,
             actions = actionsContent,
             centerTitle = centerTitle,
+            colors = colors,
             windowInsets = windowInsets,
             modifier = modifier,
         )
@@ -272,6 +276,7 @@ private fun ClassicTopBar(
             title = titleContent,
             navigationIcon = navigationIcon,
             actions = actionsContent,
+            colors = colors,
             windowInsets = windowInsets,
             modifier = modifier,
         )
@@ -280,6 +285,7 @@ private fun ClassicTopBar(
             title = titleContent,
             navigationIcon = navigationIcon,
             actions = actionsContent,
+            colors = colors,
             windowInsets = windowInsets,
             modifier = modifier,
         )
@@ -296,6 +302,7 @@ private fun ClassicMasthead(
     navigationIcon: @Composable () -> Unit,
     actions: @Composable RowScope.() -> Unit,
     centerTitle: Boolean,
+    colors: TopAppBarColors,
     windowInsets: WindowInsets,
     modifier: Modifier = Modifier,
 ) {
@@ -312,6 +319,7 @@ private fun ClassicMasthead(
         navigationIcon = navigationIcon,
         actions = actions,
         titleHorizontalAlignment = if (centerTitle) Alignment.CenterHorizontally else Alignment.Start,
+        colors = colors,
         windowInsets = windowInsets,
         scrollBehavior = chrome?.behavior,
         modifier = modifier,
