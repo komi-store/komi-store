@@ -178,6 +178,16 @@
 -keep class rikka.shizuku.** { *; }
 -dontwarn rikka.shizuku.**
 
+# ── Dhizuku (Silent Install) ─────────────────────────────────────────────
+# Dhizuku loads the UserService by the class name in its ComponentName.
+# Nothing in the app constructs it, so without this R8 strips the
+# constructor and every AIDL method.
+-keep class zed.rainxch.core.data.services.dhizuku.DhizukuInstallerServiceImpl { *; }
+
+-keep class zed.rainxch.core.data.services.dhizuku.IDhizukuInstallerService { *; }
+-keep class zed.rainxch.core.data.services.dhizuku.IDhizukuInstallerService$Stub { *; }
+-keep class zed.rainxch.core.data.services.dhizuku.IDhizukuInstallerService$Stub$Proxy { *; }
+
 # ── Enum safety ────────────────────────────────────────────────────────────
 # Keep all enum values and valueOf methods (used by serialization/Room)
 -keepclassmembers enum * {
