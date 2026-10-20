@@ -22,6 +22,7 @@ import zed.rainxch.core.data.local.db.entities.UpdateHistoryEntity
 import zed.rainxch.core.data.mappers.toDomain
 import zed.rainxch.core.data.mappers.toEntity
 import zed.rainxch.core.data.mappers.toReleaseWindow
+import zed.rainxch.core.data.mappers.toUpdateCheckWindow
 import zed.rainxch.core.data.network.GitHubClientProvider
 import zed.rainxch.core.data.network.executeRequest
 import zed.rainxch.core.domain.model.account.github.GithubRelease
@@ -218,22 +219,52 @@ class InstalledAppsRepositoryImpl(
         )
     }
 
-    override suspend fun checkForUpdates(packageName: String): Boolean {
-        val app = installedAppsDao.getAppByPackage(packageName) ?: return false
-
-        if (!app.updateCheckEnabled) {
-            return false
+    override suspend fun checkForUpdates(packageName: String): Boolean =
+        checkEnabledApp(packageName, recordUnmatched = true) { app ->
+            fetchReleaseWindow(
+                owner = app.repoOwner,
+                repo = app.repoName,
+                includePreReleases = app.includePreReleases,
+                sourceHost = app.sourceHost,
+            )
         }
 
-        try {
-            val releases =
-                fetchReleaseWindow(
-                    owner = app.repoOwner,
-                    repo = app.repoName,
-                    includePreReleases = app.includePreReleases,
-                    sourceHost = app.sourceHost,
-                )
+    override suspend fun checkForUpdatesWithReleases(
+        packageName: String,
+        releases: List<GithubRelease>,
+    ): Boolean =
+        checkEnabledApp(packageName, recordUnmatched = false) { app ->
+            releases.toUpdateCheckWindow(includePreReleases = app.includePreReleases, limit = RELEASE_WINDOW)
+        }
 
+    private suspend fun checkEnabledApp(
+        packageName: String,
+        recordUnmatched: Boolean,
+        window: suspend (InstalledAppEntity) -> List<GithubRelease>,
+    ): Boolean {
+        val app = installedAppsDao.getAppByPackage(packageName) ?: return false
+        if (!app.updateCheckEnabled) return false
+        val releases =
+            try {
+                window(app)
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                Logger.e { "Failed to check updates for $packageName: ${e.message}" }
+                installedAppsDao.updateLastChecked(packageName, System.currentTimeMillis())
+                return false
+            }
+        return checkAgainstWindow(app, releases, recordUnmatched)
+    }
+
+    private suspend fun checkAgainstWindow(
+        app: InstalledAppEntity,
+        releases: List<GithubRelease>,
+        recordUnmatched: Boolean,
+    ): Boolean {
+        val packageName = app.packageName
+
+        try {
             // An empty window is a failed fetch (backend error, rate limit, network), not
             // proof the repo lost its releases. Keep what the last good check found and
             // leave lastCheckedAt alone so the next check retries.
@@ -249,6 +280,7 @@ class InstalledAppsRepositoryImpl(
                     "No matching release found for ${app.appName} in window of ${releases.size}; " +
                         "filter=${app.assetFilterRegex}, fallback=${app.fallbackToOlderReleases}"
                 }
+                if (!recordUnmatched) return app.isUpdateAvailable
                 recordUnmatchedRelease(packageName)
                 return false
             }

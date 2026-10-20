@@ -20,7 +20,7 @@
     <ID>CyclomaticComplexMethod:DesktopInstaller.kt$DesktopInstaller$private fun determineLinuxPackageType(): LinuxPackageType</ID>
     <ID>CyclomaticComplexMethod:DhizukuInstallerServiceImpl.kt$DhizukuInstallerServiceImpl$override fun installPackage( pfd: ParcelFileDescriptor, fileSize: Long, expectedPackageName: String?, expectedVersionCode: Long, installerPackageName: String?, ): Int</ID>
     <ID>CyclomaticComplexMethod:ExternalImportRepositoryImpl.kt$ExternalImportRepositoryImpl$override suspend fun resolveMatches(candidates: List&lt;ExternalAppCandidate&gt;): List&lt;RepoMatchResult&gt;</ID>
-    <ID>CyclomaticComplexMethod:InstalledAppsRepositoryImpl.kt$InstalledAppsRepositoryImpl$override suspend fun checkForUpdates(packageName: String): Boolean</ID>
+    <ID>CyclomaticComplexMethod:InstalledAppsRepositoryImpl.kt$InstalledAppsRepositoryImpl$private suspend fun checkAgainstWindow( app: InstalledAppEntity, releases: List&lt;GithubRelease&gt;, recordUnmatched: Boolean, ): Boolean</ID>
     <ID>CyclomaticComplexMethod:ProxyRepositoryImpl.kt$ProxyRepositoryImpl$private suspend fun migrateIfNeeded()</ID>
     <ID>CyclomaticComplexMethod:RateLimitInterceptor.kt$RateLimitInterceptor.Plugin$private fun parseRateLimitFromHeaders(headers: Headers): RateLimitInfo?</ID>
     <ID>CyclomaticComplexMethod:StarredRepositoryImpl.kt$StarredRepositoryImpl$override suspend fun fetchStarredForUsername( username: String, ): Result&lt;List&lt;zed.rainxch.core.domain.model.repository.StarredRepository&gt;&gt;</ID>
@@ -52,7 +52,7 @@
     <ID>LongMethod:DesktopInstaller.kt$DesktopInstaller$private fun runCommandInTerminal( command: String, terminals: List&lt;LinuxTerminal&gt;, )</ID>
     <ID>LongMethod:DhizukuInstallerServiceImpl.kt$DhizukuInstallerServiceImpl$override fun installPackage( pfd: ParcelFileDescriptor, fileSize: Long, expectedPackageName: String?, expectedVersionCode: Long, installerPackageName: String?, ): Int</ID>
     <ID>LongMethod:ExternalImportRepositoryImpl.kt$ExternalImportRepositoryImpl$override suspend fun resolveMatches(candidates: List&lt;ExternalAppCandidate&gt;): List&lt;RepoMatchResult&gt;</ID>
-    <ID>LongMethod:InstalledAppsRepositoryImpl.kt$InstalledAppsRepositoryImpl$override suspend fun checkForUpdates(packageName: String): Boolean</ID>
+    <ID>LongMethod:InstalledAppsRepositoryImpl.kt$InstalledAppsRepositoryImpl$private suspend fun checkAgainstWindow( app: InstalledAppEntity, releases: List&lt;GithubRelease&gt;, recordUnmatched: Boolean, ): Boolean</ID>
     <ID>LongMethod:PackageEventReceiver.kt$PackageEventReceiver$private suspend fun handleExternalInstall( packageName: String, app: zed.rainxch.core.domain.model.installation.InstalledApp, repo: InstalledAppsRepository, monitor: PackageMonitor, )</ID>
     <ID>LongMethod:PackageEventReceiver.kt$PackageEventReceiver$private suspend fun onPackageInstalled(packageName: String)</ID>
     <ID>LongMethod:ProxyRepositoryImpl.kt$ProxyRepositoryImpl$private suspend fun migrateIfNeeded()</ID>
@@ -211,9 +211,10 @@
     <ID>ReturnCount:ExternalImportRepositoryImpl.kt$ExternalImportRepositoryImpl$private suspend fun migrateLegacyInitialScanFlag()</ID>
     <ID>ReturnCount:GithubAssetAuth.kt$GithubAssetAuth$fun isGithubHost(url: String): Boolean</ID>
     <ID>ReturnCount:HttpClientFactory.android.kt$internal fun resolveAndroidSystemProxy(): Proxy</ID>
-    <ID>ReturnCount:InstalledAppsRepositoryImpl.kt$InstalledAppsRepositoryImpl$override suspend fun checkForUpdates(packageName: String): Boolean</ID>
     <ID>ReturnCount:InstalledAppsRepositoryImpl.kt$InstalledAppsRepositoryImpl$override suspend fun previewMatchingAssets( owner: String, repo: String, regex: String?, includePreReleases: Boolean, fallbackToOlderReleases: Boolean, ): MatchingPreview</ID>
     <ID>ReturnCount:InstalledAppsRepositoryImpl.kt$InstalledAppsRepositoryImpl$override suspend fun resolveTrackedRelease(packageName: String): ResolvedRelease?</ID>
+    <ID>ReturnCount:InstalledAppsRepositoryImpl.kt$InstalledAppsRepositoryImpl$private suspend fun checkAgainstWindow( app: InstalledAppEntity, releases: List&lt;GithubRelease&gt;, recordUnmatched: Boolean, ): Boolean</ID>
+    <ID>ReturnCount:InstalledAppsRepositoryImpl.kt$InstalledAppsRepositoryImpl$private suspend fun checkEnabledApp( packageName: String, recordUnmatched: Boolean, window: suspend (InstalledAppEntity) -&gt; List&lt;GithubRelease&gt;, ): Boolean</ID>
     <ID>ReturnCount:InstalledAppsRepositoryImpl.kt$InstalledAppsRepositoryImpl$private suspend fun fetchReleaseWindow( owner: String, repo: String, includePreReleases: Boolean, sourceHost: String? = null, ): List&lt;GithubRelease&gt;</ID>
     <ID>ReturnCount:InstallerSourceClassifier.kt$InstallerSourceClassifier$fun classify( packageName: String, applicationInfo: ApplicationInfo?, ): InstallerKind</ID>
     <ID>ReturnCount:ManifestHintExtractor.kt$ManifestHintExtractor$fun extract(metaData: Bundle?): ManifestHint?</ID>
