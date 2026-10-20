@@ -1,6 +1,7 @@
 package zed.rainxch.search.presentation
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.material.icons.rounded.Search
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
@@ -34,7 +35,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.OpenInNew
 import androidx.compose.material.icons.automirrored.filled.Sort
-import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.Link
@@ -857,33 +857,14 @@ private fun SearchTopbar(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(10.dp),
     ) {
-        val colors = LocalPersonality.current.colors
-        val shape = LocalPersonality.current.shape
         KomiTextField(
             value = state.query,
             onValueChange = { value ->
                 onAction(SearchAction.OnSearchChange(value))
             },
             placeholder = stringResource(Res.string.search_repositories_hint),
-            leadingIcon = Icons.Default.Search,
-            trailing = {
-                if (state.query.isNotEmpty()) {
-                    Box(
-                        modifier = Modifier
-                            .size(28.dp)
-                            .clip(RoundedCornerShape(shape.cornerSmall))
-                            .clickable { onAction(SearchAction.OnClearClick) },
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        KomiIcon(
-                            imageVector = Icons.Default.Clear,
-                            contentDescription = stringResource(Res.string.dismiss),
-                            modifier = Modifier.size(18.dp),
-                            tint = colors.onSurfaceVariant,
-                        )
-                    }
-                }
-            },
+            leadingIcon = Icons.Rounded.Search,
+            onClear = { onAction(SearchAction.OnClearClick) },
             keyboardType = KeyboardType.Text,
             onCommit = { onAction(SearchAction.OnSearchImeClick) },
             modifier = Modifier

@@ -569,6 +569,8 @@
     <string name="delete_downloads_confirmation_message">This will permanently remove all downloaded APKs and installers (%1$s). You can re-download them anytime.</string>
     <string name="downloads_cleared">All downloaded packages have been deleted.</string>
     <string name="clear">Clear</string>
+    <string name="show_password">Show password</string>
+    <string name="hide_password">Hide password</string>
 
 
 

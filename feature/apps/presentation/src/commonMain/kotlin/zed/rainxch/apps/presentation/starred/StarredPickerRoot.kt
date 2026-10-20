@@ -1,6 +1,7 @@
 package zed.rainxch.apps.presentation.starred
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.material.icons.rounded.Search
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -191,7 +192,8 @@ private fun StarredPickerScreen(
                             onValueChange = { onAction(StarredPickerAction.OnSearchChange(it)) },
                             modifier = Modifier.fillMaxWidth(),
                             placeholder = stringResource(Res.string.starred_picker_search_hint),
-                            leadingIcon = Icons.Filled.Search,
+                            leadingIcon = Icons.Rounded.Search,
+                            clearable = true,
                         )
 
                         Spacer(Modifier.height(8.dp))

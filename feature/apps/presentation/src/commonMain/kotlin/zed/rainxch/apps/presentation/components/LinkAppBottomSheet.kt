@@ -1,6 +1,8 @@
 package zed.rainxch.apps.presentation.components
 
 import zed.rainxch.core.presentation.utils.formatFileSize
+import androidx.compose.material.icons.rounded.Search
+import androidx.compose.material.icons.rounded.FilterAlt
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -170,7 +172,8 @@ private fun PickAppStep(
             onValueChange = onSearchChange,
             modifier = Modifier.fillMaxWidth(),
             placeholder = stringResource(Res.string.search_apps_hint),
-            leadingIcon = Icons.Default.Search,
+            leadingIcon = Icons.Rounded.Search,
+            clearable = true,
         )
 
         Spacer(Modifier.height(8.dp))
@@ -775,7 +778,8 @@ private fun PickAssetStep(
             modifier = Modifier.fillMaxWidth(),
             label = stringResource(Res.string.asset_filter_label),
             placeholder = stringResource(Res.string.asset_filter_placeholder),
-            leadingIcon = Icons.Default.FilterAlt,
+            leadingIcon = Icons.Rounded.FilterAlt,
+            clearable = true,
             helper = if (filterError == null) filterSupporting else null,
             error = if (filterError != null) filterSupporting else null,
             enabled = !isProcessing,

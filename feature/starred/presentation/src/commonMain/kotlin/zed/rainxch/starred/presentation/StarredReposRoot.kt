@@ -1,6 +1,7 @@
 package zed.rainxch.starred.presentation
 
 import androidx.compose.foundation.clickable
+import androidx.compose.material.icons.rounded.Search
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -346,16 +347,8 @@ private fun StarredSearchBar(
                 .fillMaxWidth()
                 .padding(horizontal = 12.dp, vertical = 8.dp),
         placeholder = stringResource(Res.string.search_repositories_hint),
-        leadingIcon = Icons.Filled.Search,
-        trailing = {
-            if (query.isNotEmpty()) {
-                KomiIcon(
-                    imageVector = Icons.Filled.Close,
-                    contentDescription = stringResource(Res.string.clear_search),
-                    modifier = Modifier.clickable { onQueryChange("") },
-                )
-            }
-        },
+        leadingIcon = Icons.Rounded.Search,
+        clearable = true,
     )
 }
 

@@ -1,6 +1,7 @@
 package zed.rainxch.apps.presentation.components
 
 import zed.rainxch.core.presentation.utils.formatFileSize
+import androidx.compose.material.icons.rounded.FilterAlt
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -24,7 +25,6 @@ import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material.icons.filled.Warning
 import zed.rainxch.core.presentation.components.buttons.KomiButton
-import zed.rainxch.core.presentation.components.buttons.KomiButtonSize
 import zed.rainxch.core.presentation.components.buttons.KomiButtonVariant
 import zed.rainxch.core.presentation.components.dividers.KomiHorizontalDivider
 import zed.rainxch.core.presentation.components.icon.KomiIcon
@@ -115,17 +115,8 @@ fun AdvancedAppSettingsBottomSheet(
                 modifier = Modifier.fillMaxWidth(),
                 label = stringResource(Res.string.asset_filter_label),
                 placeholder = stringResource(Res.string.asset_filter_placeholder),
-                leadingIcon = Icons.Default.FilterAlt,
-                trailing = {
-                    if (state.advancedFilterDraft.isNotEmpty()) {
-                        KomiButton(
-                            onClick = { onAction(AppsAction.OnAdvancedClearFilter) },
-                            label = stringResource(Res.string.clear),
-                            variant = KomiButtonVariant.Text,
-                            size = KomiButtonSize.Sm,
-                        )
-                    }
-                },
+                leadingIcon = Icons.Rounded.FilterAlt,
+                onClear = { onAction(AppsAction.OnAdvancedClearFilter) },
                 helper = if (state.advancedFilterError == null) advancedSupporting else null,
                 error = if (state.advancedFilterError != null) advancedSupporting else null,
                 enabled = !state.advancedSavingFilter,

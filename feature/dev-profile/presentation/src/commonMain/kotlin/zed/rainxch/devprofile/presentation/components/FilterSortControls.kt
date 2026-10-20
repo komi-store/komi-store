@@ -1,6 +1,7 @@
 package zed.rainxch.devprofile.presentation.components
 
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.material.icons.rounded.Search
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
@@ -15,7 +16,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Sort
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -36,7 +36,6 @@ import zed.rainxch.devprofile.domain.model.RepoFilterType
 import zed.rainxch.devprofile.domain.model.RepoSortType
 import zed.rainxch.devprofile.presentation.DeveloperProfileAction
 import zed.rainxch.githubstore.core.presentation.res.Res
-import zed.rainxch.githubstore.core.presentation.res.clear_search
 import zed.rainxch.githubstore.core.presentation.res.filter_favorites
 import zed.rainxch.githubstore.core.presentation.res.filter_installed
 import zed.rainxch.githubstore.core.presentation.res.filter_with_installable
@@ -69,22 +68,8 @@ fun FilterSortControls(
             onValueChange = { onAction(DeveloperProfileAction.OnSearchQueryChange(it)) },
             modifier = Modifier.fillMaxWidth(),
             placeholder = stringResource(Res.string.search_repositories),
-            leadingIcon = Icons.Default.Search,
-            trailing = {
-                if (searchQuery.isNotBlank()) {
-                    Box(
-                        modifier = Modifier
-                            .clickable { onAction(DeveloperProfileAction.OnSearchQueryChange("")) },
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        KomiIcon(
-                            imageVector = Icons.Default.Close,
-                            contentDescription = stringResource(Res.string.clear_search),
-                            modifier = Modifier.size(20.dp),
-                        )
-                    }
-                }
-            },
+            leadingIcon = Icons.Rounded.Search,
+            clearable = true,
         )
 
         Row(

@@ -1,6 +1,5 @@
 package zed.rainxch.apps.presentation.import.components
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -9,6 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.rounded.Search
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -16,7 +16,8 @@ import androidx.compose.ui.unit.dp
 import kotlinx.collections.immutable.ImmutableList
 import org.jetbrains.compose.resources.stringResource
 import zed.rainxch.apps.presentation.import.model.RepoSuggestionUi
-import zed.rainxch.core.presentation.components.icon.KomiIcon
+import zed.rainxch.core.presentation.components.buttons.KomiButtonVariant
+import zed.rainxch.core.presentation.components.buttons.KomiIconButton
 import zed.rainxch.core.presentation.components.inputs.KomiTextField
 import zed.rainxch.core.presentation.components.progress.KomiCircularProgress
 import zed.rainxch.core.presentation.components.text.KomiText
@@ -52,15 +53,12 @@ fun RepoSearchOverride(
                 error = searchError?.takeIf { it.isNotBlank() },
                 placeholder = stringResource(Res.string.external_import_search_placeholder_url),
                 trailing = {
-                    Box(
-                        modifier = Modifier.size(48.dp).clickable(onClick = onSubmit),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        KomiIcon(
-                            imageVector = Icons.Default.Search,
-                            contentDescription = stringResource(Res.string.external_import_search_icon_label),
-                        )
-                    }
+                    KomiIconButton(
+                        icon = Icons.Rounded.Search,
+                        contentDescription = stringResource(Res.string.external_import_search_icon_label),
+                        onClick = onSubmit,
+                        variant = KomiButtonVariant.Text,
+                    )
                 },
                 onCommit = onSubmit,
             )

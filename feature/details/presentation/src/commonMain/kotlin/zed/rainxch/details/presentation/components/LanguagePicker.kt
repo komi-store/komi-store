@@ -1,6 +1,7 @@
 package zed.rainxch.details.presentation.components
 
 import androidx.compose.foundation.background
+import androidx.compose.material.icons.rounded.Search
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -73,7 +74,8 @@ fun LanguagePicker(
                 value = query,
                 onValueChange = onQueryChange,
                 placeholder = stringResource(Res.string.search_language),
-                leadingIcon = Icons.Default.Search,
+                leadingIcon = Icons.Rounded.Search,
+                clearable = true,
                 modifier =
                     Modifier
                         .fillMaxWidth()

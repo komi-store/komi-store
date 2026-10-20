@@ -1,6 +1,7 @@
 package zed.rainxch.favourites.presentation.import
 
 import androidx.compose.foundation.clickable
+import androidx.compose.material.icons.rounded.Search
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,7 +16,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.FavoriteBorder
@@ -42,7 +42,6 @@ import zed.rainxch.core.presentation.components.text.KomiTextRole
 import zed.rainxch.core.presentation.locals.LocalPersonality
 import zed.rainxch.core.presentation.utils.ObserveAsEvents
 import zed.rainxch.githubstore.core.presentation.res.Res
-import zed.rainxch.githubstore.core.presentation.res.clear_search
 import zed.rainxch.githubstore.core.presentation.res.import_stars_add
 import zed.rainxch.githubstore.core.presentation.res.import_stars_add_all
 import zed.rainxch.githubstore.core.presentation.res.import_stars_added
@@ -195,19 +194,8 @@ private fun ResultsPanel(
             onValueChange = { onAction(ImportStarsAction.OnSearchChange(it)) },
             modifier = Modifier.fillMaxWidth(),
             placeholder = stringResource(Res.string.import_stars_search_hint),
-            leadingIcon = Icons.Filled.Search,
-            trailing = {
-                if (state.searchQuery.isNotEmpty()) {
-                    KomiIcon(
-                        imageVector = Icons.Filled.Close,
-                        contentDescription = stringResource(Res.string.clear_search),
-                        tint = colors.onSurfaceVariant,
-                        modifier = Modifier
-                            .size(18.dp)
-                            .clickable { onAction(ImportStarsAction.OnClearSearch) },
-                    )
-                }
-            },
+            leadingIcon = Icons.Rounded.Search,
+            onClear = { onAction(ImportStarsAction.OnClearSearch) },
         )
 
         if (state.pendingCount > 0) {

@@ -25,8 +25,6 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -50,6 +48,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
+import org.jetbrains.compose.resources.stringResource
 import zed.rainxch.core.presentation.components.text.KomiText
 import zed.rainxch.core.presentation.components.text.KomiTextRole
 import zed.rainxch.core.presentation.locals.LocalPersonality
@@ -64,6 +63,10 @@ import zed.rainxch.core.presentation.personality.model.PersonalityColors
 import zed.rainxch.core.presentation.personality.model.PersonalityType
 import zed.rainxch.core.presentation.personality.utils.PersonalityPreview
 import zed.rainxch.core.presentation.spacing.Spacing
+import zed.rainxch.githubstore.core.presentation.res.Res
+import zed.rainxch.githubstore.core.presentation.res.clear
+import zed.rainxch.githubstore.core.presentation.res.hide_password
+import zed.rainxch.githubstore.core.presentation.res.show_password
 
 @Composable
 fun KomiTextField(
@@ -77,6 +80,7 @@ fun KomiTextField(
     leadingIcon: ImageVector? = null,
     trailing: @Composable (() -> Unit)? = null,
     clearable: Boolean = false,
+    onClear: (() -> Unit)? = null,
     multiline: Boolean = false,
     rows: Int = 4,
     required: Boolean = false,
@@ -86,6 +90,8 @@ fun KomiTextField(
     keyboardType: KeyboardType = KeyboardType.Text,
     onCommit: (() -> Unit)? = null,
 ) {
+    // onClear replaces the plain clear for a screen whose clear does more than empty the text.
+    val clear: (() -> Unit)? = onClear ?: if (clearable) ({ onValueChange("") }) else null
     when (val personality = LocalPersonality.current) {
         is MangaPersonality -> {
             MangaTextField(
@@ -98,7 +104,14 @@ fun KomiTextField(
                 error = error,
                 placeholder = placeholder,
                 leadingIcon = leadingIcon,
-                trailing = trailing,
+                trailing =
+                    trailing ?: onClear?.let { onClearClick ->
+                        {
+                            if (enabled && value.isNotEmpty()) {
+                                ClearButton(personality.colors, fieldMetrics(size).icon, onClearClick)
+                            }
+                        }
+                    },
                 clearable = clearable,
                 multiline = multiline,
                 rows = rows,
@@ -113,6 +126,7 @@ fun KomiTextField(
 
         is ClassicPersonality -> {
             ClassicTextField(
+                personality = personality,
                 value = value,
                 onValueChange = onValueChange,
                 modifier = modifier,
@@ -122,7 +136,7 @@ fun KomiTextField(
                 placeholder = placeholder,
                 leadingIcon = leadingIcon,
                 trailing = trailing,
-                clearable = clearable,
+                onClear = clear,
                 multiline = multiline,
                 rows = rows,
                 required = required,
@@ -333,7 +347,7 @@ private fun ClearButton(
     ) {
         Icon(
             imageVector = Icons.Default.Close,
-            contentDescription = "Clear",
+            contentDescription = stringResource(Res.string.clear),
             modifier = Modifier.size(iconSize - 5.dp),
             tint = colors.onSurface,
         )
@@ -350,115 +364,12 @@ private fun PasswordToggle(
     val interaction = remember { MutableInteractionSource() }
     Icon(
         imageVector = if (visible) Icons.Default.VisibilityOff else Icons.Default.Visibility,
-        contentDescription = null,
+        contentDescription = stringResource(if (visible) Res.string.hide_password else Res.string.show_password),
         tint = tint,
         modifier =
             Modifier
                 .size(iconSize)
                 .clickable(interactionSource = interaction, indication = null, onClick = onToggle),
-    )
-}
-
-@Composable
-private fun ClassicTextField(
-    value: String,
-    onValueChange: (String) -> Unit,
-    modifier: Modifier,
-    label: String?,
-    helper: String?,
-    error: String?,
-    placeholder: String?,
-    leadingIcon: ImageVector?,
-    trailing: @Composable (() -> Unit)?,
-    clearable: Boolean,
-    multiline: Boolean,
-    rows: Int,
-    required: Boolean,
-    enabled: Boolean,
-    password: Boolean,
-    keyboardType: KeyboardType,
-    onCommit: (() -> Unit)?,
-) {
-    val hasError = error != null
-    val supporting = error ?: helper
-    val showClear = clearable && enabled && value.isNotEmpty() && trailing == null
-    var passwordVisible by remember { mutableStateOf(false) }
-    val visualTransformation = if (password && !passwordVisible) {
-        PasswordVisualTransformation()
-    } else VisualTransformation.None
-
-    TextField(
-        value = value,
-        onValueChange = onValueChange,
-        modifier = modifier.fillMaxWidth(),
-        enabled = enabled,
-        isError = hasError,
-        visualTransformation = visualTransformation,
-        label = label?.let {
-            {
-                Text(text = if (required) "$it *" else it)
-            }
-        },
-        placeholder = placeholder?.let {
-            {
-                Text(
-                    text = it,
-                    color = LocalPersonality.current.colors.onSurfaceVariant,
-                    maxLines = if (multiline) Int.MAX_VALUE else 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-            }
-        },
-        leadingIcon = leadingIcon?.let {
-            {
-                Icon(
-                    imageVector = it,
-                    contentDescription = null
-                )
-            }
-        },
-        trailingIcon =
-            when {
-                trailing != null -> {
-                    trailing
-                }
-
-                password -> {
-                    {
-                        Icon(
-                            imageVector = if (passwordVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility,
-                            contentDescription = null,
-                            modifier = Modifier.clickable(onClick = {
-                                passwordVisible = !passwordVisible
-                            }),
-                        )
-                    }
-                }
-
-                showClear -> {
-                    {
-                        Icon(
-                            imageVector = Icons.Default.Close,
-                            contentDescription = "Clear",
-                            modifier = Modifier.clickable(onClick = { onValueChange("") }),
-                        )
-                    }
-                }
-
-                else -> {
-                    null
-                }
-            },
-        supportingText = supporting?.let { { Text(it) } },
-        singleLine = !multiline,
-        minLines = if (multiline) rows else 1,
-        keyboardOptions =
-            KeyboardOptions(
-                keyboardType = keyboardType,
-                imeAction = if (!multiline && onCommit != null) ImeAction.Done else ImeAction.Default,
-            ),
-        maxLines = if (multiline) Int.MAX_VALUE else 1,
-        keyboardActions = KeyboardActions(onDone = { onCommit?.invoke() }),
     )
 }
 

@@ -1,6 +1,6 @@
 package zed.rainxch.favourites.presentation
 
-import androidx.compose.foundation.clickable
+import androidx.compose.material.icons.rounded.Search
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,7 +15,6 @@ import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridS
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.Sort
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.rounded.PersonAdd
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.Composable
@@ -34,7 +33,6 @@ import zed.rainxch.core.presentation.components.bars.KomiTopBar
 import zed.rainxch.core.presentation.components.bars.KomiTopBarSize
 import zed.rainxch.core.presentation.components.buttons.KomiButtonVariant
 import zed.rainxch.core.presentation.components.buttons.KomiIconButton
-import zed.rainxch.core.presentation.components.icon.KomiIcon
 import zed.rainxch.core.presentation.components.inputs.KomiTextField
 import zed.rainxch.core.presentation.components.overlays.KomiDropdown
 import zed.rainxch.core.presentation.components.overlays.KomiMenuEntry
@@ -239,16 +237,8 @@ private fun FavouritesSearchBar(
                 .fillMaxWidth()
                 .padding(horizontal = 12.dp, vertical = 8.dp),
         placeholder = stringResource(Res.string.search_repositories_hint),
-        leadingIcon = Icons.Filled.Search,
-        trailing = {
-            if (query.isNotEmpty()) {
-                KomiIcon(
-                    imageVector = Icons.Filled.Close,
-                    contentDescription = stringResource(Res.string.clear_search),
-                    modifier = Modifier.clickable { onQueryChange("") },
-                )
-            }
-        },
+        leadingIcon = Icons.Rounded.Search,
+        clearable = true,
     )
 }
 

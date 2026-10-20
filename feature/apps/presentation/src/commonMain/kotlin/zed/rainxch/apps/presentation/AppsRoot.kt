@@ -3,6 +3,7 @@
 package zed.rainxch.apps.presentation
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.material.icons.rounded.Search
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -251,7 +252,8 @@ fun AppsScreen(
                     KomiTextField(
                         value = state.searchQuery,
                         onValueChange = { onAction(AppsAction.OnSearchChange(it)) },
-                        leadingIcon = Icons.Default.Search,
+                        leadingIcon = Icons.Rounded.Search,
+                        clearable = true,
                         placeholder = stringResource(Res.string.search_your_apps),
                         modifier =
                             Modifier
