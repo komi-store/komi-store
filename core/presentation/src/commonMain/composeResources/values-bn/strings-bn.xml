@@ -26,7 +26,6 @@
 
     <!-- Apps feature - Update states -->
     <string name="checking">পরীক্ষা করা হচ্ছে…</string>
-    <string name="updated_successfully">সফলভাবে আপডেট হয়েছে</string>
     <string name="error_with_message">ত্রুটি: %1$s</string>
 
     <!-- Apps feature - Update all progress -->
@@ -915,13 +914,6 @@
     <string name="apps_variant_subtitle">%1$s  ·  %2$s</string>
     <string name="apps_section_header_cd">%1$s, %2$d, %3$s</string>
     <string name="apps_section_header_static_cd">%1$s, %2$d</string>
-    <string name="apps_compact_status_filter_active">মনোরেপো ফিল্টার সক্রিয়</string>
-    <string name="apps_compact_status_pending_install">ইনস্টল মুলতুবি</string>
-    <string name="apps_compact_status_pre_release_on">প্রি-রিলিজ চালু</string>
-    <string name="apps_compact_status_ready_to_install">ইনস্টলের জন্য প্রস্তুত</string>
-    <string name="apps_compact_status_updates_ignored">আপডেট উপেক্ষা করা হয়েছে</string>
-    <string name="apps_compact_status_variant_pinned">ভ্যারিয়েন্ট পিন করা</string>
-    <string name="apps_compact_status_variant_stale">ভ্যারিয়েন্ট পুরোনো, ব্যবস্থা প্রয়োজন</string>
     <string name="apps_ignore_updates">আপডেট উপেক্ষা করুন</string>
     <string name="apps_section_collapse">বিভাগ সংকুচিত করুন</string>
     <string name="apps_section_count_suffix">· %1$d</string>

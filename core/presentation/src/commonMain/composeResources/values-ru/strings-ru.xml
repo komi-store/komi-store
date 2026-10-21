@@ -20,7 +20,6 @@
     <string name="cancel">Отмена</string>
 
     <string name="checking">Проверка…</string>
-    <string name="updated_successfully">Успешно обновлено</string>
     <string name="error_with_message">Ошибка: %1$s</string>
 
     <string name="updating_x_of_y">Обновление %1$d из %2$d</string>
@@ -919,13 +918,6 @@
     <string name="apps_variant_subtitle">%1$s  ·  %2$s</string>
     <string name="apps_section_header_cd">%1$s, %2$d, %3$s</string>
     <string name="apps_section_header_static_cd">%1$s, %2$d</string>
-    <string name="apps_compact_status_filter_active">фильтр monorepo активен</string>
-    <string name="apps_compact_status_pending_install">установка в ожидании</string>
-    <string name="apps_compact_status_pre_release_on">пре-релиз включён</string>
-    <string name="apps_compact_status_ready_to_install">готов к установке</string>
-    <string name="apps_compact_status_updates_ignored">обновления игнорируются</string>
-    <string name="apps_compact_status_variant_pinned">вариант закреплён</string>
-    <string name="apps_compact_status_variant_stale">вариант устарел, нужно действие</string>
     <string name="apps_ignore_updates">Игнорировать обновления</string>
     <string name="apps_section_collapse">Свернуть раздел</string>
     <string name="apps_section_count_suffix">· %1$d</string>

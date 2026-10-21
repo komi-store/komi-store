@@ -70,7 +70,7 @@ fun AppsSectionHeader(
         modifier =
             modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp)
+                .padding(horizontal = 4.dp)
                 .padding(top = 20.dp, bottom = 6.dp)
                 .let { base ->
                     if (collapsible) {

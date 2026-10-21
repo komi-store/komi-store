@@ -26,7 +26,6 @@
 
     <!-- Apps feature - Update states -->
     <string name="checking">जाँच हो रही है...</string>
-    <string name="updated_successfully">सफलतापूर्वक अपडेट किया गया</string>
     <string name="error_with_message">गलती: %1$s</string>
 
     <!-- Apps feature - Update all progress -->
@@ -926,13 +925,6 @@
     <string name="apps_variant_subtitle">%1$s  ·  %2$s</string>
     <string name="apps_section_header_cd">%1$s, %2$d, %3$s</string>
     <string name="apps_section_header_static_cd">%1$s, %2$d</string>
-    <string name="apps_compact_status_filter_active">मोनोरेपो फ़िल्टर सक्रिय</string>
-    <string name="apps_compact_status_pending_install">इंस्टॉल लंबित</string>
-    <string name="apps_compact_status_pre_release_on">प्री-रिलीज़ चालू</string>
-    <string name="apps_compact_status_ready_to_install">इंस्टॉल के लिए तैयार</string>
-    <string name="apps_compact_status_updates_ignored">अपडेट अनदेखे किए गए</string>
-    <string name="apps_compact_status_variant_pinned">वैरिएंट पिन किया गया</string>
-    <string name="apps_compact_status_variant_stale">वैरिएंट पुराना, कार्रवाई आवश्यक</string>
     <string name="apps_ignore_updates">अपडेट अनदेखा करें</string>
     <string name="apps_section_collapse">अनुभाग संक्षिप्त करें</string>
     <string name="apps_section_count_suffix">· %1$d</string>

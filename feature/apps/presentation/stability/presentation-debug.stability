@@ -5,24 +5,6 @@
 //   ./gradlew :presentation:stabilityDump
 
 @Composable
-private fun zed.rainxch.apps.presentation.AppItemCardGroup(group: zed.rainxch.apps.presentation.model.AppGroup, onAction: kotlin.Function1<zed.rainxch.apps.presentation.AppsAction, kotlin.Unit>, onOpenRepo: kotlin.Function1<zed.rainxch.apps.presentation.model.InstalledAppUi, kotlin.Unit>): kotlin.Unit
-  skippable: true
-  restartable: true
-  params:
-    - group: STABLE (class with no mutable properties)
-    - onAction: STABLE (function type)
-    - onOpenRepo: STABLE (function type)
-
-@Composable
-private fun zed.rainxch.apps.presentation.AppItemCardWithActions(appItem: zed.rainxch.apps.presentation.model.AppItem, onAction: kotlin.Function1<zed.rainxch.apps.presentation.AppsAction, kotlin.Unit>, onOpenRepo: kotlin.Function1<zed.rainxch.apps.presentation.model.InstalledAppUi, kotlin.Unit>): kotlin.Unit
-  skippable: true
-  restartable: true
-  params:
-    - appItem: STABLE (class with no mutable properties)
-    - onAction: STABLE (function type)
-    - onOpenRepo: STABLE (function type)
-
-@Composable
 public fun zed.rainxch.apps.presentation.AppsRoot(onNavigateBack: kotlin.Function0<kotlin.Unit>, onNavigateToRepo: kotlin.Function5<@[ParameterName(name = \, onNavigateToExternalImport: kotlin.Function0<kotlin.Unit>, onNavigateToStarredPicker: kotlin.Function0<kotlin.Unit>, viewModel: zed.rainxch.apps.presentation.AppsViewModel, state: zed.rainxch.apps.presentation.AppsState): kotlin.Unit
   skippable: false
   restartable: true
@@ -53,22 +35,21 @@ private fun zed.rainxch.apps.presentation.AppsSearchField(query: kotlin.String, 
     - modifier: STABLE (marked @Stable or @Immutable)
 
 @Composable
-private fun zed.rainxch.apps.presentation.CompactAppRowWithActions(appItem: zed.rainxch.apps.presentation.model.AppItem, onAction: kotlin.Function1<zed.rainxch.apps.presentation.AppsAction, kotlin.Unit>, onRowSelect: kotlin.Function1<zed.rainxch.apps.presentation.model.InstalledAppUi, kotlin.Unit>, framed: kotlin.Boolean): kotlin.Unit
-  skippable: true
-  restartable: true
-  params:
-    - appItem: STABLE (class with no mutable properties)
-    - onAction: STABLE (function type)
-    - onRowSelect: STABLE (function type)
-    - framed: STABLE (primitive type)
-
-@Composable
 private fun zed.rainxch.apps.presentation.KeepAtTopWhenSectionsChange(gridState: androidx.compose.foundation.lazy.grid.LazyGridState, sections: kotlin.collections.List<kotlin.Boolean>): kotlin.Unit
   skippable: false
   restartable: true
   params:
     - gridState: STABLE (marked @Stable or @Immutable)
     - sections: RUNTIME (requires runtime check)
+
+@Composable
+private fun zed.rainxch.apps.presentation.LibraryGroupItem(group: zed.rainxch.apps.presentation.model.AppGroup, onAction: kotlin.Function1<zed.rainxch.apps.presentation.AppsAction, kotlin.Unit>, onOpenRepo: kotlin.Function1<zed.rainxch.apps.presentation.model.InstalledAppUi, kotlin.Unit>): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - group: STABLE (class with no mutable properties)
+    - onAction: STABLE (function type)
+    - onOpenRepo: STABLE (function type)
 
 @Composable
 public fun zed.rainxch.apps.presentation.components.AdvancedAppSettingsBottomSheet(state: zed.rainxch.apps.presentation.AppsState, onAction: kotlin.Function1<zed.rainxch.apps.presentation.AppsAction, kotlin.Unit>): kotlin.Unit
@@ -79,36 +60,6 @@ public fun zed.rainxch.apps.presentation.components.AdvancedAppSettingsBottomShe
     - onAction: STABLE (function type)
 
 @Composable
-internal fun zed.rainxch.apps.presentation.components.AppCardToolbar(appItem: zed.rainxch.apps.presentation.model.AppItem, onAdvancedSettingsClick: kotlin.Function0<kotlin.Unit>, onPickVariantClick: kotlin.Function0<kotlin.Unit>, onTogglePreReleases: kotlin.Function1<kotlin.Boolean, kotlin.Unit>, onToggleUpdateCheck: kotlin.Function1<kotlin.Boolean, kotlin.Unit>, onSkipVersionClick: kotlin.Function0<kotlin.Unit>, onUnskipVersionClick: kotlin.Function0<kotlin.Unit>, controlsEnabled: kotlin.Boolean): kotlin.Unit
-  skippable: true
-  restartable: true
-  params:
-    - appItem: STABLE (class with no mutable properties)
-    - onAdvancedSettingsClick: STABLE (function type)
-    - onPickVariantClick: STABLE (function type)
-    - onTogglePreReleases: STABLE (function type)
-    - onToggleUpdateCheck: STABLE (function type)
-    - onSkipVersionClick: STABLE (function type)
-    - onUnskipVersionClick: STABLE (function type)
-    - controlsEnabled: STABLE (primitive type)
-
-@Composable
-public fun zed.rainxch.apps.presentation.components.AppGroupCard(header: zed.rainxch.apps.presentation.model.InstalledAppUi, modifier: androidx.compose.ui.Modifier, content: @[Composable] @[ExtensionFunctionType] androidx.compose.runtime.internal.ComposableFunction1<androidx.compose.foundation.layout.ColumnScope, kotlin.Unit>): kotlin.Unit
-  skippable: true
-  restartable: true
-  params:
-    - header: STABLE (class with no mutable properties)
-    - modifier: STABLE (marked @Stable or @Immutable)
-    - content: STABLE (composable function type)
-
-@Composable
-public fun zed.rainxch.apps.presentation.components.AppGroupDivider(modifier: androidx.compose.ui.Modifier): kotlin.Unit
-  skippable: true
-  restartable: true
-  params:
-    - modifier: STABLE (marked @Stable or @Immutable)
-
-@Composable
 public fun zed.rainxch.apps.presentation.components.AppGroupHeader(app: zed.rainxch.apps.presentation.model.InstalledAppUi, modifier: androidx.compose.ui.Modifier): kotlin.Unit
   skippable: true
   restartable: true
@@ -117,33 +68,12 @@ public fun zed.rainxch.apps.presentation.components.AppGroupHeader(app: zed.rain
     - modifier: STABLE (marked @Stable or @Immutable)
 
 @Composable
-public fun zed.rainxch.apps.presentation.components.AppGroupStack(header: zed.rainxch.apps.presentation.model.InstalledAppUi, modifier: androidx.compose.ui.Modifier, content: @[Composable] @[ExtensionFunctionType] androidx.compose.runtime.internal.ComposableFunction1<androidx.compose.foundation.layout.ColumnScope, kotlin.Unit>): kotlin.Unit
-  skippable: true
-  restartable: true
-  params:
-    - header: STABLE (class with no mutable properties)
-    - modifier: STABLE (marked @Stable or @Immutable)
-    - content: STABLE (composable function type)
-
-@Composable
-public fun zed.rainxch.apps.presentation.components.AppItemCard(appItem: zed.rainxch.apps.presentation.model.AppItem, onOpenClick: kotlin.Function0<kotlin.Unit>, onUpdateClick: kotlin.Function0<kotlin.Unit>, onUninstallClick: kotlin.Function0<kotlin.Unit>, onRepoClick: kotlin.Function0<kotlin.Unit>, onTogglePreReleases: kotlin.Function1<kotlin.Boolean, kotlin.Unit>, onToggleUpdateCheck: kotlin.Function1<kotlin.Boolean, kotlin.Unit>, onAdvancedSettingsClick: kotlin.Function0<kotlin.Unit>, onPickVariantClick: kotlin.Function0<kotlin.Unit>, onInstallPendingClick: kotlin.Function0<kotlin.Unit>, onDiscardPendingClick: kotlin.Function0<kotlin.Unit>, onSkipVersionClick: kotlin.Function0<kotlin.Unit>, onUnskipVersionClick: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+private fun zed.rainxch.apps.presentation.components.AppMenu(appItem: zed.rainxch.apps.presentation.model.AppItem, onAction: kotlin.Function1<zed.rainxch.apps.presentation.AppsAction, kotlin.Unit>): kotlin.Unit
   skippable: true
   restartable: true
   params:
     - appItem: STABLE (class with no mutable properties)
-    - onOpenClick: STABLE (function type)
-    - onUpdateClick: STABLE (function type)
-    - onUninstallClick: STABLE (function type)
-    - onRepoClick: STABLE (function type)
-    - onTogglePreReleases: STABLE (function type)
-    - onToggleUpdateCheck: STABLE (function type)
-    - onAdvancedSettingsClick: STABLE (function type)
-    - onPickVariantClick: STABLE (function type)
-    - onInstallPendingClick: STABLE (function type)
-    - onDiscardPendingClick: STABLE (function type)
-    - onSkipVersionClick: STABLE (function type)
-    - onUnskipVersionClick: STABLE (function type)
-    - modifier: STABLE (marked @Stable or @Immutable)
+    - onAction: STABLE (function type)
 
 @Composable
 public fun zed.rainxch.apps.presentation.components.AppsSectionHeader(title: kotlin.String, count: kotlin.Int, isExpanded: kotlin.Boolean, collapsible: kotlin.Boolean, onToggle: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
@@ -167,48 +97,11 @@ public fun zed.rainxch.apps.presentation.components.AppsTopbar(onAction: kotlin.
     - search: STABLE (composable function type)
 
 @Composable
-public fun zed.rainxch.apps.presentation.components.CompactAppRow(appItem: zed.rainxch.apps.presentation.model.AppItem, onOpenClick: kotlin.Function0<kotlin.Unit>, onInstallPendingClick: kotlin.Function0<kotlin.Unit>, onDiscardPendingClick: kotlin.Function0<kotlin.Unit>, onAdvancedSettingsClick: kotlin.Function0<kotlin.Unit>, onPickVariantClick: kotlin.Function0<kotlin.Unit>, onUninstallClick: kotlin.Function0<kotlin.Unit>, onTogglePreReleases: kotlin.Function1<kotlin.Boolean, kotlin.Unit>, onToggleUpdateCheck: kotlin.Function1<kotlin.Boolean, kotlin.Unit>, onUnskipVersionClick: kotlin.Function0<kotlin.Unit>, onRowClick: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier, framed: kotlin.Boolean): kotlin.Unit
+private fun zed.rainxch.apps.presentation.components.CloseButton(label: kotlin.String, onClick: kotlin.Function0<kotlin.Unit>): kotlin.Unit
   skippable: true
   restartable: true
   params:
-    - appItem: STABLE (class with no mutable properties)
-    - onOpenClick: STABLE (function type)
-    - onInstallPendingClick: STABLE (function type)
-    - onDiscardPendingClick: STABLE (function type)
-    - onAdvancedSettingsClick: STABLE (function type)
-    - onPickVariantClick: STABLE (function type)
-    - onUninstallClick: STABLE (function type)
-    - onTogglePreReleases: STABLE (function type)
-    - onToggleUpdateCheck: STABLE (function type)
-    - onUnskipVersionClick: STABLE (function type)
-    - onRowClick: STABLE (function type)
-    - modifier: STABLE (marked @Stable or @Immutable)
-    - framed: STABLE (primitive type)
-
-@Composable
-private fun zed.rainxch.apps.presentation.components.CompactRowOverflow(appName: kotlin.String, isBusy: kotlin.Boolean, isPending: kotlin.Boolean, isPreReleaseEnabled: kotlin.Boolean, isUpdateCheckEnabled: kotlin.Boolean, hasSkippedReleaseTag: kotlin.Boolean, onAdvancedSettingsClick: kotlin.Function0<kotlin.Unit>, onPickVariantClick: kotlin.Function0<kotlin.Unit>, onUninstallClick: kotlin.Function0<kotlin.Unit>, onTogglePreReleases: kotlin.Function1<kotlin.Boolean, kotlin.Unit>, onToggleUpdateCheck: kotlin.Function1<kotlin.Boolean, kotlin.Unit>, onDiscardPendingClick: kotlin.Function0<kotlin.Unit>, onUnskipVersionClick: kotlin.Function0<kotlin.Unit>): kotlin.Unit
-  skippable: true
-  restartable: true
-  params:
-    - appName: STABLE (String is immutable)
-    - isBusy: STABLE (primitive type)
-    - isPending: STABLE (primitive type)
-    - isPreReleaseEnabled: STABLE (primitive type)
-    - isUpdateCheckEnabled: STABLE (primitive type)
-    - hasSkippedReleaseTag: STABLE (primitive type)
-    - onAdvancedSettingsClick: STABLE (function type)
-    - onPickVariantClick: STABLE (function type)
-    - onUninstallClick: STABLE (function type)
-    - onTogglePreReleases: STABLE (function type)
-    - onToggleUpdateCheck: STABLE (function type)
-    - onDiscardPendingClick: STABLE (function type)
-    - onUnskipVersionClick: STABLE (function type)
-
-@Composable
-private fun zed.rainxch.apps.presentation.components.DeleteTaskButton(onClick: kotlin.Function0<kotlin.Unit>): kotlin.Unit
-  skippable: true
-  restartable: true
-  params:
+    - label: STABLE (String is immutable)
     - onClick: STABLE (function type)
 
 @Composable
@@ -224,6 +117,19 @@ internal fun zed.rainxch.apps.presentation.components.DowngradeWarningColor(): a
   skippable: true
   restartable: true
   params:
+
+@Composable
+private fun zed.rainxch.apps.presentation.components.DownloadActions(stage: zed.rainxch.core.domain.system.DownloadStage, onPause: kotlin.Function0<kotlin.Unit>, onResume: kotlin.Function0<kotlin.Unit>, onRetry: kotlin.Function0<kotlin.Unit>, onDiscard: kotlin.Function0<kotlin.Unit>, onInstall: kotlin.Function0<kotlin.Unit>, onDismiss: kotlin.Function0<kotlin.Unit>): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - stage: STABLE (class with no mutable properties)
+    - onPause: STABLE (function type)
+    - onResume: STABLE (function type)
+    - onRetry: STABLE (function type)
+    - onDiscard: STABLE (function type)
+    - onInstall: STABLE (function type)
+    - onDismiss: STABLE (function type)
 
 @Composable
 private fun zed.rainxch.apps.presentation.components.EnterUrlStep(selectedApp: zed.rainxch.apps.presentation.model.DeviceAppUi?, repoUrl: kotlin.String, isValidating: kotlin.Boolean, validationError: kotlin.String?, validationStatus: kotlin.String?, onUrlChanged: kotlin.Function1<kotlin.String, kotlin.Unit>, onConfirm: kotlin.Function0<kotlin.Unit>, onBack: kotlin.Function0<kotlin.Unit>): kotlin.Unit
@@ -250,14 +156,32 @@ public fun zed.rainxch.apps.presentation.components.ImportSummarySheet(summary: 
     - onDismiss: STABLE (function type)
 
 @Composable
-public fun zed.rainxch.apps.presentation.components.InProgressAppCard(download: zed.rainxch.core.domain.system.OrchestratedDownload, installedVersion: kotlin.String?, rowItem: zed.rainxch.apps.presentation.model.AppItem?, onRowAction: kotlin.Function1<zed.rainxch.apps.presentation.AppsAction, kotlin.Unit>, onPause: kotlin.Function0<kotlin.Unit>, onResume: kotlin.Function0<kotlin.Unit>, onRetry: kotlin.Function0<kotlin.Unit>, onDiscard: kotlin.Function0<kotlin.Unit>, onInstall: kotlin.Function0<kotlin.Unit>, onDismiss: kotlin.Function0<kotlin.Unit>, onOpenRepo: kotlin.Function0<kotlin.Unit>?, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+public fun zed.rainxch.apps.presentation.components.KaoBanner(onLearnMore: kotlin.Function0<kotlin.Unit>, onDismiss: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - onLearnMore: STABLE (function type)
+    - onDismiss: STABLE (function type)
+    - modifier: STABLE (marked @Stable or @Immutable)
+
+@Composable
+public fun zed.rainxch.apps.presentation.components.LibraryAppRow(appItem: zed.rainxch.apps.presentation.model.AppItem, onAction: kotlin.Function1<zed.rainxch.apps.presentation.AppsAction, kotlin.Unit>, onOpenRepo: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier, framed: kotlin.Boolean): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - appItem: STABLE (class with no mutable properties)
+    - onAction: STABLE (function type)
+    - onOpenRepo: STABLE (function type)
+    - modifier: STABLE (marked @Stable or @Immutable)
+    - framed: STABLE (primitive type)
+
+@Composable
+public fun zed.rainxch.apps.presentation.components.LibraryDownloadRow(download: zed.rainxch.core.domain.system.OrchestratedDownload, installedVersion: kotlin.String?, onPause: kotlin.Function0<kotlin.Unit>, onResume: kotlin.Function0<kotlin.Unit>, onRetry: kotlin.Function0<kotlin.Unit>, onDiscard: kotlin.Function0<kotlin.Unit>, onInstall: kotlin.Function0<kotlin.Unit>, onDismiss: kotlin.Function0<kotlin.Unit>, onOpenRepo: kotlin.Function0<kotlin.Unit>?, modifier: androidx.compose.ui.Modifier): kotlin.Unit
   skippable: false
   restartable: true
   params:
     - download: UNSTABLE (has mutable properties or unstable members)
     - installedVersion: STABLE (class with no mutable properties)
-    - rowItem: STABLE (class with no mutable properties)
-    - onRowAction: STABLE (function type)
     - onPause: STABLE (function type)
     - onResume: STABLE (function type)
     - onRetry: STABLE (function type)
@@ -268,12 +192,48 @@ public fun zed.rainxch.apps.presentation.components.InProgressAppCard(download: 
     - modifier: STABLE (marked @Stable or @Immutable)
 
 @Composable
-public fun zed.rainxch.apps.presentation.components.KaoBanner(onLearnMore: kotlin.Function0<kotlin.Unit>, onDismiss: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+public fun zed.rainxch.apps.presentation.components.LibraryGroup(header: zed.rainxch.apps.presentation.model.InstalledAppUi, modifier: androidx.compose.ui.Modifier, content: @[Composable] @[ExtensionFunctionType] androidx.compose.runtime.internal.ComposableFunction1<androidx.compose.foundation.layout.ColumnScope, kotlin.Unit>): kotlin.Unit
   skippable: true
   restartable: true
   params:
-    - onLearnMore: STABLE (function type)
-    - onDismiss: STABLE (function type)
+    - header: STABLE (class with no mutable properties)
+    - modifier: STABLE (marked @Stable or @Immutable)
+    - content: STABLE (composable function type)
+
+@Composable
+public fun zed.rainxch.apps.presentation.components.LibraryGroupDivider(modifier: androidx.compose.ui.Modifier): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - modifier: STABLE (marked @Stable or @Immutable)
+
+@Composable
+public fun zed.rainxch.apps.presentation.components.LibraryRow(app: zed.rainxch.apps.presentation.components.LibraryRowApp, status: kotlin.String, statusTone: zed.rainxch.apps.presentation.components.LibraryStatusTone, onClick: kotlin.Function0<kotlin.Unit>?, modifier: androidx.compose.ui.Modifier, tags: kotlinx.collections.immutable.ImmutableList<kotlin.String>, progress: zed.rainxch.apps.presentation.components.LibraryProgress?, framed: kotlin.Boolean, actions: @[Composable] @[ExtensionFunctionType] androidx.compose.runtime.internal.ComposableFunction1<androidx.compose.foundation.layout.RowScope, kotlin.Unit>): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - app: STABLE (class with no mutable properties)
+    - status: STABLE (String is immutable)
+    - statusTone: STABLE (class with no mutable properties)
+    - onClick: STABLE (function type)
+    - modifier: STABLE (marked @Stable or @Immutable)
+    - tags: STABLE (known stable type)
+    - progress: STABLE (class with no mutable properties)
+    - framed: STABLE (primitive type)
+    - actions: STABLE (composable function type)
+
+@Composable
+private fun zed.rainxch.apps.presentation.components.LibraryRowContent(app: zed.rainxch.apps.presentation.components.LibraryRowApp, status: kotlin.String, statusTone: zed.rainxch.apps.presentation.components.LibraryStatusTone, tags: kotlinx.collections.immutable.ImmutableList<kotlin.String>, progress: zed.rainxch.apps.presentation.components.LibraryProgress?, showOwner: kotlin.Boolean, actions: @[Composable] @[ExtensionFunctionType] androidx.compose.runtime.internal.ComposableFunction1<androidx.compose.foundation.layout.RowScope, kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - app: STABLE (class with no mutable properties)
+    - status: STABLE (String is immutable)
+    - statusTone: STABLE (class with no mutable properties)
+    - tags: STABLE (known stable type)
+    - progress: STABLE (class with no mutable properties)
+    - showOwner: STABLE (primitive type)
+    - actions: STABLE (composable function type)
     - modifier: STABLE (marked @Stable or @Immutable)
 
 @Composable
@@ -283,6 +243,22 @@ public fun zed.rainxch.apps.presentation.components.LinkAppBottomSheet(state: ze
   params:
     - state: UNSTABLE (has mutable properties or unstable members)
     - onAction: STABLE (function type)
+
+@Composable
+private fun zed.rainxch.apps.presentation.components.MainAction(appItem: zed.rainxch.apps.presentation.model.AppItem, onAction: kotlin.Function1<zed.rainxch.apps.presentation.AppsAction, kotlin.Unit>): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - appItem: STABLE (class with no mutable properties)
+    - onAction: STABLE (function type)
+
+@Composable
+private fun zed.rainxch.apps.presentation.components.OwnerLine(owner: kotlin.String?, sourceHost: kotlin.String?): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - owner: STABLE (class with no mutable properties)
+    - sourceHost: STABLE (class with no mutable properties)
 
 @Composable
 public fun zed.rainxch.apps.presentation.components.PendingDiscardSheet(app: zed.rainxch.apps.presentation.model.InstalledAppUi, onAction: kotlin.Function1<zed.rainxch.apps.presentation.AppsAction, kotlin.Unit>): kotlin.Unit
@@ -341,15 +317,6 @@ private fun zed.rainxch.apps.presentation.components.PreviewSection(isLoading: k
     - onRefresh: STABLE (function type)
 
 @Composable
-private fun zed.rainxch.apps.presentation.components.ProgressBody(download: zed.rainxch.core.domain.system.OrchestratedDownload, paused: kotlin.Boolean, modifier: androidx.compose.ui.Modifier): kotlin.Unit
-  skippable: false
-  restartable: true
-  params:
-    - download: UNSTABLE (has mutable properties or unstable members)
-    - paused: STABLE (primitive type)
-    - modifier: STABLE (marked @Stable or @Immutable)
-
-@Composable
 private fun zed.rainxch.apps.presentation.components.SmartMatchStep(selectedApp: zed.rainxch.apps.presentation.model.DeviceAppUi?, loading: kotlin.Boolean, suggestions: kotlinx.collections.immutable.ImmutableList<zed.rainxch.core.domain.system.RepoMatchSuggestion>, error: kotlin.String?, isValidating: kotlin.Boolean, validationStatus: kotlin.String?, onSuggestionSelected: kotlin.Function3<@[ParameterName(name = \, onEnterUrlManually: kotlin.Function0<kotlin.Unit>, onRetry: kotlin.Function0<kotlin.Unit>, onBack: kotlin.Function0<kotlin.Unit>): kotlin.Unit
   skippable: true
   restartable: true
@@ -371,22 +338,6 @@ public fun zed.rainxch.apps.presentation.components.SourceChip(host: kotlin.Stri
   restartable: true
   params:
     - host: STABLE (String is immutable)
-    - modifier: STABLE (marked @Stable or @Immutable)
-
-@Composable
-private fun zed.rainxch.apps.presentation.components.StageLine(download: zed.rainxch.core.domain.system.OrchestratedDownload, installedVersion: kotlin.String?): kotlin.Unit
-  skippable: false
-  restartable: true
-  params:
-    - download: UNSTABLE (has mutable properties or unstable members)
-    - installedVersion: STABLE (class with no mutable properties)
-
-@Composable
-public fun zed.rainxch.apps.presentation.components.StatusDotCluster(flags: zed.rainxch.apps.presentation.model.CompactStatusFlags, modifier: androidx.compose.ui.Modifier): kotlin.Unit
-  skippable: true
-  restartable: true
-  params:
-    - flags: STABLE (class with no mutable properties)
     - modifier: STABLE (marked @Stable or @Immutable)
 
 @Composable
@@ -462,28 +413,49 @@ private fun zed.rainxch.apps.presentation.components.VariantRow(isSelected: kotl
     - leadingIcon: STABLE (marked @Stable or @Immutable)
 
 @Composable
-private fun zed.rainxch.apps.presentation.components.VersionLine(installedVersion: kotlin.String?, targetVersion: kotlin.String): kotlin.Unit
+private fun zed.rainxch.apps.presentation.components.color(): androidx.compose.ui.graphics.Color
   skippable: true
   restartable: true
   params:
-    - installedVersion: STABLE (class with no mutable properties)
-    - targetVersion: STABLE (String is immutable)
 
 @Composable
-public fun zed.rainxch.apps.presentation.components.buildCompactRowSemantics(appName: kotlin.String, installedVersion: kotlin.String, flags: zed.rainxch.apps.presentation.model.CompactStatusFlags): kotlin.String
-  skippable: true
-  restartable: true
-  params:
-    - appName: STABLE (String is immutable)
-    - installedVersion: STABLE (String is immutable)
-    - flags: STABLE (class with no mutable properties)
-
-@Composable
-public fun zed.rainxch.apps.presentation.components.rememberCompactStatusFlags(appItem: zed.rainxch.apps.presentation.model.AppItem): zed.rainxch.apps.presentation.model.CompactStatusFlags
+private fun zed.rainxch.apps.presentation.components.menuEntries(appItem: zed.rainxch.apps.presentation.model.AppItem): kotlinx.collections.immutable.ImmutableList<zed.rainxch.core.presentation.components.overlays.KomiMenuItem>
   skippable: true
   restartable: true
   params:
     - appItem: STABLE (class with no mutable properties)
+
+@Composable
+private fun zed.rainxch.apps.presentation.components.readyStatus(): kotlin.Pair<kotlin.String, zed.rainxch.apps.presentation.components.LibraryStatusTone>
+  skippable: true
+  restartable: true
+  params:
+
+@Composable
+private fun zed.rainxch.apps.presentation.components.status(): kotlin.Pair<kotlin.String, zed.rainxch.apps.presentation.components.LibraryStatusTone>
+  skippable: true
+  restartable: true
+  params:
+
+@Composable
+private fun zed.rainxch.apps.presentation.components.status(installedVersion: kotlin.String?): kotlin.Pair<kotlin.String, zed.rainxch.apps.presentation.components.LibraryStatusTone>
+  skippable: true
+  restartable: true
+  params:
+    - installedVersion: STABLE (class with no mutable properties)
+
+@Composable
+private fun zed.rainxch.apps.presentation.components.tags(): kotlinx.collections.immutable.ImmutableList<kotlin.String>
+  skippable: true
+  restartable: true
+  params:
+
+@Composable
+private fun zed.rainxch.apps.presentation.components.versionText(installedVersion: kotlin.String?): kotlin.String
+  skippable: true
+  restartable: true
+  params:
+    - installedVersion: STABLE (class with no mutable properties)
 
 @Composable
 public fun zed.rainxch.apps.presentation.import.ExternalImportRoot(onNavigateBack: kotlin.Function0<kotlin.Unit>, onNavigateToDetails: kotlin.Function1<@[ParameterName(name = \, onAddManually: kotlin.Function0<kotlin.Unit>, viewModel: zed.rainxch.apps.presentation.import.ExternalImportViewModel): kotlin.Unit

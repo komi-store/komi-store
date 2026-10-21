@@ -39,15 +39,9 @@ import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import zed.rainxch.apps.presentation.components.AdvancedAppSettingsBottomSheet
-import zed.rainxch.apps.presentation.components.AppGroupCard
-import zed.rainxch.apps.presentation.components.AppGroupDivider
-import zed.rainxch.apps.presentation.components.AppGroupStack
-import zed.rainxch.apps.presentation.components.AppItemCard
 import zed.rainxch.apps.presentation.components.AppsSectionHeader
 import zed.rainxch.apps.presentation.components.AppsTopbar
-import zed.rainxch.apps.presentation.components.CompactAppRow
 import zed.rainxch.apps.presentation.components.ImportSummarySheet
-import zed.rainxch.apps.presentation.components.InProgressAppCard
 import zed.rainxch.apps.presentation.components.KaoBanner
 import zed.rainxch.apps.presentation.components.LinkAppBottomSheet
 import zed.rainxch.apps.presentation.components.PendingDiscardSheet
@@ -56,7 +50,6 @@ import zed.rainxch.apps.presentation.components.UpdatesBanner
 import zed.rainxch.apps.presentation.components.VariantPickerDialog
 import zed.rainxch.apps.presentation.import.components.ImportProposalBanner
 import zed.rainxch.apps.presentation.model.AppGroup
-import zed.rainxch.apps.presentation.model.AppItem
 import zed.rainxch.apps.presentation.model.InstalledAppUi
 import zed.rainxch.core.presentation.components.ScrollbarContainer
 import zed.rainxch.core.presentation.components.buttons.KomiFab
@@ -97,6 +90,10 @@ import zed.rainxch.githubstore.core.presentation.res.search_your_apps
 import zed.rainxch.githubstore.core.presentation.res.uninstall
 import kotlin.time.ExperimentalTime
 import zed.rainxch.core.presentation.layout.withoutBottom
+import zed.rainxch.apps.presentation.components.LibraryAppRow
+import zed.rainxch.apps.presentation.components.LibraryDownloadRow
+import zed.rainxch.apps.presentation.components.LibraryGroup
+import zed.rainxch.apps.presentation.components.LibraryGroupDivider
 
 @Composable
 fun AppsRoot(
@@ -419,16 +416,11 @@ fun AppsScreen(
                                                         )
                                                     }
                                                 }
-                                            InProgressAppCard(
+                                            LibraryDownloadRow(
                                                 download = download,
                                                 installedVersion =
                                                     installedVersions[download.packageName],
-                                                rowItem =
-                                                    state.apps.find {
-                                                        it.installedApp.packageName == download.packageName
-                                                    },
                                                 onOpenRepo = openRepo,
-                                                onRowAction = onAction,
                                                 onPause = {
                                                     onAction(
                                                         AppsAction.OnCancelInProgressDownload(
@@ -509,7 +501,7 @@ fun AppsScreen(
                                             state.pendingGroups,
                                             key = { group -> "pending-${group.key}" },
                                         ) { group ->
-                                            AppItemCardGroup(
+                                            LibraryGroupItem(
                                                 group = group,
                                                 onAction = onAction,
                                                 onOpenRepo = onRowSelect,
@@ -537,7 +529,7 @@ fun AppsScreen(
                                             state.updateGroups,
                                             key = { group -> "rich-${group.key}" },
                                         ) { group ->
-                                            AppItemCardGroup(
+                                            LibraryGroupItem(
                                                 group = group,
                                                 onAction = onAction,
                                                 onOpenRepo = onRowSelect,
@@ -563,26 +555,11 @@ fun AppsScreen(
                                                 state.idleGroups,
                                                 key = { group -> "compact-${group.key}" },
                                             ) { group ->
-                                                val single = group.items.singleOrNull()
-                                                if (single != null) {
-                                                    CompactAppRowWithActions(
-                                                        appItem = single,
-                                                        onAction = onAction,
-                                                        onRowSelect = onRowSelect,
-                                                    )
-                                                } else {
-                                                    AppGroupCard(header = group.items.first().installedApp) {
-                                                        group.items.forEachIndexed { index, appItem ->
-                                                            if (index > 0) AppGroupDivider()
-                                                            CompactAppRowWithActions(
-                                                                appItem = appItem,
-                                                                onAction = onAction,
-                                                                onRowSelect = onRowSelect,
-                                                                framed = false,
-                                                            )
-                                                        }
-                                                    }
-                                                }
+                                                LibraryGroupItem(
+                                                    group = group,
+                                                    onAction = onAction,
+                                                    onOpenRepo = onRowSelect,
+                                                )
                                             }
                                         }
                                     }
@@ -631,150 +608,29 @@ private fun KeepAtTopWhenSectionsChange(
     }
 }
 
+// An app on its own card, or several apps from one repo on one card.
 @Composable
-private fun AppItemCardWithActions(
-    appItem: AppItem,
-    onAction: (AppsAction) -> Unit,
-    onOpenRepo: (InstalledAppUi) -> Unit,
-) {
-    AppItemCard(
-        appItem = appItem,
-        onOpenClick = {
-            onAction(
-                AppsAction.OnOpenApp(
-                    appItem.installedApp
-                )
-            )
-        },
-        onUpdateClick = {
-            onAction(
-                AppsAction.OnUpdateApp(
-                    appItem.installedApp
-                )
-            )
-        },
-        onUninstallClick = {
-            onAction(
-                AppsAction.OnUninstallApp(
-                    appItem.installedApp
-                )
-            )
-        },
-        onRepoClick = { onOpenRepo(appItem.installedApp) },
-        onTogglePreReleases = { enabled ->
-            onAction(
-                AppsAction.OnTogglePreReleases(
-                    appItem.installedApp.packageName,
-                    enabled
-                )
-            )
-        },
-        onToggleUpdateCheck = { enabled ->
-            onAction(
-                AppsAction.OnToggleUpdateCheck(
-                    appItem.installedApp.packageName,
-                    enabled
-                )
-            )
-        },
-        onAdvancedSettingsClick = {
-            onAction(
-                AppsAction.OnOpenAdvancedSettings(
-                    appItem.installedApp
-                )
-            )
-        },
-        onPickVariantClick = {
-            onAction(
-                AppsAction.OnOpenVariantPicker(
-                    app = appItem.installedApp,
-                    resumeUpdateAfterPick = false,
-                ),
-            )
-        },
-        onInstallPendingClick = {
-            onAction(
-                AppsAction.OnInstallPendingApp(
-                    appItem.installedApp
-                )
-            )
-        },
-        onDiscardPendingClick = {
-            onAction(
-                AppsAction.OnDiscardPendingInstall(
-                    appItem.installedApp
-                )
-            )
-        },
-        onSkipVersionClick = {
-            val tag =
-                appItem.installedApp.latestVersion
-                    ?: appItem.installedApp.latestVersionName
-            if (!tag.isNullOrBlank()) {
-                onAction(
-                    AppsAction.OnSkipReleaseTag(
-                        appItem.installedApp.packageName,
-                        tag,
-                    ),
-                )
-            }
-        },
-        onUnskipVersionClick = {
-            onAction(
-                AppsAction.OnUnskipReleaseTag(
-                    appItem.installedApp.packageName
-                )
-            )
-        },
-    )
-}
-
-@Composable
-private fun AppItemCardGroup(
+private fun LibraryGroupItem(
     group: AppGroup,
     onAction: (AppsAction) -> Unit,
     onOpenRepo: (InstalledAppUi) -> Unit,
 ) {
     val single = group.items.singleOrNull()
     if (single != null) {
-        AppItemCardWithActions(appItem = single, onAction = onAction, onOpenRepo = onOpenRepo)
+        LibraryAppRow(appItem = single, onAction = onAction, onOpenRepo = { onOpenRepo(single.installedApp) })
         return
     }
-    AppGroupStack(header = group.items.first().installedApp) {
-        group.items.forEach { appItem ->
-            AppItemCardWithActions(appItem = appItem, onAction = onAction, onOpenRepo = onOpenRepo)
+    LibraryGroup(header = group.items.first().installedApp) {
+        group.items.forEachIndexed { index, appItem ->
+            if (index > 0) LibraryGroupDivider()
+            LibraryAppRow(
+                appItem = appItem,
+                onAction = onAction,
+                onOpenRepo = { onOpenRepo(appItem.installedApp) },
+                framed = false,
+            )
         }
     }
-}
-
-@Composable
-private fun CompactAppRowWithActions(
-    appItem: AppItem,
-    onAction: (AppsAction) -> Unit,
-    onRowSelect: (InstalledAppUi) -> Unit,
-    framed: Boolean = true,
-) {
-    val app = appItem.installedApp
-    CompactAppRow(
-        appItem = appItem,
-        onOpenClick = { onAction(AppsAction.OnOpenApp(app)) },
-        onInstallPendingClick = { onAction(AppsAction.OnInstallPendingApp(app)) },
-        onDiscardPendingClick = { onAction(AppsAction.OnDiscardPendingInstall(app)) },
-        onAdvancedSettingsClick = { onAction(AppsAction.OnOpenAdvancedSettings(app)) },
-        onPickVariantClick = {
-            onAction(AppsAction.OnOpenVariantPicker(app = app, resumeUpdateAfterPick = false))
-        },
-        onUninstallClick = { onAction(AppsAction.OnUninstallApp(app)) },
-        onTogglePreReleases = { enabled ->
-            onAction(AppsAction.OnTogglePreReleases(app.packageName, enabled))
-        },
-        onToggleUpdateCheck = { enabled ->
-            onAction(AppsAction.OnToggleUpdateCheck(app.packageName, enabled))
-        },
-        onUnskipVersionClick = { onAction(AppsAction.OnUnskipReleaseTag(app.packageName)) },
-        onRowClick = { onRowSelect(app) },
-        framed = framed,
-    )
 }
 
 @Preview

@@ -20,7 +20,6 @@
     <string name="cancel">Annuler</string>
 
     <string name="checking">Vérification…</string>
-    <string name="updated_successfully">Mise à jour réussie</string>
     <string name="error_with_message">Erreur : %1$s</string>
 
     <string name="updating_x_of_y">Mise à jour %1$d sur %2$d</string>
@@ -895,13 +894,6 @@
     <string name="apps_variant_subtitle">%1$s  ·  %2$s</string>
     <string name="apps_section_header_cd">%1$s, %2$d, %3$s</string>
     <string name="apps_section_header_static_cd">%1$s, %2$d</string>
-    <string name="apps_compact_status_filter_active">filtre monorepo actif</string>
-    <string name="apps_compact_status_pending_install">installation en attente</string>
-    <string name="apps_compact_status_pre_release_on">pré-version activée</string>
-    <string name="apps_compact_status_ready_to_install">prêt à installer</string>
-    <string name="apps_compact_status_updates_ignored">mises à jour ignorées</string>
-    <string name="apps_compact_status_variant_pinned">variante épinglée</string>
-    <string name="apps_compact_status_variant_stale">variante obsolète, action requise</string>
     <string name="apps_ignore_updates">Ignorer les mises à jour</string>
     <string name="apps_section_collapse">Réduire la section</string>
     <string name="apps_section_count_suffix">· %1$d</string>

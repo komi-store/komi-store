@@ -20,7 +20,6 @@
     <string name="cancel">取消</string>
 
     <string name="checking">正在檢查…</string>
-    <string name="updated_successfully">更新成功</string>
     <string name="error_with_message">錯誤：%1$s</string>
 
     <string name="updating_x_of_y">正在更新 %1$d / %2$d</string>
@@ -886,13 +885,6 @@
     <string name="apps_variant_subtitle">%1$s  ·  %2$s</string>
     <string name="apps_section_header_cd">%1$s，%2$d，%3$s</string>
     <string name="apps_section_header_static_cd">%1$s，%2$d</string>
-    <string name="apps_compact_status_filter_active">monorepo 過濾器已啟用</string>
-    <string name="apps_compact_status_pending_install">待安裝</string>
-    <string name="apps_compact_status_pre_release_on">預釋出已開啟</string>
-    <string name="apps_compact_status_ready_to_install">可以安裝</string>
-    <string name="apps_compact_status_updates_ignored">已忽略更新</string>
-    <string name="apps_compact_status_variant_pinned">變體已鎖定</string>
-    <string name="apps_compact_status_variant_stale">變體過期，需要處理</string>
     <string name="apps_ignore_updates">忽略更新</string>
     <string name="apps_section_collapse">摺疊分組</string>
     <string name="apps_section_count_suffix">· %1$d</string>

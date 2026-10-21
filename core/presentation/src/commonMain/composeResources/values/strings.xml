@@ -29,7 +29,6 @@
 
     <!-- Apps feature - Update states -->
     <string name="checking">Checking…</string>
-    <string name="updated_successfully">Updated successfully</string>
     <string name="error_with_message">Error: %1$s</string>
 
     <!-- Apps feature - Update all progress -->
@@ -1096,14 +1095,10 @@
     <string name="apps_variant_subtitle">%1$s  ·  %2$s</string>
     <string name="apps_section_header_cd">%1$s, %2$d, %3$s</string>
     <string name="apps_section_header_static_cd">%1$s, %2$d</string>
-    <string name="apps_compact_status_filter_active">monorepo filter active</string>
-    <string name="apps_compact_status_variant_pinned">variant pinned</string>
-    <string name="apps_compact_status_pre_release_on">pre-release on</string>
-    <string name="apps_compact_status_variant_stale">variant stale, action needed</string>
-    <string name="apps_compact_status_pending_install">pending install</string>
-    <string name="apps_compact_status_ready_to_install">ready to install</string>
-    <string name="apps_compact_status_updates_ignored">updates ignored</string>
     <string name="apps_ignore_updates">Ignore updates</string>
+    <string name="apps_tag_updates_ignored">Updates ignored</string>
+    <string name="apps_tag_skipped">Skipped %1$s</string>
+    <string name="apps_tag_asset_filter">Asset filter</string>
     <string name="discard_pending_install">Discard</string>
     <string name="delete_task">Delete task</string>
     <string name="apps_updates_banner_title_one">1 update available</string>

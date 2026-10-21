@@ -26,7 +26,6 @@
 
     <!-- Apps feature - Update states -->
     <string name="checking">Kontrol ediliyor…</string>
-    <string name="updated_successfully">Başarıyla güncellendi</string>
     <string name="error_with_message">Hata: %1$s</string>
 
     <!-- Apps feature - Update all progress -->
@@ -925,13 +924,6 @@
     <string name="apps_variant_subtitle">%1$s  ·  %2$s</string>
     <string name="apps_section_header_cd">%1$s, %2$d, %3$s</string>
     <string name="apps_section_header_static_cd">%1$s, %2$d</string>
-    <string name="apps_compact_status_filter_active">monorepo filtresi aktif</string>
-    <string name="apps_compact_status_pending_install">kurulum bekliyor</string>
-    <string name="apps_compact_status_pre_release_on">ön sürüm açık</string>
-    <string name="apps_compact_status_ready_to_install">kurulmaya hazır</string>
-    <string name="apps_compact_status_updates_ignored">güncellemeler yok sayıldı</string>
-    <string name="apps_compact_status_variant_pinned">varyant sabitlendi</string>
-    <string name="apps_compact_status_variant_stale">varyant eski, işlem gerekli</string>
     <string name="apps_ignore_updates">Güncellemeleri yok say</string>
     <string name="apps_section_collapse">Bölümü daralt</string>
     <string name="apps_section_count_suffix">· %1$d</string>

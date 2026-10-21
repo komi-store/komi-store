@@ -26,7 +26,6 @@
 
     <!-- Apps feature - Update states -->
     <string name="checking">Controllo…</string>
-    <string name="updated_successfully">Aggiornata con successo</string>
     <string name="error_with_message">Errore: %1$s</string>
 
     <!-- Apps feature - Update all progress -->
@@ -928,13 +927,6 @@
     <string name="apps_variant_subtitle">%1$s  ·  %2$s</string>
     <string name="apps_section_header_cd">%1$s, %2$d, %3$s</string>
     <string name="apps_section_header_static_cd">%1$s, %2$d</string>
-    <string name="apps_compact_status_filter_active">filtro monorepo attivo</string>
-    <string name="apps_compact_status_pending_install">installazione in attesa</string>
-    <string name="apps_compact_status_pre_release_on">pre-release attivo</string>
-    <string name="apps_compact_status_ready_to_install">pronto da installare</string>
-    <string name="apps_compact_status_updates_ignored">aggiornamenti ignorati</string>
-    <string name="apps_compact_status_variant_pinned">variante fissata</string>
-    <string name="apps_compact_status_variant_stale">variante obsoleta, azione richiesta</string>
     <string name="apps_ignore_updates">Ignora gli aggiornamenti</string>
     <string name="apps_section_collapse">Comprimi sezione</string>
     <string name="apps_section_count_suffix">· %1$d</string>

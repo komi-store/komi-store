@@ -20,7 +20,6 @@
     <string name="cancel">キャンセル</string>
 
     <string name="checking">確認中…</string>
-    <string name="updated_successfully">更新完了</string>
     <string name="error_with_message">エラー：%1$s</string>
 
     <string name="updating_x_of_y">%2$d 件中 %1$d 件を更新中</string>
@@ -887,13 +886,6 @@
     <string name="apps_variant_subtitle">%1$s  ·  %2$s</string>
     <string name="apps_section_header_cd">%1$s、%2$d、%3$s</string>
     <string name="apps_section_header_static_cd">%1$s、%2$d</string>
-    <string name="apps_compact_status_filter_active">モノレポフィルター有効</string>
-    <string name="apps_compact_status_pending_install">インストール保留中</string>
-    <string name="apps_compact_status_pre_release_on">プレリリース有効</string>
-    <string name="apps_compact_status_ready_to_install">インストール準備完了</string>
-    <string name="apps_compact_status_updates_ignored">更新を無視中</string>
-    <string name="apps_compact_status_variant_pinned">バリアント固定</string>
-    <string name="apps_compact_status_variant_stale">バリアントが古いです、対応が必要</string>
     <string name="apps_ignore_updates">更新を無視</string>
     <string name="apps_section_collapse">セクションを折りたたむ</string>
     <string name="apps_section_count_suffix">· %1$d</string>

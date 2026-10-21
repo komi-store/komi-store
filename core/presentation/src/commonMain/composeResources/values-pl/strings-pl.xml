@@ -21,7 +21,6 @@
     <string name="cancel">Anuluj</string>
 
     <string name="checking">Sprawdzanie…</string>
-    <string name="updated_successfully">Zaktualizowano pomyślnie</string>
     <string name="error_with_message">Błąd: %1$s</string>
 
     <string name="updating_x_of_y">Aktualizowanie %1$d z %2$d</string>
@@ -919,13 +918,6 @@
     <string name="apps_variant_subtitle">%1$s  ·  %2$s</string>
     <string name="apps_section_header_cd">%1$s, %2$d, %3$s</string>
     <string name="apps_section_header_static_cd">%1$s, %2$d</string>
-    <string name="apps_compact_status_filter_active">filtr monorepo aktywny</string>
-    <string name="apps_compact_status_pending_install">oczekuje na instalację</string>
-    <string name="apps_compact_status_pre_release_on">pre-release włączony</string>
-    <string name="apps_compact_status_ready_to_install">gotowy do instalacji</string>
-    <string name="apps_compact_status_updates_ignored">aktualizacje zignorowane</string>
-    <string name="apps_compact_status_variant_pinned">wariant przypięty</string>
-    <string name="apps_compact_status_variant_stale">wariant nieaktualny, wymagana akcja</string>
     <string name="apps_ignore_updates">Ignoruj aktualizacje</string>
     <string name="apps_section_collapse">Zwiń sekcję</string>
     <string name="apps_section_count_suffix">· %1$d</string>
