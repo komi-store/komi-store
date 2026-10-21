@@ -33,6 +33,7 @@ import zed.rainxch.githubstore.core.presentation.res.apps_skip_version_unskip
 import zed.rainxch.githubstore.core.presentation.res.apps_tag_asset_filter
 import zed.rainxch.githubstore.core.presentation.res.apps_tag_skipped
 import zed.rainxch.githubstore.core.presentation.res.apps_tag_updates_ignored
+import zed.rainxch.githubstore.core.presentation.res.apps_variant_stale_pick
 import zed.rainxch.githubstore.core.presentation.res.checking
 import zed.rainxch.githubstore.core.presentation.res.delete_task
 import zed.rainxch.githubstore.core.presentation.res.downloading
@@ -115,7 +116,7 @@ private fun AppItem.status(): Pair<String, LibraryStatusTone> {
         }
 
         app.preferredVariantStale -> {
-            stringResource(Res.string.variant_stale_hint) to LibraryStatusTone.Error
+            staleStatus(app) to LibraryStatusTone.Error
         }
 
         app.isUpdateAvailable && app.updateCheckEnabled -> {
@@ -127,6 +128,14 @@ private fun AppItem.status(): Pair<String, LibraryStatusTone> {
         }
     }
 }
+
+// With an update, Update picks the variant again; without one, the row's main action does.
+@Composable
+private fun staleStatus(app: InstalledAppUi): String =
+    stringResource(if (app.hasUpdate) Res.string.variant_stale_hint else Res.string.apps_variant_stale_pick)
+
+private val InstalledAppUi.hasUpdate: Boolean
+    get() = isUpdateAvailable && updateCheckEnabled && !isPendingInstall
 
 @Composable
 private fun AppItem.readyStatus(): Pair<String, LibraryStatusTone> {
@@ -170,12 +179,22 @@ private fun MainAction(
             )
         }
 
-        app.isUpdateAvailable && app.updateCheckEnabled && !app.isPendingInstall -> {
+        app.hasUpdate -> {
             KomiButton(
                 onClick = { cooldown.run { onAction(AppsAction.OnUpdateApp(app)) } },
                 label = stringResource(Res.string.update),
                 size = KomiButtonSize.Sm,
                 enabled = !appItem.isWorking && !cooldown.active,
+            )
+        }
+
+        app.preferredVariantStale && !app.isPendingInstall -> {
+            KomiButton(
+                onClick = { onAction(AppsAction.OnOpenVariantPicker(app = app, resumeUpdateAfterPick = false)) },
+                label = stringResource(Res.string.variant_picker_open),
+                variant = KomiButtonVariant.Tonal,
+                size = KomiButtonSize.Sm,
+                enabled = !appItem.isWorking,
             )
         }
 

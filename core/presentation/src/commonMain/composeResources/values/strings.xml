@@ -1099,6 +1099,7 @@
     <string name="apps_tag_updates_ignored">Updates ignored</string>
     <string name="apps_tag_skipped">Skipped %1$s</string>
     <string name="apps_tag_asset_filter">Asset filter</string>
+    <string name="apps_variant_stale_pick">Variant changed. Pick it again.</string>
     <string name="discard_pending_install">Discard</string>
     <string name="delete_task">Delete task</string>
     <string name="apps_updates_banner_title_one">1 update available</string>

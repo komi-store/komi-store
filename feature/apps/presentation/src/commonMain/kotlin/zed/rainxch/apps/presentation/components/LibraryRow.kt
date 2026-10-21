@@ -1,5 +1,6 @@
 package zed.rainxch.apps.presentation.components
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -25,9 +27,6 @@ import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import zed.rainxch.apps.presentation.model.InstalledAppUi
 import zed.rainxch.core.presentation.components.InstalledAppIcon
-import zed.rainxch.core.presentation.components.chips.KomiChip
-import zed.rainxch.core.presentation.components.chips.KomiChipKind
-import zed.rainxch.core.presentation.components.chips.KomiChipSize
 import zed.rainxch.core.presentation.components.dividers.KomiHorizontalDivider
 import zed.rainxch.core.presentation.components.progress.KomiLinearProgress
 import zed.rainxch.core.presentation.components.surfaces.KomiSurface
@@ -113,10 +112,7 @@ private fun LibraryRowContent(
 ) {
     val colors = LocalPersonality.current.colors
     Column(modifier = modifier.padding(horizontal = 14.dp, vertical = 12.dp)) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-        ) {
+        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             InstalledAppIcon(
                 packageName = app.packageName,
                 appName = app.name,
@@ -141,24 +137,26 @@ private fun LibraryRowContent(
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.padding(top = 2.dp),
                 )
-                if (tags.isNotEmpty()) {
-                    FlowRow(
-                        modifier = Modifier.padding(top = 6.dp),
-                        horizontalArrangement = Arrangement.spacedBy(4.dp),
-                        verticalArrangement = Arrangement.spacedBy(4.dp),
-                    ) {
-                        tags.forEach { tag ->
-                            KomiChip(label = tag, kind = KomiChipKind.Info, size = KomiChipSize.Sm, tilt = false)
-                        }
-                    }
-                }
             }
 
+            // Centred on the icon, which sits at the top when tags make the row taller.
             Row(
+                modifier = Modifier.heightIn(min = 48.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(4.dp),
                 content = actions,
             )
+        }
+
+        // Under the name, but as wide as the row: the actions would squeeze them otherwise.
+        if (tags.isNotEmpty()) {
+            FlowRow(
+                modifier = Modifier.padding(start = 60.dp, top = 6.dp),
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                verticalArrangement = Arrangement.spacedBy(4.dp),
+            ) {
+                tags.forEach { tag -> LibraryTag(text = tag) }
+            }
         }
 
         when (progress) {
@@ -205,6 +203,22 @@ private fun OwnerLine(
         }
         sourceHost?.let { SourceChip(host = it) }
     }
+}
+
+@Composable
+private fun LibraryTag(text: String) {
+    val personality = LocalPersonality.current
+    KomiText(
+        text = text,
+        role = KomiTextRole.LabelSmall,
+        color = personality.colors.onSurfaceVariant,
+        maxLines = 1,
+        modifier =
+            Modifier
+                .clip(RoundedCornerShape(personality.shape.cornerSmall))
+                .background(personality.colors.surfaceContainerHigh)
+                .padding(horizontal = 8.dp, vertical = 3.dp),
+    )
 }
 
 @Composable
