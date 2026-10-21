@@ -53,7 +53,8 @@ import zed.rainxch.githubstore.core.presentation.res.sort_updates_first
 @Composable
 fun AppsTopbar(
     onAction: (AppsAction) -> Unit,
-    state: AppsState
+    state: AppsState,
+    search: (@Composable () -> Unit)? = null,
 ) {
     val colors = LocalPersonality.current.colors
     val shape = LocalPersonality.current.shape
@@ -115,6 +116,7 @@ fun AppsTopbar(
 
     KomiTopBar(
         title = stringResource(Res.string.bottom_nav_apps_title),
+        search = search,
         actions = {
             if (LocalPersonality.current is MangaPersonality) {
                 Row(
