@@ -2,6 +2,7 @@ package zed.rainxch.core.presentation.components.bars
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
@@ -52,6 +53,7 @@ import zed.rainxch.core.presentation.personality.manga.MangaPaper
 import zed.rainxch.core.presentation.personality.manga.decoration.speedLineWash
 import zed.rainxch.core.presentation.personality.mangaPersonality
 import zed.rainxch.core.presentation.personality.utils.PersonalityPreview
+import zed.rainxch.core.presentation.spacing.Spacing
 import zed.rainxch.githubstore.core.presentation.res.Res
 import zed.rainxch.githubstore.core.presentation.res.navigate_back
 import androidx.compose.material3.Text as MaterialText
@@ -64,23 +66,34 @@ fun KomiTopBar(
     subtitle: String? = null,
     leading: (@Composable () -> Unit)? = null,
     onBack: (() -> Unit)? = null,
+    search: (@Composable () -> Unit)? = null,
     actions: (@Composable RowScope.() -> Unit)? = null,
     size: KomiTopBarSize = KomiTopBarSize.Masthead,
     centerTitle: Boolean = false,
     insets: Boolean = true,
 ) {
     val personality = LocalPersonality.current
-    val chrome = LocalScaffoldChrome.current
-    // Classic hands the back action and the actions to its KomiScaffold, which draws them in a
-    // KomiActionBar at the bottom, so the top bar keeps only the title.
-    val scaffoldChrome = if (personality is ClassicPersonality) chrome else null
+    // A Classic tab screen has no top bar: its search field and actions go to the tab card.
+    val tabCard = LocalTabCardSlot.current?.takeIf { personality is ClassicPersonality }
+    // Elsewhere Classic hands the back action and the actions to its KomiScaffold, which draws
+    // them in a KomiActionBar at the bottom, so the top bar keeps only the title. A search field
+    // keeps its actions beside it.
+    val scaffoldChrome = LocalScaffoldChrome.current?.takeIf { personality is ClassicPersonality && search == null }
     if (scaffoldChrome != null) HandToScaffold(chrome = scaffoldChrome, onBack = onBack, actions = actions)
     val topBarBack: (@Composable () -> Unit)? =
         onBack?.takeIf { scaffoldChrome == null }?.let { back -> @Composable { TopBarBack(back) } }
     val resolvedLeading = leading ?: topBarBack
     val topBarActions = actions.takeIf { scaffoldChrome == null }
-    when (personality) {
-        is MangaPersonality -> {
+    when {
+        tabCard != null -> {
+            HandToTabCard(slot = tabCard, search = search, actions = actions)
+        }
+
+        search != null -> {
+            SearchTopBar(search = search, actions = actions, insets = insets, modifier = modifier)
+        }
+
+        personality is MangaPersonality -> {
             MangaTopBar(
                 personality = personality,
                 title = title,
@@ -95,7 +108,7 @@ fun KomiTopBar(
             )
         }
 
-        is ClassicPersonality -> {
+        personality is ClassicPersonality -> {
             ClassicTopBar(
                 title = title,
                 subtitle = subtitle,
@@ -107,6 +120,28 @@ fun KomiTopBar(
                 modifier = modifier,
             )
         }
+    }
+}
+
+// A search screen's field takes the title's place, with its actions beside it.
+@Composable
+private fun SearchTopBar(
+    search: @Composable () -> Unit,
+    actions: (@Composable RowScope.() -> Unit)?,
+    insets: Boolean,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .then(if (insets) Modifier.statusBarsPadding() else Modifier)
+                .padding(horizontal = Spacing.lg, vertical = Spacing.md),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(10.dp),
+    ) {
+        Box(modifier = Modifier.weight(1f)) { search() }
+        actions?.invoke(this)
     }
 }
 

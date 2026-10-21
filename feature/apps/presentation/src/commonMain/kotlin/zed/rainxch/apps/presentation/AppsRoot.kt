@@ -60,6 +60,7 @@ import zed.rainxch.apps.presentation.model.AppItem
 import zed.rainxch.apps.presentation.model.InstalledAppUi
 import zed.rainxch.core.presentation.components.ScrollbarContainer
 import zed.rainxch.core.presentation.components.buttons.KomiFab
+import zed.rainxch.core.presentation.components.bars.LocalTabCardSlot
 import zed.rainxch.core.presentation.components.inputs.KomiTextField
 import zed.rainxch.core.presentation.components.overlays.KomiToastState
 import zed.rainxch.core.presentation.components.overlays.rememberKomiToastState
@@ -95,6 +96,7 @@ import zed.rainxch.githubstore.core.presentation.res.no_apps_found
 import zed.rainxch.githubstore.core.presentation.res.search_your_apps
 import zed.rainxch.githubstore.core.presentation.res.uninstall
 import kotlin.time.ExperimentalTime
+import zed.rainxch.core.presentation.layout.withoutBottom
 
 @Composable
 fun AppsRoot(
@@ -218,11 +220,19 @@ fun AppsScreen(
     toastState: KomiToastState,
 ) {
     val colors = LocalPersonality.current.colors
+    // Classic's tab card holds the search field; elsewhere it stays above the list.
+    val searchInCard = LocalTabCardSlot.current != null
     KomiScaffold(
         topBar = {
             AppsTopbar(
                 onAction = onAction,
-                state = state
+                state = state,
+                search =
+                    if (searchInCard) {
+                        { AppsSearchField(query = state.searchQuery, onAction = onAction, modifier = Modifier.fillMaxWidth()) }
+                    } else {
+                        null
+                    },
             )
         },
         floatingActionButton = {
@@ -241,7 +251,7 @@ fun AppsScreen(
             onRefresh = { onAction(AppsAction.OnRefresh) },
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding),
+                .padding(innerPadding.withoutBottom()),
         ) {
             Box(
                 modifier = Modifier.fillMaxSize(),
@@ -249,18 +259,17 @@ fun AppsScreen(
                 Column(
                     modifier = Modifier.fillMaxHeight(),
                 ) {
-                    KomiTextField(
-                        value = state.searchQuery,
-                        onValueChange = { onAction(AppsAction.OnSearchChange(it)) },
-                        leadingIcon = Icons.Rounded.Search,
-                        clearable = true,
-                        placeholder = stringResource(Res.string.search_your_apps),
-                        modifier =
-                            Modifier
-                                .fillMaxWidth()
-                                .drivesPullToRefresh()
-                                .padding(horizontal = 16.dp, vertical = 8.dp),
-                    )
+                    if (!searchInCard) {
+                        AppsSearchField(
+                            query = state.searchQuery,
+                            onAction = onAction,
+                            modifier =
+                                Modifier
+                                    .fillMaxWidth()
+                                    .drivesPullToRefresh()
+                                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                        )
+                    }
 
                     if (state.isCheckingForUpdates) {
                         Row(
@@ -357,7 +366,7 @@ fun AppsScreen(
                                         start = 12.dp,
                                         end = 12.dp,
                                         top = 8.dp,
-                                        bottom = 88.dp,
+                                        bottom = 88.dp + innerPadding.calculateBottomPadding(),
                                     )
                                 val appGridCells =
                                     rememberWidthCappedGridCells(contentPadding = appGridPadding)
@@ -593,6 +602,22 @@ fun AppsScreen(
 
 // A lazy grid keeps its first visible item in place, so a section that appears above it while
 // the user is at the top (an update check finding updates) would land offscreen.
+@Composable
+private fun AppsSearchField(
+    query: String,
+    onAction: (AppsAction) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    KomiTextField(
+        value = query,
+        onValueChange = { onAction(AppsAction.OnSearchChange(it)) },
+        leadingIcon = Icons.Rounded.Search,
+        clearable = true,
+        placeholder = stringResource(Res.string.search_your_apps),
+        modifier = modifier,
+    )
+}
+
 @Composable
 private fun KeepAtTopWhenSectionsChange(
     gridState: LazyGridState,

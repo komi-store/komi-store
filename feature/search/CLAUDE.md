@@ -31,4 +31,5 @@ Platform filter type is `DiscoveryPlatform` (core/domain).
 - Empty-grid-after-Hide-seen banner offers one-tap reset (issue #574) -> `OnDisableHideSeenForResults`, which turns the Hide seen setting off.
 - Long-press card -> `DiscoveryRepoCard`'s own actions sheet (core/presentation): share, open on GitHub, seen toggle, hide.
 - `DiscoveryRepositoryUi.isCurrentUserOwner` flipped by `observeCurrentUser` (E20).
+- The query field and the filters button are `KomiTopBar`'s `search` and `actions`. In Classic they sit in the tab card at the bottom.
 - Clipboard auto-detect (gated by `TweaksRepository.getAutoDetectClipboardLinks()`) surfaces GitHub URLs from clipboard as a dismissible banner.

@@ -25,11 +25,16 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import zed.rainxch.core.presentation.components.bars.HandTopBarToTabCard
 import zed.rainxch.core.presentation.components.bars.KomiActionBar
+import zed.rainxch.core.presentation.components.bars.KomiTabCard
 import zed.rainxch.core.presentation.components.bars.LocalScaffoldChrome
+import zed.rainxch.core.presentation.components.bars.LocalTabCardSlot
 import zed.rainxch.core.presentation.components.bars.ScaffoldChrome
+import zed.rainxch.core.presentation.components.bars.foldsTabCard
 import zed.rainxch.core.presentation.components.bars.rememberScaffoldChrome
 import zed.rainxch.core.presentation.components.bars.scrollsChrome
+import zed.rainxch.core.presentation.components.bars.tabCardContentInsets
 import zed.rainxch.core.presentation.components.buttons.KomiButtonVariant
 import zed.rainxch.core.presentation.components.buttons.KomiIconButton
 import zed.rainxch.core.presentation.components.overlays.KomiToastHost
@@ -63,16 +68,23 @@ fun KomiScaffold(
     val colors = LocalPersonality.current.colors
     val isManga = LocalPersonality.current is MangaPersonality
     val inkDividers = isManga && dividers
-    val chrome = rememberScaffoldChrome(enabled = !isManga && topBar != null)
+    // On a Classic tab screen the tab card at the bottom holds the top bar's search and actions
+    // and the FAB, and folds as the content scrolls; the content keeps room for the status bar.
+    val tabCard = LocalTabCardSlot.current?.takeIf { !isManga }
+    val scaffoldTopBar = topBar.takeIf { tabCard == null }
+    val scaffoldFab = floatingActionButton.takeIf { tabCard == null }
+    val chrome = rememberScaffoldChrome(enabled = !isManga && scaffoldTopBar != null)
     // The FAB joins the action bar when there is one, instead of floating on its own.
     val fabInBar = chrome?.hasActionBar == true
 
-    Box(modifier = modifier.fillMaxSize().scrollsChrome(chrome)) {
+    Box(modifier = modifier.fillMaxSize().scrollsChrome(chrome).foldsTabCard(tabCard)) {
+        HandTopBarToTabCard(slot = tabCard, topBar = topBar)
         Scaffold(
             containerColor = colors.background,
             contentColor = colors.onBackground,
+            contentWindowInsets = tabCardContentInsets(tabCard),
             topBar = {
-                topBar?.let { bar ->
+                scaffoldTopBar?.let { bar ->
                     CompositionLocalProvider(LocalScaffoldChrome provides chrome) {
                         Column {
                             bar()
@@ -89,7 +101,7 @@ fun KomiScaffold(
                     }
                 }
             },
-            floatingActionButton = { if (!fabInBar) floatingActionButton?.invoke() },
+            floatingActionButton = { if (!fabInBar) scaffoldFab?.invoke() },
         ) { innerPadding ->
             Box(modifier = Modifier.fillMaxSize()) {
                 if (isManga && grid) {
@@ -113,6 +125,7 @@ fun KomiScaffold(
                 chrome?.let { FloatingActionBar(chrome = it, floatingActionButton = floatingActionButton, padding = innerPadding) }
             }
         }
+        KomiTabCard(slot = tabCard, fab = floatingActionButton, modifier = Modifier.align(Alignment.BottomCenter))
         toastState?.let { KomiToastHost(state = it) }
         overlay?.invoke()
     }

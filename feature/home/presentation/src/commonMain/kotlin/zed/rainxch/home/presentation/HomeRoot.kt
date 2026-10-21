@@ -73,6 +73,8 @@ import zed.rainxch.home.presentation.components.HomePlatformPicker
 import zed.rainxch.home.presentation.components.RepositoryActionsSheet
 import zed.rainxch.home.presentation.model.ChartTab
 import zed.rainxch.home.presentation.model.toDiscoveryUi
+import zed.rainxch.core.presentation.layout.withoutBottom
+import androidx.compose.ui.unit.Dp
 
 @Composable
 fun HomeRoot(
@@ -154,7 +156,7 @@ private fun HomeScreen(
         toastState = toastState
     ) { innerPadding ->
         Box(
-            modifier = Modifier.fillMaxSize().padding(innerPadding),
+            modifier = Modifier.fillMaxSize().padding(innerPadding.withoutBottom()),
             contentAlignment = Alignment.TopCenter,
         ) {
             if (isAndroid()) {
@@ -166,6 +168,7 @@ private fun HomeScreen(
                     HomeChartFeed(
                         state = state,
                         listState = listState,
+                        bottomInset = innerPadding.calculateBottomPadding(),
                         onAction = onAction
                     )
                 }
@@ -173,6 +176,7 @@ private fun HomeScreen(
                 HomeChartFeed(
                     state = state,
                     listState = listState,
+                    bottomInset = innerPadding.calculateBottomPadding(),
                     onAction = onAction
                 )
             }
@@ -221,10 +225,11 @@ private fun HomeScreen(
 private fun HomeChartFeed(
     state: HomeState,
     listState: LazyStaggeredGridState,
+    bottomInset: Dp,
     onAction: (HomeAction) -> Unit,
 ) {
     val colors = LocalPersonality.current.colors
-    val gridPadding = PaddingValues(start = 12.dp, end = 12.dp, bottom = 32.dp)
+    val gridPadding = PaddingValues(start = 12.dp, end = 12.dp, bottom = 32.dp + bottomInset)
     val cells =
         rememberWidthCappedStaggeredCells(
             contentPadding = gridPadding,

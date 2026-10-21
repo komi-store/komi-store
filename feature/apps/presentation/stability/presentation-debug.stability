@@ -44,6 +44,15 @@ public fun zed.rainxch.apps.presentation.AppsScreen(state: zed.rainxch.apps.pres
     - toastState: STABLE (marked @Stable or @Immutable)
 
 @Composable
+private fun zed.rainxch.apps.presentation.AppsSearchField(query: kotlin.String, onAction: kotlin.Function1<zed.rainxch.apps.presentation.AppsAction, kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - query: STABLE (String is immutable)
+    - onAction: STABLE (function type)
+    - modifier: STABLE (marked @Stable or @Immutable)
+
+@Composable
 private fun zed.rainxch.apps.presentation.CompactAppRowWithActions(appItem: zed.rainxch.apps.presentation.model.AppItem, onAction: kotlin.Function1<zed.rainxch.apps.presentation.AppsAction, kotlin.Unit>, onRowSelect: kotlin.Function1<zed.rainxch.apps.presentation.model.InstalledAppUi, kotlin.Unit>, framed: kotlin.Boolean): kotlin.Unit
   skippable: true
   restartable: true
@@ -149,12 +158,13 @@ public fun zed.rainxch.apps.presentation.components.AppsSectionHeader(title: kot
     - modifier: STABLE (marked @Stable or @Immutable)
 
 @Composable
-public fun zed.rainxch.apps.presentation.components.AppsTopbar(onAction: kotlin.Function1<zed.rainxch.apps.presentation.AppsAction, kotlin.Unit>, state: zed.rainxch.apps.presentation.AppsState): kotlin.Unit
+public fun zed.rainxch.apps.presentation.components.AppsTopbar(onAction: kotlin.Function1<zed.rainxch.apps.presentation.AppsAction, kotlin.Unit>, state: zed.rainxch.apps.presentation.AppsState, search: @[Composable] androidx.compose.runtime.internal.ComposableFunction0<kotlin.Unit>?): kotlin.Unit
   skippable: false
   restartable: true
   params:
     - onAction: STABLE (function type)
     - state: UNSTABLE (has mutable properties or unstable members)
+    - search: STABLE (composable function type)
 
 @Composable
 public fun zed.rainxch.apps.presentation.components.CompactAppRow(appItem: zed.rainxch.apps.presentation.model.AppItem, onOpenClick: kotlin.Function0<kotlin.Unit>, onInstallPendingClick: kotlin.Function0<kotlin.Unit>, onDiscardPendingClick: kotlin.Function0<kotlin.Unit>, onAdvancedSettingsClick: kotlin.Function0<kotlin.Unit>, onPickVariantClick: kotlin.Function0<kotlin.Unit>, onUninstallClick: kotlin.Function0<kotlin.Unit>, onTogglePreReleases: kotlin.Function1<kotlin.Boolean, kotlin.Unit>, onToggleUpdateCheck: kotlin.Function1<kotlin.Boolean, kotlin.Unit>, onUnskipVersionClick: kotlin.Function0<kotlin.Unit>, onRowClick: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier, framed: kotlin.Boolean): kotlin.Unit

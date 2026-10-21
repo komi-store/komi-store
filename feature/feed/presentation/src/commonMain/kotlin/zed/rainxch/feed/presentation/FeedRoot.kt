@@ -76,6 +76,8 @@ import zed.rainxch.githubstore.core.presentation.res.feed_masthead_title_accent
 import zed.rainxch.githubstore.core.presentation.res.feed_offline
 import zed.rainxch.githubstore.core.presentation.res.feed_platform_all
 import zed.rainxch.githubstore.core.presentation.res.home_retry
+import zed.rainxch.core.presentation.layout.withoutBottom
+import androidx.compose.ui.unit.Dp
 
 @Composable
 fun FeedRoot(
@@ -165,11 +167,12 @@ private fun FeedScreen(
                 onRefresh = { onAction(FeedAction.OnRefresh) },
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(innerPadding),
+                    .padding(innerPadding.withoutBottom()),
             ) {
                 FeedContent(
                     listState = listState,
                     state = state,
+                    bottomInset = innerPadding.calculateBottomPadding(),
                     onAction = onAction,
                 )
             }
@@ -177,8 +180,9 @@ private fun FeedScreen(
             FeedContent(
                 listState = listState,
                 state = state,
+                bottomInset = innerPadding.calculateBottomPadding(),
                 onAction = onAction,
-                modifier = Modifier.padding(innerPadding),
+                modifier = Modifier.padding(innerPadding.withoutBottom()),
             )
         }
     }
@@ -196,12 +200,13 @@ private fun FeedScreen(
 private fun FeedContent(
     listState: LazyStaggeredGridState,
     state: FeedState,
+    bottomInset: Dp,
     onAction: (FeedAction) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val colors = LocalPersonality.current.colors
     val isManga = LocalPersonality.current is MangaPersonality
-    val gridPadding = PaddingValues(start = 12.dp, end = 12.dp, bottom = 32.dp)
+    val gridPadding = PaddingValues(start = 12.dp, end = 12.dp, bottom = 32.dp + bottomInset)
     val cells =
         rememberWidthCappedStaggeredCells(
             contentPadding = gridPadding,
