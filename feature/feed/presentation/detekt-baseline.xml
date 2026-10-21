@@ -2,7 +2,7 @@
 <SmellBaseline>
   <ManuallySuppressedIssues/>
   <CurrentIssues>
-    <ID>CyclomaticComplexMethod:FeedRoot.kt$@Composable private fun FeedContent( listState: LazyStaggeredGridState, state: FeedState, onAction: (FeedAction) -&gt; Unit, modifier: Modifier = Modifier, )</ID>
+    <ID>CyclomaticComplexMethod:FeedRoot.kt$@Composable private fun FeedContent( listState: LazyStaggeredGridState, state: FeedState, bottomInset: Dp, onAction: (FeedAction) -&gt; Unit, modifier: Modifier = Modifier, )</ID>
     <ID>CyclomaticComplexMethod:FeedViewModel.kt$FeedViewModel$fun onAction(action: FeedAction)</ID>
     <ID>LongMethod:FeedViewModel.kt$FeedViewModel$fun onAction(action: FeedAction)</ID>
     <ID>LongParameterList:FeedRepoCardMapper.kt$( isInstalled: Boolean, isUpdateAvailable: Boolean, isFavourite: Boolean, isStarred: Boolean, isSeen: Boolean, isCurrentUserOwner: Boolean, )</ID>

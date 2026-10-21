@@ -158,7 +158,8 @@ internal fun HandTopBarToTabCard(
 
 internal fun Modifier.foldsTabCard(slot: KomiTabCardSlot?): Modifier = if (slot == null) this else nestedScroll(slot.state.foldConnection)
 
-// Room under a tab screen's content for the folded card; the unfolded tab row overlaps it.
+// The room a tab screen's list leaves at its end for the folded card. The list scrolls under the
+// card (see withoutBottom); the unfolded tab row covers a little more of it.
 @Composable
 internal fun tabCardContentInsets(slot: KomiTabCardSlot?): WindowInsets =
     if (slot == null) {

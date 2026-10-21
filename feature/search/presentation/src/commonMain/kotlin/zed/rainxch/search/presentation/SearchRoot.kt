@@ -124,6 +124,7 @@ import zed.rainxch.search.presentation.model.SearchSourceUi
 import zed.rainxch.search.presentation.model.SortByUi
 import zed.rainxch.search.presentation.utils.label
 import kotlin.time.Duration.Companion.milliseconds
+import zed.rainxch.core.presentation.layout.withoutBottom
 
 @Composable
 fun SearchRoot(
@@ -353,7 +354,7 @@ fun SearchScreen(
         },
     ) { innerPadding ->
         Box(
-            modifier = Modifier.fillMaxSize().padding(innerPadding),
+            modifier = Modifier.fillMaxSize().padding(innerPadding.withoutBottom()),
             contentAlignment = Alignment.TopCenter,
         ) {
             val gridEdgeInset = 12.dp
@@ -577,7 +578,7 @@ fun SearchScreen(
                                 contentPadding =
                                     PaddingValues(
                                         top = 12.dp,
-                                        bottom = 12.dp,
+                                        bottom = 12.dp + innerPadding.calculateBottomPadding(),
                                     ),
                                 modifier =
                                     Modifier

@@ -32,6 +32,7 @@ import zed.rainxch.githubstore.core.presentation.res.logout_success
 import zed.rainxch.githubstore.core.presentation.res.profile_title
 import zed.rainxch.profile.presentation.components.LogoutDialog
 import zed.rainxch.profile.presentation.components.profileSections
+import zed.rainxch.core.presentation.layout.withoutBottom
 
 @Composable
 fun ProfileRoot(
@@ -138,12 +139,13 @@ fun ProfileScreen(
     ) { innerPadding ->
         val listState = rememberLazyListState()
         Box(
-            modifier = Modifier.fillMaxSize().padding(innerPadding),
+            modifier = Modifier.fillMaxSize().padding(innerPadding.withoutBottom()),
             contentAlignment = Alignment.TopCenter,
         ) {
             LazyColumn(
                 state = listState,
-                contentPadding = PaddingValues(16.dp),
+                contentPadding =
+                    PaddingValues(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 16.dp + innerPadding.calculateBottomPadding()),
                 modifier =
                     Modifier
                         .constrainedContentWidth()

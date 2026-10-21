@@ -96,6 +96,7 @@ import zed.rainxch.githubstore.core.presentation.res.no_apps_found
 import zed.rainxch.githubstore.core.presentation.res.search_your_apps
 import zed.rainxch.githubstore.core.presentation.res.uninstall
 import kotlin.time.ExperimentalTime
+import zed.rainxch.core.presentation.layout.withoutBottom
 
 @Composable
 fun AppsRoot(
@@ -250,7 +251,7 @@ fun AppsScreen(
             onRefresh = { onAction(AppsAction.OnRefresh) },
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding),
+                .padding(innerPadding.withoutBottom()),
         ) {
             Box(
                 modifier = Modifier.fillMaxSize(),
@@ -365,7 +366,7 @@ fun AppsScreen(
                                         start = 12.dp,
                                         end = 12.dp,
                                         top = 8.dp,
-                                        bottom = 88.dp,
+                                        bottom = 88.dp + innerPadding.calculateBottomPadding(),
                                     )
                                 val appGridCells =
                                     rememberWidthCappedGridCells(contentPadding = appGridPadding)
