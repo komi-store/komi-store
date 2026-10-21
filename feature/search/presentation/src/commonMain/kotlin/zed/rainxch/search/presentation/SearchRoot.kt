@@ -326,6 +326,12 @@ fun SearchScreen(
         }
     }
 
+    LaunchedEffect(Unit) {
+        if (state.query.isEmpty()) {
+            focusRequester.requestFocus()
+        }
+    }
+
     KomiScaffold(
         topBar = {
             SearchTopbar(
@@ -867,12 +873,6 @@ private fun SearchTopbar(
                     .focusRequester(focusRequester),
                 multiline = false
             )
-            // Asked here, where the field is: the tab card composes it after the screen.
-            LaunchedEffect(Unit) {
-                if (state.query.isEmpty()) {
-                    focusRequester.requestFocus()
-                }
-            }
         },
         actions = {
             FiltersButton(

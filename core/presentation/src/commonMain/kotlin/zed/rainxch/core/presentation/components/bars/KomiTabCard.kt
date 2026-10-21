@@ -14,10 +14,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.add
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
@@ -28,16 +29,16 @@ import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
@@ -48,16 +49,20 @@ import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 import org.jetbrains.compose.resources.stringResource
 import zed.rainxch.core.presentation.components.badge.KomiBadge
 import zed.rainxch.core.presentation.components.badge.KomiBadgedBox
 import zed.rainxch.core.presentation.components.text.KomiText
 import zed.rainxch.core.presentation.components.text.KomiTextRole
+import zed.rainxch.core.presentation.locals.LocalAnimatedVisibilityScope
 import zed.rainxch.core.presentation.locals.LocalPersonality
+import zed.rainxch.core.presentation.locals.LocalSharedTransitionScope
 import zed.rainxch.core.presentation.personality.ClassicPersonality
 import zed.rainxch.core.presentation.spacing.Spacing
 import zed.rainxch.githubstore.core.presentation.res.Res
@@ -66,14 +71,18 @@ import zed.rainxch.githubstore.core.presentation.res.show_tabs
 
 // Classic's tab card, after Chocola: one card at the bottom of the tab screens with the screen's
 // search field and actions, and the tab row under them. The row folds behind a toggle while the
-// content scrolls down and unfolds on the way up. The app shell draws it, so it stays put while the
-// tabs slide; each tab screen hands it its content through LocalTabCardSlot.
+// content scrolls down and unfolds on the way up. The app shell owns the tabs and the fold, shared
+// by every tab, and gives each tab destination a LocalTabCardSlot. KomiScaffold draws the card in
+// the screen's own composition, after its top bar hands over the search field and actions, so the
+// field never recomposes with a value its screen has already replaced (that loses typing). A
+// shared element keeps the card in place while the tabs slide.
 @Stable
 class KomiTabCardState {
-    internal val search = mutableStateMapOf<String, @Composable () -> Unit>()
-    internal val actions = mutableStateMapOf<String, @Composable RowScope.() -> Unit>()
-    internal val fab = mutableStateMapOf<String, @Composable () -> Unit>()
     internal var folded by mutableStateOf(false)
+    internal var items by mutableStateOf<ImmutableList<KomiNavItem>>(persistentListOf())
+    internal var onSelect: (String) -> Unit = {}
+    internal var onSearch: () -> Unit = {}
+    private val parts = HashMap<String, TabCardParts>()
 
     internal val foldConnection =
         object : NestedScrollConnection {
@@ -92,9 +101,23 @@ class KomiTabCardState {
         }
 
     fun slot(tabId: String): KomiTabCardSlot = KomiTabCardSlot(this, tabId)
+
+    // The app shell's part: the tabs, what picking one does and what the search field opens.
+    fun setTabs(
+        items: ImmutableList<KomiNavItem>,
+        onSelect: (String) -> Unit,
+        onSearch: () -> Unit,
+    ) {
+        this.items = items
+        this.onSelect = onSelect
+        this.onSearch = onSearch
+    }
+
+    internal fun parts(tabId: String): TabCardParts = parts.getOrPut(tabId) { TabCardParts() }
 }
 
-// The tab a screen belongs to, so the card shows the content of the selected tab only.
+// A tab destination's slot: the shared state and the tab the screen belongs to, which its card
+// shows as selected.
 @Immutable
 data class KomiTabCardSlot(
     val state: KomiTabCardState,
@@ -103,46 +126,76 @@ data class KomiTabCardSlot(
 
 val LocalTabCardSlot = staticCompositionLocalOf<KomiTabCardSlot?> { null }
 
-// What the folded card leaves of the screen: the search row and its margins, above the
-// navigation bar inset. Content is padded by this; the tab row unfolds over it.
-object KomiTabCardDefaults {
-    val FoldedHeight = 80.dp
+// What a tab screen's top bar hands its card, written while composing, ahead of the card that
+// reads it further down the same composition.
+@Stable
+internal class TabCardParts {
+    var search by mutableStateOf<(@Composable () -> Unit)?>(null)
+    var actions by mutableStateOf<(@Composable RowScope.() -> Unit)?>(null)
 }
+
+@Composable
+internal fun HandToTabCard(
+    slot: KomiTabCardSlot,
+    search: (@Composable () -> Unit)?,
+    actions: (@Composable RowScope.() -> Unit)?,
+) {
+    val parts = slot.state.parts(slot.tabId)
+    parts.search = search
+    parts.actions = actions
+}
+
+// A tab screen's scaffold runs its top bar here, ahead of the card, instead of in Material's top
+// bar slot, which is composed during layout, after the card.
+@Composable
+internal fun HandTopBarToTabCard(
+    slot: KomiTabCardSlot?,
+    topBar: (@Composable () -> Unit)?,
+) {
+    if (slot != null) topBar?.invoke()
+}
+
+internal fun Modifier.foldsTabCard(slot: KomiTabCardSlot?): Modifier = if (slot == null) this else nestedScroll(slot.state.foldConnection)
+
+// Room under a tab screen's content for the folded card; the unfolded tab row overlaps it.
+@Composable
+internal fun tabCardContentInsets(slot: KomiTabCardSlot?): WindowInsets =
+    if (slot == null) {
+        ScaffoldDefaults.contentWindowInsets
+    } else {
+        ScaffoldDefaults.contentWindowInsets.add(WindowInsets(bottom = FoldedHeight))
+    }
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-fun KomiTabCard(
-    state: KomiTabCardState,
-    items: ImmutableList<KomiNavItem>,
-    selectedId: String,
-    onSelect: (String) -> Unit,
-    onSearch: () -> Unit,
+internal fun KomiTabCard(
+    slot: KomiTabCardSlot?,
+    fab: (@Composable () -> Unit)?,
     modifier: Modifier = Modifier,
 ) {
-    val personality = LocalPersonality.current
-    val motion = personality.motion
+    if (slot == null) return
+    val state = slot.state
+    val parts = state.parts(slot.tabId)
+    val search = parts.search
+    val actions = parts.actions
+    val motion = LocalPersonality.current.motion
     val haptics = LocalHapticFeedback.current
-    val search = state.search[selectedId]
-    val actions = state.actions[selectedId]
-    val fab = state.fab[selectedId]
+    // The window pans the focused field above the keyboard; the FAB stays out of the way meanwhile.
+    val ime = WindowInsets.ime
+    val density = LocalDensity.current
+    val typing by remember(ime, density) { derivedStateOf { ime.getBottom(density) > 0 } }
     Column(
         modifier =
             modifier
                 .fillMaxWidth()
                 .navigationBarsPadding()
-                .imePadding()
                 .padding(horizontal = Spacing.md, vertical = Spacing.sm),
         horizontalAlignment = Alignment.End,
         verticalArrangement = Arrangement.spacedBy(Spacing.sm),
     ) {
         // The screen's FAB rides above the card's end, like Chocola's shuffle button.
-        fab?.let { CompositionLocalProvider(LocalInBar provides true, content = it) }
-        Surface(
-            shape = RoundedCornerShape(CardCorner),
-            color = personality.colors.surfaceContainerHigh,
-            shadowElevation = CardElevation,
-            modifier = Modifier.fillMaxWidth(),
-        ) {
+        if (!typing) fab?.let { CompositionLocalProvider(LocalInBar provides true, content = it) }
+        CardSurface(modifier = tabSwitchModifier()) {
             Column(modifier = Modifier.animateContentSize(motion.bouncySpatial())) {
                 Row(
                     modifier = Modifier.fillMaxWidth().heightIn(min = SearchRowHeight).padding(horizontal = Spacing.sm),
@@ -155,13 +208,13 @@ fun KomiTabCard(
                         exit = scaleOut(motion.fastEffects()) + fadeOut(motion.fastEffects()),
                     ) {
                         TabToggle(
-                            item = items.firstOrNull { it.id == selectedId },
-                            anyBadge = items.any { it.badgeCount > 0 },
+                            item = state.items.firstOrNull { it.id == slot.tabId },
+                            anyBadge = state.items.any { it.badgeCount > 0 },
                             onClick = { state.folded = false },
                         )
                     }
                     Box(modifier = Modifier.weight(1f)) {
-                        if (search != null) search() else SearchPill(onClick = onSearch)
+                        if (search != null) search() else SearchPill(onClick = { state.onSearch() })
                     }
                     actions?.let { content ->
                         CompositionLocalProvider(LocalInBar provides true) {
@@ -175,11 +228,11 @@ fun KomiTabCard(
                     exit = shrinkVertically(motion.fastEffects()) + fadeOut(motion.fastEffects()),
                 ) {
                     ClassicNavRow(
-                        items = items,
-                        selectedId = selectedId,
+                        items = state.items,
+                        selectedId = slot.tabId,
                         onSelect = { id ->
                             haptics.performHapticFeedback(HapticFeedbackType.Confirm)
-                            onSelect(id)
+                            state.onSelect(id)
                         },
                         containerColor = Color.Transparent,
                         windowInsets = WindowInsets(0, 0, 0, 0),
@@ -187,6 +240,31 @@ fun KomiTabCard(
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun CardSurface(
+    modifier: Modifier = Modifier,
+    content: @Composable () -> Unit,
+) {
+    Surface(
+        shape = RoundedCornerShape(CardCorner),
+        color = LocalPersonality.current.colors.surfaceContainerHigh,
+        shadowElevation = CardElevation,
+        modifier = modifier.fillMaxWidth(),
+        content = content,
+    )
+}
+
+// Each tab screen draws its own card; matched across a tab switch, it stays where it is.
+@Composable
+private fun tabSwitchModifier(): Modifier {
+    val sharedScope = LocalSharedTransitionScope.current
+    val visibilityScope = LocalAnimatedVisibilityScope.current
+    if (sharedScope == null || visibilityScope == null) return Modifier
+    return with(sharedScope) {
+        Modifier.sharedElement(rememberSharedContentState(key = SHARED_KEY), visibilityScope)
     }
 }
 
@@ -235,41 +313,10 @@ private fun SearchPill(onClick: () -> Unit) {
     }
 }
 
-// A tab screen's top bar and scaffold hand their search field, actions and FAB to the card.
-@Composable
-internal fun HandToTabCard(
-    slot: KomiTabCardSlot,
-    search: (@Composable () -> Unit)?,
-    actions: (@Composable RowScope.() -> Unit)?,
-) {
-    val currentSearch by rememberUpdatedState(search)
-    val currentActions by rememberUpdatedState(actions)
-    val hasSearch = search != null
-    val hasActions = actions != null
-    DisposableEffect(slot, hasSearch, hasActions) {
-        if (hasSearch) slot.state.search[slot.tabId] = { currentSearch?.invoke() }
-        if (hasActions) slot.state.actions[slot.tabId] = { currentActions?.invoke(this) }
-        onDispose {
-            slot.state.search.remove(slot.tabId)
-            slot.state.actions.remove(slot.tabId)
-        }
-    }
-}
+private const val SHARED_KEY = "komi-tab-card"
 
-@Composable
-internal fun HandFabToTabCard(
-    slot: KomiTabCardSlot?,
-    fab: (@Composable () -> Unit)?,
-) {
-    val currentFab by rememberUpdatedState(fab)
-    val hasFab = fab != null
-    DisposableEffect(slot, hasFab) {
-        if (slot != null && hasFab) slot.state.fab[slot.tabId] = { currentFab?.invoke() }
-        onDispose { slot?.state?.fab?.remove(slot.tabId) }
-    }
-}
-
-internal fun Modifier.foldsTabCard(slot: KomiTabCardSlot?): Modifier = if (slot == null) this else nestedScroll(slot.state.foldConnection)
+// The search row and the card's margins: what the folded card covers above the navigation bar.
+private val FoldedHeight = 80.dp
 
 private val CardCorner = 28.dp
 

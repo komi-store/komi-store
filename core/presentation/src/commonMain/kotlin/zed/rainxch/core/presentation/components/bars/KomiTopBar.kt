@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.windowInsetsTopHeight
 import androidx.compose.material.icons.Icons
@@ -79,8 +78,7 @@ fun KomiTopBar(
     // Elsewhere Classic hands the back action and the actions to its KomiScaffold, which draws
     // them in a KomiActionBar at the bottom, so the top bar keeps only the title. A search field
     // keeps its actions beside it.
-    val scaffoldChrome =
-        LocalScaffoldChrome.current?.takeIf { personality is ClassicPersonality && tabCard == null && search == null }
+    val scaffoldChrome = LocalScaffoldChrome.current?.takeIf { personality is ClassicPersonality && search == null }
     if (scaffoldChrome != null) HandToScaffold(chrome = scaffoldChrome, onBack = onBack, actions = actions)
     val topBarBack: (@Composable () -> Unit)? =
         onBack?.takeIf { scaffoldChrome == null }?.let { back -> @Composable { TopBarBack(back) } }
@@ -88,7 +86,7 @@ fun KomiTopBar(
     val topBarActions = actions.takeIf { scaffoldChrome == null }
     when {
         tabCard != null -> {
-            TabCardTopBar(slot = tabCard, search = search, actions = actions, insets = insets, modifier = modifier)
+            HandToTabCard(slot = tabCard, search = search, actions = actions)
         }
 
         search != null -> {
@@ -123,19 +121,6 @@ fun KomiTopBar(
             )
         }
     }
-}
-
-// A tab screen keeps only room for the status bar; the card at the bottom holds the rest.
-@Composable
-private fun TabCardTopBar(
-    slot: KomiTabCardSlot,
-    search: (@Composable () -> Unit)?,
-    actions: (@Composable RowScope.() -> Unit)?,
-    insets: Boolean,
-    modifier: Modifier = Modifier,
-) {
-    HandToTabCard(slot = slot, search = search, actions = actions)
-    if (insets) Spacer(modifier = modifier.windowInsetsTopHeight(WindowInsets.statusBars))
 }
 
 // A search screen's field takes the title's place, with its actions beside it.

@@ -86,10 +86,6 @@ import zed.rainxch.tweaks.presentation.hosttokens.HostTokensRoot
 import zed.rainxch.tweaks.presentation.licenses.LicensesRoot
 import zed.rainxch.tweaks.presentation.mirror.MirrorPickerRoot
 import zed.rainxch.tweaks.presentation.skipped.SkippedUpdatesRoot
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
-import androidx.compose.foundation.layout.navigationBars
-import zed.rainxch.core.presentation.components.bars.KomiTabCardDefaults
 import zed.rainxch.core.presentation.components.bars.KomiTabCardState
 import zed.rainxch.core.presentation.components.bars.LocalTabCardSlot
 import zed.rainxch.core.presentation.personality.ClassicPersonality
@@ -162,15 +158,8 @@ fun AppNavigation(
                                 .allowedScreens()
                                 .any { it.screen::class == currentScreen::class }
 
-                    // The content ends above the folded tab card, which keeps its height as the
-                    // tab row unfolds over the content.
-                    val navigationBarHeight = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
-                    val bottomInset =
-                        when {
-                            !showBottomBar -> 0.dp
-                            tabCard != null -> KomiTabCardDefaults.FoldedHeight + navigationBarHeight
-                            else -> bottomBarHeight
-                        }
+                    // Classic's tab screens draw their tab card over their own content.
+                    val bottomInset = if (showBottomBar && tabCard == null) bottomBarHeight else 0.dp
                     SharedTransitionLayout(
                         modifier =
                             Modifier
@@ -353,8 +342,11 @@ fun AppNavigation(
                                     koinViewModel {
                                         parametersOf(initialPlatform)
                                     }
-                                val tabSlot = tabCard?.slot(tabIdOf(GithubStoreGraph.SearchScreen()))
-                                CompositionLocalProvider(LocalTabCardSlot provides tabSlot) {
+                                CompositionLocalProvider(
+                                    LocalSharedTransitionScope provides this@SharedTransitionLayout,
+                                    LocalAnimatedVisibilityScope provides this@composable,
+                                    LocalTabCardSlot provides tabCard?.slot(tabIdOf(GithubStoreGraph.SearchScreen())),
+                                ) {
                                     AdaptiveListDetailScaffold(
                                         state = listDetailState,
                                         emptyPaneTitle = pickRepoTitle,
@@ -819,6 +811,7 @@ fun AppNavigation(
                                 navController = navController,
                                 unreadAnnouncementsCount = announcementsViewModel.unreadCount,
                                 tabCard = tabCard,
+                                sharedTransitionScope = this@SharedTransitionLayout,
                             )
 
                             composable<GithubStoreGraph.RecentlyViewedScreen> {
@@ -945,7 +938,11 @@ fun AppNavigation(
                                     stringResource(Res.string.adaptive_pick_repo_title)
                                 val pickRepoSubtitle =
                                     stringResource(Res.string.adaptive_pick_repo_subtitle)
-                                CompositionLocalProvider(LocalTabCardSlot provides tabCard?.slot(tabIdOf(GithubStoreGraph.AppsScreen))) {
+                                CompositionLocalProvider(
+                                    LocalSharedTransitionScope provides this@SharedTransitionLayout,
+                                    LocalAnimatedVisibilityScope provides this@composable,
+                                    LocalTabCardSlot provides tabCard?.slot(tabIdOf(GithubStoreGraph.AppsScreen)),
+                                ) {
                                     AdaptiveListDetailScaffold(
                                         state = listDetailState,
                                         emptyPaneTitle = pickRepoTitle,

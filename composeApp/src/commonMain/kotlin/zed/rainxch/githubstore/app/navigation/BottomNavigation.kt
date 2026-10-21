@@ -7,7 +7,6 @@ import kotlinx.collections.immutable.toImmutableList
 import org.jetbrains.compose.resources.stringResource
 import zed.rainxch.core.presentation.components.bars.KomiBottomBar
 import zed.rainxch.core.presentation.components.bars.KomiNavItem
-import zed.rainxch.core.presentation.components.bars.KomiTabCard
 import zed.rainxch.core.presentation.components.bars.KomiTabCardState
 import zed.rainxch.core.presentation.personality.utils.PersonalityPreview
 
@@ -51,15 +50,9 @@ fun BottomNavigation(
         if (target != null && target != currentScreen) onNavigate(target)
     }
     if (tabCard != null) {
-        // On a tab without a search field of its own, the card's field opens the Search tab.
-        KomiTabCard(
-            state = tabCard,
-            items = items,
-            selectedId = selectedId,
-            onSelect = onSelect,
-            onSearch = { onSelect(tabIdOf(GithubStoreGraph.SearchScreen())) },
-            modifier = modifier,
-        )
+        // Classic's tab screens draw the tab card themselves; on a tab without a search field of
+        // its own, the card's field opens the Search tab.
+        tabCard.setTabs(items = items, onSelect = onSelect, onSearch = { onSelect(tabIdOf(GithubStoreGraph.SearchScreen())) })
     } else {
         KomiBottomBar(items = items, selectedId = selectedId, onSelect = onSelect, modifier = modifier)
     }

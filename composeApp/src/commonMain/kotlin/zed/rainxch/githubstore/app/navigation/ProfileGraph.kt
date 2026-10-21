@@ -1,5 +1,6 @@
 package zed.rainxch.githubstore.app.navigation
 
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -10,19 +11,26 @@ import androidx.navigation.navigation
 import kotlinx.coroutines.flow.StateFlow
 import zed.rainxch.core.presentation.components.bars.KomiTabCardState
 import zed.rainxch.core.presentation.components.bars.LocalTabCardSlot
+import zed.rainxch.core.presentation.locals.LocalAnimatedVisibilityScope
+import zed.rainxch.core.presentation.locals.LocalSharedTransitionScope
 import zed.rainxch.profile.presentation.ProfileRoot
 
 fun NavGraphBuilder.profileGraph(
     navController: NavHostController,
     unreadAnnouncementsCount: StateFlow<Int>,
     tabCard: KomiTabCardState?,
+    sharedTransitionScope: SharedTransitionScope,
 ) {
     navigation<GithubStoreGraph.ProfileGraph>(
         startDestination = GithubStoreGraph.ProfileGraph.ProfileScreen,
     ) {
         composable<GithubStoreGraph.ProfileGraph.ProfileScreen> {
             val unreadCount by unreadAnnouncementsCount.collectAsStateWithLifecycle()
-            CompositionLocalProvider(LocalTabCardSlot provides tabCard?.slot(tabIdOf(GithubStoreGraph.ProfileGraph.ProfileScreen))) {
+            CompositionLocalProvider(
+                LocalSharedTransitionScope provides sharedTransitionScope,
+                LocalAnimatedVisibilityScope provides this@composable,
+                LocalTabCardSlot provides tabCard?.slot(tabIdOf(GithubStoreGraph.ProfileGraph.ProfileScreen)),
+            ) {
                 ProfileRoot(
                     onNavigateToAuthentication = {
                         navController.navigate(GithubStoreGraph.AuthenticationScreen)
