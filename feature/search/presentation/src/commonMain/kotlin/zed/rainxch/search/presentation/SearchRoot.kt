@@ -569,7 +569,7 @@ fun SearchScreen(
                                 contentPadding =
                                     PaddingValues(
                                         top = 12.dp,
-                                        bottom = 12.dp + innerPadding.calculateBottomPadding(),
+                                        bottom = 88.dp + innerPadding.calculateBottomPadding(),
                                     ),
                                 modifier =
                                     Modifier
