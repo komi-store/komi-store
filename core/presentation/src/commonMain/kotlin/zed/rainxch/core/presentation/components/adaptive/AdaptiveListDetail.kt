@@ -23,6 +23,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import zed.rainxch.core.presentation.components.bars.LocalTabCardSlot
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.saveable.Saver
@@ -135,7 +137,8 @@ fun AdaptiveListDetailScaffold(
                         subtitle = emptyPaneSubtitle,
                     )
                 } else {
-                    detail(args)
+                    // The detail beside a tab's list must not hand its actions to the tab card.
+                    CompositionLocalProvider(LocalTabCardSlot provides null) { detail(args) }
                 }
             }
         }

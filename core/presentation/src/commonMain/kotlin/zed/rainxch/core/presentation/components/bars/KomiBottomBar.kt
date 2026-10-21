@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -24,6 +25,7 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.ShortNavigationBar
+import androidx.compose.material3.ShortNavigationBarDefaults
 import androidx.compose.material3.ShortNavigationBarItem
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -163,7 +165,27 @@ private fun ClassicBottomBar(
     modifier: Modifier = Modifier,
 ) {
     // On the page itself, like the top bar: the selected item's indicator is enough.
-    ShortNavigationBar(modifier = modifier, containerColor = LocalPersonality.current.colors.background) {
+    ClassicNavRow(
+        items = items,
+        selectedId = selectedId,
+        onSelect = onSelect,
+        containerColor = LocalPersonality.current.colors.background,
+        windowInsets = ShortNavigationBarDefaults.windowInsets,
+        modifier = modifier,
+    )
+}
+
+// Material's short navigation bar; the tab card puts the same row inside itself.
+@Composable
+internal fun ClassicNavRow(
+    items: ImmutableList<KomiNavItem>,
+    selectedId: String,
+    onSelect: (String) -> Unit,
+    containerColor: Color,
+    windowInsets: WindowInsets,
+    modifier: Modifier = Modifier,
+) {
+    ShortNavigationBar(modifier = modifier, containerColor = containerColor, windowInsets = windowInsets) {
         items.forEach { item ->
             val selected = item.id == selectedId
             ShortNavigationBarItem(

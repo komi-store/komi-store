@@ -86,6 +86,13 @@ import zed.rainxch.tweaks.presentation.hosttokens.HostTokensRoot
 import zed.rainxch.tweaks.presentation.licenses.LicensesRoot
 import zed.rainxch.tweaks.presentation.mirror.MirrorPickerRoot
 import zed.rainxch.tweaks.presentation.skipped.SkippedUpdatesRoot
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.navigationBars
+import zed.rainxch.core.presentation.components.bars.KomiTabCardDefaults
+import zed.rainxch.core.presentation.components.bars.KomiTabCardState
+import zed.rainxch.core.presentation.components.bars.LocalTabCardSlot
+import zed.rainxch.core.presentation.personality.ClassicPersonality
 
 @Composable
 fun AppNavigation(
@@ -142,6 +149,10 @@ fun AppNavigation(
                 ) {
                     val density = LocalDensity.current
                     var bottomBarHeight by remember { mutableStateOf(0.dp) }
+                    // Classic's tab card, after Chocola; Manga keeps its bottom bar and the desktop
+                    // its sidebar.
+                    val tabCardState = remember { KomiTabCardState() }
+                    val tabCard = tabCardState.takeIf { LocalPersonality.current is ClassicPersonality && !isDesktop() }
                     val currentScreen =
                         navController.currentBackStackEntryAsState().value.getCurrentScreen()
                     val showBottomBar =
@@ -151,14 +162,20 @@ fun AppNavigation(
                                 .allowedScreens()
                                 .any { it.screen::class == currentScreen::class }
 
+                    // The content ends above the folded tab card, which keeps its height as the
+                    // tab row unfolds over the content.
+                    val navigationBarHeight = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
+                    val bottomInset =
+                        when {
+                            !showBottomBar -> 0.dp
+                            tabCard != null -> KomiTabCardDefaults.FoldedHeight + navigationBarHeight
+                            else -> bottomBarHeight
+                        }
                     SharedTransitionLayout(
                         modifier =
                             Modifier
-                                .padding(
-                                    bottom = if (showBottomBar) bottomBarHeight else 0.dp,
-                                ).then(
-                                    if (showBottomBar) Modifier.consumeWindowInsets(PaddingValues(bottom = bottomBarHeight)) else Modifier,
-                                ),
+                                .padding(bottom = bottomInset)
+                                .consumeWindowInsets(PaddingValues(bottom = bottomInset)),
                     ) {
                         val motion = LocalPersonality.current.motion
                         NavHost(
@@ -208,6 +225,7 @@ fun AppNavigation(
                                 CompositionLocalProvider(
                                     LocalSharedTransitionScope provides this@SharedTransitionLayout,
                                     LocalAnimatedVisibilityScope provides this@composable,
+                                    LocalTabCardSlot provides tabCard?.slot(tabIdOf(GithubStoreGraph.ExploreScreen)),
                                 ) {
                                     val listDetailState = rememberAdaptiveListDetailState()
 
@@ -258,6 +276,7 @@ fun AppNavigation(
                                 CompositionLocalProvider(
                                     LocalSharedTransitionScope provides this@SharedTransitionLayout,
                                     LocalAnimatedVisibilityScope provides this@composable,
+                                    LocalTabCardSlot provides tabCard?.slot(tabIdOf(GithubStoreGraph.ChartsScreen)),
                                 ) {
                                     val listDetailState = rememberAdaptiveListDetailState()
 
@@ -334,76 +353,79 @@ fun AppNavigation(
                                     koinViewModel {
                                         parametersOf(initialPlatform)
                                     }
-                                AdaptiveListDetailScaffold(
-                                    state = listDetailState,
-                                    emptyPaneTitle = pickRepoTitle,
-                                    emptyPaneSubtitle = pickRepoSubtitle,
-                                    list = { isExpanded ->
-                                        SearchRoot(
-                                            onNavigateBack = {
-                                                navController.navigateUp()
-                                            },
-                                            onNavigateToDetails = { repoId, owner, repo, sourceHost ->
-                                                if (isExpanded) {
-                                                    listDetailState.select(
-                                                        AdaptiveDetailArgs(
-                                                            repositoryId = repoId,
-                                                            owner = owner,
-                                                            repo = repo,
-                                                            sourceHost = sourceHost,
-                                                        ),
-                                                    )
-                                                } else {
+                                val tabSlot = tabCard?.slot(tabIdOf(GithubStoreGraph.SearchScreen()))
+                                CompositionLocalProvider(LocalTabCardSlot provides tabSlot) {
+                                    AdaptiveListDetailScaffold(
+                                        state = listDetailState,
+                                        emptyPaneTitle = pickRepoTitle,
+                                        emptyPaneSubtitle = pickRepoSubtitle,
+                                        list = { isExpanded ->
+                                            SearchRoot(
+                                                onNavigateBack = {
+                                                    navController.navigateUp()
+                                                },
+                                                onNavigateToDetails = { repoId, owner, repo, sourceHost ->
+                                                    if (isExpanded) {
+                                                        listDetailState.select(
+                                                            AdaptiveDetailArgs(
+                                                                repositoryId = repoId,
+                                                                owner = owner,
+                                                                repo = repo,
+                                                                sourceHost = sourceHost,
+                                                            ),
+                                                        )
+                                                    } else {
+                                                        navController.navigate(
+                                                            GithubStoreGraph.DetailsScreen(
+                                                                repositoryId = repoId,
+                                                                owner = owner,
+                                                                repo = repo,
+                                                                sourceHost = sourceHost,
+                                                            ),
+                                                        )
+                                                    }
+                                                },
+                                                onNavigateToDetailsFromLink = { owner, repo ->
+                                                    if (isExpanded) {
+                                                        listDetailState.select(
+                                                            AdaptiveDetailArgs(
+                                                                owner = owner,
+                                                                repo = repo,
+                                                            ),
+                                                        )
+                                                    } else {
+                                                        navController.navigate(
+                                                            GithubStoreGraph.DetailsScreen(
+                                                                owner = owner,
+                                                                repo = repo,
+                                                            ),
+                                                        )
+                                                    }
+                                                },
+                                                onNavigateToDeveloperProfile = { username ->
                                                     navController.navigate(
-                                                        GithubStoreGraph.DetailsScreen(
-                                                            repositoryId = repoId,
-                                                            owner = owner,
-                                                            repo = repo,
-                                                            sourceHost = sourceHost,
+                                                        GithubStoreGraph.DeveloperProfileScreen(
+                                                            username = username,
                                                         ),
                                                     )
-                                                }
-                                            },
-                                            onNavigateToDetailsFromLink = { owner, repo ->
-                                                if (isExpanded) {
+                                                },
+                                                viewModel = searchViewModel,
+                                            )
+                                        },
+                                        detail = { detailArgs ->
+                                            AdaptiveDetailPaneContent(
+                                                args = detailArgs,
+                                                navController = navController,
+                                                onCrossNavToRepo = { newArgs ->
                                                     listDetailState.select(
-                                                        AdaptiveDetailArgs(
-                                                            owner = owner,
-                                                            repo = repo,
-                                                        ),
+                                                        newArgs,
                                                     )
-                                                } else {
-                                                    navController.navigate(
-                                                        GithubStoreGraph.DetailsScreen(
-                                                            owner = owner,
-                                                            repo = repo,
-                                                        ),
-                                                    )
-                                                }
-                                            },
-                                            onNavigateToDeveloperProfile = { username ->
-                                                navController.navigate(
-                                                    GithubStoreGraph.DeveloperProfileScreen(
-                                                        username = username,
-                                                    ),
-                                                )
-                                            },
-                                            viewModel = searchViewModel,
-                                        )
-                                    },
-                                    detail = { detailArgs ->
-                                        AdaptiveDetailPaneContent(
-                                            args = detailArgs,
-                                            navController = navController,
-                                            onCrossNavToRepo = { newArgs ->
-                                                listDetailState.select(
-                                                    newArgs,
-                                                )
-                                            },
-                                            onClearPane = { listDetailState.clear() },
-                                        )
-                                    },
-                                )
+                                                },
+                                                onClearPane = { listDetailState.clear() },
+                                            )
+                                        },
+                                    )
+                                }
                             }
 
                             composable<GithubStoreGraph.DetailsScreen> { backStackEntry ->
@@ -796,6 +818,7 @@ fun AppNavigation(
                             profileGraph(
                                 navController = navController,
                                 unreadAnnouncementsCount = announcementsViewModel.unreadCount,
+                                tabCard = tabCard,
                             )
 
                             composable<GithubStoreGraph.RecentlyViewedScreen> {
@@ -922,63 +945,65 @@ fun AppNavigation(
                                     stringResource(Res.string.adaptive_pick_repo_title)
                                 val pickRepoSubtitle =
                                     stringResource(Res.string.adaptive_pick_repo_subtitle)
-                                AdaptiveListDetailScaffold(
-                                    state = listDetailState,
-                                    emptyPaneTitle = pickRepoTitle,
-                                    emptyPaneSubtitle = pickRepoSubtitle,
-                                    list = { isExpanded ->
-                                        AppsRoot(
-                                            onNavigateBack = {
-                                                navController.navigateUp()
-                                            },
-                                            onNavigateToRepo = { repoId, sourceHost, owner, repo, packageName ->
-                                                if (isExpanded) {
+                                CompositionLocalProvider(LocalTabCardSlot provides tabCard?.slot(tabIdOf(GithubStoreGraph.AppsScreen))) {
+                                    AdaptiveListDetailScaffold(
+                                        state = listDetailState,
+                                        emptyPaneTitle = pickRepoTitle,
+                                        emptyPaneSubtitle = pickRepoSubtitle,
+                                        list = { isExpanded ->
+                                            AppsRoot(
+                                                onNavigateBack = {
+                                                    navController.navigateUp()
+                                                },
+                                                onNavigateToRepo = { repoId, sourceHost, owner, repo, packageName ->
+                                                    if (isExpanded) {
+                                                        listDetailState.select(
+                                                            AdaptiveDetailArgs(
+                                                                repositoryId = repoId,
+                                                                isComingFromUpdate = true,
+                                                                sourceHost = sourceHost,
+                                                                owner = owner,
+                                                                repo = repo,
+                                                                packageName = packageName,
+                                                            ),
+                                                        )
+                                                    } else {
+                                                        navController.navigate(
+                                                            GithubStoreGraph.DetailsScreen(
+                                                                repositoryId = repoId,
+                                                                isComingFromUpdate = true,
+                                                                sourceHost = sourceHost,
+                                                                owner = owner.orEmpty(),
+                                                                repo = repo.orEmpty(),
+                                                                packageName = packageName,
+                                                            ),
+                                                        )
+                                                    }
+                                                },
+                                                onNavigateToExternalImport = {
+                                                    navController.navigate(GithubStoreGraph.ExternalImportScreen)
+                                                },
+                                                onNavigateToStarredPicker = {
+                                                    navController.navigate(GithubStoreGraph.StarredPickerScreen)
+                                                },
+                                                viewModel = appsViewModel,
+                                                state = appsState,
+                                            )
+                                        },
+                                        detail = { detailArgs ->
+                                            AdaptiveDetailPaneContent(
+                                                args = detailArgs,
+                                                navController = navController,
+                                                onCrossNavToRepo = { newArgs ->
                                                     listDetailState.select(
-                                                        AdaptiveDetailArgs(
-                                                            repositoryId = repoId,
-                                                            isComingFromUpdate = true,
-                                                            sourceHost = sourceHost,
-                                                            owner = owner,
-                                                            repo = repo,
-                                                            packageName = packageName,
-                                                        ),
+                                                        newArgs,
                                                     )
-                                                } else {
-                                                    navController.navigate(
-                                                        GithubStoreGraph.DetailsScreen(
-                                                            repositoryId = repoId,
-                                                            isComingFromUpdate = true,
-                                                            sourceHost = sourceHost,
-                                                            owner = owner.orEmpty(),
-                                                            repo = repo.orEmpty(),
-                                                            packageName = packageName,
-                                                        ),
-                                                    )
-                                                }
-                                            },
-                                            onNavigateToExternalImport = {
-                                                navController.navigate(GithubStoreGraph.ExternalImportScreen)
-                                            },
-                                            onNavigateToStarredPicker = {
-                                                navController.navigate(GithubStoreGraph.StarredPickerScreen)
-                                            },
-                                            viewModel = appsViewModel,
-                                            state = appsState,
-                                        )
-                                    },
-                                    detail = { detailArgs ->
-                                        AdaptiveDetailPaneContent(
-                                            args = detailArgs,
-                                            navController = navController,
-                                            onCrossNavToRepo = { newArgs ->
-                                                listDetailState.select(
-                                                    newArgs,
-                                                )
-                                            },
-                                            onClearPane = { listDetailState.clear() },
-                                        )
-                                    },
-                                )
+                                                },
+                                                onClearPane = { listDetailState.clear() },
+                                            )
+                                        },
+                                    )
+                                }
                             }
 
                             composable<GithubStoreGraph.ExternalImportScreen> {
@@ -1026,6 +1051,7 @@ fun AppNavigation(
                             },
                             isUpdateAvailable = appsState.apps.any { it.installedApp.isUpdateAvailable },
                             hasUnreadAnnouncements = announcementsUnreadCount > 0,
+                            tabCard = tabCard,
                         )
                     }
                 }

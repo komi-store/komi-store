@@ -25,9 +25,12 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import zed.rainxch.core.presentation.components.bars.HandFabToTabCard
 import zed.rainxch.core.presentation.components.bars.KomiActionBar
 import zed.rainxch.core.presentation.components.bars.LocalScaffoldChrome
+import zed.rainxch.core.presentation.components.bars.LocalTabCardSlot
 import zed.rainxch.core.presentation.components.bars.ScaffoldChrome
+import zed.rainxch.core.presentation.components.bars.foldsTabCard
 import zed.rainxch.core.presentation.components.bars.rememberScaffoldChrome
 import zed.rainxch.core.presentation.components.bars.scrollsChrome
 import zed.rainxch.core.presentation.components.buttons.KomiButtonVariant
@@ -66,8 +69,12 @@ fun KomiScaffold(
     val chrome = rememberScaffoldChrome(enabled = !isManga && topBar != null)
     // The FAB joins the action bar when there is one, instead of floating on its own.
     val fabInBar = chrome?.hasActionBar == true
+    // On a Classic tab screen the tab card holds the FAB, and folds as the content scrolls.
+    val tabCard = LocalTabCardSlot.current?.takeIf { !isManga }
+    HandFabToTabCard(slot = tabCard, fab = floatingActionButton)
+    val scaffoldFab = floatingActionButton.takeIf { tabCard == null }
 
-    Box(modifier = modifier.fillMaxSize().scrollsChrome(chrome)) {
+    Box(modifier = modifier.fillMaxSize().scrollsChrome(chrome).foldsTabCard(tabCard)) {
         Scaffold(
             containerColor = colors.background,
             contentColor = colors.onBackground,
@@ -89,7 +96,7 @@ fun KomiScaffold(
                     }
                 }
             },
-            floatingActionButton = { if (!fabInBar) floatingActionButton?.invoke() },
+            floatingActionButton = { if (!fabInBar) scaffoldFab?.invoke() },
         ) { innerPadding ->
             Box(modifier = Modifier.fillMaxSize()) {
                 if (isManga && grid) {

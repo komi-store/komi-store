@@ -28,7 +28,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
@@ -78,6 +77,7 @@ import zed.rainxch.core.presentation.components.buttons.RepoLayoutToggle
 import zed.rainxch.core.presentation.components.buttons.KomiFab
 import zed.rainxch.core.presentation.components.cards.DiscoveryRepoCard
 import zed.rainxch.core.presentation.components.icon.KomiIcon
+import zed.rainxch.core.presentation.components.bars.KomiTopBar
 import zed.rainxch.core.presentation.components.inputs.KomiTextField
 import zed.rainxch.core.presentation.components.overlays.KomiToastState
 import zed.rainxch.core.presentation.components.overlays.rememberKomiToastState
@@ -96,6 +96,7 @@ import zed.rainxch.core.presentation.utils.arrowKeyScroll
 import zed.rainxch.core.presentation.utils.toIcon
 import zed.rainxch.core.presentation.utils.toLabel
 import zed.rainxch.githubstore.core.presentation.res.Res
+import zed.rainxch.githubstore.core.presentation.res.bottom_nav_search_title
 import zed.rainxch.githubstore.core.presentation.res.clipboard_link_detected
 import zed.rainxch.githubstore.core.presentation.res.detected_links
 import zed.rainxch.githubstore.core.presentation.res.dismiss
@@ -322,12 +323,6 @@ fun SearchScreen(
                 delay(100.milliseconds)
                 currentOnAction(SearchAction.LoadMore)
             }
-        }
-    }
-
-    LaunchedEffect(Unit) {
-        if (state.query.isEmpty()) {
-            focusRequester.requestFocus()
         }
     }
 
@@ -853,36 +848,39 @@ private fun SearchTopbar(
     state: SearchState,
     focusRequester: FocusRequester,
 ) {
-    Row(
-        modifier =
-            Modifier
-                .fillMaxWidth()
-                .statusBarsPadding()
-                .padding(horizontal = 16.dp, vertical = 12.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(10.dp),
-    ) {
-        KomiTextField(
-            value = state.query,
-            onValueChange = { value ->
-                onAction(SearchAction.OnSearchChange(value))
-            },
-            placeholder = stringResource(Res.string.search_repositories_hint),
-            leadingIcon = Icons.Rounded.Search,
-            onClear = { onAction(SearchAction.OnClearClick) },
-            keyboardType = KeyboardType.Text,
-            onCommit = { onAction(SearchAction.OnSearchImeClick) },
-            modifier = Modifier
-                .weight(1f)
-                .focusRequester(focusRequester),
-            multiline = false
-        )
-
-        FiltersButton(
-            activeCount = state.activeFilterCount,
-            onClick = { onAction(SearchAction.OnToggleFiltersSheet) },
-        )
-    }
+    // In Classic the field and the filters button move to the tab card at the bottom.
+    KomiTopBar(
+        title = stringResource(Res.string.bottom_nav_search_title),
+        search = {
+            KomiTextField(
+                value = state.query,
+                onValueChange = { value ->
+                    onAction(SearchAction.OnSearchChange(value))
+                },
+                placeholder = stringResource(Res.string.search_repositories_hint),
+                leadingIcon = Icons.Rounded.Search,
+                onClear = { onAction(SearchAction.OnClearClick) },
+                keyboardType = KeyboardType.Text,
+                onCommit = { onAction(SearchAction.OnSearchImeClick) },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .focusRequester(focusRequester),
+                multiline = false
+            )
+            // Asked here, where the field is: the tab card composes it after the screen.
+            LaunchedEffect(Unit) {
+                if (state.query.isEmpty()) {
+                    focusRequester.requestFocus()
+                }
+            }
+        },
+        actions = {
+            FiltersButton(
+                activeCount = state.activeFilterCount,
+                onClick = { onAction(SearchAction.OnToggleFiltersSheet) },
+            )
+        },
+    )
 }
 
 // The search field's filters on the core icon button (a press morph and tooltip in Classic, the
