@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.ime
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
@@ -174,13 +175,14 @@ internal fun KomiTabCard(
     modifier: Modifier = Modifier,
 ) {
     if (slot == null) return
+    ResizeWindowForKeyboard()
     val state = slot.state
     val parts = state.parts(slot.tabId)
     val search = parts.search
     val actions = parts.actions
     val motion = LocalPersonality.current.motion
     val haptics = LocalHapticFeedback.current
-    // The window pans the focused field above the keyboard; the FAB stays out of the way meanwhile.
+    // While the keyboard is up the card keeps only the field and the actions.
     val ime = WindowInsets.ime
     val density = LocalDensity.current
     val typing by remember(ime, density) { derivedStateOf { ime.getBottom(density) > 0 } }
@@ -189,6 +191,7 @@ internal fun KomiTabCard(
             modifier
                 .fillMaxWidth()
                 .navigationBarsPadding()
+                .imePadding()
                 .padding(horizontal = Spacing.md, vertical = Spacing.sm),
         horizontalAlignment = Alignment.End,
         verticalArrangement = Arrangement.spacedBy(Spacing.sm),
@@ -203,7 +206,7 @@ internal fun KomiTabCard(
                     horizontalArrangement = Arrangement.spacedBy(Spacing.xs),
                 ) {
                     AnimatedVisibility(
-                        visible = state.folded,
+                        visible = state.folded && !typing,
                         enter = scaleIn(motion.bouncySpatial()) + fadeIn(motion.fastEffects()),
                         exit = scaleOut(motion.fastEffects()) + fadeOut(motion.fastEffects()),
                     ) {
@@ -223,7 +226,7 @@ internal fun KomiTabCard(
                     }
                 }
                 AnimatedVisibility(
-                    visible = !state.folded,
+                    visible = !state.folded && !typing,
                     enter = expandVertically(motion.bouncySpatial()) + fadeIn(motion.fastEffects()),
                     exit = shrinkVertically(motion.fastEffects()) + fadeOut(motion.fastEffects()),
                 ) {
