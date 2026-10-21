@@ -220,7 +220,7 @@ class HomeViewModel(
                 }
             }
 
-            is HomeAction.OnRepoClick -> {
+            is HomeAction.OnRepoClick, HomeAction.OnSearchClick -> {
                 Unit
             }
         }

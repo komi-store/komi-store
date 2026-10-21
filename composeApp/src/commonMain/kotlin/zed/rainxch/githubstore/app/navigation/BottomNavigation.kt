@@ -15,6 +15,7 @@ fun BottomNavigation(
     currentScreen: GithubStoreGraph,
     onNavigate: (GithubStoreGraph) -> Unit,
     isUpdateAvailable: Boolean,
+    onSearch: () -> Unit,
     modifier: Modifier = Modifier,
     hasUnreadAnnouncements: Boolean = false,
     tabCard: KomiTabCardState? = null,
@@ -50,9 +51,8 @@ fun BottomNavigation(
         if (target != null && target != currentScreen) onNavigate(target)
     }
     if (tabCard != null) {
-        // Classic's tab screens draw the tab card themselves; on a tab without a search field of
-        // its own, the card's field opens the Search tab.
-        tabCard.setTabs(items = items, onSelect = onSelect, onSearch = { onSelect(tabIdOf(GithubStoreGraph.SearchScreen())) })
+        // Classic's tab screens draw the tab card themselves; its search field opens Search.
+        tabCard.setTabs(items = items, onSelect = onSelect, onSearch = onSearch)
     } else {
         KomiBottomBar(items = items, selectedId = selectedId, onSelect = onSelect, modifier = modifier)
     }
@@ -69,6 +69,7 @@ private fun BottomNavigationPreview() {
             currentScreen = GithubStoreGraph.ExploreScreen,
             onNavigate = {},
             isUpdateAvailable = true,
+            onSearch = {},
         )
     }
 }

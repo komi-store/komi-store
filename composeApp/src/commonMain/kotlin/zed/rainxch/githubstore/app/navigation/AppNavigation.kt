@@ -275,6 +275,9 @@ fun AppNavigation(
                                         emptyPaneSubtitle = stringResource(Res.string.adaptive_pick_repo_subtitle),
                                         list = { isExpanded ->
                                             HomeRoot(
+                                                onNavigateToSearch = {
+                                                    navController.navigate(GithubStoreGraph.SearchScreen())
+                                                },
                                                 onNavigateToDetails = { repoId ->
                                                     if (isExpanded) {
                                                         listDetailState.select(
@@ -345,7 +348,6 @@ fun AppNavigation(
                                 CompositionLocalProvider(
                                     LocalSharedTransitionScope provides this@SharedTransitionLayout,
                                     LocalAnimatedVisibilityScope provides this@composable,
-                                    LocalTabCardSlot provides tabCard?.slot(tabIdOf(GithubStoreGraph.SearchScreen())),
                                 ) {
                                     AdaptiveListDetailScaffold(
                                         state = listDetailState,
@@ -1047,6 +1049,7 @@ fun AppNavigation(
                                 }
                             },
                             isUpdateAvailable = appsState.apps.any { it.installedApp.isUpdateAvailable },
+                            onSearch = { navController.navigate(GithubStoreGraph.SearchScreen()) },
                             hasUnreadAnnouncements = announcementsUnreadCount > 0,
                             tabCard = tabCard,
                         )

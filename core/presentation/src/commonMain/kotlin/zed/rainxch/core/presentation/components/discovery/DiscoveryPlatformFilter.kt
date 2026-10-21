@@ -3,6 +3,7 @@ package zed.rainxch.core.presentation.components.discovery
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Devices
 import androidx.compose.material.icons.rounded.KeyboardArrowDown
+import androidx.compose.material.icons.rounded.Search
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import kotlinx.collections.immutable.toImmutableList
@@ -11,6 +12,8 @@ import zed.rainxch.core.domain.model.repository.DiscoveryPlatform
 import zed.rainxch.core.presentation.components.buttons.KomiButton
 import zed.rainxch.core.presentation.components.buttons.KomiButtonSize
 import zed.rainxch.core.presentation.components.buttons.KomiButtonVariant
+import zed.rainxch.core.presentation.components.buttons.KomiIconButton
+import zed.rainxch.core.presentation.components.buttons.KomiIconButtonSize
 import zed.rainxch.core.presentation.components.overlays.KomiMenuItem
 import zed.rainxch.core.presentation.components.overlays.KomiMenuList
 import zed.rainxch.core.presentation.components.overlays.KomiSheet
@@ -18,6 +21,7 @@ import zed.rainxch.core.presentation.components.overlays.KomiSheetPlacement
 import zed.rainxch.core.presentation.utils.toIcon
 import zed.rainxch.core.presentation.utils.toLabel
 import zed.rainxch.githubstore.core.presentation.res.Res
+import zed.rainxch.githubstore.core.presentation.res.feed_cd_search
 import zed.rainxch.githubstore.core.presentation.res.feed_platform_all
 import zed.rainxch.githubstore.core.presentation.res.feed_platform_picker_title
 import zed.rainxch.githubstore.core.presentation.res.feed_platform_picker_title_jp
@@ -41,6 +45,21 @@ fun DiscoveryPlatformButton(
         size = KomiButtonSize.Sm,
         leadingIcon = if (all) null else platform.toIcon(),
         trailingIcon = Icons.Rounded.KeyboardArrowDown,
+        modifier = modifier,
+    )
+}
+
+// Manga's way into Search from Explore and Top Charts; Classic has the tab card's search field.
+@Composable
+fun DiscoverySearchButton(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    KomiIconButton(
+        icon = Icons.Rounded.Search,
+        contentDescription = stringResource(Res.string.feed_cd_search),
+        onClick = onClick,
+        size = KomiIconButtonSize.Sm,
         modifier = modifier,
     )
 }

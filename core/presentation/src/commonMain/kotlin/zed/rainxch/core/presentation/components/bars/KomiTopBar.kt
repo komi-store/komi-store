@@ -90,7 +90,13 @@ fun KomiTopBar(
         }
 
         search != null -> {
-            SearchTopBar(search = search, actions = actions, insets = insets, modifier = modifier)
+            SearchTopBar(
+                search = search,
+                leading = resolvedLeading,
+                actions = actions,
+                insets = insets,
+                modifier = modifier,
+            )
         }
 
         personality is MangaPersonality -> {
@@ -127,6 +133,7 @@ fun KomiTopBar(
 @Composable
 private fun SearchTopBar(
     search: @Composable () -> Unit,
+    leading: (@Composable () -> Unit)?,
     actions: (@Composable RowScope.() -> Unit)?,
     insets: Boolean,
     modifier: Modifier = Modifier,
@@ -140,6 +147,7 @@ private fun SearchTopBar(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(10.dp),
     ) {
+        leading?.invoke()
         Box(modifier = Modifier.weight(1f)) { search() }
         actions?.invoke(this)
     }

@@ -28,4 +28,5 @@ feature/feed/
 - `DiscoveryPlatformPicker` offers every `DiscoveryPlatform` except iOS: `/v1/feed` rejects `platform=ios` and its items carry no iOS data. The Desktop sidebar leaves iOS out too, so Feed never receives it; iOS discovery is in Search.
 - List or grid comes from `TweaksRepository.getRepoGridLayout`, set in Tweaks (Look & feel).
 - Long-press opens `DiscoveryRepoCard`'s built-in action sheet (Share / Open on GitHub / seen toggle / Hide), unlike Home's VM-driven `RepositoryActionsSheet`. Hidden repos, and seen ones when hide-seen is on, are filtered in `rebuild()`.
-- Unused: `FeedPlatformBar`, and `FeedAction.OnSearchClick` / `OnProfileClick` (handled by `FeedRoot`, never dispatched).
+- Search is not a tab: in Manga (no tab card, `LocalTabCardSlot` null) the top bar also has `DiscoverySearchButton`, which sends `FeedAction.OnSearchClick`; `FeedRoot` opens Search.
+- Unused: `FeedPlatformBar`, and `FeedAction.OnProfileClick` (handled by `FeedRoot`, never dispatched).

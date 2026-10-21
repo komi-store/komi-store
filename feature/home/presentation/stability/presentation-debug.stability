@@ -5,45 +5,11 @@
 //   ./gradlew :presentation:stabilityDump
 
 @Composable
-private fun zed.rainxch.home.presentation.HomeChartFeed(state: zed.rainxch.home.presentation.HomeState, listState: androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridState, onAction: kotlin.Function1<zed.rainxch.home.presentation.HomeAction, kotlin.Unit>): kotlin.Unit
-  skippable: true
-  restartable: true
-  params:
-    - state: STABLE (marked @Stable or @Immutable)
-    - listState: STABLE (marked @Stable or @Immutable)
-    - onAction: STABLE (function type)
-
-@Composable
-private fun zed.rainxch.home.presentation.HomeEmpty(): kotlin.Unit
-  skippable: true
-  restartable: true
-  params:
-
-@Composable
-private fun zed.rainxch.home.presentation.HomeEndCap(): kotlin.Unit
-  skippable: true
-  restartable: true
-  params:
-
-@Composable
-private fun zed.rainxch.home.presentation.HomeError(message: kotlin.String, onRetry: kotlin.Function0<kotlin.Unit>): kotlin.Unit
-  skippable: true
-  restartable: true
-  params:
-    - message: STABLE (String is immutable)
-    - onRetry: STABLE (function type)
-
-@Composable
-private fun zed.rainxch.home.presentation.HomeLoading(): kotlin.Unit
-  skippable: true
-  restartable: true
-  params:
-
-@Composable
-public fun zed.rainxch.home.presentation.HomeRoot(onNavigateToDetails: kotlin.Function1<@[ParameterName(name = \, viewModel: zed.rainxch.home.presentation.HomeViewModel): kotlin.Unit
+public fun zed.rainxch.home.presentation.HomeRoot(onNavigateToSearch: kotlin.Function0<kotlin.Unit>, onNavigateToDetails: kotlin.Function1<@[ParameterName(name = \, viewModel: zed.rainxch.home.presentation.HomeViewModel): kotlin.Unit
   skippable: false
   restartable: true
   params:
+    - onNavigateToSearch: STABLE (function type)
     - onNavigateToDetails: STABLE (function type)
     - viewModel: UNSTABLE (has mutable properties or unstable members)
 
@@ -77,44 +43,6 @@ private fun zed.rainxch.home.presentation.categorylist.CategoryListScreen(state:
     - onBack: STABLE (function type)
 
 @Composable
-private fun zed.rainxch.home.presentation.components.ChartTabSegment(tab: zed.rainxch.home.presentation.model.ChartTab, selected: kotlin.Boolean, onClick: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
-  skippable: true
-  restartable: true
-  params:
-    - tab: STABLE (class with no mutable properties)
-    - selected: STABLE (primitive type)
-    - onClick: STABLE (function type)
-    - modifier: STABLE (marked @Stable or @Immutable)
-
-@Composable
-public fun zed.rainxch.home.presentation.components.HomeChartTabs(selected: zed.rainxch.home.presentation.model.ChartTab, onSelect: kotlin.Function1<zed.rainxch.home.presentation.model.ChartTab, kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
-  skippable: true
-  restartable: true
-  params:
-    - selected: STABLE (class with no mutable properties)
-    - onSelect: STABLE (function type)
-    - modifier: STABLE (marked @Stable or @Immutable)
-
-@Composable
-public fun zed.rainxch.home.presentation.components.HomePlatformPicker(platforms: kotlinx.collections.immutable.ImmutableList<zed.rainxch.core.domain.model.repository.DiscoveryPlatform>, selected: zed.rainxch.core.domain.model.repository.DiscoveryPlatform, onSelect: kotlin.Function1<zed.rainxch.core.domain.model.repository.DiscoveryPlatform, kotlin.Unit>, onDismiss: kotlin.Function0<kotlin.Unit>): kotlin.Unit
-  skippable: true
-  restartable: true
-  params:
-    - platforms: STABLE (known stable type)
-    - selected: STABLE (class with no mutable properties)
-    - onSelect: STABLE (function type)
-    - onDismiss: STABLE (function type)
-
-@Composable
-private fun zed.rainxch.home.presentation.components.HomePlatformRow(platform: zed.rainxch.core.domain.model.repository.DiscoveryPlatform, isSelected: kotlin.Boolean, onClick: kotlin.Function0<kotlin.Unit>): kotlin.Unit
-  skippable: true
-  restartable: true
-  params:
-    - platform: STABLE (class with no mutable properties)
-    - isSelected: STABLE (primitive type)
-    - onClick: STABLE (function type)
-
-@Composable
 public fun zed.rainxch.home.presentation.components.RepositoryActionsSheet(repository: zed.rainxch.core.presentation.model.GithubRepoSummaryUi, isSeen: kotlin.Boolean, onDismiss: kotlin.Function0<kotlin.Unit>, onShare: kotlin.Function0<kotlin.Unit>, onOpenOnGithub: kotlin.Function0<kotlin.Unit>, onToggleSeen: kotlin.Function0<kotlin.Unit>, onHide: kotlin.Function0<kotlin.Unit>): kotlin.Unit
   skippable: true
   restartable: true
@@ -136,4 +64,10 @@ private fun zed.rainxch.home.presentation.components.SheetRow(label: kotlin.Stri
     - icon: STABLE (marked @Stable or @Immutable)
     - onClick: STABLE (function type)
     - tint: STABLE (marked @Stable or @Immutable)
+
+@Composable
+private fun zed.rainxch.home.presentation.label(): kotlin.String
+  skippable: true
+  restartable: true
+  params:
 

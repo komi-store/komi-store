@@ -25,6 +25,7 @@ import zed.rainxch.core.domain.isDesktop
 import zed.rainxch.core.domain.model.repository.DiscoveryPlatform
 import zed.rainxch.core.domain.model.repository.FeedCategory
 import zed.rainxch.core.presentation.components.bars.KomiTopBar
+import zed.rainxch.core.presentation.components.bars.LocalTabCardSlot
 import zed.rainxch.core.presentation.components.buttons.KomiButton
 import zed.rainxch.core.presentation.components.buttons.KomiButtonVariant
 import zed.rainxch.core.presentation.components.cards.DiscoveryRepoCard
@@ -34,6 +35,7 @@ import zed.rainxch.core.presentation.components.discovery.DiscoveryFeed
 import zed.rainxch.core.presentation.components.discovery.DiscoveryFeedStatus
 import zed.rainxch.core.presentation.components.discovery.DiscoveryPlatformButton
 import zed.rainxch.core.presentation.components.discovery.DiscoveryPlatformPicker
+import zed.rainxch.core.presentation.components.discovery.DiscoverySearchButton
 import zed.rainxch.core.presentation.components.overlays.KomiToastState
 import zed.rainxch.core.presentation.components.overlays.rememberKomiToastState
 import zed.rainxch.core.presentation.components.scaffold.KomiScaffold
@@ -113,6 +115,9 @@ private fun FeedScreen(
                         null
                     } else {
                         {
+                            if (LocalTabCardSlot.current == null) {
+                                DiscoverySearchButton(onClick = { onAction(FeedAction.OnSearchClick) })
+                            }
                             DiscoveryPlatformButton(
                                 platform = state.selectedPlatform,
                                 onClick = { onAction(FeedAction.OnPlatformPickerOpen) },

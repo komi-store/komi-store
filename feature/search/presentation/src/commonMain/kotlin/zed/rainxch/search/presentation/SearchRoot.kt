@@ -124,6 +124,7 @@ import zed.rainxch.search.presentation.model.SortByUi
 import zed.rainxch.search.presentation.utils.label
 import kotlin.time.Duration.Companion.milliseconds
 import zed.rainxch.core.presentation.layout.withoutBottom
+import zed.rainxch.core.domain.isDesktop
 
 @Composable
 fun SearchRoot(
@@ -845,9 +846,10 @@ private fun SearchTopbar(
     state: SearchState,
     focusRequester: FocusRequester,
 ) {
-    // In Classic the field and the filters button move to the tab card at the bottom.
     KomiTopBar(
         title = stringResource(Res.string.bottom_nav_search_title),
+        // The Desktop sidebar holds Search; on a phone it is pushed over a tab.
+        onBack = if (isDesktop()) null else ({ onAction(SearchAction.OnNavigateBackClick) }),
         search = {
             KomiTextField(
                 value = state.query,

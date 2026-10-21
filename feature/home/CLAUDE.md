@@ -24,7 +24,7 @@ feature/home/
 ## Notes
 
 - Page 1 of a chart: `CachedRepositoriesDataSource` (backend category list, offline mirror JSON under `OFFLINE_MIRROR_BASE` if the backend fails) -> `CacheManager` copy (`HOME_REPOS`, 24h) -> direct GitHub `/search/repositories`, checking candidates for installers under a `Semaphore`. Later pages skip the data source. Backend / mirror lists come as one page (`hasMore = false`); only the GitHub search path paginates.
-- The screen body is core's `DiscoveryFeed`, shared with Explore: the charts are its chips. The only top-bar action is `DiscoveryPlatformButton` / `DiscoveryPlatformPicker`, hidden on Desktop, where the sidebar sets the platform. List or grid comes from Tweaks (`TweaksRepository.getRepoGridLayout`).
+- The screen body is core's `DiscoveryFeed`, shared with Explore: the charts are its chips. Its top-bar actions are `DiscoveryPlatformButton` / `DiscoveryPlatformPicker` and, in Manga (no tab card), `DiscoverySearchButton` (`HomeAction.OnSearchClick`, which `HomeRoot` turns into `onNavigateToSearch`), hidden on Desktop, where the sidebar sets the platform. List or grid comes from Tweaks (`TweaksRepository.getRepoGridLayout`).
 - Platform comes from the shared `BrowseFilterStore` (`core`, in-memory, starts at the device platform; also set by Feed and the Desktop sidebar). A change clears every chart and reloads the selected one. The VM passes one platform or none.
 - Each tab keeps its own repos / page / hasMore in the VM's `ChartCache`, so switching back to a loaded tab does not refetch. Load-more dedupes by `id`.
 - `HomeViewModel.filterVisible` drops hidden ids and, when hide-seen is on, seen ids.

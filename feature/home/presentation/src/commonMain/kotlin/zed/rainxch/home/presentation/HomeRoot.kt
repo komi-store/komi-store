@@ -17,6 +17,7 @@ import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import zed.rainxch.core.domain.isDesktop
 import zed.rainxch.core.presentation.components.bars.KomiTopBar
+import zed.rainxch.core.presentation.components.bars.LocalTabCardSlot
 import zed.rainxch.core.presentation.components.cards.DiscoveryRepoCard
 import zed.rainxch.core.presentation.components.cards.KomiRepoCardFeed
 import zed.rainxch.core.presentation.components.discovery.DiscoveryChip
@@ -24,6 +25,7 @@ import zed.rainxch.core.presentation.components.discovery.DiscoveryFeed
 import zed.rainxch.core.presentation.components.discovery.DiscoveryFeedStatus
 import zed.rainxch.core.presentation.components.discovery.DiscoveryPlatformButton
 import zed.rainxch.core.presentation.components.discovery.DiscoveryPlatformPicker
+import zed.rainxch.core.presentation.components.discovery.DiscoverySearchButton
 import zed.rainxch.core.presentation.components.overlays.KomiToastState
 import zed.rainxch.core.presentation.components.overlays.rememberKomiToastState
 import zed.rainxch.core.presentation.components.scaffold.KomiScaffold
@@ -41,6 +43,7 @@ import zed.rainxch.home.presentation.model.toDiscoveryUi
 
 @Composable
 fun HomeRoot(
+    onNavigateToSearch: () -> Unit,
     onNavigateToDetails: (repoId: Long) -> Unit,
     viewModel: HomeViewModel = koinViewModel(),
 ) {
@@ -69,6 +72,7 @@ fun HomeRoot(
         listState = listState,
         onAction = { action ->
             when (action) {
+                HomeAction.OnSearchClick -> onNavigateToSearch()
                 is HomeAction.OnRepoClick -> onNavigateToDetails(action.repo.id)
                 else -> viewModel.onAction(action)
             }
@@ -97,6 +101,9 @@ private fun HomeScreen(
                         null
                     } else {
                         {
+                            if (LocalTabCardSlot.current == null) {
+                                DiscoverySearchButton(onClick = { onAction(HomeAction.OnSearchClick) })
+                            }
                             DiscoveryPlatformButton(
                                 platform = state.selectedPlatform,
                                 onClick = { onAction(HomeAction.OnPlatformPopupOpen) },
