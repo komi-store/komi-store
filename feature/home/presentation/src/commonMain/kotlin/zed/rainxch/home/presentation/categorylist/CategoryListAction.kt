@@ -7,8 +7,6 @@ sealed interface CategoryListAction {
 
     data object OnRefresh : CategoryListAction
 
-    data object OnToggleGridLayout : CategoryListAction
-
     data class OnRepoClick(
         val repoId: Long,
     ) : CategoryListAction

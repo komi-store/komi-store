@@ -28,7 +28,6 @@ import zed.rainxch.githubstore.core.presentation.res.home_section_most_popular
 import zed.rainxch.githubstore.core.presentation.res.home_section_trending_now
 import zed.rainxch.core.presentation.components.bars.KomiTopBar
 import zed.rainxch.core.presentation.components.bars.KomiTopBarSize
-import zed.rainxch.core.presentation.components.buttons.RepoLayoutToggle
 import zed.rainxch.core.presentation.components.cards.DiscoveryRepoCard
 import zed.rainxch.core.presentation.components.cards.KomiRepoCardFeed
 import zed.rainxch.core.presentation.components.progress.KomiCircularProgress
@@ -96,12 +95,6 @@ private fun CategoryListScreen(
                 ),
                 size = KomiTopBarSize.Compact,
                 onBack = onBack,
-                actions = {
-                    RepoLayoutToggle(
-                        isGridLayout = state.isGridLayout,
-                        onToggle = { onAction(CategoryListAction.OnToggleGridLayout) },
-                    )
-                },
             )
         },
     ) { innerPadding ->

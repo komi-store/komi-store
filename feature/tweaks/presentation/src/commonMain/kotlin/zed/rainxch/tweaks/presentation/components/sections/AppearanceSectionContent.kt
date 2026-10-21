@@ -19,6 +19,9 @@ import kotlinx.collections.immutable.toImmutableList
 import zed.rainxch.core.presentation.components.buttons.KomiIconButtonSize
 import zed.rainxch.core.presentation.components.buttons.KomiSegmented
 import zed.rainxch.core.presentation.components.buttons.KomiSegmentedItem
+import zed.rainxch.githubstore.core.presentation.res.repo_layout_grid
+import zed.rainxch.githubstore.core.presentation.res.repo_layout_list
+import zed.rainxch.githubstore.core.presentation.res.repo_layout_title
 
 private enum class ModeChoice { LIGHT, DARK, SYSTEM }
 
@@ -61,7 +64,6 @@ fun appearanceSectionContent(
             AppPersonality.MANGA -> {
                 SettingsRow(
                     title = stringResource(Res.string.appearance_section_paper),
-                    last = !desktop,
                     trailing = {
                         KomiSegmented(
                             selected = state.mangaPaper,
@@ -81,7 +83,6 @@ fun appearanceSectionContent(
             AppPersonality.CLASSIC -> {
                 SettingsRow(
                     title = stringResource(Res.string.appearance_section_mode),
-                    last = !desktop && !amoledVisible,
                     trailing = {
                         KomiSegmented(
                             selected = isDarkToChoice(state.isDarkTheme),
@@ -101,7 +102,6 @@ fun appearanceSectionContent(
                     SettingsRow(
                         title = stringResource(Res.string.amoled_black_theme),
                         subtitle = stringResource(Res.string.amoled_black_description),
-                        last = !desktop,
                         trailing = {
                             KomiSwitch(
                                 checked = state.isAmoledThemeEnabled,
@@ -112,6 +112,24 @@ fun appearanceSectionContent(
                 }
             }
         }
+
+        // How Explore, Top Charts and Search lay out repositories.
+        SettingsRow(
+            title = stringResource(Res.string.repo_layout_title),
+            last = !desktop,
+            trailing = {
+                KomiSegmented(
+                    selected = state.isRepoGridLayout,
+                    onSelect = { onAction(TweaksAction.OnRepoLayoutSelected(it)) },
+                    size = KomiIconButtonSize.Sm,
+                    items =
+                        persistentListOf(
+                            KomiSegmentedItem(value = false, title = stringResource(Res.string.repo_layout_list)),
+                            KomiSegmentedItem(value = true, title = stringResource(Res.string.repo_layout_grid)),
+                        ),
+                )
+            },
+        )
 
         if (desktop) {
             SettingsRow(

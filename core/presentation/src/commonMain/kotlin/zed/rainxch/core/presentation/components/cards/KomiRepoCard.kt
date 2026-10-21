@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -153,14 +154,16 @@ fun KomiRepoCard(
                         }
                     }
                 }
-                CardBadge(
-                    feed = feed,
-                    rank = rank,
-                    dailyStars = dailyStars,
-                    version = version,
-                    releasedAgoDays = releasedAgoDays,
-                    colors = colors,
-                )
+                if (!compact) {
+                    CardBadge(
+                        feed = feed,
+                        rank = rank,
+                        dailyStars = dailyStars,
+                        version = version,
+                        releasedAgoDays = releasedAgoDays,
+                        colors = colors,
+                    )
+                }
             }
 
             KomiText(
@@ -172,9 +175,9 @@ fun KomiRepoCard(
                 modifier = Modifier.padding(top = gap),
             )
 
-            if (compact && platforms.isNotEmpty()) {
+            if (compact && (platforms.isNotEmpty() || feed != KomiRepoCardFeed.Plain)) {
                 Row(
-                    modifier = Modifier.padding(top = gap),
+                    modifier = Modifier.fillMaxWidth().padding(top = gap),
                     horizontalArrangement = Arrangement.spacedBy(6.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
@@ -188,6 +191,16 @@ fun KomiRepoCard(
                             )
                         }
                     }
+                    // A narrow grid card has no room for the chart badge beside the name.
+                    Spacer(Modifier.weight(1f))
+                    CardBadge(
+                        feed = feed,
+                        rank = rank,
+                        dailyStars = dailyStars,
+                        version = version,
+                        releasedAgoDays = releasedAgoDays,
+                        colors = colors,
+                    )
                 }
             } else if (platforms.isNotEmpty()) {
                 FlowRow(

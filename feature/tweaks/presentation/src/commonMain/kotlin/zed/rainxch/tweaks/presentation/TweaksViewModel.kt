@@ -95,6 +95,7 @@ class TweaksViewModel(
             .onStart {
                 if (!hasLoadedInitialData) {
                     loadCurrentTheme()
+                    loadRepoLayout()
                     loadVersionName()
                     loadProxyConfig()
                     loadInstallerPreference()
@@ -170,6 +171,14 @@ class TweaksViewModel(
 
     private fun loadVersionName() {
         _state.update { it.copy(versionName = appVersionInfo.versionName) }
+    }
+
+    private fun loadRepoLayout() {
+        viewModelScope.launch {
+            tweaksRepository.getRepoGridLayout().collect { grid ->
+                _state.update { it.copy(isRepoGridLayout = grid) }
+            }
+        }
     }
 
     private fun loadCurrentTheme() {
@@ -601,6 +610,12 @@ class TweaksViewModel(
             is TweaksAction.OnAmoledThemeToggled -> {
                 viewModelScope.launch {
                     tweaksRepository.setAmoledTheme(action.enabled)
+                }
+            }
+
+            is TweaksAction.OnRepoLayoutSelected -> {
+                viewModelScope.launch {
+                    tweaksRepository.setRepoGridLayout(action.grid)
                 }
             }
 

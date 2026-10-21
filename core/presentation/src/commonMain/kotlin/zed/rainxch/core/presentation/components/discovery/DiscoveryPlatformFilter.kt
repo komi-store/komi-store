@@ -1,11 +1,16 @@
-package zed.rainxch.feed.presentation.components
+package zed.rainxch.core.presentation.components.discovery
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Devices
+import androidx.compose.material.icons.rounded.KeyboardArrowDown
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import kotlinx.collections.immutable.toImmutableList
 import org.jetbrains.compose.resources.stringResource
 import zed.rainxch.core.domain.model.repository.DiscoveryPlatform
+import zed.rainxch.core.presentation.components.buttons.KomiButton
+import zed.rainxch.core.presentation.components.buttons.KomiButtonSize
+import zed.rainxch.core.presentation.components.buttons.KomiButtonVariant
 import zed.rainxch.core.presentation.components.overlays.KomiMenuItem
 import zed.rainxch.core.presentation.components.overlays.KomiMenuList
 import zed.rainxch.core.presentation.components.overlays.KomiSheet
@@ -17,11 +22,31 @@ import zed.rainxch.githubstore.core.presentation.res.feed_platform_all
 import zed.rainxch.githubstore.core.presentation.res.feed_platform_picker_title
 import zed.rainxch.githubstore.core.presentation.res.feed_platform_picker_title_jp
 
-// The backend feed has no iOS data and rejects platform=ios.
+// The backend's feed and charts have no iOS data, and /v1/feed rejects platform=ios; iOS
+// discovery is in Search.
 private val FeedPlatforms = DiscoveryPlatform.entries - DiscoveryPlatform.Ios
 
+// Explore's and Top Charts' action: the platform filter, labelled with the current platform.
 @Composable
-fun FeedPlatformPicker(
+fun DiscoveryPlatformButton(
+    platform: DiscoveryPlatform,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val all = platform == DiscoveryPlatform.All
+    KomiButton(
+        onClick = onClick,
+        label = if (all) stringResource(Res.string.feed_platform_all) else platform.toLabel(),
+        variant = KomiButtonVariant.Primary,
+        size = KomiButtonSize.Sm,
+        leadingIcon = if (all) null else platform.toIcon(),
+        trailingIcon = Icons.Rounded.KeyboardArrowDown,
+        modifier = modifier,
+    )
+}
+
+@Composable
+fun DiscoveryPlatformPicker(
     selected: DiscoveryPlatform,
     onSelect: (DiscoveryPlatform) -> Unit,
     onDismiss: () -> Unit,

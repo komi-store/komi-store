@@ -48,6 +48,4 @@ sealed interface FeedAction {
     data class OnMarkAsUnseen(
         val repoId: Long,
     ) : FeedAction
-
-    data object OnToggleGridLayout : FeedAction
 }

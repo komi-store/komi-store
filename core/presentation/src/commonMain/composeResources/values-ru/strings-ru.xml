@@ -188,7 +188,6 @@
 
 
 
-    <string name="home_finding_repositories">Поиск репозиториев...</string>
     <string name="home_retry">Повторить</string>
     <string name="home_failed_to_load_repositories">Не удалось загрузить репозитории</string>
 
@@ -1459,14 +1458,9 @@
     <string name="repo_pages_pr_draft">Черновик</string>
 
     <string name="feed_end_cap">続く · TO BE CONTINUED</string>
-    <string name="feed_layout_description_grid">Переключить на сетку</string>
-    <string name="feed_layout_description_list">Переключить на список</string>
     <string name="feed_masthead_subtitle">発見 · DISCOVER APPS</string>
     <string name="home_masthead_subtitle">ランキング · CHARTS &amp; PICKS</string>
     <string name="feed_platform_picker_title_jp">対応</string>
-    <string name="home_chart_popular_jp">人気</string>
-    <string name="home_chart_releases_jp">新着</string>
-    <string name="home_chart_trending_jp">急上昇</string>
     <string name="sidebar_browse_jp">航行</string>
     <string name="sidebar_categories_jp">部門</string>
     <string name="sidebar_nav_charts_jp">ランキング</string>
@@ -1503,7 +1497,6 @@
     <string name="home_chart_releases">Релизы</string>
     <string name="home_chart_trending">В тренде</string>
     <string name="home_masthead_title">Топ-чарты</string>
-    <string name="home_platform_filter">Фильтр платформ</string>
     <string name="paper_day">День</string>
     <string name="paper_night">Ночь</string>
     <string name="repo_card_details">Подробнее</string>

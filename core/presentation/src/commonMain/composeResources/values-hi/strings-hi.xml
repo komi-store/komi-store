@@ -215,7 +215,6 @@
     <!-- Errors -->
     <string name="error_generic">गलती: %1$s</string>
 
-    <string name="home_finding_repositories">रिपॉजिटरी ढूंढी जा रही हैं...</string>
     <string name="home_retry">पुन: प्रयास करें</string>
     <string name="home_failed_to_load_repositories">रिपॉजिटरी लोड करने में विफल रहा</string>
 
@@ -1461,14 +1460,9 @@
     <string name="repo_pages_pr_state_merged">मर्ज किया गया</string>
     <string name="repo_pages_pr_draft">ड्राफ्ट</string>
     <string name="feed_end_cap">続く · TO BE CONTINUED</string>
-    <string name="feed_layout_description_grid">ग्रिड लेआउट पर जाएँ</string>
-    <string name="feed_layout_description_list">सूची लेआउट पर जाएँ</string>
     <string name="feed_masthead_subtitle">発見 · DISCOVER APPS</string>
     <string name="home_masthead_subtitle">ランキング · CHARTS &amp; PICKS</string>
     <string name="feed_platform_picker_title_jp">対応</string>
-    <string name="home_chart_popular_jp">人気</string>
-    <string name="home_chart_releases_jp">新着</string>
-    <string name="home_chart_trending_jp">急上昇</string>
     <string name="sidebar_browse_jp">航行</string>
     <string name="sidebar_categories_jp">部門</string>
     <string name="sidebar_nav_charts_jp">ランキング</string>
@@ -1505,7 +1499,6 @@
     <string name="home_chart_releases">रिलीज़</string>
     <string name="home_chart_trending">ट्रेंडिंग</string>
     <string name="home_masthead_title">टॉप चार्ट</string>
-    <string name="home_platform_filter">प्लेटफ़ॉर्म फ़िल्टर करें</string>
     <string name="paper_day">दिन</string>
     <string name="paper_night">रात</string>
     <string name="repo_card_details">विवरण</string>

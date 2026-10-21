@@ -721,12 +721,6 @@ class SearchViewModel(
                 }
             }
 
-            SearchAction.OnToggleGridLayout -> {
-                val grid = !_state.value.isGridLayout
-                _state.update { it.copy(isGridLayout = grid) }
-                viewModelScope.launch { tweaksRepository.setRepoGridLayout(grid) }
-            }
-
             SearchAction.OnFabClick -> {
                 viewModelScope.launch {
                     try {

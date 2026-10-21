@@ -11,8 +11,6 @@ sealed interface HomeAction {
 
     data object OnLoadMore : HomeAction
 
-    data object OnToggleGridLayout : HomeAction
-
     data class OnChartSelected(
         val chart: ChartTab,
     ) : HomeAction

@@ -35,6 +35,10 @@ sealed interface TweaksAction {
         val enabled: Boolean,
     ) : TweaksAction
 
+    data class OnRepoLayoutSelected(
+        val grid: Boolean,
+    ) : TweaksAction
+
     data class OnDarkThemeChange(
         val isDarkTheme: Boolean?,
     ) : TweaksAction

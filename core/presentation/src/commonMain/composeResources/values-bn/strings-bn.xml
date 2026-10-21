@@ -217,7 +217,6 @@
 
 
 
-    <string name="home_finding_repositories">রিপোজিটরি খোঁজা হচ্ছে...</string>
     <string name="home_retry">পুনরায় চেষ্টা</string>
     <string name="home_failed_to_load_repositories">রিপোজিটরি লোড করতে ব্যর্থ</string>
 
@@ -1446,14 +1445,9 @@
     <string name="repo_pages_pr_state_merged">মার্জ করা হয়েছে</string>
     <string name="repo_pages_pr_draft">খসড়া</string>
     <string name="feed_end_cap">続く · TO BE CONTINUED</string>
-    <string name="feed_layout_description_grid">গ্রিড লেআউটে যান</string>
-    <string name="feed_layout_description_list">তালিকা লেআউটে যান</string>
     <string name="feed_masthead_subtitle">発見 · DISCOVER APPS</string>
     <string name="home_masthead_subtitle">ランキング · CHARTS &amp; PICKS</string>
     <string name="feed_platform_picker_title_jp">対応</string>
-    <string name="home_chart_popular_jp">人気</string>
-    <string name="home_chart_releases_jp">新着</string>
-    <string name="home_chart_trending_jp">急上昇</string>
     <string name="sidebar_browse_jp">航行</string>
     <string name="sidebar_categories_jp">部門</string>
     <string name="sidebar_nav_charts_jp">ランキング</string>
@@ -1490,7 +1484,6 @@
     <string name="home_chart_releases">রিলিজ</string>
     <string name="home_chart_trending">ট্রেন্ডিং</string>
     <string name="home_masthead_title">শীর্ষ তালিকা</string>
-    <string name="home_platform_filter">প্ল্যাটফর্ম ফিল্টার করুন</string>
     <string name="paper_day">দিন</string>
     <string name="paper_night">রাত</string>
     <string name="repo_card_details">বিস্তারিত</string>

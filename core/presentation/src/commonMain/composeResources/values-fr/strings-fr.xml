@@ -167,7 +167,6 @@
 
 
 
-    <string name="home_finding_repositories">Recherche de dépôts…</string>
     <string name="home_retry">Réessayer</string>
     <string name="home_failed_to_load_repositories">Impossible de charger les dépôts</string>
 
@@ -1427,14 +1426,9 @@
     <string name="repo_pages_pr_state_merged">Fusionnée</string>
     <string name="repo_pages_pr_draft">Brouillon</string>
     <string name="feed_end_cap">続く · TO BE CONTINUED</string>
-    <string name="feed_layout_description_grid">Afficher en grille</string>
-    <string name="feed_layout_description_list">Afficher en liste</string>
     <string name="feed_masthead_subtitle">発見 · DISCOVER APPS</string>
     <string name="home_masthead_subtitle">ランキング · CHARTS &amp; PICKS</string>
     <string name="feed_platform_picker_title_jp">対応</string>
-    <string name="home_chart_popular_jp">人気</string>
-    <string name="home_chart_releases_jp">新着</string>
-    <string name="home_chart_trending_jp">急上昇</string>
     <string name="sidebar_browse_jp">航行</string>
     <string name="sidebar_categories_jp">部門</string>
     <string name="sidebar_nav_charts_jp">ランキング</string>
@@ -1471,7 +1465,6 @@
     <string name="home_chart_releases">Versions</string>
     <string name="home_chart_trending">Tendances</string>
     <string name="home_masthead_title">Classements</string>
-    <string name="home_platform_filter">Filtrer les plateformes</string>
     <string name="paper_day">Jour</string>
     <string name="paper_night">Nuit</string>
     <string name="repo_card_details">Détails</string>

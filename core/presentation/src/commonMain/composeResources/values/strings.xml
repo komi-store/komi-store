@@ -309,20 +309,15 @@
 
 
 
-    <string name="home_finding_repositories">Finding repositories...</string>
     <string name="home_retry">Retry</string>
     <string name="home_failed_to_load_repositories">Failed to load repositories</string>
 
     <string name="home_topbar_discover">Discover</string>
     <string name="home_masthead_title">Top Charts</string>
     <string name="home_masthead_subtitle">ランキング · CHARTS &amp; PICKS</string>
-    <string name="home_platform_filter">Filter platforms</string>
     <string name="home_chart_trending">Trending</string>
-    <string name="home_chart_trending_jp">急上昇</string>
     <string name="home_chart_releases">Releases</string>
-    <string name="home_chart_releases_jp">新着</string>
     <string name="home_chart_popular">Popular</string>
-    <string name="home_chart_popular_jp">人気</string>
     <string name="sidebar_browse">Browse</string>
     <string name="sidebar_browse_jp">航行</string>
     <string name="sidebar_platform">Platform</string>
@@ -734,6 +729,9 @@
     <string name="scrollbar_option_description">Show scrollbar on scrollable lists (desktop)</string>
 
     <string name="content_width_title">Content width</string>
+    <string name="repo_layout_title">Repository layout</string>
+    <string name="repo_layout_list">List</string>
+    <string name="repo_layout_grid">Grid</string>
     <string name="content_width_description">Controls the maximum column width of the details screen (desktop)</string>
     <string name="content_width_compact">Compact</string>
     <string name="content_width_wide">Wide</string>
@@ -1536,8 +1534,6 @@
     <string name="feed_offline">Offline — showing a saved feed</string>
     <string name="feed_failed_to_load">Couldn\'t load the feed</string>
     <string name="feed_end_cap">続く · TO BE CONTINUED</string>
-    <string name="feed_layout_description_grid">Switch to grid layout</string>
-    <string name="feed_layout_description_list">Switch to list layout</string>
     <string name="feed_category_ai">AI</string>
     <string name="feed_category_privacy">Privacy</string>
     <string name="feed_category_networking">Networking</string>

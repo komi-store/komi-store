@@ -168,7 +168,6 @@
 
 
 
-    <string name="home_finding_repositories">リポジトリを検索中…</string>
     <string name="home_retry">再試行</string>
     <string name="home_failed_to_load_repositories">リポジトリの読み込みに失敗しました</string>
 
@@ -1415,14 +1414,9 @@
 
     <!-- Feed / For You masthead, sidebar, categories -->
     <string name="feed_end_cap">続く · TO BE CONTINUED</string>
-    <string name="feed_layout_description_grid">グリッド表示に切り替え</string>
-    <string name="feed_layout_description_list">リスト表示に切り替え</string>
     <string name="feed_masthead_subtitle">発見 · DISCOVER APPS</string>
     <string name="home_masthead_subtitle">ランキング · CHARTS &amp; PICKS</string>
     <string name="feed_platform_picker_title_jp">対応</string>
-    <string name="home_chart_popular_jp">人気</string>
-    <string name="home_chart_releases_jp">新着</string>
-    <string name="home_chart_trending_jp">急上昇</string>
     <string name="sidebar_browse_jp">航行</string>
     <string name="sidebar_categories_jp">部門</string>
     <string name="sidebar_nav_charts_jp">ランキング</string>
@@ -1459,7 +1453,6 @@
     <string name="home_chart_releases">新着</string>
     <string name="home_chart_trending">急上昇</string>
     <string name="home_masthead_title">ランキング</string>
-    <string name="home_platform_filter">プラットフォームでフィルター</string>
     <string name="paper_day">デイ</string>
     <string name="paper_night">ナイト</string>
     <string name="repo_card_details">詳細</string>
