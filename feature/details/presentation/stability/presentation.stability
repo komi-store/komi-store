@@ -413,6 +413,16 @@ private fun zed.rainxch.details.presentation.components.PermissionsSection(permi
     - permissions: RUNTIME (requires runtime check)
 
 @Composable
+internal fun zed.rainxch.details.presentation.components.PlatformDock(platformReleases: kotlin.collections.List<zed.rainxch.core.domain.utils.PlatformRelease>, devicePlatform: zed.rainxch.core.domain.model.repository.DiscoveryPlatform?, onPlatformClick: kotlin.Function1<zed.rainxch.core.domain.model.repository.DiscoveryPlatform, kotlin.Unit>?, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - platformReleases: RUNTIME (requires runtime check)
+    - devicePlatform: STABLE (class with no mutable properties)
+    - onPlatformClick: STABLE (function type)
+    - modifier: STABLE (marked @Stable or @Immutable)
+
+@Composable
 public fun zed.rainxch.details.presentation.components.PlatformHandoffSheet(handoff: zed.rainxch.core.domain.utils.PlatformRelease, onAction: kotlin.Function1<zed.rainxch.details.presentation.DetailsAction, kotlin.Unit>): kotlin.Unit
   skippable: true
   restartable: true
@@ -602,14 +612,14 @@ public fun zed.rainxch.details.presentation.components.StatItem(label: kotlin.St
     - modifier: STABLE (marked @Stable or @Immutable)
 
 @Composable
-private fun zed.rainxch.details.presentation.components.StatusChip(status: zed.rainxch.details.presentation.components.HeaderStatus): kotlin.Unit
+internal fun zed.rainxch.details.presentation.components.StatusChip(status: zed.rainxch.details.presentation.components.HeaderStatus): kotlin.Unit
   skippable: true
   restartable: true
   params:
     - status: STABLE (class with no mutable properties)
 
 @Composable
-private fun zed.rainxch.details.presentation.components.StatusSticker(status: zed.rainxch.details.presentation.components.HeaderStatus, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+internal fun zed.rainxch.details.presentation.components.StatusSticker(status: zed.rainxch.details.presentation.components.HeaderStatus, modifier: androidx.compose.ui.Modifier): kotlin.Unit
   skippable: true
   restartable: true
   params:

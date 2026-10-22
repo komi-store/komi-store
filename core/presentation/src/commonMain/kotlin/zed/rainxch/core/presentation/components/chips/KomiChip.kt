@@ -263,22 +263,7 @@ private fun ClassicChip(
         }
 
         KomiChipKind.Tonal -> {
-            val colors = LocalPersonality.current.colors
-            val container = if (selected) colors.primaryContainer else colors.surfaceContainerHigh
-            val content = if (selected) colors.onPrimaryContainer else colors.onSurfaceVariant
-            AssistChip(
-                onClick = onClick ?: {},
-                label = { Text(text) },
-                modifier = modifier,
-                leadingIcon = leading,
-                colors =
-                    AssistChipDefaults.assistChipColors(
-                        containerColor = container,
-                        labelColor = content,
-                        leadingIconContentColor = content,
-                    ),
-                border = null,
-            )
+            ClassicTonalChip(text = text, selected = selected, leading = leading, onClick = onClick, modifier = modifier)
         }
 
         KomiChipKind.Filter -> {
@@ -308,6 +293,32 @@ private fun ClassicChip(
             )
         }
     }
+}
+
+@Composable
+private fun ClassicTonalChip(
+    text: String,
+    selected: Boolean,
+    leading: (@Composable () -> Unit)?,
+    onClick: (() -> Unit)?,
+    modifier: Modifier = Modifier,
+) {
+    val colors = LocalPersonality.current.colors
+    val container = if (selected) colors.primaryContainer else colors.surfaceContainerHigh
+    val content = if (selected) colors.onPrimaryContainer else colors.onSurfaceVariant
+    AssistChip(
+        onClick = onClick ?: {},
+        label = { Text(text) },
+        modifier = modifier,
+        leadingIcon = leading,
+        colors =
+            AssistChipDefaults.assistChipColors(
+                containerColor = container,
+                labelColor = content,
+                leadingIconContentColor = content,
+            ),
+        border = null,
+    )
 }
 
 private const val CHIP_SKEW_DEGREES = 8f

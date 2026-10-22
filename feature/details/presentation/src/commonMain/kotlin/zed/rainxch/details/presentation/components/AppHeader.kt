@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -28,9 +27,6 @@ import androidx.compose.material.icons.automirrored.outlined.CallSplit
 import androidx.compose.material.icons.filled.UnfoldMore
 import androidx.compose.material.icons.filled.Verified
 import androidx.compose.material.icons.outlined.History
-import androidx.compose.material.icons.rounded.CheckCircle
-import androidx.compose.material.icons.rounded.InstallMobile
-import androidx.compose.material.icons.rounded.Upgrade
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -39,16 +35,12 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.flow.first
-import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 import zed.rainxch.core.domain.model.account.github.GithubRelease
 import zed.rainxch.core.domain.model.account.github.GithubRepoSummary
@@ -57,7 +49,6 @@ import zed.rainxch.core.domain.model.installation.InstalledApp
 import zed.rainxch.core.domain.model.installation.isReallyInstalled
 import zed.rainxch.core.domain.model.repository.DiscoveryPlatform
 import zed.rainxch.core.domain.utils.PlatformRelease
-import zed.rainxch.core.domain.utils.VersionMath
 import zed.rainxch.core.presentation.components.GitHubStoreImage
 import zed.rainxch.core.presentation.components.InstalledAppIcon
 import zed.rainxch.core.presentation.components.chips.KomiChip
@@ -73,21 +64,14 @@ import zed.rainxch.core.presentation.components.text.KomiTextRole
 import zed.rainxch.core.presentation.locals.LocalPersonality
 import zed.rainxch.core.presentation.personality.MangaPersonality
 import zed.rainxch.core.presentation.personality.manga.decoration.hardShadow
-import zed.rainxch.core.presentation.personality.model.PersonalityColors
 import zed.rainxch.core.presentation.spacing.Spacing
-import zed.rainxch.core.presentation.utils.daysSinceIso
 import zed.rainxch.core.presentation.utils.formatReleasedAgo
-import zed.rainxch.core.presentation.utils.toIcon
-import zed.rainxch.core.presentation.utils.toLabel
 import zed.rainxch.details.presentation.model.DownloadStage
 import zed.rainxch.githubstore.core.presentation.res.Res
 import zed.rainxch.githubstore.core.presentation.res.details_last_push
 import zed.rainxch.githubstore.core.presentation.res.forked_repository
-import zed.rainxch.githubstore.core.presentation.res.installed
 import zed.rainxch.githubstore.core.presentation.res.no_description
-import zed.rainxch.githubstore.core.presentation.res.pending_install
 import zed.rainxch.githubstore.core.presentation.res.self_owned_badge
-import zed.rainxch.githubstore.core.presentation.res.update_available
 import kotlin.math.roundToInt
 
 // Classic sets the header on the page itself; Manga inks it into a panel with the install status
@@ -409,88 +393,14 @@ private fun HeaderChips(
             }
         }
         if (platformReleases.isNotEmpty()) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(Spacing.sm),
-            ) {
-                platformReleases.forEach { (platform, platformRelease) ->
-                    PlatformTile(
-                        platform = platform,
-                        release = platformRelease,
-                        isDevice = platform == devicePlatform,
-                        onClick = onPlatformClick?.let { handler -> { handler(platform) } },
-                        modifier = Modifier.weight(1f, fill = false).widthIn(max = 96.dp).fillMaxWidth(),
-                    )
-                }
-            }
-        }
-    }
-}
-
-// One tile per platform: its icon over the version of its newest build, or the year when that build
-// is over a year old. The device's tile is filled; in Manga every tile is inked.
-@Composable
-private fun PlatformTile(
-    platform: DiscoveryPlatform,
-    release: GithubRelease,
-    isDevice: Boolean,
-    onClick: (() -> Unit)?,
-    modifier: Modifier = Modifier,
-) {
-    val personality = LocalPersonality.current
-    val colors = personality.colors
-    val manga = personality is MangaPersonality
-    val stale = (daysSinceIso(release.publishedAt) ?: 0) > STALE_PLATFORM_DAYS
-    val (container, content) = platformTileColors(colors, manga = manga, isDevice = isDevice, stale = stale)
-    val shape = if (manga) RectangleShape else RoundedCornerShape(personality.shape.cornerSmall)
-    val ink =
-        if (manga) {
-            Modifier.hardShadow(offset = DpOffset(2.dp, 2.dp), color = colors.shadow)
-        } else {
-            Modifier
-        }
-    Column(
-        modifier =
-            modifier
-                .then(ink)
-                .clip(shape)
-                .background(container)
-                .then(if (manga) Modifier.border(2.dp, colors.outline) else Modifier)
-                .then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier)
-                .padding(vertical = Spacing.sm),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(Spacing.xs),
-    ) {
-        platform.toIcon()?.let { icon ->
-            KomiIcon(
-                imageVector = icon,
-                contentDescription = platform.toLabel(),
-                tint = content,
-                modifier = Modifier.size(20.dp),
+            PlatformDock(
+                platformReleases = platformReleases,
+                devicePlatform = devicePlatform,
+                onPlatformClick = onPlatformClick,
             )
         }
-        KomiText(
-            text = if (stale) release.publishedAt.take(4) else platformVersion(release),
-            role = KomiTextRole.LabelSmall,
-            color = content,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-        )
     }
 }
-
-private fun platformTileColors(
-    colors: PersonalityColors,
-    manga: Boolean,
-    isDevice: Boolean,
-    stale: Boolean,
-): Pair<Color, Color> =
-    when {
-        isDevice && manga -> colors.primary to colors.onPrimary
-        isDevice -> colors.primaryContainer to colors.onPrimaryContainer
-        stale -> (if (manga) colors.surface else colors.surfaceContainerHigh) to colors.disabledContent
-        else -> (if (manga) colors.surface else colors.surfaceContainerHigh) to colors.onSurfaceVariant
-    }
 
 // The status, the monorepo app label and one chip per installed app; the selected chip scrolls into view.
 @Composable
@@ -562,60 +472,7 @@ private fun AppChipRow(
     }
 }
 
-@Composable
-private fun StatusChip(status: HeaderStatus) {
-    KomiChip(
-        label = stringResource(status.label),
-        kind = KomiChipKind.Tonal,
-        size = KomiChipSize.Sm,
-        selected = status.emphasized,
-        leadingIcon = status.icon,
-    )
-}
-
-@Composable
-private fun StatusSticker(
-    status: HeaderStatus,
-    modifier: Modifier = Modifier,
-) {
-    val colors = LocalPersonality.current.colors
-    KomiText(
-        text = stringResource(status.label),
-        role = KomiTextRole.Stamp,
-        color = if (status.emphasized) colors.onPrimary else colors.onSurface,
-        modifier =
-            modifier
-                .rotate(STICKER_TILT)
-                .hardShadow(offset = DpOffset(3.dp, 3.dp), color = colors.shadow)
-                .background(if (status.emphasized) colors.primary else colors.surface)
-                .border(3.dp, colors.outline)
-                .padding(horizontal = Spacing.sm, vertical = Spacing.xs),
-    )
-}
-
-private enum class HeaderStatus(
-    val label: StringResource,
-    val icon: ImageVector,
-    val emphasized: Boolean,
-) {
-    Pending(Res.string.pending_install, Icons.Rounded.InstallMobile, true),
-    Update(Res.string.update_available, Icons.Rounded.Upgrade, true),
-    Installed(Res.string.installed, Icons.Rounded.CheckCircle, false),
-}
-
-private fun headerStatusOf(app: InstalledApp): HeaderStatus =
-    when {
-        app.isPendingInstall -> HeaderStatus.Pending
-        app.isUpdateAvailable -> HeaderStatus.Update
-        else -> HeaderStatus.Installed
-    }
-
-private fun platformVersion(release: GithubRelease): String =
-    VersionMath.normalizeVersion(release.tagName).ifBlank { release.tagName }
-
-private const val STALE_PLATFORM_DAYS = 365
 private const val BUSY_PICTURE_SCALE = 0.72f
 private const val REST_CORNER_PERCENT = 30f
 private const val CIRCLE_CORNER_PERCENT = 50f
 private const val MANGA_PICTURE_TILT = -3f
-private const val STICKER_TILT = 6f
