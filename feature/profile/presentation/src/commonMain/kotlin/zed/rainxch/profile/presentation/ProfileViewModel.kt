@@ -113,9 +113,7 @@ class ProfileViewModel(
             ProfileAction.OnAnnouncementsClick,
             ProfileAction.OnTweaksClick,
             ProfileAction.OnAboutClick,
-            -> {
-                Unit
-            }
+            -> {}
         }
     }
 }

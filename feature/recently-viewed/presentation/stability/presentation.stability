@@ -6,7 +6,7 @@
 
 @Composable
 public fun zed.rainxch.recentlyviewed.presentation.RecentlyViewedRoot(onNavigateBack: kotlin.Function0<kotlin.Unit>, onNavigateToDetails: kotlin.Function4<@[ParameterName(name = \, onNavigateToDeveloperProfile: kotlin.Function1<@[ParameterName(name = \, viewModel: zed.rainxch.recentlyviewed.presentation.RecentlyViewedViewModel): kotlin.Unit
-  skippable: false
+  skippable: true
   restartable: true
   params:
     - onNavigateBack: STABLE (function type)

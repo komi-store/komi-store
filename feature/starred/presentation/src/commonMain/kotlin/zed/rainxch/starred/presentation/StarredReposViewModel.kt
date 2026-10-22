@@ -208,9 +208,7 @@ class StarredReposViewModel(
             is StarredReposAction.OnRepositoryClick,
             is StarredReposAction.OnDeveloperProfileClick,
             StarredReposAction.OnSignInClick,
-            -> {
-                Unit
-            }
+            -> {}
 
             StarredReposAction.OnRefresh -> {
                 _state.update { it.copy(searchQuery = "") }

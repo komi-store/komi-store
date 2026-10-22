@@ -15,7 +15,7 @@ class BuildKonfigConventionPlugin : Plugin<Project> {
             }
 
             extensions.configure<BuildKonfigExtension> {
-                packageName = target.pathToPackageName()
+                packageName.set(target.pathToPackageName())
 
                 defaultConfigs {
                     val localProps =

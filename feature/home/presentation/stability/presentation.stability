@@ -6,7 +6,7 @@
 
 @Composable
 public fun zed.rainxch.home.presentation.HomeRoot(onNavigateToSearch: kotlin.Function0<kotlin.Unit>, onNavigateToDetails: kotlin.Function1<@[ParameterName(name = \, viewModel: zed.rainxch.home.presentation.HomeViewModel): kotlin.Unit
-  skippable: false
+  skippable: true
   restartable: true
   params:
     - onNavigateToSearch: STABLE (function type)
@@ -25,7 +25,7 @@ private fun zed.rainxch.home.presentation.HomeScreen(state: zed.rainxch.home.pre
 
 @Composable
 public fun zed.rainxch.home.presentation.categorylist.CategoryListRoot(category: zed.rainxch.home.domain.model.HomeCategory, onNavigateBack: kotlin.Function0<kotlin.Unit>, onNavigateToDetails: kotlin.Function1<kotlin.Long, kotlin.Unit>, viewModel: zed.rainxch.home.presentation.categorylist.CategoryListViewModel): kotlin.Unit
-  skippable: false
+  skippable: true
   restartable: true
   params:
     - category: STABLE (class with no mutable properties)
@@ -67,7 +67,7 @@ private fun zed.rainxch.home.presentation.components.SheetRow(label: kotlin.Stri
 
 @Composable
 private fun zed.rainxch.home.presentation.label(): kotlin.String
-  skippable: true
-  restartable: true
+  skippable: false
+  restartable: false
   params:
 

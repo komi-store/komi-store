@@ -15,10 +15,10 @@ private fun zed.rainxch.search.presentation.ActiveFilterChip(label: kotlin.Strin
 
 @Composable
 private fun zed.rainxch.search.presentation.ActiveFiltersStrip(state: zed.rainxch.search.presentation.SearchState, onAction: kotlin.Function1<zed.rainxch.search.presentation.SearchAction, kotlin.Unit>): kotlin.Unit
-  skippable: false
+  skippable: true
   restartable: true
   params:
-    - state: RUNTIME (requires runtime check)
+    - state: UNKNOWN (interface or non-final class; concrete implementation unknown)
     - onAction: STABLE (function type)
 
 @Composable
@@ -47,7 +47,7 @@ private fun zed.rainxch.search.presentation.ExploreFromGithubButton(status: zed.
     - onExplore: STABLE (function type)
 
 @Composable
-private fun zed.rainxch.search.presentation.FiltersPillButton(activeCount: kotlin.Int, onClick: kotlin.Function0<kotlin.Unit>): kotlin.Unit
+private fun zed.rainxch.search.presentation.FiltersButton(activeCount: kotlin.Int, onClick: kotlin.Function0<kotlin.Unit>): kotlin.Unit
   skippable: true
   restartable: true
   params:
@@ -56,15 +56,15 @@ private fun zed.rainxch.search.presentation.FiltersPillButton(activeCount: kotli
 
 @Composable
 public fun zed.rainxch.search.presentation.PlatformPicker(state: zed.rainxch.search.presentation.SearchState, onAction: kotlin.Function1<zed.rainxch.search.presentation.SearchAction, kotlin.Unit>): kotlin.Unit
-  skippable: false
+  skippable: true
   restartable: true
   params:
-    - state: RUNTIME (requires runtime check)
+    - state: UNKNOWN (interface or non-final class; concrete implementation unknown)
     - onAction: STABLE (function type)
 
 @Composable
 public fun zed.rainxch.search.presentation.SearchRoot(onNavigateBack: kotlin.Function0<kotlin.Unit>, onNavigateToDetails: kotlin.Function4<@[ParameterName(name = \, onNavigateToDetailsFromLink: kotlin.Function2<@[ParameterName(name = \, onNavigateToDeveloperProfile: kotlin.Function1<@[ParameterName(name = \, viewModel: zed.rainxch.search.presentation.SearchViewModel): kotlin.Unit
-  skippable: false
+  skippable: true
   restartable: true
   params:
     - onNavigateBack: STABLE (function type)
@@ -75,20 +75,20 @@ public fun zed.rainxch.search.presentation.SearchRoot(onNavigateBack: kotlin.Fun
 
 @Composable
 public fun zed.rainxch.search.presentation.SearchScreen(state: zed.rainxch.search.presentation.SearchState, toastState: zed.rainxch.core.presentation.components.overlays.KomiToastState, onAction: kotlin.Function1<zed.rainxch.search.presentation.SearchAction, kotlin.Unit>): kotlin.Unit
-  skippable: false
+  skippable: true
   restartable: true
   params:
-    - state: RUNTIME (requires runtime check)
+    - state: UNKNOWN (interface or non-final class; concrete implementation unknown)
     - toastState: STABLE (marked @Stable or @Immutable)
     - onAction: STABLE (function type)
 
 @Composable
 private fun zed.rainxch.search.presentation.SearchTopbar(onAction: kotlin.Function1<zed.rainxch.search.presentation.SearchAction, kotlin.Unit>, state: zed.rainxch.search.presentation.SearchState, focusRequester: androidx.compose.ui.focus.FocusRequester): kotlin.Unit
-  skippable: false
+  skippable: true
   restartable: true
   params:
     - onAction: STABLE (function type)
-    - state: RUNTIME (requires runtime check)
+    - state: UNKNOWN (interface or non-final class; concrete implementation unknown)
     - focusRequester: STABLE (marked @Stable or @Immutable)
 
 @Composable
@@ -122,8 +122,8 @@ public fun zed.rainxch.search.presentation.components.SearchFiltersSheet(selecte
   skippable: true
   restartable: true
   params:
-    - selectedSource: STABLE (class with no mutable properties)
-    - availableSources: STABLE (known stable type)
+    - selectedSource: UNKNOWN (interface or non-final class; concrete implementation unknown)
+    - availableSources: UNKNOWN (interface or non-final class; concrete implementation unknown)
     - selectedPlatform: STABLE (class with no mutable properties)
     - selectedLanguage: STABLE (class with no mutable properties)
     - selectedSortBy: STABLE (class with no mutable properties)

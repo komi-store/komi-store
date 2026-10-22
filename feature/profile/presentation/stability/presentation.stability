@@ -6,7 +6,7 @@
 
 @Composable
 public fun zed.rainxch.profile.presentation.ProfileRoot(onNavigateToDevProfile: kotlin.Function1<@[ParameterName(name = \, onNavigateToAuthentication: kotlin.Function0<kotlin.Unit>, onNavigateToStarredRepos: kotlin.Function0<kotlin.Unit>, onNavigateToFavouriteRepos: kotlin.Function0<kotlin.Unit>, onNavigateToRecentlyViewed: kotlin.Function0<kotlin.Unit>, onNavigateToWhatsNew: kotlin.Function0<kotlin.Unit>, onNavigateToAnnouncements: kotlin.Function0<kotlin.Unit>, onNavigateToTweaks: kotlin.Function0<kotlin.Unit>, onNavigateToAbout: kotlin.Function0<kotlin.Unit>, hasUnreadAnnouncements: kotlin.Boolean, viewModel: zed.rainxch.profile.presentation.ProfileViewModel): kotlin.Unit
-  skippable: false
+  skippable: true
   restartable: true
   params:
     - onNavigateToDevProfile: STABLE (function type)
@@ -23,20 +23,20 @@ public fun zed.rainxch.profile.presentation.ProfileRoot(onNavigateToDevProfile: 
 
 @Composable
 public fun zed.rainxch.profile.presentation.ProfileScreen(state: zed.rainxch.profile.presentation.ProfileState, onAction: kotlin.Function1<zed.rainxch.profile.presentation.ProfileAction, kotlin.Unit>, toastState: zed.rainxch.core.presentation.components.overlays.KomiToastState, hasUnreadAnnouncements: kotlin.Boolean): kotlin.Unit
-  skippable: false
+  skippable: true
   restartable: true
   params:
-    - state: UNSTABLE (has mutable properties or unstable members)
+    - state: UNKNOWN (interface or non-final class; concrete implementation unknown)
     - onAction: STABLE (function type)
     - toastState: STABLE (marked @Stable or @Immutable)
     - hasUnreadAnnouncements: STABLE (primitive type)
 
 @Composable
 private fun zed.rainxch.profile.presentation.announcements.ActionRow(announcement: zed.rainxch.core.domain.model.announcement.Announcement, isAcknowledged: kotlin.Boolean, onCtaClick: kotlin.Function0<kotlin.Unit>, onDismissClick: kotlin.Function0<kotlin.Unit>, onAcknowledgeClick: kotlin.Function0<kotlin.Unit>): kotlin.Unit
-  skippable: false
+  skippable: true
   restartable: true
   params:
-    - announcement: UNSTABLE (has mutable properties or unstable members)
+    - announcement: UNSTABLE (cross-module type without @Stable/@Immutable)
     - isAcknowledged: STABLE (primitive type)
     - onCtaClick: STABLE (function type)
     - onDismissClick: STABLE (function type)
@@ -44,10 +44,10 @@ private fun zed.rainxch.profile.presentation.announcements.ActionRow(announcemen
 
 @Composable
 public fun zed.rainxch.profile.presentation.announcements.AnnouncementCard(announcement: zed.rainxch.core.domain.model.announcement.Announcement, isAcknowledged: kotlin.Boolean, isExpanded: kotlin.Boolean, onToggleExpand: kotlin.Function0<kotlin.Unit>, onCtaClick: kotlin.Function0<kotlin.Unit>, onDismissClick: kotlin.Function0<kotlin.Unit>, onAcknowledgeClick: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
-  skippable: false
+  skippable: true
   restartable: true
   params:
-    - announcement: UNSTABLE (has mutable properties or unstable members)
+    - announcement: UNSTABLE (cross-module type without @Stable/@Immutable)
     - isAcknowledged: STABLE (primitive type)
     - isExpanded: STABLE (primitive type)
     - onToggleExpand: STABLE (function type)
@@ -61,7 +61,7 @@ public fun zed.rainxch.profile.presentation.announcements.AnnouncementsScreen(st
   skippable: true
   restartable: true
   params:
-    - state: STABLE (class with no mutable properties)
+    - state: UNKNOWN (interface or non-final class; concrete implementation unknown)
     - onAction: STABLE (function type)
     - onNavigateBack: STABLE (function type)
 
@@ -105,7 +105,7 @@ private fun zed.rainxch.profile.presentation.announcements.HeaderRow(severity: z
 
 @Composable
 public fun zed.rainxch.profile.presentation.announcements.MuteSettingsBottomSheet(mutedCategories: kotlin.collections.Set<zed.rainxch.core.domain.model.announcement.AnnouncementCategory>, onToggle: kotlin.Function2<zed.rainxch.core.domain.model.announcement.AnnouncementCategory, kotlin.Boolean, kotlin.Unit>, onDismiss: kotlin.Function0<kotlin.Unit>): kotlin.Unit
-  skippable: false
+  skippable: true
   restartable: true
   params:
     - mutedCategories: RUNTIME (requires runtime check)
@@ -114,17 +114,17 @@ public fun zed.rainxch.profile.presentation.announcements.MuteSettingsBottomShee
 
 @Composable
 private fun zed.rainxch.profile.presentation.announcements.severityAccent(severity: zed.rainxch.core.domain.model.announcement.AnnouncementSeverity): androidx.compose.ui.graphics.Color
-  skippable: true
-  restartable: true
+  skippable: false
+  restartable: false
   params:
     - severity: STABLE (class with no mutable properties)
 
 @Composable
 private fun zed.rainxch.profile.presentation.components.HeroIdentityCard(state: zed.rainxch.profile.presentation.ProfileState, onAction: kotlin.Function1<zed.rainxch.profile.presentation.ProfileAction, kotlin.Unit>): kotlin.Unit
-  skippable: false
+  skippable: true
   restartable: true
   params:
-    - state: UNSTABLE (has mutable properties or unstable members)
+    - state: UNKNOWN (interface or non-final class; concrete implementation unknown)
     - onAction: STABLE (function type)
 
 @Composable
@@ -170,10 +170,10 @@ private fun zed.rainxch.profile.presentation.components.PlaceholderLine(widthFra
 
 @Composable
 private fun zed.rainxch.profile.presentation.components.SignedInContent(state: zed.rainxch.profile.presentation.ProfileState, onAction: kotlin.Function1<zed.rainxch.profile.presentation.ProfileAction, kotlin.Unit>): kotlin.Unit
-  skippable: false
+  skippable: true
   restartable: true
   params:
-    - state: UNSTABLE (has mutable properties or unstable members)
+    - state: UNKNOWN (interface or non-final class; concrete implementation unknown)
     - onAction: STABLE (function type)
 
 @Composable
@@ -192,10 +192,10 @@ private fun zed.rainxch.profile.presentation.whatsnew.BulletRow(text: kotlin.Str
 
 @Composable
 public fun zed.rainxch.profile.presentation.whatsnew.SectionBlock(section: zed.rainxch.core.domain.model.announcement.WhatsNewSection): kotlin.Unit
-  skippable: false
+  skippable: true
   restartable: true
   params:
-    - section: UNSTABLE (has mutable properties or unstable members)
+    - section: UNSTABLE (cross-module type without @Stable/@Immutable)
 
 @Composable
 private fun zed.rainxch.profile.presentation.whatsnew.SectionLabel(type: zed.rainxch.core.domain.model.announcement.WhatsNewSectionType): kotlin.Unit
@@ -206,14 +206,14 @@ private fun zed.rainxch.profile.presentation.whatsnew.SectionLabel(type: zed.rai
 
 @Composable
 public fun zed.rainxch.profile.presentation.whatsnew.WhatsNewEntryCard(entry: zed.rainxch.core.domain.model.announcement.WhatsNewEntry): kotlin.Unit
-  skippable: false
+  skippable: true
   restartable: true
   params:
-    - entry: UNSTABLE (has mutable properties or unstable members)
+    - entry: UNSTABLE (cross-module type without @Stable/@Immutable)
 
 @Composable
 public fun zed.rainxch.profile.presentation.whatsnew.WhatsNewHistoryScreen(entries: kotlin.collections.List<zed.rainxch.core.domain.model.announcement.WhatsNewEntry>, onNavigateBack: kotlin.Function0<kotlin.Unit>): kotlin.Unit
-  skippable: false
+  skippable: true
   restartable: true
   params:
     - entries: RUNTIME (requires runtime check)

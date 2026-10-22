@@ -11,18 +11,8 @@ updates:
       # Kermit 2.2 deprecates the tag-first log overloads used across the codebase, and warnings are errors; lift with the logging cleanup (D7 in docs/quality/findings.md).
       - dependency-name: "co.touchlab:kermit*"
         update-types: ["version-update:semver-minor", "version-update:semver-major"]
-      # Held for steps 6-7 of the AGP 9 migration, which bring this group at pinned versions; lift then.
-      - dependency-name: "org.jetbrains.kotlin*"
-        update-types: ["version-update:semver-minor", "version-update:semver-major"]
-      - dependency-name: "com.google.devtools.ksp*"
-        update-types: ["version-update:semver-minor", "version-update:semver-major"]
-      - dependency-name: "*compose.stability*"
-        update-types: ["version-update:semver-minor", "version-update:semver-major"]
-      - dependency-name: "com.github.skydoves:compose-stability*"
-        update-types: ["version-update:semver-minor", "version-update:semver-major"]
+      # Held for step 7 of the AGP 9 migration, which brings Compose Multiplatform 1.12 at a pinned version; lift then.
       - dependency-name: "org.jetbrains.compose*"
-        update-types: ["version-update:semver-minor", "version-update:semver-major"]
-      - dependency-name: "com.codingfeline.buildkonfig*"
         update-types: ["version-update:semver-minor", "version-update:semver-major"]
     groups:
       kotlin-toolchain:

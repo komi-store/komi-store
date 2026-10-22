@@ -28,7 +28,7 @@ private fun zed.rainxch.starred.presentation.NotInstallableHint(count: kotlin.In
 
 @Composable
 public fun zed.rainxch.starred.presentation.StarredReposRoot(onNavigateBack: kotlin.Function0<kotlin.Unit>, onNavigateToDetails: kotlin.Function1<@[ParameterName(name = \, onNavigateToDeveloperProfile: kotlin.Function1<@[ParameterName(name = \, onNavigateToAuthentication: kotlin.Function0<kotlin.Unit>, viewModel: zed.rainxch.starred.presentation.StarredReposViewModel): kotlin.Unit
-  skippable: false
+  skippable: true
   restartable: true
   params:
     - onNavigateBack: STABLE (function type)

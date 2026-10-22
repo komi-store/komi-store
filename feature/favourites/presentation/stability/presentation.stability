@@ -6,7 +6,7 @@
 
 @Composable
 public fun zed.rainxch.favourites.presentation.FavouritesRoot(onNavigateBack: kotlin.Function0<kotlin.Unit>, onNavigateToDetails: kotlin.Function4<@[ParameterName(name = \, onNavigateToDeveloperProfile: kotlin.Function1<@[ParameterName(name = \, onNavigateToImportStars: kotlin.Function0<kotlin.Unit>, viewModel: zed.rainxch.favourites.presentation.FavouritesViewModel): kotlin.Unit
-  skippable: false
+  skippable: true
   restartable: true
   params:
     - onNavigateBack: STABLE (function type)
@@ -70,7 +70,7 @@ private fun zed.rainxch.favourites.presentation.import.CandidateRow(candidate: z
 
 @Composable
 public fun zed.rainxch.favourites.presentation.import.ImportStarsRoot(viewModel: zed.rainxch.favourites.presentation.import.ImportStarsViewModel, onNavigateBack: kotlin.Function0<kotlin.Unit>, onNavigateToDetails: kotlin.Function3<@[ParameterName(name = \): kotlin.Unit
-  skippable: false
+  skippable: true
   restartable: true
   params:
     - viewModel: UNSTABLE (has mutable properties or unstable members)

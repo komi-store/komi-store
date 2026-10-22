@@ -29,7 +29,7 @@ CI runs these on every pull request. Existing findings live in committed baselin
 ./gradlew spotlessApply                  # formats the files you changed
 ./gradlew compileKotlinJvm compileAndroidMain :androidApp:compileDebugKotlin jvmTest detekt :konsist-test:test
 ./gradlew lintDebug lintAndroidMain
-./gradlew androidMainStabilityCheck      # its own invocation, after compileAndroidMain
+./gradlew stabilityCheck                 # its own invocation, after compileKotlinJvm compileAndroidMain
 ```
 
 In Claude Code, `/verify` runs the same steps. CI also lints agent docs with agnix. Details and baseline rules: `docs/agents/checks.md`.

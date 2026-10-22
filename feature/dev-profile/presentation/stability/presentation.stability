@@ -6,7 +6,7 @@
 
 @Composable
 public fun zed.rainxch.devprofile.presentation.DevProfileTopbar(state: zed.rainxch.devprofile.presentation.DeveloperProfileState, onAction: kotlin.Function1<zed.rainxch.devprofile.presentation.DeveloperProfileAction, kotlin.Unit>): kotlin.Unit
-  skippable: false
+  skippable: true
   restartable: true
   params:
     - state: UNSTABLE (has mutable properties or unstable members)
@@ -14,7 +14,7 @@ public fun zed.rainxch.devprofile.presentation.DevProfileTopbar(state: zed.rainx
 
 @Composable
 public fun zed.rainxch.devprofile.presentation.DeveloperProfileRoot(onNavigateBack: kotlin.Function0<kotlin.Unit>, onNavigateToDetails: kotlin.Function1<@[ParameterName(name = \, onNavigateToUser: kotlin.Function1<@[ParameterName(name = \, viewModel: zed.rainxch.devprofile.presentation.DeveloperProfileViewModel): kotlin.Unit
-  skippable: false
+  skippable: true
   restartable: true
   params:
     - onNavigateBack: STABLE (function type)
@@ -24,7 +24,7 @@ public fun zed.rainxch.devprofile.presentation.DeveloperProfileRoot(onNavigateBa
 
 @Composable
 public fun zed.rainxch.devprofile.presentation.DeveloperProfileScreen(state: zed.rainxch.devprofile.presentation.DeveloperProfileState, onAction: kotlin.Function1<zed.rainxch.devprofile.presentation.DeveloperProfileAction, kotlin.Unit>): kotlin.Unit
-  skippable: false
+  skippable: true
   restartable: true
   params:
     - state: UNSTABLE (has mutable properties or unstable members)
@@ -57,26 +57,26 @@ private fun zed.rainxch.devprofile.presentation.components.BioText(bio: kotlin.S
 
 @Composable
 private fun zed.rainxch.devprofile.presentation.components.CalendarGrid(days: kotlin.collections.List<zed.rainxch.devprofile.domain.model.ContributionDay>): kotlin.Unit
-  skippable: false
+  skippable: true
   restartable: true
   params:
     - days: RUNTIME (requires runtime check)
 
 @Composable
 public fun zed.rainxch.devprofile.presentation.components.ContributionCalendarCard(contributions: zed.rainxch.devprofile.domain.model.ContributionCalendar?, isLoading: kotlin.Boolean, modifier: androidx.compose.ui.Modifier): kotlin.Unit
-  skippable: false
+  skippable: true
   restartable: true
   params:
-    - contributions: UNSTABLE (has mutable properties or unstable members)
+    - contributions: UNSTABLE (cross-module type without @Stable/@Immutable)
     - isLoading: STABLE (primitive type)
     - modifier: STABLE (marked @Stable or @Immutable)
 
 @Composable
 public fun zed.rainxch.devprofile.presentation.components.DeveloperRepoItem(repository: zed.rainxch.devprofile.domain.model.DeveloperRepository, onItemClick: kotlin.Function0<kotlin.Unit>, onToggleFavorite: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
-  skippable: false
+  skippable: true
   restartable: true
   params:
-    - repository: UNSTABLE (has mutable properties or unstable members)
+    - repository: UNSTABLE (cross-module type without @Stable/@Immutable)
     - onItemClick: STABLE (function type)
     - onToggleFavorite: STABLE (function type)
     - modifier: STABLE (marked @Stable or @Immutable)
@@ -112,10 +112,10 @@ public fun zed.rainxch.devprofile.presentation.components.FilterSortControls(cur
 
 @Composable
 public fun zed.rainxch.devprofile.presentation.components.IdentityRailCard(profile: zed.rainxch.devprofile.domain.model.DeveloperProfile, onAction: kotlin.Function1<zed.rainxch.devprofile.presentation.DeveloperProfileAction, kotlin.Unit>): kotlin.Unit
-  skippable: false
+  skippable: true
   restartable: true
   params:
-    - profile: UNSTABLE (has mutable properties or unstable members)
+    - profile: UNSTABLE (cross-module type without @Stable/@Immutable)
     - onAction: STABLE (function type)
 
 @Composable
@@ -159,10 +159,10 @@ private fun zed.rainxch.devprofile.presentation.components.OrgPill(): kotlin.Uni
 
 @Composable
 public fun zed.rainxch.devprofile.presentation.components.ProfileInfoCard(profile: zed.rainxch.devprofile.domain.model.DeveloperProfile, onAction: kotlin.Function1<zed.rainxch.devprofile.presentation.DeveloperProfileAction, kotlin.Unit>): kotlin.Unit
-  skippable: false
+  skippable: true
   restartable: true
   params:
-    - profile: UNSTABLE (has mutable properties or unstable members)
+    - profile: UNSTABLE (cross-module type without @Stable/@Immutable)
     - onAction: STABLE (function type)
 
 @Composable

@@ -6,7 +6,7 @@
 
 @Composable
 public fun zed.rainxch.tweaks.presentation.TweaksRoot(onNavigateBack: kotlin.Function0<kotlin.Unit>, onNavigateToHostTokens: kotlin.Function0<kotlin.Unit>, onNavigateToMirrorPicker: kotlin.Function0<kotlin.Unit>, onNavigateToSkippedUpdates: kotlin.Function0<kotlin.Unit>, onNavigateToHiddenRepositories: kotlin.Function0<kotlin.Unit>, viewModel: zed.rainxch.tweaks.presentation.TweaksViewModel): kotlin.Unit
-  skippable: false
+  skippable: true
   restartable: true
   params:
     - onNavigateBack: STABLE (function type)
@@ -36,12 +36,12 @@ private fun zed.rainxch.tweaks.presentation.appinfo.AppIdentityCard(versionName:
 
 @Composable
 public fun zed.rainxch.tweaks.presentation.appinfo.AppInfoRoot(onNavigateBack: kotlin.Function0<kotlin.Unit>, onNavigateToLicenses: kotlin.Function0<kotlin.Unit>, viewModel: zed.rainxch.tweaks.presentation.appinfo.AppInfoViewModel): kotlin.Unit
-  skippable: false
+  skippable: true
   restartable: true
   params:
     - onNavigateBack: STABLE (function type)
     - onNavigateToLicenses: STABLE (function type)
-    - viewModel: RUNTIME (requires runtime check)
+    - viewModel: UNSTABLE (has mutable properties or unstable members)
 
 @Composable
 private fun zed.rainxch.tweaks.presentation.appinfo.CommunityCard(onTelegram: kotlin.Function0<kotlin.Unit>, onDiscord: kotlin.Function0<kotlin.Unit>, onMastodon: kotlin.Function0<kotlin.Unit>, onReddit: kotlin.Function0<kotlin.Unit>, onGithub: kotlin.Function0<kotlin.Unit>, onWebsite: kotlin.Function0<kotlin.Unit>, onBusiness: kotlin.Function0<kotlin.Unit>): kotlin.Unit
@@ -80,7 +80,7 @@ public fun zed.rainxch.tweaks.presentation.components.ClearDownloadsDialog(cache
 
 @Composable
 public fun zed.rainxch.tweaks.presentation.components.CustomForgesDialog(state: zed.rainxch.tweaks.presentation.TweaksState, onAction: kotlin.Function1<zed.rainxch.tweaks.presentation.TweaksAction, kotlin.Unit>): kotlin.Unit
-  skippable: false
+  skippable: true
   restartable: true
   params:
     - state: UNSTABLE (has mutable properties or unstable members)
@@ -131,7 +131,16 @@ public fun zed.rainxch.tweaks.presentation.components.TweaksStubScreen(title: ko
     - onNavigateBack: STABLE (function type)
 
 @Composable
-public fun zed.rainxch.tweaks.presentation.components.appearance.AccentSwatch(fill: androidx.compose.ui.graphics.Color, onFill: androidx.compose.ui.graphics.Color, mono: kotlin.Boolean, selected: kotlin.Boolean, onClick: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+private fun zed.rainxch.tweaks.presentation.components.appearance.AccentRow(accent: zed.rainxch.core.domain.model.appearance.AccentId, onAccentSelected: kotlin.Function1<zed.rainxch.core.domain.model.appearance.AccentId, kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - accent: STABLE (class with no mutable properties)
+    - onAccentSelected: STABLE (function type)
+    - modifier: STABLE (marked @Stable or @Immutable)
+
+@Composable
+public fun zed.rainxch.tweaks.presentation.components.appearance.AccentSwatch(fill: androidx.compose.ui.graphics.Color, onFill: androidx.compose.ui.graphics.Color, mono: kotlin.Boolean, selected: kotlin.Boolean, label: kotlin.String, onClick: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier, icon: androidx.compose.ui.graphics.vector.ImageVector?): kotlin.Unit
   skippable: true
   restartable: true
   params:
@@ -139,8 +148,10 @@ public fun zed.rainxch.tweaks.presentation.components.appearance.AccentSwatch(fi
     - onFill: STABLE (marked @Stable or @Immutable)
     - mono: STABLE (primitive type)
     - selected: STABLE (primitive type)
+    - label: STABLE (String is immutable)
     - onClick: STABLE (function type)
     - modifier: STABLE (marked @Stable or @Immutable)
+    - icon: STABLE (marked @Stable or @Immutable)
 
 @Composable
 public fun zed.rainxch.tweaks.presentation.components.appearance.AppearanceHeadline(personality: zed.rainxch.core.domain.model.appearance.AppPersonality, accent: zed.rainxch.core.domain.model.appearance.AccentId, onPersonalitySelected: kotlin.Function1<zed.rainxch.core.domain.model.appearance.AppPersonality, kotlin.Unit>, onAccentSelected: kotlin.Function1<zed.rainxch.core.domain.model.appearance.AccentId, kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
@@ -183,6 +194,19 @@ public fun zed.rainxch.tweaks.presentation.components.appearance.PersonalityTile
     - modifier: STABLE (marked @Stable or @Immutable)
 
 @Composable
+private fun zed.rainxch.tweaks.presentation.components.appearance.SwatchBody(fill: androidx.compose.ui.graphics.Color, onFill: androidx.compose.ui.graphics.Color, mono: kotlin.Boolean, selected: kotlin.Boolean, label: kotlin.String, onClick: kotlin.Function0<kotlin.Unit>, icon: androidx.compose.ui.graphics.vector.ImageVector?): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - fill: STABLE (marked @Stable or @Immutable)
+    - onFill: STABLE (marked @Stable or @Immutable)
+    - mono: STABLE (primitive type)
+    - selected: STABLE (primitive type)
+    - label: STABLE (String is immutable)
+    - onClick: STABLE (function type)
+    - icon: STABLE (marked @Stable or @Immutable)
+
+@Composable
 private fun zed.rainxch.tweaks.presentation.components.desktop.NavRow(label: kotlin.String, kicker: kotlin.String?, active: kotlin.Boolean, onClick: kotlin.Function0<kotlin.Unit>): kotlin.Unit
   skippable: true
   restartable: true
@@ -194,7 +218,7 @@ private fun zed.rainxch.tweaks.presentation.components.desktop.NavRow(label: kot
 
 @Composable
 public fun zed.rainxch.tweaks.presentation.components.desktop.TweaksDesktopContent(state: zed.rainxch.tweaks.presentation.TweaksState, onAction: kotlin.Function1<zed.rainxch.tweaks.presentation.TweaksAction, kotlin.Unit>, personality: zed.rainxch.core.domain.model.appearance.AppPersonality, accent: zed.rainxch.core.domain.model.appearance.AccentId, onPersonalitySelected: kotlin.Function1<zed.rainxch.core.domain.model.appearance.AppPersonality, kotlin.Unit>, onAccentSelected: kotlin.Function1<zed.rainxch.core.domain.model.appearance.AccentId, kotlin.Unit>, currentLanguageLabel: kotlin.String, onOpenLanguage: kotlin.Function0<kotlin.Unit>, onOpenFeedback: kotlin.Function0<kotlin.Unit>, onNavigateToMirrorPicker: kotlin.Function0<kotlin.Unit>, onNavigateToHiddenRepositories: kotlin.Function0<kotlin.Unit>, onNavigateToHostTokens: kotlin.Function0<kotlin.Unit>, onNavigateBack: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
-  skippable: false
+  skippable: true
   restartable: true
   params:
     - state: UNSTABLE (has mutable properties or unstable members)
@@ -214,8 +238,8 @@ public fun zed.rainxch.tweaks.presentation.components.desktop.TweaksDesktopConte
 
 @Composable
 private fun zed.rainxch.tweaks.presentation.components.desktop.label(): kotlin.String
-  skippable: true
-  restartable: true
+  skippable: false
+  restartable: false
   params:
 
 @Composable
@@ -239,7 +263,7 @@ private fun zed.rainxch.tweaks.presentation.components.sections.AttributionRadio
 
 @Composable
 private fun zed.rainxch.tweaks.presentation.components.sections.AttributionRows(state: zed.rainxch.tweaks.presentation.TweaksState, onAction: kotlin.Function1<zed.rainxch.tweaks.presentation.TweaksAction, kotlin.Unit>): kotlin.Unit
-  skippable: false
+  skippable: true
   restartable: true
   params:
     - state: UNSTABLE (has mutable properties or unstable members)
@@ -255,7 +279,7 @@ private fun zed.rainxch.tweaks.presentation.components.sections.BatteryOptimizat
 
 @Composable
 private fun zed.rainxch.tweaks.presentation.components.sections.DeeplCredentialsForm(state: zed.rainxch.tweaks.presentation.TweaksState, onAction: kotlin.Function1<zed.rainxch.tweaks.presentation.TweaksAction, kotlin.Unit>): kotlin.Unit
-  skippable: false
+  skippable: true
   restartable: true
   params:
     - state: UNSTABLE (has mutable properties or unstable members)
@@ -307,7 +331,7 @@ private fun zed.rainxch.tweaks.presentation.components.sections.IntervalBlock(se
 
 @Composable
 private fun zed.rainxch.tweaks.presentation.components.sections.LibreTranslateCredentialsForm(state: zed.rainxch.tweaks.presentation.TweaksState, onAction: kotlin.Function1<zed.rainxch.tweaks.presentation.TweaksAction, kotlin.Unit>): kotlin.Unit
-  skippable: false
+  skippable: true
   restartable: true
   params:
     - state: UNSTABLE (has mutable properties or unstable members)
@@ -315,7 +339,7 @@ private fun zed.rainxch.tweaks.presentation.components.sections.LibreTranslateCr
 
 @Composable
 private fun zed.rainxch.tweaks.presentation.components.sections.MicrosoftCredentialsForm(state: zed.rainxch.tweaks.presentation.TweaksState, onAction: kotlin.Function1<zed.rainxch.tweaks.presentation.TweaksAction, kotlin.Unit>): kotlin.Unit
-  skippable: false
+  skippable: true
   restartable: true
   params:
     - state: UNSTABLE (has mutable properties or unstable members)
@@ -372,7 +396,7 @@ private fun zed.rainxch.tweaks.presentation.components.sections.ShizukuStatusBad
 
 @Composable
 public fun zed.rainxch.tweaks.presentation.components.sections.SourcesSectionContent(state: zed.rainxch.tweaks.presentation.TweaksState, onAction: kotlin.Function1<zed.rainxch.tweaks.presentation.TweaksAction, kotlin.Unit>, modifier: androidx.compose.ui.Modifier, onNavigateToMirrorPicker: kotlin.Function0<kotlin.Unit>): kotlin.Unit
-  skippable: false
+  skippable: true
   restartable: true
   params:
     - state: UNSTABLE (has mutable properties or unstable members)
@@ -390,7 +414,7 @@ private fun zed.rainxch.tweaks.presentation.components.sections.StatusDot(color:
 
 @Composable
 private fun zed.rainxch.tweaks.presentation.components.sections.TranslationTargetDropdown(state: zed.rainxch.tweaks.presentation.TweaksState, onAction: kotlin.Function1<zed.rainxch.tweaks.presentation.TweaksAction, kotlin.Unit>): kotlin.Unit
-  skippable: false
+  skippable: true
   restartable: true
   params:
     - state: UNSTABLE (has mutable properties or unstable members)
@@ -398,7 +422,7 @@ private fun zed.rainxch.tweaks.presentation.components.sections.TranslationTarge
 
 @Composable
 private fun zed.rainxch.tweaks.presentation.components.sections.YoudaoCredentialsForm(state: zed.rainxch.tweaks.presentation.TweaksState, onAction: kotlin.Function1<zed.rainxch.tweaks.presentation.TweaksAction, kotlin.Unit>): kotlin.Unit
-  skippable: false
+  skippable: true
   restartable: true
   params:
     - state: UNSTABLE (has mutable properties or unstable members)
@@ -414,7 +438,7 @@ public fun zed.rainxch.tweaks.presentation.components.sections.appSection(onOpen
 
 @Composable
 public fun zed.rainxch.tweaks.presentation.components.sections.appearanceSectionContent(state: zed.rainxch.tweaks.presentation.TweaksState, onAction: kotlin.Function1<zed.rainxch.tweaks.presentation.TweaksAction, kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
-  skippable: false
+  skippable: true
   restartable: true
   params:
     - state: UNSTABLE (has mutable properties or unstable members)
@@ -423,7 +447,7 @@ public fun zed.rainxch.tweaks.presentation.components.sections.appearanceSection
 
 @Composable
 public fun zed.rainxch.tweaks.presentation.components.sections.connectionSectionContent(state: zed.rainxch.tweaks.presentation.TweaksState, onAction: kotlin.Function1<zed.rainxch.tweaks.presentation.TweaksAction, kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
-  skippable: false
+  skippable: true
   restartable: true
   params:
     - state: UNSTABLE (has mutable properties or unstable members)
@@ -432,7 +456,7 @@ public fun zed.rainxch.tweaks.presentation.components.sections.connectionSection
 
 @Composable
 public fun zed.rainxch.tweaks.presentation.components.sections.connectivitySection(state: zed.rainxch.tweaks.presentation.TweaksState, onAction: kotlin.Function1<zed.rainxch.tweaks.presentation.TweaksAction, kotlin.Unit>, onNavigateToMirrorPicker: kotlin.Function0<kotlin.Unit>, showHead: kotlin.Boolean): kotlin.Unit
-  skippable: false
+  skippable: true
   restartable: true
   params:
     - state: UNSTABLE (has mutable properties or unstable members)
@@ -442,14 +466,14 @@ public fun zed.rainxch.tweaks.presentation.components.sections.connectivitySecti
 
 @Composable
 private fun zed.rainxch.tweaks.presentation.components.sections.formatIntervalLabel(hours: kotlin.Long): kotlin.String
-  skippable: true
-  restartable: true
+  skippable: false
+  restartable: false
   params:
     - hours: STABLE (primitive type)
 
 @Composable
 public fun zed.rainxch.tweaks.presentation.components.sections.installSectionContent(state: zed.rainxch.tweaks.presentation.TweaksState, onAction: kotlin.Function1<zed.rainxch.tweaks.presentation.TweaksAction, kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
-  skippable: false
+  skippable: true
   restartable: true
   params:
     - state: UNSTABLE (has mutable properties or unstable members)
@@ -458,7 +482,7 @@ public fun zed.rainxch.tweaks.presentation.components.sections.installSectionCon
 
 @Composable
 public fun zed.rainxch.tweaks.presentation.components.sections.installsSection(state: zed.rainxch.tweaks.presentation.TweaksState, onAction: kotlin.Function1<zed.rainxch.tweaks.presentation.TweaksAction, kotlin.Unit>, onNavigateToSkippedUpdates: kotlin.Function0<kotlin.Unit>, showHead: kotlin.Boolean): kotlin.Unit
-  skippable: false
+  skippable: true
   restartable: true
   params:
     - state: UNSTABLE (has mutable properties or unstable members)
@@ -468,7 +492,7 @@ public fun zed.rainxch.tweaks.presentation.components.sections.installsSection(s
 
 @Composable
 public fun zed.rainxch.tweaks.presentation.components.sections.lookAndFeelSection(state: zed.rainxch.tweaks.presentation.TweaksState, onAction: kotlin.Function1<zed.rainxch.tweaks.presentation.TweaksAction, kotlin.Unit>, personality: zed.rainxch.core.domain.model.appearance.AppPersonality, accent: zed.rainxch.core.domain.model.appearance.AccentId, onPersonalitySelected: kotlin.Function1<zed.rainxch.core.domain.model.appearance.AppPersonality, kotlin.Unit>, onAccentSelected: kotlin.Function1<zed.rainxch.core.domain.model.appearance.AccentId, kotlin.Unit>, currentLanguageLabel: kotlin.String, onOpenLanguage: kotlin.Function0<kotlin.Unit>, showHead: kotlin.Boolean): kotlin.Unit
-  skippable: false
+  skippable: true
   restartable: true
   params:
     - state: UNSTABLE (has mutable properties or unstable members)
@@ -483,7 +507,7 @@ public fun zed.rainxch.tweaks.presentation.components.sections.lookAndFeelSectio
 
 @Composable
 public fun zed.rainxch.tweaks.presentation.components.sections.privacySection(state: zed.rainxch.tweaks.presentation.TweaksState, onAction: kotlin.Function1<zed.rainxch.tweaks.presentation.TweaksAction, kotlin.Unit>, onNavigateToHiddenRepositories: kotlin.Function0<kotlin.Unit>, onNavigateToHostTokens: kotlin.Function0<kotlin.Unit>, showHead: kotlin.Boolean): kotlin.Unit
-  skippable: false
+  skippable: true
   restartable: true
   params:
     - state: UNSTABLE (has mutable properties or unstable members)
@@ -494,7 +518,7 @@ public fun zed.rainxch.tweaks.presentation.components.sections.privacySection(st
 
 @Composable
 public fun zed.rainxch.tweaks.presentation.components.sections.privacySectionContent(state: zed.rainxch.tweaks.presentation.TweaksState, onAction: kotlin.Function1<zed.rainxch.tweaks.presentation.TweaksAction, kotlin.Unit>, modifier: androidx.compose.ui.Modifier, onNavigateToHiddenRepositories: kotlin.Function0<kotlin.Unit>): kotlin.Unit
-  skippable: false
+  skippable: true
   restartable: true
   params:
     - state: UNSTABLE (has mutable properties or unstable members)
@@ -504,28 +528,28 @@ public fun zed.rainxch.tweaks.presentation.components.sections.privacySectionCon
 
 @Composable
 private fun zed.rainxch.tweaks.presentation.components.sections.providerLabel(provider: zed.rainxch.core.domain.model.settings.TranslationProvider): kotlin.String
-  skippable: true
-  restartable: true
+  skippable: false
+  restartable: false
   params:
     - provider: STABLE (class with no mutable properties)
 
 @Composable
 private fun zed.rainxch.tweaks.presentation.components.sections.proxySummary(form: zed.rainxch.tweaks.presentation.model.ProxyScopeFormState): kotlin.String
-  skippable: true
-  restartable: true
+  skippable: false
+  restartable: false
   params:
     - form: STABLE (class with no mutable properties)
 
 @Composable
 private fun zed.rainxch.tweaks.presentation.components.sections.scopeTitle(scope: zed.rainxch.core.domain.model.settings.ProxyScope): kotlin.String
-  skippable: true
-  restartable: true
+  skippable: false
+  restartable: false
   params:
     - scope: STABLE (class with no mutable properties)
 
 @Composable
 public fun zed.rainxch.tweaks.presentation.components.sections.storageSectionContent(state: zed.rainxch.tweaks.presentation.TweaksState, onAction: kotlin.Function1<zed.rainxch.tweaks.presentation.TweaksAction, kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
-  skippable: false
+  skippable: true
   restartable: true
   params:
     - state: UNSTABLE (has mutable properties or unstable members)
@@ -534,7 +558,7 @@ public fun zed.rainxch.tweaks.presentation.components.sections.storageSectionCon
 
 @Composable
 public fun zed.rainxch.tweaks.presentation.components.sections.translationSectionContent(state: zed.rainxch.tweaks.presentation.TweaksState, onAction: kotlin.Function1<zed.rainxch.tweaks.presentation.TweaksAction, kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
-  skippable: false
+  skippable: true
   restartable: true
   params:
     - state: UNSTABLE (has mutable properties or unstable members)
@@ -543,7 +567,7 @@ public fun zed.rainxch.tweaks.presentation.components.sections.translationSectio
 
 @Composable
 public fun zed.rainxch.tweaks.presentation.components.sections.updatesSectionContent(state: zed.rainxch.tweaks.presentation.TweaksState, onAction: kotlin.Function1<zed.rainxch.tweaks.presentation.TweaksAction, kotlin.Unit>, modifier: androidx.compose.ui.Modifier, onNavigateToSkippedUpdates: kotlin.Function0<kotlin.Unit>): kotlin.Unit
-  skippable: false
+  skippable: true
   restartable: true
   params:
     - state: UNSTABLE (has mutable properties or unstable members)
@@ -616,8 +640,8 @@ public fun zed.rainxch.tweaks.presentation.components.shell.SettingsValuePill(va
 
 @Composable
 public fun zed.rainxch.tweaks.presentation.components.shell.tweaksKicker(slot: zed.rainxch.tweaks.presentation.components.shell.TweaksDecorSlot): kotlin.String?
-  skippable: true
-  restartable: true
+  skippable: false
+  restartable: false
   params:
     - slot: STABLE (class with no mutable properties)
 
@@ -663,13 +687,13 @@ public fun zed.rainxch.tweaks.presentation.feedback.components.DiagnosticsPrevie
 
 @Composable
 public fun zed.rainxch.tweaks.presentation.feedback.components.FeedbackBottomSheet(onDismiss: kotlin.Function0<kotlin.Unit>, onSent: kotlin.Function1<zed.rainxch.tweaks.presentation.feedback.model.FeedbackChannel, kotlin.Unit>, onError: kotlin.Function0<kotlin.Unit>, viewModel: zed.rainxch.tweaks.presentation.feedback.FeedbackViewModel): kotlin.Unit
-  skippable: false
+  skippable: true
   restartable: true
   params:
     - onDismiss: STABLE (function type)
     - onSent: STABLE (function type)
     - onError: STABLE (function type)
-    - viewModel: RUNTIME (requires runtime check)
+    - viewModel: UNSTABLE (has mutable properties or unstable members)
 
 @Composable
 private fun zed.rainxch.tweaks.presentation.feedback.components.FeedbackContent(state: zed.rainxch.tweaks.presentation.feedback.FeedbackState, onAction: kotlin.Function1<zed.rainxch.tweaks.presentation.feedback.FeedbackAction, kotlin.Unit>, onDismiss: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier, scrollable: kotlin.Boolean): kotlin.Unit
@@ -737,24 +761,24 @@ public fun zed.rainxch.tweaks.presentation.feedback.components.TopicSelector(sel
 
 @Composable
 public fun zed.rainxch.tweaks.presentation.hidden.HiddenRepositoriesRoot(onNavigateBack: kotlin.Function0<kotlin.Unit>, viewModel: zed.rainxch.tweaks.presentation.hidden.HiddenRepositoriesViewModel): kotlin.Unit
-  skippable: false
+  skippable: true
   restartable: true
   params:
     - onNavigateBack: STABLE (function type)
-    - viewModel: RUNTIME (requires runtime check)
+    - viewModel: UNSTABLE (has mutable properties or unstable members)
 
 @Composable
 private fun zed.rainxch.tweaks.presentation.hosttokens.AddTokenDialog(state: zed.rainxch.tweaks.presentation.hosttokens.HostTokensState, replacingExisting: zed.rainxch.core.domain.model.account.HostToken?, onAction: kotlin.Function1<zed.rainxch.tweaks.presentation.hosttokens.HostTokensAction, kotlin.Unit>): kotlin.Unit
-  skippable: false
+  skippable: true
   restartable: true
   params:
     - state: UNSTABLE (has mutable properties or unstable members)
-    - replacingExisting: UNSTABLE (has mutable properties or unstable members)
+    - replacingExisting: UNSTABLE (cross-module type without @Stable/@Immutable)
     - onAction: STABLE (function type)
 
 @Composable
 private fun zed.rainxch.tweaks.presentation.hosttokens.EmptyStatePicker(presetForges: kotlin.collections.List<zed.rainxch.core.domain.model.account.ForgeKind>, onPickPreset: kotlin.Function1<zed.rainxch.core.domain.model.account.ForgeKind, kotlin.Unit>, onPickOther: kotlin.Function0<kotlin.Unit>, onOpenTokenCreationPage: kotlin.Function1<zed.rainxch.core.domain.model.account.ForgeKind, kotlin.Unit>): kotlin.Unit
-  skippable: false
+  skippable: true
   restartable: true
   params:
     - presetForges: RUNTIME (requires runtime check)
@@ -771,11 +795,11 @@ public fun zed.rainxch.tweaks.presentation.hosttokens.HostTokensEntryCard(onClic
 
 @Composable
 public fun zed.rainxch.tweaks.presentation.hosttokens.HostTokensRoot(onNavigateBack: kotlin.Function0<kotlin.Unit>, viewModel: zed.rainxch.tweaks.presentation.hosttokens.HostTokensViewModel): kotlin.Unit
-  skippable: false
+  skippable: true
   restartable: true
   params:
     - onNavigateBack: STABLE (function type)
-    - viewModel: RUNTIME (requires runtime check)
+    - viewModel: UNSTABLE (has mutable properties or unstable members)
 
 @Composable
 private fun zed.rainxch.tweaks.presentation.hosttokens.OAuthCoexistenceNote(): kotlin.Unit
@@ -792,7 +816,7 @@ private fun zed.rainxch.tweaks.presentation.hosttokens.OtherForgeCard(onPick: ko
 
 @Composable
 private fun zed.rainxch.tweaks.presentation.hosttokens.PickerDialog(presetForges: kotlin.collections.List<zed.rainxch.core.domain.model.account.ForgeKind>, onPickPreset: kotlin.Function1<zed.rainxch.core.domain.model.account.ForgeKind, kotlin.Unit>, onPickOther: kotlin.Function0<kotlin.Unit>, onOpenTokenCreationPage: kotlin.Function1<zed.rainxch.core.domain.model.account.ForgeKind, kotlin.Unit>, onDismiss: kotlin.Function0<kotlin.Unit>): kotlin.Unit
-  skippable: false
+  skippable: true
   restartable: true
   params:
     - presetForges: RUNTIME (requires runtime check)
@@ -813,10 +837,10 @@ private fun zed.rainxch.tweaks.presentation.hosttokens.PresetForgeCard(kind: zed
 
 @Composable
 private fun zed.rainxch.tweaks.presentation.hosttokens.TokenRow(token: zed.rainxch.core.domain.model.account.HostToken, isValidating: kotlin.Boolean, validation: zed.rainxch.tweaks.presentation.hosttokens.ValidationLine?, onValidate: kotlin.Function0<kotlin.Unit>, onDelete: kotlin.Function0<kotlin.Unit>, onReplace: kotlin.Function0<kotlin.Unit>, onEditLabel: kotlin.Function0<kotlin.Unit>, onOpenManagePage: kotlin.Function1<zed.rainxch.core.domain.model.account.ForgeKind, kotlin.Unit>, last: kotlin.Boolean): kotlin.Unit
-  skippable: false
+  skippable: true
   restartable: true
   params:
-    - token: UNSTABLE (has mutable properties or unstable members)
+    - token: UNSTABLE (cross-module type without @Stable/@Immutable)
     - isValidating: STABLE (primitive type)
     - validation: RUNTIME (requires runtime check)
     - onValidate: STABLE (function type)
@@ -836,15 +860,15 @@ private fun zed.rainxch.tweaks.presentation.licenses.LibraryRow(library: zed.rai
 
 @Composable
 public fun zed.rainxch.tweaks.presentation.licenses.LicensesRoot(onNavigateBack: kotlin.Function0<kotlin.Unit>, viewModel: zed.rainxch.tweaks.presentation.licenses.LicensesViewModel): kotlin.Unit
-  skippable: false
+  skippable: true
   restartable: true
   params:
     - onNavigateBack: STABLE (function type)
-    - viewModel: RUNTIME (requires runtime check)
+    - viewModel: UNSTABLE (has mutable properties or unstable members)
 
 @Composable
 public fun zed.rainxch.tweaks.presentation.mirror.MirrorPickerRoot(onNavigateBack: kotlin.Function0<kotlin.Unit>, viewModel: zed.rainxch.tweaks.presentation.mirror.MirrorPickerViewModel): kotlin.Unit
-  skippable: false
+  skippable: true
   restartable: true
   params:
     - onNavigateBack: STABLE (function type)
@@ -852,10 +876,10 @@ public fun zed.rainxch.tweaks.presentation.mirror.MirrorPickerRoot(onNavigateBac
 
 @Composable
 private fun zed.rainxch.tweaks.presentation.mirror.MirrorSettingsRow(mirror: zed.rainxch.core.domain.model.mirror.MirrorConfig, measuredMs: kotlin.Int?, isFastest: kotlin.Boolean, selected: kotlin.Boolean, last: kotlin.Boolean, onClick: kotlin.Function0<kotlin.Unit>): kotlin.Unit
-  skippable: false
+  skippable: true
   restartable: true
   params:
-    - mirror: UNSTABLE (has mutable properties or unstable members)
+    - mirror: UNSTABLE (cross-module type without @Stable/@Immutable)
     - measuredMs: STABLE (class with no mutable properties)
     - isFastest: STABLE (primitive type)
     - selected: STABLE (primitive type)
@@ -891,16 +915,16 @@ public fun zed.rainxch.tweaks.presentation.mirror.components.StatusDot(status: z
 
 @Composable
 private fun zed.rainxch.tweaks.presentation.mirror.formatTestResult(result: zed.rainxch.tweaks.presentation.mirror.TestResult): kotlin.String
-  skippable: true
-  restartable: true
+  skippable: false
+  restartable: false
   params:
-    - result: STABLE (class with no mutable properties)
+    - result: UNKNOWN (interface or non-final class; concrete implementation unknown)
 
 @Composable
 public fun zed.rainxch.tweaks.presentation.skipped.SkippedUpdatesRoot(onNavigateBack: kotlin.Function0<kotlin.Unit>, viewModel: zed.rainxch.tweaks.presentation.skipped.SkippedUpdatesViewModel): kotlin.Unit
-  skippable: false
+  skippable: true
   restartable: true
   params:
     - onNavigateBack: STABLE (function type)
-    - viewModel: RUNTIME (requires runtime check)
+    - viewModel: UNSTABLE (has mutable properties or unstable members)
 

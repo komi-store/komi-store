@@ -193,9 +193,7 @@ private fun RowScope.DownloadActions(
             )
         }
 
-        else -> {
-            Unit
-        }
+        else -> {}
     }
     when (stage) {
         DownloadStage.Installing -> CloseButton(label = stringResource(Res.string.dismiss), onClick = onDismiss)

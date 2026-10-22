@@ -6,7 +6,7 @@
 
 @Composable
 public fun zed.rainxch.auth.presentation.AuthenticationRoot(onNavigateToHome: kotlin.Function0<kotlin.Unit>, viewModel: zed.rainxch.auth.presentation.AuthenticationViewModel): kotlin.Unit
-  skippable: false
+  skippable: true
   restartable: true
   params:
     - onNavigateToHome: STABLE (function type)
@@ -17,7 +17,7 @@ public fun zed.rainxch.auth.presentation.AuthenticationScreen(state: zed.rainxch
   skippable: true
   restartable: true
   params:
-    - state: STABLE (class with no mutable properties)
+    - state: UNKNOWN (interface or non-final class; concrete implementation unknown)
     - onAction: STABLE (function type)
 
 @Composable
@@ -51,7 +51,7 @@ private fun zed.rainxch.auth.presentation.StateDevicePrompt(state: zed.rainxch.a
   skippable: true
   restartable: true
   params:
-    - state: STABLE (class with no mutable properties)
+    - state: UNKNOWN (interface or non-final class; concrete implementation unknown)
     - authState: STABLE (class with no mutable properties)
     - onAction: STABLE (function type)
 
