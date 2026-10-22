@@ -1,5 +1,6 @@
 package zed.rainxch.core.presentation.personality.utils
 
+import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -20,7 +21,7 @@ fun KomiSeededTheme(
     content: @Composable () -> Unit,
 ) {
     val personality = LocalPersonality.current
-    if (personality !is ClassicPersonality || personality.colorScheme.primary.toHct().chroma < MONO_CHROMA) {
+    if (personality !is ClassicPersonality || personality.colorScheme.isGray()) {
         content()
         return
     }
@@ -39,6 +40,8 @@ fun KomiSeededTheme(
         MaterialTheme(colorScheme = scheme, content = content)
     }
 }
+
+private fun ColorScheme.isGray(): Boolean = primary.toHct().chroma < MONO_CHROMA
 
 private const val HALF_LUMINANCE = 0.5f
 private const val MONO_CHROMA = 4.0
