@@ -1,14 +1,16 @@
 package zed.rainxch.details.presentation.components
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -27,10 +29,15 @@ import androidx.compose.material.icons.automirrored.outlined.CallSplit
 import androidx.compose.material.icons.filled.UnfoldMore
 import androidx.compose.material.icons.filled.Verified
 import androidx.compose.material.icons.outlined.History
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.MaterialShapes
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -40,6 +47,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
+import androidx.graphics.shapes.Morph
 import kotlinx.coroutines.flow.first
 import org.jetbrains.compose.resources.stringResource
 import zed.rainxch.core.domain.model.account.github.GithubRelease
@@ -57,25 +65,29 @@ import zed.rainxch.core.presentation.components.chips.KomiChipSize
 import zed.rainxch.core.presentation.components.icon.KomiIcon
 import zed.rainxch.core.presentation.components.overlays.KomiTooltip
 import zed.rainxch.core.presentation.components.progress.KomiCircularProgress
+import zed.rainxch.core.presentation.components.shapes.MorphShape
 import zed.rainxch.core.presentation.components.surfaces.KomiScreentone
 import zed.rainxch.core.presentation.components.surfaces.KomiSurface
+import zed.rainxch.core.presentation.components.surfaces.KomiSurfacePaper
 import zed.rainxch.core.presentation.components.text.KomiText
 import zed.rainxch.core.presentation.components.text.KomiTextRole
 import zed.rainxch.core.presentation.locals.LocalPersonality
 import zed.rainxch.core.presentation.personality.MangaPersonality
 import zed.rainxch.core.presentation.personality.manga.decoration.hardShadow
+import zed.rainxch.core.presentation.personality.utils.KomiSeededTheme
 import zed.rainxch.core.presentation.spacing.Spacing
 import zed.rainxch.core.presentation.utils.formatReleasedAgo
+import zed.rainxch.core.presentation.utils.rememberIconSeedColor
 import zed.rainxch.details.presentation.model.DownloadStage
 import zed.rainxch.githubstore.core.presentation.res.Res
 import zed.rainxch.githubstore.core.presentation.res.details_last_push
 import zed.rainxch.githubstore.core.presentation.res.forked_repository
 import zed.rainxch.githubstore.core.presentation.res.no_description
 import zed.rainxch.githubstore.core.presentation.res.self_owned_badge
-import kotlin.math.roundToInt
 
-// Classic sets the header on the page itself; Manga inks it into a panel with the install status
-// as a sticker on its corner. Both share the body below.
+// Classic tints the header card from the colors of the app's icon and badges the picture with the
+// install status; Manga inks it into a panel with the status as a sticker on its corner. Both share
+// the body below.
 @Composable
 fun AppHeader(
     author: GithubUserProfile?,
@@ -111,19 +123,26 @@ fun AppHeader(
         animationSpec = personality.motion.defaultEffects(),
         label = "header-progress",
     )
+    val avatarUrl = author?.avatarUrl ?: repository.owner.avatarUrl
+    val deviceApp = installedApp?.takeIf { it.isReallyInstalled() }
+    // Plays once per visit, not each time the header scrolls back into view.
+    var entered by rememberSaveable { mutableStateOf(false) }
+    LaunchedEffect(Unit) { entered = true }
+    val playEntrance = !entered && !manga && personality.motion.animates
     val body: @Composable () -> Unit = {
         HeaderBody(
             owner = author?.login ?: repository.owner.login,
-            avatarUrl = author?.avatarUrl ?: repository.owner.avatarUrl,
+            avatarUrl = avatarUrl,
             repository = repository,
-            installedApp = installedApp,
+            deviceApp = deviceApp,
+            status = status.takeIf { !manga },
             downloadStage = downloadStage,
             progress = { progress },
+            playEntrance = playEntrance,
             isCurrentUserOwner = isCurrentUserOwner,
             onOwnerClick = onOwnerClick,
         ) {
             HeaderChips(
-                status = status.takeIf { !manga },
                 installedApp = installedApp,
                 switcherApps = switcherApps,
                 appLabel = appLabel?.takeIf { installedApp == null },
@@ -133,23 +152,28 @@ fun AppHeader(
                 platformReleases = platformReleases,
                 devicePlatform = devicePlatform,
                 onPlatformClick = onPlatformClick,
+                playEntrance = playEntrance,
             )
         }
     }
     // Manga's sticker hangs off the panel's corner, so the panel leaves room for it.
     val stickerRoom = if (manga) Modifier.padding(top = Spacing.md, end = Spacing.sm) else Modifier
-    Box(modifier = modifier.fillMaxWidth().then(stickerRoom)) {
-        KomiSurface(
-            modifier = Modifier.fillMaxWidth(),
-            screentone = KomiScreentone.Corner,
-            contentPadding = PaddingValues(Spacing.lg),
-            content = body,
-        )
-        if (manga && status != null) {
-            StatusSticker(
-                status = status,
-                modifier = Modifier.align(Alignment.TopEnd).offset(x = Spacing.sm, y = -Spacing.md),
+    val seed = if (manga) null else rememberIconSeedColor(packageName = deviceApp?.packageName, imageUrl = avatarUrl)
+    KomiSeededTheme(seed = seed) {
+        Box(modifier = modifier.fillMaxWidth().then(stickerRoom)) {
+            KomiSurface(
+                modifier = Modifier.fillMaxWidth(),
+                paper = KomiSurfacePaper.Tinted,
+                screentone = KomiScreentone.Corner,
+                contentPadding = PaddingValues(Spacing.lg),
+                content = body,
             )
+            if (manga && status != null) {
+                StatusSticker(
+                    status = status,
+                    modifier = Modifier.align(Alignment.TopEnd).offset(x = Spacing.sm, y = -Spacing.md),
+                )
+            }
         }
     }
 }
@@ -159,9 +183,11 @@ private fun HeaderBody(
     owner: String,
     avatarUrl: String?,
     repository: GithubRepoSummary,
-    installedApp: InstalledApp?,
+    deviceApp: InstalledApp?,
+    status: HeaderStatus?,
     downloadStage: DownloadStage,
     progress: () -> Float,
+    playEntrance: Boolean,
     isCurrentUserOwner: Boolean,
     onOwnerClick: () -> Unit,
     chips: @Composable () -> Unit,
@@ -174,10 +200,12 @@ private fun HeaderBody(
             horizontalArrangement = Arrangement.spacedBy(Spacing.lg),
         ) {
             HeaderPicture(
-                installedApp = installedApp,
+                deviceApp = deviceApp,
                 avatarUrl = avatarUrl,
+                status = status,
                 downloadStage = downloadStage,
                 progress = progress,
+                playEntrance = playEntrance,
             )
             Column(
                 modifier = Modifier.weight(1f),
@@ -198,33 +226,47 @@ private fun HeaderBody(
     }
 }
 
-// The installed app's own icon when it is on the device, else the owner's avatar. While a
-// download runs, the picture shrinks into the progress ring; in Classic it also rounds to a circle.
+// The installed app's own icon when it is on the device, else the owner's avatar. Classic sets the
+// icon on a cookie-shaped plate (the avatar is cut to the cookie), pops it in and badges its corner
+// with [status]; Manga squares and tilts it. While a download runs, the picture shrinks into the
+// progress ring, and in Classic the cookie morphs into a circle.
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun HeaderPicture(
-    installedApp: InstalledApp?,
+    deviceApp: InstalledApp?,
     avatarUrl: String?,
+    status: HeaderStatus?,
     downloadStage: DownloadStage,
     progress: () -> Float,
+    playEntrance: Boolean,
 ) {
     val personality = LocalPersonality.current
     val manga = personality is MangaPersonality
     val colors = personality.colors
+    val motion = personality.motion
     val busy = downloadStage != DownloadStage.IDLE && downloadStage != DownloadStage.PAUSED
     val scale by animateFloatAsState(
         targetValue = if (busy) BUSY_PICTURE_SCALE else 1f,
-        animationSpec = personality.motion.bouncySpatial(),
+        animationSpec = motion.bouncySpatial(),
         label = "header-picture-scale",
     )
-    val cornerPercent by animateFloatAsState(
-        targetValue = if (busy) CIRCLE_CORNER_PERCENT else REST_CORNER_PERCENT,
-        animationSpec = personality.motion.defaultSpatial(),
-        label = "header-picture-corner",
+    val round by animateFloatAsState(
+        targetValue = if (busy) 1f else 0f,
+        animationSpec = motion.defaultSpatial(),
+        label = "header-picture-round",
     )
-    val shape = if (manga) RectangleShape else RoundedCornerShape(percent = cornerPercent.roundToInt())
-    val app = installedApp?.takeIf { it.isReallyInstalled() }
+    val pop = remember { Animatable(if (playEntrance) POP_START_SCALE else 1f) }
+    LaunchedEffect(Unit) { pop.animateTo(1f, motion.bouncySpatial()) }
+    val cookie = remember { Morph(MaterialShapes.Cookie4Sided, MaterialShapes.Circle) }
+    val shape = remember(manga, round) { if (manga) RectangleShape else MorphShape(cookie, round) }
     Box(
-        modifier = Modifier.size(if (manga) 84.dp else 80.dp),
+        modifier =
+            Modifier
+                .size(if (manga) 84.dp else 80.dp)
+                .graphicsLayer {
+                    scaleX = pop.value
+                    scaleY = pop.value
+                },
         contentAlignment = Alignment.Center,
     ) {
         Box(
@@ -244,31 +286,64 @@ private fun HeaderPicture(
                             Modifier
                         },
                     ).clip(shape)
-                    .background(colors.surfaceContainerHigh),
+                    .background(if (manga || deviceApp == null) colors.surfaceContainerHigh else colors.primaryContainer),
+            contentAlignment = Alignment.Center,
         ) {
-            if (app != null) {
-                InstalledAppIcon(
-                    packageName = app.packageName,
-                    appName = app.appName,
-                    modifier = Modifier.fillMaxSize(),
-                    avatarFallbackUrl = avatarUrl,
-                )
-            } else {
-                GitHubStoreImage(imageModel = { avatarUrl }, modifier = Modifier.fillMaxSize())
+            PictureImage(deviceApp = deviceApp, avatarUrl = avatarUrl, plated = !manga)
+        }
+        DownloadRing(downloadStage = downloadStage, progress = progress)
+        if (status != null) {
+            AnimatedVisibility(
+                visible = !busy,
+                modifier = Modifier.align(Alignment.BottomEnd).offset(x = Spacing.xs, y = Spacing.xs),
+                enter = scaleIn(motion.bouncySpatial()),
+                exit = scaleOut(motion.fastSpatial()),
+            ) {
+                StatusBadge(status)
             }
         }
-        when (downloadStage) {
-            DownloadStage.DOWNLOADING -> {
-                KomiCircularProgress(progress = { 1f }, modifier = Modifier.fillMaxSize(), color = colors.primaryTint)
-                KomiCircularProgress(progress = progress, modifier = Modifier.fillMaxSize())
-            }
+    }
+}
 
-            DownloadStage.VERIFYING, DownloadStage.INSTALLING -> {
-                KomiCircularProgress(modifier = Modifier.fillMaxSize())
-            }
+// An installed app's icon carries its own shape, so on a plate it sits inset rather than cut.
+@Composable
+private fun PictureImage(
+    deviceApp: InstalledApp?,
+    avatarUrl: String?,
+    plated: Boolean,
+) {
+    if (deviceApp != null) {
+        InstalledAppIcon(
+            packageName = deviceApp.packageName,
+            appName = deviceApp.appName,
+            modifier = Modifier.fillMaxSize(if (plated) PLATED_ICON_FRACTION else 1f),
+            avatarFallbackUrl = avatarUrl,
+        )
+    } else {
+        GitHubStoreImage(imageModel = { avatarUrl }, modifier = Modifier.fillMaxSize())
+    }
+}
 
-            DownloadStage.IDLE, DownloadStage.PAUSED -> {}
+@Composable
+private fun DownloadRing(
+    downloadStage: DownloadStage,
+    progress: () -> Float,
+) {
+    when (downloadStage) {
+        DownloadStage.DOWNLOADING -> {
+            KomiCircularProgress(
+                progress = { 1f },
+                modifier = Modifier.fillMaxSize(),
+                color = LocalPersonality.current.colors.primaryTint,
+            )
+            KomiCircularProgress(progress = progress, modifier = Modifier.fillMaxSize())
         }
+
+        DownloadStage.VERIFYING, DownloadStage.INSTALLING -> {
+            KomiCircularProgress(modifier = Modifier.fillMaxSize())
+        }
+
+        DownloadStage.IDLE, DownloadStage.PAUSED -> {}
     }
 }
 
@@ -317,10 +392,10 @@ private fun RepoTitle(name: String) {
     // BasicText keeps the repository's own case; KomiText would capitalize a display role in Manga.
     BasicText(
         text = name,
-        style = type.display.copy(color = personality.colors.onSurface),
+        style = type.displayEmphasized.copy(color = personality.colors.onSurface),
         maxLines = 1,
         softWrap = false,
-        autoSize = TextAutoSize.StepBased(minFontSize = type.sectionTitle.fontSize, maxFontSize = type.display.fontSize),
+        autoSize = TextAutoSize.StepBased(minFontSize = type.sectionTitle.fontSize, maxFontSize = type.displayEmphasized.fontSize),
     )
 }
 
@@ -346,10 +421,8 @@ private fun LastPush(repository: GithubRepoSummary) {
     }
 }
 
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun HeaderChips(
-    status: HeaderStatus?,
     installedApp: InstalledApp?,
     switcherApps: List<InstalledApp>,
     appLabel: String?,
@@ -359,16 +432,13 @@ private fun HeaderChips(
     platformReleases: List<PlatformRelease>,
     devicePlatform: DiscoveryPlatform?,
     onPlatformClick: ((DiscoveryPlatform) -> Unit)?,
+    playEntrance: Boolean,
 ) {
     // Classic's Material chips already pad themselves to a 48dp touch target, so their rows need no gap.
     val rowGap = if (LocalPersonality.current is MangaPersonality) Spacing.sm else 0.dp
-    // Without selectors to scroll through, the status sits beside the fork chip instead of in a row of its own.
-    val selectors = appLabel != null || switcherApps.isNotEmpty()
-    val inlineStatus = status.takeIf { !selectors }
     Column(verticalArrangement = Arrangement.spacedBy(rowGap)) {
-        if (selectors) {
+        if (appLabel != null || switcherApps.isNotEmpty()) {
             AppChipRow(
-                status = status,
                 installedApp = installedApp,
                 switcherApps = switcherApps,
                 appLabel = appLabel,
@@ -376,44 +446,39 @@ private fun HeaderChips(
                 onSelectInstalledApp = onSelectInstalledApp,
             )
         }
-        if (inlineStatus != null || isFork) {
-            FlowRow(
-                horizontalArrangement = Arrangement.spacedBy(Spacing.sm),
-                verticalArrangement = Arrangement.spacedBy(rowGap),
-            ) {
-                if (inlineStatus != null) StatusChip(inlineStatus)
-                if (isFork) {
-                    KomiChip(
-                        label = stringResource(Res.string.forked_repository),
-                        kind = KomiChipKind.Tonal,
-                        size = KomiChipSize.Sm,
-                        leadingIcon = Icons.AutoMirrored.Outlined.CallSplit,
-                    )
-                }
-            }
+        if (isFork) {
+            KomiChip(
+                label = stringResource(Res.string.forked_repository),
+                kind = KomiChipKind.Tonal,
+                size = KomiChipSize.Sm,
+                leadingIcon = Icons.AutoMirrored.Outlined.CallSplit,
+            )
         }
         if (platformReleases.isNotEmpty()) {
             PlatformDock(
                 platformReleases = platformReleases,
                 devicePlatform = devicePlatform,
                 onPlatformClick = onPlatformClick,
+                playEntrance = playEntrance,
             )
         }
     }
 }
 
-// The status, the monorepo app label and one chip per installed app; the selected chip scrolls into view.
+// The monorepo app label and one chip per installed app; the selected chip scrolls into view.
 @Composable
 private fun AppChipRow(
-    status: HeaderStatus?,
     installedApp: InstalledApp?,
     switcherApps: List<InstalledApp>,
     appLabel: String?,
     onAppLabelClick: () -> Unit,
     onSelectInstalledApp: (String) -> Unit,
 ) {
-    val shape = LocalPersonality.current.shape
-    val firstChipIndex = (if (status != null) 1 else 0) + (if (appLabel != null) 1 else 0)
+    val personality = LocalPersonality.current
+    val shape = personality.shape
+    // A selected Classic filter chip takes the tinted card's own color, so Classic uses tonal ones here.
+    val chipKind = if (personality is MangaPersonality) KomiChipKind.Filter else KomiChipKind.Tonal
+    val firstChipIndex = if (appLabel != null) 1 else 0
     val selectedIndex = switcherApps.indexOfFirst { it.packageName == installedApp?.packageName }
     val targetIndex =
         when {
@@ -438,14 +503,11 @@ private fun AppChipRow(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.fillMaxWidth(),
     ) {
-        if (status != null) {
-            item(key = "status") { StatusChip(status) }
-        }
         if (appLabel != null) {
             item(key = "app") {
                 KomiChip(
                     label = appLabel,
-                    kind = KomiChipKind.Filter,
+                    kind = chipKind,
                     size = KomiChipSize.Sm,
                     selected = true,
                     leadingIcon = Icons.Default.UnfoldMore,
@@ -456,7 +518,7 @@ private fun AppChipRow(
         items(switcherApps, key = { it.packageName }) { app ->
             KomiChip(
                 label = app.appName,
-                kind = KomiChipKind.Filter,
+                kind = chipKind,
                 size = KomiChipSize.Sm,
                 selected = app.packageName == installedApp?.packageName,
                 leadingContent = {
@@ -473,6 +535,6 @@ private fun AppChipRow(
 }
 
 private const val BUSY_PICTURE_SCALE = 0.72f
-private const val REST_CORNER_PERCENT = 30f
-private const val CIRCLE_CORNER_PERCENT = 50f
+private const val POP_START_SCALE = 0.6f
+private const val PLATED_ICON_FRACTION = 0.76f
 private const val MANGA_PICTURE_TILT = -3f

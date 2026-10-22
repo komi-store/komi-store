@@ -40,7 +40,7 @@ actual fun InstalledAppIcon(
     }
 }
 
-private fun resolveInstalledIcon(
+internal fun resolveInstalledIcon(
     packageManager: PackageManager,
     packageName: String,
 ): ImageBitmap? =

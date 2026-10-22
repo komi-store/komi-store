@@ -2,23 +2,29 @@ package zed.rainxch.details.presentation.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.CheckCircle
 import androidx.compose.material.icons.rounded.InstallMobile
 import androidx.compose.material.icons.rounded.Upgrade
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.MaterialShapes
+import androidx.compose.material3.toShape
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 import zed.rainxch.core.domain.model.installation.InstalledApp
-import zed.rainxch.core.presentation.components.chips.KomiChip
-import zed.rainxch.core.presentation.components.chips.KomiChipKind
-import zed.rainxch.core.presentation.components.chips.KomiChipSize
+import zed.rainxch.core.presentation.components.icon.KomiIcon
+import zed.rainxch.core.presentation.components.overlays.KomiTooltip
 import zed.rainxch.core.presentation.components.text.KomiText
 import zed.rainxch.core.presentation.components.text.KomiTextRole
 import zed.rainxch.core.presentation.locals.LocalPersonality
@@ -29,15 +35,33 @@ import zed.rainxch.githubstore.core.presentation.res.installed
 import zed.rainxch.githubstore.core.presentation.res.pending_install
 import zed.rainxch.githubstore.core.presentation.res.update_available
 
+// Classic's status: a burst on the picture's corner, its label in the tooltip and for screen readers.
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-internal fun StatusChip(status: HeaderStatus) {
-    KomiChip(
-        label = stringResource(status.label),
-        kind = KomiChipKind.Tonal,
-        size = KomiChipSize.Sm,
-        selected = status.emphasized,
-        leadingIcon = status.icon,
-    )
+internal fun StatusBadge(
+    status: HeaderStatus,
+    modifier: Modifier = Modifier,
+) {
+    val colors = LocalPersonality.current.colors
+    val label = stringResource(status.label)
+    val shape = MaterialShapes.SoftBurst.toShape()
+    KomiTooltip(text = label, modifier = modifier) {
+        Box(
+            modifier =
+                Modifier
+                    .size(30.dp)
+                    .shadow(elevation = 2.dp, shape = shape)
+                    .background(if (status.emphasized) colors.primary else colors.primaryContainer, shape),
+            contentAlignment = Alignment.Center,
+        ) {
+            KomiIcon(
+                imageVector = status.icon,
+                contentDescription = label,
+                tint = if (status.emphasized) colors.onPrimary else colors.onPrimaryContainer,
+                modifier = Modifier.size(16.dp),
+            )
+        }
+    }
 }
 
 @Composable

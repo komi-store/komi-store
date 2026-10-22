@@ -34,6 +34,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.semantics.selected
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
@@ -304,12 +306,12 @@ private fun ClassicTonalChip(
     modifier: Modifier = Modifier,
 ) {
     val colors = LocalPersonality.current.colors
-    val container = if (selected) colors.primaryContainer else colors.surfaceContainerHigh
+    val container = if (selected) colors.primaryContainer else colors.surface
     val content = if (selected) colors.onPrimaryContainer else colors.onSurfaceVariant
     AssistChip(
         onClick = onClick ?: {},
         label = { Text(text) },
-        modifier = modifier,
+        modifier = if (onClick != null) modifier.semantics { this.selected = selected } else modifier,
         leadingIcon = leading,
         colors =
             AssistChipDefaults.assistChipColors(

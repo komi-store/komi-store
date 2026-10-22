@@ -29,6 +29,16 @@ internal val MangaType =
                 letterSpacing = 0.01.em,
                 fontSynthesis = SingleWeight,
             ),
+        // Anton has no heavier weight, so the emphasized display is the display.
+        displayEmphasized =
+            TextStyle(
+                fontFamily = MangaDisplayFamily,
+                fontWeight = FontWeight.Normal,
+                fontSize = 32.sp,
+                lineHeight = 36.sp,
+                letterSpacing = 0.01.em,
+                fontSynthesis = SingleWeight,
+            ),
         screenTitle =
             TextStyle(
                 fontFamily = MangaDisplayFamily,

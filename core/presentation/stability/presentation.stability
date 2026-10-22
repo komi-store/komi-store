@@ -2166,6 +2166,14 @@ public fun zed.rainxch.core.presentation.personality.manga.withMangaFonts(script
     - script: STABLE (class with no mutable properties)
 
 @Composable
+public fun zed.rainxch.core.presentation.personality.utils.KomiSeededTheme(seed: androidx.compose.ui.graphics.Color?, content: @[Composable] androidx.compose.runtime.internal.ComposableFunction0<kotlin.Unit>): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - seed: STABLE (marked @Stable or @Immutable)
+    - content: STABLE (composable function type)
+
+@Composable
 public fun zed.rainxch.core.presentation.personality.utils.PersonalityPreview(personality: zed.rainxch.core.presentation.personality.Personality, content: @[Composable] androidx.compose.runtime.internal.ComposableFunction0<kotlin.Unit>): kotlin.Unit
   skippable: true
   restartable: true
@@ -2190,6 +2198,20 @@ public fun zed.rainxch.core.presentation.personality.utils.PersonalityTheme(pers
     - personality: UNKNOWN (interface or non-final class; concrete implementation unknown)
     - languageTag: STABLE (class with no mutable properties)
     - content: STABLE (composable function type)
+
+@Composable
+private fun zed.rainxch.core.presentation.personality.utils.animatedScheme(target: androidx.compose.material3.ColorScheme, spec: androidx.compose.animation.core.AnimationSpec<androidx.compose.ui.graphics.Color>): androidx.compose.material3.ColorScheme
+  skippable: false
+  restartable: false
+  params:
+    - target: STABLE (marked @Stable or @Immutable)
+    - spec: UNKNOWN (interface or non-final class; concrete implementation unknown)
+
+@Composable
+public fun zed.rainxch.core.presentation.personality.utils.animatedScheme.animated(): androidx.compose.ui.graphics.Color
+  skippable: false
+  restartable: false
+  params:
 
 @Composable
 public fun zed.rainxch.core.presentation.utils.ObserveAsEvents(flow: kotlinx.coroutines.flow.Flow<T of zed.rainxch.core.presentation.utils.ObserveAsEvents>, key1: kotlin.Any?, key2: kotlin.Any?, onEvent: kotlin.coroutines.SuspendFunction1<T of zed.rainxch.core.presentation.utils.ObserveAsEvents, kotlin.Unit>): kotlin.Unit
@@ -2308,6 +2330,14 @@ public fun zed.rainxch.core.presentation.utils.rememberDisplayModeOptions(): kot
   skippable: false
   restartable: false
   params:
+
+@Composable
+public fun zed.rainxch.core.presentation.utils.rememberIconSeedColor(packageName: kotlin.String?, imageUrl: kotlin.String?): androidx.compose.ui.graphics.Color?
+  skippable: false
+  restartable: false
+  params:
+    - packageName: STABLE (class with no mutable properties)
+    - imageUrl: STABLE (class with no mutable properties)
 
 @Composable
 public fun zed.rainxch.core.presentation.utils.rememberTapCooldown(duration: kotlin.time.Duration): zed.rainxch.core.presentation.utils.TapCooldown
