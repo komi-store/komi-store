@@ -171,13 +171,22 @@ private fun tileShape(
     first: Boolean,
     last: Boolean,
     inner: Dp,
-): Shape {
-    if (manga) return RectangleShape
-    if (isDevice) return RoundedCornerShape(PILL)
-    val start = if (first) PILL else inner
-    val end = if (last) PILL else inner
-    return RoundedCornerShape(topStart = start, bottomStart = start, topEnd = end, bottomEnd = end)
-}
+): Shape =
+    when {
+        manga -> {
+            RectangleShape
+        }
+
+        isDevice -> {
+            RoundedCornerShape(PILL)
+        }
+
+        else -> {
+            val start = if (first) PILL else inner
+            val end = if (last) PILL else inner
+            RoundedCornerShape(topStart = start, bottomStart = start, topEnd = end, bottomEnd = end)
+        }
+    }
 
 private fun platformTileColors(
     colors: PersonalityColors,
