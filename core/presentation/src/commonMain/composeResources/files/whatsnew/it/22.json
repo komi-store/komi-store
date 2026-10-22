@@ -1,0 +1,34 @@
+{
+  "versionCode": 22,
+  "versionName": "1.9.3",
+  "releaseDate": "2026-10-22",
+  "showAsSheet": true,
+  "sections": [
+    {
+      "type": "NEW",
+      "bullets": [
+        "Classic è stato ricostruito con Material 3 Expressive: colori dello sfondo su Android 12+ e pagine delle app nei colori dell'icona di ciascuna app.",
+        "I download riprendono dopo un'interruzione, continuano in background e si possono mettere in pausa senza eliminarli.",
+        "Installa e segui più app pubblicate dallo stesso repository, raggruppate nella tua Libreria.",
+        "Passa gli APK a un installer di terze parti come InstallerX, scegli la frequenza di aggiornamento dello schermo e trova il mirror più veloce dal tuo dispositivo.",
+        "Il cinese tradizionale (繁體中文) è ora disponibile in Modifiche → Lingua."
+      ]
+    },
+    {
+      "type": "IMPROVED",
+      "bullets": [
+        "Le pagine delle app si aprono su una release installabile sul tuo dispositivo e mostrano tutte le piattaforme del progetto.",
+        "Esplora e Classifiche condividono un unico feed, con vista a elenco o a griglia in Modifiche; la ricerca si apre da entrambe.",
+        "I controlli degli aggiornamenti in background avvengono ogni 12 ore su Android 12+, con molte meno richieste."
+      ]
+    },
+    {
+      "type": "FIXED",
+      "bullets": [
+        "Gli aggiornamenti sono molto più precisi: le build nightly e ripubblicate vengono rilevate e un'app che usi già non viene più proposta.",
+        "Su desktop, l'aggiornamento non cancella più il database dell'app.",
+        "Un'installazione annullata non blocca più la successiva e l'installer predefinito si apre senza il selettore «Apri con»."
+      ]
+    }
+  ]
+}
