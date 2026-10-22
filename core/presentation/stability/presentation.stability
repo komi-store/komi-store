@@ -2200,20 +2200,6 @@ public fun zed.rainxch.core.presentation.personality.utils.PersonalityTheme(pers
     - content: STABLE (composable function type)
 
 @Composable
-private fun zed.rainxch.core.presentation.personality.utils.animatedScheme(target: androidx.compose.material3.ColorScheme, spec: androidx.compose.animation.core.AnimationSpec<androidx.compose.ui.graphics.Color>): androidx.compose.material3.ColorScheme
-  skippable: false
-  restartable: false
-  params:
-    - target: STABLE (marked @Stable or @Immutable)
-    - spec: UNKNOWN (interface or non-final class; concrete implementation unknown)
-
-@Composable
-public fun zed.rainxch.core.presentation.personality.utils.animatedScheme.animated(): androidx.compose.ui.graphics.Color
-  skippable: false
-  restartable: false
-  params:
-
-@Composable
 public fun zed.rainxch.core.presentation.utils.ObserveAsEvents(flow: kotlinx.coroutines.flow.Flow<T of zed.rainxch.core.presentation.utils.ObserveAsEvents>, key1: kotlin.Any?, key2: kotlin.Any?, onEvent: kotlin.coroutines.SuspendFunction1<T of zed.rainxch.core.presentation.utils.ObserveAsEvents, kotlin.Unit>): kotlin.Unit
   skippable: true
   restartable: true

@@ -74,10 +74,8 @@ import zed.rainxch.core.presentation.components.text.KomiTextRole
 import zed.rainxch.core.presentation.locals.LocalPersonality
 import zed.rainxch.core.presentation.personality.MangaPersonality
 import zed.rainxch.core.presentation.personality.manga.decoration.hardShadow
-import zed.rainxch.core.presentation.personality.utils.KomiSeededTheme
 import zed.rainxch.core.presentation.spacing.Spacing
 import zed.rainxch.core.presentation.utils.formatReleasedAgo
-import zed.rainxch.core.presentation.utils.rememberIconSeedColor
 import zed.rainxch.details.presentation.model.DownloadStage
 import zed.rainxch.githubstore.core.presentation.res.Res
 import zed.rainxch.githubstore.core.presentation.res.details_last_push
@@ -85,9 +83,9 @@ import zed.rainxch.githubstore.core.presentation.res.forked_repository
 import zed.rainxch.githubstore.core.presentation.res.no_description
 import zed.rainxch.githubstore.core.presentation.res.self_owned_badge
 
-// Classic tints the header card from the colors of the app's icon and badges the picture with the
-// install status; Manga inks it into a panel with the status as a sticker on its corner. Both share
-// the body below.
+// Classic sets the header on a tinted card (the page takes its colors from the app's icon, see
+// DetailsRoot) and badges the picture with the install status; Manga inks it into a panel with the
+// status as a sticker on its corner. Both share the body below.
 @Composable
 fun AppHeader(
     author: GithubUserProfile?,
@@ -155,22 +153,19 @@ fun AppHeader(
     }
     // Manga's sticker hangs off the panel's corner, so the panel leaves room for it.
     val stickerRoom = if (manga) Modifier.padding(top = Spacing.md, end = Spacing.sm) else Modifier
-    val seed = if (manga) null else rememberIconSeedColor(packageName = deviceApp?.packageName, imageUrl = avatarUrl)
-    KomiSeededTheme(seed = seed) {
-        Box(modifier = modifier.fillMaxWidth().then(stickerRoom)) {
-            KomiSurface(
-                modifier = Modifier.fillMaxWidth(),
-                paper = KomiSurfacePaper.Tinted,
-                screentone = KomiScreentone.Corner,
-                contentPadding = PaddingValues(Spacing.lg),
-                content = body,
+    Box(modifier = modifier.fillMaxWidth().then(stickerRoom)) {
+        KomiSurface(
+            modifier = Modifier.fillMaxWidth(),
+            paper = KomiSurfacePaper.Tinted,
+            screentone = KomiScreentone.Corner,
+            contentPadding = PaddingValues(Spacing.lg),
+            content = body,
+        )
+        if (manga && status != null) {
+            StatusSticker(
+                status = status,
+                modifier = Modifier.align(Alignment.TopEnd).offset(x = Spacing.sm, y = -Spacing.md),
             )
-            if (manga && status != null) {
-                StatusSticker(
-                    status = status,
-                    modifier = Modifier.align(Alignment.TopEnd).offset(x = Spacing.sm, y = -Spacing.md),
-                )
-            }
         }
     }
 }
