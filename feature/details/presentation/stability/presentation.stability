@@ -724,6 +724,15 @@ private fun zed.rainxch.details.presentation.components.sections.ReleaseHint(tex
     - emphasized: STABLE (primitive type)
 
 @Composable
+private fun zed.rainxch.details.presentation.components.sections.StatsGrid(repoStats: zed.rainxch.details.domain.model.RepoStats, onOpenIssues: kotlin.Function0<kotlin.Unit>?, onOpenSecurity: kotlin.Function0<kotlin.Unit>?): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - repoStats: UNSTABLE (cross-module type without @Stable/@Immutable)
+    - onOpenIssues: STABLE (function type)
+    - onOpenSecurity: STABLE (function type)
+
+@Composable
 private fun zed.rainxch.details.presentation.components.sections.rememberChipPulse(active: kotlin.Boolean): androidx.compose.runtime.State<kotlin.Float>
   skippable: false
   restartable: false

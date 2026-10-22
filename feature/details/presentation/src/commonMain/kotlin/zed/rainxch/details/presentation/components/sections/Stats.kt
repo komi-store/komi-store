@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -45,6 +46,17 @@ fun LazyListScope.stats(
             )
         }
 
+        StatsGrid(repoStats = repoStats, onOpenIssues = onOpenIssues, onOpenSecurity = onOpenSecurity)
+    }
+}
+
+@Composable
+private fun StatsGrid(
+    repoStats: RepoStats,
+    onOpenIssues: (() -> Unit)?,
+    onOpenSecurity: (() -> Unit)?,
+) {
+    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
         Row(
             modifier = Modifier.height(IntrinsicSize.Min),
             verticalAlignment = Alignment.CenterVertically,
@@ -67,9 +79,6 @@ fun LazyListScope.stats(
                 onClick = onOpenIssues,
             )
         }
-
-        Spacer(Modifier.height(10.dp))
-
         Row(
             modifier = Modifier.height(IntrinsicSize.Min),
             verticalAlignment = Alignment.CenterVertically,
