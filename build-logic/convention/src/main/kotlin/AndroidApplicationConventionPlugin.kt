@@ -10,8 +10,6 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
         with(target) {
             with(pluginManager) {
                 apply("com.android.application")
-                // android.builtInKotlin is off, so the app compiles Kotlin through KGP
-                apply("org.jetbrains.kotlin.android")
                 apply("zed.rainxch.convention.quality")
             }
 

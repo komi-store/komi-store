@@ -39,7 +39,7 @@ System interfaces with Android and Desktop implementations: `Installer`, `Instal
 
 ## Convention plugins (`build-logic/convention/`)
 
-`convention.kmp.library` (domain and data), `convention.cmp.library` (core/presentation and composeApp), `convention.cmp.feature` (feature presentation), `convention.android.application.compose` (androidApp), `convention.android.library` (core/data-aidl), `convention.room`, `convention.buildkonfig`, `convention.quality` (detekt and Kover, applied by the library and app conventions). The Compose conventions also apply the stability analyzer; Android Lint is configured in `configureKotlinAndroid`.
+`convention.kmp.library` (domain and data), `convention.cmp.library` (core/presentation and composeApp), `convention.cmp.feature` (feature presentation), `convention.android.application.compose` (androidApp), `convention.android.library` (core/data-aidl), `convention.room`, `convention.buildkonfig`, `convention.quality` (detekt and Kover, applied by the library and app conventions). The Compose conventions also apply the stability analyzer; KMP modules use the Android KMP library plugin (`com.android.kotlin.multiplatform.library`), configured in `configureAndroidTarget`; it creates lint tasks only because `com.android.lint` is applied as well, which also adds a `lintJvm` that CI doesn't run. Lint options are shared in `configureLint`.
 
 ## Adding a feature
 

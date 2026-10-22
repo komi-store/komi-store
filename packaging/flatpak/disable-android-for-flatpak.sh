@@ -43,6 +43,15 @@ import org.gradle.api.Project
 internal fun Project.configureKotlinAndroid(project: Project) {}
 KOTLIN
 
+cat > "$CONVENTION_DIR/zed/rainxch/githubstore/convention/KotlinAndroidTarget.kt" << 'KOTLIN'
+package zed.rainxch.githubstore.convention
+
+import org.gradle.api.Project
+
+// Stubbed out for Flatpak build — no Android SDK available
+internal fun Project.configureAndroidTarget() {}
+KOTLIN
+
 echo "[1/6] Patching root build.gradle.kts"
 sed -i \
     -e 's|alias(libs.plugins.android.application)|// alias(libs.plugins.android.application)|' \
@@ -103,10 +112,11 @@ KOTLIN
 
 echo "[3/6] Patching CmpLibraryConventionPlugin & CmpFeatureConventionPlugin"
 
-# CmpLibraryConventionPlugin — remove Android library dependency and debugImplementation
+# CmpLibraryConventionPlugin — remove the Android-only ui-tooling dependency
 sed -i \
     -e 's|apply("com.android.library")|// apply("com.android.library")|' \
     -e '/debugImplementation/d' \
+    -e '/androidRuntimeClasspath/d' \
     "$CONVENTION_DIR/CmpLibraryConventionPlugin.kt" 2>/dev/null || true
 
 sed -i \

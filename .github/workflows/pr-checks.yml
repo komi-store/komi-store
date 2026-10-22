@@ -33,7 +33,7 @@ jobs:
       - uses: gradle/actions/setup-gradle@3f5f9adaf7d9fecd50b5935e54106014257a94e6 # v6.4.0
 
       - name: Compile
-        run: ./gradlew compileKotlinJvm compileDebugKotlinAndroid :androidApp:compileDebugKotlin --continue
+        run: ./gradlew compileKotlinJvm compileAndroidMain :androidApp:compileDebugKotlin --continue
 
       - name: Unit tests and coverage
         run: ./gradlew jvmTest koverXmlReport koverHtmlReport --continue
@@ -84,11 +84,11 @@ jobs:
 
       - uses: gradle/actions/setup-gradle@3f5f9adaf7d9fecd50b5935e54106014257a94e6 # v6.4.0
 
-      - name: Compile Android debug
-        run: ./gradlew compileDebugKotlinAndroid
+      - name: Compile Android
+        run: ./gradlew compileAndroidMain
 
       - name: Stability check
-        run: ./gradlew debugStabilityCheck --continue
+        run: ./gradlew androidMainStabilityCheck --continue
 
   static:
     name: Spotless and detekt
@@ -153,11 +153,11 @@ jobs:
       - uses: gradle/actions/setup-gradle@3f5f9adaf7d9fecd50b5935e54106014257a94e6 # v6.4.0
 
       - name: Android Lint
-        run: ./gradlew lintDebug --continue
+        run: ./gradlew lintDebug lintAndroidMain --continue
 
       - name: Merge lint SARIF
         if: always()
-        run: python3 .github/scripts/merge_sarif.py '**/build/reports/lint-results-debug.sarif' lint.sarif
+        run: python3 .github/scripts/merge_sarif.py '**/build/reports/lint-results-*.sarif' lint.sarif
 
       - name: Upload lint SARIF
         if: always() && hashFiles('lint.sarif') != '' && (github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository)
@@ -171,7 +171,7 @@ jobs:
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: lint-reports
-          path: '**/build/reports/lint-results-debug.*'
+          path: '**/build/reports/lint-results-*.*'
           if-no-files-found: ignore
 
   agent-config:
