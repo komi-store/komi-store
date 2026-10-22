@@ -190,8 +190,7 @@ private fun platformTileColors(
         else -> colors.surface to colors.onSurfaceVariant
     }
 
-private fun platformVersion(release: GithubRelease): String =
-    VersionMath.normalizeVersion(release.tagName).ifBlank { release.tagName }
+private fun platformVersion(release: GithubRelease): String = VersionMath.normalizeVersion(release.tagName).ifBlank { release.tagName }
 
 private const val STALE_PLATFORM_DAYS = 365
 private const val DEVICE_TILE_WEIGHT = 1.25f
