@@ -345,6 +345,7 @@ class DetailsRepositoryImpl(
         return if (cached != null && cachedAt != null) CachedReleases(cached, cachedAt) else null
     }
 
+    @Suppress("LongMethod", "CyclomaticComplexMethod", "ReturnCount")
     override suspend fun getAllReleases(
         owner: String,
         repo: String,
@@ -398,6 +399,12 @@ class DetailsRepositoryImpl(
                         }.sortedByDescending { it.publishedAt }
                 if (result.isNotEmpty()) {
                     cacheManager.put(cacheKey, result, RELEASES)
+                    return result
+                }
+                // An empty backend answer can be a stale/empty mirror, not proof that the
+                // repository has no releases. Try the host directly before showing EMPTY.
+                if (!triedDirect) {
+                    readDirectWhenBackendEmpty(owner, repo, defaultBranch, cacheKey, allowStale)?.let { return it }
                 }
                 return result
             },
@@ -417,6 +424,22 @@ class DetailsRepositoryImpl(
 
         return readReleasesFromGitHub(owner, repo, defaultBranch, cacheKey, allowStale)
     }
+
+    private suspend fun readDirectWhenBackendEmpty(
+        owner: String,
+        repo: String,
+        defaultBranch: String,
+        cacheKey: String,
+        allowStale: Boolean,
+    ): List<GithubRelease>? =
+        try {
+            readReleasesFromGitHub(owner, repo, defaultBranch, cacheKey, allowStale).takeIf { it.isNotEmpty() }
+        } catch (e: CancellationException) {
+            throw e
+        } catch (t: Throwable) {
+            logger.debug("Direct releases read failed for empty backend $owner/$repo: ${t.message}")
+            null
+        }
 
     private suspend fun readReleasesFromGitHub(
         owner: String,
