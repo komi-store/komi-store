@@ -64,7 +64,7 @@ The manifest uses pre-computed SHA256 hashes. To verify or update them:
 
 ```bash
 # Gradle distribution
-curl -sL https://services.gradle.org/distributions/gradle-9.6.0-bin.zip | sha256sum
+curl -sL https://services.gradle.org/distributions/gradle-9.8.1-bin.zip | sha256sum
 
 # JBR x64 (check latest at https://github.com/JetBrains/JetBrainsRuntime/releases)
 curl -sL https://cache-redirector.jetbrains.com/intellij-jbr/jbr-21.0.10-linux-x64-b1163.105.tar.gz | sha256sum

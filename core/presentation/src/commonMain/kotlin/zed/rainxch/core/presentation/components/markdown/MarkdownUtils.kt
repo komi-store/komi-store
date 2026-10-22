@@ -21,6 +21,8 @@ fun rememberMarkdownColors(): MarkdownColors {
         inlineCodeBackground = colorScheme.surfaceContainerHigh,
         dividerColor = colorScheme.outlineVariant,
         tableBackground = colorScheme.surface,
+        highlightText = colorScheme.onSecondaryContainer,
+        highlightBackground = colorScheme.secondaryContainer,
     )
 }
 

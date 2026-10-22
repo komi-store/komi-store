@@ -35,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.intellij.markdown.flavours.gfm.GFMFlavourDescriptor
+import org.intellij.markdown.parser.CancellationToken
 import org.intellij.markdown.parser.MarkdownParser
 import org.jetbrains.compose.resources.stringResource
 import zed.rainxch.core.domain.model.account.github.GithubRelease
@@ -149,7 +150,7 @@ private fun ExpandableMarkdownContent(
     val colors = rememberMarkdownColors()
     val typography = rememberMarkdownTypography()
     val flavour = remember { GFMFlavourDescriptor() }
-    val parser = remember(flavour) { MarkdownParser(flavour) }
+    val parser = remember(flavour) { MarkdownParser(flavour, cancellationToken = CancellationToken.NonCancellable) }
     val probeClient = org.koin.compose.koinInject<io.ktor.client.HttpClient>(
         qualifier = org.koin.core.qualifier.named("test"),
     )

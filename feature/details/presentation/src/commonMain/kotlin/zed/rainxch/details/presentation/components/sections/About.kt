@@ -30,6 +30,7 @@ import com.mikepenz.markdown.model.rememberMarkdownState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.intellij.markdown.flavours.gfm.GFMFlavourDescriptor
+import org.intellij.markdown.parser.CancellationToken
 import org.intellij.markdown.parser.MarkdownParser
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
@@ -142,7 +143,7 @@ fun MarkdownContent(
     }
 
     val flavour = remember { GFMFlavourDescriptor() }
-    val parser = remember(flavour) { MarkdownParser(flavour) }
+    val parser = remember(flavour) { MarkdownParser(flavour, cancellationToken = CancellationToken.NonCancellable) }
     val components = remember(isDark, imageTransformer) {
         githubStoreMarkdownComponents(imageTransformer, isDark)
     }
