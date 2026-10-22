@@ -9,7 +9,7 @@ androidDesugarJdkLibs = "2.1.5"
 androidTools = "32.0.1"
 
 # Compose
-compose-hot-reload = "1.0.0"
+compose-hot-reload = "1.2.0"
 compose-multiplatform = "1.12.2"
 compose-lifecycle = "2.11.0"
 navigation-compose = "2.9.2"
@@ -27,10 +27,10 @@ androidx-test-uiautomator = "2.4.0"
 compose-ui-test = "1.12.1"
 
 # Kotlinx
-kotlinx-coroutines = "1.10.2"
-kotlinx-serialization = "1.10.0"
-kotlinx-datetime = "0.7.1"
-kotlinx-collections-immutable = "0.4.0"
+kotlinx-coroutines = "1.11.0"
+kotlinx-serialization = "1.11.0"
+kotlinx-datetime = "0.8.0"
+kotlinx-collections-immutable = "0.5.2"
 
 # Third party
 koin = "4.2.2"

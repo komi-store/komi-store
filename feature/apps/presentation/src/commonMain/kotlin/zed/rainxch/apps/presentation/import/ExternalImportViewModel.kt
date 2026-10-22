@@ -193,9 +193,9 @@ class ExternalImportViewModel(
         _state.update { current ->
             val nextSet =
                 if (packageName in current.expandedPackages) {
-                    current.expandedPackages.toPersistentSet().remove(packageName)
+                    current.expandedPackages.toPersistentSet().removing(packageName)
                 } else {
-                    current.expandedPackages.toPersistentSet().add(packageName)
+                    current.expandedPackages.toPersistentSet().adding(packageName)
                 }
 
             val keepSearch = current.activeSearchPackage == packageName && packageName in nextSet
@@ -932,7 +932,7 @@ class ExternalImportViewModel(
             val tallied =
                 tally(current).copy(
                     cards = newCards,
-                    expandedPackages = current.expandedPackages.toPersistentSet().remove(packageName),
+                    expandedPackages = current.expandedPackages.toPersistentSet().removing(packageName),
                     activeSearchPackage = if (current.activeSearchPackage == packageName) null else current.activeSearchPackage,
                     searchQuery = if (current.activeSearchPackage == packageName) "" else current.searchQuery,
                     searchResults = if (current.activeSearchPackage == packageName) persistentListOf() else current.searchResults,
