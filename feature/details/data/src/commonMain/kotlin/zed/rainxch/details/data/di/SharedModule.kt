@@ -45,6 +45,7 @@ val detailsModule =
                 installedAppsRepository = get(),
                 favouritesRepository = get(),
                 tweaksRepository = get(),
+                packageMonitor = get(),
                 logger = get(),
             )
         }
