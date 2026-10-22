@@ -928,6 +928,12 @@
     <string name="dhizuku_start_hint">নীরব ইনস্টল চালু করতে Dhizuku-কে Device Owner হিসেবে সক্রিয় করুন</string>
     <string name="installer_type_root">Root</string>
     <string name="installer_type_root_description">Magisk, KernelSU বা APatch root দিয়ে নীরব ইনস্টল</string>
+    <string name="installer_type_third_party">থার্ড-পার্টি ইনস্টলার</string>
+    <string name="installer_type_third_party_description">সিস্টেমের ডিফল্টের বদলে আপনার বেছে নেওয়া ইনস্টলার অ্যাপে APK পাঠান।</string>
+    <string name="external_installer_pick">ইনস্টলার অ্যাপ</string>
+    <string name="external_installer_none">নির্বাচিত নয়</string>
+    <string name="external_installer_sheet_title">যে অ্যাপগুলো APK ইনস্টল করতে পারে</string>
+    <string name="external_installer_empty">এই ডিভাইসে কোনো ইনস্টলার অ্যাপ পাওয়া যায়নি।</string>
     <string name="root_status_ready">অনুমোদিত</string>
     <string name="root_status_permission_needed">Root অনুমতি দিন</string>
     <string name="root_status_unavailable">Root নেই</string>
@@ -1061,10 +1067,6 @@
     <string name="platform_section_linux">Linux</string>
     <string name="section_chip_your_device">আপনার ডিভাইস</string>
     <string name="section_chip_for_transfer">ট্রান্সফারের জন্য</string>
-    <string name="kao_banner_title">Android-কে উন্মুক্ত রাখুন</string>
-    <string name="kao_banner_body">Google-এর ডেভেলপার-যাচাইকরণ নীতি উন্মুক্ত Android বিতরণকে হুমকির মুখে ফেলেছে। Komi Store কোয়ালিশনের পাশে।</string>
-    <string name="kao_banner_cta">আরও জানুন</string>
-    <string name="kao_banner_dismiss_cd">ব্যানার বন্ধ করুন</string>
 
     <!-- Added: parity with English source -->
     <plurals name="custom_forges_count">
@@ -1398,8 +1400,8 @@
     <string name="repo_pages_severity_unknown">অজানা</string>
 
     <!-- Repo pages: details entry -->
-    <string name="repo_pages_details_issues_button">ইস্যু</string>
     <string name="repo_pages_details_security_button">সুরক্ষা</string>
+    <string name="repo_pages_details_security_value">পরামর্শ</string>
 
     <!-- Repo pages: details entry -->
     <string name="repo_pages_details_pulls_button">পুল রিকোয়েস্ট</string>
@@ -1489,4 +1491,17 @@
     <string name="go_to_version">%1$s-এ যান</string>
     <string name="get_it_on_platform">%1$s-এর জন্য নিন</string>
     <string name="share_link">লিংক শেয়ার করুন</string>
+    <string name="display_mode_title">রিফ্রেশ রেট</string>
+    <string name="display_mode_description">ডিসপ্লে থেকে নির্দিষ্ট রিফ্রেশ রেট চায়। স্বয়ংক্রিয় হলে সিস্টেমই সিদ্ধান্ত নেয়।</string>
+    <string name="display_mode_auto">স্বয়ংক্রিয়</string>
+    <string name="display_mode_option">%1$d × %2$d · %3$d Hz</string>
+    <string name="show_tabs">ট্যাব দেখান</string>
+    <string name="repo_layout_title">রিপোজিটরি লেআউট</string>
+    <string name="repo_layout_list">তালিকা</string>
+    <string name="repo_layout_grid">গ্রিড</string>
+    <string name="apps_tag_updates_ignored">আপডেট উপেক্ষা করা হয়েছে</string>
+    <string name="apps_tag_skipped">%1$s এড়িয়ে যাওয়া হয়েছে</string>
+    <string name="apps_tag_asset_filter">অ্যাসেট ফিল্টার</string>
+    <string name="apps_variant_stale_pick">ভ্যারিয়েন্ট পরিবর্তিত হয়েছে। আবার নির্বাচন করুন।</string>
+    <string name="apps_no_release_found">ইনস্টল করার জন্য কোনো রিলিজ পাওয়া যায়নি।</string>
 </resources>

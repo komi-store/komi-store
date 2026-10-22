@@ -4,19 +4,16 @@ import androidx.room.immediateTransaction
 import androidx.room.useWriterConnection
 import co.touchlab.kermit.Logger
 import io.ktor.client.HttpClient
-import io.ktor.client.request.get
-import io.ktor.client.request.header
-import io.ktor.client.request.parameter
-import io.ktor.http.HttpHeaders
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import zed.rainxch.core.data.dto.ReleaseNetwork
 import zed.rainxch.core.data.local.db.AppDatabase
 import zed.rainxch.core.data.local.db.dao.InstalledAppDao
 import zed.rainxch.core.data.local.db.dao.UpdateHistoryDao
+import zed.rainxch.core.data.local.db.dao.adoptMatchedTag
+import zed.rainxch.core.data.local.db.dao.recordUnmatchedRelease
 import zed.rainxch.core.data.local.db.entities.InstalledAppEntity
 import zed.rainxch.core.data.local.db.entities.UpdateHistoryEntity
 import zed.rainxch.core.data.mappers.toDomain
@@ -24,9 +21,7 @@ import zed.rainxch.core.data.mappers.toEntity
 import zed.rainxch.core.data.mappers.toReleaseWindow
 import zed.rainxch.core.data.mappers.toUpdateCheckWindow
 import zed.rainxch.core.data.network.GitHubClientProvider
-import zed.rainxch.core.data.network.executeRequest
 import zed.rainxch.core.domain.model.account.github.GithubRelease
-import zed.rainxch.core.domain.model.account.github.isEffectivelyPreRelease
 import zed.rainxch.core.domain.model.installation.InstallSource
 import zed.rainxch.core.domain.model.installation.InstalledApp
 import zed.rainxch.core.domain.model.installation.ParkedInstallDisposal
@@ -57,6 +52,14 @@ class InstalledAppsRepositoryImpl(
     private val packageMonitor: PackageMonitor,
     private val digestVerifier: DigestVerifier,
 ) : InstalledAppsRepository {
+    private val parkedInstallSettler =
+        ParkedInstallSettler(
+            dao = installedAppsDao,
+            packageMonitor = packageMonitor,
+            digestVerifier = digestVerifier,
+            discard = { packageName, path -> discardParkedInstall(packageName, path) },
+        )
+
     private val checkAllMutex = Mutex()
 
     private val httpClient: HttpClient get() = clientProvider.client
@@ -135,40 +138,7 @@ class InstalledAppsRepositoryImpl(
             return backendReleases.toReleaseWindow(includePreReleases)
         }
 
-        return try {
-            val releases =
-                httpClient
-                    .executeRequest<List<ReleaseNetwork>> {
-                        get("/repos/$owner/$repo/releases") {
-                            header(HttpHeaders.Accept, "application/vnd.github+json")
-                            parameter("per_page", RELEASE_WINDOW)
-                        }
-                    }.getOrNull() ?: return emptyList()
-
-            releases
-                .asSequence()
-                .filter { it.draft != true }
-                .sortedByDescending { it.publishedAt ?: it.createdAt ?: "" }
-                .map { it.toDomain() }
-                .onEach { release ->
-                    val flagSays = release.isPrerelease
-                    val tagSays = VersionMath.isPreReleaseTag(release.tagName)
-                    if (flagSays != tagSays) {
-                        Logger.w {
-                            "Pre-release flag/tag mismatch for $owner/$repo " +
-                                "release '${release.tagName}' (name='${release.name}'): " +
-                                "apiFlag=$flagSays, tagMarker=$tagSays — " +
-                                "treating as pre-release=${true}"
-                        }
-                    }
-                }.filter { includePreReleases || !it.isEffectivelyPreRelease() }
-                .toList()
-        } catch (e: CancellationException) {
-            throw e
-        } catch (e: Exception) {
-            Logger.e { "Failed to fetch releases for $owner/$repo: ${e.message}" }
-            emptyList()
-        }
+        return fetchGithubReleaseWindow(httpClient, owner, repo, includePreReleases, RELEASE_WINDOW)
     }
 
     private suspend fun resolveTrackedReleaseFor(
@@ -201,24 +171,6 @@ class InstalledAppsRepositoryImpl(
         )
     }
 
-    private suspend fun recordUnmatchedRelease(packageName: String) {
-        installedAppsDao.clearUpdateFlagKeepBaseline(packageName, System.currentTimeMillis())
-    }
-
-    private suspend fun adoptMatchedTag(
-        app: InstalledAppEntity,
-        matchedTag: String,
-        isUpdateAvailable: Boolean,
-    ) {
-        installedAppsDao.updateInstalledVersion(
-            packageName = app.packageName,
-            installedVersion = matchedTag,
-            installedVersionName = app.installedVersionName,
-            installedVersionCode = app.installedVersionCode,
-            isUpdateAvailable = isUpdateAvailable,
-        )
-    }
-
     override suspend fun checkForUpdates(packageName: String): Boolean =
         checkEnabledApp(packageName, recordUnmatched = true) { app ->
             fetchReleaseWindow(
@@ -242,8 +194,9 @@ class InstalledAppsRepositoryImpl(
         recordUnmatched: Boolean,
         window: suspend (InstalledAppEntity) -> List<GithubRelease>,
     ): Boolean {
-        val app = installedAppsDao.getAppByPackage(packageName) ?: return false
-        if (!app.updateCheckEnabled) return false
+        val stored = installedAppsDao.getAppByPackage(packageName) ?: return false
+        if (!stored.updateCheckEnabled) return false
+        val app = parkedInstallSettler.settleIfInstalled(stored)
         val releases =
             try {
                 window(app)
@@ -281,25 +234,22 @@ class InstalledAppsRepositoryImpl(
                         "filter=${app.assetFilterRegex}, fallback=${app.fallbackToOlderReleases}"
                 }
                 if (!recordUnmatched) return app.isUpdateAvailable
-                recordUnmatchedRelease(packageName)
+                installedAppsDao.recordUnmatchedRelease(packageName)
                 return false
             }
 
             val (matchedRelease, primaryAsset, variantWasLost) = resolved
 
             val bound =
-                if (app.installedAssetId != null || app.installedAssetDigest != null) {
-                    UpdateVerdict.Bound(
-                        assetId = app.installedAssetId,
-                        assetDigest = app.installedAssetDigest,
-                        releasePublishedAt =
-                            app.installedReleaseId?.let { id ->
-                                releases.firstOrNull { it.id == id }?.publishedAt
-                            },
-                    )
-                } else {
-                    null
-                }
+                resolveInstalledBinding(
+                    app = app,
+                    releases = releases,
+                    matchedRelease = matchedRelease,
+                    matchedAsset = primaryAsset,
+                    dao = installedAppsDao,
+                    packageMonitor = packageMonitor,
+                    verifier = digestVerifier,
+                )
 
             // A rolling tag reuses one tag string across builds. Without a binding, only the
             // installed file can tell whether the release is the build the device runs.
@@ -398,7 +348,7 @@ class InstalledAppsRepositoryImpl(
                     deviceRunsMatchedRelease = verdict.deviceRunsMatchedRelease,
                 )
             if (shouldRewriteTag) {
-                adoptMatchedTag(
+                installedAppsDao.adoptMatchedTag(
                     app = app,
                     matchedTag = matchedRelease.tagName,
                     isUpdateAvailable = isUpdateAvailable,
@@ -423,13 +373,14 @@ class InstalledAppsRepositoryImpl(
     override suspend fun resolveTrackedRelease(packageName: String): ResolvedRelease? {
         val app = installedAppsDao.getAppByPackage(packageName) ?: return null
 
+        // The dead URL came from the backend's stale release copy, so the fallback must read the
+        // host itself instead of asking the same backend again.
         val releases =
-            fetchReleaseWindow(
-                owner = app.repoOwner,
-                repo = app.repoName,
-                includePreReleases = app.includePreReleases,
-                sourceHost = app.sourceHost,
-            )
+            if (app.sourceHost != null) {
+                fetchForgejoReleaseWindow(app.sourceHost, app.repoOwner, app.repoName, app.includePreReleases)
+            } else {
+                fetchGithubReleaseWindow(httpClient, app.repoOwner, app.repoName, app.includePreReleases, RELEASE_WINDOW)
+            }
 
         if (releases.isEmpty()) return null
 
@@ -465,6 +416,7 @@ class InstalledAppsRepositoryImpl(
         newReleaseId: Long?,
         newAssetId: Long?,
         newAssetDigest: String?,
+        newReleasePublishedAt: String?,
         newAssetName: String?,
         newAssetUrl: String?,
         newVersionName: String,
@@ -500,6 +452,7 @@ class InstalledAppsRepositoryImpl(
                     releaseId = newReleaseId,
                     assetId = newAssetId,
                     assetDigest = newAssetDigest,
+                    releasePublishedAt = newReleasePublishedAt,
                     assetName = newAssetName,
                     assetUrl = newAssetUrl,
                     versionName = newVersionName,
@@ -549,6 +502,7 @@ class InstalledAppsRepositoryImpl(
                             releaseId = app.latestReleaseId,
                             assetId = app.latestAssetId,
                             assetDigest = app.latestAssetDigest,
+                            releasePublishedAt = app.latestReleasePublishedAt,
                         )
                     } else {
                         it.clearPending()
@@ -682,12 +636,20 @@ class InstalledAppsRepositoryImpl(
         path: String,
         version: String?,
         assetName: String?,
+        releaseId: Long?,
+        assetId: Long?,
+        releasePublishedAt: String?,
+        assetDigest: String?,
     ) {
         installedAppsDao.markAwaitingInstall(
             packageName = packageName,
             path = path,
             version = version,
             assetName = assetName,
+            releaseId = releaseId,
+            assetId = assetId,
+            releasePublishedAt = releasePublishedAt,
+            digest = assetDigest,
         )
     }
 

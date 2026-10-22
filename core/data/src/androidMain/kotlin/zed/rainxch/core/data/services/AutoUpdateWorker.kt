@@ -61,6 +61,10 @@ class AutoUpdateWorker(
 
             val silentReady =
                 when (installerType) {
+                    InstallerType.THIRD_PARTY -> {
+                        false
+                    }
+
                     InstallerType.SHIZUKU -> {
                         shizukuServiceManager.refreshStatus()
                         shizukuServiceManager.status.value == ShizukuStatus.READY
@@ -217,6 +221,7 @@ class AutoUpdateWorker(
                         releaseId = currentApp.latestReleaseId,
                         assetId = currentApp.latestAssetId,
                         assetDigest = currentApp.latestAssetDigest,
+                        releasePublishedAt = currentApp.latestReleasePublishedAt,
                     ).withLatestSnapshot(
                         version = latestVersion,
                         assetName = assetName,

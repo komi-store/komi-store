@@ -92,6 +92,9 @@ class DefaultDownloadOrchestratorParkTest {
             assertEquals(parkedPath, write.path)
             assertEquals("v3.4.1", write.version)
             assertEquals("joplin-3.4.1.apk", write.assetName)
+            assertEquals(null, write.releaseId)
+            assertEquals(42L, write.assetId)
+            assertEquals(null, write.releasePublishedAt)
 
             assertTrue(
                 repository.pendingInstallFilePathWrites.isEmpty(),
@@ -253,11 +256,85 @@ class DefaultDownloadOrchestratorParkTest {
         const val AWAIT_PARK_MS = 10_000L
     }
 
+    private fun trackedApp(
+        latestReleaseId: Long,
+        latestReleasePublishedAt: String,
+    ): InstalledApp =
+        InstalledApp(
+            packageName = "net.cozic.joplin",
+            repoId = 1L,
+            repoName = "joplin",
+            repoOwner = "laurent22",
+            repoOwnerAvatarUrl = "",
+            repoDescription = null,
+            primaryLanguage = null,
+            repoUrl = "",
+            installedVersion = "v3.4.1",
+            installedAssetName = "joplin-3.4.1.apk",
+            installedAssetUrl = "",
+            latestVersion = "v3.4.1",
+            latestAssetName = "joplin-3.4.1.apk",
+            latestAssetUrl = "",
+            latestAssetSize = 1_000L,
+            latestReleaseId = latestReleaseId,
+            latestReleasePublishedAt = latestReleasePublishedAt,
+            appName = "Joplin",
+            installSource = InstallSource.THIS_APP,
+            installedAt = 0L,
+            lastCheckedAt = 0L,
+            lastUpdatedAt = 0L,
+            isUpdateAvailable = false,
+            signingFingerprint = null,
+            systemArchitecture = "arm64-v8a",
+            fileExtension = "apk",
+        )
+
+    @Test
+    fun a_park_records_the_timestamp_of_the_release_it_downloaded() =
+        runBlocking {
+            val repository = RecordingInstalledAppsRepository()
+            repository.tracked =
+                trackedApp(
+                    latestReleaseId = 99L,
+                    latestReleasePublishedAt = "2026-10-01T00:00:00Z",
+                )
+            val orchestrator = orchestrator(repository, scope = this)
+
+            orchestrator.enqueue(spec(InstallPolicy.InstallWhileForeground).copy(releaseId = 99L))
+            withTimeout(AWAIT_PARK_MS) { repository.parked.await() }
+
+            val write = repository.awaitingInstallWrites.single()
+            assertEquals(99L, write.releaseId)
+            assertEquals("2026-10-01T00:00:00Z", write.releasePublishedAt)
+        }
+
+    @Test
+    fun a_park_does_not_borrow_the_timestamp_of_a_different_release() =
+        runBlocking {
+            val repository = RecordingInstalledAppsRepository()
+            repository.tracked =
+                trackedApp(
+                    latestReleaseId = 100L,
+                    latestReleasePublishedAt = "2026-10-02T00:00:00Z",
+                )
+            val orchestrator = orchestrator(repository, scope = this)
+
+            orchestrator.enqueue(spec(InstallPolicy.InstallWhileForeground).copy(releaseId = 99L))
+            withTimeout(AWAIT_PARK_MS) { repository.parked.await() }
+
+            val write = repository.awaitingInstallWrites.single()
+            assertEquals(99L, write.releaseId)
+            assertEquals(null, write.releasePublishedAt)
+        }
+
     private data class ParkWrite(
         val packageName: String,
         val path: String,
         val version: String?,
         val assetName: String?,
+        val releaseId: Long?,
+        val assetId: Long?,
+        val releasePublishedAt: String?,
     )
 
     private class RecordingInstalledAppsRepository : InstalledAppsRepository {
@@ -280,8 +357,21 @@ class DefaultDownloadOrchestratorParkTest {
             path: String,
             version: String?,
             assetName: String?,
+            releaseId: Long?,
+            assetId: Long?,
+            releasePublishedAt: String?,
+            assetDigest: String?,
         ) {
-            awaitingInstallWrites += ParkWrite(packageName, path, version, assetName)
+            awaitingInstallWrites +=
+                ParkWrite(
+                    packageName = packageName,
+                    path = path,
+                    version = version,
+                    assetName = assetName,
+                    releaseId = releaseId,
+                    assetId = assetId,
+                    releasePublishedAt = releasePublishedAt,
+                )
             parked.complete(Unit)
         }
 
@@ -338,6 +428,7 @@ class DefaultDownloadOrchestratorParkTest {
             newReleaseId: Long?,
             newAssetId: Long?,
             newAssetDigest: String?,
+            newReleasePublishedAt: String?,
             newAssetName: String?,
             newAssetUrl: String?,
             newVersionName: String,
@@ -523,6 +614,8 @@ class DefaultDownloadOrchestratorParkTest {
         ) = Unit
 
         override fun markCompleted(packageName: String) = Unit
+
+        override fun onAppResumed() = Unit
     }
 
     private object NoOpInstallerInfoExtractor : InstallerInfoExtractor {
@@ -552,6 +645,8 @@ class DefaultDownloadOrchestratorParkTest {
         ) = error("parkForUser must not serialize an install")
 
         override fun markCompleted(packageName: String) = Unit
+
+        override fun onAppResumed() = Unit
     }
 
     private object FakeTokenStore : TokenStore {

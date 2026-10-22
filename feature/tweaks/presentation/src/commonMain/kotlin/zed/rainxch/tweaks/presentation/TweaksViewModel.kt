@@ -2,6 +2,7 @@ package zed.rainxch.tweaks.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.collections.immutable.toImmutableMap
 import kotlinx.collections.immutable.toImmutableSet
 import kotlinx.coroutines.CancellationException
@@ -22,12 +23,14 @@ import kotlinx.coroutines.withTimeoutOrNull
 import org.jetbrains.compose.resources.getString
 import zed.rainxch.core.domain.isDesktop
 import zed.rainxch.core.domain.logging.KomiStoreLogger
+import zed.rainxch.core.domain.model.installation.InstallerType
 import zed.rainxch.core.domain.model.settings.ProxyConfig
 import zed.rainxch.core.domain.model.settings.ProxyScope
 import zed.rainxch.core.domain.model.settings.TranslationProvider
 import zed.rainxch.core.domain.network.ProxyTestOutcome
 import zed.rainxch.core.domain.network.ProxyTester
 import zed.rainxch.core.domain.repository.CacheRepository
+import zed.rainxch.core.domain.repository.ExternalInstallerRepository
 import zed.rainxch.core.domain.repository.ProxyRepository
 import zed.rainxch.core.domain.repository.SeenReposRepository
 import zed.rainxch.core.domain.repository.TweaksRepository
@@ -56,8 +59,10 @@ import zed.rainxch.tweaks.presentation.model.ProxyType
 import zed.rainxch.tweaks.presentation.utils.TweaksDeepLinkBus
 import kotlin.time.Duration.Companion.milliseconds
 
+@Suppress("LongParameterList")
 class TweaksViewModel(
     private val tweaksRepository: TweaksRepository,
+    private val externalInstallerRepository: ExternalInstallerRepository,
     private val appVersionInfo: AppVersionInfo,
     private val installerStatusProvider: InstallerStatusProvider,
     private val proxyRepository: ProxyRepository,
@@ -106,6 +111,7 @@ class TweaksViewModel(
                     loadHideSeenEnabled()
                     loadScrollbarEnabled()
                     loadContentWidth()
+                    loadDisplayModeId()
                     loadTranslationSettings()
                     loadAppLanguage()
                     loadAutoTranslate()
@@ -326,11 +332,18 @@ class TweaksViewModel(
 
     private fun loadInstallerPreference() {
         viewModelScope.launch {
-            tweaksRepository.getInstallerType().collect { type ->
-                _state.update {
-                    it.copy(installerType = type)
-                }
+            tweaksRepository.getExternalInstallerPackage().collect { packageName ->
+                _state.update { it.copy(externalInstallerPackage = packageName) }
             }
+        }
+        viewModelScope.launch {
+            tweaksRepository.getInstallerType().collect { type ->
+                _state.update { it.copy(installerType = type) }
+            }
+        }
+        viewModelScope.launch {
+            val installers = externalInstallerRepository.listInstallers()
+            _state.update { it.copy(externalInstallers = installers.toImmutableList()) }
         }
     }
 
@@ -467,6 +480,14 @@ class TweaksViewModel(
         viewModelScope.launch {
             tweaksRepository.getContentWidth().collect { width ->
                 _state.update { it.copy(contentWidth = width) }
+            }
+        }
+    }
+
+    private fun loadDisplayModeId() {
+        viewModelScope.launch {
+            tweaksRepository.getDisplayModeId().collect { modeId ->
+                _state.update { it.copy(displayModeId = modeId) }
             }
         }
     }
@@ -643,6 +664,12 @@ class TweaksViewModel(
                 }
             }
 
+            is TweaksAction.OnDisplayModeSelected -> {
+                viewModelScope.launch {
+                    tweaksRepository.setDisplayModeId(action.modeId)
+                }
+            }
+
             is TweaksAction.OnProxyTypeSelected -> {
                 mutateForm(action.scope) { it.copy(type = action.type) }
 
@@ -785,9 +812,29 @@ class TweaksViewModel(
                 }
             }
 
+            is TweaksAction.OnExternalInstallerPickerOpenChanged -> {
+                _state.update { it.copy(externalInstallerPickerOpen = action.open) }
+                if (action.open) {
+                    viewModelScope.launch {
+                        val installers = externalInstallerRepository.listInstallers()
+                        _state.update { it.copy(externalInstallers = installers.toImmutableList()) }
+                    }
+                }
+            }
+
+            is TweaksAction.OnExternalInstallerSelected -> {
+                viewModelScope.launch {
+                    tweaksRepository.setExternalInstallerPackage(action.packageName)
+                    _state.update { it.copy(externalInstallerPickerOpen = false) }
+                }
+            }
+
             is TweaksAction.OnInstallerTypeSelected -> {
                 viewModelScope.launch {
                     tweaksRepository.setInstallerType(action.type)
+                }
+                if (action.type == InstallerType.THIRD_PARTY && _state.value.externalInstallerPackage.isBlank()) {
+                    onAction(TweaksAction.OnExternalInstallerPickerOpenChanged(true))
                 }
             }
 

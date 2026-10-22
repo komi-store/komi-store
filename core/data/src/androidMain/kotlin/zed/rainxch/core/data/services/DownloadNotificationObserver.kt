@@ -15,6 +15,7 @@ import zed.rainxch.core.domain.system.OrchestratedDownload
 class DownloadNotificationObserver(
     private val orchestrator: DownloadOrchestrator,
     private val notifier: DownloadProgressNotifier,
+    private val foregroundController: DownloadForegroundController,
 ) {
     @Volatile
     private var job: Job? = null
@@ -81,6 +82,20 @@ class DownloadNotificationObserver(
                 }
             }
             lastStages[pkg] = entry.stage
+        }
+
+        updateForeground(snapshot)
+    }
+
+    private fun updateForeground(snapshot: Map<String, OrchestratedDownload>) {
+        val active =
+            snapshot.values.filter {
+                it.stage == DownloadStage.Queued || it.stage == DownloadStage.Downloading
+            }
+        if (active.isEmpty()) {
+            foregroundController.stop()
+        } else {
+            foregroundController.ensureRunning(active)
         }
     }
 

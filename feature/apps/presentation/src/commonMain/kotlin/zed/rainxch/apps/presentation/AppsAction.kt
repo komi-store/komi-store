@@ -191,10 +191,6 @@ sealed interface AppsAction {
         val bucket: ImportSummaryBucket,
     ) : AppsAction
 
-    data object OnDismissKaoBanner : AppsAction
-
-    data object OnKaoLearnMore : AppsAction
-
     data class OnInstallPendingApp(
         val app: InstalledAppUi,
     ) : AppsAction

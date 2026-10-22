@@ -31,8 +31,10 @@ import zed.rainxch.core.data.services.LocalizationManager
 import zed.rainxch.core.data.utils.AndroidShareManager
 import zed.rainxch.core.domain.helpers.ShareManager
 import zed.rainxch.core.domain.repository.TweaksRepository
+import zed.rainxch.core.domain.system.SystemInstallSerializer
 import zed.rainxch.core.domain.use_cases.SyncInstalledAppsUseCase
 import zed.rainxch.githubstore.app.deeplink.DeepLinkParser
+import zed.rainxch.githubstore.utils.applyDisplayModePreference
 import zed.rainxch.githubstore.utils.updateSystemBars
 
 class MainActivity : ComponentActivity() {
@@ -43,6 +45,7 @@ class MainActivity : ComponentActivity() {
     private val tweaksRepository: TweaksRepository by inject()
     private val syncInstalledAppsUseCase: SyncInstalledAppsUseCase by inject()
     private val appScope: CoroutineScope by inject()
+    private val systemInstallSerializer: SystemInstallSerializer by inject()
 
     private val contentPainted =
         java.util.concurrent.atomic
@@ -75,6 +78,14 @@ class MainActivity : ComponentActivity() {
                         localizationManager.setActiveLanguageTag(newTag)
                         recreate()
                     }
+            }
+        }
+
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                tweaksRepository
+                    .getDisplayModeId()
+                    .collect { modeId -> this@MainActivity.applyDisplayModePreference(modeId) }
             }
         }
 
@@ -123,6 +134,11 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        systemInstallSerializer.onAppResumed()
     }
 
     override fun onRestart() {

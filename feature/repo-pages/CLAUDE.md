@@ -15,7 +15,7 @@ feature/repo-pages/
 
 ## Navigation
 
-`GithubStoreGraph.RepoIssuesScreen(owner, repo)`, `RepoIssueDetailScreen(owner, repo, issueNumber)`, `RepoSecurityScreen(owner, repo)`, `RepoPullsScreen(owner, repo)`. Details shows the Issues / Security entries only for GitHub repos (`sourceHost == null`). `RepoPullsScreen` is registered in `AppNavigation` but nothing navigates to it today; `PullsRoot` opens a PR in `RepoIssueDetailScreen` by number.
+`GithubStoreGraph.RepoIssuesScreen(owner, repo)`, `RepoIssueDetailScreen(owner, repo, issueNumber)`, `RepoSecurityScreen(owner, repo)`, `RepoPullsScreen(owner, repo)`. Details opens them from its stats grid, only for GitHub repos (`sourceHost == null`): the Issues tile and a Security tile become tappable. `RepoPullsScreen` is registered in `AppNavigation` but nothing navigates to it today; `PullsRoot` opens a PR in `RepoIssueDetailScreen` by number.
 
 ## Notes
 

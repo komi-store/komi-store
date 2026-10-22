@@ -7,13 +7,19 @@ import zed.rainxch.core.domain.isDesktop
 import zed.rainxch.core.domain.model.appearance.AppPersonality
 import zed.rainxch.core.domain.model.appearance.ContentWidth
 import zed.rainxch.core.domain.model.appearance.MangaPaperId
+import zed.rainxch.core.domain.repository.SYSTEM_DEFAULT_DISPLAY_MODE_ID
 import zed.rainxch.core.presentation.components.inputs.KomiSwitch
+import zed.rainxch.core.presentation.components.overlays.KomiDropdown
+import zed.rainxch.core.presentation.components.overlays.KomiMenuItem
 import zed.rainxch.core.presentation.utils.displayName
+import zed.rainxch.core.presentation.utils.rememberDisplayModeOptions
 import zed.rainxch.githubstore.core.presentation.res.*
 import zed.rainxch.tweaks.presentation.TweaksAction
 import zed.rainxch.tweaks.presentation.TweaksState
 import zed.rainxch.tweaks.presentation.components.shell.SettingsGroup
 import zed.rainxch.tweaks.presentation.components.shell.SettingsRow
+import zed.rainxch.tweaks.presentation.components.shell.SettingsValuePill
+import kotlin.math.roundToInt
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import zed.rainxch.core.presentation.components.buttons.KomiIconButtonSize
@@ -58,6 +64,7 @@ fun appearanceSectionContent(
     modifier: Modifier = Modifier,
 ) {
     val desktop = isDesktop()
+    val displayModes = rememberDisplayModeOptions()
     val amoledVisible = showsAmoledToggle(state.selectedPersonality, state.isDarkTheme)
     SettingsGroup(modifier = modifier) {
         when (state.selectedPersonality) {
@@ -116,7 +123,7 @@ fun appearanceSectionContent(
         // How Explore, Top Charts and Search lay out repositories.
         SettingsRow(
             title = stringResource(Res.string.repo_layout_title),
-            last = !desktop,
+            last = !desktop && displayModes.isEmpty(),
             trailing = {
                 KomiSegmented(
                     selected = state.isRepoGridLayout,
@@ -130,6 +137,47 @@ fun appearanceSectionContent(
                 )
             },
         )
+
+        if (displayModes.isNotEmpty()) {
+            val displayModeEntries =
+                (
+                    listOf(
+                        KomiMenuItem(
+                            id = SYSTEM_DEFAULT_DISPLAY_MODE_ID.toString(),
+                            label = stringResource(Res.string.display_mode_auto),
+                        ),
+                    ) +
+                        displayModes.map { mode ->
+                            KomiMenuItem(
+                                id = mode.id.toString(),
+                                label =
+                                    stringResource(
+                                        Res.string.display_mode_option,
+                                        mode.widthPx,
+                                        mode.heightPx,
+                                        mode.refreshRate.roundToInt(),
+                                    ),
+                            )
+                        }
+                ).toImmutableList()
+            // MainActivity applies a stored mode the display no longer reports as the system default.
+            val selectedDisplayMode =
+                displayModeEntries.firstOrNull { it.id == state.displayModeId.toString() } ?: displayModeEntries.first()
+            KomiDropdown(
+                entries = displayModeEntries,
+                onSelect = { item -> onAction(TweaksAction.OnDisplayModeSelected(item.id.toInt())) },
+                value = selectedDisplayMode.id,
+                trigger = { onClick ->
+                    SettingsRow(
+                        title = stringResource(Res.string.display_mode_title),
+                        subtitle = stringResource(Res.string.display_mode_description),
+                        last = !desktop,
+                        onClick = onClick,
+                        trailing = { SettingsValuePill(value = selectedDisplayMode.label, onClick = onClick) },
+                    )
+                },
+            )
+        }
 
         if (desktop) {
             SettingsRow(

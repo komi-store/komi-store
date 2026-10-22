@@ -7,6 +7,14 @@ import kotlin.test.assertTrue
 
 class VersionMathTest {
     @Test
+    fun a_stored_timestamp_only_counts_while_it_parses() {
+        assertEquals("2026-10-01T00:00:00Z", VersionMath.publishedAtOrNull("2026-10-01T00:00:00Z"))
+        assertEquals(null, VersionMath.publishedAtOrNull("not-a-date"))
+        assertEquals(null, VersionMath.publishedAtOrNull("   "))
+        assertEquals(null, VersionMath.publishedAtOrNull(null))
+    }
+
+    @Test
     fun normalize_preserves_opaque_marker_tags() {
         assertEquals("nightly-a1b2c3d", VersionMath.normalizeVersion("nightly-a1b2c3d"))
         assertEquals("canary-deadbeef", VersionMath.normalizeVersion("canary-deadbeef"))

@@ -932,6 +932,12 @@
     <string name="dhizuku_start_hint">Активируй Dhizuku как Device Owner для тихих установок</string>
     <string name="installer_type_root">Root</string>
     <string name="installer_type_root_description">Тихая установка через Magisk, KernelSU или APatch root</string>
+    <string name="installer_type_third_party">Сторонний установщик</string>
+    <string name="installer_type_third_party_description">Передавать APK выбранному приложению-установщику вместо системного.</string>
+    <string name="external_installer_pick">Приложение-установщик</string>
+    <string name="external_installer_none">Не выбрано</string>
+    <string name="external_installer_sheet_title">Приложения, которые могут устанавливать APK</string>
+    <string name="external_installer_empty">На этом устройстве не найдено приложений-установщиков.</string>
     <string name="root_status_ready">Предоставлен</string>
     <string name="root_status_permission_needed">Разрешить root</string>
     <string name="root_status_unavailable">Нет root</string>
@@ -1065,10 +1071,6 @@
     <string name="platform_section_linux">Linux</string>
     <string name="section_chip_your_device">Это устройство</string>
     <string name="section_chip_for_transfer">Для переноса</string>
-    <string name="kao_banner_title">Сохраним Android открытым</string>
-    <string name="kao_banner_body">Политика верификации разработчиков Google угрожает открытому распространению Android. Komi Store поддерживает коалицию.</string>
-    <string name="kao_banner_cta">Подробнее</string>
-    <string name="kao_banner_dismiss_cd">Закрыть баннер</string>
 
     <!-- ───── Russian completion pass ───── -->
     <string name="adaptive_pick_repo_subtitle">Нажми на любую карточку слева, чтобы увидеть детали здесь.</string>
@@ -1410,8 +1412,8 @@
     <string name="repo_pages_severity_unknown">Неизвестно</string>
 
     <!-- Repo pages: details entry -->
-    <string name="repo_pages_details_issues_button">Issues</string>
     <string name="repo_pages_details_security_button">Безопасность</string>
+    <string name="repo_pages_details_security_value">Уведомления</string>
 
     <!-- Repo pages: details entry -->
     <string name="repo_pages_details_pulls_button">Pull requests</string>
@@ -1502,4 +1504,17 @@
     <string name="go_to_version">Перейти к %1$s</string>
     <string name="get_it_on_platform">Скачать для %1$s</string>
     <string name="share_link">Поделиться ссылкой</string>
+    <string name="display_mode_title">Частота обновления</string>
+    <string name="display_mode_description">Запрашивает у экрана указанную частоту. В режиме «Авто» решает система.</string>
+    <string name="display_mode_auto">Авто</string>
+    <string name="display_mode_option">%1$d × %2$d · %3$d Hz</string>
+    <string name="show_tabs">Показать вкладки</string>
+    <string name="repo_layout_title">Макет репозитория</string>
+    <string name="repo_layout_list">Список</string>
+    <string name="repo_layout_grid">Сетка</string>
+    <string name="apps_tag_updates_ignored">Обновления проигнорированы</string>
+    <string name="apps_tag_skipped">Пропущено %1$s</string>
+    <string name="apps_tag_asset_filter">Фильтр ресурсов</string>
+    <string name="apps_variant_stale_pick">Вариант изменился. Выберите его снова.</string>
+    <string name="apps_no_release_found">Не удалось найти выпуск для установки.</string>
 </resources>

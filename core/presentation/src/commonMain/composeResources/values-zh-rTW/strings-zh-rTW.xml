@@ -899,6 +899,12 @@
     <string name="dhizuku_start_hint">將 Dhizuku 啟用為 Device Owner，以啟用靜默安裝</string>
     <string name="installer_type_root">Root</string>
     <string name="installer_type_root_description">透過 Magisk / KernelSU / APatch root 靜默安裝</string>
+    <string name="installer_type_third_party">第三方安裝程式</string>
+    <string name="installer_type_third_party_description">將 APK 交給你選擇的安裝應用程式，而非系統預設安裝程式。</string>
+    <string name="external_installer_pick">安裝應用程式</string>
+    <string name="external_installer_none">未選擇</string>
+    <string name="external_installer_sheet_title">可安裝 APK 的應用程式</string>
+    <string name="external_installer_empty">此裝置上找不到安裝應用程式。</string>
     <string name="root_status_ready">已授權</string>
     <string name="root_status_permission_needed">允許 Root</string>
     <string name="root_status_unavailable">無 Root</string>
@@ -1035,10 +1041,6 @@
     <string name="platform_section_linux">Linux</string>
     <string name="section_chip_your_device">你的裝置</string>
     <string name="section_chip_for_transfer">用於轉移</string>
-    <string name="kao_banner_title">保持 Android 開放</string>
-    <string name="kao_banner_body">Google 的開發者驗證政策威脅 Android 的開放分發。Komi Store 與聯盟同行。</string>
-    <string name="kao_banner_cta">瞭解更多</string>
-    <string name="kao_banner_dismiss_cd">關閉橫幅</string>
 
     <!-- Appended: translations brought to 100% parity with English source -->
     <string name="adaptive_pick_repo_subtitle">點按左側任意卡片，在此檢視詳情。</string>
@@ -1368,8 +1370,8 @@
     <string name="repo_pages_severity_unknown">未知</string>
 
     <!-- Repo pages: details entry -->
-    <string name="repo_pages_details_issues_button">Issues</string>
     <string name="repo_pages_details_security_button">安全</string>
+    <string name="repo_pages_details_security_value">公告</string>
 
     <!-- Repo pages: details entry -->
     <string name="repo_pages_details_pulls_button">拉取請求</string>
@@ -1459,4 +1461,17 @@
     <string name="go_to_version">前往 %1$s</string>
     <string name="get_it_on_platform">取得 %1$s 版</string>
     <string name="share_link">分享連結</string>
+    <string name="display_mode_title">重新整理率</string>
+    <string name="display_mode_description">向螢幕要求指定的重新整理率。自動由系統決定。</string>
+    <string name="display_mode_auto">自動</string>
+    <string name="display_mode_option">%1$d × %2$d · %3$d Hz</string>
+    <string name="show_tabs">顯示分頁</string>
+    <string name="repo_layout_title">儲存庫版面配置</string>
+    <string name="repo_layout_list">清單</string>
+    <string name="repo_layout_grid">網格</string>
+    <string name="apps_tag_updates_ignored">已忽略更新</string>
+    <string name="apps_tag_skipped">已略過 %1$s</string>
+    <string name="apps_tag_asset_filter">資產篩選</string>
+    <string name="apps_variant_stale_pick">變體已變更，請重新選擇。</string>
+    <string name="apps_no_release_found">找不到可安裝的發行版本。</string>
 </resources>

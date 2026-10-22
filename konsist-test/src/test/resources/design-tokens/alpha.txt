@@ -2,7 +2,6 @@
 1 core/presentation/src/commonMain/kotlin/zed/rainxch/core/presentation/components/cards/KomiRepoCard.kt
 1 feature/apps/presentation/src/commonMain/kotlin/zed/rainxch/apps/presentation/starred/components/StarredCandidateRow.kt
 1 feature/details/presentation/src/commonMain/kotlin/zed/rainxch/details/presentation/components/ApkInspectSheet.kt
-9 feature/details/presentation/src/commonMain/kotlin/zed/rainxch/details/presentation/components/AppHeader.kt
 5 feature/details/presentation/src/commonMain/kotlin/zed/rainxch/details/presentation/components/SmartInstallButton.kt
 4 feature/details/presentation/src/commonMain/kotlin/zed/rainxch/details/presentation/components/sections/WhatsNew.kt
 1 feature/details/presentation/src/commonMain/kotlin/zed/rainxch/details/presentation/components/states/ErrorState.kt

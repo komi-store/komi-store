@@ -301,6 +301,14 @@ private fun zed.rainxch.tweaks.presentation.components.sections.DhizukuStatusBad
     - availability: STABLE (class with no mutable properties)
 
 @Composable
+private fun zed.rainxch.tweaks.presentation.components.sections.ExternalInstallerPickerSheet(state: zed.rainxch.tweaks.presentation.TweaksState, onAction: kotlin.Function1<zed.rainxch.tweaks.presentation.TweaksAction, kotlin.Unit>): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - state: UNSTABLE (has mutable properties or unstable members)
+    - onAction: STABLE (function type)
+
+@Composable
 private fun zed.rainxch.tweaks.presentation.components.sections.HintRow(text: kotlin.String): kotlin.Unit
   skippable: true
   restartable: true
@@ -411,6 +419,14 @@ private fun zed.rainxch.tweaks.presentation.components.sections.StatusDot(color:
   params:
     - color: STABLE (marked @Stable or @Immutable)
     - label: STABLE (String is immutable)
+
+@Composable
+private fun zed.rainxch.tweaks.presentation.components.sections.ThirdPartyInstallerRows(state: zed.rainxch.tweaks.presentation.TweaksState, onAction: kotlin.Function1<zed.rainxch.tweaks.presentation.TweaksAction, kotlin.Unit>): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - state: UNSTABLE (has mutable properties or unstable members)
+    - onAction: STABLE (function type)
 
 @Composable
 private fun zed.rainxch.tweaks.presentation.components.sections.TranslationTargetDropdown(state: zed.rainxch.tweaks.presentation.TweaksState, onAction: kotlin.Function1<zed.rainxch.tweaks.presentation.TweaksAction, kotlin.Unit>): kotlin.Unit

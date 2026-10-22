@@ -60,8 +60,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.GitHubStore.Splash"
+        android:enableOnBackInvokedCallback="true"
         android:usesCleartextTraffic="false"
-        tools:targetApi="29">
+        tools:targetApi="33">
 
         <activity
             android:name=".MainActivity"
@@ -212,6 +213,12 @@
             android:enabled="true"
             android:exported="true"
             android:permission="android.permission.INTERACT_ACROSS_USERS_FULL" />
+
+        <service
+            android:name="zed.rainxch.core.data.services.DownloadForegroundService"
+            android:exported="false"
+            android:foregroundServiceType="dataSync"
+            android:stopWithTask="false" />
     </application>
 
 </manifest>

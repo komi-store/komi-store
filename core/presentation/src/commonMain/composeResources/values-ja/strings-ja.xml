@@ -900,6 +900,12 @@
     <string name="dhizuku_start_hint">サイレントインストールを有効化するには、DhizukuをDevice Ownerとして有効化してください</string>
     <string name="installer_type_root">Root</string>
     <string name="installer_type_root_description">Magisk / KernelSU / APatch root によるサイレントインストール</string>
+    <string name="installer_type_third_party">サードパーティ製インストーラー</string>
+    <string name="installer_type_third_party_description">システム標準の代わりに、選んだインストーラーアプリに APK を渡します。</string>
+    <string name="external_installer_pick">インストーラーアプリ</string>
+    <string name="external_installer_none">未選択</string>
+    <string name="external_installer_sheet_title">APK をインストールできるアプリ</string>
+    <string name="external_installer_empty">このデバイスにインストーラーアプリが見つかりません。</string>
     <string name="root_status_ready">許可済み</string>
     <string name="root_status_permission_needed">Root を許可</string>
     <string name="root_status_unavailable">Root なし</string>
@@ -1033,10 +1039,6 @@
     <string name="platform_section_linux">Linux</string>
     <string name="section_chip_your_device">このデバイス</string>
     <string name="section_chip_for_transfer">転送用</string>
-    <string name="kao_banner_title">Android をオープンに</string>
-    <string name="kao_banner_body">Google の開発者検証ポリシーが Android のオープンな配布を脅かしています。Komi Store は連合を支持します。</string>
-    <string name="kao_banner_cta">詳しく見る</string>
-    <string name="kao_banner_dismiss_cd">バナーを閉じる</string>
 
     <string name="adaptive_pick_repo_subtitle">左側のカードをタップすると詳細がここに表示されます。</string>
     <string name="adaptive_pick_repo_title">リポジトリを選択</string>
@@ -1365,8 +1367,8 @@
     <string name="repo_pages_severity_unknown">不明</string>
 
     <!-- Repo pages: details entry -->
-    <string name="repo_pages_details_issues_button">課題</string>
     <string name="repo_pages_details_security_button">セキュリティ</string>
+    <string name="repo_pages_details_security_value">アドバイザリ</string>
 
     <!-- Repo pages: details entry -->
     <string name="repo_pages_details_pulls_button">プルリクエスト</string>
@@ -1458,4 +1460,17 @@
     <string name="go_to_version">%1$s に移動</string>
     <string name="get_it_on_platform">%1$s 版を入手</string>
     <string name="share_link">リンクを共有</string>
+    <string name="display_mode_title">リフレッシュレート</string>
+    <string name="display_mode_description">画面に指定したリフレッシュレートを要求します。自動ではシステムに任せます。</string>
+    <string name="display_mode_auto">自動</string>
+    <string name="display_mode_option">%1$d × %2$d · %3$d Hz</string>
+    <string name="show_tabs">タブを表示</string>
+    <string name="repo_layout_title">リポジトリのレイアウト</string>
+    <string name="repo_layout_list">リスト</string>
+    <string name="repo_layout_grid">グリッド</string>
+    <string name="apps_tag_updates_ignored">更新を無視</string>
+    <string name="apps_tag_skipped">%1$s をスキップ</string>
+    <string name="apps_tag_asset_filter">アセットフィルター</string>
+    <string name="apps_variant_stale_pick">バリアントが変更されました。もう一度選択してください。</string>
+    <string name="apps_no_release_found">インストールできるリリースが見つかりませんでした。</string>
 </resources>

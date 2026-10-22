@@ -956,6 +956,12 @@
     <string name="dhizuku_start_hint">فعّل Dhizuku كمالك للجهاز لتمكين التثبيت الصامت</string>
     <string name="installer_type_root">روت</string>
     <string name="installer_type_root_description">تثبيت صامت عبر Magisk أو KernelSU أو APatch</string>
+    <string name="installer_type_third_party">مثبّت تابع لجهة خارجية</string>
+    <string name="installer_type_third_party_description">سلّم ملف APK إلى تطبيق تثبيت تختاره بدلاً من المثبّت الافتراضي للنظام.</string>
+    <string name="external_installer_pick">تطبيق التثبيت</string>
+    <string name="external_installer_none">لم يتم الاختيار</string>
+    <string name="external_installer_sheet_title">التطبيقات التي يمكنها تثبيت ملفات APK</string>
+    <string name="external_installer_empty">لم يتم العثور على تطبيقات تثبيت على هذا الجهاز.</string>
     <string name="root_status_ready">ممنوح</string>
     <string name="root_status_permission_needed">السماح بالروت</string>
     <string name="root_status_unavailable">لا يوجد روت</string>
@@ -1089,10 +1095,6 @@
     <string name="platform_section_linux">Linux</string>
     <string name="section_chip_your_device">جهازك</string>
     <string name="section_chip_for_transfer">للنقل</string>
-    <string name="kao_banner_title">أبقِ أندرويد مفتوحًا</string>
-    <string name="kao_banner_body">سياسة التحقق من المطورين من Google تهدد التوزيع المفتوح لأندرويد. Komi Store يدعم التحالف.</string>
-    <string name="kao_banner_cta">اعرف المزيد</string>
-    <string name="kao_banner_dismiss_cd">إغلاق البانر</string>
 
     <!-- Design refresh additions -->
     <string name="adaptive_pick_repo_subtitle">انقر على أي بطاقة على اليسار لعرض تفاصيلها هنا.</string>
@@ -1442,8 +1444,8 @@
     <string name="repo_pages_severity_unknown">غير معروف</string>
 
     <!-- Repo pages: details entry -->
-    <string name="repo_pages_details_issues_button">المشكلات</string>
     <string name="repo_pages_details_security_button">الأمان</string>
+    <string name="repo_pages_details_security_value">التنبيهات</string>
 
     <!-- Repo pages: details entry -->
     <string name="repo_pages_details_pulls_button">طلبات السحب</string>
@@ -1534,4 +1536,17 @@
     <string name="go_to_version">الانتقال إلى %1$s</string>
     <string name="get_it_on_platform">احصل عليه لـ %1$s</string>
     <string name="share_link">مشاركة الرابط</string>
+    <string name="display_mode_title">معدل التحديث</string>
+    <string name="display_mode_description">يطلب من الشاشة معدل تحديث محددًا. خيار «تلقائي» يترك القرار للنظام.</string>
+    <string name="display_mode_auto">تلقائي</string>
+    <string name="display_mode_option">%1$d × %2$d · %3$d Hz</string>
+    <string name="show_tabs">إظهار علامات التبويب</string>
+    <string name="repo_layout_title">تخطيط المستودع</string>
+    <string name="repo_layout_list">قائمة</string>
+    <string name="repo_layout_grid">شبكة</string>
+    <string name="apps_tag_updates_ignored">تم تجاهل التحديثات</string>
+    <string name="apps_tag_skipped">تم تخطي %1$s</string>
+    <string name="apps_tag_asset_filter">عامل تصفية الأصول</string>
+    <string name="apps_variant_stale_pick">تغيّر المتغير. اختره مرة أخرى.</string>
+    <string name="apps_no_release_found">تعذّر العثور على إصدار للتثبيت.</string>
 </resources>

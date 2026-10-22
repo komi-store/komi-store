@@ -6,6 +6,157 @@ import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class UpdateVerdictTest {
+    // The id changed because the asset was re-uploaded, but the bytes did not: a locally
+    // confirmed digest that equals the release's digest must keep the verdict at "no update".
+    @Test
+    fun a_confirmed_matching_digest_makes_a_republished_tag_a_non_update() {
+        val digest = "sha256:aaaa"
+        val result =
+            decide(
+                installedTag = "2.0.5",
+                installedVersionName = "2.0.5",
+                matchedTag = "v2.0.5",
+                matchedPublishedAt = "2026-10-20T00:00:00Z",
+                matchedAssetId = 900L,
+                matchedAssetDigest = digest,
+                bound =
+                    UpdateVerdict.Bound(
+                        assetId = 899L,
+                        assetDigest = digest,
+                        releasePublishedAt = "2026-10-01T00:00:00Z",
+                    ),
+            )
+
+        assertFalse(result.isUpdateAvailable)
+    }
+
+    // A real device reports versionName "2.0.5" while the tag is "v2.0.5". That name match
+    // used to short-circuit the verdict before the re-release check could run.
+    @Test
+    fun a_republished_stable_tag_the_device_reports_by_name_is_still_an_update() {
+        val result =
+            decide(
+                installedTag = "2.0.5",
+                installedVersionName = "2.0.5",
+                matchedTag = "v2.0.5",
+                matchedPublishedAt = "2026-10-20T00:00:00Z",
+                matchedAssetId = 900L,
+                bound =
+                    UpdateVerdict.Bound(
+                        assetId = 899L,
+                        assetDigest = null,
+                        releasePublishedAt = "2026-10-01T00:00:00Z",
+                    ),
+            )
+
+        assertTrue(result.isUpdateAvailable)
+    }
+
+    // A re-released stable tag cannot be seen by the version comparison; different bytes plus a
+    // later publish time is the one signal that a rebuild happened.
+    @Test
+    fun a_republished_stable_tag_with_new_bytes_and_a_later_time_is_an_update() {
+        val result =
+            decide(
+                installedTag = "2.0.5",
+                installedVersionCode = 205L,
+                matchedTag = "2.0.5",
+                matchedPublishedAt = "2026-10-20T00:00:00Z",
+                matchedAssetId = 900L,
+                bound =
+                    UpdateVerdict.Bound(
+                        assetId = 899L,
+                        assetDigest = null,
+                        releasePublishedAt = "2026-10-01T00:00:00Z",
+                    ),
+            )
+
+        assertTrue(result.isUpdateAvailable)
+    }
+
+    @Test
+    fun a_republished_stable_tag_with_the_same_bytes_is_not_an_update() {
+        val result =
+            decide(
+                installedTag = "2.0.5",
+                matchedTag = "2.0.5",
+                matchedPublishedAt = "2026-10-20T00:00:00Z",
+                matchedAssetId = 899L,
+                bound =
+                    UpdateVerdict.Bound(
+                        assetId = 899L,
+                        assetDigest = null,
+                        releasePublishedAt = "2026-10-01T00:00:00Z",
+                    ),
+            )
+
+        assertFalse(result.isUpdateAvailable)
+    }
+
+    @Test
+    fun a_republished_stable_tag_with_an_older_time_is_not_an_update() {
+        val result =
+            decide(
+                installedTag = "2.0.5",
+                matchedTag = "2.0.5",
+                matchedPublishedAt = "2026-09-01T00:00:00Z",
+                matchedAssetId = 900L,
+                bound =
+                    UpdateVerdict.Bound(
+                        assetId = 899L,
+                        assetDigest = null,
+                        releasePublishedAt = "2026-10-01T00:00:00Z",
+                    ),
+            )
+
+        assertFalse(result.isUpdateAvailable)
+    }
+
+    // The device runs a pre-release built after the stable it is being compared with. While the
+    // app was tracked as a rolling build that timestamp won; once the channel is stable the tag
+    // comparison decides, otherwise a newer stable release stays hidden forever.
+    @Test
+    fun a_newer_stable_tag_wins_over_a_bound_prerelease_timestamp() {
+        val result =
+            decide(
+                installedTag = "2.0.4",
+                installedVersionCode = 204L,
+                storedLatestTag = "2.0.5",
+                storedPublishedAt = "2026-09-01T00:00:00Z",
+                matchedTag = "2.0.5",
+                matchedPublishedAt = "2026-09-01T00:00:00Z",
+                bound =
+                    UpdateVerdict.Bound(
+                        assetId = 11L,
+                        assetDigest = "pre-release-digest",
+                        releasePublishedAt = "2026-10-01T00:00:00Z",
+                    ),
+            )
+
+        assertTrue(result.isUpdateAvailable)
+    }
+
+    // A nightly install cannot be ordered against a versioned tag, so its binding still decides:
+    // a stable release published after the installed build is an update.
+    @Test
+    fun a_bound_nightly_still_sees_a_later_stable_release() {
+        val result =
+            decide(
+                installedTag = "nightly",
+                matchedTag = "v2.0.5",
+                matchedPublishedAt = "2026-09-20T00:00:00Z",
+                matchedAssetId = 22L,
+                bound =
+                    UpdateVerdict.Bound(
+                        assetId = 11L,
+                        assetDigest = null,
+                        releasePublishedAt = "2026-09-08T00:00:00Z",
+                    ),
+            )
+
+        assertTrue(result.isUpdateAvailable)
+    }
+
     private fun decide(
         installedTag: String = "1.0.0",
         installedVersionCode: Long = 100L,
@@ -56,51 +207,6 @@ class UpdateVerdictTest {
             bound = bound,
             selfAttestedDigest = selfAttestedDigest,
         )
-
-    // The device runs a pre-release built after the stable it is being compared with. While the
-    // app was tracked as a rolling build that timestamp won; once the channel is stable the tag
-    // comparison decides, otherwise a newer stable release stays hidden forever.
-    @Test
-    fun a_newer_stable_tag_wins_over_a_bound_prerelease_timestamp() {
-        val result =
-            decide(
-                installedTag = "2.0.4",
-                installedVersionCode = 204L,
-                storedLatestTag = "2.0.5",
-                storedPublishedAt = "2026-09-01T00:00:00Z",
-                matchedTag = "2.0.5",
-                matchedPublishedAt = "2026-09-01T00:00:00Z",
-                bound =
-                    UpdateVerdict.Bound(
-                        assetId = 11L,
-                        assetDigest = "pre-release-digest",
-                        releasePublishedAt = "2026-10-01T00:00:00Z",
-                    ),
-            )
-
-        assertTrue(result.isUpdateAvailable)
-    }
-
-    // A nightly install cannot be ordered against a versioned tag, so its binding still decides:
-    // a stable release published after the installed build is an update.
-    @Test
-    fun a_bound_nightly_still_sees_a_later_stable_release() {
-        val result =
-            decide(
-                installedTag = "nightly",
-                matchedTag = "v2.0.5",
-                matchedPublishedAt = "2026-09-20T00:00:00Z",
-                matchedAssetId = 22L,
-                bound =
-                    UpdateVerdict.Bound(
-                        assetId = 11L,
-                        assetDigest = null,
-                        releasePublishedAt = "2026-09-08T00:00:00Z",
-                    ),
-            )
-
-        assertTrue(result.isUpdateAvailable)
-    }
 
     // com.yunx.app: v1.2.8 was offered, the install was blocked for want of installer
     // authorisation, and it was installed another way. The device then reported 1.2.8 while the

@@ -850,6 +850,17 @@ private fun zed.rainxch.core.presentation.components.chips.ClassicChip(label: ko
     - onRemove: STABLE (function type)
 
 @Composable
+private fun zed.rainxch.core.presentation.components.chips.ClassicTonalChip(text: kotlin.String, selected: kotlin.Boolean, leading: @[Composable] androidx.compose.runtime.internal.ComposableFunction0<kotlin.Unit>?, onClick: kotlin.Function0<kotlin.Unit>?, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - text: STABLE (String is immutable)
+    - selected: STABLE (primitive type)
+    - leading: STABLE (composable function type)
+    - onClick: STABLE (function type)
+    - modifier: STABLE (marked @Stable or @Immutable)
+
+@Composable
 public fun zed.rainxch.core.presentation.components.chips.KomiChip(label: kotlin.String, modifier: androidx.compose.ui.Modifier, kind: zed.rainxch.core.presentation.components.chips.KomiChipKind, size: zed.rainxch.core.presentation.components.chips.KomiChipSize, selected: kotlin.Boolean, index: kotlin.Int, tilt: kotlin.Boolean, leadingIcon: androidx.compose.ui.graphics.vector.ImageVector?, leadingContent: @[Composable] androidx.compose.runtime.internal.ComposableFunction0<kotlin.Unit>?, count: kotlin.Int?, onClick: kotlin.Function0<kotlin.Unit>?, onRemove: kotlin.Function0<kotlin.Unit>?): kotlin.Unit
   skippable: true
   restartable: true
@@ -2155,6 +2166,14 @@ public fun zed.rainxch.core.presentation.personality.manga.withMangaFonts(script
     - script: STABLE (class with no mutable properties)
 
 @Composable
+public fun zed.rainxch.core.presentation.personality.utils.KomiSeededTheme(seed: androidx.compose.ui.graphics.Color?, content: @[Composable] androidx.compose.runtime.internal.ComposableFunction0<kotlin.Unit>): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - seed: STABLE (marked @Stable or @Immutable)
+    - content: STABLE (composable function type)
+
+@Composable
 public fun zed.rainxch.core.presentation.personality.utils.PersonalityPreview(personality: zed.rainxch.core.presentation.personality.Personality, content: @[Composable] androidx.compose.runtime.internal.ComposableFunction0<kotlin.Unit>): kotlin.Unit
   skippable: true
   restartable: true
@@ -2291,6 +2310,20 @@ public fun zed.rainxch.core.presentation.utils.formatReleasedAgo(isoInstant: kot
   restartable: false
   params:
     - isoInstant: STABLE (class with no mutable properties)
+
+@Composable
+public fun zed.rainxch.core.presentation.utils.rememberDisplayModeOptions(): kotlin.collections.List<zed.rainxch.core.presentation.utils.DisplayModeOption>
+  skippable: false
+  restartable: false
+  params:
+
+@Composable
+public fun zed.rainxch.core.presentation.utils.rememberIconSeedColor(packageName: kotlin.String?, imageUrl: kotlin.String?): androidx.compose.ui.graphics.Color?
+  skippable: false
+  restartable: false
+  params:
+    - packageName: STABLE (class with no mutable properties)
+    - imageUrl: STABLE (class with no mutable properties)
 
 @Composable
 public fun zed.rainxch.core.presentation.utils.rememberTapCooldown(duration: kotlin.time.Duration): zed.rainxch.core.presentation.utils.TapCooldown

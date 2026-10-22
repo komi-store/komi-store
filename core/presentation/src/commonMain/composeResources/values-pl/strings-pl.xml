@@ -932,6 +932,12 @@
     <string name="dhizuku_start_hint">Aktywuj Dhizuku jako Device Owner, aby włączyć ciche instalacje</string>
     <string name="installer_type_root">Root</string>
     <string name="installer_type_root_description">Cicha instalacja przez Magisk, KernelSU lub APatch root</string>
+    <string name="installer_type_third_party">Zewnętrzny instalator</string>
+    <string name="installer_type_third_party_description">Przekaż plik APK wybranej aplikacji instalującej zamiast instalatorowi systemowemu.</string>
+    <string name="external_installer_pick">Aplikacja instalująca</string>
+    <string name="external_installer_none">Nie wybrano</string>
+    <string name="external_installer_sheet_title">Aplikacje, które mogą instalować pliki APK</string>
+    <string name="external_installer_empty">Nie znaleziono na tym urządzeniu aplikacji instalujących.</string>
     <string name="root_status_ready">Przyznano</string>
     <string name="root_status_permission_needed">Zezwól na root</string>
     <string name="root_status_unavailable">Brak root</string>
@@ -1065,10 +1071,6 @@
     <string name="platform_section_linux">Linux</string>
     <string name="section_chip_your_device">Twoje urządzenie</string>
     <string name="section_chip_for_transfer">Do transferu</string>
-    <string name="kao_banner_title">Niech Android pozostanie otwarty</string>
-    <string name="kao_banner_body">Polityka weryfikacji deweloperów Google zagraża otwartej dystrybucji Androida. Komi Store popiera koalicję.</string>
-    <string name="kao_banner_cta">Dowiedz się więcej</string>
-    <string name="kao_banner_dismiss_cd">Zamknij baner</string>
 
     <!-- ───── Polish translations added for 100% coverage ───── -->
     <string name="adaptive_pick_repo_subtitle">Dotknij dowolnej karty po lewej, aby zobaczyć jej szczegóły tutaj.</string>
@@ -1410,8 +1412,8 @@
     <string name="repo_pages_severity_unknown">Nieznana</string>
 
     <!-- Repo pages: details entry -->
-    <string name="repo_pages_details_issues_button">Zgłoszenia</string>
     <string name="repo_pages_details_security_button">Bezpieczeństwo</string>
+    <string name="repo_pages_details_security_value">Zalecenia</string>
 
     <!-- Repo pages: details entry -->
     <string name="repo_pages_details_pulls_button">Pull requesty</string>
@@ -1502,4 +1504,17 @@
     <string name="go_to_version">Przejdź do %1$s</string>
     <string name="get_it_on_platform">Pobierz na %1$s</string>
     <string name="share_link">Udostępnij link</string>
+    <string name="display_mode_title">Częstotliwość odświeżania</string>
+    <string name="display_mode_description">Prosi ekran o określoną częstotliwość. Automatycznie pozostawia decyzję systemowi.</string>
+    <string name="display_mode_auto">Automatycznie</string>
+    <string name="display_mode_option">%1$d × %2$d · %3$d Hz</string>
+    <string name="show_tabs">Pokaż karty</string>
+    <string name="repo_layout_title">Układ repozytorium</string>
+    <string name="repo_layout_list">Lista</string>
+    <string name="repo_layout_grid">Siatka</string>
+    <string name="apps_tag_updates_ignored">Aktualizacje zignorowane</string>
+    <string name="apps_tag_skipped">Pominięto %1$s</string>
+    <string name="apps_tag_asset_filter">Filtr zasobów</string>
+    <string name="apps_variant_stale_pick">Wariant uległ zmianie. Wybierz go ponownie.</string>
+    <string name="apps_no_release_found">Nie znaleziono wydania do zainstalowania.</string>
 </resources>

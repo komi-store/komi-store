@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialShapes
-import androidx.compose.material3.toPath
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -20,21 +19,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Matrix
-import androidx.compose.ui.graphics.Outline
-import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.unit.Density
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.graphics.shapes.Morph
 import zed.rainxch.core.presentation.components.overlays.KomiTooltip
+import zed.rainxch.core.presentation.components.shapes.MorphShape
 import zed.rainxch.core.presentation.locals.LocalPersonality
 
 // The bar's floating buttons (back, the screen's FAB): a tonal cookie that answers a press with
@@ -92,24 +86,6 @@ internal fun KomiCookieButton(
                 modifier = Modifier.graphicsLayer { rotationZ = PRESS_TURN * press },
             )
         }
-    }
-}
-
-// A Morph at one point of its progress. A spring can overshoot, so the outline itself stays
-// between the two shapes.
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
-private class MorphShape(
-    private val morph: Morph,
-    private val progress: Float,
-) : Shape {
-    override fun createOutline(
-        size: Size,
-        layoutDirection: LayoutDirection,
-        density: Density,
-    ): Outline {
-        val path = morph.toPath(progress = progress.coerceIn(0f, 1f))
-        path.transform(Matrix().apply { scale(x = size.width, y = size.height) })
-        return Outline.Generic(path)
     }
 }
 

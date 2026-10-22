@@ -938,6 +938,12 @@
     <string name="dhizuku_start_hint">Sessiz kurulumları etkinleştirmek için Dhizuku'yu Device Owner olarak etkinleştirin</string>
     <string name="installer_type_root">Root</string>
     <string name="installer_type_root_description">Magisk, KernelSU veya APatch root ile sessiz yükleme</string>
+    <string name="installer_type_third_party">Üçüncü taraf yükleyici</string>
+    <string name="installer_type_third_party_description">APK'yı sistem varsayılanı yerine seçtiğiniz yükleyici uygulamaya verin.</string>
+    <string name="external_installer_pick">Yükleyici uygulama</string>
+    <string name="external_installer_none">Seçilmedi</string>
+    <string name="external_installer_sheet_title">APK yükleyebilen uygulamalar</string>
+    <string name="external_installer_empty">Bu cihazda yükleyici uygulama bulunamadı.</string>
     <string name="root_status_ready">Verildi</string>
     <string name="root_status_permission_needed">Root'a izin ver</string>
     <string name="root_status_unavailable">Root yok</string>
@@ -1071,10 +1077,6 @@
     <string name="platform_section_linux">Linux</string>
     <string name="section_chip_your_device">Cihazınız</string>
     <string name="section_chip_for_transfer">Aktarım için</string>
-    <string name="kao_banner_title">Android'i Açık Tutun</string>
-    <string name="kao_banner_body">Google'ın geliştirici doğrulama politikası açık Android dağıtımını tehdit ediyor. Komi Store koalisyonu destekliyor.</string>
-    <string name="kao_banner_cta">Daha fazla bilgi</string>
-    <string name="kao_banner_dismiss_cd">Banner'ı kapat</string>
 
     <!-- ───── Turkish backlog top-up ───── -->
     <plurals name="custom_forges_count">
@@ -1408,8 +1410,8 @@
     <string name="repo_pages_severity_unknown">Bilinmiyor</string>
 
     <!-- Repo pages: details entry -->
-    <string name="repo_pages_details_issues_button">Sorunlar</string>
     <string name="repo_pages_details_security_button">Güvenlik</string>
+    <string name="repo_pages_details_security_value">Bültenler</string>
 
     <!-- Repo pages: details entry -->
     <string name="repo_pages_details_pulls_button">Pull request&apos;ler</string>
@@ -1500,4 +1502,17 @@
     <string name="go_to_version">%1$s sürümüne git</string>
     <string name="get_it_on_platform">%1$s için edinin</string>
     <string name="share_link">Bağlantıyı paylaş</string>
+    <string name="display_mode_title">Yenileme hızı</string>
+    <string name="display_mode_description">Ekrandan belirli bir yenileme hızı ister. Otomatik, kararı sisteme bırakır.</string>
+    <string name="display_mode_auto">Otomatik</string>
+    <string name="display_mode_option">%1$d × %2$d · %3$d Hz</string>
+    <string name="show_tabs">Sekmeleri göster</string>
+    <string name="repo_layout_title">Depo düzeni</string>
+    <string name="repo_layout_list">Liste</string>
+    <string name="repo_layout_grid">Izgara</string>
+    <string name="apps_tag_updates_ignored">Güncellemeler yok sayıldı</string>
+    <string name="apps_tag_skipped">%1$s atlandı</string>
+    <string name="apps_tag_asset_filter">Varlık filtresi</string>
+    <string name="apps_variant_stale_pick">Varyant değişti. Yeniden seçin.</string>
+    <string name="apps_no_release_found">Yüklenecek bir sürüm bulunamadı.</string>
 </resources>

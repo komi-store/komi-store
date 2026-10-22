@@ -907,6 +907,12 @@
     <string name="dhizuku_start_hint">Activa Dhizuku como Device Owner para habilitar instalaciones silenciosas</string>
     <string name="installer_type_root">Root</string>
     <string name="installer_type_root_description">Instalación silenciosa vía Magisk, KernelSU o APatch root</string>
+    <string name="installer_type_third_party">Instalador de terceros</string>
+    <string name="installer_type_third_party_description">Envía el APK a la app instaladora que elijas, en lugar de la del sistema.</string>
+    <string name="external_installer_pick">App instaladora</string>
+    <string name="external_installer_none">Sin seleccionar</string>
+    <string name="external_installer_sheet_title">Apps que pueden instalar APK</string>
+    <string name="external_installer_empty">No se encontraron apps instaladoras en este dispositivo.</string>
     <string name="root_status_ready">Concedido</string>
     <string name="root_status_permission_needed">Permitir root</string>
     <string name="root_status_unavailable">Sin root</string>
@@ -1040,10 +1046,6 @@
     <string name="platform_section_linux">Linux</string>
     <string name="section_chip_your_device">Tu dispositivo</string>
     <string name="section_chip_for_transfer">Para transferir</string>
-    <string name="kao_banner_title">Mantén Android abierto</string>
-    <string name="kao_banner_body">La política de verificación de desarrolladores de Google amenaza la distribución abierta de Android. Komi Store apoya a la coalición.</string>
-    <string name="kao_banner_cta">Saber más</string>
-    <string name="kao_banner_dismiss_cd">Cerrar banner</string>
 
     <!-- Translated batch: appended for parity with English source -->
     <string name="adaptive_pick_repo_subtitle">Toca cualquier tarjeta de la izquierda para ver sus detalles aquí.</string>
@@ -1377,8 +1379,8 @@
     <string name="repo_pages_severity_unknown">Desconocida</string>
 
     <!-- Repo pages: details entry -->
-    <string name="repo_pages_details_issues_button">Issues</string>
     <string name="repo_pages_details_security_button">Seguridad</string>
+    <string name="repo_pages_details_security_value">Avisos</string>
 
     <!-- Repo pages: details entry -->
     <string name="repo_pages_details_pulls_button">Pull requests</string>
@@ -1468,4 +1470,17 @@
     <string name="go_to_version">Ir a %1$s</string>
     <string name="get_it_on_platform">Obtenlo para %1$s</string>
     <string name="share_link">Compartir enlace</string>
+    <string name="display_mode_title">Frecuencia de actualización</string>
+    <string name="display_mode_description">Solicita al panel una frecuencia concreta. Automático deja decidir al sistema.</string>
+    <string name="display_mode_auto">Automático</string>
+    <string name="display_mode_option">%1$d × %2$d · %3$d Hz</string>
+    <string name="show_tabs">Mostrar pestañas</string>
+    <string name="repo_layout_title">Diseño del repositorio</string>
+    <string name="repo_layout_list">Lista</string>
+    <string name="repo_layout_grid">Cuadrícula</string>
+    <string name="apps_tag_updates_ignored">Actualizaciones ignoradas</string>
+    <string name="apps_tag_skipped">Omitido %1$s</string>
+    <string name="apps_tag_asset_filter">Filtro de recursos</string>
+    <string name="apps_variant_stale_pick">La variante cambió. Vuelve a elegirla.</string>
+    <string name="apps_no_release_found">No se encontró una versión para instalar.</string>
 </resources>

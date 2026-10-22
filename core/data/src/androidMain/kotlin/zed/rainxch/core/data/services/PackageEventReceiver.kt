@@ -134,6 +134,7 @@ class PackageEventReceiver() :
                                 newReleaseId = settled.installedReleaseId,
                                 newAssetId = settled.installedAssetId,
                                 newAssetDigest = settled.installedAssetDigest,
+                                newReleasePublishedAt = settled.installedReleasePublishedAt,
                                 newAssetName = app.latestAssetName ?: "",
                                 newAssetUrl = app.latestAssetUrl ?: "",
                                 newVersionName = resolution.versionName,

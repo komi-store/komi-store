@@ -43,6 +43,9 @@ class SilentInstallerDispatcher(
     @Volatile
     private var cachedInstallerAttribution: InstallerAttribution = InstallerAttribution.SystemDefault
 
+    @Volatile
+    private var cachedExternalInstallerPackage: String = ""
+
     fun observeInstallerPreference() {
         scope.launch {
             tweaksRepository.getInstallerType().collect { type ->
@@ -54,6 +57,12 @@ class SilentInstallerDispatcher(
             tweaksRepository.getInstallerAttribution().collect { attribution ->
                 cachedInstallerAttribution = attribution
                 Logger.d(TAG) { "Installer attribution changed to: $attribution" }
+            }
+        }
+        scope.launch {
+            tweaksRepository.getExternalInstallerPackage().collect { packageName ->
+                cachedExternalInstallerPackage = packageName
+                Logger.d(TAG) { "External installer package changed to: $packageName" }
             }
         }
     }
@@ -95,6 +104,11 @@ class SilentInstallerDispatcher(
             Logger.d(TAG) { "Silent backend active — skipping unknown sources permission check" }
             return
         }
+        // The picked app installs; runStandardInstall still checks if handing off fails.
+        if (cachedInstallerType == InstallerType.THIRD_PARTY && cachedExternalInstallerPackage.isNotBlank()) {
+            Logger.d(TAG) { "Third-party installer picked - skipping unknown sources permission check" }
+            return
+        }
         androidInstaller.ensurePermissionsOrThrow(extOrMime)
     }
 
@@ -102,14 +116,32 @@ class SilentInstallerDispatcher(
         filePath: String,
         extOrMime: String,
     ): InstallOutcome {
-        Logger.d(TAG) { "install() called — filePath=$filePath, extOrMime=$extOrMime, cached=$cachedInstallerType" }
+        Logger.d(TAG) { "install() called - filePath=$filePath, extOrMime=$extOrMime, cached=$cachedInstallerType" }
+        return tryThirdPartyInstall(filePath)
+            ?: trySilentInstallWithBackend(filePath)
+            ?: runStandardInstall(filePath, extOrMime)
+    }
 
-        val backend = resolveActiveBackend()
-        if (backend != Backend.DEFAULT) {
-            val outcome = trySilentInstall(filePath, backend)
-            if (outcome != null) return outcome
+    private fun tryThirdPartyInstall(filePath: String): InstallOutcome? {
+        val packageName = cachedExternalInstallerPackage
+        if (cachedInstallerType != InstallerType.THIRD_PARTY || packageName.isBlank()) return null
+        val launched = ExternalInstallerLauncher(androidContext).launch(filePath, packageName)
+        if (!launched) {
+            Logger.d(TAG) { "Third-party installer $packageName could not be opened, falling back" }
         }
+        return if (launched) InstallOutcome.DELEGATED_TO_SYSTEM else null
+    }
 
+    private suspend fun trySilentInstallWithBackend(filePath: String): InstallOutcome? {
+        val backend = resolveActiveBackend()
+        if (backend == Backend.DEFAULT) return null
+        return trySilentInstall(filePath, backend)
+    }
+
+    private suspend fun runStandardInstall(
+        filePath: String,
+        extOrMime: String,
+    ): InstallOutcome {
         Logger.d(TAG) { "Falling back to standard AndroidInstaller for: $filePath" }
         androidInstaller.ensurePermissionsOrThrow(extOrMime)
         return androidInstaller.install(filePath, extOrMime)
@@ -267,6 +299,10 @@ class SilentInstallerDispatcher(
 
     private fun resolveActiveBackend(): Backend =
         when (cachedInstallerType) {
+            InstallerType.THIRD_PARTY -> {
+                Backend.DEFAULT
+            }
+
             InstallerType.SHIZUKU -> {
                 shizukuServiceManager.refreshStatus()
                 if (shizukuServiceManager.status.value == ShizukuStatus.READY) Backend.SHIZUKU else Backend.DEFAULT

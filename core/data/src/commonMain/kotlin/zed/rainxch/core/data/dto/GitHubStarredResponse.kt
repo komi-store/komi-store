@@ -2,6 +2,10 @@ package zed.rainxch.core.data.dto
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.jsonArray
+import kotlinx.serialization.json.jsonObject
 
 @Serializable
 data class GitHubStarredResponseWithTimestamp(
@@ -28,3 +32,24 @@ data class GitHubStarredResponse(
         @SerialName("avatar_url") val avatarUrl: String,
     )
 }
+
+// A host that ignores the star media type sends bare repositories: keep them, without star
+// times, instead of failing the sync. Parsed by hand because a JsonTransformingSerializer on
+// the wrapper makes its generated serializer() ask for itself (ExceptionInInitializerError).
+internal fun parseStarredPage(
+    json: Json,
+    element: JsonElement,
+): List<GitHubStarredResponseWithTimestamp> =
+    element.jsonArray.map { entry ->
+        val obj = entry.jsonObject
+        if (REPO_KEY in obj) {
+            json.decodeFromJsonElement(GitHubStarredResponseWithTimestamp.serializer(), obj)
+        } else {
+            GitHubStarredResponseWithTimestamp(
+                starredAt = null,
+                repo = json.decodeFromJsonElement(GitHubStarredResponse.serializer(), obj),
+            )
+        }
+    }
+
+private const val REPO_KEY = "repo"

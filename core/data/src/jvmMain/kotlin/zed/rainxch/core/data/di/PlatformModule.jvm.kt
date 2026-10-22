@@ -22,6 +22,7 @@ import zed.rainxch.core.data.services.DesktopUpdateScheduleManager
 import zed.rainxch.core.data.services.FileLocationsProvider
 import zed.rainxch.core.data.services.LocalizationManager
 import zed.rainxch.core.data.services.external.DesktopExternalAppScanner
+import zed.rainxch.core.data.services.installer.DesktopExternalInstallerRepository
 import zed.rainxch.core.data.utils.DesktopAppLauncher
 import zed.rainxch.core.data.utils.DesktopBrowserHelper
 import zed.rainxch.core.data.utils.DesktopClipboardHelper
@@ -32,6 +33,7 @@ import zed.rainxch.core.domain.helpers.ClipboardHelper
 import zed.rainxch.core.domain.helpers.ShareManager
 import zed.rainxch.core.domain.network.DigestVerifier
 import zed.rainxch.core.domain.network.Downloader
+import zed.rainxch.core.domain.repository.ExternalInstallerRepository
 import zed.rainxch.core.domain.system.ApkInspector
 import zed.rainxch.core.domain.system.DownloadProgressNotifier
 import zed.rainxch.core.domain.system.ExternalAppScanner
@@ -51,6 +53,8 @@ actual val corePlatformModule =
                 digestVerifier = get(),
             )
         }
+
+        single<ExternalInstallerRepository> { DesktopExternalInstallerRepository() }
 
         single<Installer> {
             DesktopInstaller(

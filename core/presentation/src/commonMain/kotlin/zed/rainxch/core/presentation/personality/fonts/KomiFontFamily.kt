@@ -40,6 +40,7 @@ object KomiFontFamily {
             Font(Res.font.nunito, FontWeight.SemiBold),
             Font(Res.font.nunito, FontWeight.Bold),
             Font(Res.font.nunito, FontWeight.ExtraBold),
+            Font(Res.font.nunito, FontWeight.Black),
         )
 
     @Composable

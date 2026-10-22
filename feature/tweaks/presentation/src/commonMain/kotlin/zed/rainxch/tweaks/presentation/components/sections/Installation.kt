@@ -29,6 +29,7 @@ import zed.rainxch.core.presentation.components.buttons.KomiButton
 import zed.rainxch.core.presentation.components.buttons.KomiButtonSize
 import zed.rainxch.core.presentation.components.buttons.KomiButtonVariant
 import zed.rainxch.core.presentation.components.inputs.KomiRadioButton
+import zed.rainxch.core.presentation.components.overlays.KomiSheet
 import zed.rainxch.core.presentation.components.inputs.KomiSlider
 import zed.rainxch.core.presentation.components.inputs.KomiSwitch
 import zed.rainxch.core.presentation.components.inputs.KomiTextField
@@ -92,11 +93,11 @@ fun installSectionContent(
                 selected = state.installerType == InstallerType.ROOT,
                 onClick = { onAction(TweaksAction.OnInstallerTypeSelected(InstallerType.ROOT)) },
                 badge = { RootStatusBadge(state.rootAvailability) },
-                last = true,
             )
             if (state.installerType == InstallerType.ROOT) {
                 RootActions(state.rootAvailability) { onAction(TweaksAction.OnRequestRootPermission) }
             }
+            ThirdPartyInstallerRows(state, onAction)
         }
 
         val silentReady =
@@ -120,6 +121,73 @@ fun installSectionContent(
             SettingsGroup {
                 AttributionRows(state, onAction)
             }
+        }
+    }
+
+    ExternalInstallerPickerSheet(state, onAction)
+}
+
+@Composable
+private fun ThirdPartyInstallerRows(
+    state: TweaksState,
+    onAction: (TweaksAction) -> Unit,
+) {
+    InstallerTypeRow(
+        type = InstallerType.THIRD_PARTY,
+        title = stringResource(Res.string.installer_type_third_party),
+        description = stringResource(Res.string.installer_type_third_party_description),
+        selected = state.installerType == InstallerType.THIRD_PARTY,
+        onClick = { onAction(TweaksAction.OnInstallerTypeSelected(InstallerType.THIRD_PARTY)) },
+        last = state.installerType != InstallerType.THIRD_PARTY,
+    )
+    if (state.installerType != InstallerType.THIRD_PARTY) return
+
+    val selectedLabel =
+        state.externalInstallers
+            .firstOrNull { it.packageName == state.externalInstallerPackage }
+            ?.label
+    SettingsRow(
+        title = stringResource(Res.string.external_installer_pick),
+        subtitle =
+            selectedLabel
+                ?: state.externalInstallerPackage.ifBlank {
+                    stringResource(Res.string.external_installer_none)
+                },
+        last = true,
+        onClick = { onAction(TweaksAction.OnExternalInstallerPickerOpenChanged(true)) },
+    )
+}
+
+@Composable
+private fun ExternalInstallerPickerSheet(
+    state: TweaksState,
+    onAction: (TweaksAction) -> Unit,
+) {
+    if (!state.externalInstallerPickerOpen) return
+
+    KomiSheet(
+        onDismiss = { onAction(TweaksAction.OnExternalInstallerPickerOpenChanged(false)) },
+        title = stringResource(Res.string.external_installer_sheet_title),
+    ) {
+        if (state.externalInstallers.isEmpty()) {
+            KomiText(
+                text = stringResource(Res.string.external_installer_empty),
+                role = KomiTextRole.Body,
+                color = LocalPersonality.current.colors.onSurfaceVariant,
+            )
+        }
+        state.externalInstallers.forEach { installer ->
+            SettingsRow(
+                title = installer.label,
+                subtitle = installer.packageName,
+                onClick = { onAction(TweaksAction.OnExternalInstallerSelected(installer.packageName)) },
+                trailing = {
+                    KomiRadioButton(
+                        selected = installer.packageName == state.externalInstallerPackage,
+                        onClick = { onAction(TweaksAction.OnExternalInstallerSelected(installer.packageName)) },
+                    )
+                },
+            )
         }
     }
 }

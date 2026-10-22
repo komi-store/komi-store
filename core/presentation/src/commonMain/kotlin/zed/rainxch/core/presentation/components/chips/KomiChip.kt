@@ -20,6 +20,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material3.AssistChip
+import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.InputChip
 import androidx.compose.material3.Text
@@ -33,6 +34,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.semantics.selected
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
@@ -261,6 +264,10 @@ private fun ClassicChip(
             )
         }
 
+        KomiChipKind.Tonal -> {
+            ClassicTonalChip(text = text, selected = selected, leading = leading, onClick = onClick, modifier = modifier)
+        }
+
         KomiChipKind.Filter -> {
             MaterialFilterChip(
                 selected = selected,
@@ -290,6 +297,32 @@ private fun ClassicChip(
     }
 }
 
+@Composable
+private fun ClassicTonalChip(
+    text: String,
+    selected: Boolean,
+    leading: (@Composable () -> Unit)?,
+    onClick: (() -> Unit)?,
+    modifier: Modifier = Modifier,
+) {
+    val colors = LocalPersonality.current.colors
+    val container = if (selected) colors.primaryContainer else colors.surface
+    val content = if (selected) colors.onPrimaryContainer else colors.onSurfaceVariant
+    AssistChip(
+        onClick = onClick ?: {},
+        label = { Text(text) },
+        modifier = if (onClick != null) modifier.semantics { this.selected = selected } else modifier,
+        leadingIcon = leading,
+        colors =
+            AssistChipDefaults.assistChipColors(
+                containerColor = container,
+                labelColor = content,
+                leadingIconContentColor = content,
+            ),
+        border = null,
+    )
+}
+
 private const val CHIP_SKEW_DEGREES = 8f
 
 private fun chipStampShape(skewDegrees: Float): Shape =
@@ -313,7 +346,7 @@ private fun chipMetrics(
     kind: KomiChipKind,
     size: KomiChipSize,
 ): ChipMetrics {
-    val filterLike = kind != KomiChipKind.Info
+    val filterLike = kind == KomiChipKind.Filter || kind == KomiChipKind.Input
     return when {
         filterLike && size == KomiChipSize.Sm -> ChipMetrics(26.dp, 11.dp, 14.dp, 2.5.dp)
         filterLike && size == KomiChipSize.Md -> ChipMetrics(34.dp, 14.dp, 16.dp, 2.5.dp)

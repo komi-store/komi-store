@@ -13,6 +13,7 @@ data class SaveInstalledAppParams(
     val releaseId: Long?,
     val assetId: Long?,
     val assetDigest: String?,
+    val releasePublishedAt: String? = null,
     val isPendingInstall: Boolean,
     val isFavourite: Boolean,
     val siblingAssetCount: Int,
