@@ -192,7 +192,7 @@ konsist = { group = "com.lemonappdev", name = "konsist", version.ref = "konsist"
 
 [plugins]
 
-convention-cmp-application = { id = "zed.rainxch.convention.cmp.application", version = "unspecified" }
+convention-android-application-compose = { id = "zed.rainxch.convention.android.application.compose", version = "unspecified" }
 convention-android-library = { id = "zed.rainxch.convention.android.library", version = "unspecified" }
 convention-kmp-library = { id = "zed.rainxch.convention.kmp.library", version = "unspecified" }
 convention-cmp-library = { id = "zed.rainxch.convention.cmp.library", version = "unspecified" }

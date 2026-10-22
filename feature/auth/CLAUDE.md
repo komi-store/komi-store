@@ -60,4 +60,4 @@ User picks it ("Use device code instead") when the web flow can't complete (brow
 - `GitHubAuthApi` and `WebAuthApi` are Koin singles. Their clients come from `createPlatformHttpClient` with the `ProxyScope.DISCOVERY` proxy ("Search & metadata" in Tweaks) and are rebuilt when it changes, so every sign-in path follows the user's proxy.
 - `GITHUB_CLIENT_ID` in `local.properties` for builds; must match the OAuth App registered on the backend and used by the Worker.
 - Endpoints: `WEB_ORIGIN = https://github-store.org`, `BACKEND_ORIGIN = https://api.github-store.org`. Constants in `core/data/network/BackendEndpoints.kt`.
-- Android deep-link filters in `composeApp/src/androidMain/AndroidManifest.xml`: scheme `githubstore`, hosts `auth`, `callback`, `repo`, `apps`. Desktop registers the protocol via `DesktopDeepLink` on Win/Linux (macOS uses the bundle Info.plist `CFBundleURLTypes`).
+- Android deep-link filters in `androidApp/src/main/AndroidManifest.xml`: scheme `githubstore`, hosts `auth`, `callback`, `repo`, `apps`. Desktop registers the protocol via `DesktopDeepLink` on Win/Linux (macOS uses the bundle Info.plist `CFBundleURLTypes`).

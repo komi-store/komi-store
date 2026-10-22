@@ -24,7 +24,7 @@ val KoFileDeclaration.expectedPackagePrefix: String?
         return "zed.rainxch.$owner.${match.groupValues[3]}"
     }
 
-private val APP_ROOTS = Regex("""^(core|feature|composeApp)/""")
+private val APP_ROOTS = Regex("""^(core|feature|composeApp|androidApp)/""")
 
 val appProduction: KoScope by lazy {
     Konsist.scopeFromProduction().slice { APP_ROOTS.containsMatchIn(it.relativePath) }

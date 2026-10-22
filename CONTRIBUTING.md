@@ -94,10 +94,10 @@ sdk.dir=/path/to/Android/sdk
 
 ```bash
 # Android debug build
-./gradlew :composeApp:assembleDebug
+./gradlew :androidApp:assembleDebug
 
 # Android release build (unsigned; the build has no signing config)
-./gradlew :composeApp:assembleRelease
+./gradlew :androidApp:assembleRelease
 
 # Desktop run (dev mode)
 ./gradlew :composeApp:run
@@ -124,7 +124,8 @@ The first build will pull a lot of dependencies. Subsequent builds reuse the Gra
 ## Project layout
 
 ```text
-composeApp/                          # App entry points, navigation, DI wiring
+androidApp/                          # Android application: activity, manifest, resources, R8 rules
+composeApp/                          # Shared app code, navigation, DI wiring, Desktop entry point
 core/
   domain/                            # Interfaces, models, pure logic
   data/                              # Repositories, Ktor, Room, Koin, platform code
