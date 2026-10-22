@@ -53,7 +53,7 @@ The full rule set, with examples, is `docs/code-style.md`. These apply to almost
 - `docs/agents/sign-in.md`: OAuth handoff, device flow, personal access tokens, the `X-GitHub-Token` header
 - `docs/agents/forges.md`: Codeberg and Forgejo clients, per-host tokens, `RepoIdCodec`
 - `docs/agents/releases-and-assets.md`: how releases, assets and installed apps are matched
-- `docs/agents/platform.md`: silent installs, Desktop logs, encrypted storage, Gradle memory
+- `docs/agents/platform.md`: silent installs, local network access, Desktop logs, encrypted storage, Gradle memory
 - `docs/agents/translation.md`: translation providers
 - `docs/agents/distribution.md`: installers, signing, Homebrew and WinGet (maintainers)
 - `feature/<name>/CLAUDE.md`: notes for one feature

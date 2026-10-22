@@ -6,6 +6,10 @@ Silent installs go through Shizuku (`ShizukuProvider`, then AIDL, then `pm insta
 
 The Shizuku and Dhizuku AIDL interfaces live in `core/data-aidl`, a plain Android library, because the Android KMP library plugin (`com.android.kotlin.multiplatform.library`) has no AIDL support. They keep their `zed.rainxch.core.data.services.*` packages, which the Shizuku keep rules in `androidApp/proguard-rules.pro` name.
 
+## Local network access
+
+The app targets Android 17, which blocks traffic to LAN addresses (Wi-Fi or Ethernet; private, link-local, CGNAT and multicast ranges) without the `ACCESS_LOCAL_NETWORK` runtime permission. `MainActivity` resolves the hosts of the HTTP/SOCKS proxies, custom forges and the LibreTranslate URL (`LocalNetworkHosts.kt`). When any of them is on the LAN, it asks for the permission at launch, and asks again in the same session only when that set of hosts changes. After two denials Android stops showing the prompt. The address ranges are in `core/domain/.../network/LocalNetworkAddress.kt`. Loopback isn't a local network, so an on-device proxy at 127.0.0.1 needs nothing.
+
 ## Desktop logs
 
 `CrashReporter.install()`, called at the start of `DesktopApp.main`, tees stdout and stderr to a rotating `session.log` and writes `crash-<ts>.log` on an uncaught exception.

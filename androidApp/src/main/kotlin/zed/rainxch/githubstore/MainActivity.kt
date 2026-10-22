@@ -1,10 +1,15 @@
 package zed.rainxch.githubstore
 
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
@@ -43,6 +48,9 @@ class MainActivity : ComponentActivity() {
         java.util.concurrent.atomic
             .AtomicBoolean(false)
 
+    private var localNetworkPromptedFor = emptySet<String>()
+    private val localNetworkPermission = registerForActivityResult(ActivityResultContracts.RequestPermission()) {}
+
     override fun onCreate(savedInstanceState: Bundle?) {
         val splash = installSplashScreen()
         enableEdgeToEdge()
@@ -70,6 +78,10 @@ class MainActivity : ComponentActivity() {
             }
         }
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.CINNAMON_BUN) {
+            requestLocalNetworkAccessWhenNeeded()
+        }
+
         setContent {
             DisposableEffect(Unit) {
                 val listener =
@@ -91,6 +103,25 @@ class MainActivity : ComponentActivity() {
                 },
                 onContentPainted = { contentPainted.set(true) },
             )
+        }
+    }
+
+    // Android 17 blocks LAN traffic without ACCESS_LOCAL_NETWORK. While the activity lives, asks again only when the
+    // set of LAN hosts in the proxy, forge or LibreTranslate settings changes; after two denials Android stops showing
+    // the prompt.
+    @RequiresApi(Build.VERSION_CODES.CINNAMON_BUN)
+    private fun requestLocalNetworkAccessWhenNeeded() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                localNetworkHosts(tweaksRepository).collect { hosts ->
+                    val granted =
+                        checkSelfPermission(Manifest.permission.ACCESS_LOCAL_NETWORK) == PackageManager.PERMISSION_GRANTED
+                    if (hosts.isNotEmpty() && hosts != localNetworkPromptedFor && !granted) {
+                        localNetworkPromptedFor = hosts
+                        localNetworkPermission.launch(Manifest.permission.ACCESS_LOCAL_NETWORK)
+                    }
+                }
+            }
         }
     }
 

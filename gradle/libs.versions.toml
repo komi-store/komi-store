@@ -66,8 +66,8 @@ projectApplicationId = "zed.rainxch.githubstore"
 projectVersionName = "1.9.3"
 projectVersionCode = "22"
 projectMinSdkVersion = "26"
-projectTargetSdkVersion = "36"
-projectCompileSdkVersion = "36"
+projectTargetSdkVersion = "37"
+projectCompileSdkVersion = "37"
 
 [libraries]
 # Kotlin

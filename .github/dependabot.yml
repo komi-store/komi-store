@@ -8,17 +8,6 @@ updates:
       default-days: 7
     open-pull-requests-limit: 5
     ignore:
-      # Newer releases need compileSdk 37 (AndroidX Compose 1.12, lifecycle 2.11, OkHttp 5.5); lift with the compileSdk 37 upgrade. Patches still come through.
-      - dependency-name: "org.jetbrains.androidx.lifecycle:*"
-        update-types: ["version-update:semver-minor", "version-update:semver-major"]
-      - dependency-name: "io.ktor:*"
-        update-types: ["version-update:semver-minor", "version-update:semver-major"]
-      - dependency-name: "io.coil-kt.coil3:*"
-        update-types: ["version-update:semver-minor", "version-update:semver-major"]
-      - dependency-name: "com.mikepenz:multiplatform-markdown-renderer*"
-        update-types: ["version-update:semver-minor", "version-update:semver-major"]
-      - dependency-name: "io.github.iamr0s:Dhizuku-API"
-        update-types: ["version-update:semver-minor", "version-update:semver-major"]
       # Kermit 2.2 deprecates the tag-first log overloads used across the codebase, and warnings are errors; lift with the logging cleanup (D7 in docs/quality/findings.md).
       - dependency-name: "co.touchlab:kermit*"
         update-types: ["version-update:semver-minor", "version-update:semver-major"]

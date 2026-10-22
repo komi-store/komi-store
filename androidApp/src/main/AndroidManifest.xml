@@ -4,6 +4,9 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
 
+    <!-- Android 17: requested at runtime when a proxy, forge or LibreTranslate host is on the LAN -->
+    <uses-permission android:name="android.permission.ACCESS_LOCAL_NETWORK" />
+
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <uses-permission
