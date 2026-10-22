@@ -58,3 +58,13 @@ The full rule set, with examples, is `docs/code-style.md`. These apply to almost
 - `docs/agents/distribution.md`: installers, signing, Homebrew and WinGet (maintainers)
 - `feature/<name>/CLAUDE.md`: notes for one feature
 - `docs/quality/findings.md`: the research behind the rules
+
+## Code graph and subagents
+
+This repository has a native-Kotlin `graft` graph at `graft/` (local cache, gitignored). It exists only for this repository; do not build or use it in other projects.
+
+When dispatching a subagent for this repository, include this in the prompt:
+
+> A native-Kotlin `graft` graph exists at `graft/`. Before reading large files, use `graft ask "<question>"` or `graft skeleton <file>` to get exact file:line. After changing a public function, run `graft callers <symbol> -d 2` and report affected call sites. Do not run `graft init`, do not run `graft build --deep`, and do not treat Kotlin call edges as complete without compiler/tests confirming them.
+
+Subagents do not inherit this conversation, so the instruction must be in the dispatched prompt, not only here.
