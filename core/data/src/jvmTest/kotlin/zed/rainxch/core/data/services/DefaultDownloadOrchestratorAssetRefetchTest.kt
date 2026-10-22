@@ -610,6 +610,8 @@ class DefaultDownloadOrchestratorAssetRefetchTest {
         ) = Unit
 
         override fun markCompleted(packageName: String) = Unit
+
+        override fun onAppResumed() = Unit
     }
 
     private object StubTokenStore : TokenStore {

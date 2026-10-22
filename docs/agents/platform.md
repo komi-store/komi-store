@@ -4,6 +4,8 @@
 
 Silent installs go through Shizuku (`ShizukuProvider`, then AIDL, then `pm install -S`), Dhizuku, or root through libsu (`services/root/RootServiceManager`). `services/installer/SilentInstallerDispatcher` in `core/data/src/androidMain` picks one from the installer setting and falls back to the standard installer on failure.
 
+The standard installer (setting Default) opens the system package installer directly when other APK installers are present and Android has no default for them, so no chooser appears. A handed-off install keeps `SystemInstallSerializer`'s gate until the package broadcast arrives; `MainActivity.onResume` releases it, because a cancelled installer screen sends no broadcast.
+
 The Shizuku and Dhizuku AIDL interfaces live in `core/data-aidl`, a plain Android library, because the Android KMP library plugin (`com.android.kotlin.multiplatform.library`) has no AIDL support. They keep their `zed.rainxch.core.data.services.*` packages, which the Shizuku keep rules in `androidApp/proguard-rules.pro` name.
 
 ## Local network access

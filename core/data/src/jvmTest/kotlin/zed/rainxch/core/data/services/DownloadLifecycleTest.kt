@@ -427,6 +427,8 @@ class DownloadLifecycleTest {
         ) = Unit
 
         override fun markCompleted(packageName: String) = Unit
+
+        override fun onAppResumed() = Unit
     }
 
     private object StubAssetSourceRefetcher : AssetSourceRefetcher {
