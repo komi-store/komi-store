@@ -20,8 +20,10 @@ import coil3.request.ImageRequest
 import coil3.svg.SvgDecoder
 import kotlinx.coroutines.channels.Channel
 import org.koin.compose.viewmodel.koinViewModel
+import zed.rainxch.core.domain.model.appearance.AccentId
 import zed.rainxch.core.domain.model.appearance.AppPersonality
 import zed.rainxch.core.presentation.ProfileAvatarSpec
+import zed.rainxch.core.presentation.personality.classic.systemWallpaperColorScheme
 import zed.rainxch.core.presentation.personality.classicPersonality
 import zed.rainxch.core.presentation.personality.mangaPersonality
 import zed.rainxch.core.presentation.personality.toMangaAccent
@@ -119,11 +121,15 @@ fun App(
             }
 
             AppPersonality.CLASSIC -> {
-                classicPersonality(
-                    dark = resolvedDarkTheme,
-                    amoled = mainState.isAmoledTheme,
-                    accent = mainState.accent,
-                )
+                val wallpaper = if (mainState.accent == AccentId.WALLPAPER) systemWallpaperColorScheme(resolvedDarkTheme) else null
+                remember(resolvedDarkTheme, mainState.isAmoledTheme, mainState.accent, wallpaper) {
+                    classicPersonality(
+                        dark = resolvedDarkTheme,
+                        amoled = mainState.isAmoledTheme,
+                        accent = mainState.accent,
+                        wallpaper = wallpaper,
+                    )
+                }
             }
         }
 

@@ -65,8 +65,6 @@ sealed interface SearchAction {
 
     data object OnFabClick : SearchAction
 
-    data object OnToggleGridLayout : SearchAction
-
     data object OnToggleFiltersSheet : SearchAction
 
     data object DismissClipboardBanner : SearchAction

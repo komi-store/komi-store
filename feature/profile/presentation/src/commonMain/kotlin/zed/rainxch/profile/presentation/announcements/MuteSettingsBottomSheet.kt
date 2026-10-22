@@ -17,7 +17,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
 import zed.rainxch.core.domain.model.announcement.AnnouncementCategory
@@ -50,10 +49,8 @@ fun MuteSettingsBottomSheet(
         ) {
             KomiText(
                 text = stringResource(Res.string.announcements_mute_settings_title),
-                role = KomiTextRole.Title,
-                fontWeight = FontWeight.SemiBold,
+                role = KomiTextRole.CardTitle,
                 color = colors.onSurface,
-                uppercase = false,
             )
 
             AnnouncementCategory.entries.forEach { category ->
@@ -106,7 +103,6 @@ private fun CategoryRow(
             role = KomiTextRole.Body,
             color = colors.onSurface,
             modifier = Modifier.weight(1f),
-            uppercase = false,
         )
         if (locked) {
             KomiIcon(

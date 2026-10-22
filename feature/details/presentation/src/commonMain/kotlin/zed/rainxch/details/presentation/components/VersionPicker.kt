@@ -29,10 +29,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.collections.immutable.ImmutableSet
@@ -94,9 +92,7 @@ fun VersionPicker(
     ) {
         KomiText(
             text = stringResource(Res.string.versions_title),
-            role = KomiTextRole.Label,
-            fontWeight = FontWeight.SemiBold,
-            fontSize = 12.sp,
+            role = KomiTextRole.Overline,
             color = colors.primary,
             modifier = Modifier.padding(horizontal = 4.dp),
         )
@@ -127,19 +123,16 @@ fun VersionPicker(
                                 release.tagName
                             }
                         } ?: stringResource(Res.string.no_version_selected),
-                    role = KomiTextRole.Stamp,
-                    fontWeight = FontWeight.SemiBold,
+                    role = KomiTextRole.Label,
                     color = colors.onSurface,
                     overflow = TextOverflow.Clip,
                     maxLines = 1,
-                    uppercase = false,
                 )
                 (selectedAppLabel ?: selectedRelease?.name)?.let { name ->
                     if (name != selectedRelease?.tagName) {
                         KomiText(
                             text = name,
                             role = KomiTextRole.Body,
-                            fontSize = 13.sp,
                             color = colors.onSurfaceVariant,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
@@ -175,12 +168,9 @@ fun VersionPicker(
         ) {
             KomiText(
                 text = stringResource(Res.string.versions_title),
-                role = KomiTextRole.Title,
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 20.sp,
+                role = KomiTextRole.CardTitle,
                 color = colors.onSurface,
                 modifier = Modifier.padding(vertical = 6.dp),
-                uppercase = false,
             )
             Spacer(Modifier.size(8.dp))
             if (lines.size > 1) {
@@ -239,7 +229,7 @@ fun VersionPicker(
                             devicePlatform = devicePlatform,
                         )
                         KomiHorizontalDivider(
-                            color = colors.outlineVariant.copy(alpha = 0.5f),
+                            color = colors.divider,
                             thickness = 0.5.dp,
                         )
                     }
@@ -280,22 +270,18 @@ private fun VersionListItem(
             ) {
                 KomiText(
                     text = release.tagName,
-                    role = KomiTextRole.Stamp,
-                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.SemiBold,
+                    role = KomiTextRole.ItemTitle,
                     color =
                         when {
                             isSelected -> colors.primary
                             hasDeviceBuild -> colors.onSurface
                             else -> colors.onSurfaceVariant
                         },
-                    uppercase = false,
                 )
                 if (isLatest) {
                     KomiText(
                         text = stringResource(Res.string.latest_badge),
-                        role = KomiTextRole.Label,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 10.sp,
+                        role = KomiTextRole.Overline,
                         color = colors.primary,
                         modifier =
                             Modifier
@@ -314,9 +300,7 @@ private fun VersionListItem(
                     val specificLabel = release.preReleaseLabel()
                     KomiText(
                         text = specificLabel ?: stringResource(Res.string.pre_release_badge),
-                        role = KomiTextRole.Label,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 10.sp,
+                        role = KomiTextRole.Overline,
                         color = colors.primary,
                         modifier =
                             Modifier
@@ -334,7 +318,6 @@ private fun VersionListItem(
                     KomiText(
                         text = name,
                         role = KomiTextRole.Body,
-                        fontSize = 13.sp,
                         color = colors.onSurfaceVariant,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
@@ -348,11 +331,8 @@ private fun VersionListItem(
                     } else {
                         "${formatIsoDateOrRaw(release.publishedAt)} · ${stringResource(Res.string.no_build_for_this_device)}"
                     },
-                role = KomiTextRole.Label,
-                fontSize = 12.sp,
-                fontWeight = FontWeight.Medium,
+                role = KomiTextRole.LabelSmall,
                 color = colors.onSurfaceVariant,
-                uppercase = false,
             )
         }
         if (platforms.isNotEmpty()) {
@@ -377,11 +357,8 @@ private fun VersionBadge(text: String) {
     val shape = RoundedCornerShape(LocalPersonality.current.shape.cornerSmall)
     KomiText(
         text = text,
-        role = KomiTextRole.Label,
-        fontWeight = FontWeight.Bold,
-        fontSize = 10.sp,
+        role = KomiTextRole.LabelSmall,
         color = colors.primary,
-        uppercase = false,
         modifier =
             Modifier
                 .clip(shape)

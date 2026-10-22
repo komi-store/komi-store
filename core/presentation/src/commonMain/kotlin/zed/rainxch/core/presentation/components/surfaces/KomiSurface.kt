@@ -251,21 +251,29 @@ private fun ClassicSurface(
 ) {
     val colors = personality.colors
     val shape = remember(personality.shape.corner) { RoundedCornerShape(personality.shape.corner) }
-    val border =
-        remember(personality.shape.borderPanel, colors.outlineVariant) {
-            BorderStroke(personality.shape.borderPanel, colors.outlineVariant)
-        }
+    // Tonal surfaces: the container color steps up with elevation instead of drawing an outline.
+    // A background-colored surface keeps the outline, since it would vanish into the page.
     val fill =
         when (paper) {
-            KomiSurfacePaper.Surface -> colors.surface
-            KomiSurfacePaper.Background -> colors.background
+            KomiSurfacePaper.Background -> {
+                colors.background
+            }
+
+            KomiSurfacePaper.Surface -> {
+                when (elevation) {
+                    KomiSurfaceElevation.Flat -> colors.surface
+                    KomiSurfaceElevation.Card -> colors.surfaceContainer
+                    KomiSurfaceElevation.Raised, KomiSurfaceElevation.Modal -> colors.surfaceContainerHigh
+                }
+            }
         }
+    val border =
+        if (paper == KomiSurfacePaper.Background) BorderStroke(personality.shape.borderPanel, colors.outlineVariant) else null
     val shadowElevation =
         when (elevation) {
-            KomiSurfaceElevation.Flat -> 0.dp
-            KomiSurfaceElevation.Card -> 1.dp
+            KomiSurfaceElevation.Flat, KomiSurfaceElevation.Card -> 0.dp
             KomiSurfaceElevation.Raised -> 3.dp
-            KomiSurfaceElevation.Modal -> 8.dp
+            KomiSurfaceElevation.Modal -> 6.dp
         }
 
     val clickModifier =
@@ -289,7 +297,7 @@ private fun ClassicSurface(
 @Composable
 private fun PreviewPanelBody() {
     Column(verticalArrangement = Arrangement.spacedBy(Spacing.xs)) {
-        KomiText("Ollama", role = KomiTextRole.Title)
+        KomiText("Ollama", role = KomiTextRole.CardTitle)
         KomiText("Run large language models locally.", role = KomiTextRole.Body)
         KomiText("v0.5.4 · 174M", role = KomiTextRole.Mono)
     }

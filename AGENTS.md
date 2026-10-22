@@ -4,7 +4,8 @@ Open-source app store for apps released on GitHub, Codeberg and other Forgejo fo
 
 ## Map
 
-- `composeApp/`: entry points, navigation (`GithubStoreGraph`, `AppNavigation`), DI wiring (`ViewModelsModule`, `initKoin`)
+- `composeApp/`: shared app code and the Desktop entry point: navigation (`GithubStoreGraph`, `AppNavigation`), DI wiring (`ViewModelsModule`, `initKoin`)
+- `androidApp/`: the Android application: `MainActivity`, `GithubStoreApp`, manifest, resources, R8 rules
 - `core/domain`: interfaces, models and pure logic, no framework imports
 - `core/data`: repositories, Ktor clients, Room, Koin modules, Android and Desktop implementations
 - `core/presentation`: the `Personality` design system, `Komi*` components, strings for 14 locales
@@ -14,7 +15,7 @@ Open-source app store for apps released on GitHub, Codeberg and other Forgejo fo
 ## Build and run
 
 ```bash
-./gradlew :composeApp:assembleDebug     # Android APK
+./gradlew :androidApp:assembleDebug     # Android APK
 ./gradlew :composeApp:run               # Desktop
 ```
 
@@ -26,7 +27,7 @@ CI runs these on every pull request. Existing findings live in committed baselin
 
 ```bash
 ./gradlew spotlessApply                  # formats the files you changed
-./gradlew compileKotlinJvm compileDebugKotlinAndroid jvmTest detekt :konsist-test:test
+./gradlew compileKotlinJvm compileDebugKotlinAndroid :androidApp:compileDebugKotlin jvmTest detekt :konsist-test:test
 ./gradlew lintDebug
 ./gradlew debugStabilityCheck            # its own invocation, after compileDebugKotlinAndroid
 ```

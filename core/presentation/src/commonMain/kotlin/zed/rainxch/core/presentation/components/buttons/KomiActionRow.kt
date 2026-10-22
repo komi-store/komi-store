@@ -15,17 +15,18 @@ import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.rounded.MoreVert
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.sp
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import org.jetbrains.compose.resources.stringResource
+import zed.rainxch.core.presentation.components.bars.LocalInBar
 import zed.rainxch.core.presentation.components.dividers.KomiVerticalDivider
 import zed.rainxch.core.presentation.components.overlays.KomiDropdown
 import zed.rainxch.core.presentation.components.overlays.KomiMenuEntry
@@ -61,6 +62,8 @@ fun KomiActionRow(
             is ClassicPersonality -> if (showLabels) Spacing.lg else Spacing.sm
         }
     val dividerHeight = size.metrics.box * DIVIDER_HEIGHT_FRACTION
+    // A bar's pill already groups its buttons, and its overflow is the vertical one used elsewhere.
+    val inBar = LocalInBar.current
     val overflowVariant =
         when (LocalPersonality.current) {
             is MangaPersonality -> KomiButtonVariant.Tonal
@@ -102,8 +105,10 @@ fun KomiActionRow(
         }
 
         if (overflow.isNotEmpty()) {
-            Box(modifier = Modifier.height(dividerHeight)) {
-                KomiVerticalDivider()
+            if (!inBar) {
+                Box(modifier = Modifier.height(dividerHeight)) {
+                    KomiVerticalDivider()
+                }
             }
 
             KomiDropdown(
@@ -111,7 +116,7 @@ fun KomiActionRow(
                 onSelect = { menuItem -> overflow.firstOrNull { it.title == menuItem.id }?.onClick?.invoke() },
                 trigger = { onClick ->
                     KomiIconButton(
-                        icon = Icons.Default.MoreHoriz,
+                        icon = if (inBar) Icons.Rounded.MoreVert else Icons.Default.MoreHoriz,
                         contentDescription = stringResource(Res.string.cd_more_actions),
                         onClick = onClick,
                         variant = overflowVariant,
@@ -155,11 +160,10 @@ private fun KomiActionTile(
 
             KomiText(
                 text = item.title,
-                role = KomiTextRole.Label,
+                role = KomiTextRole.LabelSmall,
                 color =
                     LocalPersonality.current.colors.onSurfaceVariant
                         .copy(alpha = if (item.enabled) 1f else 0.45f),
-                fontSize = 11.sp,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )

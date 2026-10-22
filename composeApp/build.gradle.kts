@@ -1,16 +1,9 @@
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 
 plugins {
-    alias(libs.plugins.convention.cmp.application)
+    alias(libs.plugins.convention.cmp.library)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.compose.hot.reload)
-}
-
-android {
-    dependenciesInfo {
-        includeInApk = false
-        includeInBundle = false
-    }
 }
 
 kotlin {
@@ -19,14 +12,6 @@ kotlin {
     }
 
     sourceSets {
-        androidMain.dependencies {
-            implementation(libs.androidx.compose.ui.tooling.preview)
-            implementation(libs.androidx.activity.compose)
-
-            implementation(libs.core.splashscreen)
-
-            implementation(libs.koin.android)
-        }
         commonMain.dependencies {
             implementation(projects.core.data)
             implementation(projects.core.domain)
@@ -181,29 +166,5 @@ compose.desktop {
                 appCategory = "Development"
             }
         }
-    }
-}
-
-tasks.register("printRuntimeDependencies") {
-    description = "Lists all runtime dependencies for licenses.json maintenance."
-    group = "verification"
-    val coordinatesProvider: Provider<List<String>> =
-        project.provider {
-            val cfg =
-                configurations.findByName("releaseRuntimeClasspath")
-                    ?: configurations.findByName("androidReleaseRuntimeClasspath")
-                    ?: error("No release runtime classpath configuration found.")
-            cfg.incoming.resolutionResult.allComponents
-                .asSequence()
-                .map { it.id }
-                .filterIsInstance<ModuleComponentIdentifier>()
-                .map { "${it.group}:${it.module}:${it.version}" }
-                .distinct()
-                .sorted()
-                .toList()
-        }
-    notCompatibleWithConfigurationCache("Resolves Android variant configurations at execution time.")
-    doLast {
-        coordinatesProvider.get().forEach { println(it) }
     }
 }

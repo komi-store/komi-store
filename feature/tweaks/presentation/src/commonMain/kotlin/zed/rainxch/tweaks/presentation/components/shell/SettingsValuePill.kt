@@ -15,10 +15,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import zed.rainxch.core.presentation.components.icon.KomiIcon
 import zed.rainxch.core.presentation.components.text.KomiText
 import zed.rainxch.core.presentation.components.text.KomiTextRole
@@ -52,9 +50,6 @@ fun SettingsValuePill(
                     text = value,
                     role = KomiTextRole.Label,
                     color = colors.onSurface,
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.Black,
-                    uppercase = false,
                 )
                 KomiIcon(
                     imageVector = Icons.Filled.KeyboardArrowDown,
@@ -82,9 +77,6 @@ fun SettingsValuePill(
                     text = value,
                     role = KomiTextRole.Label,
                     color = colors.onSurface,
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    uppercase = false,
                 )
                 KomiIcon(
                     imageVector = Icons.Filled.KeyboardArrowDown,

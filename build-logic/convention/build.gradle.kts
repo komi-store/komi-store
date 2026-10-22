@@ -55,9 +55,9 @@ gradlePlugin {
             id = "zed.rainxch.convention.android.application.compose"
             implementationClass = "AndroidApplicationComposeConventionPlugin"
         }
-        register("cmpApplication") {
-            id = "zed.rainxch.convention.cmp.application"
-            implementationClass = "CmpApplicationConventionPlugin"
+        register("androidLibrary") {
+            id = "zed.rainxch.convention.android.library"
+            implementationClass = "AndroidLibraryConventionPlugin"
         }
         register("kmpLibrary") {
             id = "zed.rainxch.convention.kmp.library"

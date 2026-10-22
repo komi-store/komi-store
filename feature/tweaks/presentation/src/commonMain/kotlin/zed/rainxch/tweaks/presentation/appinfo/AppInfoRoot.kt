@@ -18,7 +18,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.automirrored.outlined.OpenInNew
@@ -39,10 +38,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalUriHandler
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
@@ -54,12 +51,10 @@ import zed.rainxch.githubstore.core.presentation.res.app_icon
 import zed.rainxch.core.presentation.components.buttons.KomiButton
 import zed.rainxch.core.presentation.components.buttons.KomiButtonVariant
 import zed.rainxch.core.presentation.components.buttons.KomiButtonSize
-import zed.rainxch.core.presentation.components.buttons.KomiIconButton
 import zed.rainxch.core.presentation.components.scaffold.KomiScaffold
 import zed.rainxch.core.presentation.components.text.KomiText
 import zed.rainxch.core.presentation.components.text.KomiTextRole
 import zed.rainxch.core.presentation.utils.constrainedContentWidth
-import zed.rainxch.githubstore.core.presentation.res.navigate_back
 import zed.rainxch.githubstore.core.presentation.res.tweaks_app_info_app_name
 import zed.rainxch.githubstore.core.presentation.res.tweaks_app_info_community_business_cta
 import zed.rainxch.githubstore.core.presentation.res.tweaks_app_info_community_business_subtitle
@@ -100,13 +95,7 @@ fun AppInfoRoot(
         topBar = {
             KomiTopBar(
                 title = stringResource(Res.string.tweaks_entry_app_info),
-                leading = {
-                    KomiIconButton(
-                        icon = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = stringResource(Res.string.navigate_back),
-                        onClick = onNavigateBack,
-                    )
-                }
+                onBack = onNavigateBack,
             )
         },
         grid = true,
@@ -132,7 +121,7 @@ fun AppInfoRoot(
 
                 KomiText(
                     text = stringResource(Res.string.tweaks_app_info_community_section),
-                    role = KomiTextRole.Title
+                    role = KomiTextRole.SectionTitle
                 )
                 Spacer(Modifier.height(8.dp))
 
@@ -205,23 +194,19 @@ private fun AppIdentityCard(versionName: String) {
             ) {
                 KomiText(
                     text = stringResource(Res.string.tweaks_app_info_app_name),
-                    role = KomiTextRole.Title,
-                    fontWeight = FontWeight.SemiBold,
+                    role = KomiTextRole.SectionTitle,
                     color = colors.onSurface,
                 )
                 KomiText(
                     text = versionName.ifBlank { "—" },
                     role = KomiTextRole.Mono,
                     color = colors.onSurfaceVariant,
-                    uppercase = false,
                 )
                 Spacer(Modifier.height(4.dp))
                 KomiText(
                     text = stringResource(Res.string.tweaks_app_info_tagline),
                     role = KomiTextRole.Body,
-                    fontSize = 13.sp,
                     color = colors.onSurfaceVariant,
-                    uppercase = false,
                 )
             }
         }
@@ -247,15 +232,13 @@ private fun CommunityCard(
             ) {
                 KomiText(
                     text = stringResource(Res.string.tweaks_app_info_community_title),
-                    role = KomiTextRole.Title,
-                    fontWeight = FontWeight.SemiBold,
+                    role = KomiTextRole.SectionTitle,
                     color = colors.onSurface,
                     modifier = Modifier.weight(1f),
                 )
                 KomiText(
                     text = stringResource(Res.string.tweaks_app_info_community_subtitle),
-                    role = KomiTextRole.Label,
-                    fontSize = 11.sp,
+                    role = KomiTextRole.Overline,
                     color = colors.onSurfaceVariant,
                 )
             }
@@ -316,7 +299,7 @@ private fun CommunityCard(
             }
 
             Spacer(Modifier.height(16.dp))
-            KomiHorizontalDivider(color = colors.outline.copy(alpha = 0.5f))
+            KomiHorizontalDivider(color = colors.divider)
             Spacer(Modifier.height(14.dp))
 
             Row(
@@ -327,17 +310,13 @@ private fun CommunityCard(
                 Column(modifier = Modifier.weight(1f)) {
                     KomiText(
                         text = stringResource(Res.string.tweaks_app_info_community_business_title),
-                        role = KomiTextRole.Title,
-                        fontWeight = FontWeight.SemiBold,
+                        role = KomiTextRole.CardTitle,
                         color = colors.onSurface,
-                        uppercase = false,
                     )
                     KomiText(
                         text = stringResource(Res.string.tweaks_app_info_community_business_subtitle),
                         role = KomiTextRole.Body,
-                        fontSize = 13.sp,
                         color = colors.onSurfaceVariant,
-                        uppercase = false,
                     )
                 }
                 KomiButton(
@@ -400,13 +379,10 @@ private fun SocialTile(
             }
             KomiText(
                 text = label,
-                role = KomiTextRole.Label,
-                fontSize = 12.sp,
-                fontWeight = FontWeight.SemiBold,
+                role = KomiTextRole.LabelSmall,
                 color = LocalPersonality.current.colors.onSurface,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
-                uppercase = false,
             )
         }
     }
@@ -462,21 +438,17 @@ private fun ActionRow(
             ) {
                 KomiText(
                     text = title,
-                    role = KomiTextRole.Stamp,
-                    fontWeight = FontWeight.SemiBold,
+                    role = KomiTextRole.ItemTitle,
                     color = colors.onSurface,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    uppercase = false,
                 )
                 KomiText(
                     text = subtitle,
                     role = KomiTextRole.Body,
-                    fontSize = 13.sp,
                     color = colors.onSurfaceVariant,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    uppercase = false,
                 )
             }
             KomiIcon(

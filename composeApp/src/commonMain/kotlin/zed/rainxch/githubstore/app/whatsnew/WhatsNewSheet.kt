@@ -8,9 +8,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.stringResource
 import zed.rainxch.core.domain.model.announcement.WhatsNewEntry
 import zed.rainxch.core.presentation.components.buttons.KomiButton
@@ -76,10 +74,8 @@ private fun SheetHeader(entry: WhatsNewEntry) {
     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
         KomiText(
             text = stringResource(Res.string.whats_new_sheet_heading, entry.versionName),
-            role = KomiTextRole.Title,
-            fontWeight = FontWeight.Bold,
+            role = KomiTextRole.CardTitle,
             color = colors.onSurface,
-            uppercase = false,
         )
         KomiText(
             text =
@@ -88,10 +84,8 @@ private fun SheetHeader(entry: WhatsNewEntry) {
                     entry.versionName,
                     entry.releaseDate,
                 ),
-            role = KomiTextRole.Label,
-            fontSize = 12.sp,
+            role = KomiTextRole.Caption,
             color = colors.onSurfaceVariant,
-            uppercase = false,
         )
     }
 }

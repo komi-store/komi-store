@@ -32,10 +32,8 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.onClick
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import kotlinx.collections.immutable.ImmutableList
 import org.jetbrains.compose.resources.stringResource
 import zed.rainxch.core.presentation.components.InstalledAppIcon
@@ -112,22 +110,18 @@ fun CandidateCard(
                 ) {
                     KomiText(
                         text = candidate.appLabel,
-                        role = KomiTextRole.Title,
-                        fontWeight = FontWeight.SemiBold,
+                        role = KomiTextRole.CardTitle,
                         color = colors.onSurface,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
-                        uppercase = false,
                     )
 
                     KomiText(
                         text = candidate.packageName,
                         role = KomiTextRole.Body,
-                        fontSize = 13.sp,
                         color = colors.onSurfaceVariant,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
-                        uppercase = false,
                     )
 
                     Box(
@@ -140,10 +134,8 @@ fun CandidateCard(
                                 Res.string.external_import_card_installer_chip,
                                 candidate.installerLabel,
                             ),
-                            role = KomiTextRole.Label,
-                            fontSize = 11.sp,
+                            role = KomiTextRole.Caption,
                             color = colors.onPrimaryContainer,
-                            uppercase = false,
                             modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
                         )
                     }
@@ -262,7 +254,6 @@ private fun PreselectedRow(suggestion: RepoSuggestionUi?) {
                 text = stringResource(Res.string.external_import_card_preselect_unknown),
                 role = KomiTextRole.Body,
                 color = contentColor,
-                uppercase = false,
                 modifier = Modifier.padding(horizontal = 12.dp, vertical = 12.dp),
             )
         } else {
@@ -272,19 +263,16 @@ private fun PreselectedRow(suggestion: RepoSuggestionUi?) {
             ) {
                 KomiText(
                     text = stringResource(Res.string.external_import_card_preselect_known_prefix),
-                    role = KomiTextRole.Label,
-                    fontSize = 11.sp,
+                    role = KomiTextRole.Overline,
                     color = contentColor,
                 )
 
                 KomiText(
                     text = suggestion.repo,
-                    role = KomiTextRole.Title,
-                    fontWeight = FontWeight.SemiBold,
+                    role = KomiTextRole.CardTitle,
                     color = contentColor,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    uppercase = false,
                 )
 
                 Row(
@@ -297,11 +285,9 @@ private fun PreselectedRow(suggestion: RepoSuggestionUi?) {
                             suggestion.owner,
                         ),
                         role = KomiTextRole.Body,
-                        fontSize = 13.sp,
                         color = contentColor,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
-                        uppercase = false,
                         modifier = Modifier.weight(1f, fill = false),
                     )
 
@@ -310,10 +296,8 @@ private fun PreselectedRow(suggestion: RepoSuggestionUi?) {
                             Res.string.external_import_match_confidence_chip,
                             suggestion.confidencePercent,
                         ),
-                        role = KomiTextRole.Label,
-                        fontSize = 11.sp,
+                        role = KomiTextRole.Caption,
                         color = contentColor,
-                        uppercase = false,
                     )
                 }
             }

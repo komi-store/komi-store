@@ -12,9 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.stringResource
 import zed.rainxch.core.presentation.components.text.KomiText
 import zed.rainxch.core.presentation.components.text.KomiTextRole
@@ -38,11 +36,8 @@ fun LazyListScope.stats(repoStats: RepoStats) {
         ) {
             KomiText(
                 text = stringResource(Res.string.details_stats_section),
-                role = KomiTextRole.Title,
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 22.sp,
+                role = KomiTextRole.SectionTitle,
                 color = colors.onBackground,
-                uppercase = false,
             )
         }
 

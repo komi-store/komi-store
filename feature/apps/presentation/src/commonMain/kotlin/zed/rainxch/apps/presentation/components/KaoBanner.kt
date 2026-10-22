@@ -19,9 +19,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.stringResource
 import zed.rainxch.core.presentation.components.buttons.KomiButton
 import zed.rainxch.core.presentation.components.buttons.KomiButtonSize
@@ -72,16 +70,13 @@ fun KaoBanner(
                 ) {
                     KomiText(
                         text = stringResource(Res.string.kao_banner_title),
-                        role = KomiTextRole.Stamp,
-                        fontWeight = FontWeight.SemiBold,
-                        uppercase = false,
+                        role = KomiTextRole.CardTitle,
                         color = colors.onPrimaryContainer,
                     )
 
                     KomiText(
                         text = stringResource(Res.string.kao_banner_body),
                         role = KomiTextRole.Body,
-                        fontSize = 13.sp,
                         color = colors.onPrimaryContainer,
                     )
                 }

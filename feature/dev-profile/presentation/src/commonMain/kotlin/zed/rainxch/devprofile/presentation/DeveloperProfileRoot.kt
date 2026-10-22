@@ -14,11 +14,10 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.FolderOff
-import androidx.compose.material.icons.filled.OpenInBrowser
+import androidx.compose.material.icons.rounded.OpenInBrowser
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
 import zed.rainxch.core.presentation.components.icon.KomiIcon
@@ -244,7 +243,6 @@ fun DeveloperProfileScreen(
                             text = state.errorMessage,
                             role = KomiTextRole.Body,
                             color = colors.onSurface,
-                            uppercase = false,
                             modifier = Modifier.weight(1f),
                         )
 
@@ -297,7 +295,7 @@ private fun EmptyReposContent(
             imageVector = Icons.Default.FolderOff,
             contentDescription = null,
             modifier = Modifier.size(48.dp),
-            tint = colors.onSurfaceVariant.copy(alpha = 0.6f),
+            tint = colors.onSurfaceVariant,
         )
 
         Spacer(modifier = Modifier.height(12.dp))
@@ -308,7 +306,6 @@ private fun EmptyReposContent(
             role = KomiTextRole.Body,
             color = colors.onSurfaceVariant,
             textAlign = TextAlign.Center,
-            uppercase = false,
         )
     }
 }
@@ -318,26 +315,22 @@ fun DevProfileTopbar(
     state: DeveloperProfileState,
     onAction: (DeveloperProfileAction) -> Unit,
 ) {
+    val profileUrl = state.profile?.htmlUrl
     KomiTopBar(
         title = state.username,
         size = KomiTopBarSize.Compact,
-        leading = {
-            KomiIconButton(
-                icon = Icons.AutoMirrored.Filled.ArrowBack,
-                contentDescription = stringResource(Res.string.navigate_back),
-                onClick = { onAction(DeveloperProfileAction.OnNavigateBackClick) },
-                variant = KomiButtonVariant.Tonal,
-            )
-        },
-        actions = {
-            state.profile?.htmlUrl?.let {
+        onBack = { onAction(DeveloperProfileAction.OnNavigateBackClick) },
+        actions = if (profileUrl != null) {
+            {
                 KomiIconButton(
-                    icon = Icons.Default.OpenInBrowser,
+                    icon = Icons.Rounded.OpenInBrowser,
                     contentDescription = stringResource(Res.string.open_repository),
-                    onClick = { onAction(DeveloperProfileAction.OnOpenLink(it)) },
+                    onClick = { onAction(DeveloperProfileAction.OnOpenLink(profileUrl)) },
                     variant = KomiButtonVariant.Tonal,
                 )
             }
+        } else {
+            null
         },
     )
 }
@@ -366,10 +359,9 @@ private fun ErrorContent(
         KomiText(
             text = stringResource(Res.string.error_generic, message),
             maxLines = 3,
-            role = KomiTextRole.Title,
+            role = KomiTextRole.CardTitle,
             color = colors.onSurface,
             textAlign = TextAlign.Center,
-            uppercase = false,
         )
 
         Spacer(modifier = Modifier.height(16.dp))

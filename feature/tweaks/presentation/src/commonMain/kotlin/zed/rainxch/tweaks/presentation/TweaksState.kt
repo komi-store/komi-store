@@ -32,6 +32,7 @@ data class TweaksState(
     val selectedThemeColor: AppTheme = AppTheme.NORD,
     val selectedFontTheme: FontTheme = FontTheme.CUSTOM,
     val isAmoledThemeEnabled: Boolean = false,
+    val isRepoGridLayout: Boolean = false,
     val isDarkTheme: Boolean? = null,
     val versionName: String = "",
     val proxyForms: ImmutableMap<ProxyScope, ProxyScopeFormState> =

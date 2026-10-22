@@ -24,6 +24,7 @@ kotlin {
                 implementation(libs.markdown.renderer)
                 implementation(libs.markdown.renderer.coil3)
                 implementation(libs.highlights)
+                implementation(libs.material.kolor)
             }
         }
 

@@ -39,9 +39,7 @@ import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.ImmutableSet
 import org.jetbrains.compose.resources.stringResource
@@ -95,10 +93,8 @@ fun ImportSummarySheet(
             }
             KomiText(
                 text = stringResource(Res.string.import_summary_title, formatLabel),
-                role = KomiTextRole.Title,
+                role = KomiTextRole.CardTitle,
                 color = colors.onSurface,
-                fontWeight = FontWeight.SemiBold,
-                uppercase = false,
             )
 
             val importedPart = stringResource(Res.string.import_summary_imported, summary.imported)
@@ -206,11 +202,8 @@ private fun UnknownFormatSheet(
 
                 KomiText(
                     text = stringResource(Res.string.import_summary_unknown_format),
-                    role = KomiTextRole.Title,
-                    fontSize = 16.sp,
+                    role = KomiTextRole.CardTitle,
                     color = colors.onSurface,
-                    fontWeight = FontWeight.SemiBold,
-                    uppercase = false,
                 )
             }
 
@@ -225,7 +218,6 @@ private fun UnknownFormatSheet(
                     KomiText(
                         text = preview,
                         role = KomiTextRole.Mono,
-                        fontSize = 13.sp,
                         color = colors.onSurfaceVariant,
                         modifier = Modifier
                             .fillMaxWidth()
@@ -270,18 +262,14 @@ private fun SummaryBucket(
             Column(modifier = Modifier.weight(1f)) {
                 KomiText(
                     text = title,
-                    role = KomiTextRole.Title,
-                    fontSize = 14.sp,
+                    role = KomiTextRole.ItemTitle,
                     color = colors.onSurface,
-                    fontWeight = FontWeight.Medium,
-                    uppercase = false,
                 )
 
                 if (!caption.isNullOrBlank()) {
                     KomiText(
                         text = caption,
                         role = KomiTextRole.Body,
-                        fontSize = 13.sp,
                         color = colors.onSurfaceVariant,
                     )
                 }
@@ -320,8 +308,6 @@ private fun SummaryBucket(
                     KomiText(
                         text = items[idx],
                         role = KomiTextRole.Body,
-                        fontSize = 13.sp,
-                        uppercase = false,
                         color = colors.onSurfaceVariant,
                     )
                 }

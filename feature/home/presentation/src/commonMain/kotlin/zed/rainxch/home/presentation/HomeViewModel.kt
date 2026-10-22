@@ -126,12 +126,6 @@ class HomeViewModel(
                 loadMore()
             }
 
-            HomeAction.OnToggleGridLayout -> {
-                val grid = !_state.value.isGridLayout
-                _state.update { it.copy(isGridLayout = grid) }
-                viewModelScope.launch { tweaksRepository.setRepoGridLayout(grid) }
-            }
-
             is HomeAction.OnChartSelected -> {
                 selectChart(action.chart)
             }
@@ -226,7 +220,7 @@ class HomeViewModel(
                 }
             }
 
-            is HomeAction.OnRepoClick -> {
+            is HomeAction.OnRepoClick, HomeAction.OnSearchClick -> {
                 Unit
             }
         }

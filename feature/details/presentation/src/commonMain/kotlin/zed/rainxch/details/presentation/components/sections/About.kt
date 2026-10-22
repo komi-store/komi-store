@@ -22,10 +22,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onSizeChanged
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.mikepenz.markdown.compose.Markdown
 import com.mikepenz.markdown.model.ImageTransformer
 import com.mikepenz.markdown.model.rememberMarkdownState
@@ -71,19 +69,14 @@ fun LazyListScope.about(
             ) {
                 KomiText(
                     text = stringResource(Res.string.about_this_app),
-                    role = KomiTextRole.Title,
-                    fontWeight = FontWeight.SemiBold,
-                    fontSize = 22.sp,
+                    role = KomiTextRole.SectionTitle,
                     color = colors.onBackground,
-                    uppercase = false,
                 )
                 readmeLanguage?.let {
                     KomiText(
                         text = it,
-                        role = KomiTextRole.Label,
-                        fontSize = 11.sp,
+                        role = KomiTextRole.Caption,
                         color = colors.outline,
-                        uppercase = false,
                     )
                 }
             }

@@ -81,7 +81,6 @@ internal fun RawDetailsState.toView(): DetailsState {
         systemArchitecture = systemArchitecture,
         isObtainiumAvailable = isObtainiumAvailable,
         isObtainiumEnabled = isObtainiumEnabled,
-        isInstallDropdownExpanded = isInstallDropdownExpanded,
         isAppManagerAvailable = isAppManagerAvailable,
         isAppManagerEnabled = isAppManagerEnabled,
         installedApp = installedApp,

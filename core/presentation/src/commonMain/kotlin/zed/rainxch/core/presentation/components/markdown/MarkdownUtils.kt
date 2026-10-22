@@ -4,14 +4,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextLinkStyles
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import com.mikepenz.markdown.model.DefaultMarkdownColors
 import com.mikepenz.markdown.model.DefaultMarkdownTypography
 import com.mikepenz.markdown.model.MarkdownColors
 import com.mikepenz.markdown.model.MarkdownTypography
+import zed.rainxch.core.presentation.locals.LocalPersonality
 
 @Composable
 fun rememberMarkdownColors(): MarkdownColors {
@@ -19,8 +17,8 @@ fun rememberMarkdownColors(): MarkdownColors {
 
     return DefaultMarkdownColors(
         text = colorScheme.onBackground,
-        codeBackground = colorScheme.surfaceVariant.copy(alpha = 0.5f),
-        inlineCodeBackground = colorScheme.surfaceVariant.copy(alpha = 0.5f),
+        codeBackground = colorScheme.surfaceContainerHigh,
+        inlineCodeBackground = colorScheme.surfaceContainerHigh,
         dividerColor = colorScheme.outlineVariant,
         tableBackground = colorScheme.surface,
     )
@@ -30,23 +28,24 @@ fun rememberMarkdownColors(): MarkdownColors {
 fun rememberMarkdownTypography(): MarkdownTypography {
     val typography = MaterialTheme.typography
     val colorScheme = MaterialTheme.colorScheme
+    val monoFamily = LocalPersonality.current.type.mono.fontFamily
 
     return DefaultMarkdownTypography(
-        h1 = typography.headlineMedium.copy(fontWeight = FontWeight.Bold),
-        h2 = typography.titleLarge.copy(fontWeight = FontWeight.SemiBold),
-        h3 = typography.titleMedium.copy(fontWeight = FontWeight.Medium),
-        h4 = typography.titleSmall.copy(fontWeight = FontWeight.Medium),
-        h5 = typography.titleSmall.copy(fontWeight = FontWeight.Normal),
-        h6 = typography.labelLarge.copy(fontWeight = FontWeight.Bold),
+        h1 = typography.headlineMedium,
+        h2 = typography.titleLarge,
+        h3 = typography.titleMedium,
+        h4 = typography.titleSmall,
+        h5 = typography.titleSmall,
+        h6 = typography.labelMedium,
         text = typography.bodyLarge,
         code =
             typography.bodyMedium.copy(
-                fontFamily = FontFamily.Monospace,
+                fontFamily = monoFamily,
                 color = colorScheme.onSurfaceVariant,
             ),
         inlineCode =
             typography.bodyMedium.copy(
-                fontFamily = FontFamily.Monospace,
+                fontFamily = monoFamily,
                 color = colorScheme.onSurfaceVariant,
             ),
         quote =

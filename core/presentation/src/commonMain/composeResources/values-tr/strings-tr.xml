@@ -26,7 +26,6 @@
 
     <!-- Apps feature - Update states -->
     <string name="checking">Kontrol ediliyor…</string>
-    <string name="updated_successfully">Başarıyla güncellendi</string>
     <string name="error_with_message">Hata: %1$s</string>
 
     <!-- Apps feature - Update all progress -->
@@ -137,6 +136,9 @@
     <string name="open_repository">Repoyu Aç</string>
     <string name="open_in_browser">Tarayıcıda aç</string>
     <string name="cancel_download">İndirmeyi iptal et</string>
+    <string name="pause">Duraklat</string>
+    <string name="resume">Sürdür</string>
+    <string name="paused">Duraklatıldı</string>
     <string name="show_install_options">Yükleme seçeneklerini göster</string>
 
     <string name="retry">Tekrar dene</string>
@@ -213,7 +215,6 @@
 
 
 
-    <string name="home_finding_repositories">Repolar bulunuyor...</string>
     <string name="home_retry">Tekrar dene</string>
     <string name="home_failed_to_load_repositories">Repolar yüklenemedi</string>
 
@@ -256,6 +257,16 @@
     <string name="sign_in_required">Giriş gerekli</string>
     <string name="sign_in_with_github_for_stars">GitHub ile oturum açarak yıldızlı repolarınızı görüntüleyin</string>
     <string name="no_starred_repos">Yıldızlı repo yok</string>
+    <plurals name="starred_hidden_not_installable">
+        <item quantity="one">Yüklenebilir sürümü olmayan %1$d yıldızlı repo daha var</item>
+        <item quantity="other">Yüklenebilir sürümü olmayan %1$d yıldızlı repo daha var</item>
+    </plurals>
+    <plurals name="starred_including_not_installable">
+        <item quantity="one">Yüklenebilir sürümü olmayan %1$d yıldızlı repo dahil</item>
+        <item quantity="other">Yüklenebilir sürümü olmayan %1$d yıldızlı repo dahil</item>
+    </plurals>
+    <string name="starred_show_all">Tümünü göster</string>
+    <string name="starred_installable_only">Yalnızca yüklenebilir</string>
     <string name="star_repos_hint">Yüklenebilir sürümlü repoları görmek için GitHub'da yıldızlayın</string>
     <string name="last_synced">Son eşitleme</string>
     <string name="just_now">Şimdi</string>
@@ -313,6 +324,7 @@
     <string name="released_yesterday">Dün yayınlandı</string>
     <string name="released_days_ago">%1$d gün önce yayınlandı</string>
     <string name="released_on_date">%1$s tarihinde yayınlandı</string>
+    <string name="details_last_push">Son push %1$s</string>
 
     <string name="bottom_nav_explore_title">Keşfet</string>
     <string name="bottom_nav_search_title">Ara</string>
@@ -370,6 +382,9 @@
     <string name="proxy_test_error_auth_required">Proxy kimlik doğrulaması gerekiyor.</string>
     <string name="proxy_test_error_status">Beklenmeyen yanıt: HTTP %1$d</string>
     <string name="proxy_test_error_unknown">Bağlantı testi başarısız</string>
+    <string name="proxy_test_master_result">Arama: %1$s, İndirmeler: %2$s, Çeviri: %3$s</string>
+    <string name="proxy_test_probe_ok">%1$d ms</string>
+    <string name="proxy_test_probe_failed">başarısız</string>
 
 
 
@@ -395,6 +410,12 @@
     <string name="auth_check_status">Zaten yetkilendirdim</string>
     <string name="auth_polling_status">Kontrol ediliyor…</string>
     <string name="auth_rate_limited">İstek sınırına ulaşıldı — %1$d sn sonra tekrar denenecek</string>
+    <string name="auth_error_unreachable">GitHub'a bağlanılamadı</string>
+    <string name="auth_error_rate_limited">Çok fazla giriş denemesi</string>
+    <string name="auth_hint_wait">Birkaç dakika bekleyin, sonra tekrar deneyin.</string>
+    <string name="auth_error_denied">Yetkilendirme reddedildi</string>
+    <string name="auth_error_browser">Tarayıcı açılamadı</string>
+    <string name="auth_hint_other_method">Bunun yerine cihaz kodu veya personal access token kullanın.</string>
 
     <!-- Read More / Show Less -->
     <string name="read_more">Devamını oku</string>
@@ -415,6 +436,8 @@
     <string name="no_github_link_in_clipboard">Panoda GitHub bağlantısı bulunamadı</string>
 
     <string name="clear">Temizle</string>
+    <string name="show_password">Şifreyi göster</string>
+    <string name="hide_password">Şifreyi gizle</string>
 
 
 
@@ -514,12 +537,15 @@
     <string name="hide_repository">Depoyu gizle</string>
 
     <string name="recently_viewed">Son görüntülenenler</string>
+    <string name="recently_viewed_remove_cd">Geçmişten kaldır</string>
     <string name="profile_recently_viewed_description">Ziyaret ettiğiniz depolar</string>
     <string name="delete_all">Tümünü sil</string>
     <string name="delete_downloads_confirmation_title">Tüm indirmeler silinsin mi?</string>
     <string name="delete_downloads_confirmation_message">Bu işlem tüm APK ve kurulum dosyalarını kalıcı olarak silecek (%1$s). İstediğiniz zaman yeniden indirebilirsiniz.</string>
     <string name="downloads_cleared">Tüm indirilen paketler silindi.</string>
     <string name="unable_to_verify_attestation">Doğrulanamadı</string>
+    <string name="details_attestation_verified_explainer">Bu dosyanın SHA-256 değeri, deponun GitHub'da yayımladığı bir yapı onayıyla eşleşiyor; yani dosya deponun kendi yapısından geliyor.</string>
+    <string name="details_attestation_unverified_explainer">Komi Store bu dosyayı deponun yapı onaylarıyla karşılaştıramadı. Bu tek başına dosyayı güvensiz yapmaz.</string>
 
     <string name="recent_searches">Son aramalar</string>
     <string name="clear_all_history">Tümünü temizle</string>
@@ -575,6 +601,8 @@
     <string name="variant_label_inline">Varyant: %1$s</string>
     <string name="variant_picker_unpin">Sabitlemeyi kaldır</string>
     <string name="variant_picker_pinned_badge">Sabitlendi</string>
+    <string name="assets_section_available">Mevcut</string>
+    <string name="assets_section_your_app">Uygulamanız</string>
     <string name="variant_picker_open">Varyant seç</string>
     <string name="variant_picker_open_filter">Filtreyi düzenle</string>
     <string name="variant_first_pin_toast">Sonraki güncellemeler %1$s varyantını tercih edecek. Bunu uygulama ayarlarından istediğiniz zaman değiştirebilirsiniz.</string>
@@ -794,6 +822,7 @@
     <string name="feedback_send_via_github">GitHub Issue olarak aç</string>
     <string name="feedback_send_success_email">Teşekkürler — posta istemciniz açılıyor.</string>
     <string name="feedback_send_success_github">Teşekkürler — tarayıcınız açılıyor.</string>
+    <string name="feedback_send_failed">Geri bildirim kanalı açılamadı</string>
 
     <!-- ═══════════════════════════════════════════════════════════════
          E5 — Mirror feature
@@ -810,6 +839,14 @@
     <string name="mirror_picker_description">Sürüm dosyalarını indirmek için kullanılır. GitHub API çağrıları her zaman doğrudan gider. Çoğu kullanıcı bunu Doğrudan GitHub olarak bırakmalıdır.</string>
     <string name="mirror_section_official">Resmi</string>
     <string name="mirror_section_community">Topluluk</string>
+    <string name="mirror_pick_fastest">En hızlıyı seç</string>
+    <string name="mirror_pick_fastest_sub">Her aynayı ölç, en hızlıyı seç</string>
+    <string name="mirror_measuring">Bu cihazdan ölçülüyor…</string>
+    <string name="mirror_measure_latency">Gecikmeyi ölç</string>
+    <string name="mirror_latency_local">Sizden %1$d ms</string>
+    <string name="mirror_fastest_badge">%1$s · en hızlı</string>
+    <string name="mirror_fastest_chosen">%1$s aynasına geçildi (%2$d ms).</string>
+    <string name="mirror_no_mirror_responded">Hiçbir ayna yanıt vermedi. Bağlantınızı kontrol edip tekrar deneyin.</string>
     <string name="mirror_status_ok">%1$dms</string>
     <string name="mirror_status_degraded">%1$dms</string>
     <string name="mirror_status_down">(kapalı)</string>
@@ -825,6 +862,7 @@
     <string name="mirror_test_http_error">Ayna %1$d döndürdü</string>
     <string name="mirror_test_timeout">5s sonra zaman aşımı</string>
     <string name="mirror_test_dns_fail">Ana bilgisayar çözümlenemedi</string>
+    <string name="mirror_test_failed">Bağlantı başarısız</string>
     <string name="mirror_deploy_your_own_hint">Tüm aynalar mı çöktü? 5 dakikada kendinizinkini barındırabilirsiniz — belgelere bakın.</string>
     <string name="mirror_removed_toast">%1$s artık kullanılamıyor, Doğrudan GitHub'a geçildi.</string>
 
@@ -880,13 +918,12 @@
     <string name="apk_inspect_title">APK İncele</string>
     <string name="apk_inspect_version_code">Sürüm</string>
     <string name="apps_compact_more_actions">%1$s için diğer işlemler</string>
-    <string name="apps_compact_status_filter_active">monorepo filtresi aktif</string>
-    <string name="apps_compact_status_pending_install">kurulum bekliyor</string>
-    <string name="apps_compact_status_pre_release_on">ön sürüm açık</string>
-    <string name="apps_compact_status_ready_to_install">kurulmaya hazır</string>
-    <string name="apps_compact_status_updates_ignored">güncellemeler yok sayıldı</string>
-    <string name="apps_compact_status_variant_pinned">varyant sabitlendi</string>
-    <string name="apps_compact_status_variant_stale">varyant eski, işlem gerekli</string>
+    <string name="apps_menu_item_active">%1$s  ✓</string>
+    <string name="apps_version_update">%1$s → %2$s</string>
+    <string name="apps_version_dated">%1$s (%2$s)</string>
+    <string name="apps_variant_subtitle">%1$s  ·  %2$s</string>
+    <string name="apps_section_header_cd">%1$s, %2$d, %3$s</string>
+    <string name="apps_section_header_static_cd">%1$s, %2$d</string>
     <string name="apps_ignore_updates">Güncellemeleri yok say</string>
     <string name="apps_section_collapse">Bölümü daralt</string>
     <string name="apps_section_count_suffix">· %1$d</string>
@@ -911,6 +948,7 @@
     <string name="dhizuku_status_permission_needed">İzin gerekli</string>
     <string name="dhizuku_status_ready">Hazır</string>
     <string name="discard_pending_install">Sil</string>
+    <string name="delete_task">Görevi sil</string>
     <string name="error_state_go_back">Geri dön</string>
     <string name="error_state_subtitle_generic">Bu repo yüklenemedi. Aşağıdaki Yeniden Dene düğmesini kullanın.</string>
     <string name="error_state_subtitle_not_found">Repo özel, yeniden adlandırılmış veya silinmiş olabilir.</string>
@@ -968,6 +1006,9 @@
     <string name="starred_picker_sort_recent">Son yıldızlananlar</string>
     <string name="starred_picker_sort_stars">En çok yıldız</string>
     <string name="starred_picker_star_dedup_tooltip">GitHub'da yıldızı kaldırmak uygulamanın takibini bırakmaz.</string>
+    <string name="starred_picker_cd_ships_apk">APK yayınlıyor</string>
+    <string name="starred_picker_cd_already_tracked">zaten takipte</string>
+    <string name="starred_picker_cd_latest">son sürüm %1$s</string>
     <string name="import_stars_title">Kullanıcı adıyla yıldızlı depoları içe aktar</string>
     <string name="import_stars_subtitle">Herhangi bir GitHub kullanıcı adı gir, herkese açık yıldızlı repolarına göz at ve favorilerine ekle. Giriş yapmana gerek yok.</string>
     <string name="import_stars_hint">GitHub kullanıcı adı</string>
@@ -1062,7 +1103,6 @@
     <string name="apps_updates_banner_subtitle">Tümünü tek seferde incele veya güncelle.</string>
     <string name="apps_updates_banner_title_one">1 güncelleme mevcut</string>
     <string name="apps_updates_banner_title_other">%1$d güncelleme mevcut</string>
-    <string name="back_cd">Geri</string>
     <string name="cd_back">Geri</string>
     <string name="cd_image">Resim</string>
     <string name="common_see_all">Tümünü gör ›</string>
@@ -1114,11 +1154,16 @@
     <string name="host_tokens_row_valid_short">Geçerli · %1$s</string>
     <string name="host_tokens_row_validate">Kontrol et</string>
     <string name="host_tokens_saved">%1$s için token kaydedildi</string>
+    <string name="host_tokens_load_failed">Kaydedilmiş tokenler yüklenemedi</string>
+    <string name="host_tokens_save_failed">%1$s için token kaydedilemedi</string>
+    <string name="host_tokens_delete_failed">%1$s için token silinemedi</string>
     <string name="host_tokens_title">Kimlik doğrulama tokenleri</string>
     <string name="host_tokens_undo_action">Geri al</string>
     <string name="host_tokens_undo_failed">%1$s için token geri yüklenemedi</string>
     <string name="host_tokens_undo_snackbar">%1$s için token kaldırıldı</string>
     <string name="host_tokens_validation_failed_fallback">bilinmeyen hata</string>
+    <string name="host_tokens_validation_http">HTTP %1$d</string>
+    <string name="host_tokens_validation_unreachable">sunucuya ulaşılamadı</string>
     <string name="host_tokens_validation_host_invalid">Geçersiz host</string>
     <string name="host_tokens_validation_host_required">Host gerekli</string>
     <string name="host_tokens_validation_token_required">Token gerekli</string>
@@ -1280,6 +1325,12 @@
     <string name="profile_section_account">Hesap</string>
     <string name="appearance_section_mode">Mod</string>
     <string name="appearance_section_display">Görüntü</string>
+    <string name="tweaks_accent_crimson">Kızıl</string>
+    <string name="tweaks_accent_cobalt">Kobalt</string>
+    <string name="tweaks_accent_sun">Güneş</string>
+    <string name="tweaks_accent_frost">Kırağı</string>
+    <string name="tweaks_accent_mono">Tek renk</string>
+    <string name="tweaks_accent_wallpaper">Duvar kâğıdı renkleri</string>
     <string name="theme_dynamic">Dinamik</string>
     <string name="auth_more_signin_options">Diğer giriş seçenekleri</string>
     <string name="auth_hide_signin_options">Seçenekleri gizle</string>
@@ -1397,14 +1448,9 @@
     <string name="repo_pages_pr_draft">Taslak</string>
 
     <string name="feed_end_cap">続く · TO BE CONTINUED</string>
-    <string name="feed_layout_description_grid">Izgara görünümüne geç</string>
-    <string name="feed_layout_description_list">Liste görünümüne geç</string>
     <string name="feed_masthead_subtitle">発見 · DISCOVER APPS</string>
     <string name="home_masthead_subtitle">ランキング · CHARTS &amp; PICKS</string>
     <string name="feed_platform_picker_title_jp">対応</string>
-    <string name="home_chart_popular_jp">人気</string>
-    <string name="home_chart_releases_jp">新着</string>
-    <string name="home_chart_trending_jp">急上昇</string>
     <string name="sidebar_browse_jp">航行</string>
     <string name="sidebar_categories_jp">部門</string>
     <string name="sidebar_nav_charts_jp">ランキング</string>
@@ -1441,7 +1487,6 @@
     <string name="home_chart_releases">Sürümler</string>
     <string name="home_chart_trending">Trend</string>
     <string name="home_masthead_title">En Popüler</string>
-    <string name="home_platform_filter">Platformları filtrele</string>
     <string name="paper_day">Gündüz</string>
     <string name="paper_night">Gece</string>
     <string name="repo_card_details">Ayrıntılar</string>

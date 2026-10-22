@@ -11,7 +11,6 @@ import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.pluralStringResource
@@ -59,11 +58,9 @@ fun CompletionToast(
                         trackedCount,
                         trackedCount,
                     ),
-                role = KomiTextRole.Title,
-                fontWeight = FontWeight.SemiBold,
+                role = KomiTextRole.CardTitle,
                 color = colors.onSurface,
                 textAlign = TextAlign.Center,
-                uppercase = false,
             )
 
             if (skipped > 0) {
@@ -72,7 +69,6 @@ fun CompletionToast(
                     role = KomiTextRole.Body,
                     color = colors.onSurfaceVariant,
                     textAlign = TextAlign.Center,
-                    uppercase = false,
                 )
             }
 

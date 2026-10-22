@@ -9,26 +9,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextLayoutResult
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.isSpecified
 import zed.rainxch.core.presentation.locals.LocalPersonality
+import zed.rainxch.core.presentation.locals.appLocale
 import zed.rainxch.core.presentation.personality.classicPersonality
 import zed.rainxch.core.presentation.personality.manga.MangaAccent
 import zed.rainxch.core.presentation.personality.manga.MangaPaper
 import zed.rainxch.core.presentation.personality.utils.PersonalityPreview
-
-private val KomiTextRole.isHeading: Boolean
-    get() =
-        this == KomiTextRole.Display ||
-            this == KomiTextRole.Title ||
-            this == KomiTextRole.Stamp ||
-            this == KomiTextRole.Label
 
 @Composable
 fun KomiText(
@@ -39,19 +30,12 @@ fun KomiText(
     maxLines: Int = Int.MAX_VALUE,
     overflow: TextOverflow = TextOverflow.Clip,
     textAlign: TextAlign? = null,
-    uppercase: Boolean? = null,
-    fontSize: TextUnit = TextUnit.Unspecified,
-    fontWeight: FontWeight? = null,
-    letterSpacing: TextUnit = TextUnit.Unspecified,
-    lineHeight: TextUnit = TextUnit.Unspecified,
     autoSize: TextAutoSize? = null,
     onTextLayout: ((TextLayoutResult) -> Unit)? = null,
 ) {
     val personality = LocalPersonality.current
-    val style = komiTextStyle(personality.type, role, fontSize, fontWeight, letterSpacing, lineHeight)
-    val resolvedUppercase = uppercase ?: (role.isHeading && personality.type.uppercaseHeadings)
     Text(
-        text = if (resolvedUppercase) text.uppercase() else text,
+        text = if (role.case.isUpper(personality.type)) text.toUpperCase(appLocale()) else text,
         modifier = modifier,
         color = if (color != Color.Unspecified) color else personality.colors.onSurface,
         autoSize = autoSize,
@@ -59,7 +43,7 @@ fun KomiText(
         overflow = overflow,
         textAlign = textAlign,
         onTextLayout = onTextLayout ?: {},
-        style = style,
+        style = role.style(personality.type),
     )
 }
 
@@ -72,14 +56,9 @@ fun KomiText(
     maxLines: Int = Int.MAX_VALUE,
     overflow: TextOverflow = TextOverflow.Clip,
     textAlign: TextAlign? = null,
-    fontSize: TextUnit = TextUnit.Unspecified,
-    fontWeight: FontWeight? = null,
-    letterSpacing: TextUnit = TextUnit.Unspecified,
-    lineHeight: TextUnit = TextUnit.Unspecified,
     onTextLayout: ((TextLayoutResult) -> Unit)? = null,
 ) {
     val personality = LocalPersonality.current
-    val style = komiTextStyle(personality.type, role, fontSize, fontWeight, letterSpacing, lineHeight)
     Text(
         text = text,
         modifier = modifier,
@@ -88,49 +67,42 @@ fun KomiText(
         overflow = overflow,
         textAlign = textAlign,
         onTextLayout = onTextLayout ?: {},
-        style = style,
+        style = role.style(personality.type),
     )
 }
 
-private fun komiTextStyle(
-    type: zed.rainxch.core.presentation.personality.model.PersonalityType,
-    role: KomiTextRole,
-    fontSize: TextUnit,
-    fontWeight: FontWeight?,
-    letterSpacing: TextUnit,
-    lineHeight: TextUnit,
-): TextStyle {
-    var style: TextStyle =
-        when (role) {
-            KomiTextRole.Display -> type.display
-            KomiTextRole.Title -> type.title
-            KomiTextRole.Stamp -> type.stamp
-            KomiTextRole.Body -> type.body
-            KomiTextRole.Label -> type.label
-            KomiTextRole.Mono -> type.mono
-        }
-    if (fontSize.isSpecified) style = style.copy(fontSize = fontSize)
-    if (fontWeight != null) style = style.copy(fontWeight = fontWeight)
-    if (letterSpacing.isSpecified) style = style.copy(letterSpacing = letterSpacing)
-    if (lineHeight.isSpecified) style = style.copy(lineHeight = lineHeight)
-    return style
+@Composable
+private fun KomiTextScale() {
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        KomiText("Godot", role = KomiTextRole.Display)
+        KomiText("Library", role = KomiTextRole.ScreenTitle)
+        KomiText("What's new", role = KomiTextRole.SectionTitle)
+        KomiText("RustDesk", role = KomiTextRole.CardTitle)
+        KomiText("True black (AMOLED)", role = KomiTextRole.ItemTitle)
+        KomiText(
+            "An open-source remote desktop application designed for self-hosting.",
+            role = KomiTextRole.Body,
+        )
+        KomiText(
+            "Godot 3.6.3 is a maintenance release addressing stability and usability issues.",
+            role = KomiTextRole.Reading,
+        )
+        KomiText("119k · 20 MB · 2 mo ago", role = KomiTextRole.Caption)
+        KomiText("v3.6.3-stable · arm64-v8a", role = KomiTextRole.Mono)
+        KomiText("Install latest", role = KomiTextRole.LabelLarge)
+        KomiText("Security", role = KomiTextRole.Label)
+        KomiText("Top charts", role = KomiTextRole.LabelSmall)
+        KomiText("Assets", role = KomiTextRole.Overline)
+        KomiText("Pre-release", role = KomiTextRole.Stamp)
+        KomiText("118k", role = KomiTextRole.Numeral)
+    }
 }
 
 @Preview
 @Composable
 private fun KomiTextRolesPreview() {
     PersonalityPreview {
-        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            KomiText("Discover", role = KomiTextRole.Display)
-            KomiText("Trending Now", role = KomiTextRole.Title)
-            KomiText("No. 01", role = KomiTextRole.Stamp)
-            KomiText(
-                "Get up and running with large language models locally, in a single command.",
-                role = KomiTextRole.Body,
-            )
-            KomiText("New Release", role = KomiTextRole.Label, color = LocalPersonality.current.colors.primary)
-            KomiText("v0.5.4 · 174M", role = KomiTextRole.Mono)
-        }
+        KomiTextScale()
     }
 }
 
@@ -138,12 +110,7 @@ private fun KomiTextRolesPreview() {
 @Composable
 private fun KomiTextNightPreview() {
     PersonalityPreview(paper = MangaPaper.NIGHT, accent = MangaAccent.SUN) {
-        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            KomiText("Discover", role = KomiTextRole.Display)
-            KomiText("Trending Now", role = KomiTextRole.Title)
-            KomiText("Get up and running with large language models locally.", role = KomiTextRole.Body)
-            KomiText("v0.5.4", role = KomiTextRole.Mono)
-        }
+        KomiTextScale()
     }
 }
 
@@ -151,11 +118,7 @@ private fun KomiTextNightPreview() {
 @Composable
 private fun KomiTextNordPreview() {
     PersonalityPreview(paper = MangaPaper.NORD, accent = MangaAccent.FROST) {
-        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            KomiText("Discover", role = KomiTextRole.Display)
-            KomiText("Trending Now", role = KomiTextRole.Title)
-            KomiText("Get up and running with large language models locally.", role = KomiTextRole.Body)
-        }
+        KomiTextScale()
     }
 }
 
@@ -165,7 +128,7 @@ private fun KomiTextEllipsisPreview() {
     PersonalityPreview {
         KomiText(
             "OllamaSuperLongRepositoryNameThatOverflowsTheLine",
-            role = KomiTextRole.Title,
+            role = KomiTextRole.SectionTitle,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
         )
@@ -176,15 +139,7 @@ private fun KomiTextEllipsisPreview() {
 @Composable
 private fun KomiTextClassicPreview() {
     PersonalityPreview(classicPersonality()) {
-        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            KomiText("Discover", role = KomiTextRole.Display)
-            KomiText("Trending Now", role = KomiTextRole.Title)
-            KomiText(
-                "Get up and running with large language models locally, in a single command.",
-                role = KomiTextRole.Body,
-            )
-            KomiText("v0.5.4 · 174M", role = KomiTextRole.Mono)
-        }
+        KomiTextScale()
     }
 }
 
@@ -192,10 +147,6 @@ private fun KomiTextClassicPreview() {
 @Composable
 private fun KomiTextClassicDarkPreview() {
     PersonalityPreview(classicPersonality(dark = true)) {
-        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            KomiText("Discover", role = KomiTextRole.Display)
-            KomiText("Trending Now", role = KomiTextRole.Title)
-            KomiText("Get up and running with large language models locally.", role = KomiTextRole.Body)
-        }
+        KomiTextScale()
     }
 }

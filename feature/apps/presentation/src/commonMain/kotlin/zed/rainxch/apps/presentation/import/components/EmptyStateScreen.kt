@@ -13,7 +13,6 @@ import androidx.compose.material.icons.outlined.Search
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
@@ -60,8 +59,7 @@ fun EmptyStateScreen(
 
                 KomiText(
                     text = stringResource(Res.string.external_import_empty_all_matched),
-                    role = KomiTextRole.Title,
-                    fontWeight = FontWeight.SemiBold,
+                    role = KomiTextRole.SectionTitle,
                     color = colors.onSurface,
                     textAlign = TextAlign.Center,
                 )
@@ -87,8 +85,7 @@ fun EmptyStateScreen(
 
                 KomiText(
                     text = stringResource(Res.string.external_import_empty_no_apps_title),
-                    role = KomiTextRole.Title,
-                    fontWeight = FontWeight.SemiBold,
+                    role = KomiTextRole.SectionTitle,
                     color = colors.onSurface,
                     textAlign = TextAlign.Center,
                 )
@@ -98,7 +95,6 @@ fun EmptyStateScreen(
                     role = KomiTextRole.Body,
                     color = colors.onSurfaceVariant,
                     textAlign = TextAlign.Center,
-                    uppercase = false,
                 )
 
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {

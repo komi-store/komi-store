@@ -27,7 +27,6 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.stringResource
 import zed.rainxch.core.presentation.components.buttons.KomiIconButton
 import zed.rainxch.core.presentation.components.text.KomiText
@@ -119,19 +118,16 @@ fun TweaksDesktopContent(
                 )
                 KomiText(
                     text = stringResource(Res.string.tweaks_title),
-                    role = KomiTextRole.Display,
+                    role = KomiTextRole.ScreenTitle,
                     color = colors.onSurface,
-                    fontSize = 22.sp,
                     modifier = Modifier.padding(start = 6.dp),
                 )
             }
             tweaksKicker(TweaksDecorSlot.SettingsNavTitle)?.let { navKicker ->
                 KomiText(
                     text = navKicker,
-                    role = KomiTextRole.Label,
+                    role = KomiTextRole.Caption,
                     color = colors.onSurfaceVariant,
-                    fontSize = 10.sp,
-                    uppercase = false,
                     modifier = Modifier.padding(start = 6.dp, bottom = 14.dp),
                 )
             }
@@ -235,19 +231,15 @@ private fun NavRow(
     ) {
         KomiText(
             text = label,
-            role = if (isManga) KomiTextRole.Stamp else KomiTextRole.Label,
+            role = KomiTextRole.Label,
             color = if (active) colors.onPrimary else colors.onSurface,
-            fontSize = 14.sp,
-            uppercase = if (isManga) null else false,
             modifier = Modifier.weight(1f),
         )
         if (kicker != null) {
             KomiText(
                 text = kicker,
-                role = KomiTextRole.Label,
+                role = KomiTextRole.Caption,
                 color = if (active) colors.onPrimary else colors.onSurfaceVariant,
-                fontSize = 9.5.sp,
-                uppercase = false,
             )
         }
     }

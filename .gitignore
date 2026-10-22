@@ -34,7 +34,7 @@ google-services.json
 *.hprof
 .kotlin/
 
-composeApp/release/baselineProfiles/
+androidApp/release/baselineProfiles/
 
 composeApp/kotzilla.json
 

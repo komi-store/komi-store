@@ -20,10 +20,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.collections.immutable.PersistentSet
 import org.jetbrains.compose.resources.stringResource
@@ -173,10 +171,8 @@ private fun IssueDetailContent(
             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 KomiText(
                     text = detail.title,
-                    role = KomiTextRole.Title,
-                    fontWeight = FontWeight.SemiBold,
+                    role = KomiTextRole.CardTitle,
                     color = colors.onBackground,
-                    uppercase = false,
                 )
 
                 KomiText(
@@ -187,9 +183,7 @@ private fun IssueDetailContent(
                                 detail.authorLogin,
                             ),
                     role = KomiTextRole.Body,
-                    fontSize = 13.sp,
                     color = colors.onSurfaceVariant,
-                    uppercase = false,
                 )
             }
         }
@@ -230,10 +224,8 @@ private fun IssueDetailContent(
 
                 KomiText(
                     text = stringResource(Res.string.repo_pages_issue_comments_section),
-                    role = KomiTextRole.Title,
-                    fontWeight = FontWeight.SemiBold,
+                    role = KomiTextRole.CardTitle,
                     color = colors.onBackground,
-                    uppercase = false,
                     modifier = Modifier.padding(top = 8.dp),
                 )
             }
@@ -265,10 +257,8 @@ private fun CommentCard(
         ) {
             KomiText(
                 text = comment.authorLogin,
-                role = KomiTextRole.Label,
-                fontWeight = FontWeight.SemiBold,
+                role = KomiTextRole.LabelSmall,
                 color = colors.onSurface,
-                uppercase = false,
             )
 
             RepoMarkdown(content = comment.bodyMarkdown, modifier = Modifier.fillMaxWidth())
@@ -304,10 +294,8 @@ private fun ThumbChip(
             if (count > 0) {
                 KomiText(
                     text = count.toString(),
-                    role = KomiTextRole.Label,
-                    fontSize = 12.sp,
+                    role = KomiTextRole.Caption,
                     color = colors.onSurfaceVariant,
-                    uppercase = false,
                 )
             }
         }

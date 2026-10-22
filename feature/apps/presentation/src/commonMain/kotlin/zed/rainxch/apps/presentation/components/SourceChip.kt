@@ -6,9 +6,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import zed.rainxch.core.presentation.components.text.KomiText
 import zed.rainxch.core.presentation.components.text.KomiTextRole
 import zed.rainxch.core.presentation.locals.LocalPersonality
@@ -27,10 +25,7 @@ fun SourceChip(
         }
     KomiText(
         text = label,
-        role = KomiTextRole.Label,
-        fontSize = 11.sp,
-        fontWeight = FontWeight.SemiBold,
-        uppercase = false,
+        role = KomiTextRole.LabelSmall,
         color = colors.onPrimaryContainer,
         modifier =
             modifier

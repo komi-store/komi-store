@@ -25,6 +25,8 @@ import androidx.compose.material.icons.outlined.Favorite
 import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material.icons.outlined.Schedule
 import androidx.compose.material.icons.outlined.Star
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -63,27 +65,62 @@ private val SelectionBarWidth = 5.dp
 private val ClassicDividerInset = 56.dp
 private const val DISABLED_ALPHA = 0.45f
 
+// Classic draws Material 3 Expressive's segmented list: one tonal tile per row, 2dp apart,
+// with the outer corners rounded more than the inner ones.
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun KomiList(
     items: ImmutableList<KomiListItem>,
     modifier: Modifier = Modifier,
 ) {
-    KomiListContainer(modifier = modifier) {
-        items.forEachIndexed { index, item ->
-            KomiListRow(
-                title = item.title,
-                subtitle = item.subtitle,
-                icon = item.icon,
-                onClick = rowClick(item),
-                onLongClick = item.onLongClick,
-                destructive = item.destructive,
-                selected = item.selected,
-                enabled = item.enabled,
-                showDivider = index < items.lastIndex,
-                trailing = { RowTrailing(item.trailing) },
-            )
+    when (val personality = LocalPersonality.current) {
+        is MangaPersonality -> {
+            KomiListContainer(modifier = modifier) {
+                items.forEachIndexed { index, item ->
+                    ItemRow(item = item, showDivider = index < items.lastIndex)
+                }
+            }
+        }
+
+        is ClassicPersonality -> {
+            Column(
+                modifier = modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap),
+            ) {
+                items.forEachIndexed { index, item ->
+                    ItemRow(
+                        item = item,
+                        showDivider = false,
+                        modifier =
+                            Modifier
+                                .clip(ListItemDefaults.segmentedShapes(index, items.size).shape)
+                                .background(personality.colors.surfaceContainer),
+                    )
+                }
+            }
         }
     }
+}
+
+@Composable
+private fun ItemRow(
+    item: KomiListItem,
+    showDivider: Boolean,
+    modifier: Modifier = Modifier,
+) {
+    KomiListRow(
+        title = item.title,
+        modifier = modifier,
+        subtitle = item.subtitle,
+        icon = item.icon,
+        onClick = rowClick(item),
+        onLongClick = item.onLongClick,
+        destructive = item.destructive,
+        selected = item.selected,
+        enabled = item.enabled,
+        showDivider = showDivider,
+        trailing = { RowTrailing(item.trailing) },
+    )
 }
 
 @Composable
@@ -150,7 +187,7 @@ fun KomiListRow(
             else -> colors.onSurface
         }
     val subtitleColor =
-        if (selected && !isManga) colors.onPrimaryContainer.copy(alpha = 0.8f) else colors.onSurfaceVariant
+        if (selected && !isManga) colors.onPrimaryContainer else colors.onSurfaceVariant
     val clickModifier =
         when {
             onClick == null && onLongClick == null -> {
@@ -202,10 +239,8 @@ fun KomiListRow(
         Column(modifier = Modifier.weight(1f)) {
             KomiText(
                 text = title,
-                role = KomiTextRole.Label,
+                role = if (strong) KomiTextRole.CardTitle else KomiTextRole.ItemTitle,
                 color = titleColor,
-                fontWeight = if (strong) androidx.compose.ui.text.font.FontWeight.Black else null,
-                uppercase = false,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
@@ -215,7 +250,6 @@ fun KomiListRow(
                     text = it,
                     role = KomiTextRole.Body,
                     color = subtitleColor,
-                    uppercase = false,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )

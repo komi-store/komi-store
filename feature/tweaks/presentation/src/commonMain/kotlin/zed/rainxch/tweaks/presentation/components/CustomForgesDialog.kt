@@ -13,7 +13,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.shape.RoundedCornerShape
 import org.jetbrains.compose.resources.stringResource
 import zed.rainxch.core.presentation.components.buttons.KomiButton
@@ -39,16 +38,14 @@ fun CustomForgesDialog(
     val colors = personality.colors
     KomiDialog(
         onDismissRequest = { onAction(TweaksAction.OnDismissCustomForgesDialog) },
-        title = { KomiText(stringResource(Res.string.custom_forges_dialog_title), role = KomiTextRole.Title) },
+        title = { KomiText(stringResource(Res.string.custom_forges_dialog_title), role = KomiTextRole.CardTitle) },
         text = {
             Column {
 
                 KomiText(
                     text = stringResource(Res.string.custom_forges_dialog_builtin_note),
                     role = KomiTextRole.Body,
-                    fontSize = 13.sp,
                     color = colors.onPrimaryContainer,
-                    uppercase = false,
                     modifier = Modifier
                         .padding(bottom = 10.dp)
                         .clip(RoundedCornerShape(personality.shape.cornerSmall))
@@ -58,9 +55,7 @@ fun CustomForgesDialog(
                 KomiText(
                     text = stringResource(Res.string.custom_forges_dialog_help),
                     role = KomiTextRole.Body,
-                    fontSize = 13.sp,
                     color = colors.onSurfaceVariant,
-                    uppercase = false,
                 )
                 Row(
                     modifier = Modifier.padding(top = 12.dp).fillMaxWidth(),
@@ -85,9 +80,7 @@ fun CustomForgesDialog(
                     KomiText(
                         text = state.customForgeError,
                         role = KomiTextRole.Body,
-                        fontSize = 13.sp,
                         color = colors.error,
-                        uppercase = false,
                         modifier = Modifier.padding(top = 4.dp),
                     )
                 }
@@ -95,9 +88,7 @@ fun CustomForgesDialog(
                     KomiText(
                         text = stringResource(Res.string.custom_forges_empty),
                         role = KomiTextRole.Body,
-                        fontSize = 13.sp,
                         color = colors.onSurfaceVariant,
-                        uppercase = false,
                         modifier = Modifier.padding(top = 16.dp),
                     )
                 } else {

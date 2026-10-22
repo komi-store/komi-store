@@ -25,8 +25,6 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -41,8 +39,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -52,8 +48,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.em
-import androidx.compose.ui.unit.sp
+import org.jetbrains.compose.resources.stringResource
+import zed.rainxch.core.presentation.components.text.KomiText
+import zed.rainxch.core.presentation.components.text.KomiTextRole
 import zed.rainxch.core.presentation.locals.LocalPersonality
 import zed.rainxch.core.presentation.personality.ClassicPersonality
 import zed.rainxch.core.presentation.personality.MangaPersonality
@@ -66,6 +63,10 @@ import zed.rainxch.core.presentation.personality.model.PersonalityColors
 import zed.rainxch.core.presentation.personality.model.PersonalityType
 import zed.rainxch.core.presentation.personality.utils.PersonalityPreview
 import zed.rainxch.core.presentation.spacing.Spacing
+import zed.rainxch.githubstore.core.presentation.res.Res
+import zed.rainxch.githubstore.core.presentation.res.clear
+import zed.rainxch.githubstore.core.presentation.res.hide_password
+import zed.rainxch.githubstore.core.presentation.res.show_password
 
 @Composable
 fun KomiTextField(
@@ -79,6 +80,7 @@ fun KomiTextField(
     leadingIcon: ImageVector? = null,
     trailing: @Composable (() -> Unit)? = null,
     clearable: Boolean = false,
+    onClear: (() -> Unit)? = null,
     multiline: Boolean = false,
     rows: Int = 4,
     required: Boolean = false,
@@ -88,6 +90,8 @@ fun KomiTextField(
     keyboardType: KeyboardType = KeyboardType.Text,
     onCommit: (() -> Unit)? = null,
 ) {
+    // onClear replaces the plain clear for a screen whose clear does more than empty the text.
+    val clear: (() -> Unit)? = onClear ?: if (clearable) ({ onValueChange("") }) else null
     when (val personality = LocalPersonality.current) {
         is MangaPersonality -> {
             MangaTextField(
@@ -100,7 +104,14 @@ fun KomiTextField(
                 error = error,
                 placeholder = placeholder,
                 leadingIcon = leadingIcon,
-                trailing = trailing,
+                trailing =
+                    trailing ?: onClear?.let { onClearClick ->
+                        {
+                            if (enabled && value.isNotEmpty()) {
+                                ClearButton(personality.colors, fieldMetrics(size).icon, onClearClick)
+                            }
+                        }
+                    },
                 clearable = clearable,
                 multiline = multiline,
                 rows = rows,
@@ -115,6 +126,7 @@ fun KomiTextField(
 
         is ClassicPersonality -> {
             ClassicTextField(
+                personality = personality,
                 value = value,
                 onValueChange = onValueChange,
                 modifier = modifier,
@@ -124,7 +136,7 @@ fun KomiTextField(
                 placeholder = placeholder,
                 leadingIcon = leadingIcon,
                 trailing = trailing,
-                clearable = clearable,
+                onClear = clear,
                 multiline = multiline,
                 rows = rows,
                 required = required,
@@ -192,21 +204,12 @@ private fun MangaTextField(
 
     Column(modifier = modifier.then(if (enabled) Modifier else Modifier.alpha(0.5f))) {
         if (label != null) {
-            val labelStyle = TextStyle(
-                fontFamily = type.display.fontFamily,
-                fontSize = (metrics.font - 2f).sp,
-                letterSpacing = 0.05.em,
-            )
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    text = label.uppercase(),
-                    style = labelStyle,
-                    color = colors.onSurface
-                )
+                KomiText(text = label, role = KomiTextRole.Overline, color = colors.onSurface)
                 if (required) {
-                    Text(
+                    KomiText(
                         text = "*",
-                        style = labelStyle,
+                        role = KomiTextRole.Overline,
                         color =
                             if (hasError) {
                                 colors.error
@@ -271,13 +274,7 @@ private fun MangaTextField(
                 onValueChange = onValueChange,
                 modifier = Modifier.weight(1f).focusRequester(focusRequester),
                 enabled = enabled,
-                textStyle =
-                    TextStyle(
-                        fontFamily = type.body.fontFamily,
-                        fontWeight = FontWeight.W700,
-                        fontSize = metrics.font.sp,
-                        color = colors.onSurface,
-                    ),
+                textStyle = type.reading.copy(color = colors.onSurface),
                 cursorBrush = SolidColor(if (hasAccent) colors.primary else colors.onSurface),
                 visualTransformation = visualTransformation,
                 singleLine = !multiline,
@@ -292,13 +289,9 @@ private fun MangaTextField(
                 interactionSource = interaction,
                 decorationBox = { inner ->
                     if (value.isEmpty() && placeholder != null) {
-                        Text(
+                        KomiText(
                             text = placeholder,
-                            style = TextStyle(
-                                fontFamily = type.body.fontFamily,
-                                fontWeight = FontWeight.W700,
-                                fontSize = metrics.font.sp
-                            ),
+                            role = KomiTextRole.Reading,
                             color = colors.onSurfaceVariant,
                             maxLines = if (multiline) Int.MAX_VALUE else 1,
                             overflow = TextOverflow.Ellipsis
@@ -327,13 +320,9 @@ private fun MangaTextField(
         val supporting = error ?: helper
         if (supporting != null) {
             Spacer(modifier = Modifier.height(6.dp))
-            Text(
+            KomiText(
                 text = supporting,
-                style = TextStyle(
-                    fontFamily = type.body.fontFamily,
-                    fontWeight = FontWeight.W700,
-                    fontSize = (metrics.font - 3.5f).sp
-                ),
+                role = KomiTextRole.Caption,
                 color = if (hasError) colors.error else colors.onSurfaceVariant,
             )
         }
@@ -358,7 +347,7 @@ private fun ClearButton(
     ) {
         Icon(
             imageVector = Icons.Default.Close,
-            contentDescription = "Clear",
+            contentDescription = stringResource(Res.string.clear),
             modifier = Modifier.size(iconSize - 5.dp),
             tint = colors.onSurface,
         )
@@ -375,7 +364,7 @@ private fun PasswordToggle(
     val interaction = remember { MutableInteractionSource() }
     Icon(
         imageVector = if (visible) Icons.Default.VisibilityOff else Icons.Default.Visibility,
-        contentDescription = null,
+        contentDescription = stringResource(if (visible) Res.string.hide_password else Res.string.show_password),
         tint = tint,
         modifier =
             Modifier
@@ -384,113 +373,9 @@ private fun PasswordToggle(
     )
 }
 
-@Composable
-private fun ClassicTextField(
-    value: String,
-    onValueChange: (String) -> Unit,
-    modifier: Modifier,
-    label: String?,
-    helper: String?,
-    error: String?,
-    placeholder: String?,
-    leadingIcon: ImageVector?,
-    trailing: @Composable (() -> Unit)?,
-    clearable: Boolean,
-    multiline: Boolean,
-    rows: Int,
-    required: Boolean,
-    enabled: Boolean,
-    password: Boolean,
-    keyboardType: KeyboardType,
-    onCommit: (() -> Unit)?,
-) {
-    val hasError = error != null
-    val supporting = error ?: helper
-    val showClear = clearable && enabled && value.isNotEmpty() && trailing == null
-    var passwordVisible by remember { mutableStateOf(false) }
-    val visualTransformation = if (password && !passwordVisible) {
-        PasswordVisualTransformation()
-    } else VisualTransformation.None
-
-    TextField(
-        value = value,
-        onValueChange = onValueChange,
-        modifier = modifier.fillMaxWidth(),
-        enabled = enabled,
-        isError = hasError,
-        visualTransformation = visualTransformation,
-        label = label?.let {
-            {
-                Text(text = if (required) "$it *" else it)
-            }
-        },
-        placeholder = placeholder?.let {
-            {
-                Text(
-                    text = it,
-                    color = LocalPersonality.current.colors.onSurfaceVariant,
-                    maxLines = if (multiline) Int.MAX_VALUE else 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-            }
-        },
-        leadingIcon = leadingIcon?.let {
-            {
-                Icon(
-                    imageVector = it,
-                    contentDescription = null
-                )
-            }
-        },
-        trailingIcon =
-            when {
-                trailing != null -> {
-                    trailing
-                }
-
-                password -> {
-                    {
-                        Icon(
-                            imageVector = if (passwordVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility,
-                            contentDescription = null,
-                            modifier = Modifier.clickable(onClick = {
-                                passwordVisible = !passwordVisible
-                            }),
-                        )
-                    }
-                }
-
-                showClear -> {
-                    {
-                        Icon(
-                            imageVector = Icons.Default.Close,
-                            contentDescription = "Clear",
-                            modifier = Modifier.clickable(onClick = { onValueChange("") }),
-                        )
-                    }
-                }
-
-                else -> {
-                    null
-                }
-            },
-        supportingText = supporting?.let { { Text(it) } },
-        singleLine = !multiline,
-        minLines = if (multiline) rows else 1,
-        keyboardOptions =
-            KeyboardOptions(
-                keyboardType = keyboardType,
-                imeAction = if (!multiline && onCommit != null) ImeAction.Done else ImeAction.Default,
-            ),
-        maxLines = if (multiline) Int.MAX_VALUE else 1,
-        keyboardActions = KeyboardActions(onDone = { onCommit?.invoke() }),
-    )
-}
-
 private data class FieldMetrics(
     val height: Dp,
     val paddingX: Dp,
-    val font: Float,
     val icon: Dp,
     val border: Dp,
     val shadow: Dp,
@@ -498,9 +383,9 @@ private data class FieldMetrics(
 
 private fun fieldMetrics(size: KomiTextFieldSize): FieldMetrics =
     when (size) {
-        KomiTextFieldSize.Sm -> FieldMetrics(38.dp, 11.dp, 13f, 16.dp, 2.5.dp, 3.dp)
-        KomiTextFieldSize.Md -> FieldMetrics(46.dp, 12.dp, 15f, 19.dp, 3.dp, 4.dp)
-        KomiTextFieldSize.Lg -> FieldMetrics(54.dp, 14.dp, 17f, 21.dp, 3.dp, 5.dp)
+        KomiTextFieldSize.Sm -> FieldMetrics(38.dp, 11.dp, 16.dp, 2.5.dp, 3.dp)
+        KomiTextFieldSize.Md -> FieldMetrics(46.dp, 12.dp, 19.dp, 3.dp, 4.dp)
+        KomiTextFieldSize.Lg -> FieldMetrics(54.dp, 14.dp, 21.dp, 3.dp, 5.dp)
     }
 
 @Composable

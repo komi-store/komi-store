@@ -1,7 +1,6 @@
 package zed.rainxch.apps.presentation.components
 
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -26,10 +25,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.stringResource
 import zed.rainxch.apps.presentation.model.UpdateAllProgress
 import zed.rainxch.core.presentation.components.buttons.KomiButton
@@ -65,7 +62,7 @@ fun UpdatesBanner(
 ) {
     val rotation by animateFloatAsState(
         targetValue = if (isExpanded) 0f else -90f,
-        animationSpec = tween(durationMillis = 180),
+        animationSpec = LocalPersonality.current.motion.fastSpatial(),
         label = "updates-banner-chevron",
     )
     val colors = LocalPersonality.current.colors
@@ -83,7 +80,7 @@ fun UpdatesBanner(
             .background(colors.primaryContainer)
             .border(
                 width = 0.5.dp,
-                color = colors.outlineVariant.copy(alpha = 0.35f),
+                color = colors.divider,
                 shape = RoundedCornerShape(shape.corner),
             ),
     ) {
@@ -100,7 +97,7 @@ fun UpdatesBanner(
                             modifier = Modifier
                                 .size(32.dp)
                                 .clip(RoundedCornerShape(shape.corner))
-                                .background(colors.primary.copy(alpha = 0.18f)),
+                                .background(colors.primaryTint),
                             contentAlignment = Alignment.Center,
                         ) {
                             KomiIcon(
@@ -117,10 +114,7 @@ fun UpdatesBanner(
                     Column(modifier = Modifier.weight(1f)) {
                         KomiText(
                             text = title,
-                            role = KomiTextRole.Title,
-                            fontWeight = FontWeight.SemiBold,
-                            fontSize = 18.sp,
-                            uppercase = false,
+                            role = KomiTextRole.CardTitle,
                             color = colors.onPrimaryContainer,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
@@ -129,8 +123,7 @@ fun UpdatesBanner(
                         KomiText(
                             text = stringResource(Res.string.apps_updates_banner_subtitle),
                             role = KomiTextRole.Body,
-                            fontSize = 13.sp,
-                            color = colors.onPrimaryContainer.copy(alpha = 0.78f),
+                            color = colors.onPrimaryContainer,
                             maxLines = 2,
                             overflow = TextOverflow.Ellipsis,
                         )
@@ -139,7 +132,7 @@ fun UpdatesBanner(
                     KomiIcon(
                         imageVector = Icons.Default.ExpandMore,
                         contentDescription = null,
-                        tint = colors.onPrimaryContainer.copy(alpha = 0.78f),
+                        tint = colors.onPrimaryContainer,
                         modifier = Modifier
                             .size(22.dp)
                             .rotate(rotation),
@@ -161,10 +154,7 @@ fun UpdatesBanner(
                                         updateAllProgress.current,
                                         updateAllProgress.total,
                                     ),
-                                    role = KomiTextRole.Title,
-                                    fontSize = 14.sp,
-                                    fontWeight = FontWeight.SemiBold,
-                                    uppercase = false,
+                                    role = KomiTextRole.ItemTitle,
                                     color = colors.onPrimaryContainer,
                                 )
 
@@ -174,8 +164,7 @@ fun UpdatesBanner(
                                         updateAllProgress.currentAppName,
                                     ),
                                     role = KomiTextRole.Body,
-                                    fontSize = 13.sp,
-                                    color = colors.onPrimaryContainer.copy(alpha = 0.78f),
+                                    color = colors.onPrimaryContainer,
                                     maxLines = 1,
                                     overflow = TextOverflow.Ellipsis,
                                 )

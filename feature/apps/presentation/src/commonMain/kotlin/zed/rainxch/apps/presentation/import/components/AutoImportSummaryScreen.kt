@@ -17,10 +17,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import kotlinx.collections.immutable.ImmutableList
 import org.jetbrains.compose.resources.pluralStringResource
 import org.jetbrains.compose.resources.stringResource
@@ -72,11 +70,9 @@ fun AutoImportSummaryScreen(
                         autoLinkedCount,
                         autoLinkedCount,
                     ),
-                role = KomiTextRole.Title,
-                fontWeight = FontWeight.Bold,
+                role = KomiTextRole.CardTitle,
                 color = colors.onSurface,
                 textAlign = TextAlign.Center,
-                uppercase = false,
             )
 
             KomiText(
@@ -84,7 +80,6 @@ fun AutoImportSummaryScreen(
                 role = KomiTextRole.Body,
                 color = colors.onSurfaceVariant,
                 textAlign = TextAlign.Center,
-                uppercase = false,
             )
 
             if (cardsRemaining > 0) {
@@ -98,7 +93,6 @@ fun AutoImportSummaryScreen(
                     role = KomiTextRole.Body,
                     color = colors.onSurface,
                     textAlign = TextAlign.Center,
-                    uppercase = false,
                 )
             }
 
@@ -156,11 +150,8 @@ private fun ChipSurface(text: String) {
     ) {
         KomiText(
             text = text,
-            role = KomiTextRole.Label,
-            fontSize = 12.sp,
-            fontWeight = FontWeight.Medium,
+            role = KomiTextRole.LabelSmall,
             color = colors.onPrimaryContainer,
-            uppercase = false,
             modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
         )
     }

@@ -16,9 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.stringResource
 import zed.rainxch.core.presentation.components.icon.KomiIcon
 import zed.rainxch.core.presentation.components.surfaces.KomiSurface
@@ -48,7 +46,7 @@ fun HostTokensEntryCard(
                 modifier = Modifier
                     .size(36.dp)
                     .clip(RoundedCornerShape(personality.shape.cornerSmall))
-                    .background(colors.primary.copy(alpha = 0.14f)),
+                    .background(colors.primaryTint),
                 contentAlignment = Alignment.Center,
             ) {
                 KomiIcon(
@@ -61,17 +59,13 @@ fun HostTokensEntryCard(
             Column(modifier = Modifier.weight(1f)) {
                 KomiText(
                     text = stringResource(Res.string.host_tokens_title),
-                    role = KomiTextRole.Title,
-                    fontWeight = FontWeight.SemiBold,
+                    role = KomiTextRole.CardTitle,
                     color = colors.onSurface,
-                    uppercase = false,
                 )
                 KomiText(
                     text = stringResource(Res.string.host_tokens_entry_subtitle),
                     role = KomiTextRole.Body,
-                    fontSize = 13.sp,
                     color = colors.onSurfaceVariant,
-                    uppercase = false,
                 )
             }
             KomiIcon(

@@ -140,12 +140,6 @@ class FeedViewModel(
                 browseFilterStore.setCategory(action.category)
             }
 
-            FeedAction.OnToggleGridLayout -> {
-                val grid = !_state.value.isGridLayout
-                _state.update { it.copy(isGridLayout = grid) }
-                viewModelScope.launch { tweaksRepository.setRepoGridLayout(grid) }
-            }
-
             is FeedAction.OnShareClick -> {
                 viewModelScope.launch {
                     runCatching {

@@ -135,8 +135,8 @@ modules:
         commit: f46e709c596e6579964e1b9ea5fcdc91f7497ec3
       # Gradle distribution (referenced by gradle-wrapper.properties after sed patch)
       - type: file
-        url: https://services.gradle.org/distributions/gradle-9.4.1-bin.zip
-        sha256: 2ab2958f2a1e51120c326cad6f385153bb11ee93b3c216c5fccebfdfbb7ec6cb
+        url: https://services.gradle.org/distributions/gradle-9.6.0-bin.zip
+        sha256: bbaeb2fef8710818cf0e261201dab964c572f92b942812df0c3620d62a529a01
         dest: gradle/wrapper
         dest-filename: gradle-bin.zip
       # Pre-downloaded Gradle/Maven dependencies for offline build.

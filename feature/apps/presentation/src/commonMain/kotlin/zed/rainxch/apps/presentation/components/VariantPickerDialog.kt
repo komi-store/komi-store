@@ -36,10 +36,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.stringResource
 import zed.rainxch.apps.presentation.AppsAction
 import zed.rainxch.apps.presentation.AppsState
@@ -60,8 +58,7 @@ fun VariantPickerDialog(
             Column {
                 KomiText(
                     text = stringResource(Res.string.variant_picker_title),
-                    role = KomiTextRole.Title,
-                    fontWeight = FontWeight.Bold,
+                    role = KomiTextRole.CardTitle,
                 )
 
                 Spacer(Modifier.height(2.dp))
@@ -69,8 +66,6 @@ fun VariantPickerDialog(
                 KomiText(
                     text = app.appName,
                     role = KomiTextRole.Body,
-                    fontSize = 13.sp,
-                    uppercase = false,
                     color = colors.onSurfaceVariant,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
@@ -102,8 +97,7 @@ fun VariantPickerDialog(
                         Column(modifier = Modifier.weight(1f)) {
                             KomiText(
                                 text = stringResource(Res.string.variant_picker_stale_title),
-                                role = KomiTextRole.Body,
-                                fontWeight = FontWeight.SemiBold,
+                                role = KomiTextRole.Label,
                                 color = colors.onError,
                             )
 
@@ -114,8 +108,6 @@ fun VariantPickerDialog(
                                         state.variantPickerCurrentVariant,
                                     ),
                                     role = KomiTextRole.Body,
-                                    fontSize = 13.sp,
-                                    uppercase = false,
                                     color = colors.onError,
                                 )
                             }
@@ -179,7 +171,7 @@ fun VariantPickerDialog(
                                 )
 
                                 KomiHorizontalDivider(
-                                    color = colors.outlineVariant.copy(alpha = 0.4f),
+                                    color = colors.divider,
                                 )
                             }
 
@@ -266,10 +258,8 @@ private fun VariantRow(
         Column(modifier = Modifier.weight(1f)) {
             KomiText(
                 text = title,
-                role = KomiTextRole.Body,
+                role = if (isSelected) KomiTextRole.Label else KomiTextRole.Body,
                 color = colors.onSurface,
-                fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,
-                uppercase = false,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
@@ -277,8 +267,6 @@ private fun VariantRow(
             KomiText(
                 text = subtitle,
                 role = KomiTextRole.Body,
-                fontSize = 13.sp,
-                uppercase = false,
                 color = colors.onSurfaceVariant,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,

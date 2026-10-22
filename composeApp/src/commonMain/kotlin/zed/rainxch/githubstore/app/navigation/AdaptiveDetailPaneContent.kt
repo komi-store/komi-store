@@ -1,7 +1,6 @@
 package zed.rainxch.githubstore.app.navigation
 
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
@@ -15,6 +14,7 @@ import androidx.navigation.NavHostController
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 import zed.rainxch.core.presentation.components.adaptive.AdaptiveDetailArgs
+import zed.rainxch.core.presentation.locals.LocalPersonality
 import zed.rainxch.details.presentation.DetailsRoot
 import zed.rainxch.details.presentation.DetailsViewModel
 import zed.rainxch.details.presentation.about.AboutRoot
@@ -49,6 +49,7 @@ fun AdaptiveDetailPaneContent(
     key(args) {
         var route: DetailPaneRoute by remember { mutableStateOf(DetailPaneRoute.Main) }
 
+        val motion = LocalPersonality.current.motion
         AnimatedContent(
             targetState = route,
             transitionSpec = {
@@ -56,20 +57,20 @@ fun AdaptiveDetailPaneContent(
                 if (forward) {
                     slideInHorizontally(
                         initialOffsetX = { fullWidth -> fullWidth },
-                        animationSpec = tween(durationMillis = 280),
+                        animationSpec = motion.medium(),
                     ) togetherWith
                         slideOutHorizontally(
                             targetOffsetX = { fullWidth -> -fullWidth / 4 },
-                            animationSpec = tween(durationMillis = 280),
+                            animationSpec = motion.medium(),
                         )
                 } else {
                     slideInHorizontally(
                         initialOffsetX = { fullWidth -> -fullWidth / 4 },
-                        animationSpec = tween(durationMillis = 280),
+                        animationSpec = motion.medium(),
                     ) togetherWith
                         slideOutHorizontally(
                             targetOffsetX = { fullWidth -> fullWidth },
-                            animationSpec = tween(durationMillis = 280),
+                            animationSpec = motion.medium(),
                         )
                 }
             },

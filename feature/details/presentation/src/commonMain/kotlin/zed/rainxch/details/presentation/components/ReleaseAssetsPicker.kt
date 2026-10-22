@@ -1,7 +1,6 @@
 package zed.rainxch.details.presentation.components
 
 import androidx.compose.animation.animateContentSize
-import androidx.compose.animation.core.tween
 import zed.rainxch.core.presentation.utils.formatFileSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -26,7 +25,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.outlined.Devices
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.unit.sp
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -35,7 +33,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -113,9 +110,7 @@ fun ReleaseAssetsPicker(
     ) {
         KomiText(
             text = stringResource(Res.string.assets_title),
-            role = KomiTextRole.Label,
-            fontWeight = FontWeight.SemiBold,
-            fontSize = 12.sp,
+            role = KomiTextRole.Overline,
             color = colors.primary,
             modifier = Modifier.padding(horizontal = 4.dp),
         )
@@ -139,13 +134,11 @@ fun ReleaseAssetsPicker(
         ) {
             KomiText(
                 text = selectedAsset?.name ?: stringResource(Res.string.no_assets_selected),
-                role = KomiTextRole.Stamp,
-                fontWeight = FontWeight.SemiBold,
+                role = KomiTextRole.Label,
                 color = colors.onSurface,
                 overflow = TextOverflow.Ellipsis,
                 maxLines = 1,
                 modifier = Modifier.weight(1f),
-                uppercase = false,
             )
             KomiIcon(
                 imageVector = Icons.Default.UnfoldMore,
@@ -191,11 +184,8 @@ private fun ReleaseAssetsItemsPicker(
                 Column(modifier = Modifier.weight(1f).padding(vertical = 6.dp)) {
                     KomiText(
                         text = stringResource(Res.string.assets_title),
-                        role = KomiTextRole.Title,
-                        fontWeight = FontWeight.SemiBold,
-                        fontSize = 20.sp,
+                        role = KomiTextRole.CardTitle,
                         color = colors.onSurface,
-                        uppercase = false,
                     )
                 }
                 KomiIconButton(
@@ -217,7 +207,6 @@ private fun ReleaseAssetsItemsPicker(
                     KomiText(
                         text = stringResource(Res.string.variant_picker_pinned, pinnedVariant),
                         role = KomiTextRole.Body,
-                        fontSize = 13.sp,
                         color = colors.onSurfaceVariant,
                         modifier = Modifier.weight(1f),
                     )
@@ -291,7 +280,7 @@ private fun ReleaseAssetsItemsPicker(
             }
             LazyColumn(
                 modifier = Modifier.fillMaxWidth()
-                    .animateContentSize(animationSpec = tween(durationMillis = 250))
+                    .animateContentSize(animationSpec = LocalPersonality.current.motion.defaultSpatial())
                     .heightIn(max = 420.dp),
                 contentPadding = PaddingValues(vertical = 8.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
@@ -343,8 +332,7 @@ private fun ReleaseAssetsItemsPicker(
                                 text = stringResource(
                                     if (allInstalled) Res.string.installed else Res.string.assets_section_your_app,
                                 ),
-                                role = KomiTextRole.Label,
-                                fontWeight = FontWeight.SemiBold,
+                                role = KomiTextRole.Overline,
                                 color = colors.primary,
                                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
                             )
@@ -365,15 +353,14 @@ private fun ReleaseAssetsItemsPicker(
                         if (otherAssets.isNotEmpty()) {
                             item(key = "section-divider-available") {
                                 KomiHorizontalDivider(
-                                    color = colors.outlineVariant.copy(alpha = 0.5f),
+                                    color = colors.divider,
                                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp),
                                 )
                             }
                             item(key = "section-header-available") {
                                 KomiText(
                                     text = stringResource(Res.string.assets_section_available),
-                                    role = KomiTextRole.Label,
-                                    fontWeight = FontWeight.SemiBold,
+                                    role = KomiTextRole.Overline,
                                     color = colors.primary,
                                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
                                 )
@@ -446,11 +433,8 @@ private fun ReleaseAssetsAboutDialog(
         ) {
             KomiText(
                 text = stringResource(Res.string.multiple_assets_info_dialog_title),
-                role = KomiTextRole.Title,
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 20.sp,
+                role = KomiTextRole.CardTitle,
                 color = colors.onSurface,
-                uppercase = false,
             )
             Spacer(Modifier.size(12.dp))
             KomiText(
@@ -487,8 +471,7 @@ private fun ReleaseAssetItem(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 KomiText(
                     text = asset.name,
-                    role = KomiTextRole.Stamp,
-                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                    role = KomiTextRole.ItemTitle,
                     overflow = TextOverflow.Ellipsis,
                     maxLines = 2,
                     color =
@@ -498,7 +481,6 @@ private fun ReleaseAssetItem(
                             colors.onSurface
                         },
                     modifier = Modifier.weight(1f, fill = false),
-                    uppercase = false,
                 )
                 val variantBadge = when (variantStatus) {
                     AssetOwnership.VariantStatus.INSTALLED -> Res.string.installed
@@ -509,35 +491,30 @@ private fun ReleaseAssetItem(
                     Spacer(Modifier.width(6.dp))
                     KomiText(
                         text = stringResource(variantBadge),
-                        role = KomiTextRole.Label,
-                        fontSize = 11.sp,
+                        role = KomiTextRole.Caption,
                         color = colors.onSurfaceVariant,
                         modifier = Modifier
                             .clip(RoundedCornerShape(shape.cornerSmall))
                             .background(colors.surfaceVariant)
                             .padding(horizontal = 6.dp, vertical = 2.dp),
-                        uppercase = false,
                     )
                 }
                 if (isPinned) {
                     Spacer(Modifier.width(6.dp))
                     KomiText(
                         text = stringResource(Res.string.variant_picker_pinned_badge),
-                        role = KomiTextRole.Label,
-                        fontSize = 11.sp,
+                        role = KomiTextRole.Caption,
                         color = colors.onPrimaryContainer,
                         modifier = Modifier
                             .clip(RoundedCornerShape(shape.cornerSmall))
                             .background(colors.primaryContainer)
                             .padding(horizontal = 6.dp, vertical = 2.dp),
-                        uppercase = false,
                     )
                 }
             }
             KomiText(
                 text = formatFileSize(asset.size),
                 role = KomiTextRole.Body,
-                fontSize = 13.sp,
                 color = colors.onSurfaceVariant,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
@@ -606,11 +583,9 @@ private fun PlatformSectionCard(
             ) {
                 KomiText(
                     text = platformLabel,
-                    role = KomiTextRole.Title,
-                    fontWeight = FontWeight.SemiBold,
+                    role = KomiTextRole.CardTitle,
                     color = colors.onSurface,
                     modifier = Modifier.weight(1f),
-                    uppercase = false,
                 )
                 SectionChip(
                     label =
@@ -645,7 +620,7 @@ private fun PlatformSectionCard(
                 )
                 if (index < assets.lastIndex) {
                     KomiHorizontalDivider(
-                        color = colors.outlineVariant.copy(alpha = 0.4f),
+                        color = colors.divider,
                         modifier = Modifier.padding(horizontal = 16.dp),
                     )
                 }
@@ -665,14 +640,11 @@ private fun SectionChip(
     val content = colors.onPrimaryContainer
     KomiText(
         text = label,
-        role = KomiTextRole.Label,
-        fontSize = 11.sp,
-        fontWeight = FontWeight.SemiBold,
+        role = KomiTextRole.LabelSmall,
         color = content,
         modifier = Modifier
             .clip(RoundedCornerShape(shape.cornerSmall))
             .background(container)
             .padding(horizontal = 8.dp, vertical = 3.dp),
-        uppercase = false,
     )
 }

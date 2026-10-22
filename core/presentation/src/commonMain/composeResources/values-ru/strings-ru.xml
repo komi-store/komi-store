@@ -20,7 +20,6 @@
     <string name="cancel">Отмена</string>
 
     <string name="checking">Проверка…</string>
-    <string name="updated_successfully">Успешно обновлено</string>
     <string name="error_with_message">Ошибка: %1$s</string>
 
     <string name="updating_x_of_y">Обновление %1$d из %2$d</string>
@@ -115,6 +114,9 @@
 
     <string name="open_repository">Открыть репозиторий</string>
     <string name="cancel_download">Отменить загрузку</string>
+    <string name="pause">Приостановить</string>
+    <string name="resume">Возобновить</string>
+    <string name="paused">Приостановлено</string>
 
     <string name="retry">Повторить</string>
     <string name="no_description">Описание отсутствует.</string>
@@ -185,7 +187,6 @@
 
 
 
-    <string name="home_finding_repositories">Поиск репозиториев...</string>
     <string name="home_retry">Повторить</string>
     <string name="home_failed_to_load_repositories">Не удалось загрузить репозитории</string>
 
@@ -227,6 +228,20 @@
 
     <string name="sign_in_required">Требуется вход</string>
     <string name="no_starred_repos">Нет избранных репозиториев</string>
+    <plurals name="starred_hidden_not_installable">
+        <item quantity="one">Ещё %1$d избранный репозиторий без установочного релиза</item>
+        <item quantity="few">Ещё %1$d избранных репозитория без установочного релиза</item>
+        <item quantity="many">Ещё %1$d избранных репозиториев без установочного релиза</item>
+        <item quantity="other">Ещё %1$d избранного репозитория без установочного релиза</item>
+    </plurals>
+    <plurals name="starred_including_not_installable">
+        <item quantity="one">Включая %1$d избранный репозиторий без установочного релиза</item>
+        <item quantity="few">Включая %1$d избранных репозитория без установочного релиза</item>
+        <item quantity="many">Включая %1$d избранных репозиториев без установочного релиза</item>
+        <item quantity="other">Включая %1$d избранного репозитория без установочного релиза</item>
+    </plurals>
+    <string name="starred_show_all">Показать все</string>
+    <string name="starred_installable_only">Только устанавливаемые</string>
     <string name="sign_in_with_github_for_stars">Войди через GitHub, чтобы увидеть избранные репозитории</string>
     <string name="star_repos_hint">Отмечай репозитории с установочными релизами на GitHub</string>
     <string name="last_synced">Последняя синхронизация</string>
@@ -287,6 +302,7 @@
     <string name="released_yesterday">Опубликовано вчера</string>
     <string name="released_days_ago">Опубликовано %1$d день(дней) назад</string>
     <string name="released_on_date">Опубликовано %1$s</string>
+    <string name="details_last_push">Последний пуш: %1$s</string>
 
     <string name="bottom_nav_explore_title">Обзор</string>
     <string name="bottom_nav_search_title">Поиск</string>
@@ -344,6 +360,9 @@
     <string name="proxy_test_error_auth_required">Требуется аутентификация прокси.</string>
     <string name="proxy_test_error_status">Неожиданный ответ: HTTP %1$d</string>
     <string name="proxy_test_error_unknown">Не удалось проверить соединение</string>
+    <string name="proxy_test_master_result">Поиск: %1$s, Загрузки: %2$s, Перевод: %3$s</string>
+    <string name="proxy_test_probe_ok">%1$d мс</string>
+    <string name="proxy_test_probe_failed">ошибка</string>
 
 
 
@@ -369,6 +388,12 @@
     <string name="auth_check_status">Я уже авторизовался</string>
     <string name="auth_polling_status">Проверка…</string>
     <string name="auth_rate_limited">Превышен лимит — повтор через %1$d с</string>
+    <string name="auth_error_unreachable">Не удалось подключиться к GitHub</string>
+    <string name="auth_error_rate_limited">Слишком много попыток входа</string>
+    <string name="auth_hint_wait">Подожди несколько минут и попробуй снова.</string>
+    <string name="auth_error_denied">В авторизации отказано</string>
+    <string name="auth_error_browser">Не удалось открыть браузер</string>
+    <string name="auth_hint_other_method">Используй вместо этого код устройства или персональный токен доступа.</string>
 
     <!-- Read More / Show Less -->
     <string name="read_more">Читать далее</string>
@@ -389,6 +414,8 @@
     <string name="no_github_link_in_clipboard">Ссылка GitHub не найдена в буфере обмена</string>
 
     <string name="clear">Очистить</string>
+    <string name="show_password">Показать пароль</string>
+    <string name="hide_password">Скрыть пароль</string>
 
 
 
@@ -486,12 +513,15 @@
     <string name="hide_repository">Скрыть репозиторий</string>
 
     <string name="recently_viewed">Недавно просмотренные</string>
+    <string name="recently_viewed_remove_cd">Удалить из истории</string>
     <string name="profile_recently_viewed_description">Репозитории, которые ты посещал</string>
     <string name="delete_all">Удалить всё</string>
     <string name="delete_downloads_confirmation_title">Удалить все загрузки?</string>
     <string name="delete_downloads_confirmation_message">Это навсегда удалит все APK и установщики (%1$s). Ты сможешь скачать их снова в любое время.</string>
     <string name="downloads_cleared">Все загруженные пакеты удалены.</string>
     <string name="unable_to_verify_attestation">Не удалось проверить</string>
+    <string name="details_attestation_verified_explainer">SHA-256 этого файла совпадает с аттестацией сборки, которую репозиторий опубликовал на GitHub, значит файл получен из собственной сборки репозитория.</string>
+    <string name="details_attestation_unverified_explainer">Komi Store не удалось сверить этот файл с аттестациями сборки репозитория. Само по себе это не делает его небезопасным.</string>
 
     <string name="recent_searches">Недавние поиски</string>
     <string name="clear_all_history">Очистить всё</string>
@@ -551,6 +581,8 @@
     <string name="variant_label_inline">Вариант: %1$s</string>
     <string name="variant_picker_unpin">Открепить</string>
     <string name="variant_picker_pinned_badge">Закреплено</string>
+    <string name="assets_section_available">Доступные</string>
+    <string name="assets_section_your_app">Твоё приложение</string>
     <string name="variant_picker_open">Выбрать вариант</string>
     <string name="variant_picker_open_filter">Настроить фильтр</string>
     <string name="variant_first_pin_toast">Будущие обновления будут предпочитать вариант %1$s. Изменить это можно в любое время в настройках приложения.</string>
@@ -784,6 +816,7 @@
     <string name="feedback_send_via_github">Открыть как Issue на GitHub</string>
     <string name="feedback_send_success_email">Спасибо — открываем почтовый клиент.</string>
     <string name="feedback_send_success_github">Спасибо — открываем браузер.</string>
+    <string name="feedback_send_failed">Не удалось открыть канал обратной связи</string>
 
     <!-- ═══════════════════════════════════════════════════════════════
          E5 — Mirror feature
@@ -800,6 +833,14 @@
     <string name="mirror_picker_description">Используется для загрузки файлов релизов. Обращения к API GitHub всегда идут напрямую. Большинству пользователей следует оставить настройку «Напрямую через GitHub».</string>
     <string name="mirror_section_official">Официальное</string>
     <string name="mirror_section_community">Сообщество</string>
+    <string name="mirror_pick_fastest">Выбрать самое быстрое</string>
+    <string name="mirror_pick_fastest_sub">Замерить все зеркала и выбрать самое быстрое</string>
+    <string name="mirror_measuring">Замер с этого устройства…</string>
+    <string name="mirror_measure_latency">Измерить задержку</string>
+    <string name="mirror_latency_local">%1$d мс от тебя</string>
+    <string name="mirror_fastest_badge">%1$s · самое быстрое</string>
+    <string name="mirror_fastest_chosen">Переключено на %1$s (%2$d мс).</string>
+    <string name="mirror_no_mirror_responded">Ни одно зеркало не ответило. Проверь подключение и попробуй снова.</string>
     <string name="mirror_status_ok">%1$dms</string>
     <string name="mirror_status_degraded">%1$dms</string>
     <string name="mirror_status_down">(недоступно)</string>
@@ -815,6 +856,7 @@
     <string name="mirror_test_http_error">Зеркало вернуло %1$d</string>
     <string name="mirror_test_timeout">Превышено время ожидания (5s)</string>
     <string name="mirror_test_dns_fail">Не удалось разрешить имя хоста</string>
+    <string name="mirror_test_failed">Не удалось подключиться</string>
     <string name="mirror_deploy_your_own_hint">Все зеркала недоступны? За 5 минут можно развернуть своё — смотри документацию.</string>
     <string name="mirror_removed_toast">%1$s больше недоступно, выполнен переход на прямой доступ через GitHub.</string>
 
@@ -870,13 +912,12 @@
     <string name="apk_inspect_title">Проверка APK</string>
     <string name="apk_inspect_version_code">Версия</string>
     <string name="apps_compact_more_actions">Больше действий для %1$s</string>
-    <string name="apps_compact_status_filter_active">фильтр monorepo активен</string>
-    <string name="apps_compact_status_pending_install">установка в ожидании</string>
-    <string name="apps_compact_status_pre_release_on">пре-релиз включён</string>
-    <string name="apps_compact_status_ready_to_install">готов к установке</string>
-    <string name="apps_compact_status_updates_ignored">обновления игнорируются</string>
-    <string name="apps_compact_status_variant_pinned">вариант закреплён</string>
-    <string name="apps_compact_status_variant_stale">вариант устарел, нужно действие</string>
+    <string name="apps_menu_item_active">%1$s  ✓</string>
+    <string name="apps_version_update">%1$s → %2$s</string>
+    <string name="apps_version_dated">%1$s (%2$s)</string>
+    <string name="apps_variant_subtitle">%1$s  ·  %2$s</string>
+    <string name="apps_section_header_cd">%1$s, %2$d, %3$s</string>
+    <string name="apps_section_header_static_cd">%1$s, %2$d</string>
     <string name="apps_ignore_updates">Игнорировать обновления</string>
     <string name="apps_section_collapse">Свернуть раздел</string>
     <string name="apps_section_count_suffix">· %1$d</string>
@@ -901,6 +942,7 @@
     <string name="dhizuku_status_permission_needed">Требуется разрешение</string>
     <string name="dhizuku_status_ready">Готов</string>
     <string name="discard_pending_install">Отбросить</string>
+    <string name="delete_task">Удалить задачу</string>
     <string name="error_state_go_back">Назад</string>
     <string name="error_state_subtitle_generic">Не удалось загрузить этот репо. Нажми «Повторить» ниже.</string>
     <string name="error_state_subtitle_not_found">Репозиторий мог стать приватным, быть переименован или удалён.</string>
@@ -958,6 +1000,9 @@
     <string name="starred_picker_sort_recent">Недавно отмеченные</string>
     <string name="starred_picker_sort_stars">Больше звёзд</string>
     <string name="starred_picker_star_dedup_tooltip">Снятие звезды на GitHub не отменяет отслеживание приложения.</string>
+    <string name="starred_picker_cd_ships_apk">с APK</string>
+    <string name="starred_picker_cd_already_tracked">уже отслеживается</string>
+    <string name="starred_picker_cd_latest">последний релиз %1$s</string>
     <string name="import_stars_title">Импорт репозиториев со звездой по имени пользователя</string>
     <string name="import_stars_subtitle">Введи любое имя пользователя GitHub, чтобы посмотреть его публичные репозитории со звездой и добавить их в избранное. Вход не требуется.</string>
     <string name="import_stars_hint">Имя пользователя GitHub</string>
@@ -1036,7 +1081,6 @@
     <string name="apps_updates_banner_subtitle">Просмотри или обнови всё сразу.</string>
     <string name="apps_updates_banner_title_one">Доступно 1 обновление</string>
     <string name="apps_updates_banner_title_other">Доступно обновлений: %1$d</string>
-    <string name="back_cd">Назад</string>
     <string name="cd_back">Назад</string>
     <string name="cd_image">Изображение</string>
     <string name="common_see_all">Все ›</string>
@@ -1100,11 +1144,16 @@
     <string name="host_tokens_row_valid_short">Действителен · %1$s</string>
     <string name="host_tokens_row_validate">Проверить</string>
     <string name="host_tokens_saved">Токен сохранён для %1$s</string>
+    <string name="host_tokens_load_failed">Не удалось загрузить сохранённые токены</string>
+    <string name="host_tokens_save_failed">Не удалось сохранить токен для %1$s</string>
+    <string name="host_tokens_delete_failed">Не удалось удалить токен для %1$s</string>
     <string name="host_tokens_title">Токены аутентификации</string>
     <string name="host_tokens_undo_action">Отменить</string>
     <string name="host_tokens_undo_failed">Не удалось восстановить токен для %1$s</string>
     <string name="host_tokens_undo_snackbar">Токен для %1$s удалён</string>
     <string name="host_tokens_validation_failed_fallback">неизвестная ошибка</string>
+    <string name="host_tokens_validation_http">HTTP %1$d</string>
+    <string name="host_tokens_validation_unreachable">не удалось связаться с сервером</string>
     <string name="host_tokens_validation_host_invalid">Неверный хост</string>
     <string name="host_tokens_validation_host_required">Требуется хост</string>
     <string name="host_tokens_validation_token_required">Требуется токен</string>
@@ -1278,6 +1327,12 @@
     <string name="profile_section_account">Аккаунт</string>
     <string name="appearance_section_mode">Режим</string>
     <string name="appearance_section_display">Отображение</string>
+    <string name="tweaks_accent_crimson">Багровый</string>
+    <string name="tweaks_accent_cobalt">Кобальт</string>
+    <string name="tweaks_accent_sun">Солнце</string>
+    <string name="tweaks_accent_frost">Иней</string>
+    <string name="tweaks_accent_mono">Монохром</string>
+    <string name="tweaks_accent_wallpaper">Цвета обоев</string>
     <string name="theme_dynamic">Динамичная</string>
     <string name="auth_more_signin_options">Другие способы входа</string>
     <string name="auth_hide_signin_options">Скрыть параметры</string>
@@ -1395,14 +1450,9 @@
     <string name="repo_pages_pr_draft">Черновик</string>
 
     <string name="feed_end_cap">続く · TO BE CONTINUED</string>
-    <string name="feed_layout_description_grid">Переключить на сетку</string>
-    <string name="feed_layout_description_list">Переключить на список</string>
     <string name="feed_masthead_subtitle">発見 · DISCOVER APPS</string>
     <string name="home_masthead_subtitle">ランキング · CHARTS &amp; PICKS</string>
     <string name="feed_platform_picker_title_jp">対応</string>
-    <string name="home_chart_popular_jp">人気</string>
-    <string name="home_chart_releases_jp">新着</string>
-    <string name="home_chart_trending_jp">急上昇</string>
     <string name="sidebar_browse_jp">航行</string>
     <string name="sidebar_categories_jp">部門</string>
     <string name="sidebar_nav_charts_jp">ランキング</string>
@@ -1439,7 +1489,6 @@
     <string name="home_chart_releases">Релизы</string>
     <string name="home_chart_trending">В тренде</string>
     <string name="home_masthead_title">Топ-чарты</string>
-    <string name="home_platform_filter">Фильтр платформ</string>
     <string name="paper_day">День</string>
     <string name="paper_night">Ночь</string>
     <string name="repo_card_details">Подробнее</string>

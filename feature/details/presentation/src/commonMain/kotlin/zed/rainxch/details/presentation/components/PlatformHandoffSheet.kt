@@ -14,10 +14,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.stringResource
 import zed.rainxch.core.domain.utils.PlatformRelease
 import zed.rainxch.core.domain.utils.assetPlatformOf
@@ -71,19 +69,14 @@ fun PlatformHandoffSheet(
             }
             KomiText(
                 text = stringResource(Res.string.get_it_on_platform, platform.toLabel()),
-                role = KomiTextRole.Title,
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 20.sp,
+                role = KomiTextRole.CardTitle,
                 color = colors.onSurface,
-                uppercase = false,
             )
         }
         KomiText(
             text = "${release.tagName} · ${formatIsoDateOrRaw(release.publishedAt)}",
             role = KomiTextRole.Body,
-            fontSize = 13.sp,
             color = colors.onSurfaceVariant,
-            uppercase = false,
         )
         Spacer(Modifier.size(12.dp))
 
@@ -102,18 +95,14 @@ fun PlatformHandoffSheet(
                     KomiText(
                         text = asset.name,
                         role = KomiTextRole.Body,
-                        fontSize = 14.sp,
                         color = colors.onSurface,
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis,
-                        uppercase = false,
                     )
                     KomiText(
                         text = formatFileSize(asset.size),
-                        role = KomiTextRole.Label,
-                        fontSize = 12.sp,
+                        role = KomiTextRole.Caption,
                         color = colors.onSurfaceVariant,
-                        uppercase = false,
                     )
                 }
                 KomiIconButton(

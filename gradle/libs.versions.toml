@@ -1,5 +1,5 @@
 [versions]
-agp = "8.13.2"
+agp = "9.4.1"
 composeBom = "2025.07.00"
 kermit = "2.0.8"
 kotlin = "2.3.10"
@@ -44,6 +44,7 @@ buildkonfig = "0.17.1"
 markdownRenderer = "0.39.2"
 coil3 = "3.3.0"
 highlights = "1.1.0"
+materialKolor = "4.1.1"
 shizuku = "13.1.5"
 libsu = "6.0.0"
 dhizuku = "2.5.4"
@@ -169,6 +170,7 @@ jetbrains-bundle = { module = "org.jetbrains.androidx.core:core-bundle", version
 markdown-renderer = { module = "com.mikepenz:multiplatform-markdown-renderer-m3", version.ref = "markdownRenderer" }
 markdown-renderer-coil3 = { module = "com.mikepenz:multiplatform-markdown-renderer-coil3", version.ref = "markdownRenderer" }
 highlights = { module = "dev.snipme:highlights", version.ref = "highlights" }
+material-kolor = { module = "com.materialkolor:material-kolor", version.ref = "materialKolor" }
 
 # WorkManager
 androidx-work-runtime = { module = "androidx.work:work-runtime-ktx", version.ref = "work" }
@@ -190,7 +192,8 @@ konsist = { group = "com.lemonappdev", name = "konsist", version.ref = "konsist"
 
 [plugins]
 
-convention-cmp-application = { id = "zed.rainxch.convention.cmp.application", version = "unspecified" }
+convention-android-application-compose = { id = "zed.rainxch.convention.android.application.compose", version = "unspecified" }
+convention-android-library = { id = "zed.rainxch.convention.android.library", version = "unspecified" }
 convention-kmp-library = { id = "zed.rainxch.convention.kmp.library", version = "unspecified" }
 convention-cmp-library = { id = "zed.rainxch.convention.cmp.library", version = "unspecified" }
 convention-cmp-feature = { id = "zed.rainxch.convention.cmp.feature", version = "unspecified" }

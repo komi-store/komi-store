@@ -29,7 +29,7 @@ fun CustomMirrorDialog(
 ) {
     KomiDialog(
         onDismissRequest = onDismiss,
-        title = { KomiText(stringResource(Res.string.mirror_custom_dialog_title), role = KomiTextRole.Title) },
+        title = { KomiText(stringResource(Res.string.mirror_custom_dialog_title), role = KomiTextRole.CardTitle) },
         text = {
             Column(modifier = Modifier.fillMaxWidth()) {
                 KomiTextField(

@@ -31,10 +31,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.stringResource
 import zed.rainxch.core.domain.model.announcement.Announcement
 import zed.rainxch.core.domain.model.announcement.AnnouncementCategory
@@ -119,12 +117,10 @@ fun AnnouncementCard(
 
                     KomiText(
                         text = announcement.title,
-                        role = KomiTextRole.Title,
-                        fontWeight = FontWeight.SemiBold,
+                        role = KomiTextRole.CardTitle,
                         color = colors.onSurface,
                         maxLines = 3,
                         overflow = TextOverflow.Ellipsis,
-                        uppercase = false,
                     )
 
                     ExpandableBody(
@@ -177,8 +173,7 @@ private fun HeaderRow(
             Spacer(Modifier.width(4.dp))
             KomiText(
                 text = stringResource(Res.string.announcements_acknowledged),
-                role = KomiTextRole.Label,
-                fontSize = 11.sp,
+                role = KomiTextRole.Overline,
                 color = colors.primary,
             )
         }
@@ -198,10 +193,8 @@ private fun CategoryChip(category: AnnouncementCategory) {
     ) {
         KomiText(
             text = stringResource(categoryLabel(category)),
-            role = KomiTextRole.Label,
-            fontSize = 11.sp,
+            role = KomiTextRole.Caption,
             color = colors.onSurfaceVariant,
-            uppercase = false,
         )
     }
 }
@@ -219,7 +212,6 @@ private fun ExpandableBody(
             text = body,
             role = KomiTextRole.Body,
             color = colors.onSurface,
-            uppercase = false,
             maxLines = if (isExpanded) Int.MAX_VALUE else BODY_COLLAPSED_LINES,
             onTextLayout = { layout ->
                 if (!isExpanded) {

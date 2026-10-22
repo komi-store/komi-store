@@ -24,10 +24,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.stringResource
 import zed.rainxch.core.presentation.components.GitHubStoreImage
 import zed.rainxch.core.presentation.components.chips.KomiChip
@@ -81,10 +79,8 @@ fun FavouriteRepositoryItem(
 
                 KomiText(
                     text = favouriteRepository.repoOwner,
-                    role = KomiTextRole.Label,
-                    fontWeight = FontWeight.Medium,
+                    role = KomiTextRole.LabelSmall,
                     color = colors.onSurfaceVariant,
-                    uppercase = false,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.weight(1f, fill = false),
@@ -110,10 +106,8 @@ fun FavouriteRepositoryItem(
                 Column(modifier = Modifier.weight(1f)) {
                     KomiText(
                         text = favouriteRepository.repoName,
-                        role = KomiTextRole.Title,
-                        fontWeight = FontWeight.SemiBold,
+                        role = KomiTextRole.CardTitle,
                         color = colors.onSurface,
-                        uppercase = false,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                     )
@@ -124,9 +118,7 @@ fun FavouriteRepositoryItem(
                         KomiText(
                             text = it,
                             role = KomiTextRole.Body,
-                            fontSize = 13.sp,
                             color = colors.onSurfaceVariant,
-                            uppercase = false,
                             maxLines = 2,
                             overflow = TextOverflow.Ellipsis,
                         )

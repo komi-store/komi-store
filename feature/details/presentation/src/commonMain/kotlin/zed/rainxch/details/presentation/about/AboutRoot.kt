@@ -13,17 +13,13 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mikepenz.markdown.compose.Markdown
 import io.ktor.client.HttpClient
@@ -33,8 +29,7 @@ import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 import org.koin.core.qualifier.named
 import zed.rainxch.core.presentation.components.bars.KomiTopBar
-import zed.rainxch.core.presentation.components.buttons.KomiIconButton
-import zed.rainxch.core.presentation.components.progress.KomiCircularProgress
+import zed.rainxch.core.presentation.components.progress.KomiLoadingIndicator
 import zed.rainxch.core.presentation.components.text.KomiText
 import zed.rainxch.core.presentation.components.text.KomiTextRole
 import zed.rainxch.core.presentation.locals.LocalPersonality
@@ -47,7 +42,6 @@ import zed.rainxch.details.presentation.components.LanguagePicker
 import zed.rainxch.details.presentation.components.TranslationCard
 import zed.rainxch.details.presentation.utils.ProvideLanguageLinkInterceptor
 import zed.rainxch.githubstore.core.presentation.res.Res
-import zed.rainxch.githubstore.core.presentation.res.cd_back
 import zed.rainxch.githubstore.core.presentation.res.details_about_screen_title
 import zed.rainxch.githubstore.core.presentation.res.retry
 
@@ -112,13 +106,7 @@ private fun AboutScreen(
     KomiScaffold(
         topBar = {
             KomiTopBar(
-                leading = {
-                    KomiIconButton(
-                        onClick = onBack,
-                        icon = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = stringResource(Res.string.cd_back),
-                    )
-                },
+                onBack = onBack,
                 title = state.repoName,
             )
         },
@@ -128,7 +116,7 @@ private fun AboutScreen(
                 state.isLoading -> Box(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center,
-                ) { KomiCircularProgress() }
+                ) { KomiLoadingIndicator() }
 
                 state.errorMessage != null -> Box(
                     modifier = Modifier.fillMaxSize(),
@@ -145,7 +133,7 @@ private fun AboutScreen(
 
                         KomiText(
                             text = stringResource(Res.string.retry),
-                            role = KomiTextRole.Label,
+                            role = KomiTextRole.Overline,
                             color = personalityColors.primary,
                             modifier = Modifier
                                 .padding(8.dp)
@@ -164,11 +152,8 @@ private fun AboutScreen(
                         Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
                             KomiText(
                                 text = stringResource(Res.string.details_about_screen_title),
-                                role = KomiTextRole.Display,
-                                fontWeight = FontWeight.SemiBold,
-                                fontSize = 26.sp,
+                                role = KomiTextRole.ScreenTitle,
                                 color = personalityColors.onBackground,
-                                uppercase = false,
                             )
 
                             state.readmeLanguage?.let { lang ->
@@ -176,10 +161,8 @@ private fun AboutScreen(
 
                                 KomiText(
                                     text = lang,
-                                    role = KomiTextRole.Label,
-                                    fontSize = 11.sp,
+                                    role = KomiTextRole.Caption,
                                     color = personalityColors.onSurfaceVariant,
-                                    uppercase = false,
                                 )
                             }
                         }

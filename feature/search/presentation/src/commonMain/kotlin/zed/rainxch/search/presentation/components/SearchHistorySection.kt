@@ -16,7 +16,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import kotlinx.collections.immutable.ImmutableList
@@ -48,9 +47,8 @@ fun SearchHistorySection(
         ) {
             KomiText(
                 text = stringResource(Res.string.recent_searches),
-                role = KomiTextRole.Title,
+                role = KomiTextRole.SectionTitle,
                 color = colors.onSurfaceVariant,
-                fontWeight = FontWeight.Medium,
             )
 
             KomiButton(
@@ -85,7 +83,6 @@ fun SearchHistorySection(
                     color = colors.onSurface,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    uppercase = false,
                     modifier = Modifier.weight(1f),
                 )
 

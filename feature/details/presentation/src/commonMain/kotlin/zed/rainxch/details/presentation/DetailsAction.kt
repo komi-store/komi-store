@@ -82,8 +82,6 @@ sealed interface DetailsAction {
 
     data object DismissExternalInstallerPrompt : DetailsAction
 
-    data object OnToggleInstallDropdown : DetailsAction
-
     data object OnNavigateBackClick : DetailsAction
 
     data object OnToggleFavorite : DetailsAction

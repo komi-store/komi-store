@@ -21,10 +21,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.stringResource
 import zed.rainxch.apps.presentation.import.model.RepoSuggestionUi
 import zed.rainxch.apps.presentation.import.model.SuggestionChipTone
@@ -69,12 +67,10 @@ fun RepoCandidateRow(
         Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
             KomiText(
                 text = suggestion.repo,
-                role = KomiTextRole.Title,
-                fontWeight = FontWeight.SemiBold,
+                role = KomiTextRole.CardTitle,
                 color = colors.onSurface,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
-                uppercase = false,
             )
 
             Row(
@@ -88,7 +84,6 @@ fun RepoCandidateRow(
                             suggestion.owner,
                         ),
                     role = KomiTextRole.Body,
-                    fontSize = 13.sp,
                     color = colors.onSurfaceVariant,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
@@ -122,8 +117,7 @@ fun RepoCandidateRow(
                                     suggestion.sourceHost
                                 }
                             },
-                        role = KomiTextRole.Label,
-                        fontSize = 11.sp,
+                        role = KomiTextRole.Caption,
                         color =
                             if (suggestion.sourceHost == null) {
                                 colors.onSurfaceVariant
@@ -132,7 +126,6 @@ fun RepoCandidateRow(
                             },
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
-                        uppercase = false,
                         modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
                     )
                 }
@@ -142,7 +135,6 @@ fun RepoCandidateRow(
                 KomiText(
                     text = suggestion.description,
                     role = KomiTextRole.Body,
-                    fontSize = 13.sp,
                     color = colors.onSurfaceVariant,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
@@ -162,10 +154,8 @@ fun RepoCandidateRow(
 
                     KomiText(
                         text = formatCompactCount(suggestion.stars),
-                        role = KomiTextRole.Label,
-                        fontSize = 11.sp,
+                        role = KomiTextRole.Caption,
                         color = colors.onSurfaceVariant,
-                        uppercase = false,
                     )
                 }
             }
@@ -189,10 +179,8 @@ fun RepoCandidateRow(
                         Res.string.external_import_match_confidence_chip,
                         suggestion.confidencePercent,
                     ),
-                role = KomiTextRole.Label,
-                fontSize = 12.sp,
+                role = KomiTextRole.Caption,
                 color = chipFg,
-                uppercase = false,
                 modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
             )
         }

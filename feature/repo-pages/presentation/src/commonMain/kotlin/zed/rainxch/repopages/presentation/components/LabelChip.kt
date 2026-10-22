@@ -7,7 +7,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import zed.rainxch.core.presentation.components.text.KomiText
 import zed.rainxch.core.presentation.components.text.KomiTextRole
 import zed.rainxch.core.presentation.locals.LocalPersonality
@@ -27,10 +26,8 @@ internal fun LabelChip(label: IssueLabel) {
     ) {
         KomiText(
             text = label.name,
-            role = KomiTextRole.Label,
-            fontSize = 11.sp,
+            role = KomiTextRole.Caption,
             color = colors.onSurface,
-            uppercase = false,
         )
     }
 }

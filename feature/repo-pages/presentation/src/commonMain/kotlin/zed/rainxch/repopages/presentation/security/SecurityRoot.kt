@@ -15,9 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.jetbrains.compose.resources.stringResource
 import zed.rainxch.core.presentation.components.scaffold.KomiScaffold
@@ -160,10 +158,8 @@ private fun SectionHeader(text: String) {
     val colors = LocalPersonality.current.colors
     KomiText(
         text = text,
-        role = KomiTextRole.Title,
-        fontWeight = FontWeight.SemiBold,
+        role = KomiTextRole.CardTitle,
         color = colors.onBackground,
-        uppercase = false,
         modifier = Modifier.padding(top = 4.dp),
     )
 }
@@ -184,11 +180,8 @@ private fun AdvisoryCard(advisory: SecurityAdvisory) {
         ) {
             KomiText(
                 text = advisory.summary,
-                role = KomiTextRole.Title,
-                fontSize = 14.sp,
-                fontWeight = FontWeight.SemiBold,
+                role = KomiTextRole.ItemTitle,
                 color = colors.onSurface,
-                uppercase = false,
             )
 
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -205,10 +198,8 @@ private fun AdvisoryCard(advisory: SecurityAdvisory) {
                 if (meta.isNotEmpty()) {
                     KomiText(
                         text = meta,
-                        role = KomiTextRole.Label,
-                        fontSize = 12.sp,
+                        role = KomiTextRole.Caption,
                         color = colors.onSurfaceVariant,
-                        uppercase = false,
                     )
                 }
             }
@@ -242,11 +233,8 @@ private fun SeverityBadge(severity: AdvisorySeverity) {
         }
     KomiText(
         text = label,
-        role = KomiTextRole.Label,
-        fontSize = 12.sp,
-        fontWeight = FontWeight.SemiBold,
+        role = KomiTextRole.LabelSmall,
         color = color,
-        uppercase = false,
         modifier =
             Modifier
                 .background(color.copy(alpha = 0.16f), RoundedCornerShape(shape.cornerSmall))

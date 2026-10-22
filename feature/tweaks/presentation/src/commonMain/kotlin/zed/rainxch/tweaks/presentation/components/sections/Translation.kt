@@ -18,7 +18,6 @@ import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.stringResource
 import zed.rainxch.core.domain.model.settings.SupportedTranslationLanguages
 import zed.rainxch.core.domain.model.settings.TranslationProvider
@@ -39,7 +38,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.text.font.FontWeight
 import zed.rainxch.githubstore.core.presentation.res.*
 import zed.rainxch.tweaks.presentation.TweaksAction
 import zed.rainxch.tweaks.presentation.TweaksState
@@ -100,10 +98,8 @@ fun translationSectionContent(
             Column(modifier = Modifier.padding(start = 15.dp, end = 15.dp, bottom = 15.dp)) {
                 KomiText(
                     text = stringResource(Res.string.translation_auto_target_label),
-                    role = KomiTextRole.Label,
-                    fontSize = 12.sp,
+                    role = KomiTextRole.Caption,
                     color = LocalPersonality.current.colors.onSurfaceVariant,
-                    uppercase = false,
                 )
                 Spacer(Modifier.height(6.dp))
                 TranslationTargetDropdown(
@@ -153,12 +149,10 @@ private fun TranslationTargetDropdown(
     ) {
         KomiText(
             text = currentLabel,
-            role = KomiTextRole.Body,
+            role = KomiTextRole.Label,
             color = colors.onSurface,
-            fontWeight = FontWeight.Medium,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
-            uppercase = false,
             modifier = Modifier.weight(1f, fill = false),
         )
 
@@ -269,9 +263,7 @@ private fun DeeplCredentialsForm(
         KomiText(
             text = stringResource(Res.string.translation_deepl_help),
             role = KomiTextRole.Body,
-            fontSize = 13.sp,
             color = LocalPersonality.current.colors.onSurfaceVariant,
-            uppercase = false,
         )
         KomiButton(
             onClick = { runCatching { uriHandler.openUri("https://www.deepl.com/pro-api") } },
@@ -313,9 +305,7 @@ private fun MicrosoftCredentialsForm(
         KomiText(
             text = stringResource(Res.string.translation_microsoft_help),
             role = KomiTextRole.Body,
-            fontSize = 13.sp,
             color = LocalPersonality.current.colors.onSurfaceVariant,
-            uppercase = false,
         )
         KomiButton(
             onClick = { runCatching { uriHandler.openUri("https://portal.azure.com/#create/Microsoft.CognitiveServicesTextTranslation") } },

@@ -30,10 +30,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.intellij.markdown.flavours.gfm.GFMFlavourDescriptor
@@ -73,11 +71,8 @@ fun LazyListScope.whatsNew(
         ) {
             KomiText(
                 text = stringResource(Res.string.whats_new),
-                role = KomiTextRole.Title,
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 22.sp,
+                role = KomiTextRole.SectionTitle,
                 color = colors.onBackground,
-                uppercase = false,
             )
         }
 
@@ -96,21 +91,17 @@ fun LazyListScope.whatsNew(
         ) {
             KomiText(
                 text = release.tagName,
-                role = KomiTextRole.Title,
-                fontWeight = FontWeight.SemiBold,
+                role = KomiTextRole.CardTitle,
                 color = colors.primary,
                 maxLines = 1,
                 overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
                 modifier = Modifier.weight(1f),
-                uppercase = false,
             )
             KomiText(
                 text = formatIsoDateOrRaw(release.publishedAt),
-                role = KomiTextRole.Label,
-                fontSize = 12.sp,
+                role = KomiTextRole.Caption,
                 color = colors.onSurfaceVariant,
                 maxLines = 1,
-                uppercase = false,
             )
         }
     }
@@ -255,10 +246,8 @@ private fun ExpandableMarkdownContent(
                     } else {
                         stringResource(Res.string.read_more)
                     },
-                    role = KomiTextRole.Title,
-                    fontWeight = FontWeight.Bold,
+                    role = KomiTextRole.CardTitle,
                     color = personalityColors.surface,
-                    uppercase = false,
                 )
                 if (!isExpanded) {
                     KomiIcon(

@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -21,6 +22,7 @@ import androidx.compose.material.icons.outlined.Download
 import androidx.compose.material.icons.outlined.Schedule
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -31,10 +33,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ColorMatrix
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.collections.immutable.ImmutableList
@@ -124,7 +126,7 @@ fun KomiRepoCard(
                 Column(modifier = Modifier.weight(1f)) {
                     KomiText(
                         text = name,
-                        role = KomiTextRole.Title,
+                        role = KomiTextRole.CardTitle,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                     )
@@ -135,10 +137,8 @@ fun KomiRepoCard(
                     ) {
                         KomiText(
                             text = "@$owner",
-                            role = KomiTextRole.Body,
+                            role = KomiTextRole.Caption,
                             color = colors.onSurfaceVariant,
-                            fontSize = 12.sp,
-                            fontWeight = FontWeight.W600,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
                             modifier = Modifier.weight(1f, fill = false),
@@ -147,39 +147,37 @@ fun KomiRepoCard(
                             Diamond(color = colors.onSurfaceVariant)
                             KomiText(
                                 text = language,
-                                role = KomiTextRole.Body,
-                                color = colors.onSurface,
-                                fontSize = 12.sp,
-                                fontWeight = FontWeight.W800,
+                                role = KomiTextRole.Caption,
+                                color = colors.onSurfaceVariant,
                                 maxLines = 1,
                             )
                         }
                     }
                 }
-                CardBadge(
-                    feed = feed,
-                    rank = rank,
-                    dailyStars = dailyStars,
-                    version = version,
-                    releasedAgoDays = releasedAgoDays,
-                    colors = colors,
-                )
+                if (!compact) {
+                    CardBadge(
+                        feed = feed,
+                        rank = rank,
+                        dailyStars = dailyStars,
+                        version = version,
+                        releasedAgoDays = releasedAgoDays,
+                        colors = colors,
+                    )
+                }
             }
 
             KomiText(
                 text = description,
                 role = KomiTextRole.Body,
                 color = colors.onSurface,
-                fontSize = 13.5.sp,
-                fontWeight = FontWeight.W500,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.padding(top = gap),
             )
 
-            if (compact && platforms.isNotEmpty()) {
+            if (compact && (platforms.isNotEmpty() || feed != KomiRepoCardFeed.Plain)) {
                 Row(
-                    modifier = Modifier.padding(top = gap),
+                    modifier = Modifier.fillMaxWidth().padding(top = gap),
                     horizontalArrangement = Arrangement.spacedBy(6.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
@@ -193,6 +191,16 @@ fun KomiRepoCard(
                             )
                         }
                     }
+                    // A narrow grid card has no room for the chart badge beside the name.
+                    Spacer(Modifier.weight(1f))
+                    CardBadge(
+                        feed = feed,
+                        rank = rank,
+                        dailyStars = dailyStars,
+                        version = version,
+                        releasedAgoDays = releasedAgoDays,
+                        colors = colors,
+                    )
                 }
             } else if (platforms.isNotEmpty()) {
                 FlowRow(
@@ -225,7 +233,7 @@ fun KomiRepoCard(
             HorizontalDivider(
                 modifier = Modifier.padding(top = if (compact) 9.dp else 12.dp),
                 thickness = 2.dp,
-                color = colors.outline.copy(alpha = 0.3f),
+                color = colors.divider,
             )
             Row(
                 modifier = Modifier.fillMaxWidth().padding(top = if (compact) 9.dp else 11.dp),
@@ -262,9 +270,8 @@ fun KomiRepoCard(
                     if (!compact) {
                         KomiText(
                             text = "Read",
-                            role = KomiTextRole.Label,
+                            role = KomiTextRole.LabelSmall,
                             color = colors.onSurface,
-                            fontSize = 12.5.sp,
                             modifier = Modifier.padding(end = 2.dp),
                         )
                     }
@@ -362,13 +369,7 @@ private fun CardIconTile(
                         colorFilter = if (colors.isDark) InkAvatarFilterNight else InkAvatarFilterDay,
                     )
                 } else {
-                    KomiText(
-                        text = monogram.uppercase(),
-                        role = KomiTextRole.Title,
-                        color = colors.onSurface,
-                        fontSize = (size.value * 0.46f).sp,
-                        maxLines = 1,
-                    )
+                    MonogramText(monogram = monogram, color = colors.onSurface, fontSize = (size.value * 0.46f).sp)
                 }
             }
         }
@@ -388,13 +389,7 @@ private fun CardIconTile(
                         modifier = Modifier.matchParentSize(),
                     )
                 } else {
-                    KomiText(
-                        text = monogram.uppercase(),
-                        role = KomiTextRole.Title,
-                        color = colors.onSurface,
-                        fontSize = (size.value * 0.42f).sp,
-                        maxLines = 1,
-                    )
+                    MonogramText(monogram = monogram, color = colors.onSurface, fontSize = (size.value * 0.42f).sp)
                 }
             }
         }
@@ -455,7 +450,7 @@ private fun RankStamp(
     rank: Int,
     colors: PersonalityColors,
 ) {
-    Box(modifier = Modifier.size(46.dp).rotate(-8f), contentAlignment = Alignment.Center) {
+    Box(modifier = Modifier.size(52.dp).rotate(-8f), contentAlignment = Alignment.Center) {
         Box(
             modifier =
                 Modifier
@@ -477,18 +472,8 @@ private fun RankStamp(
                     ),
         )
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            KomiText(
-                text = "NO.",
-                role = KomiTextRole.Label,
-                color = colors.onPrimary,
-                fontSize = 8.sp,
-            )
-            KomiText(
-                text = rank.toString().padStart(2, '0'),
-                role = KomiTextRole.Title,
-                color = colors.onPrimary,
-                fontSize = 21.sp,
-            )
+            KomiText(text = "NO.", role = KomiTextRole.Overline, color = colors.onPrimary)
+            KomiText(text = rank.toString().padStart(2, '0'), role = KomiTextRole.Numeral, color = colors.onPrimary)
         }
     }
 }
@@ -508,9 +493,8 @@ private fun BurstBadge(
         )
         KomiText(
             text = text,
-            role = KomiTextRole.Title,
+            role = KomiTextRole.Stamp,
             color = colors.onPrimary,
-            fontSize = 13.sp,
             modifier = Modifier.rotate(-6f),
         )
     }
@@ -532,19 +516,13 @@ private fun NewReleaseStamp(
                     .border(width = 2.dp, color = colors.outline)
                     .padding(horizontal = 7.dp, vertical = 3.dp),
         ) {
-            KomiText(
-                text = "New Release",
-                role = KomiTextRole.Label,
-                color = colors.onPrimary,
-                fontSize = 10.5.sp,
-            )
+            KomiText(text = "New Release", role = KomiTextRole.Overline, color = colors.onPrimary)
         }
         if (version != null) {
             KomiText(
                 text = "v$version",
-                role = KomiTextRole.Title,
+                role = KomiTextRole.Mono,
                 color = colors.onSurface,
-                fontSize = 14.sp,
                 modifier = Modifier.padding(top = 4.dp),
             )
         }
@@ -577,12 +555,7 @@ private fun ClassicBadge(
                     .background(color = colors.primaryContainer)
                     .padding(horizontal = 8.dp, vertical = 4.dp),
         ) {
-            KomiText(
-                text = text,
-                role = KomiTextRole.Label,
-                color = colors.onPrimaryContainer,
-                fontSize = 11.sp,
-            )
+            KomiText(text = text, role = KomiTextRole.LabelSmall, color = colors.onPrimaryContainer)
         }
     }
 }
@@ -604,15 +577,25 @@ private fun Stat(
             modifier = Modifier.size(15.dp),
             tint = if (hero) colors.primary else colors.onSurface,
         )
-        KomiText(
-            text = value,
-            role = KomiTextRole.Body,
-            color = colors.onSurface,
-            fontSize = 13.5.sp,
-            fontWeight = FontWeight.W800,
-            maxLines = 1,
-        )
+        KomiText(text = value, role = KomiTextRole.Caption, color = colors.onSurfaceVariant, maxLines = 1)
     }
+}
+
+// The monogram stands in for an app icon, so it scales with its tile rather than following the type scale.
+@Composable
+private fun MonogramText(
+    monogram: String,
+    color: Color,
+    fontSize: TextUnit,
+) {
+    Text(
+        text = monogram.uppercase(),
+        color = color,
+        maxLines = 1,
+        style =
+            LocalPersonality.current.type.display
+                .copy(fontSize = fontSize, lineHeight = fontSize),
+    )
 }
 
 @Composable

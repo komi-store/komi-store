@@ -9,9 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.stringResource
 import zed.rainxch.core.domain.model.announcement.WhatsNewSection
 import zed.rainxch.core.domain.model.announcement.WhatsNewSectionType
@@ -78,9 +76,7 @@ private fun SectionLabel(type: WhatsNewSectionType) {
 
     KomiText(
         text = label,
-        role = KomiTextRole.Label,
-        fontSize = 12.sp,
-        fontWeight = FontWeight.SemiBold,
+        role = KomiTextRole.Overline,
         color = color,
     )
 }
@@ -96,14 +92,12 @@ private fun BulletRow(text: String) {
             text = "•",
             role = KomiTextRole.Body,
             color = colors.onSurfaceVariant,
-            uppercase = false,
         )
         KomiText(
             text = text,
             role = KomiTextRole.Body,
             color = colors.onSurface,
             modifier = Modifier.fillMaxWidth(),
-            uppercase = false,
         )
     }
 }

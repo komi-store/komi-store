@@ -27,9 +27,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import kotlinx.collections.immutable.ImmutableList
 import org.jetbrains.compose.resources.stringResource
 import zed.rainxch.core.domain.model.repository.DiscoveryPlatform
@@ -87,9 +85,7 @@ fun SearchFiltersSheet(
             ) {
                 KomiText(
                     text = stringResource(Res.string.search_filters_title),
-                    role = KomiTextRole.Title,
-                    fontWeight = FontWeight.SemiBold,
-                    fontSize = 22.sp,
+                    role = KomiTextRole.CardTitle,
                     modifier = Modifier.weight(1f),
                 )
                 KomiButton(
@@ -170,8 +166,6 @@ private fun FilterSection(
         KomiText(
             text = title,
             role = KomiTextRole.Label,
-            fontWeight = FontWeight.SemiBold,
-            fontSize = 13.sp,
             color = colors.onSurfaceVariant,
         )
 
@@ -200,7 +194,7 @@ private fun SelectableChip(
     val border = if (selected) {
         BorderStroke(0.dp, colors.primary)
     } else {
-        BorderStroke(1.dp, colors.outlineVariant.copy(alpha = 0.5f))
+        BorderStroke(1.dp, colors.divider)
     }
     Box(
         modifier = Modifier
@@ -226,10 +220,8 @@ private fun SelectableChip(
 
             KomiText(
                 text = text,
-                role = KomiTextRole.Label,
-                fontWeight = FontWeight.Medium,
+                role = KomiTextRole.LabelSmall,
                 color = content,
-                uppercase = false,
             )
         }
     }
@@ -249,7 +241,7 @@ private fun NavRow(
             .clip(RoundedCornerShape(shape.corner))
             .border(
                 width = 1.dp,
-                color = colors.outlineVariant.copy(alpha = 0.5f),
+                color = colors.divider,
                 shape = RoundedCornerShape(shape.corner),
             )
             .clickable(onClick = onClick)
@@ -270,10 +262,8 @@ private fun NavRow(
 
             KomiText(
                 text = value,
-                role = KomiTextRole.Body,
-                fontWeight = FontWeight.SemiBold,
+                role = KomiTextRole.Label,
                 color = colors.onSurface,
-                uppercase = false,
                 modifier = Modifier.weight(1f),
             )
 

@@ -1,8 +1,6 @@
 package zed.rainxch.core.presentation.components.overlays
 
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.snap
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -47,7 +45,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import zed.rainxch.core.presentation.components.buttons.KomiButton
@@ -179,7 +176,7 @@ private fun MangaBottomSheet(
         shape = RectangleShape,
         containerColor = colors.background,
         contentColor = colors.onSurface,
-        scrimColor = colors.scrim.copy(alpha = 0.5f),
+        scrimColor = colors.scrimOverlay,
         dragHandle = null,
     ) {
         Column(Modifier.fillMaxWidth()) {
@@ -220,7 +217,7 @@ private fun MangaCenterDialog(
     LaunchedEffect(Unit) { shown = true }
     val progress by animateFloatAsState(
         targetValue = if (shown) 1f else 0f,
-        animationSpec = if (motionOff) snap() else tween(personality.motion.cardEnterMs),
+        animationSpec = personality.motion.defaultSpatial(),
         label = "komiSheetPop",
     )
 
@@ -344,18 +341,15 @@ private fun MangaSheetInner(
                 )
                 KomiText(
                     text = title,
-                    role = KomiTextRole.Title,
-                    fontSize = 19.sp,
+                    role = KomiTextRole.CardTitle,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
                 if (titleJp != null) {
                     KomiText(
                         text = titleJp,
-                        role = KomiTextRole.Label,
+                        role = KomiTextRole.Caption,
                         color = colors.onSurfaceVariant,
-                        fontSize = 11.sp,
-                        uppercase = false,
                         maxLines = 1,
                     )
                 }
@@ -443,7 +437,7 @@ private fun ClassicBottomSheet(
             if (title != null) {
                 KomiText(
                     text = title,
-                    role = KomiTextRole.Title,
+                    role = KomiTextRole.CardTitle,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
@@ -496,7 +490,7 @@ private fun ClassicCenterDialog(
                 if (title != null) {
                     KomiText(
                         text = title,
-                        role = KomiTextRole.Title,
+                        role = KomiTextRole.CardTitle,
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis
                     )

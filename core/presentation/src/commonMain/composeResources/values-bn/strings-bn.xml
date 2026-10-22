@@ -26,7 +26,6 @@
 
     <!-- Apps feature - Update states -->
     <string name="checking">পরীক্ষা করা হচ্ছে…</string>
-    <string name="updated_successfully">সফলভাবে আপডেট হয়েছে</string>
     <string name="error_with_message">ত্রুটি: %1$s</string>
 
     <!-- Apps feature - Update all progress -->
@@ -138,6 +137,9 @@
     <string name="open_repository">রিপোজিটরি খুলুন</string>
     <string name="open_in_browser">ব্রাউজারে খুলুন</string>
     <string name="cancel_download">ডাউনলোড বাতিল করুন</string>
+    <string name="pause">বিরতি দিন</string>
+    <string name="resume">আবার শুরু করুন</string>
+    <string name="paused">বিরতিতে</string>
     <string name="show_install_options">ইনস্টল অপশন দেখান</string>
 
     <string name="retry">পুনরায় চেষ্টা করুন</string>
@@ -214,7 +216,6 @@
 
 
 
-    <string name="home_finding_repositories">রিপোজিটরি খোঁজা হচ্ছে...</string>
     <string name="home_retry">পুনরায় চেষ্টা</string>
     <string name="home_failed_to_load_repositories">রিপোজিটরি লোড করতে ব্যর্থ</string>
 
@@ -257,6 +258,16 @@
     <string name="sign_in_required">সাইন ইন প্রয়োজন</string>
     <string name="sign_in_with_github_for_stars">স্টার করা রিপোজিটরি দেখতে GitHub দিয়ে সাইন ইন করুন</string>
     <string name="no_starred_repos">কোনো স্টার করা রিপোজিটরি নেই</string>
+    <plurals name="starred_hidden_not_installable">
+        <item quantity="one">আরও %1$dটি স্টার করা রিপোর কোনো ইনস্টলযোগ্য রিলিজ নেই</item>
+        <item quantity="other">আরও %1$dটি স্টার করা রিপোর কোনো ইনস্টলযোগ্য রিলিজ নেই</item>
+    </plurals>
+    <plurals name="starred_including_not_installable">
+        <item quantity="one">ইনস্টলযোগ্য রিলিজ ছাড়া %1$dটি স্টার করা রিপো সহ</item>
+        <item quantity="other">ইনস্টলযোগ্য রিলিজ ছাড়া %1$dটি স্টার করা রিপো সহ</item>
+    </plurals>
+    <string name="starred_show_all">সব দেখান</string>
+    <string name="starred_installable_only">শুধু ইনস্টলযোগ্য</string>
     <string name="star_repos_hint">ইনস্টলযোগ্য রিলিজ থাকা রিপোজিটরি GitHub-এ স্টার করুন</string>
     <string name="last_synced">শেষ সিঙ্ক</string>
     <string name="just_now">এইমাত্র</string>
@@ -316,6 +327,7 @@
     <string name="released_yesterday">গতকাল প্রকাশিত</string>
     <string name="released_days_ago">%1$d দিন আগে প্রকাশিত</string>
     <string name="released_on_date">%1$s তারিখে প্রকাশিত</string>
+    <string name="details_last_push">শেষ পুশ %1$s</string>
 
     <string name="bottom_nav_explore_title">অন্বেষণ</string>
     <string name="bottom_nav_search_title">অনুসন্ধান</string>
@@ -373,6 +385,9 @@
     <string name="proxy_test_error_auth_required">প্রক্সি প্রমাণীকরণ প্রয়োজন।</string>
     <string name="proxy_test_error_status">অপ্রত্যাশিত প্রতিক্রিয়া: HTTP %1$d</string>
     <string name="proxy_test_error_unknown">সংযোগ পরীক্ষা ব্যর্থ</string>
+    <string name="proxy_test_master_result">অনুসন্ধান: %1$s, ডাউনলোড: %2$s, অনুবাদ: %3$s</string>
+    <string name="proxy_test_probe_ok">%1$d ms</string>
+    <string name="proxy_test_probe_failed">ব্যর্থ</string>
 
 
 
@@ -398,6 +413,12 @@
     <string name="auth_check_status">আমি ইতিমধ্যেই অনুমোদন করেছি</string>
     <string name="auth_polling_status">যাচাই করা হচ্ছে…</string>
     <string name="auth_rate_limited">অনুরোধ সীমাবদ্ধ — %1$d সেকেন্ডে পুনরায় চেষ্টা করা হবে</string>
+    <string name="auth_error_unreachable">GitHub-এ সংযোগ করা যায়নি</string>
+    <string name="auth_error_rate_limited">অনেক বেশি সাইন-ইন প্রচেষ্টা</string>
+    <string name="auth_hint_wait">কয়েক মিনিট অপেক্ষা করুন, তারপর আবার চেষ্টা করুন।</string>
+    <string name="auth_error_denied">অনুমোদন প্রত্যাখ্যান করা হয়েছে</string>
+    <string name="auth_error_browser">ব্রাউজার খোলা যায়নি</string>
+    <string name="auth_hint_other_method">এর পরিবর্তে ডিভাইস কোড বা Personal Access Token ব্যবহার করুন।</string>
 
     <!-- Read More / Show Less -->
     <string name="read_more">আরও পড়ুন</string>
@@ -418,6 +439,8 @@
     <string name="no_github_link_in_clipboard">ক্লিপবোর্ডে কোনো GitHub লিংক পাওয়া যায়নি</string>
 
     <string name="clear">পরিষ্কার করুন</string>
+    <string name="show_password">পাসওয়ার্ড দেখান</string>
+    <string name="hide_password">পাসওয়ার্ড লুকান</string>
 
 
 
@@ -516,12 +539,15 @@
     <string name="hide_repository">রিপোজিটরি লুকান</string>
 
     <string name="recently_viewed">সাম্প্রতিক দেখা</string>
+    <string name="recently_viewed_remove_cd">ইতিহাস থেকে সরান</string>
     <string name="profile_recently_viewed_description">আপনি যেসব রিপোজিটরি দেখেছেন</string>
     <string name="delete_all">সব মুছুন</string>
     <string name="delete_downloads_confirmation_title">সব ডাউনলোড মুছবেন?</string>
     <string name="delete_downloads_confirmation_message">এটি সব APK এবং ইনস্টলার স্থায়ীভাবে মুছে ফেলবে (%1$s)। আপনি যেকোনো সময় আবার ডাউনলোড করতে পারবেন।</string>
     <string name="downloads_cleared">সব ডাউনলোড করা প্যাকেজ মুছে ফেলা হয়েছে।</string>
     <string name="unable_to_verify_attestation">যাচাই করা যায়নি</string>
+    <string name="details_attestation_verified_explainer">এই ফাইলের SHA-256 রিপোজিটরির GitHub-এ প্রকাশিত একটি বিল্ড অ্যাটেস্টেশনের সাথে মেলে, তাই এটি রিপোজিটরির নিজস্ব বিল্ড থেকেই এসেছে।</string>
+    <string name="details_attestation_unverified_explainer">Komi Store রিপোজিটরির বিল্ড অ্যাটেস্টেশনের সাথে এই ফাইলটি মিলিয়ে দেখতে পারেনি। শুধু এ কারণেই এটি অনিরাপদ নয়।</string>
 
     <string name="recent_searches">সাম্প্রতিক অনুসন্ধান</string>
     <string name="clear_all_history">সব মুছুন</string>
@@ -577,6 +603,8 @@
     <string name="variant_label_inline">ভ্যারিয়েন্ট: %1$s</string>
     <string name="variant_picker_unpin">আনপিন</string>
     <string name="variant_picker_pinned_badge">পিন করা</string>
+    <string name="assets_section_available">উপলব্ধ</string>
+    <string name="assets_section_your_app">আপনার অ্যাপ</string>
     <string name="variant_picker_open">ভ্যারিয়েন্ট নির্বাচন</string>
     <string name="variant_picker_open_filter">ফিল্টার সমন্বয়</string>
     <string name="variant_first_pin_toast">ভবিষ্যতের আপডেটগুলি %1$s ভ্যারিয়েন্ট পছন্দ করবে। অ্যাপ সেটিংস থেকে যেকোনো সময় পরিবর্তন করুন।</string>
@@ -786,6 +814,7 @@
     <string name="feedback_send_via_github">GitHub ইস্যু হিসেবে খুলুন</string>
     <string name="feedback_send_success_email">ধন্যবাদ — মেইল ক্লায়েন্ট খোলা হচ্ছে।</string>
     <string name="feedback_send_success_github">ধন্যবাদ — ব্রাউজার খোলা হচ্ছে।</string>
+    <string name="feedback_send_failed">ফিডব্যাক চ্যানেল খোলা যায়নি</string>
 
     <!-- E5 — Mirror feature -->
     <!-- Tweaks - Custom forges -->
@@ -800,6 +829,14 @@
     <string name="mirror_picker_description">রিলিজ অ্যাসেট ডাউনলোড করতে ব্যবহৃত। GitHub API কল সবসময় সরাসরি যায়। বেশিরভাগ ব্যবহারকারীর Direct GitHub-এ রাখা উচিত।</string>
     <string name="mirror_section_official">অফিসিয়াল</string>
     <string name="mirror_section_community">কমিউনিটি</string>
+    <string name="mirror_pick_fastest">দ্রুততমটি বাছুন</string>
+    <string name="mirror_pick_fastest_sub">প্রতিটি মিরর মেপে দ্রুততমটি বাছুন</string>
+    <string name="mirror_measuring">এই ডিভাইস থেকে মাপা হচ্ছে…</string>
+    <string name="mirror_measure_latency">লেটেন্সি মাপুন</string>
+    <string name="mirror_latency_local">আপনার থেকে %1$d ms</string>
+    <string name="mirror_fastest_badge">%1$s · দ্রুততম</string>
+    <string name="mirror_fastest_chosen">%1$s-এ স্যুইচ করা হয়েছে (%2$d ms)।</string>
+    <string name="mirror_no_mirror_responded">কোনো মিরর সাড়া দেয়নি। আপনার সংযোগ পরীক্ষা করে আবার চেষ্টা করুন।</string>
     <string name="mirror_status_ok">%1$dms</string>
     <string name="mirror_status_degraded">%1$dms</string>
     <string name="mirror_status_down">(বন্ধ)</string>
@@ -815,6 +852,7 @@
     <string name="mirror_test_http_error">মিরর %1$d ফেরত দিয়েছে</string>
     <string name="mirror_test_timeout">5 সেকেন্ড পরে টাইমআউট</string>
     <string name="mirror_test_dns_fail">হোস্ট রিসলভ করা যায়নি</string>
+    <string name="mirror_test_failed">সংযোগ ব্যর্থ</string>
     <string name="mirror_deploy_your_own_hint">সব মিরর নষ্ট? ৫ মিনিটে নিজের মিরর হোস্ট করুন — ডক্স দেখুন।</string>
     <string name="mirror_removed_toast">%1$s আর পাওয়া যাচ্ছে না, Direct GitHub-এ স্যুইচ করা হয়েছে।</string>
 
@@ -870,13 +908,12 @@
     <string name="apk_inspect_title">APK পরিদর্শন</string>
     <string name="apk_inspect_version_code">সংস্করণ</string>
     <string name="apps_compact_more_actions">%1$s এর জন্য আরও অ্যাকশন</string>
-    <string name="apps_compact_status_filter_active">মনোরেপো ফিল্টার সক্রিয়</string>
-    <string name="apps_compact_status_pending_install">ইনস্টল মুলতুবি</string>
-    <string name="apps_compact_status_pre_release_on">প্রি-রিলিজ চালু</string>
-    <string name="apps_compact_status_ready_to_install">ইনস্টলের জন্য প্রস্তুত</string>
-    <string name="apps_compact_status_updates_ignored">আপডেট উপেক্ষা করা হয়েছে</string>
-    <string name="apps_compact_status_variant_pinned">ভ্যারিয়েন্ট পিন করা</string>
-    <string name="apps_compact_status_variant_stale">ভ্যারিয়েন্ট পুরোনো, ব্যবস্থা প্রয়োজন</string>
+    <string name="apps_menu_item_active">%1$s  ✓</string>
+    <string name="apps_version_update">%1$s → %2$s</string>
+    <string name="apps_version_dated">%1$s (%2$s)</string>
+    <string name="apps_variant_subtitle">%1$s  ·  %2$s</string>
+    <string name="apps_section_header_cd">%1$s, %2$d, %3$s</string>
+    <string name="apps_section_header_static_cd">%1$s, %2$d</string>
     <string name="apps_ignore_updates">আপডেট উপেক্ষা করুন</string>
     <string name="apps_section_collapse">বিভাগ সংকুচিত করুন</string>
     <string name="apps_section_count_suffix">· %1$d</string>
@@ -901,6 +938,7 @@
     <string name="dhizuku_status_permission_needed">অনুমতি প্রয়োজন</string>
     <string name="dhizuku_status_ready">প্রস্তুত</string>
     <string name="discard_pending_install">বাদ দিন</string>
+    <string name="delete_task">টাস্ক মুছুন</string>
     <string name="error_state_go_back">ফিরে যান</string>
     <string name="error_state_subtitle_generic">আমরা এই রিপো লোড করতে পারিনি। নিচের পুনরায় চেষ্টা বোতাম ব্যবহার করুন।</string>
     <string name="error_state_subtitle_not_found">রিপোজিটরিটি ব্যক্তিগত, পুনঃনামকৃত বা মুছে ফেলা হতে পারে।</string>
@@ -958,6 +996,9 @@
     <string name="starred_picker_sort_recent">সম্প্রতি স্টার করা</string>
     <string name="starred_picker_sort_stars">সবচেয়ে বেশি স্টার</string>
     <string name="starred_picker_star_dedup_tooltip">GitHub-এ স্টার সরিয়ে নিলে অ্যাপটি আনট্র্যাক হবে না।</string>
+    <string name="starred_picker_cd_ships_apk">APK আছে</string>
+    <string name="starred_picker_cd_already_tracked">ইতিমধ্যে ট্র্যাক করা</string>
+    <string name="starred_picker_cd_latest">সর্বশেষ %1$s</string>
     <string name="import_stars_title">ইউজারনেম দিয়ে স্টার করা রিপো ইম্পোর্ট করুন</string>
     <string name="import_stars_subtitle">যেকোনো GitHub ইউজারনেম লিখুন, তাদের পাবলিক স্টার করা রিপো ব্রাউজ করুন এবং প্রিয় তালিকায় যোগ করুন। সাইন-ইন লাগবে না।</string>
     <string name="import_stars_hint">GitHub ইউজারনেম</string>
@@ -1052,7 +1093,6 @@
     <string name="apps_updates_banner_subtitle">পর্যালোচনা করুন বা একসাথে সব আপডেট করুন।</string>
     <string name="apps_updates_banner_title_one">১টি আপডেট উপলব্ধ</string>
     <string name="apps_updates_banner_title_other">%1$dটি আপডেট উপলব্ধ</string>
-    <string name="back_cd">পেছনে</string>
     <string name="cd_back">পেছনে</string>
     <string name="cd_image">ছবি</string>
     <string name="common_see_all">সব দেখুন ›</string>
@@ -1104,11 +1144,16 @@
     <string name="host_tokens_row_valid_short">বৈধ · %1$s</string>
     <string name="host_tokens_row_validate">পরীক্ষা</string>
     <string name="host_tokens_saved">%1$s এর জন্য টোকেন সংরক্ষিত হয়েছে</string>
+    <string name="host_tokens_load_failed">সংরক্ষিত টোকেন লোড করা যায়নি</string>
+    <string name="host_tokens_save_failed">%1$s এর জন্য টোকেন সংরক্ষণ করা যায়নি</string>
+    <string name="host_tokens_delete_failed">%1$s এর জন্য টোকেন মোছা যায়নি</string>
     <string name="host_tokens_title">প্রমাণীকরণ টোকেন</string>
     <string name="host_tokens_undo_action">পূর্বাবস্থায় ফেরান</string>
     <string name="host_tokens_undo_failed">%1$s এর জন্য টোকেন পুনরুদ্ধার করা যায়নি</string>
     <string name="host_tokens_undo_snackbar">%1$s এর জন্য টোকেন সরানো হয়েছে</string>
     <string name="host_tokens_validation_failed_fallback">অজানা ত্রুটি</string>
+    <string name="host_tokens_validation_http">HTTP %1$d</string>
+    <string name="host_tokens_validation_unreachable">সার্ভারে পৌঁছানো যায়নি</string>
     <string name="host_tokens_validation_host_invalid">অবৈধ হোস্ট</string>
     <string name="host_tokens_validation_host_required">হোস্ট প্রয়োজন</string>
     <string name="host_tokens_validation_token_required">টোকেন প্রয়োজন</string>
@@ -1270,6 +1315,12 @@
     <string name="profile_section_account">অ্যাকাউন্ট</string>
     <string name="appearance_section_mode">মোড</string>
     <string name="appearance_section_display">ডিসপ্লে</string>
+    <string name="tweaks_accent_crimson">গাঢ় লাল</string>
+    <string name="tweaks_accent_cobalt">কোবাল্ট</string>
+    <string name="tweaks_accent_sun">সূর্য</string>
+    <string name="tweaks_accent_frost">হিম</string>
+    <string name="tweaks_accent_mono">মোনো</string>
+    <string name="tweaks_accent_wallpaper">ওয়ালপেপারের রং</string>
     <string name="theme_dynamic">ডাইনামিক</string>
     <string name="auth_more_signin_options">আরও সাইন-ইন বিকল্প</string>
     <string name="auth_hide_signin_options">বিকল্প লুকান</string>
@@ -1386,14 +1437,9 @@
     <string name="repo_pages_pr_state_merged">মার্জ করা হয়েছে</string>
     <string name="repo_pages_pr_draft">খসড়া</string>
     <string name="feed_end_cap">続く · TO BE CONTINUED</string>
-    <string name="feed_layout_description_grid">গ্রিড লেআউটে যান</string>
-    <string name="feed_layout_description_list">তালিকা লেআউটে যান</string>
     <string name="feed_masthead_subtitle">発見 · DISCOVER APPS</string>
     <string name="home_masthead_subtitle">ランキング · CHARTS &amp; PICKS</string>
     <string name="feed_platform_picker_title_jp">対応</string>
-    <string name="home_chart_popular_jp">人気</string>
-    <string name="home_chart_releases_jp">新着</string>
-    <string name="home_chart_trending_jp">急上昇</string>
     <string name="sidebar_browse_jp">航行</string>
     <string name="sidebar_categories_jp">部門</string>
     <string name="sidebar_nav_charts_jp">ランキング</string>
@@ -1430,7 +1476,6 @@
     <string name="home_chart_releases">রিলিজ</string>
     <string name="home_chart_trending">ট্রেন্ডিং</string>
     <string name="home_masthead_title">শীর্ষ তালিকা</string>
-    <string name="home_platform_filter">প্ল্যাটফর্ম ফিল্টার করুন</string>
     <string name="paper_day">দিন</string>
     <string name="paper_night">রাত</string>
     <string name="repo_card_details">বিস্তারিত</string>

@@ -4,8 +4,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.outlined.MoreVert
+import androidx.compose.material.icons.rounded.MoreVert
 import zed.rainxch.core.presentation.components.overlays.KomiDropdown
 import zed.rainxch.core.presentation.components.overlays.KomiMenuItem
 import zed.rainxch.core.presentation.components.overlays.rememberKomiToastState
@@ -42,7 +41,6 @@ import zed.rainxch.core.presentation.utils.ObserveAsEvents
 import zed.rainxch.githubstore.core.presentation.res.Res
 import zed.rainxch.githubstore.core.presentation.res.external_import_overflow_more
 import zed.rainxch.githubstore.core.presentation.res.external_import_overflow_skip_remaining
-import zed.rainxch.githubstore.core.presentation.res.external_import_top_bar_back
 import zed.rainxch.githubstore.core.presentation.res.external_import_top_bar_title
 import zed.rainxch.githubstore.core.presentation.res.external_import_undo_action
 
@@ -97,16 +95,9 @@ fun ExternalImportRoot(
                 KomiTopBar(
                     title = stringResource(Res.string.external_import_top_bar_title),
                     size = KomiTopBarSize.Compact,
-                    leading = {
-                        KomiIconButton(
-                            icon = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(Res.string.external_import_top_bar_back),
-                            onClick = { viewModel.onAction(ExternalImportAction.OnExit) },
-                            variant = KomiButtonVariant.Tonal,
-                        )
-                    },
-                    actions = {
-                        if (state.phase == ImportPhase.AwaitingReview && state.cards.size > 1) {
+                    onBack = { viewModel.onAction(ExternalImportAction.OnExit) },
+                    actions = if (state.phase == ImportPhase.AwaitingReview && state.cards.size > 1) {
+                        {
                             KomiDropdown(
                                 entries = persistentListOf(
                                     KomiMenuItem(
@@ -122,7 +113,7 @@ fun ExternalImportRoot(
                                 },
                                 trigger = { onClick ->
                                     KomiIconButton(
-                                        icon = Icons.Outlined.MoreVert,
+                                        icon = Icons.Rounded.MoreVert,
                                         contentDescription = stringResource(Res.string.external_import_overflow_more),
                                         onClick = onClick,
                                         variant = KomiButtonVariant.Tonal,
@@ -130,6 +121,8 @@ fun ExternalImportRoot(
                                 },
                             )
                         }
+                    } else {
+                        null
                     },
                 )
             },

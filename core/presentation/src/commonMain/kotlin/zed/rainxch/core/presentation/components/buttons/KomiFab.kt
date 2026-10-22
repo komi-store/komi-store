@@ -26,7 +26,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import zed.rainxch.core.presentation.components.bars.LocalInBar
 import zed.rainxch.core.presentation.components.icon.KomiIcon
 import zed.rainxch.core.presentation.components.text.KomiText
 import zed.rainxch.core.presentation.components.text.KomiTextRole
@@ -51,14 +51,23 @@ fun KomiFab(
 
         is ClassicPersonality -> {
             val colors = personality.colors
-            if (label != null) {
+            if (label == null && LocalInBar.current) {
+                KomiCookieButton(
+                    icon = icon,
+                    contentDescription = contentDescription,
+                    onClick = onClick,
+                    containerColor = colors.primaryContainer,
+                    contentColor = colors.onPrimaryContainer,
+                    modifier = modifier,
+                )
+            } else if (label != null) {
                 ExtendedFloatingActionButton(
                     onClick = onClick,
                     modifier = modifier,
                     containerColor = colors.primaryContainer,
                     contentColor = colors.onPrimaryContainer,
                     icon = { KomiIcon(icon, contentDescription, modifier = Modifier.size(20.dp)) },
-                    text = { KomiText(label, role = KomiTextRole.Label) },
+                    text = { KomiText(label, role = KomiTextRole.LabelLarge) },
                 )
             } else {
                 FloatingActionButton(
@@ -108,7 +117,7 @@ private fun MangaFab(
             horizontalArrangement = Arrangement.spacedBy(10.dp),
         ) {
             KomiIcon(icon, contentDescription, modifier = Modifier.size(22.dp), tint = colors.onPrimary)
-            KomiText(label, role = KomiTextRole.Label, color = colors.onPrimary, fontSize = 15.sp)
+            KomiText(label, role = KomiTextRole.LabelLarge, color = colors.onPrimary)
         }
     } else {
         Box(modifier = base.size(56.dp), contentAlignment = Alignment.Center) {

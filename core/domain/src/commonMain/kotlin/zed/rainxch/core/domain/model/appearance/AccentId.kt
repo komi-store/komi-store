@@ -6,6 +6,9 @@ enum class AccentId {
     COBALT,
     SUN,
     FROST,
+
+    // Classic on Android 12+ only: the system's colors from the wallpaper.
+    WALLPAPER,
     ;
 
     companion object {

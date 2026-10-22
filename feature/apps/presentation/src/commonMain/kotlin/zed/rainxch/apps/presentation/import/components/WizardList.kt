@@ -23,9 +23,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.ImmutableSet
 import kotlinx.collections.immutable.persistentListOf
@@ -75,11 +73,8 @@ fun WizardList(
                         cards.size,
                         cards.size,
                     ),
-                    role = KomiTextRole.Label,
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Medium,
+                    role = KomiTextRole.LabelSmall,
                     color = colors.onSurfaceVariant,
-                    uppercase = false,
                     modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
                 )
             }

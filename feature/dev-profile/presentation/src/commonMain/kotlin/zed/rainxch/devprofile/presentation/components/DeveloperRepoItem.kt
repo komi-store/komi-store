@@ -30,11 +30,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.stringResource
 import zed.rainxch.core.presentation.components.chips.KomiChip
 import zed.rainxch.core.presentation.components.chips.KomiChipKind
@@ -74,11 +72,9 @@ fun DeveloperRepoItem(
                     KomiText(
                         text = repository.name,
                         maxLines = 1,
-                        role = KomiTextRole.Title,
-                        fontWeight = FontWeight.SemiBold,
+                        role = KomiTextRole.CardTitle,
                         overflow = TextOverflow.Ellipsis,
                         color = colors.onSurface,
-                        uppercase = false,
                     )
 
                     val releaseDate = repository.latestReleaseAt
@@ -92,12 +88,10 @@ fun DeveloperRepoItem(
                         text =
                             stringResource(label, formatRelativeLong(dateString))
                                 .replaceFirstChar { it.uppercase() },
-                        role = KomiTextRole.Label,
-                        fontSize = 12.sp,
+                        role = KomiTextRole.Caption,
                         overflow = TextOverflow.Ellipsis,
                         color = colors.onSurfaceVariant,
                         maxLines = 1,
-                        uppercase = false,
                     )
                 }
 
@@ -115,10 +109,8 @@ fun DeveloperRepoItem(
                     text = description,
                     maxLines = 2,
                     role = KomiTextRole.Body,
-                    fontSize = 13.sp,
                     color = colors.onSurfaceVariant,
                     overflow = TextOverflow.Ellipsis,
-                    uppercase = false,
                 )
             }
 
@@ -207,7 +199,7 @@ fun DeveloperRepoItem(
                             text =
                                 repository.latestVersion
                                     ?: stringResource(Res.string.has_release),
-                            container = colors.primary.copy(alpha = 0.14f),
+                            container = colors.primaryTint,
                             content = colors.primary,
                         )
                     } else if (repository.hasReleases) {
@@ -222,7 +214,7 @@ fun DeveloperRepoItem(
                     if (repository.isInstalled) {
                         TonalBadge(
                             text = stringResource(Res.string.installed),
-                            container = colors.primary.copy(alpha = 0.18f),
+                            container = colors.primaryTint,
                             content = colors.primary,
                         )
                     }
@@ -240,7 +232,7 @@ private fun FavoriteToggle(
     val colors = LocalPersonality.current.colors
     val container =
         if (isFavorite) {
-            colors.error.copy(alpha = 0.18f)
+            colors.errorTint
         } else {
             colors.surfaceContainerHigh
         }
@@ -291,12 +283,9 @@ private fun TonalBadge(
     ) {
         KomiText(
             text = text,
-            role = KomiTextRole.Label,
-            fontSize = 12.sp,
-            fontWeight = FontWeight.SemiBold,
+            role = KomiTextRole.LabelSmall,
             color = content,
             modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
-            uppercase = false,
         )
     }
 }

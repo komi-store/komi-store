@@ -32,7 +32,7 @@ import zed.rainxch.core.presentation.personality.utils.PersonalityPreview
 fun KomiHeadline(
     text: String,
     modifier: Modifier = Modifier,
-    role: KomiTextRole = KomiTextRole.Title,
+    role: KomiTextRole = KomiTextRole.SectionTitle,
     color: Color = Color.Unspecified,
     maxLines: Int = 1,
 ) {

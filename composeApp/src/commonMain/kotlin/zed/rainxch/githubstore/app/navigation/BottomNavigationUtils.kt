@@ -40,5 +40,7 @@ object BottomNavigationUtils {
             ),
         )
 
-    fun allowedScreens(): List<BottomNavigationItem> = items()
+    // The bottom bar leaves Search out: Classic's tab card has a search field, Manga's Explore and
+    // Top Charts a search button. The Desktop sidebar keeps it.
+    fun allowedScreens(): List<BottomNavigationItem> = items().filterNot { it.screen is GithubStoreGraph.SearchScreen }
 }

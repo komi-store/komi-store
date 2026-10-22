@@ -18,6 +18,8 @@ fun testInstalledApp(
     lastCheckedAt: Long = 2_000L,
     lastUpdatedAt: Long = 1_500L,
     skippedReleaseTag: String? = null,
+    installedReleaseId: Long? = null,
+    pendingInstallReleaseId: Long? = null,
 ): InstalledApp =
     InstalledApp(
         packageName = packageName,
@@ -54,4 +56,6 @@ fun testInstalledApp(
         pendingInstallVersion = pendingInstallVersion,
         pendingInstallAssetName = pendingInstallAssetName,
         skippedReleaseTag = skippedReleaseTag,
+        installedReleaseId = installedReleaseId,
+        pendingInstallReleaseId = pendingInstallReleaseId,
     )

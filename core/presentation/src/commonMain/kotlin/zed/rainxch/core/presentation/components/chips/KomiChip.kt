@@ -33,16 +33,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.em
-import androidx.compose.ui.unit.sp
+import zed.rainxch.core.presentation.components.text.KomiText
+import zed.rainxch.core.presentation.components.text.KomiTextRole
 import zed.rainxch.core.presentation.locals.LocalPersonality
 import zed.rainxch.core.presentation.personality.ClassicPersonality
 import zed.rainxch.core.presentation.personality.MangaPersonality
@@ -53,7 +51,6 @@ import zed.rainxch.core.presentation.personality.manga.decoration.hardShadow
 import zed.rainxch.core.presentation.personality.manga.decoration.inkFocusRing
 import zed.rainxch.core.presentation.personality.mangaPersonality
 import zed.rainxch.core.presentation.personality.model.PersonalityColors
-import zed.rainxch.core.presentation.personality.model.PersonalityType
 import zed.rainxch.core.presentation.personality.utils.PersonalityPreview
 import zed.rainxch.core.presentation.spacing.Spacing
 import kotlin.math.PI
@@ -184,16 +181,15 @@ private fun MangaChip(
         } else if (leadingIcon != null) {
             Icon(imageVector = leadingIcon, contentDescription = null, modifier = Modifier.size(metrics.icon), tint = fg)
         }
-        ChipLabel(label = label, isFilter = isFilter, color = fg, fontSizeSp = metrics.font, type = personality.type)
+        KomiText(
+            text = label,
+            role = if (isFilter) KomiTextRole.Stamp else KomiTextRole.LabelSmall,
+            color = fg,
+            maxLines = 1,
+            overflow = TextOverflow.Clip,
+        )
         if (count != null) {
-            ChipCountPill(
-                count = count,
-                selected = selected,
-                color = fg,
-                colors = colors,
-                fontSizeSp = metrics.font,
-                type = personality.type,
-            )
+            ChipCountPill(count = count, selected = selected, color = fg, colors = colors)
         }
         if (kind == KomiChipKind.Input) {
             ChipRemove(onRemove = onRemove, color = fg, iconSize = metrics.icon)
@@ -202,36 +198,16 @@ private fun MangaChip(
 }
 
 @Composable
-private fun ChipLabel(
-    label: String,
-    isFilter: Boolean,
-    color: Color,
-    fontSizeSp: Float,
-    type: PersonalityType,
-) {
-    val style =
-        TextStyle(
-            fontFamily = if (isFilter) type.display.fontFamily else type.body.fontFamily,
-            fontWeight = if (isFilter) FontWeight.Normal else FontWeight.W800,
-            fontSize = fontSizeSp.sp,
-            letterSpacing = if (isFilter) 0.05.em else 0.04.em,
-        )
-    Text(text = label.uppercase(), style = style, color = color, maxLines = 1, overflow = TextOverflow.Clip)
-}
-
-@Composable
 private fun ChipCountPill(
     count: Int,
     selected: Boolean,
     color: Color,
     colors: PersonalityColors,
-    fontSizeSp: Float,
-    type: PersonalityType,
 ) {
-    val pillBg = if (selected) Color.White.copy(alpha = 0.22f) else colors.surfaceVariant
-    Text(
+    val pillBg = if (selected) colors.onPrimaryTint else colors.surfaceVariant
+    KomiText(
         text = count.toString(),
-        style = TextStyle(fontFamily = type.mono.fontFamily, fontWeight = FontWeight.Bold, fontSize = (fontSizeSp - 1.5f).sp),
+        role = KomiTextRole.Mono,
         color = color,
         maxLines = 1,
         modifier = Modifier.background(pillBg).padding(horizontal = 4.dp),
@@ -329,7 +305,6 @@ private fun chipStampShape(skewDegrees: Float): Shape =
 private data class ChipMetrics(
     val height: Dp,
     val paddingX: Dp,
-    val font: Float,
     val icon: Dp,
     val border: Dp,
 )
@@ -340,10 +315,10 @@ private fun chipMetrics(
 ): ChipMetrics {
     val filterLike = kind != KomiChipKind.Info
     return when {
-        filterLike && size == KomiChipSize.Sm -> ChipMetrics(26.dp, 11.dp, 12f, 14.dp, 2.5.dp)
-        filterLike && size == KomiChipSize.Md -> ChipMetrics(34.dp, 14.dp, 14f, 16.dp, 2.5.dp)
-        size == KomiChipSize.Sm -> ChipMetrics(24.dp, 9.dp, 11f, 13.dp, 2.dp)
-        else -> ChipMetrics(28.dp, 10.dp, 11.5f, 14.dp, 2.dp)
+        filterLike && size == KomiChipSize.Sm -> ChipMetrics(26.dp, 11.dp, 14.dp, 2.5.dp)
+        filterLike && size == KomiChipSize.Md -> ChipMetrics(34.dp, 14.dp, 16.dp, 2.5.dp)
+        size == KomiChipSize.Sm -> ChipMetrics(24.dp, 9.dp, 13.dp, 2.dp)
+        else -> ChipMetrics(28.dp, 10.dp, 14.dp, 2.dp)
     }
 }
 

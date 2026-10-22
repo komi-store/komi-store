@@ -8,9 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.stringResource
 import zed.rainxch.core.presentation.components.inputs.KomiSwitch
 import zed.rainxch.core.presentation.components.surfaces.KomiSurface
@@ -46,17 +44,13 @@ fun DiagnosticsPreview(
                 Column {
                     KomiText(
                         text = stringResource(Res.string.feedback_diagnostics_header),
-                        role = KomiTextRole.Title,
-                        fontWeight = FontWeight.Medium,
+                        role = KomiTextRole.CardTitle,
                         color = colors.onSurface,
-                        uppercase = false,
                     )
                     KomiText(
                         text = stringResource(Res.string.feedback_diagnostics_include),
                         role = KomiTextRole.Body,
-                        fontSize = 13.sp,
                         color = colors.onSurfaceVariant,
-                        uppercase = false,
                     )
                 }
                 KomiSwitch(
@@ -69,9 +63,7 @@ fun DiagnosticsPreview(
                 KomiText(
                     text = formatDiagnostics(diagnostics, channel),
                     role = KomiTextRole.Body,
-                    fontSize = 13.sp,
                     color = colors.onSurfaceVariant,
-                    uppercase = false,
                     modifier = Modifier.padding(top = 12.dp),
                 )
             }

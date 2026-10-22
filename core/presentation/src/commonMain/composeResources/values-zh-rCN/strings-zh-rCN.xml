@@ -20,7 +20,6 @@
     <string name="cancel">取消</string>
 
     <string name="checking">正在检查…</string>
-    <string name="updated_successfully">更新成功</string>
     <string name="error_with_message">错误：%1$s</string>
 
     <string name="updating_x_of_y">正在更新 %1$d / %2$d</string>
@@ -169,7 +168,6 @@
 
 
 
-    <string name="home_finding_repositories">正在查找仓库…</string>
     <string name="home_retry">重试</string>
     <string name="home_failed_to_load_repositories">加载仓库失败</string>
 
@@ -211,6 +209,14 @@
 
     <string name="sign_in_required">需要登录</string>
     <string name="no_starred_repos">没有加星标的仓库</string>
+    <plurals name="starred_hidden_not_installable">
+        <item quantity="other">另有 %1$d 个星标仓库没有可安装的版本</item>
+    </plurals>
+    <plurals name="starred_including_not_installable">
+        <item quantity="other">包括 %1$d 个没有可安装版本的星标仓库</item>
+    </plurals>
+    <string name="starred_show_all">显示全部</string>
+    <string name="starred_installable_only">仅可安装</string>
     <string name="sign_in_with_github_for_stars">使用 GitHub 登录以查看加星标的仓库</string>
     <string name="star_repos_hint">在 GitHub 上，给存在可安装版本的仓库加星标以在此查看</string>
     <string name="last_synced">上次同步</string>
@@ -349,6 +355,9 @@
     <string name="proxy_test_error_auth_required">需要代理身份验证。</string>
     <string name="proxy_test_error_status">意外响应：HTTP %1$d</string>
     <string name="proxy_test_error_unknown">连接测试失败</string>
+    <string name="proxy_test_master_result">搜索：%1$s，下载：%2$s，翻译：%3$s</string>
+    <string name="proxy_test_probe_ok">%1$d ms</string>
+    <string name="proxy_test_probe_failed">失败</string>
 
 
 
@@ -374,6 +383,12 @@
     <string name="auth_check_status">我已经授权</string>
     <string name="auth_polling_status">正在检查…</string>
     <string name="auth_rate_limited">请求过于频繁 — 将在 %1$d 秒后重试</string>
+    <string name="auth_error_unreachable">无法连接到 GitHub</string>
+    <string name="auth_error_rate_limited">登录尝试次数过多</string>
+    <string name="auth_hint_wait">请等待几分钟后重试。</string>
+    <string name="auth_error_denied">授权被拒绝</string>
+    <string name="auth_error_browser">无法打开浏览器</string>
+    <string name="auth_hint_other_method">请改用设备代码或个人访问令牌。</string>
 
     <!-- Read More / Show Less -->
     <string name="read_more">阅读更多</string>
@@ -394,6 +409,8 @@
     <string name="no_github_link_in_clipboard">剪贴板中未找到 GitHub 链接</string>
 
     <string name="clear">清除</string>
+    <string name="show_password">显示密码</string>
+    <string name="hide_password">隐藏密码</string>
 
 
 
@@ -497,6 +514,8 @@
     <string name="delete_downloads_confirmation_message">这将永久删除所有 APK 和安装程序（%1$s）。你可以随时重新下载。</string>
     <string name="downloads_cleared">所有已下载的包已被删除。</string>
     <string name="unable_to_verify_attestation">无法验证</string>
+    <string name="details_attestation_verified_explainer">此文件的 SHA-256 与该仓库在 GitHub 上发布的构建证明相符，因此它来自该仓库自己的构建。</string>
+    <string name="details_attestation_unverified_explainer">Komi Store 无法将此文件与该仓库的构建证明进行核对。仅凭这一点并不意味着它不安全。</string>
 
     <string name="recent_searches">最近搜索</string>
     <string name="clear_all_history">清除全部</string>
@@ -550,6 +569,8 @@
     <string name="variant_label_inline">变体：%1$s</string>
     <string name="variant_picker_unpin">取消固定</string>
     <string name="variant_picker_pinned_badge">已固定</string>
+    <string name="assets_section_available">可用</string>
+    <string name="assets_section_your_app">你的应用</string>
     <string name="variant_picker_open">选择变体</string>
     <string name="variant_picker_open_filter">调整筛选器</string>
     <string name="variant_first_pin_toast">将来的更新将优先使用 %1$s 变体。可以随时在应用设置中更改。</string>
@@ -765,6 +786,7 @@
     <string name="feedback_send_via_github">新增 GitHub Issue</string>
     <string name="feedback_send_success_email">感谢您 — 正在打开电子邮件客户端。</string>
     <string name="feedback_send_success_github">感谢您 — 正在打开浏览器。</string>
+    <string name="feedback_send_failed">无法打开反馈渠道</string>
 
     <!-- ═══════════════════════════════════════════════════════════════
          E5 — Mirror feature
@@ -781,6 +803,14 @@
     <string name="mirror_picker_description">用于下载发布资源。GitHub API 调用始终直接进行。大多数用户应保持"直连 GitHub"设置。</string>
     <string name="mirror_section_official">官方</string>
     <string name="mirror_section_community">社区</string>
+    <string name="mirror_pick_fastest">选择最快</string>
+    <string name="mirror_pick_fastest_sub">测量每个镜像，选择最快的</string>
+    <string name="mirror_measuring">正在从此设备测量…</string>
+    <string name="mirror_measure_latency">测量延迟</string>
+    <string name="mirror_latency_local">距你 %1$d ms</string>
+    <string name="mirror_fastest_badge">%1$s · 最快</string>
+    <string name="mirror_fastest_chosen">已切换到 %1$s（%2$d ms）。</string>
+    <string name="mirror_no_mirror_responded">没有镜像响应。请检查网络连接后重试。</string>
     <string name="mirror_status_ok">%1$dms</string>
     <string name="mirror_status_degraded">%1$dms</string>
     <string name="mirror_status_down">(不可用)</string>
@@ -796,6 +826,7 @@
     <string name="mirror_test_http_error">镜像返回 %1$d</string>
     <string name="mirror_test_timeout">5s 后超时</string>
     <string name="mirror_test_dns_fail">无法解析主机</string>
+    <string name="mirror_test_failed">连接失败</string>
     <string name="mirror_deploy_your_own_hint">所有镜像都不能用？可以用五分钟来自行托管一个，点按查看文档。</string>
     <string name="mirror_removed_toast">%1$s 已不再可用，已切换到直连 GitHub。</string>
 
@@ -851,13 +882,12 @@
     <string name="apk_inspect_title">APK 检查</string>
     <string name="apk_inspect_version_code">版本</string>
     <string name="apps_compact_more_actions">%1$s 的更多操作</string>
-    <string name="apps_compact_status_filter_active">monorepo 过滤器已启用</string>
-    <string name="apps_compact_status_pending_install">待安装</string>
-    <string name="apps_compact_status_pre_release_on">预发布已开启</string>
-    <string name="apps_compact_status_ready_to_install">可以安装</string>
-    <string name="apps_compact_status_updates_ignored">已忽略更新</string>
-    <string name="apps_compact_status_variant_pinned">变体已锁定</string>
-    <string name="apps_compact_status_variant_stale">变体过期，需要处理</string>
+    <string name="apps_menu_item_active">%1$s  ✓</string>
+    <string name="apps_version_update">%1$s → %2$s</string>
+    <string name="apps_version_dated">%1$s (%2$s)</string>
+    <string name="apps_variant_subtitle">%1$s  ·  %2$s</string>
+    <string name="apps_section_header_cd">%1$s，%2$d，%3$s</string>
+    <string name="apps_section_header_static_cd">%1$s，%2$d</string>
     <string name="apps_ignore_updates">忽略更新</string>
     <string name="apps_section_collapse">折叠分组</string>
     <string name="apps_section_count_suffix">· %1$d</string>
@@ -1021,7 +1051,6 @@
     <string name="apps_updates_banner_subtitle">逐个审查或一键全部更新。</string>
     <string name="apps_updates_banner_title_one">1 个可用更新</string>
     <string name="apps_updates_banner_title_other">%1$d 个可用更新</string>
-    <string name="back_cd">返回</string>
     <string name="cd_back">返回</string>
     <string name="cd_image">图片</string>
     <string name="common_see_all">查看全部 ›</string>
@@ -1079,11 +1108,16 @@
     <string name="host_tokens_row_valid_short">有效 · %1$s</string>
     <string name="host_tokens_row_validate">检查</string>
     <string name="host_tokens_saved">已保存 %1$s 的令牌</string>
+    <string name="host_tokens_load_failed">无法加载已保存的令牌</string>
+    <string name="host_tokens_save_failed">无法保存 %1$s 的令牌</string>
+    <string name="host_tokens_delete_failed">无法删除 %1$s 的令牌</string>
     <string name="host_tokens_title">认证令牌</string>
     <string name="host_tokens_undo_action">撤销</string>
     <string name="host_tokens_undo_failed">无法恢复 %1$s 的令牌</string>
     <string name="host_tokens_undo_snackbar">已移除 %1$s 的令牌</string>
     <string name="host_tokens_validation_failed_fallback">未知错误</string>
+    <string name="host_tokens_validation_http">HTTP %1$d</string>
+    <string name="host_tokens_validation_unreachable">无法连接到服务器</string>
     <string name="host_tokens_validation_host_invalid">无效的主机</string>
     <string name="host_tokens_validation_host_required">必须填写主机</string>
     <string name="host_tokens_validation_token_required">必须填写令牌</string>
@@ -1251,6 +1285,12 @@
     <string name="profile_section_account">账户</string>
     <string name="appearance_section_mode">模式</string>
     <string name="appearance_section_display">显示</string>
+    <string name="tweaks_accent_crimson">绯红</string>
+    <string name="tweaks_accent_cobalt">钴蓝</string>
+    <string name="tweaks_accent_sun">暖阳</string>
+    <string name="tweaks_accent_frost">霜白</string>
+    <string name="tweaks_accent_mono">单色</string>
+    <string name="tweaks_accent_wallpaper">壁纸配色</string>
     <string name="theme_dynamic">动态</string>
     <string name="auth_more_signin_options">更多登录方式</string>
     <string name="auth_hide_signin_options">隐藏选项</string>
@@ -1367,14 +1407,9 @@
     <string name="repo_pages_pr_state_merged">已合并</string>
     <string name="repo_pages_pr_draft">草稿</string>
     <string name="feed_end_cap">続く · TO BE CONTINUED</string>
-    <string name="feed_layout_description_grid">切换为网格布局</string>
-    <string name="feed_layout_description_list">切换为列表布局</string>
     <string name="feed_masthead_subtitle">発見 · DISCOVER APPS</string>
     <string name="home_masthead_subtitle">ランキング · CHARTS &amp; PICKS</string>
     <string name="feed_platform_picker_title_jp">対応</string>
-    <string name="home_chart_popular_jp">人気</string>
-    <string name="home_chart_releases_jp">新着</string>
-    <string name="home_chart_trending_jp">急上昇</string>
     <string name="sidebar_browse_jp">航行</string>
     <string name="sidebar_categories_jp">部門</string>
     <string name="sidebar_nav_charts_jp">ランキング</string>
@@ -1411,7 +1446,6 @@
     <string name="home_chart_releases">新发布</string>
     <string name="home_chart_trending">趋势</string>
     <string name="home_masthead_title">排行榜</string>
-    <string name="home_platform_filter">筛选平台</string>
     <string name="paper_day">白天</string>
     <string name="paper_night">夜晚</string>
     <string name="repo_card_details">详情</string>

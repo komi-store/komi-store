@@ -33,10 +33,8 @@ fun KomiHorizontalDivider(
     val resolvedColor =
         if (color != Color.Unspecified) {
             color
-        } else if (isManga) {
-            personality.colors.outline.copy(alpha = 0.4f)
         } else {
-            personality.colors.outlineVariant
+            personality.colors.divider
         }
     Box(
         modifier
@@ -65,10 +63,8 @@ fun KomiVerticalDivider(
     val resolvedColor =
         if (color != Color.Unspecified) {
             color
-        } else if (isManga) {
-            personality.colors.outline.copy(alpha = 0.4f)
         } else {
-            personality.colors.outlineVariant
+            personality.colors.divider
         }
     Box(
         modifier

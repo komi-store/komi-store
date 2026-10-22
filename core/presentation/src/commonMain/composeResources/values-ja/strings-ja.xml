@@ -20,7 +20,6 @@
     <string name="cancel">キャンセル</string>
 
     <string name="checking">確認中…</string>
-    <string name="updated_successfully">更新完了</string>
     <string name="error_with_message">エラー：%1$s</string>
 
     <string name="updating_x_of_y">%2$d 件中 %1$d 件を更新中</string>
@@ -168,7 +167,6 @@
 
 
 
-    <string name="home_finding_repositories">リポジトリを検索中…</string>
     <string name="home_retry">再試行</string>
     <string name="home_failed_to_load_repositories">リポジトリの読み込みに失敗しました</string>
 
@@ -210,6 +208,14 @@
 
     <string name="sign_in_required">ログインが必要です</string>
     <string name="no_starred_repos">スター付きリポジトリはありません</string>
+    <plurals name="starred_hidden_not_installable">
+        <item quantity="other">インストール可能なリリースがないスター付きリポジトリがあと %1$d 件あります</item>
+    </plurals>
+    <plurals name="starred_including_not_installable">
+        <item quantity="other">インストール可能なリリースがないスター付きリポジトリ %1$d 件を含む</item>
+    </plurals>
+    <string name="starred_show_all">すべて表示</string>
+    <string name="starred_installable_only">インストール可能のみ</string>
     <string name="sign_in_with_github_for_stars">GitHubでログインしてスター付きリポジトリを表示します</string>
     <string name="star_repos_hint">インストール可能なリリースのあるリポジトリにスターを付けてください</string>
     <string name="last_synced">最終同期</string>
@@ -270,6 +276,7 @@
     <string name="released_yesterday">昨日リリース</string>
     <string name="released_days_ago">%1$d日前にリリース</string>
     <string name="released_on_date">%1$sにリリース</string>
+    <string name="details_last_push">最終プッシュ: %1$s</string>
 
     <string name="bottom_nav_explore_title">発見</string>
     <string name="bottom_nav_search_title">検索</string>
@@ -290,6 +297,9 @@
     <string name="open_repository">リポジトリを開く</string>
     <string name="open_in_browser">ブラウザで開く</string>
     <string name="cancel_download">ダウンロードをキャンセル</string>
+    <string name="pause">一時停止</string>
+    <string name="resume">再開</string>
+    <string name="paused">一時停止中</string>
     <string name="show_install_options">インストールオプションを表示</string>
 
     <!-- Errors & states -->
@@ -344,6 +354,9 @@
     <string name="proxy_test_error_auth_required">プロキシ認証が必要です。</string>
     <string name="proxy_test_error_status">予期しない応答：HTTP %1$d</string>
     <string name="proxy_test_error_unknown">接続テストに失敗しました</string>
+    <string name="proxy_test_master_result">検索: %1$s、ダウンロード: %2$s、翻訳: %3$s</string>
+    <string name="proxy_test_probe_ok">%1$d ms</string>
+    <string name="proxy_test_probe_failed">失敗</string>
 
 
 
@@ -369,6 +382,12 @@
     <string name="auth_check_status">すでに認証しました</string>
     <string name="auth_polling_status">確認中…</string>
     <string name="auth_rate_limited">レート制限に達しました — %1$d秒後に再試行</string>
+    <string name="auth_error_unreachable">GitHub に接続できませんでした</string>
+    <string name="auth_error_rate_limited">サインインの試行回数が多すぎます</string>
+    <string name="auth_hint_wait">数分待ってから再試行してください。</string>
+    <string name="auth_error_denied">認証が拒否されました</string>
+    <string name="auth_error_browser">ブラウザを開けませんでした</string>
+    <string name="auth_hint_other_method">代わりにデバイスコードまたは個人アクセストークンを使用してください。</string>
 
     <!-- Read More / Show Less -->
     <string name="read_more">もっと読む</string>
@@ -389,6 +408,8 @@
     <string name="no_github_link_in_clipboard">クリップボードにGitHubリンクが見つかりません</string>
 
     <string name="clear">クリア</string>
+    <string name="show_password">パスワードを表示</string>
+    <string name="hide_password">パスワードを非表示</string>
 
 
 
@@ -485,12 +506,15 @@
     <string name="hide_repository">リポジトリを非表示</string>
 
     <string name="recently_viewed">最近閲覧した</string>
+    <string name="recently_viewed_remove_cd">履歴から削除</string>
     <string name="profile_recently_viewed_description">訪問したリポジトリ</string>
     <string name="delete_all">すべて削除</string>
     <string name="delete_downloads_confirmation_title">すべてのダウンロードを削除しますか？</string>
     <string name="delete_downloads_confirmation_message">すべてのAPKとインストーラーが完全に削除されます（%1$s）。いつでも再ダウンロードできます。</string>
     <string name="downloads_cleared">すべてのダウンロード済みパッケージが削除されました。</string>
     <string name="unable_to_verify_attestation">確認できませんでした</string>
+    <string name="details_attestation_verified_explainer">このファイルの SHA-256 は、リポジトリが GitHub で公開したビルド証明と一致します。リポジトリ自身のビルドから作られたファイルです。</string>
+    <string name="details_attestation_unverified_explainer">Komi Store はこのファイルをリポジトリのビルド証明と照合できませんでした。それだけで安全でないとは限りません。</string>
 
     <string name="recent_searches">最近の検索</string>
     <string name="clear_all_history">すべてクリア</string>
@@ -544,6 +568,8 @@
     <string name="variant_label_inline">バリアント: %1$s</string>
     <string name="variant_picker_unpin">固定解除</string>
     <string name="variant_picker_pinned_badge">固定中</string>
+    <string name="assets_section_available">利用可能</string>
+    <string name="assets_section_your_app">お使いのアプリ</string>
     <string name="variant_picker_open">バリアントを選択</string>
     <string name="variant_picker_open_filter">フィルターを調整</string>
     <string name="variant_first_pin_toast">今後のアップデートでは %1$s バリアントが優先されます。アプリ設定からいつでも変更できます。</string>
@@ -758,6 +784,7 @@
     <string name="feedback_send_via_github">GitHub Issue として開く</string>
     <string name="feedback_send_success_email">ありがとうございます — メールクライアントを開いています。</string>
     <string name="feedback_send_success_github">ありがとうございます — ブラウザを開いています。</string>
+    <string name="feedback_send_failed">フィードバックの送信先を開けませんでした</string>
 
     <!-- ═══════════════════════════════════════════════════════════════
          E5 — Mirror feature
@@ -774,6 +801,14 @@
     <string name="mirror_picker_description">リリースアセットのダウンロードに使用されます。GitHub API の呼び出しは常に直接行われます。ほとんどのユーザーは「GitHub 直接」のままにしておくことをお勧めします。</string>
     <string name="mirror_section_official">公式</string>
     <string name="mirror_section_community">コミュニティ</string>
+    <string name="mirror_pick_fastest">最速を選択</string>
+    <string name="mirror_pick_fastest_sub">すべてのミラーを計測し、最速のものを選択</string>
+    <string name="mirror_measuring">このデバイスから計測中…</string>
+    <string name="mirror_measure_latency">レイテンシを計測</string>
+    <string name="mirror_latency_local">このデバイスから %1$d ms</string>
+    <string name="mirror_fastest_badge">%1$s · 最速</string>
+    <string name="mirror_fastest_chosen">%1$s に切り替えました（%2$d ms）。</string>
+    <string name="mirror_no_mirror_responded">応答したミラーはありません。接続を確認して再試行してください。</string>
     <string name="mirror_status_ok">%1$dms</string>
     <string name="mirror_status_degraded">%1$dms</string>
     <string name="mirror_status_down">(ダウン)</string>
@@ -789,6 +824,7 @@
     <string name="mirror_test_http_error">ミラーが %1$d を返しました</string>
     <string name="mirror_test_timeout">5s 後にタイムアウト</string>
     <string name="mirror_test_dns_fail">ホストを解決できませんでした</string>
+    <string name="mirror_test_failed">接続に失敗しました</string>
     <string name="mirror_deploy_your_own_hint">すべてのミラーが使えない場合は、5 分で自前のミラーをホストできます — ドキュメントをご覧ください。</string>
     <string name="mirror_removed_toast">%1$s は利用できなくなりました。GitHub 直接に切り替えました。</string>
 
@@ -844,13 +880,12 @@
     <string name="apk_inspect_title">APK検査</string>
     <string name="apk_inspect_version_code">バージョン</string>
     <string name="apps_compact_more_actions">%1$sのその他の操作</string>
-    <string name="apps_compact_status_filter_active">モノレポフィルター有効</string>
-    <string name="apps_compact_status_pending_install">インストール保留中</string>
-    <string name="apps_compact_status_pre_release_on">プレリリース有効</string>
-    <string name="apps_compact_status_ready_to_install">インストール準備完了</string>
-    <string name="apps_compact_status_updates_ignored">更新を無視中</string>
-    <string name="apps_compact_status_variant_pinned">バリアント固定</string>
-    <string name="apps_compact_status_variant_stale">バリアントが古いです、対応が必要</string>
+    <string name="apps_menu_item_active">%1$s  ✓</string>
+    <string name="apps_version_update">%1$s → %2$s</string>
+    <string name="apps_version_dated">%1$s (%2$s)</string>
+    <string name="apps_variant_subtitle">%1$s  ·  %2$s</string>
+    <string name="apps_section_header_cd">%1$s、%2$d、%3$s</string>
+    <string name="apps_section_header_static_cd">%1$s、%2$d</string>
     <string name="apps_ignore_updates">更新を無視</string>
     <string name="apps_section_collapse">セクションを折りたたむ</string>
     <string name="apps_section_count_suffix">· %1$d</string>
@@ -875,6 +910,7 @@
     <string name="dhizuku_status_permission_needed">権限が必要</string>
     <string name="dhizuku_status_ready">準備完了</string>
     <string name="discard_pending_install">破棄</string>
+    <string name="delete_task">タスクを削除</string>
     <string name="error_state_go_back">戻る</string>
     <string name="error_state_subtitle_generic">このリポジトリを読み込めませんでした。下の再試行ボタンを使用してください。</string>
     <string name="error_state_subtitle_not_found">リポジトリは非公開、名前変更、または削除された可能性があります。</string>
@@ -932,6 +968,9 @@
     <string name="starred_picker_sort_recent">最近スター付け</string>
     <string name="starred_picker_sort_stars">スター数順</string>
     <string name="starred_picker_star_dedup_tooltip">GitHubでスターを外してもアプリの追跡は解除されません。</string>
+    <string name="starred_picker_cd_ships_apk">APK を配信</string>
+    <string name="starred_picker_cd_already_tracked">すでに追跡中</string>
+    <string name="starred_picker_cd_latest">最新 %1$s</string>
     <string name="import_stars_title">ユーザー名でスター付きリポジトリをインポート</string>
     <string name="import_stars_subtitle">任意のGitHubユーザー名を入力して、公開スター付きリポジトリを見てお気に入りに追加できます。サインイン不要。</string>
     <string name="import_stars_hint">GitHubユーザー名</string>
@@ -1009,7 +1048,6 @@
     <string name="apps_updates_banner_subtitle">すべてをまとめて確認・更新できます。</string>
     <string name="apps_updates_banner_title_one">1 件の更新があります</string>
     <string name="apps_updates_banner_title_other">%1$d 件の更新があります</string>
-    <string name="back_cd">戻る</string>
     <string name="cd_back">戻る</string>
     <string name="cd_image">画像</string>
     <string name="common_see_all">すべて見る ›</string>
@@ -1067,11 +1105,16 @@
     <string name="host_tokens_row_valid_short">有効 ・ %1$s</string>
     <string name="host_tokens_row_validate">確認</string>
     <string name="host_tokens_saved">%1$s のトークンを保存しました</string>
+    <string name="host_tokens_load_failed">保存されたトークンを読み込めませんでした</string>
+    <string name="host_tokens_save_failed">%1$s のトークンを保存できませんでした</string>
+    <string name="host_tokens_delete_failed">%1$s のトークンを削除できませんでした</string>
     <string name="host_tokens_title">認証トークン</string>
     <string name="host_tokens_undo_action">元に戻す</string>
     <string name="host_tokens_undo_failed">%1$s のトークンを復元できませんでした</string>
     <string name="host_tokens_undo_snackbar">%1$s のトークンを削除しました</string>
     <string name="host_tokens_validation_failed_fallback">不明なエラー</string>
+    <string name="host_tokens_validation_http">HTTP %1$d</string>
+    <string name="host_tokens_validation_unreachable">サーバーに接続できませんでした</string>
     <string name="host_tokens_validation_host_invalid">ホストが無効です</string>
     <string name="host_tokens_validation_host_required">ホストは必須です</string>
     <string name="host_tokens_validation_token_required">トークンは必須です</string>
@@ -1239,6 +1282,12 @@
     <string name="profile_section_account">アカウント</string>
     <string name="appearance_section_mode">モード</string>
     <string name="appearance_section_display">表示</string>
+    <string name="tweaks_accent_crimson">クリムゾン</string>
+    <string name="tweaks_accent_cobalt">コバルト</string>
+    <string name="tweaks_accent_sun">サン</string>
+    <string name="tweaks_accent_frost">フロスト</string>
+    <string name="tweaks_accent_mono">モノ</string>
+    <string name="tweaks_accent_wallpaper">壁紙の色</string>
     <string name="theme_dynamic">ダイナミック</string>
     <string name="auth_more_signin_options">他のサインイン方法</string>
     <string name="auth_hide_signin_options">オプションを隠す</string>
@@ -1357,14 +1406,9 @@
 
     <!-- Feed / For You masthead, sidebar, categories -->
     <string name="feed_end_cap">続く · TO BE CONTINUED</string>
-    <string name="feed_layout_description_grid">グリッド表示に切り替え</string>
-    <string name="feed_layout_description_list">リスト表示に切り替え</string>
     <string name="feed_masthead_subtitle">発見 · DISCOVER APPS</string>
     <string name="home_masthead_subtitle">ランキング · CHARTS &amp; PICKS</string>
     <string name="feed_platform_picker_title_jp">対応</string>
-    <string name="home_chart_popular_jp">人気</string>
-    <string name="home_chart_releases_jp">新着</string>
-    <string name="home_chart_trending_jp">急上昇</string>
     <string name="sidebar_browse_jp">航行</string>
     <string name="sidebar_categories_jp">部門</string>
     <string name="sidebar_nav_charts_jp">ランキング</string>
@@ -1401,7 +1445,6 @@
     <string name="home_chart_releases">新着</string>
     <string name="home_chart_trending">急上昇</string>
     <string name="home_masthead_title">ランキング</string>
-    <string name="home_platform_filter">プラットフォームでフィルター</string>
     <string name="paper_day">デイ</string>
     <string name="paper_night">ナイト</string>
     <string name="repo_card_details">詳細</string>

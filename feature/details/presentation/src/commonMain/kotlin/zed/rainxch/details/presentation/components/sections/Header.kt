@@ -3,34 +3,22 @@ package zed.rainxch.details.presentation.components.sections
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
-import androidx.compose.material.icons.automirrored.filled.OpenInNew
-import androidx.compose.material.icons.filled.Security
-import androidx.compose.material.icons.filled.Update
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Popup
-import androidx.compose.ui.window.PopupProperties
 import kotlinx.collections.immutable.toImmutableList
 import org.jetbrains.compose.resources.stringResource
 import zed.rainxch.core.domain.model.installation.InstallSource
@@ -38,8 +26,6 @@ import zed.rainxch.core.domain.model.installation.isReallyInstalled
 import zed.rainxch.core.domain.utils.AssetVariant
 import zed.rainxch.core.domain.utils.assetPlatformOf
 import zed.rainxch.core.presentation.components.icon.KomiIcon
-import zed.rainxch.core.presentation.components.surfaces.KomiSurface
-import zed.rainxch.core.presentation.components.surfaces.KomiSurfaceElevation
 import zed.rainxch.core.presentation.components.text.KomiText
 import zed.rainxch.core.presentation.components.text.KomiTextRole
 import zed.rainxch.core.presentation.locals.LocalPersonality
@@ -56,14 +42,8 @@ import zed.rainxch.details.presentation.components.VersionPicker
 import zed.rainxch.details.presentation.components.VersionTypePicker
 import zed.rainxch.details.presentation.model.DownloadStage
 import zed.rainxch.githubstore.core.presentation.res.Res
-import zed.rainxch.githubstore.core.presentation.res.appmanager_description
-import zed.rainxch.githubstore.core.presentation.res.external_installer_description
 import zed.rainxch.githubstore.core.presentation.res.go_to_version
-import zed.rainxch.githubstore.core.presentation.res.inspect_with_appmanager
 import zed.rainxch.githubstore.core.presentation.res.newer_releases_no_build_for_device
-import zed.rainxch.githubstore.core.presentation.res.obtainium_description
-import zed.rainxch.githubstore.core.presentation.res.open_in_obtainium
-import zed.rainxch.githubstore.core.presentation.res.open_with_external_installer
 
 fun LazyListScope.header(
     state: DetailsState,
@@ -241,39 +221,6 @@ fun LazyListScope.header(
                         )
                     }
                 }
-
-                if (state.isInstallDropdownExpanded) {
-                    val density = LocalDensity.current
-                    Popup(
-                        alignment = Alignment.TopStart,
-                        offset = with(density) { IntOffset(0, 20.dp.roundToPx()) },
-                        onDismissRequest = { onAction(DetailsAction.OnToggleInstallDropdown) },
-                        properties = PopupProperties(focusable = true),
-                    ) {
-                        KomiSurface(elevation = KomiSurfaceElevation.Modal) {
-                            Column(modifier = Modifier.width(300.dp)) {
-                                InstallOptionItem(
-                                    title = stringResource(Res.string.open_in_obtainium),
-                                    subtitle = stringResource(Res.string.obtainium_description),
-                                    icon = Icons.Default.Update,
-                                    onClick = { onAction(DetailsAction.OpenInObtainium) },
-                                )
-                                InstallOptionItem(
-                                    title = stringResource(Res.string.inspect_with_appmanager),
-                                    subtitle = stringResource(Res.string.appmanager_description),
-                                    icon = Icons.Default.Security,
-                                    onClick = { onAction(DetailsAction.OpenInAppManager) },
-                                )
-                                InstallOptionItem(
-                                    title = stringResource(Res.string.open_with_external_installer),
-                                    subtitle = stringResource(Res.string.external_installer_description),
-                                    icon = Icons.AutoMirrored.Filled.OpenInNew,
-                                    onClick = { onAction(DetailsAction.InstallWithExternalApp) },
-                                )
-                            }
-                        }
-                    }
-                }
             }
         }
 
@@ -316,54 +263,8 @@ private fun ReleaseHint(
         )
         KomiText(
             text = text,
-            role = KomiTextRole.Body,
-            fontSize = 13.sp,
-            fontWeight = if (emphasized) FontWeight.SemiBold else FontWeight.Normal,
+            role = if (emphasized) KomiTextRole.Label else KomiTextRole.Body,
             color = tint,
-            uppercase = false,
         )
-    }
-}
-
-@Composable
-private fun InstallOptionItem(
-    title: String,
-    subtitle: String,
-    icon: ImageVector,
-    onClick: () -> Unit,
-) {
-    val colors = LocalPersonality.current.colors
-    Row(
-        modifier =
-            Modifier
-                .fillMaxWidth()
-                .clickable(onClick = onClick)
-                .padding(horizontal = 14.dp, vertical = 10.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
-    ) {
-        KomiIcon(
-            imageVector = icon,
-            contentDescription = null,
-            modifier = Modifier.size(20.dp),
-            tint = colors.onSurface,
-        )
-        Column(modifier = Modifier.weight(1f)) {
-            KomiText(
-                text = title,
-                role = KomiTextRole.Body,
-                color = colors.onSurface,
-                uppercase = false,
-                fontSize = 14.sp,
-                fontWeight = FontWeight.W600,
-            )
-            KomiText(
-                text = subtitle,
-                role = KomiTextRole.Body,
-                color = colors.onSurfaceVariant,
-                uppercase = false,
-                fontSize = 12.sp,
-            )
-        }
     }
 }

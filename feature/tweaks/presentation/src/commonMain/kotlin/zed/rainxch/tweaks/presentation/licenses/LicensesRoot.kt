@@ -10,23 +10,18 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import zed.rainxch.core.presentation.components.overlays.rememberKomiToastState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalUriHandler
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import zed.rainxch.core.presentation.components.bars.KomiTopBar
-import zed.rainxch.core.presentation.components.buttons.KomiIconButton
 import zed.rainxch.core.presentation.components.progress.KomiCircularProgress
 import zed.rainxch.core.presentation.components.scaffold.KomiScaffold
 import zed.rainxch.core.presentation.components.surfaces.KomiSurface
@@ -34,7 +29,6 @@ import zed.rainxch.core.presentation.components.text.KomiText
 import zed.rainxch.core.presentation.components.text.KomiTextRole
 import zed.rainxch.core.presentation.locals.LocalPersonality
 import zed.rainxch.githubstore.core.presentation.res.Res
-import zed.rainxch.githubstore.core.presentation.res.navigate_back
 import zed.rainxch.githubstore.core.presentation.res.tweaks_licenses_intro_body
 import zed.rainxch.githubstore.core.presentation.res.tweaks_licenses_intro_title
 import zed.rainxch.githubstore.core.presentation.res.tweaks_licenses_load_failed
@@ -53,13 +47,7 @@ fun LicensesRoot(
         topBar = {
             KomiTopBar(
                 title = stringResource(Res.string.tweaks_licenses_title),
-                leading = {
-                    KomiIconButton(
-                        icon = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = stringResource(Res.string.navigate_back),
-                        onClick = onNavigateBack,
-                    )
-                },
+                onBack = onNavigateBack,
             )
         },
         toastState = toastState,
@@ -80,15 +68,12 @@ fun LicensesRoot(
                     text = stringResource(Res.string.tweaks_licenses_intro_title),
                     role = KomiTextRole.Body,
                     color = colors.onSurface,
-                    uppercase = false,
                 )
                 Spacer(Modifier.height(4.dp))
                 KomiText(
                     text = stringResource(Res.string.tweaks_licenses_intro_body),
                     role = KomiTextRole.Body,
-                    fontSize = 13.sp,
                     color = colors.onSurfaceVariant,
-                    uppercase = false,
                 )
             }
         }
@@ -111,7 +96,6 @@ fun LicensesRoot(
                     text = stringResource(Res.string.tweaks_licenses_load_failed),
                     role = KomiTextRole.Body,
                     color = LocalPersonality.current.colors.error,
-                    uppercase = false,
                     modifier = Modifier.padding(16.dp),
                 )
             }
@@ -150,19 +134,15 @@ private fun LibraryRow(library: LibraryEntry, onClick: () -> Unit) {
         ) {
             KomiText(
                 text = library.name,
-                role = KomiTextRole.Title,
-                fontWeight = FontWeight.SemiBold,
+                role = KomiTextRole.CardTitle,
                 color = colors.onSurface,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
-                uppercase = false,
             )
             KomiText(
                 text = library.license,
                 role = KomiTextRole.Mono,
-                fontSize = 11.sp,
                 color = colors.onSurfaceVariant,
-                uppercase = false,
             )
         }
     }

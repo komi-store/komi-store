@@ -18,10 +18,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import kotlinx.collections.immutable.ImmutableList
 import org.jetbrains.compose.resources.stringResource
 import zed.rainxch.core.presentation.components.icon.KomiIcon
@@ -65,9 +63,7 @@ fun LanguagePickerSheet(
             KomiText(
                 text = intro,
                 role = KomiTextRole.Body,
-                fontSize = 13.sp,
                 color = LocalPersonality.current.colors.onSurfaceVariant,
-                uppercase = false,
                 modifier = Modifier.padding(horizontal = 4.dp, vertical = 4.dp),
             )
 
@@ -150,24 +146,19 @@ private fun LanguageRow(
             Column(modifier = Modifier.weight(1f)) {
                 KomiText(
                     text = title,
-                    role = KomiTextRole.Body,
-                    fontSize = 15.sp,
-                    fontWeight = FontWeight.SemiBold,
+                    role = KomiTextRole.ItemTitle,
                     color = colors.onSurface,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    uppercase = false,
                 )
 
                 if (!subtitleTag.isNullOrBlank()) {
                     KomiText(
                         text = subtitleTag,
-                        role = KomiTextRole.Label,
-                        fontSize = 11.sp,
+                        role = KomiTextRole.Caption,
                         color = colors.onSurfaceVariant,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
-                        uppercase = false,
                     )
                 }
             }

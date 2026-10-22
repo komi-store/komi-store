@@ -5,6 +5,7 @@ import androidx.compose.material3.CircularWavyProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.LinearWavyProgressIndicator
+import androidx.compose.material3.LoadingIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -99,4 +100,16 @@ fun KomiLinearProgress(
         trackColor = personality.colors.surfaceVariant,
         strokeCap = if (personality is MangaPersonality) StrokeCap.Butt else StrokeCap.Round,
     )
+}
+
+// A screen or panel waiting a few seconds for its content. Classic shows Material 3 Expressive's
+// shape-morphing indicator, Manga its ink spinner. Waits inside buttons and rows, and long ones
+// (sign-in, scans), stay on KomiCircularProgress.
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+fun KomiLoadingIndicator(modifier: Modifier = Modifier) {
+    when (val personality = LocalPersonality.current) {
+        is MangaPersonality -> KomiCircularProgress(modifier = modifier)
+        is ClassicPersonality -> LoadingIndicator(modifier = modifier, color = personality.colors.primary)
+    }
 }

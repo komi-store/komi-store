@@ -1,9 +1,7 @@
 package zed.rainxch.details.presentation.components
 
 import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -44,10 +42,8 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.lerp
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.flow.first
 import org.jetbrains.compose.resources.stringResource
 import zed.rainxch.core.domain.model.account.github.GithubRelease
@@ -63,6 +59,7 @@ import zed.rainxch.core.presentation.components.chips.KomiChip
 import zed.rainxch.core.presentation.components.chips.KomiChipKind
 import zed.rainxch.core.presentation.components.chips.KomiChipSize
 import zed.rainxch.core.presentation.components.icon.KomiIcon
+import zed.rainxch.core.presentation.components.overlays.KomiTooltip
 import zed.rainxch.core.presentation.components.progress.KomiCircularProgress
 import zed.rainxch.core.presentation.components.text.KomiText
 import zed.rainxch.core.presentation.components.text.KomiTextRole
@@ -129,19 +126,19 @@ fun AppHeader(
     val tintFraction = if (isDark) 0.10f else 0.06f
     val animatedAccent by animateColorAsState(
         targetValue = normalizedAccent,
-        animationSpec = tween(durationMillis = 1800, easing = LinearOutSlowInEasing),
+        animationSpec = LocalPersonality.current.motion.slowEffects(),
         label = "details-hero-accent",
     )
     val animatedSurface by animateColorAsState(
         targetValue = lerp(surface, normalizedAccent, tintFraction),
-        animationSpec = tween(durationMillis = 1800, easing = LinearOutSlowInEasing),
+        animationSpec = LocalPersonality.current.motion.slowEffects(),
         label = "details-hero-surface",
     )
     val borderColor = colors.outline
 
     val animatedProgress by animateFloatAsState(
         targetValue = (downloadProgress ?: 0) / 100f,
-        animationSpec = tween(durationMillis = 500),
+        animationSpec = LocalPersonality.current.motion.defaultEffects(),
         label = "avatar-progress",
     )
 
@@ -214,24 +211,25 @@ fun AppHeader(
             ) {
                 KomiText(
                     text = author?.login ?: repository.owner.login,
-                    role = KomiTextRole.Label,
-                    fontSize = 13.sp,
-                    color = colors.onSurface.copy(alpha = 0.75f),
+                    role = KomiTextRole.Body,
+                    color = colors.onSurfaceVariant,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     modifier =
                         Modifier
                             .weight(1f, fill = false)
                             .clickable(onClick = onOwnerClick),
-                    uppercase = false,
                 )
                 if (isCurrentUserOwner) {
-                    KomiIcon(
-                        imageVector = Icons.Filled.Verified,
-                        contentDescription = stringResource(Res.string.self_owned_badge),
-                        modifier = Modifier.size(16.dp),
-                        tint = colors.primary,
-                    )
+                    val selfOwned = stringResource(Res.string.self_owned_badge)
+                    KomiTooltip(text = selfOwned) {
+                        KomiIcon(
+                            imageVector = Icons.Filled.Verified,
+                            contentDescription = selfOwned,
+                            modifier = Modifier.size(16.dp),
+                            tint = colors.primary,
+                        )
+                    }
                 }
             }
             Row(
@@ -242,22 +240,17 @@ fun AppHeader(
                 horizontalArrangement = Arrangement.spacedBy(10.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
+                val type = LocalPersonality.current.type
+                // BasicText keeps the repository's own case; KomiText would capitalize a display role in Manga.
                 androidx.compose.foundation.text.BasicText(
                     text = repository.name,
-                    style =
-                        LocalPersonality.current.type.display.copy(
-                            fontWeight = FontWeight.Black,
-                            fontSize = 30.sp,
-                            letterSpacing = (-0.4).sp,
-                            color = colors.onSurface,
-                        ),
+                    style = type.display.copy(color = colors.onSurface),
                     maxLines = 1,
                     softWrap = false,
                     autoSize =
                         androidx.compose.foundation.text.TextAutoSize.StepBased(
-                            minFontSize = 18.sp,
-                            maxFontSize = 30.sp,
-                            stepSize = 1.sp,
+                            minFontSize = type.sectionTitle.fontSize,
+                            maxFontSize = type.display.fontSize,
                         ),
                     modifier = Modifier.weight(1f, fill = false),
                 )
@@ -282,7 +275,7 @@ fun AppHeader(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(6.dp),
                 ) {
-                    val statColor = colors.onSurface.copy(alpha = 0.88f)
+                    val statColor = colors.onSurface
                     KomiIcon(
                         imageVector = Icons.Outlined.History,
                         contentDescription = null,
@@ -292,10 +285,7 @@ fun AppHeader(
                     KomiText(
                         text = stringResource(Res.string.details_last_push, lastPushLabel),
                         role = KomiTextRole.Label,
-                        fontSize = 13.sp,
-                        fontWeight = FontWeight.SemiBold,
                         color = statColor,
-                        uppercase = false,
                     )
                 }
             }
@@ -303,7 +293,6 @@ fun AppHeader(
             KomiText(
                 text = repository.description ?: stringResource(Res.string.no_description),
                 role = KomiTextRole.Body,
-                fontSize = 14.sp,
                 color = colors.onSurfaceVariant,
                 modifier = Modifier.padding(horizontal = 20.dp),
             )
@@ -510,11 +499,8 @@ private fun InstalledStatusPill(installedApp: InstalledApp) {
                         else -> Res.string.installed
                     },
                 ),
-            role = KomiTextRole.Label,
-            fontWeight = FontWeight.SemiBold,
-            fontSize = 12.sp,
+            role = KomiTextRole.LabelSmall,
             color = colors.primary,
-            uppercase = false,
         )
     }
 }

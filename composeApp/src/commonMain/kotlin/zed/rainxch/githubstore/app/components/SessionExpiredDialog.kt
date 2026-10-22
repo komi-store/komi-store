@@ -5,9 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.LockOpen
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.stringResource
 import zed.rainxch.core.presentation.components.buttons.KomiButton
 import zed.rainxch.core.presentation.components.buttons.KomiButtonSize
@@ -37,10 +35,8 @@ fun SessionExpiredDialog(
         title = {
             KomiText(
                 text = stringResource(Res.string.session_expired_title),
-                role = KomiTextRole.Title,
-                fontWeight = FontWeight.Black,
+                role = KomiTextRole.CardTitle,
                 color = colors.onSurface,
-                uppercase = false,
             )
         },
         text = {
@@ -51,15 +47,12 @@ fun SessionExpiredDialog(
                     text = stringResource(Res.string.session_expired_message),
                     role = KomiTextRole.Body,
                     color = colors.outline,
-                    uppercase = false,
                 )
 
                 KomiText(
                     text = stringResource(Res.string.session_expired_hint),
                     role = KomiTextRole.Body,
-                    fontSize = 13.sp,
                     color = colors.primary,
-                    uppercase = false,
                 )
             }
         },

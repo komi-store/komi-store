@@ -25,10 +25,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import zed.rainxch.core.presentation.components.GitHubStoreImage
 import org.jetbrains.compose.resources.stringResource
 import zed.rainxch.apps.presentation.starred.StarredCandidateUi
@@ -88,23 +86,19 @@ fun StarredCandidateRow(
             Column(modifier = Modifier.weight(1f)) {
                 KomiText(
                     text = "${candidate.owner}/${candidate.name}",
-                    role = KomiTextRole.Title,
-                    fontWeight = FontWeight.SemiBold,
+                    role = KomiTextRole.CardTitle,
                     color = colors.onSurface,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    uppercase = false,
                 )
 
                 if (!candidate.description.isNullOrBlank()) {
                     KomiText(
                         text = candidate.description,
                         role = KomiTextRole.Body,
-                        fontSize = 13.sp,
                         color = colors.onSurfaceVariant,
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis,
-                        uppercase = false,
                     )
                 }
 
@@ -126,22 +120,18 @@ fun StarredCandidateRow(
 
                         KomiText(
                             text = formatCompactCount(candidate.stargazersCount),
-                            role = KomiTextRole.Label,
-                            fontSize = 11.sp,
+                            role = KomiTextRole.Caption,
                             color = colors.onSurfaceVariant,
-                            uppercase = false,
                         )
                     }
 
                     candidate.latestReleaseTag?.let { tag ->
                         KomiText(
                             text = tag,
-                            role = KomiTextRole.Label,
-                            fontSize = 11.sp,
+                            role = KomiTextRole.Caption,
                             color = colors.onSurfaceVariant,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
-                            uppercase = false,
                         )
                     }
                 }
@@ -180,6 +170,6 @@ private fun Badge(icon: androidx.compose.ui.graphics.vector.ImageVector, label: 
 
         Spacer(Modifier.width(4.dp))
 
-        KomiText(text = label, role = KomiTextRole.Label, fontSize = 11.sp, color = color, uppercase = false)
+        KomiText(text = label, role = KomiTextRole.Caption, color = color)
     }
 }

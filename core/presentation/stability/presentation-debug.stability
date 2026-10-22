@@ -153,6 +153,13 @@ private fun zed.rainxch.core.presentation.components.badge.PreviewRules(): kotli
   params:
 
 @Composable
+private fun zed.rainxch.core.presentation.components.bars.ClassicActions(content: @[Composable] @[ExtensionFunctionType] androidx.compose.runtime.internal.ComposableFunction1<androidx.compose.foundation.layout.RowScope, kotlin.Unit>): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - content: STABLE (composable function type)
+
+@Composable
 private fun zed.rainxch.core.presentation.components.bars.ClassicBottomBar(items: kotlinx.collections.immutable.ImmutableList<zed.rainxch.core.presentation.components.bars.KomiNavItem>, selectedId: kotlin.String, onSelect: kotlin.Function1<kotlin.String, kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
   skippable: true
   restartable: true
@@ -163,7 +170,7 @@ private fun zed.rainxch.core.presentation.components.bars.ClassicBottomBar(items
     - modifier: STABLE (marked @Stable or @Immutable)
 
 @Composable
-private fun zed.rainxch.core.presentation.components.bars.ClassicTopBar(title: kotlin.String, subtitle: kotlin.String?, leading: @[Composable] androidx.compose.runtime.internal.ComposableFunction0<kotlin.Unit>?, actions: @[Composable] @[ExtensionFunctionType] androidx.compose.runtime.internal.ComposableFunction1<androidx.compose.foundation.layout.RowScope, kotlin.Unit>?, centerTitle: kotlin.Boolean, insets: kotlin.Boolean, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+private fun zed.rainxch.core.presentation.components.bars.ClassicTopBar(title: kotlin.String, subtitle: kotlin.String?, leading: @[Composable] androidx.compose.runtime.internal.ComposableFunction0<kotlin.Unit>?, actions: @[Composable] @[ExtensionFunctionType] androidx.compose.runtime.internal.ComposableFunction1<androidx.compose.foundation.layout.RowScope, kotlin.Unit>?, size: zed.rainxch.core.presentation.components.bars.KomiTopBarSize, centerTitle: kotlin.Boolean, insets: kotlin.Boolean, modifier: androidx.compose.ui.Modifier): kotlin.Unit
   skippable: true
   restartable: true
   params:
@@ -171,9 +178,29 @@ private fun zed.rainxch.core.presentation.components.bars.ClassicTopBar(title: k
     - subtitle: STABLE (class with no mutable properties)
     - leading: STABLE (composable function type)
     - actions: STABLE (composable function type)
+    - size: STABLE (class with no mutable properties)
     - centerTitle: STABLE (primitive type)
     - insets: STABLE (primitive type)
     - modifier: STABLE (marked @Stable or @Immutable)
+
+@Composable
+private fun zed.rainxch.core.presentation.components.bars.HandToScaffold(chrome: zed.rainxch.core.presentation.components.bars.ScaffoldChrome, onBack: kotlin.Function0<kotlin.Unit>?, actions: @[Composable] @[ExtensionFunctionType] androidx.compose.runtime.internal.ComposableFunction1<androidx.compose.foundation.layout.RowScope, kotlin.Unit>?): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - chrome: STABLE (marked @Stable or @Immutable)
+    - onBack: STABLE (function type)
+    - actions: STABLE (composable function type)
+
+@Composable
+public fun zed.rainxch.core.presentation.components.bars.KomiActionBar(modifier: androidx.compose.ui.Modifier, onBack: kotlin.Function0<kotlin.Unit>?, floatingActionButton: @[Composable] androidx.compose.runtime.internal.ComposableFunction0<kotlin.Unit>?, actions: @[Composable] @[ExtensionFunctionType] androidx.compose.runtime.internal.ComposableFunction1<androidx.compose.foundation.layout.RowScope, kotlin.Unit>?): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - modifier: STABLE (marked @Stable or @Immutable)
+    - onBack: STABLE (function type)
+    - floatingActionButton: STABLE (composable function type)
+    - actions: STABLE (composable function type)
 
 @Composable
 public fun zed.rainxch.core.presentation.components.bars.KomiBottomBar(items: kotlinx.collections.immutable.ImmutableList<zed.rainxch.core.presentation.components.bars.KomiNavItem>, selectedId: kotlin.String, onSelect: kotlin.Function1<kotlin.String, kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
@@ -186,7 +213,7 @@ public fun zed.rainxch.core.presentation.components.bars.KomiBottomBar(items: ko
     - modifier: STABLE (marked @Stable or @Immutable)
 
 @Composable
-public fun zed.rainxch.core.presentation.components.bars.KomiTopBar(title: kotlin.String, modifier: androidx.compose.ui.Modifier, titleAccent: kotlin.String?, subtitle: kotlin.String?, leading: @[Composable] androidx.compose.runtime.internal.ComposableFunction0<kotlin.Unit>?, actions: @[Composable] @[ExtensionFunctionType] androidx.compose.runtime.internal.ComposableFunction1<androidx.compose.foundation.layout.RowScope, kotlin.Unit>?, size: zed.rainxch.core.presentation.components.bars.KomiTopBarSize, centerTitle: kotlin.Boolean, insets: kotlin.Boolean): kotlin.Unit
+public fun zed.rainxch.core.presentation.components.bars.KomiTopBar(title: kotlin.String, modifier: androidx.compose.ui.Modifier, titleAccent: kotlin.String?, subtitle: kotlin.String?, leading: @[Composable] androidx.compose.runtime.internal.ComposableFunction0<kotlin.Unit>?, onBack: kotlin.Function0<kotlin.Unit>?, actions: @[Composable] @[ExtensionFunctionType] androidx.compose.runtime.internal.ComposableFunction1<androidx.compose.foundation.layout.RowScope, kotlin.Unit>?, size: zed.rainxch.core.presentation.components.bars.KomiTopBarSize, centerTitle: kotlin.Boolean, insets: kotlin.Boolean): kotlin.Unit
   skippable: true
   restartable: true
   params:
@@ -195,6 +222,7 @@ public fun zed.rainxch.core.presentation.components.bars.KomiTopBar(title: kotli
     - titleAccent: STABLE (class with no mutable properties)
     - subtitle: STABLE (class with no mutable properties)
     - leading: STABLE (composable function type)
+    - onBack: STABLE (function type)
     - actions: STABLE (composable function type)
     - size: STABLE (class with no mutable properties)
     - centerTitle: STABLE (primitive type)
@@ -228,6 +256,12 @@ private fun zed.rainxch.core.presentation.components.bars.MangaTopBar(personalit
     - modifier: STABLE (marked @Stable or @Immutable)
 
 @Composable
+private fun zed.rainxch.core.presentation.components.bars.PreviewActionBar(): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+
+@Composable
 private fun zed.rainxch.core.presentation.components.bars.PreviewBottomBar(): kotlin.Unit
   skippable: true
   restartable: true
@@ -244,6 +278,28 @@ private fun zed.rainxch.core.presentation.components.bars.PreviewMasthead(): kot
   skippable: true
   restartable: true
   params:
+
+@Composable
+private fun zed.rainxch.core.presentation.components.bars.TopBarBack(onBack: kotlin.Function0<kotlin.Unit>): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - onBack: STABLE (function type)
+
+@Composable
+internal fun zed.rainxch.core.presentation.components.bars.rememberScaffoldChrome(enabled: kotlin.Boolean): zed.rainxch.core.presentation.components.bars.ScaffoldChrome?
+  skippable: true
+  restartable: true
+  params:
+    - enabled: STABLE (primitive type)
+
+@Composable
+internal fun zed.rainxch.core.presentation.components.buttons.BarIcon(icon: androidx.compose.ui.graphics.vector.ImageVector, contentDescription: kotlin.String): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - icon: STABLE (marked @Stable or @Immutable)
+    - contentDescription: STABLE (String is immutable)
 
 @Composable
 private fun zed.rainxch.core.presentation.components.buttons.ClassicButton(personality: zed.rainxch.core.presentation.personality.ClassicPersonality, onClick: kotlin.Function0<kotlin.Unit>, label: kotlin.String, modifier: androidx.compose.ui.Modifier, variant: zed.rainxch.core.presentation.components.buttons.KomiButtonVariant, size: zed.rainxch.core.presentation.components.buttons.KomiButtonSize, enabled: kotlin.Boolean, loading: kotlin.Boolean, fullWidth: kotlin.Boolean, leadingIcon: androidx.compose.ui.graphics.vector.ImageVector?, trailingIcon: androidx.compose.ui.graphics.vector.ImageVector?, containerColor: androidx.compose.ui.graphics.Color, contentColor: androidx.compose.ui.graphics.Color): kotlin.Unit
@@ -265,17 +321,17 @@ private fun zed.rainxch.core.presentation.components.buttons.ClassicButton(perso
     - contentColor: STABLE (marked @Stable or @Immutable)
 
 @Composable
-private fun zed.rainxch.core.presentation.components.buttons.ClassicIconButton(icon: androidx.compose.ui.graphics.vector.ImageVector, contentDescription: kotlin.String, onClick: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier, variant: zed.rainxch.core.presentation.components.buttons.KomiButtonVariant, size: zed.rainxch.core.presentation.components.buttons.KomiIconButtonSize, enabled: kotlin.Boolean): kotlin.Unit
+private fun zed.rainxch.core.presentation.components.buttons.ClassicIconButton(icon: androidx.compose.ui.graphics.vector.ImageVector, contentDescription: kotlin.String, onClick: kotlin.Function0<kotlin.Unit>, variant: zed.rainxch.core.presentation.components.buttons.KomiButtonVariant, size: zed.rainxch.core.presentation.components.buttons.KomiIconButtonSize, enabled: kotlin.Boolean, modifier: androidx.compose.ui.Modifier): kotlin.Unit
   skippable: true
   restartable: true
   params:
     - icon: STABLE (marked @Stable or @Immutable)
     - contentDescription: STABLE (String is immutable)
     - onClick: STABLE (function type)
-    - modifier: STABLE (marked @Stable or @Immutable)
     - variant: STABLE (class with no mutable properties)
     - size: STABLE (class with no mutable properties)
     - enabled: STABLE (primitive type)
+    - modifier: STABLE (marked @Stable or @Immutable)
 
 @Composable
 private fun zed.rainxch.core.presentation.components.buttons.ClassicSegmentCell(item: zed.rainxch.core.presentation.components.buttons.KomiSegmentedItem<T of zed.rainxch.core.presentation.components.buttons.ClassicSegmentCell>, active: kotlin.Boolean, shape: androidx.compose.ui.graphics.Shape, colors: zed.rainxch.core.presentation.personality.model.PersonalityColors, metrics: zed.rainxch.core.presentation.components.buttons.KomiIconButtonMetrics, onSelect: kotlin.Function1<T of zed.rainxch.core.presentation.components.buttons.ClassicSegmentCell, kotlin.Unit>): kotlin.Unit
@@ -340,7 +396,7 @@ public fun zed.rainxch.core.presentation.components.buttons.KomiButton(onClick: 
     - contentColor: STABLE (marked @Stable or @Immutable)
 
 @Composable
-private fun zed.rainxch.core.presentation.components.buttons.KomiButtonContent(label: kotlin.String, contentColor: androidx.compose.ui.graphics.Color, iconSize: androidx.compose.ui.unit.Dp, gap: androidx.compose.ui.unit.Dp, fontSize: androidx.compose.ui.unit.TextUnit, loading: kotlin.Boolean, leadingIcon: androidx.compose.ui.graphics.vector.ImageVector?, trailingIcon: androidx.compose.ui.graphics.vector.ImageVector?): kotlin.Unit
+private fun zed.rainxch.core.presentation.components.buttons.KomiButtonContent(label: kotlin.String, contentColor: androidx.compose.ui.graphics.Color, iconSize: androidx.compose.ui.unit.Dp, gap: androidx.compose.ui.unit.Dp, labelRole: zed.rainxch.core.presentation.components.text.KomiTextRole, loading: kotlin.Boolean, leadingIcon: androidx.compose.ui.graphics.vector.ImageVector?, trailingIcon: androidx.compose.ui.graphics.vector.ImageVector?): kotlin.Unit
   skippable: true
   restartable: true
   params:
@@ -348,10 +404,22 @@ private fun zed.rainxch.core.presentation.components.buttons.KomiButtonContent(l
     - contentColor: STABLE (marked @Stable or @Immutable)
     - iconSize: STABLE (marked @Stable or @Immutable)
     - gap: STABLE (marked @Stable or @Immutable)
-    - fontSize: STABLE (marked @Stable or @Immutable)
+    - labelRole: STABLE (class with no mutable properties)
     - loading: STABLE (primitive type)
     - leadingIcon: STABLE (marked @Stable or @Immutable)
     - trailingIcon: STABLE (marked @Stable or @Immutable)
+
+@Composable
+internal fun zed.rainxch.core.presentation.components.buttons.KomiCookieButton(icon: androidx.compose.ui.graphics.vector.ImageVector, contentDescription: kotlin.String, onClick: kotlin.Function0<kotlin.Unit>, containerColor: androidx.compose.ui.graphics.Color, contentColor: androidx.compose.ui.graphics.Color, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - icon: STABLE (marked @Stable or @Immutable)
+    - contentDescription: STABLE (String is immutable)
+    - onClick: STABLE (function type)
+    - containerColor: STABLE (marked @Stable or @Immutable)
+    - contentColor: STABLE (marked @Stable or @Immutable)
+    - modifier: STABLE (marked @Stable or @Immutable)
 
 @Composable
 public fun zed.rainxch.core.presentation.components.buttons.KomiFab(onClick: kotlin.Function0<kotlin.Unit>, icon: androidx.compose.ui.graphics.vector.ImageVector, contentDescription: kotlin.String, modifier: androidx.compose.ui.Modifier, label: kotlin.String?): kotlin.Unit
@@ -434,7 +502,7 @@ private fun zed.rainxch.core.presentation.components.buttons.MangaFab(personalit
     - label: STABLE (class with no mutable properties)
 
 @Composable
-private fun zed.rainxch.core.presentation.components.buttons.MangaIconButton(personality: zed.rainxch.core.presentation.personality.MangaPersonality, icon: androidx.compose.ui.graphics.vector.ImageVector, contentDescription: kotlin.String, onClick: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier, variant: zed.rainxch.core.presentation.components.buttons.KomiButtonVariant, size: zed.rainxch.core.presentation.components.buttons.KomiIconButtonSize, enabled: kotlin.Boolean): kotlin.Unit
+private fun zed.rainxch.core.presentation.components.buttons.MangaIconButton(personality: zed.rainxch.core.presentation.personality.MangaPersonality, icon: androidx.compose.ui.graphics.vector.ImageVector, contentDescription: kotlin.String, onClick: kotlin.Function0<kotlin.Unit>, variant: zed.rainxch.core.presentation.components.buttons.KomiButtonVariant, size: zed.rainxch.core.presentation.components.buttons.KomiIconButtonSize, enabled: kotlin.Boolean, modifier: androidx.compose.ui.Modifier): kotlin.Unit
   skippable: true
   restartable: true
   params:
@@ -442,10 +510,10 @@ private fun zed.rainxch.core.presentation.components.buttons.MangaIconButton(per
     - icon: STABLE (marked @Stable or @Immutable)
     - contentDescription: STABLE (String is immutable)
     - onClick: STABLE (function type)
-    - modifier: STABLE (marked @Stable or @Immutable)
     - variant: STABLE (class with no mutable properties)
     - size: STABLE (class with no mutable properties)
     - enabled: STABLE (primitive type)
+    - modifier: STABLE (marked @Stable or @Immutable)
 
 @Composable
 private fun zed.rainxch.core.presentation.components.buttons.MangaSegmentCell(item: zed.rainxch.core.presentation.components.buttons.KomiSegmentedItem<T of zed.rainxch.core.presentation.components.buttons.MangaSegmentCell>, active: kotlin.Boolean, colors: zed.rainxch.core.presentation.personality.model.PersonalityColors, metrics: zed.rainxch.core.presentation.components.buttons.KomiIconButtonMetrics, onSelect: kotlin.Function1<T of zed.rainxch.core.presentation.components.buttons.MangaSegmentCell, kotlin.Unit>): kotlin.Unit
@@ -613,6 +681,15 @@ public fun zed.rainxch.core.presentation.components.cards.KomiRepoCard(name: kot
     - releasedAt: STABLE (class with no mutable properties)
 
 @Composable
+private fun zed.rainxch.core.presentation.components.cards.MonogramText(monogram: kotlin.String, color: androidx.compose.ui.graphics.Color, fontSize: androidx.compose.ui.unit.TextUnit): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - monogram: STABLE (String is immutable)
+    - color: STABLE (marked @Stable or @Immutable)
+    - fontSize: STABLE (marked @Stable or @Immutable)
+
+@Composable
 private fun zed.rainxch.core.presentation.components.cards.NewReleaseStamp(version: kotlin.String?, showStamp: kotlin.Boolean, colors: zed.rainxch.core.presentation.personality.model.PersonalityColors): kotlin.Unit
   skippable: true
   restartable: true
@@ -656,7 +733,7 @@ private fun zed.rainxch.core.presentation.components.cards.Stat(icon: androidx.c
     - hero: STABLE (primitive type)
 
 @Composable
-private fun zed.rainxch.core.presentation.components.chips.ChipCountPill(count: kotlin.Int, selected: kotlin.Boolean, color: androidx.compose.ui.graphics.Color, colors: zed.rainxch.core.presentation.personality.model.PersonalityColors, fontSizeSp: kotlin.Float, type: zed.rainxch.core.presentation.personality.model.PersonalityType): kotlin.Unit
+private fun zed.rainxch.core.presentation.components.chips.ChipCountPill(count: kotlin.Int, selected: kotlin.Boolean, color: androidx.compose.ui.graphics.Color, colors: zed.rainxch.core.presentation.personality.model.PersonalityColors): kotlin.Unit
   skippable: true
   restartable: true
   params:
@@ -664,19 +741,6 @@ private fun zed.rainxch.core.presentation.components.chips.ChipCountPill(count: 
     - selected: STABLE (primitive type)
     - color: STABLE (marked @Stable or @Immutable)
     - colors: STABLE (marked @Stable or @Immutable)
-    - fontSizeSp: STABLE (primitive type)
-    - type: STABLE (marked @Stable or @Immutable)
-
-@Composable
-private fun zed.rainxch.core.presentation.components.chips.ChipLabel(label: kotlin.String, isFilter: kotlin.Boolean, color: androidx.compose.ui.graphics.Color, fontSizeSp: kotlin.Float, type: zed.rainxch.core.presentation.personality.model.PersonalityType): kotlin.Unit
-  skippable: true
-  restartable: true
-  params:
-    - label: STABLE (String is immutable)
-    - isFilter: STABLE (primitive type)
-    - color: STABLE (marked @Stable or @Immutable)
-    - fontSizeSp: STABLE (primitive type)
-    - type: STABLE (marked @Stable or @Immutable)
 
 @Composable
 private fun zed.rainxch.core.presentation.components.chips.ChipRemove(onRemove: kotlin.Function0<kotlin.Unit>?, color: androidx.compose.ui.graphics.Color, iconSize: androidx.compose.ui.unit.Dp): kotlin.Unit
@@ -796,27 +860,36 @@ public fun zed.rainxch.core.presentation.components.icon.KomiIcon(painter: andro
     - tint: STABLE (marked @Stable or @Immutable)
 
 @Composable
-private fun zed.rainxch.core.presentation.components.inputs.ClassicTextField(value: kotlin.String, onValueChange: kotlin.Function1<kotlin.String, kotlin.Unit>, modifier: androidx.compose.ui.Modifier, label: kotlin.String?, helper: kotlin.String?, error: kotlin.String?, placeholder: kotlin.String?, leadingIcon: androidx.compose.ui.graphics.vector.ImageVector?, trailing: @[Composable] androidx.compose.runtime.internal.ComposableFunction0<kotlin.Unit>?, clearable: kotlin.Boolean, multiline: kotlin.Boolean, rows: kotlin.Int, required: kotlin.Boolean, enabled: kotlin.Boolean, password: kotlin.Boolean, keyboardType: androidx.compose.ui.text.input.KeyboardType, onCommit: kotlin.Function0<kotlin.Unit>?): kotlin.Unit
+internal fun zed.rainxch.core.presentation.components.inputs.ClassicTextField(personality: zed.rainxch.core.presentation.personality.ClassicPersonality, value: kotlin.String, onValueChange: kotlin.Function1<kotlin.String, kotlin.Unit>, label: kotlin.String?, helper: kotlin.String?, error: kotlin.String?, placeholder: kotlin.String?, leadingIcon: androidx.compose.ui.graphics.vector.ImageVector?, trailing: @[Composable] androidx.compose.runtime.internal.ComposableFunction0<kotlin.Unit>?, onClear: kotlin.Function0<kotlin.Unit>?, multiline: kotlin.Boolean, rows: kotlin.Int, required: kotlin.Boolean, enabled: kotlin.Boolean, password: kotlin.Boolean, onCommit: kotlin.Function0<kotlin.Unit>?, keyboardType: androidx.compose.ui.text.input.KeyboardType, modifier: androidx.compose.ui.Modifier): kotlin.Unit
   skippable: false
   restartable: true
   params:
+    - personality: STABLE (marked @Stable or @Immutable)
     - value: STABLE (String is immutable)
     - onValueChange: STABLE (function type)
-    - modifier: STABLE (marked @Stable or @Immutable)
     - label: STABLE (class with no mutable properties)
     - helper: STABLE (class with no mutable properties)
     - error: STABLE (class with no mutable properties)
     - placeholder: STABLE (class with no mutable properties)
     - leadingIcon: STABLE (marked @Stable or @Immutable)
     - trailing: STABLE (composable function type)
-    - clearable: STABLE (primitive type)
+    - onClear: STABLE (function type)
     - multiline: STABLE (primitive type)
     - rows: STABLE (primitive type)
     - required: STABLE (primitive type)
     - enabled: STABLE (primitive type)
     - password: STABLE (primitive type)
-    - keyboardType: RUNTIME (requires runtime check)
     - onCommit: STABLE (function type)
+    - keyboardType: RUNTIME (requires runtime check)
+    - modifier: STABLE (marked @Stable or @Immutable)
+
+@Composable
+private fun zed.rainxch.core.presentation.components.inputs.ClearButton(visible: kotlin.Boolean, onClick: kotlin.Function0<kotlin.Unit>): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - visible: STABLE (primitive type)
+    - onClick: STABLE (function type)
 
 @Composable
 private fun zed.rainxch.core.presentation.components.inputs.ClearButton(colors: zed.rainxch.core.presentation.personality.model.PersonalityColors, iconSize: androidx.compose.ui.unit.Dp, onClear: kotlin.Function0<kotlin.Unit>): kotlin.Unit
@@ -826,6 +899,17 @@ private fun zed.rainxch.core.presentation.components.inputs.ClearButton(colors: 
     - colors: STABLE (marked @Stable or @Immutable)
     - iconSize: STABLE (marked @Stable or @Immutable)
     - onClear: STABLE (function type)
+
+@Composable
+private fun zed.rainxch.core.presentation.components.inputs.FieldContainer(personality: zed.rainxch.core.presentation.personality.ClassicPersonality, shape: androidx.compose.ui.graphics.Shape, focused: kotlin.Boolean, hasError: kotlin.Boolean, enabled: kotlin.Boolean): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - personality: STABLE (marked @Stable or @Immutable)
+    - shape: STABLE (marked @Stable or @Immutable)
+    - focused: STABLE (primitive type)
+    - hasError: STABLE (primitive type)
+    - enabled: STABLE (primitive type)
 
 @Composable
 public fun zed.rainxch.core.presentation.components.inputs.KomiCheckbox(checked: kotlin.Boolean, onCheckedChange: kotlin.Function1<kotlin.Boolean, kotlin.Unit>?, modifier: androidx.compose.ui.Modifier, enabled: kotlin.Boolean): kotlin.Unit
@@ -871,7 +955,7 @@ public fun zed.rainxch.core.presentation.components.inputs.KomiSwitch(checked: k
     - enabled: STABLE (primitive type)
 
 @Composable
-public fun zed.rainxch.core.presentation.components.inputs.KomiTextField(value: kotlin.String, onValueChange: kotlin.Function1<kotlin.String, kotlin.Unit>, modifier: androidx.compose.ui.Modifier, label: kotlin.String?, helper: kotlin.String?, error: kotlin.String?, placeholder: kotlin.String?, leadingIcon: androidx.compose.ui.graphics.vector.ImageVector?, trailing: @[Composable] androidx.compose.runtime.internal.ComposableFunction0<kotlin.Unit>?, clearable: kotlin.Boolean, multiline: kotlin.Boolean, rows: kotlin.Int, required: kotlin.Boolean, size: zed.rainxch.core.presentation.components.inputs.KomiTextFieldSize, enabled: kotlin.Boolean, password: kotlin.Boolean, keyboardType: androidx.compose.ui.text.input.KeyboardType, onCommit: kotlin.Function0<kotlin.Unit>?): kotlin.Unit
+public fun zed.rainxch.core.presentation.components.inputs.KomiTextField(value: kotlin.String, onValueChange: kotlin.Function1<kotlin.String, kotlin.Unit>, modifier: androidx.compose.ui.Modifier, label: kotlin.String?, helper: kotlin.String?, error: kotlin.String?, placeholder: kotlin.String?, leadingIcon: androidx.compose.ui.graphics.vector.ImageVector?, trailing: @[Composable] androidx.compose.runtime.internal.ComposableFunction0<kotlin.Unit>?, clearable: kotlin.Boolean, onClear: kotlin.Function0<kotlin.Unit>?, multiline: kotlin.Boolean, rows: kotlin.Int, required: kotlin.Boolean, size: zed.rainxch.core.presentation.components.inputs.KomiTextFieldSize, enabled: kotlin.Boolean, password: kotlin.Boolean, keyboardType: androidx.compose.ui.text.input.KeyboardType, onCommit: kotlin.Function0<kotlin.Unit>?): kotlin.Unit
   skippable: false
   restartable: true
   params:
@@ -885,6 +969,7 @@ public fun zed.rainxch.core.presentation.components.inputs.KomiTextField(value: 
     - leadingIcon: STABLE (marked @Stable or @Immutable)
     - trailing: STABLE (composable function type)
     - clearable: STABLE (primitive type)
+    - onClear: STABLE (function type)
     - multiline: STABLE (primitive type)
     - rows: STABLE (primitive type)
     - required: STABLE (primitive type)
@@ -931,6 +1016,14 @@ private fun zed.rainxch.core.presentation.components.inputs.MangaTextField(perso
     - onCommit: STABLE (function type)
 
 @Composable
+private fun zed.rainxch.core.presentation.components.inputs.PasswordButton(visible: kotlin.Boolean, onToggle: kotlin.Function0<kotlin.Unit>): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - visible: STABLE (primitive type)
+    - onToggle: STABLE (function type)
+
+@Composable
 private fun zed.rainxch.core.presentation.components.inputs.PasswordToggle(visible: kotlin.Boolean, onToggle: kotlin.Function0<kotlin.Unit>, iconSize: androidx.compose.ui.unit.Dp, tint: androidx.compose.ui.graphics.Color): kotlin.Unit
   skippable: true
   restartable: true
@@ -947,10 +1040,26 @@ private fun zed.rainxch.core.presentation.components.inputs.PreviewFields(): kot
   params:
 
 @Composable
+private fun zed.rainxch.core.presentation.components.inputs.fieldColors(personality: zed.rainxch.core.presentation.personality.ClassicPersonality): androidx.compose.material3.TextFieldColors
+  skippable: true
+  restartable: true
+  params:
+    - personality: STABLE (marked @Stable or @Immutable)
+
+@Composable
 private fun zed.rainxch.core.presentation.components.lists.Chevron(): kotlin.Unit
   skippable: true
   restartable: true
   params:
+
+@Composable
+private fun zed.rainxch.core.presentation.components.lists.ItemRow(item: zed.rainxch.core.presentation.components.lists.KomiListItem, showDivider: kotlin.Boolean, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - item: STABLE (marked @Stable or @Immutable)
+    - showDivider: STABLE (primitive type)
+    - modifier: STABLE (marked @Stable or @Immutable)
 
 @Composable
 public fun zed.rainxch.core.presentation.components.lists.KomiList(items: kotlinx.collections.immutable.ImmutableList<zed.rainxch.core.presentation.components.lists.KomiListItem>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
@@ -1120,6 +1229,28 @@ private fun zed.rainxch.core.presentation.components.overlays.ClassicCenterDialo
     - content: STABLE (composable function type)
 
 @Composable
+private fun zed.rainxch.core.presentation.components.overlays.ClassicMenuItem(item: zed.rainxch.core.presentation.components.overlays.KomiMenuItem, selectable: kotlin.Boolean, selected: kotlin.Boolean, shapes: androidx.compose.material3.MenuItemShapes, onClick: kotlin.Function0<kotlin.Unit>): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - item: STABLE (marked @Stable or @Immutable)
+    - selectable: STABLE (primitive type)
+    - selected: STABLE (primitive type)
+    - shapes: STABLE (marked @Stable or @Immutable)
+    - onClick: STABLE (function type)
+
+@Composable
+internal fun zed.rainxch.core.presentation.components.overlays.ClassicMenuList(entries: kotlinx.collections.immutable.ImmutableList<zed.rainxch.core.presentation.components.overlays.KomiMenuEntry>, value: kotlin.String?, onPick: kotlin.Function1<zed.rainxch.core.presentation.components.overlays.KomiMenuItem, kotlin.Unit>, inPopup: kotlin.Boolean, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - entries: STABLE (known stable type)
+    - value: STABLE (class with no mutable properties)
+    - onPick: STABLE (function type)
+    - inPopup: STABLE (primitive type)
+    - modifier: STABLE (marked @Stable or @Immutable)
+
+@Composable
 private fun zed.rainxch.core.presentation.components.overlays.ClassicToastPanel(data: zed.rainxch.core.presentation.components.overlays.KomiToastData, interaction: androidx.compose.foundation.interaction.MutableInteractionSource, onClose: kotlin.Function0<kotlin.Unit>): kotlin.Unit
   skippable: true
   restartable: true
@@ -1136,6 +1267,19 @@ private fun zed.rainxch.core.presentation.components.overlays.CloseStamp(persona
     - personality: STABLE (marked @Stable or @Immutable)
     - onClose: STABLE (function type)
     - modifier: STABLE (marked @Stable or @Immutable)
+
+@Composable
+public fun zed.rainxch.core.presentation.components.overlays.KomiCoachmark(visible: kotlin.Boolean, title: kotlin.String, text: kotlin.String, dismissLabel: kotlin.String, onDismiss: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier, content: @[Composable] androidx.compose.runtime.internal.ComposableFunction0<kotlin.Unit>): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - visible: STABLE (primitive type)
+    - title: STABLE (String is immutable)
+    - text: STABLE (String is immutable)
+    - dismissLabel: STABLE (String is immutable)
+    - onDismiss: STABLE (function type)
+    - modifier: STABLE (marked @Stable or @Immutable)
+    - content: STABLE (composable function type)
 
 @Composable
 public fun zed.rainxch.core.presentation.components.overlays.KomiDialog(onDismissRequest: kotlin.Function0<kotlin.Unit>, confirmButton: @[Composable] androidx.compose.runtime.internal.ComposableFunction0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier, dismissButton: @[Composable] androidx.compose.runtime.internal.ComposableFunction0<kotlin.Unit>?, icon: @[Composable] androidx.compose.runtime.internal.ComposableFunction0<kotlin.Unit>?, title: @[Composable] androidx.compose.runtime.internal.ComposableFunction0<kotlin.Unit>?, text: @[Composable] androidx.compose.runtime.internal.ComposableFunction0<kotlin.Unit>?, properties: androidx.compose.ui.window.DialogProperties): kotlin.Unit
@@ -1173,13 +1317,40 @@ public fun zed.rainxch.core.presentation.components.overlays.KomiDropdown(entrie
     - trigger: STABLE (composable function type)
 
 @Composable
-private fun zed.rainxch.core.presentation.components.overlays.KomiMenuRow(item: zed.rainxch.core.presentation.components.overlays.KomiMenuItem, selected: kotlin.Boolean, onClick: kotlin.Function0<kotlin.Unit>): kotlin.Unit
+public fun zed.rainxch.core.presentation.components.overlays.KomiMenuList(entries: kotlinx.collections.immutable.ImmutableList<zed.rainxch.core.presentation.components.overlays.KomiMenuEntry>, onSelect: kotlin.Function1<zed.rainxch.core.presentation.components.overlays.KomiMenuItem, kotlin.Unit>, modifier: androidx.compose.ui.Modifier, value: kotlin.String?): kotlin.Unit
   skippable: true
   restartable: true
   params:
-    - item: STABLE (marked @Stable or @Immutable)
-    - selected: STABLE (primitive type)
-    - onClick: STABLE (function type)
+    - entries: STABLE (known stable type)
+    - onSelect: STABLE (function type)
+    - modifier: STABLE (marked @Stable or @Immutable)
+    - value: STABLE (class with no mutable properties)
+
+@Composable
+private fun zed.rainxch.core.presentation.components.overlays.KomiPlainTooltip(text: kotlin.String): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - text: STABLE (String is immutable)
+
+@Composable
+public fun zed.rainxch.core.presentation.components.overlays.KomiRichTooltip(title: kotlin.String, text: kotlin.String, modifier: androidx.compose.ui.Modifier, content: @[Composable] androidx.compose.runtime.internal.ComposableFunction0<kotlin.Unit>): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - title: STABLE (String is immutable)
+    - text: STABLE (String is immutable)
+    - modifier: STABLE (marked @Stable or @Immutable)
+    - content: STABLE (composable function type)
+
+@Composable
+private fun zed.rainxch.core.presentation.components.overlays.KomiRichTooltipPanel(title: kotlin.String, text: kotlin.String, action: @[Composable] androidx.compose.runtime.internal.ComposableFunction0<kotlin.Unit>?): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - title: STABLE (String is immutable)
+    - text: STABLE (String is immutable)
+    - action: STABLE (composable function type)
 
 @Composable
 public fun zed.rainxch.core.presentation.components.overlays.KomiSheet(onDismiss: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier, placement: zed.rainxch.core.presentation.components.overlays.KomiSheetPlacement, title: kotlin.String?, titleJp: kotlin.String?, maxWidth: androidx.compose.ui.unit.Dp, dismissible: kotlin.Boolean, screentone: kotlin.Boolean, footer: @[Composable] androidx.compose.runtime.internal.ComposableFunction0<kotlin.Unit>?, content: @[Composable] @[ExtensionFunctionType] androidx.compose.runtime.internal.ComposableFunction1<androidx.compose.foundation.layout.ColumnScope, kotlin.Unit>): kotlin.Unit
@@ -1224,6 +1395,15 @@ private fun zed.rainxch.core.presentation.components.overlays.KomiToastSurface(d
     - onClose: STABLE (function type)
 
 @Composable
+public fun zed.rainxch.core.presentation.components.overlays.KomiTooltip(text: kotlin.String, modifier: androidx.compose.ui.Modifier, content: @[Composable] androidx.compose.runtime.internal.ComposableFunction0<kotlin.Unit>): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - text: STABLE (String is immutable)
+    - modifier: STABLE (marked @Stable or @Immutable)
+    - content: STABLE (composable function type)
+
+@Composable
 private fun zed.rainxch.core.presentation.components.overlays.MangaBottomSheet(personality: zed.rainxch.core.presentation.personality.MangaPersonality, onDismiss: kotlin.Function0<kotlin.Unit>, title: kotlin.String?, titleJp: kotlin.String?, footer: @[Composable] androidx.compose.runtime.internal.ComposableFunction0<kotlin.Unit>?, screentone: kotlin.Boolean, screenHeight: androidx.compose.ui.unit.Dp, modifier: androidx.compose.ui.Modifier, content: @[Composable] @[ExtensionFunctionType] androidx.compose.runtime.internal.ComposableFunction1<androidx.compose.foundation.layout.ColumnScope, kotlin.Unit>): kotlin.Unit
   skippable: true
   restartable: true
@@ -1256,6 +1436,24 @@ private fun zed.rainxch.core.presentation.components.overlays.MangaCenterDialog(
     - content: STABLE (composable function type)
 
 @Composable
+internal fun zed.rainxch.core.presentation.components.overlays.MangaMenuEntries(entries: kotlinx.collections.immutable.ImmutableList<zed.rainxch.core.presentation.components.overlays.KomiMenuEntry>, value: kotlin.String?, onPick: kotlin.Function1<zed.rainxch.core.presentation.components.overlays.KomiMenuItem, kotlin.Unit>): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - entries: STABLE (known stable type)
+    - value: STABLE (class with no mutable properties)
+    - onPick: STABLE (function type)
+
+@Composable
+private fun zed.rainxch.core.presentation.components.overlays.MangaMenuRow(item: zed.rainxch.core.presentation.components.overlays.KomiMenuItem, selected: kotlin.Boolean, onClick: kotlin.Function0<kotlin.Unit>): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - item: STABLE (marked @Stable or @Immutable)
+    - selected: STABLE (primitive type)
+    - onClick: STABLE (function type)
+
+@Composable
 private fun zed.rainxch.core.presentation.components.overlays.MangaSheetInner(personality: zed.rainxch.core.presentation.personality.MangaPersonality, title: kotlin.String?, titleJp: kotlin.String?, footer: @[Composable] androidx.compose.runtime.internal.ComposableFunction0<kotlin.Unit>?, screentone: kotlin.Boolean, grabber: kotlin.Boolean, reserveCloseSpace: kotlin.Boolean, contentPadding: zed.rainxch.core.presentation.components.overlays.PaddingSpec, maxHeight: androidx.compose.ui.unit.Dp, content: @[Composable] @[ExtensionFunctionType] androidx.compose.runtime.internal.ComposableFunction1<androidx.compose.foundation.layout.ColumnScope, kotlin.Unit>): kotlin.Unit
   skippable: true
   restartable: true
@@ -1281,15 +1479,6 @@ private fun zed.rainxch.core.presentation.components.overlays.MangaToastPanel(pe
     - progress: STABLE (function type)
     - interaction: STABLE (marked @Stable or @Immutable)
     - onClose: STABLE (function type)
-
-@Composable
-private fun zed.rainxch.core.presentation.components.overlays.MenuEntries(entries: kotlinx.collections.immutable.ImmutableList<zed.rainxch.core.presentation.components.overlays.KomiMenuEntry>, value: kotlin.String?, onPick: kotlin.Function1<zed.rainxch.core.presentation.components.overlays.KomiMenuItem, kotlin.Unit>): kotlin.Unit
-  skippable: true
-  restartable: true
-  params:
-    - entries: STABLE (known stable type)
-    - value: STABLE (class with no mutable properties)
-    - onPick: STABLE (function type)
 
 @Composable
 private fun zed.rainxch.core.presentation.components.overlays.PreviewBody(): kotlin.Unit
@@ -1377,6 +1566,13 @@ public fun zed.rainxch.core.presentation.components.progress.KomiLinearProgress(
     - color: STABLE (marked @Stable or @Immutable)
 
 @Composable
+public fun zed.rainxch.core.presentation.components.progress.KomiLoadingIndicator(modifier: androidx.compose.ui.Modifier): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - modifier: STABLE (marked @Stable or @Immutable)
+
+@Composable
 public fun zed.rainxch.core.presentation.components.refresh.KomiPullToRefresh(isRefreshing: kotlin.Boolean, onRefresh: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier, content: @[Composable] @[ExtensionFunctionType] androidx.compose.runtime.internal.ComposableFunction1<androidx.compose.foundation.layout.BoxScope, kotlin.Unit>): kotlin.Unit
   skippable: true
   restartable: true
@@ -1391,6 +1587,15 @@ public fun zed.rainxch.core.presentation.components.refresh.drivesPullToRefresh(
   skippable: true
   restartable: true
   params:
+
+@Composable
+private fun zed.rainxch.core.presentation.components.scaffold.FloatingActionBar(chrome: zed.rainxch.core.presentation.components.bars.ScaffoldChrome, floatingActionButton: @[Composable] androidx.compose.runtime.internal.ComposableFunction0<kotlin.Unit>?, padding: androidx.compose.foundation.layout.PaddingValues): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - chrome: STABLE (marked @Stable or @Immutable)
+    - floatingActionButton: STABLE (composable function type)
+    - padding: STABLE (marked @Stable or @Immutable)
 
 @Composable
 public fun zed.rainxch.core.presentation.components.scaffold.KomiScaffold(modifier: androidx.compose.ui.Modifier, topBar: @[Composable] androidx.compose.runtime.internal.ComposableFunction0<kotlin.Unit>?, bottomBar: @[Composable] androidx.compose.runtime.internal.ComposableFunction0<kotlin.Unit>?, floatingActionButton: @[Composable] androidx.compose.runtime.internal.ComposableFunction0<kotlin.Unit>?, toastState: zed.rainxch.core.presentation.components.overlays.KomiToastState?, overlay: @[Composable] androidx.compose.runtime.internal.ComposableFunction0<kotlin.Unit>?, grid: kotlin.Boolean, screentone: kotlin.Boolean, dividers: kotlin.Boolean, content: @[Composable] androidx.compose.runtime.internal.ComposableFunction1<androidx.compose.foundation.layout.PaddingValues, kotlin.Unit>): kotlin.Unit
@@ -1498,7 +1703,7 @@ public fun zed.rainxch.core.presentation.components.text.KomiHeadline(text: kotl
     - maxLines: STABLE (primitive type)
 
 @Composable
-public fun zed.rainxch.core.presentation.components.text.KomiText(text: kotlin.String, modifier: androidx.compose.ui.Modifier, role: zed.rainxch.core.presentation.components.text.KomiTextRole, color: androidx.compose.ui.graphics.Color, maxLines: kotlin.Int, overflow: androidx.compose.ui.text.style.TextOverflow, textAlign: androidx.compose.ui.text.style.TextAlign?, uppercase: kotlin.Boolean?, fontSize: androidx.compose.ui.unit.TextUnit, fontWeight: androidx.compose.ui.text.font.FontWeight?, letterSpacing: androidx.compose.ui.unit.TextUnit, lineHeight: androidx.compose.ui.unit.TextUnit, autoSize: androidx.compose.foundation.text.TextAutoSize?, onTextLayout: kotlin.Function1<androidx.compose.ui.text.TextLayoutResult, kotlin.Unit>?): kotlin.Unit
+public fun zed.rainxch.core.presentation.components.text.KomiText(text: kotlin.String, modifier: androidx.compose.ui.Modifier, role: zed.rainxch.core.presentation.components.text.KomiTextRole, color: androidx.compose.ui.graphics.Color, maxLines: kotlin.Int, overflow: androidx.compose.ui.text.style.TextOverflow, textAlign: androidx.compose.ui.text.style.TextAlign?, autoSize: androidx.compose.foundation.text.TextAutoSize?, onTextLayout: kotlin.Function1<androidx.compose.ui.text.TextLayoutResult, kotlin.Unit>?): kotlin.Unit
   skippable: false
   restartable: true
   params:
@@ -1509,16 +1714,11 @@ public fun zed.rainxch.core.presentation.components.text.KomiText(text: kotlin.S
     - maxLines: STABLE (primitive type)
     - overflow: STABLE (known stable type)
     - textAlign: STABLE (known stable type)
-    - uppercase: STABLE (class with no mutable properties)
-    - fontSize: STABLE (marked @Stable or @Immutable)
-    - fontWeight: STABLE (marked @Stable or @Immutable)
-    - letterSpacing: STABLE (marked @Stable or @Immutable)
-    - lineHeight: STABLE (marked @Stable or @Immutable)
     - autoSize: RUNTIME (requires runtime check)
     - onTextLayout: STABLE (function type)
 
 @Composable
-public fun zed.rainxch.core.presentation.components.text.KomiText(text: androidx.compose.ui.text.AnnotatedString, modifier: androidx.compose.ui.Modifier, role: zed.rainxch.core.presentation.components.text.KomiTextRole, color: androidx.compose.ui.graphics.Color, maxLines: kotlin.Int, overflow: androidx.compose.ui.text.style.TextOverflow, textAlign: androidx.compose.ui.text.style.TextAlign?, fontSize: androidx.compose.ui.unit.TextUnit, fontWeight: androidx.compose.ui.text.font.FontWeight?, letterSpacing: androidx.compose.ui.unit.TextUnit, lineHeight: androidx.compose.ui.unit.TextUnit, onTextLayout: kotlin.Function1<androidx.compose.ui.text.TextLayoutResult, kotlin.Unit>?): kotlin.Unit
+public fun zed.rainxch.core.presentation.components.text.KomiText(text: androidx.compose.ui.text.AnnotatedString, modifier: androidx.compose.ui.Modifier, role: zed.rainxch.core.presentation.components.text.KomiTextRole, color: androidx.compose.ui.graphics.Color, maxLines: kotlin.Int, overflow: androidx.compose.ui.text.style.TextOverflow, textAlign: androidx.compose.ui.text.style.TextAlign?, onTextLayout: kotlin.Function1<androidx.compose.ui.text.TextLayoutResult, kotlin.Unit>?): kotlin.Unit
   skippable: true
   restartable: true
   params:
@@ -1529,11 +1729,13 @@ public fun zed.rainxch.core.presentation.components.text.KomiText(text: androidx
     - maxLines: STABLE (primitive type)
     - overflow: STABLE (known stable type)
     - textAlign: STABLE (known stable type)
-    - fontSize: STABLE (marked @Stable or @Immutable)
-    - fontWeight: STABLE (marked @Stable or @Immutable)
-    - letterSpacing: STABLE (marked @Stable or @Immutable)
-    - lineHeight: STABLE (marked @Stable or @Immutable)
     - onTextLayout: STABLE (function type)
+
+@Composable
+private fun zed.rainxch.core.presentation.components.text.KomiTextScale(): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
 
 @Composable
 private fun zed.rainxch.core.presentation.components.text.MangaHeadline(text: kotlin.String, modifier: androidx.compose.ui.Modifier, role: zed.rainxch.core.presentation.components.text.KomiTextRole, color: androidx.compose.ui.graphics.Color, maxLines: kotlin.Int, marker: zed.rainxch.core.presentation.personality.manga.HeadlineMarker): kotlin.Unit
@@ -1582,11 +1784,24 @@ public fun zed.rainxch.core.presentation.layout.rememberWidthCappedStaggeredCell
     - maxCardWidth: STABLE (marked @Stable or @Immutable)
 
 @Composable
+public fun zed.rainxch.core.presentation.locals.appLocale(): androidx.compose.ui.text.intl.Locale
+  skippable: true
+  restartable: true
+  params:
+
+@Composable
 private fun zed.rainxch.core.presentation.personality.classic.classicDisplayFamily(script: zed.rainxch.core.presentation.personality.fonts.KomiScript): androidx.compose.ui.text.font.FontFamily
   skippable: true
   restartable: true
   params:
     - script: STABLE (class with no mutable properties)
+
+@Composable
+public fun zed.rainxch.core.presentation.personality.classic.systemWallpaperColorScheme(dark: kotlin.Boolean): androidx.compose.material3.ColorScheme?
+  skippable: true
+  restartable: true
+  params:
+    - dark: STABLE (primitive type)
 
 @Composable
 public fun zed.rainxch.core.presentation.personality.classic.withClassicFonts(script: zed.rainxch.core.presentation.personality.fonts.KomiScript): zed.rainxch.core.presentation.personality.model.PersonalityType
@@ -1615,12 +1830,6 @@ public fun zed.rainxch.core.presentation.personality.fonts.KomiFontFamily.blackH
 
 @Composable
 public fun zed.rainxch.core.presentation.personality.fonts.KomiFontFamily.delaGothicOne(): androidx.compose.ui.text.font.FontFamily
-  skippable: true
-  restartable: true
-  params:
-
-@Composable
-public fun zed.rainxch.core.presentation.personality.fonts.KomiFontFamily.geist(): androidx.compose.ui.text.font.FontFamily
   skippable: true
   restartable: true
   params:
@@ -1694,6 +1903,12 @@ public fun zed.rainxch.core.presentation.personality.fonts.KomiFontFamily.notoSa
 
 @Composable
 public fun zed.rainxch.core.presentation.personality.fonts.KomiFontFamily.notoSansSc(): androidx.compose.ui.text.font.FontFamily
+  skippable: true
+  restartable: true
+  params:
+
+@Composable
+public fun zed.rainxch.core.presentation.personality.fonts.KomiFontFamily.nunito(): androidx.compose.ui.text.font.FontFamily
   skippable: true
   restartable: true
   params:

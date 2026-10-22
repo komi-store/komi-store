@@ -19,6 +19,6 @@ fun PersonalityType.withClassicFonts(script: KomiScript): PersonalityType {
 @Composable
 private fun classicDisplayFamily(script: KomiScript): FontFamily =
     when (script) {
-        KomiScript.Latin, KomiScript.Cyrillic -> KomiFontFamily.geist()
+        KomiScript.Latin, KomiScript.Cyrillic -> KomiFontFamily.nunito()
         else -> FontFamily.Default
     }

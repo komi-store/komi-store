@@ -8,10 +8,7 @@ updates:
       default-days: 7
     open-pull-requests-limit: 5
     ignore:
-      # AGP 8.13 is tested up to Gradle 9.4.1, and 9.6 removed an internal API it uses; lift this with the AGP 9 upgrade.
-      - dependency-name: gradle-wrapper
-        versions: ["[9.5,)"]
-      # Newer releases need compileSdk 37 and AGP 9.1 (AndroidX Compose 1.12, lifecycle 2.11, OkHttp 5.5); lift with the AGP 9 upgrade. Patches still come through.
+      # Newer releases need compileSdk 37 (AndroidX Compose 1.12, lifecycle 2.11, OkHttp 5.5); lift with the compileSdk 37 upgrade. Patches still come through.
       - dependency-name: "org.jetbrains.androidx.lifecycle:*"
         update-types: ["version-update:semver-minor", "version-update:semver-major"]
       - dependency-name: "io.ktor:*"

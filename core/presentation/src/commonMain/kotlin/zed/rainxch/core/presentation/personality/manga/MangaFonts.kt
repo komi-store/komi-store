@@ -2,6 +2,7 @@ package zed.rainxch.core.presentation.personality.manga
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import zed.rainxch.core.presentation.personality.fonts.KomiFontFamily
 import zed.rainxch.core.presentation.personality.fonts.KomiScript
 import zed.rainxch.core.presentation.personality.model.PersonalityType
@@ -12,6 +13,8 @@ fun PersonalityType.withMangaFonts(script: KomiScript): PersonalityType =
         display = mangaDisplayFamily(script),
         body = mangaBodyFamily(script),
         mono = KomiFontFamily.jetBrainsMono(),
+        // Oswald is variable: at Anton's Regular it reads far lighter than Anton.
+        displayWeight = if (script == KomiScript.Cyrillic) FontWeight.Bold else null,
     )
 
 @Composable

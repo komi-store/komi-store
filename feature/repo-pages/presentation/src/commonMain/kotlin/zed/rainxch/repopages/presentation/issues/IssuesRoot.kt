@@ -26,10 +26,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.jetbrains.compose.resources.stringResource
 import zed.rainxch.core.presentation.components.buttons.KomiButton
@@ -328,13 +326,10 @@ private fun IssueRow(
             ) {
                 KomiText(
                     text = issue.title,
-                    role = KomiTextRole.Title,
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.SemiBold,
+                    role = KomiTextRole.ItemTitle,
                     color = colors.onSurface,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
-                    uppercase = false,
                 )
 
                 KomiText(
@@ -344,11 +339,9 @@ private fun IssueRow(
                                 issue.authorLogin
                             ),
                     role = KomiTextRole.Body,
-                    fontSize = 13.sp,
                     color = colors.onSurfaceVariant,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    uppercase = false,
                 )
 
                 if (issue.labels.isNotEmpty()) {

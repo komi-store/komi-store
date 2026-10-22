@@ -29,7 +29,6 @@
 
     <!-- Apps feature - Update states -->
     <string name="checking">Checking…</string>
-    <string name="updated_successfully">Updated successfully</string>
     <string name="error_with_message">Error: %1$s</string>
 
     <!-- Apps feature - Update all progress -->
@@ -79,17 +78,17 @@
     <string name="sort_by">Sort by</string>
     <string name="close">Close</string>
 
-    <string name="sort_most_stars">Most Stars</string>
-    <string name="sort_most_forks">Most Forks</string>
-    <string name="sort_best_match">Best Match</string>
-    <string name="sort_recently_released">Recently Released</string>
+    <string name="sort_most_stars">Most stars</string>
+    <string name="sort_most_forks">Most forks</string>
+    <string name="sort_best_match">Best match</string>
+    <string name="sort_recently_released">Recently released</string>
 
     <string name="sort_order_descending">Descending</string>
     <string name="sort_order_ascending">Ascending</string>
     <string name="sort_label">Sort</string>
 
     <!-- Programming languages -->
-    <string name="language_all">All Languages</string>
+    <string name="language_all">All languages</string>
     <string name="language_kotlin">Kotlin</string>
     <string name="language_java">Java</string>
     <string name="language_javascript">JavaScript</string>
@@ -246,6 +245,8 @@
     <string name="verified_build">Verified build</string>
     <string name="checking_attestation">Checking\u2026</string>
     <string name="unable_to_verify_attestation">Could not verify</string>
+    <string name="details_attestation_verified_explainer">This file's SHA-256 matches a build attestation the repository published on GitHub, so it came from the repository's own build.</string>
+    <string name="details_attestation_unverified_explainer">Komi Store couldn't check this file against the repository's build attestations. That alone doesn't make it unsafe.</string>
     <string name="install_version">Install %1$s</string>
     <string name="failed_to_open_app">Failed to open %1$s</string>
     <string name="failed_to_uninstall">Failed to uninstall %1$s</string>
@@ -307,20 +308,15 @@
 
 
 
-    <string name="home_finding_repositories">Finding repositories...</string>
     <string name="home_retry">Retry</string>
     <string name="home_failed_to_load_repositories">Failed to load repositories</string>
 
     <string name="home_topbar_discover">Discover</string>
     <string name="home_masthead_title">Top Charts</string>
     <string name="home_masthead_subtitle">ランキング · CHARTS &amp; PICKS</string>
-    <string name="home_platform_filter">Filter platforms</string>
     <string name="home_chart_trending">Trending</string>
-    <string name="home_chart_trending_jp">急上昇</string>
     <string name="home_chart_releases">Releases</string>
-    <string name="home_chart_releases_jp">新着</string>
     <string name="home_chart_popular">Popular</string>
-    <string name="home_chart_popular_jp">人気</string>
     <string name="sidebar_browse">Browse</string>
     <string name="sidebar_browse_jp">航行</string>
     <string name="sidebar_platform">Platform</string>
@@ -430,7 +426,7 @@
     <string name="filter_installed">Installed</string>
     <string name="filter_favorites">Favorites</string>
     <string name="sort">Sort</string>
-    <string name="sort_recently_updated">Recently Updated</string>
+    <string name="sort_recently_updated">Recently updated</string>
     <string name="sort_name">Name</string>
     <string name="sort_recently_added">Recently added</string>
     <string name="sort_selected">Selected</string>
@@ -543,8 +539,8 @@
     <string name="auth_hint_other_method">Use a device code or a personal access token instead.</string>
 
     <!-- Read More / Show Less -->
-    <string name="read_more">Read More</string>
-    <string name="show_less">Show Less</string>
+    <string name="read_more">Read more</string>
+    <string name="show_less">Show less</string>
 
     <string name="share_repository">Share repository</string>
     <string name="failed_to_share_link">Failed to share link</string>
@@ -567,6 +563,9 @@
     <string name="delete_downloads_confirmation_message">This will permanently remove all downloaded APKs and installers (%1$s). You can re-download them anytime.</string>
     <string name="downloads_cleared">All downloaded packages have been deleted.</string>
     <string name="clear">Clear</string>
+    <string name="show_password">Show password</string>
+    <string name="hide_password">Hide password</string>
+    <string name="show_tabs">Show tabs</string>
 
 
 
@@ -729,6 +728,9 @@
     <string name="scrollbar_option_description">Show scrollbar on scrollable lists (desktop)</string>
 
     <string name="content_width_title">Content width</string>
+    <string name="repo_layout_title">Repository layout</string>
+    <string name="repo_layout_list">List</string>
+    <string name="repo_layout_grid">Grid</string>
     <string name="content_width_description">Controls the maximum column width of the details screen (desktop)</string>
     <string name="content_width_compact">Compact</string>
     <string name="content_width_wide">Wide</string>
@@ -1093,14 +1095,12 @@
     <string name="apps_variant_subtitle">%1$s  ·  %2$s</string>
     <string name="apps_section_header_cd">%1$s, %2$d, %3$s</string>
     <string name="apps_section_header_static_cd">%1$s, %2$d</string>
-    <string name="apps_compact_status_filter_active">monorepo filter active</string>
-    <string name="apps_compact_status_variant_pinned">variant pinned</string>
-    <string name="apps_compact_status_pre_release_on">pre-release on</string>
-    <string name="apps_compact_status_variant_stale">variant stale, action needed</string>
-    <string name="apps_compact_status_pending_install">pending install</string>
-    <string name="apps_compact_status_ready_to_install">ready to install</string>
-    <string name="apps_compact_status_updates_ignored">updates ignored</string>
     <string name="apps_ignore_updates">Ignore updates</string>
+    <string name="apps_tag_updates_ignored">Updates ignored</string>
+    <string name="apps_tag_skipped">Skipped %1$s</string>
+    <string name="apps_tag_asset_filter">Asset filter</string>
+    <string name="apps_variant_stale_pick">Variant changed. Pick it again.</string>
+    <string name="apps_no_release_found">Couldn't find a release to install.</string>
     <string name="discard_pending_install">Discard</string>
     <string name="delete_task">Delete task</string>
     <string name="apps_updates_banner_title_one">1 update available</string>
@@ -1152,6 +1152,12 @@
     <string name="paper_night">Night</string>
     <string name="paper_nord">Nord</string>
     <string name="appearance_section_display">Display</string>
+    <string name="tweaks_accent_crimson">Crimson</string>
+    <string name="tweaks_accent_cobalt">Cobalt</string>
+    <string name="tweaks_accent_sun">Sun</string>
+    <string name="tweaks_accent_frost">Frost</string>
+    <string name="tweaks_accent_mono">Mono</string>
+    <string name="tweaks_accent_wallpaper">Wallpaper colors</string>
     <string name="auth_more_signin_options">More sign-in options</string>
     <string name="auth_hide_signin_options">Hide options</string>
     <string name="tweaks_sources_platforms_title">Discovery platforms</string>
@@ -1183,7 +1189,6 @@
     <string name="tweaks_install_method_desktop_empty_body">Silent installers and installer attribution are Android features. Desktop installs go through the OS package manager.</string>
     <string name="tweaks_stub_coming_soon_title">Coming in a follow-up</string>
     <string name="tweaks_stub_coming_soon_body">This screen is part of the in-progress redesign. The settings still work — they're just being moved here from the old layout.</string>
-    <string name="back_cd">Back</string>
     <string name="menubar_file_menu">File</string>
     <string name="menubar_go_menu">Go</string>
     <string name="menubar_file_quit">Quit</string>
@@ -1518,7 +1523,7 @@
     <string name="feed_cd_profile">Profile</string>
     <string name="feed_platform_picker_title">Choose your OS</string>
     <string name="feed_platform_picker_title_jp">対応</string>
-    <string name="feed_platform_all">All Platforms</string>
+    <string name="feed_platform_all">All platforms</string>
     <string name="feed_loading">Loading the latest…</string>
     <string name="feed_empty_title">Nothing here yet</string>
     <string name="feed_empty_subtitle">No %1$s apps for %2$s yet.</string>
@@ -1526,8 +1531,6 @@
     <string name="feed_offline">Offline — showing a saved feed</string>
     <string name="feed_failed_to_load">Couldn\'t load the feed</string>
     <string name="feed_end_cap">続く · TO BE CONTINUED</string>
-    <string name="feed_layout_description_grid">Switch to grid layout</string>
-    <string name="feed_layout_description_list">Switch to list layout</string>
     <string name="feed_category_ai">AI</string>
     <string name="feed_category_privacy">Privacy</string>
     <string name="feed_category_networking">Networking</string>

@@ -146,6 +146,21 @@ object UpdateVerdict {
                 null
             }
 
+        val boundUsesTimestamp =
+            timestampTracked ||
+                VersionMath.detectScheme(matched.tag) == VersionMath.Scheme.Unknown
+
+        // The attached file identity outranks every tag heuristic: when the installed build is
+        // byte-for-byte the asset being offered, no tag comparison can turn it into an update.
+        val boundMatchesInstalledFile =
+            bound != null &&
+                isSameFile(
+                    installedAssetId = bound.assetId,
+                    installedAssetDigest = bound.assetDigest,
+                    matchedAssetId = matched.assetId,
+                    matchedAssetDigest = matched.assetDigest,
+                )
+
         val isUpdateAvailable =
             when {
                 skipHolds -> {
@@ -160,19 +175,22 @@ object UpdateVerdict {
                     false
                 }
 
-                bound == null -> {
+                boundMatchesInstalledFile -> {
+                    false
+                }
+
+                // A binding only speaks where the tags cannot be ordered: a rolling tag, an
+                // unknown scheme, or an installed tag the offered one does not reconcile with
+                // (a nightly install offered a stable release). Otherwise the version comparison
+                // is authoritative: a stable release can legitimately be published before the
+                // pre-release the device installed.
+                bound == null || (reconcilable && !boundUsesTimestamp) -> {
                     tagVerdict
                 }
 
                 else -> {
                     decideBound(
-                        sameFile =
-                            isSameFile(
-                                installedAssetId = bound.assetId,
-                                installedAssetDigest = bound.assetDigest,
-                                matchedAssetId = matched.assetId,
-                                matchedAssetDigest = matched.assetDigest,
-                            ),
+                        sameFile = false,
                         matchedPublishedAt = matched.publishedAt,
                         installedReleasePublishedAt = bound.releasePublishedAt,
                         fallback = tagVerdict,

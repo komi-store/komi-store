@@ -9,9 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.stringResource
 import zed.rainxch.core.presentation.components.text.KomiText
 import zed.rainxch.core.presentation.components.text.KomiTextRole
@@ -34,11 +32,8 @@ fun LazyListScope.logs(state: DetailsState) {
         ) {
             KomiText(
                 text = stringResource(Res.string.install_logs),
-                role = KomiTextRole.Title,
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 20.sp,
+                role = KomiTextRole.CardTitle,
                 color = colors.onBackground,
-                uppercase = false,
             )
         }
     }
@@ -52,7 +47,6 @@ fun LazyListScope.logs(state: DetailsState) {
         KomiText(
             text = "> ${log.result.asText()}: ${log.assetName}",
             role = KomiTextRole.Mono,
-            fontSize = 11.sp,
             color =
                 if (log.result is LogResult.Error) {
                     colors.error

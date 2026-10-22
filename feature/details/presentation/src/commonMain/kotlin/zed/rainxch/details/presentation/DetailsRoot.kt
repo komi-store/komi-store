@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.sp
 import zed.rainxch.core.presentation.components.InstalledAppIcon
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.scrollable
@@ -22,15 +21,14 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.FavoriteBorder
-import androidx.compose.material.icons.filled.LinkOff
-import androidx.compose.material.icons.filled.OpenInBrowser
-import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material.icons.filled.Share
-import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.filled.StarBorder
+import androidx.compose.material.icons.rounded.Favorite
+import androidx.compose.material.icons.rounded.FavoriteBorder
+import androidx.compose.material.icons.rounded.LinkOff
+import androidx.compose.material.icons.rounded.OpenInBrowser
+import androidx.compose.material.icons.rounded.Refresh
+import androidx.compose.material.icons.rounded.Share
+import androidx.compose.material.icons.rounded.Star
+import androidx.compose.material.icons.rounded.StarBorder
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -52,7 +50,6 @@ import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -72,11 +69,10 @@ import zed.rainxch.core.presentation.components.buttons.KomiActionRowItem
 import zed.rainxch.core.presentation.components.buttons.KomiButton
 import zed.rainxch.core.presentation.components.buttons.KomiButtonSize
 import zed.rainxch.core.presentation.components.buttons.KomiButtonVariant
-import zed.rainxch.core.presentation.components.buttons.KomiIconButton
 import zed.rainxch.core.presentation.components.overlays.KomiDialog
 import zed.rainxch.core.presentation.components.overlays.KomiToastState
 import zed.rainxch.core.presentation.components.overlays.rememberKomiToastState
-import zed.rainxch.core.presentation.components.progress.KomiCircularProgress
+import zed.rainxch.core.presentation.components.progress.KomiLoadingIndicator
 import zed.rainxch.core.presentation.components.refresh.KomiPullToRefresh
 import zed.rainxch.core.presentation.components.scaffold.KomiScaffold
 import zed.rainxch.core.presentation.components.text.KomiText
@@ -220,9 +216,7 @@ fun DetailsRoot(
             title = {
                 KomiText(
                     text = stringResource(Res.string.downgrade_warning_title),
-                    role = KomiTextRole.Title,
-                    fontWeight = FontWeight.SemiBold,
-                    uppercase = false,
+                    role = KomiTextRole.CardTitle,
                 )
             },
             text = {
@@ -246,17 +240,13 @@ fun DetailsRoot(
                         Column {
                             KomiText(
                                 text = targetName,
-                                role = KomiTextRole.Title,
-                                fontWeight = FontWeight.SemiBold,
-                                fontSize = 15.sp,
-                                uppercase = false,
+                                role = KomiTextRole.ItemTitle,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis,
                             )
                             KomiText(
                                 text = warning.packageName,
-                                role = KomiTextRole.Body,
-                                fontSize = 12.sp,
+                                role = KomiTextRole.Caption,
                                 color = personality.colors.onSurfaceVariant,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis,
@@ -347,9 +337,7 @@ fun DetailsRoot(
             title = {
                 KomiText(
                     text = stringResource(Res.string.signing_key_changed_title),
-                    role = KomiTextRole.Title,
-                    fontWeight = FontWeight.SemiBold,
-                    uppercase = false,
+                    role = KomiTextRole.CardTitle,
                 )
             },
             text = {
@@ -395,9 +383,7 @@ fun DetailsRoot(
             title = {
                 KomiText(
                     text = stringResource(Res.string.confirm_uninstall_title),
-                    role = KomiTextRole.Title,
-                    fontWeight = FontWeight.SemiBold,
-                    uppercase = false,
+                    role = KomiTextRole.CardTitle,
                 )
             },
             text = {
@@ -438,9 +424,7 @@ fun DetailsRoot(
             title = {
                 KomiText(
                     text = stringResource(Res.string.details_unlink_external_app_dialog_title),
-                    role = KomiTextRole.Title,
-                    fontWeight = FontWeight.SemiBold,
-                    uppercase = false,
+                    role = KomiTextRole.CardTitle,
                 )
             },
             text = {
@@ -483,9 +467,7 @@ fun DetailsRoot(
             title = {
                 KomiText(
                     text = stringResource(Res.string.install_permission_unavailable),
-                    role = KomiTextRole.Title,
-                    fontWeight = FontWeight.SemiBold,
-                    uppercase = false,
+                    role = KomiTextRole.CardTitle,
                 )
             },
             text = {
@@ -540,18 +522,12 @@ fun DetailsScreen(
         topBar = {
             KomiTopBar(
                 title = "",
-                leading = {
-                    KomiIconButton(
-                        icon = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = stringResource(Res.string.navigate_back),
-                        onClick = { onAction(DetailsAction.OnNavigateBackClick) },
-                    )
+                onBack = { onAction(DetailsAction.OnNavigateBackClick) },
+                actions = if (state.repository != null) {
+                    { DetailsActions(state = state, onAction = onAction) }
+                } else {
+                    null
                 },
-                actions = {
-                    if (state.repository != null) {
-                        DetailsActions(state = state, onAction = onAction)
-                    }
-                }
             )
         },
         toastState = toastState
@@ -561,7 +537,7 @@ fun DetailsScreen(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center,
             ) {
-                KomiCircularProgress()
+                KomiLoadingIndicator()
             }
 
             return@KomiScaffold
@@ -754,7 +730,7 @@ private fun DetailsActions(
     val items = buildList {
         add(
             KomiActionRowItem(
-                icon = Icons.Default.OpenInBrowser,
+                icon = Icons.Rounded.OpenInBrowser,
                 title = openLabel,
                 onClick = {
                     onAction(DetailsAction.OpenRepoInBrowser)
@@ -763,7 +739,7 @@ private fun DetailsActions(
         )
         add(
             KomiActionRowItem(
-                icon = if (state.isStarred) Icons.Default.Star else Icons.Default.StarBorder,
+                icon = if (state.isStarred) Icons.Rounded.Star else Icons.Rounded.StarBorder,
                 title = starLabel,
                 onClick = {
                     onAction(DetailsAction.OnToggleStar)
@@ -772,7 +748,7 @@ private fun DetailsActions(
         )
         add(
             KomiActionRowItem(
-                icon = if (state.isFavourite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                icon = if (state.isFavourite) Icons.Rounded.Favorite else Icons.Rounded.FavoriteBorder,
                 title = favouriteLabel,
                 onClick = {
                     onAction(DetailsAction.OnToggleFavorite)
@@ -782,7 +758,7 @@ private fun DetailsActions(
         if (state.repository?.htmlUrl != null) {
             add(
                 KomiActionRowItem(
-                    icon = Icons.Default.Share,
+                    icon = Icons.Rounded.Share,
                     title = shareLabel,
                     onClick = {
                         onAction(DetailsAction.OnShareClick)
@@ -792,7 +768,7 @@ private fun DetailsActions(
         }
         add(
             KomiActionRowItem(
-                icon = Icons.Default.Refresh,
+                icon = Icons.Rounded.Refresh,
                 title = refreshLabel,
                 onClick = {
                     onAction(DetailsAction.Refresh)
@@ -803,7 +779,7 @@ private fun DetailsActions(
         if (state.installedApp?.installSource == InstallSource.MANUAL) {
             add(
                 KomiActionRowItem(
-                    icon = Icons.Default.LinkOff,
+                    icon = Icons.Rounded.LinkOff,
                     title = stringResource(Res.string.details_unlink_external_app_menu),
                     onClick = {
                         onAction(DetailsAction.OnUnlinkExternalApp)

@@ -26,7 +26,6 @@
 
     <!-- Apps feature - Update states -->
     <string name="checking">جارٍ التحقق…</string>
-    <string name="updated_successfully">تم التحديث بنجاح</string>
     <string name="error_with_message">خطأ: %1$s</string>
 
     <!-- Apps feature - Update all progress -->
@@ -138,6 +137,9 @@
     <string name="proxy_test_error_auth_required">يلزم التحقق من الوكيل.</string>
     <string name="proxy_test_error_status">استجابة غير متوقعة: HTTP %1$d</string>
     <string name="proxy_test_error_unknown">فشل اختبار الاتصال</string>
+    <string name="proxy_test_master_result">البحث: %1$s، التنزيلات: %2$s، الترجمة: %3$s</string>
+    <string name="proxy_test_probe_ok">%1$d مللي ثانية</string>
+    <string name="proxy_test_probe_failed">فشل</string>
 
     <!-- Snackbar -->
     <string name="logout_success">تم تسجيل الخروج بنجاح</string>
@@ -156,6 +158,9 @@
     <string name="open_repository">فتح المستودع</string>
     <string name="open_in_browser">فتح في المتصفح</string>
     <string name="cancel_download">إلغاء التنزيل</string>
+    <string name="pause">إيقاف مؤقت</string>
+    <string name="resume">استئناف</string>
+    <string name="paused">متوقف مؤقتًا</string>
     <string name="show_install_options">عرض خيارات التثبيت</string>
 
     <string name="retry">إعادة المحاولة</string>
@@ -246,7 +251,6 @@
 
 
 
-    <string name="home_finding_repositories">جارٍ البحث عن مستودعات...</string>
     <string name="home_retry">إعادة المحاولة</string>
     <string name="home_failed_to_load_repositories">فشل تحميل المستودعات</string>
 
@@ -289,6 +293,22 @@
     <string name="sign_in_required">تسجيل الدخول مطلوب</string>
     <string name="sign_in_with_github_for_stars">سجّل الدخول بـ GitHub لرؤية مستودعاتك المميزة بنجمة</string>
     <string name="no_starred_repos">لا توجد مستودعات مميزة بنجمة</string>
+    <plurals name="starred_hidden_not_installable">
+        <item quantity="one">مستودع آخر مميز بنجمة ليس له إصدار قابل للتثبيت</item>
+        <item quantity="two">مستودعان آخران مميزان بنجمة ليس لهما إصدار قابل للتثبيت</item>
+        <item quantity="few">%1$d مستودعات أخرى مميزة بنجمة ليس لها إصدار قابل للتثبيت</item>
+        <item quantity="many">%1$d مستودعًا آخر مميزًا بنجمة ليس له إصدار قابل للتثبيت</item>
+        <item quantity="other">%1$d مستودع آخر مميز بنجمة ليس له إصدار قابل للتثبيت</item>
+    </plurals>
+    <plurals name="starred_including_not_installable">
+        <item quantity="one">بما في ذلك مستودع واحد مميز بنجمة بلا إصدار قابل للتثبيت</item>
+        <item quantity="two">بما في ذلك مستودعان مميزان بنجمة بلا إصدار قابل للتثبيت</item>
+        <item quantity="few">بما في ذلك %1$d مستودعات مميزة بنجمة بلا إصدار قابل للتثبيت</item>
+        <item quantity="many">بما في ذلك %1$d مستودعًا مميزًا بنجمة بلا إصدار قابل للتثبيت</item>
+        <item quantity="other">بما في ذلك %1$d مستودع مميز بنجمة بلا إصدار قابل للتثبيت</item>
+    </plurals>
+    <string name="starred_show_all">عرض الكل</string>
+    <string name="starred_installable_only">القابلة للتثبيت فقط</string>
     <string name="star_repos_hint">ميّز المستودعات بنجمة على GitHub التي تحتوي على إصدارات قابلة للتثبيت لتظهر هنا</string>
     <string name="last_synced">آخر مزامنة</string>
     <string name="just_now">الآن</string>
@@ -346,6 +366,7 @@
     <string name="released_yesterday">صدر أمس</string>
     <string name="released_days_ago">صدر منذ %1$d يوم</string>
     <string name="released_on_date">صدر في %1$s</string>
+    <string name="details_last_push">آخر دفع %1$s</string>
 
     <string name="bottom_nav_explore_title">استكشاف</string>
     <string name="bottom_nav_search_title">البحث</string>
@@ -397,6 +418,12 @@
     <string name="auth_check_status">لقد قمت بالتفويض بالفعل</string>
     <string name="auth_polling_status">جارٍ التحقق…</string>
     <string name="auth_rate_limited">تم تقييد المعدل — إعادة المحاولة خلال %1$d ثانية</string>
+    <string name="auth_error_unreachable">تعذّر الاتصال بـ GitHub</string>
+    <string name="auth_error_rate_limited">محاولات تسجيل دخول كثيرة جدًا</string>
+    <string name="auth_hint_wait">انتظر بضع دقائق، ثم حاول مرة أخرى.</string>
+    <string name="auth_error_denied">تم رفض التفويض</string>
+    <string name="auth_error_browser">تعذّر فتح المتصفح</string>
+    <string name="auth_hint_other_method">استخدم رمز الجهاز أو رمز الوصول الشخصي بدلاً من ذلك.</string>
 
     <!-- Read More / Show Less -->
     <string name="read_more">اقرأ المزيد</string>
@@ -418,6 +445,8 @@
     <string name="no_github_link_in_clipboard">لم يتم العثور على رابط GitHub في الحافظة</string>
 
     <string name="clear">مسح</string>
+    <string name="show_password">إظهار كلمة المرور</string>
+    <string name="hide_password">إخفاء كلمة المرور</string>
 
 
 
@@ -516,12 +545,15 @@
     <string name="hide_repository">إخفاء المستودع</string>
 
     <string name="recently_viewed">تمت مشاهدته مؤخرًا</string>
+    <string name="recently_viewed_remove_cd">إزالة من السجل</string>
     <string name="profile_recently_viewed_description">المستودعات التي قمت بزيارتها</string>
     <string name="delete_all">حذف الكل</string>
     <string name="delete_downloads_confirmation_title">حذف جميع التنزيلات؟</string>
     <string name="delete_downloads_confirmation_message">سيؤدي هذا إلى حذف جميع ملفات APK والمثبتات نهائيًا (%1$s). يمكنك إعادة تنزيلها في أي وقت.</string>
     <string name="downloads_cleared">تم حذف جميع الحزم التي تم تنزيلها.</string>
     <string name="unable_to_verify_attestation">تعذر التحقق</string>
+    <string name="details_attestation_verified_explainer">يطابق SHA-256 لهذا الملف شهادة بناء نشرها المستودع على GitHub، لذا فهو صادر من بناء المستودع نفسه.</string>
+    <string name="details_attestation_unverified_explainer">تعذّر على Komi Store مطابقة هذا الملف مع شهادات البناء الخاصة بالمستودع. هذا وحده لا يجعله غير آمن.</string>
 
     <string name="recent_searches">عمليات البحث الأخيرة</string>
     <string name="clear_all_history">مسح الكل</string>
@@ -577,6 +609,8 @@
     <string name="variant_label_inline">النوع: %1$s</string>
     <string name="variant_picker_unpin">إلغاء التثبيت</string>
     <string name="variant_picker_pinned_badge">مثبت</string>
+    <string name="assets_section_available">المتاحة</string>
+    <string name="assets_section_your_app">تطبيقك</string>
     <string name="variant_picker_open">اختيار النوع</string>
     <string name="variant_picker_open_filter">تعديل التصفية</string>
     <string name="variant_first_pin_toast">سوف تفضل التحديثات المستقبلية النوع %1$s. غيّر هذا في أي وقت من إعدادات التطبيق.</string>
@@ -809,6 +843,7 @@
     <string name="feedback_send_via_github">فتح كمشكلة GitHub</string>
     <string name="feedback_send_success_email">شكراً — جارٍ فتح عميل البريد.</string>
     <string name="feedback_send_success_github">شكراً — جارٍ فتح المتصفح.</string>
+    <string name="feedback_send_failed">تعذّر فتح قناة الملاحظات</string>
 
     <!-- Tweaks - Custom forges -->
     <string name="custom_forges_entry_label">منصّات مخصّصة</string>
@@ -822,6 +857,14 @@
     <string name="mirror_picker_description">تُستخدم لتنزيل أصول الإصدار. تتجه مكالمات GitHub API دائماً مباشرة. يجب على معظم المستخدمين إبقاء هذا على GitHub المباشر.</string>
     <string name="mirror_section_official">رسمي</string>
     <string name="mirror_section_community">مجتمع</string>
+    <string name="mirror_pick_fastest">اختيار الأسرع</string>
+    <string name="mirror_pick_fastest_sub">قياس كل المرايا واختيار الأسرع</string>
+    <string name="mirror_measuring">جارٍ القياس من هذا الجهاز…</string>
+    <string name="mirror_measure_latency">قياس زمن الاستجابة</string>
+    <string name="mirror_latency_local">%1$d مللي ثانية من جهازك</string>
+    <string name="mirror_fastest_badge">%1$s · الأسرع</string>
+    <string name="mirror_fastest_chosen">تم التبديل إلى %1$s (%2$d مللي ثانية).</string>
+    <string name="mirror_no_mirror_responded">لم تستجب أي مرآة. تحقق من اتصالك وحاول مرة أخرى.</string>
     <string name="mirror_status_ok">%1$dms</string>
     <string name="mirror_status_degraded">%1$dms</string>
     <string name="mirror_status_down">(متوقف)</string>
@@ -837,6 +880,7 @@
     <string name="mirror_test_http_error">أرجعت المرآة %1$d</string>
     <string name="mirror_test_timeout">انتهت المهلة بعد 5 ثوانٍ</string>
     <string name="mirror_test_dns_fail">تعذّر حل اسم المضيف</string>
+    <string name="mirror_test_failed">فشل الاتصال</string>
     <string name="mirror_deploy_your_own_hint">كل المرايا معطّلة؟ يمكنك استضافة مرآتك الخاصة في 5 دقائق — راجع الوثائق.</string>
     <string name="mirror_removed_toast">%1$s لم يعد متاحاً، تم التبديل إلى GitHub المباشر.</string>
 
@@ -892,13 +936,12 @@
     <string name="apk_inspect_title">فحص APK</string>
     <string name="apk_inspect_version_code">الإصدار</string>
     <string name="apps_compact_more_actions">المزيد من الإجراءات لـ %1$s</string>
-    <string name="apps_compact_status_filter_active">عامل تصفية المستودع الموحَّد مفعّل</string>
-    <string name="apps_compact_status_pending_install">في انتظار التثبيت</string>
-    <string name="apps_compact_status_pre_release_on">إصدار مسبق مفعّل</string>
-    <string name="apps_compact_status_ready_to_install">جاهز للتثبيت</string>
-    <string name="apps_compact_status_updates_ignored">تم تجاهل التحديثات</string>
-    <string name="apps_compact_status_variant_pinned">المتغيّر مثبَّت</string>
-    <string name="apps_compact_status_variant_stale">المتغيّر قديم، يلزم اتخاذ إجراء</string>
+    <string name="apps_menu_item_active">%1$s  ✓</string>
+    <string name="apps_version_update">%1$s → %2$s</string>
+    <string name="apps_version_dated">%1$s (%2$s)</string>
+    <string name="apps_variant_subtitle">%1$s  ·  %2$s</string>
+    <string name="apps_section_header_cd">%1$s، %2$d، %3$s</string>
+    <string name="apps_section_header_static_cd">%1$s، %2$d</string>
     <string name="apps_ignore_updates">تجاهل التحديثات</string>
     <string name="apps_section_collapse">طي القسم</string>
     <string name="apps_section_count_suffix">· %1$d</string>
@@ -923,6 +966,7 @@
     <string name="dhizuku_status_permission_needed">الإذن مطلوب</string>
     <string name="dhizuku_status_ready">جاهز</string>
     <string name="discard_pending_install">إسقاط</string>
+    <string name="delete_task">حذف المهمة</string>
     <string name="error_state_go_back">رجوع</string>
     <string name="error_state_subtitle_generic">تعذّر تحميل هذا المستودع. استخدم زر إعادة المحاولة بالأسفل.</string>
     <string name="error_state_subtitle_not_found">ربما يكون المستودع خاصاً أو أُعيدت تسميته أو حُذف.</string>
@@ -980,6 +1024,9 @@
     <string name="starred_picker_sort_recent">المميّزة مؤخراً</string>
     <string name="starred_picker_sort_stars">الأكثر نجوماً</string>
     <string name="starred_picker_star_dedup_tooltip">إزالة النجمة من GitHub لن تُلغي تتبّع التطبيق.</string>
+    <string name="starred_picker_cd_ships_apk">يوفّر ملف APK</string>
+    <string name="starred_picker_cd_already_tracked">متتبَّع مسبقاً</string>
+    <string name="starred_picker_cd_latest">أحدث إصدار %1$s</string>
     <string name="import_stars_title">استيراد المستودعات المميّزة بنجمة باسم المستخدم</string>
     <string name="import_stars_subtitle">أدخل أي اسم مستخدم على GitHub لتصفّح مستودعاته العامة المميّزة بنجمة وإضافتها إلى المفضلة. لا حاجة لتسجيل الدخول.</string>
     <string name="import_stars_hint">اسم المستخدم على GitHub</string>
@@ -1058,7 +1105,6 @@
     <string name="apps_updates_banner_subtitle">راجع أو حدّث كل شيء دفعة واحدة.</string>
     <string name="apps_updates_banner_title_one">تحديث واحد متاح</string>
     <string name="apps_updates_banner_title_other">%1$d تحديثات متاحة</string>
-    <string name="back_cd">رجوع</string>
     <string name="cd_back">رجوع</string>
     <string name="cd_image">صورة</string>
     <string name="common_see_all">عرض الكل ›</string>
@@ -1126,11 +1172,16 @@
     <string name="host_tokens_row_valid_short">صالح · %1$s</string>
     <string name="host_tokens_row_validate">تحقّق</string>
     <string name="host_tokens_saved">تم حفظ الرمز لـ %1$s</string>
+    <string name="host_tokens_load_failed">تعذّر تحميل الرموز المحفوظة</string>
+    <string name="host_tokens_save_failed">تعذّر حفظ الرمز لـ %1$s</string>
+    <string name="host_tokens_delete_failed">تعذّر حذف الرمز لـ %1$s</string>
     <string name="host_tokens_title">رموز المصادقة</string>
     <string name="host_tokens_undo_action">تراجع</string>
     <string name="host_tokens_undo_failed">تعذّر استعادة الرمز لـ %1$s</string>
     <string name="host_tokens_undo_snackbar">تمت إزالة الرمز لـ %1$s</string>
     <string name="host_tokens_validation_failed_fallback">خطأ غير معروف</string>
+    <string name="host_tokens_validation_http">HTTP %1$d</string>
+    <string name="host_tokens_validation_unreachable">تعذّر الوصول إلى الخادم</string>
     <string name="host_tokens_validation_host_invalid">المضيف غير صالح</string>
     <string name="host_tokens_validation_host_required">المضيف مطلوب</string>
     <string name="host_tokens_validation_token_required">الرمز مطلوب</string>
@@ -1308,6 +1359,12 @@
     <string name="profile_section_account">الحساب</string>
     <string name="appearance_section_mode">الوضع</string>
     <string name="appearance_section_display">العرض</string>
+    <string name="tweaks_accent_crimson">قرمزي</string>
+    <string name="tweaks_accent_cobalt">كوبالت</string>
+    <string name="tweaks_accent_sun">شمس</string>
+    <string name="tweaks_accent_frost">صقيع</string>
+    <string name="tweaks_accent_mono">أحادي اللون</string>
+    <string name="tweaks_accent_wallpaper">ألوان الخلفية</string>
     <string name="theme_dynamic">ديناميكي</string>
     <string name="auth_more_signin_options">خيارات تسجيل دخول إضافية</string>
     <string name="auth_hide_signin_options">إخفاء الخيارات</string>
@@ -1425,14 +1482,9 @@
     <string name="repo_pages_pr_draft">مسودة</string>
 
     <string name="feed_end_cap">続く · TO BE CONTINUED</string>
-    <string name="feed_layout_description_grid">التبديل إلى عرض الشبكة</string>
-    <string name="feed_layout_description_list">التبديل إلى عرض القائمة</string>
     <string name="feed_masthead_subtitle">発見 · DISCOVER APPS</string>
     <string name="home_masthead_subtitle">ランキング · CHARTS &amp; PICKS</string>
     <string name="feed_platform_picker_title_jp">対応</string>
-    <string name="home_chart_popular_jp">人気</string>
-    <string name="home_chart_releases_jp">新着</string>
-    <string name="home_chart_trending_jp">急上昇</string>
     <string name="sidebar_browse_jp">航行</string>
     <string name="sidebar_categories_jp">部門</string>
     <string name="sidebar_nav_charts_jp">ランキング</string>
@@ -1469,7 +1521,6 @@
     <string name="home_chart_releases">الإصدارات</string>
     <string name="home_chart_trending">الأكثر تداولاً</string>
     <string name="home_masthead_title">الأكثر رواجًا</string>
-    <string name="home_platform_filter">تصفية المنصات</string>
     <string name="paper_day">نهار</string>
     <string name="paper_night">ليل</string>
     <string name="repo_card_details">التفاصيل</string>

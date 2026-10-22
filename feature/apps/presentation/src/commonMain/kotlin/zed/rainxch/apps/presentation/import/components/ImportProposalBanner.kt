@@ -16,9 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.pluralStringResource
 import org.jetbrains.compose.resources.stringResource
 import zed.rainxch.core.presentation.components.buttons.KomiButton
@@ -73,16 +71,13 @@ fun ImportProposalBanner(
                         pendingCount,
                         pendingCount,
                     ),
-                role = KomiTextRole.Stamp,
-                fontWeight = FontWeight.SemiBold,
+                role = KomiTextRole.CardTitle,
                 color = colors.onPrimaryContainer,
-                uppercase = false,
             )
 
             KomiText(
                 text = stringResource(Res.string.external_import_proposal_banner_body),
                 role = KomiTextRole.Body,
-                fontSize = 13.sp,
                 color = colors.onPrimaryContainer,
             )
         }

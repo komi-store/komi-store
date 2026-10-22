@@ -1,7 +1,6 @@
 package zed.rainxch.apps.presentation.components
 
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -23,9 +22,7 @@ import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.stringResource
 import zed.rainxch.core.presentation.components.icon.KomiIcon
 import zed.rainxch.core.presentation.components.text.KomiText
@@ -54,7 +51,7 @@ fun AppsSectionHeader(
     val colors = LocalPersonality.current.colors
     val rotation by animateFloatAsState(
         targetValue = if (isExpanded) 0f else -90f,
-        animationSpec = tween(durationMillis = 180),
+        animationSpec = LocalPersonality.current.motion.fastSpatial(),
         label = "section-chevron",
     )
 
@@ -73,7 +70,7 @@ fun AppsSectionHeader(
         modifier =
             modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp)
+                .padding(horizontal = 4.dp)
                 .padding(top = 20.dp, bottom = 6.dp)
                 .let { base ->
                     if (collapsible) {
@@ -106,19 +103,13 @@ fun AppsSectionHeader(
         ) {
             KomiText(
                 text = title,
-                role = KomiTextRole.Stamp,
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 22.sp,
-                uppercase = false,
+                role = KomiTextRole.SectionTitle,
                 color = colors.onBackground,
             )
 
             KomiText(
                 text = stringResource(Res.string.apps_section_count_suffix, count),
                 role = KomiTextRole.Label,
-                fontWeight = FontWeight.Medium,
-                fontSize = 13.sp,
-                uppercase = false,
                 color = colors.onSurfaceVariant,
                 modifier = Modifier.weight(1f),
             )

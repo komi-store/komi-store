@@ -26,7 +26,6 @@
 
     <!-- Apps feature - Update states -->
     <string name="checking">Controllo…</string>
-    <string name="updated_successfully">Aggiornata con successo</string>
     <string name="error_with_message">Errore: %1$s</string>
 
     <!-- Apps feature - Update all progress -->
@@ -138,6 +137,9 @@
     <string name="open_repository">Apri repository</string>
     <string name="open_in_browser">Apri nel browser</string>
     <string name="cancel_download">Annulla download</string>
+    <string name="pause">Metti in pausa</string>
+    <string name="resume">Riprendi</string>
+    <string name="paused">In pausa</string>
     <string name="show_install_options">Mostra opzioni di installazione</string>
 
     <string name="retry">Riprova</string>
@@ -214,7 +216,6 @@
 
 
 
-    <string name="home_finding_repositories">Ricerca di repositories...</string>
     <string name="home_retry">Riprova</string>
     <string name="home_failed_to_load_repositories">Impossibile caricare repositories</string>
 
@@ -252,6 +253,16 @@
 
     <string name="sign_in_required">Accesso richiesto</string>
     <string name="no_starred_repos">Nessun repository preferito</string>
+    <plurals name="starred_hidden_not_installable">
+        <item quantity="one">%1$d altro repo con stella non ha release installabili</item>
+        <item quantity="other">%1$d altri repo con stella non hanno release installabili</item>
+    </plurals>
+    <plurals name="starred_including_not_installable">
+        <item quantity="one">Incluso %1$d repo con stella senza release installabili</item>
+        <item quantity="other">Inclusi %1$d repo con stella senza release installabili</item>
+    </plurals>
+    <string name="starred_show_all">Mostra tutti</string>
+    <string name="starred_installable_only">Solo installabili</string>
     <string name="sign_in_with_github_for_stars">Accedi con GitHub per vedere i repository con stella</string>
     <string name="star_repos_hint">Aggiungi repository con release installabili su GitHub per vederli qui</string>
     <string name="last_synced">Ultima sincronizzazione</string>
@@ -312,6 +323,7 @@
     <string name="released_yesterday">Pubblicato ieri</string>
     <string name="released_days_ago">Pubblicato %1$d giorno/i fa</string>
     <string name="released_on_date">Pubblicato il %1$s</string>
+    <string name="details_last_push">Ultimo push %1$s</string>
 
     <string name="bottom_nav_explore_title">Esplora</string>
     <string name="bottom_nav_search_title">Cerca</string>
@@ -374,6 +386,9 @@
     <string name="proxy_test_error_auth_required">Autenticazione proxy richiesta.</string>
     <string name="proxy_test_error_status">Risposta inattesa: HTTP %1$d</string>
     <string name="proxy_test_error_unknown">Verifica connessione non riuscita</string>
+    <string name="proxy_test_master_result">Ricerca: %1$s, Download: %2$s, Traduzione: %3$s</string>
+    <string name="proxy_test_probe_ok">%1$d ms</string>
+    <string name="proxy_test_probe_failed">non riuscito</string>
 
 
 
@@ -399,6 +414,12 @@
     <string name="auth_check_status">Ho già autorizzato</string>
     <string name="auth_polling_status">Verifica in corso…</string>
     <string name="auth_rate_limited">Limite raggiunto — nuovo tentativo tra %1$d s</string>
+    <string name="auth_error_unreachable">Impossibile connettersi a GitHub</string>
+    <string name="auth_error_rate_limited">Troppi tentativi di accesso</string>
+    <string name="auth_hint_wait">Attendi qualche minuto, poi riprova.</string>
+    <string name="auth_error_denied">Autorizzazione negata</string>
+    <string name="auth_error_browser">Impossibile aprire il browser</string>
+    <string name="auth_hint_other_method">Usa invece un codice dispositivo o un personal access token.</string>
 
     <!-- Read More / Show Less -->
     <string name="read_more">Leggi di più</string>
@@ -419,6 +440,8 @@
     <string name="no_github_link_in_clipboard">Nessun link GitHub trovato negli appunti</string>
 
     <string name="clear">Pulisci</string>
+    <string name="show_password">Mostra password</string>
+    <string name="hide_password">Nascondi password</string>
 
 
 
@@ -516,12 +539,15 @@
     <string name="hide_repository">Nascondi repository</string>
 
     <string name="recently_viewed">Visualizzati di recente</string>
+    <string name="recently_viewed_remove_cd">Rimuovi dalla cronologia</string>
     <string name="profile_recently_viewed_description">Repository che hai visitato</string>
     <string name="delete_all">Elimina tutto</string>
     <string name="delete_downloads_confirmation_title">Eliminare tutti i download?</string>
     <string name="delete_downloads_confirmation_message">Questo rimuoverà definitivamente tutti gli APK e installer (%1$s). Puoi riscaricarli in qualsiasi momento.</string>
     <string name="downloads_cleared">Tutti i pacchetti scaricati sono stati eliminati.</string>
     <string name="unable_to_verify_attestation">Impossibile verificare</string>
+    <string name="details_attestation_verified_explainer">Lo SHA-256 di questo file corrisponde a un'attestazione di build che il repository ha pubblicato su GitHub, quindi proviene dalla build del repository stesso.</string>
+    <string name="details_attestation_unverified_explainer">Komi Store non è riuscito a verificare questo file con le attestazioni di build del repository. Questo da solo non lo rende pericoloso.</string>
 
     <string name="recent_searches">Ricerche recenti</string>
     <string name="clear_all_history">Cancella tutto</string>
@@ -577,6 +603,8 @@
     <string name="variant_label_inline">Variante: %1$s</string>
     <string name="variant_picker_unpin">Sblocca</string>
     <string name="variant_picker_pinned_badge">Bloccata</string>
+    <string name="assets_section_available">Disponibili</string>
+    <string name="assets_section_your_app">La tua app</string>
     <string name="variant_picker_open">Scegli variante</string>
     <string name="variant_picker_open_filter">Modifica filtro</string>
     <string name="variant_first_pin_toast">I prossimi aggiornamenti preferiranno la variante %1$s. Puoi modificarlo in qualsiasi momento dalle impostazioni dell'app.</string>
@@ -797,6 +825,7 @@
     <string name="feedback_send_via_github">Apri come Issue GitHub</string>
     <string name="feedback_send_success_email">Grazie — apertura del client di posta.</string>
     <string name="feedback_send_success_github">Grazie — apertura del browser.</string>
+    <string name="feedback_send_failed">Impossibile aprire il canale di feedback</string>
 
     <!-- ═══════════════════════════════════════════════════════════════
          E5 — Mirror feature
@@ -813,6 +842,14 @@
     <string name="mirror_picker_description">Utilizzato per scaricare i file delle release. Le chiamate API di GitHub passano sempre in modo diretto. La maggior parte degli utenti dovrebbe lasciare questa impostazione su GitHub diretto.</string>
     <string name="mirror_section_official">Ufficiale</string>
     <string name="mirror_section_community">Comunità</string>
+    <string name="mirror_pick_fastest">Scegli il più veloce</string>
+    <string name="mirror_pick_fastest_sub">Misura ogni mirror e scegli il più veloce</string>
+    <string name="mirror_measuring">Misurazione da questo dispositivo…</string>
+    <string name="mirror_measure_latency">Misura latenza</string>
+    <string name="mirror_latency_local">%1$d ms dal tuo dispositivo</string>
+    <string name="mirror_fastest_badge">%1$s · il più veloce</string>
+    <string name="mirror_fastest_chosen">Passato a %1$s (%2$d ms).</string>
+    <string name="mirror_no_mirror_responded">Nessun mirror ha risposto. Controlla la connessione e riprova.</string>
     <string name="mirror_status_ok">%1$dms</string>
     <string name="mirror_status_degraded">%1$dms</string>
     <string name="mirror_status_down">(non disponibile)</string>
@@ -828,6 +865,7 @@
     <string name="mirror_test_http_error">Il mirror ha restituito %1$d</string>
     <string name="mirror_test_timeout">Timeout dopo 5s</string>
     <string name="mirror_test_dns_fail">Impossibile risolvere l'host</string>
+    <string name="mirror_test_failed">Connessione non riuscita</string>
     <string name="mirror_deploy_your_own_hint">Tutti i mirror non disponibili? Puoi ospitarne uno tuo in 5 minuti — consulta la documentazione.</string>
     <string name="mirror_removed_toast">%1$s non è più disponibile, passato a GitHub diretto.</string>
 
@@ -883,13 +921,12 @@
     <string name="apk_inspect_title">Ispezione APK</string>
     <string name="apk_inspect_version_code">Versione</string>
     <string name="apps_compact_more_actions">Altre azioni per %1$s</string>
-    <string name="apps_compact_status_filter_active">filtro monorepo attivo</string>
-    <string name="apps_compact_status_pending_install">installazione in attesa</string>
-    <string name="apps_compact_status_pre_release_on">pre-release attivo</string>
-    <string name="apps_compact_status_ready_to_install">pronto da installare</string>
-    <string name="apps_compact_status_updates_ignored">aggiornamenti ignorati</string>
-    <string name="apps_compact_status_variant_pinned">variante fissata</string>
-    <string name="apps_compact_status_variant_stale">variante obsoleta, azione richiesta</string>
+    <string name="apps_menu_item_active">%1$s  ✓</string>
+    <string name="apps_version_update">%1$s → %2$s</string>
+    <string name="apps_version_dated">%1$s (%2$s)</string>
+    <string name="apps_variant_subtitle">%1$s  ·  %2$s</string>
+    <string name="apps_section_header_cd">%1$s, %2$d, %3$s</string>
+    <string name="apps_section_header_static_cd">%1$s, %2$d</string>
     <string name="apps_ignore_updates">Ignora gli aggiornamenti</string>
     <string name="apps_section_collapse">Comprimi sezione</string>
     <string name="apps_section_count_suffix">· %1$d</string>
@@ -914,6 +951,7 @@
     <string name="dhizuku_status_permission_needed">Permesso richiesto</string>
     <string name="dhizuku_status_ready">Pronto</string>
     <string name="discard_pending_install">Scarta</string>
+    <string name="delete_task">Elimina attività</string>
     <string name="error_state_go_back">Indietro</string>
     <string name="error_state_subtitle_generic">Non siamo riusciti a caricare questo repo. Usa il pulsante Riprova qui sotto.</string>
     <string name="error_state_subtitle_not_found">Il repository potrebbe essere privato, rinominato o eliminato.</string>
@@ -971,6 +1009,9 @@
     <string name="starred_picker_sort_recent">Recentemente preferiti</string>
     <string name="starred_picker_sort_stars">Più stelle</string>
     <string name="starred_picker_star_dedup_tooltip">Rimuovere la stella su GitHub non smetterà di tracciare l'app.</string>
+    <string name="starred_picker_cd_ships_apk">con APK</string>
+    <string name="starred_picker_cd_already_tracked">già tracciato</string>
+    <string name="starred_picker_cd_latest">ultima versione %1$s</string>
     <string name="import_stars_title">Importa repository con stella per nome utente</string>
     <string name="import_stars_subtitle">Inserisci un qualsiasi nome utente GitHub per sfogliare i suoi repository con stella pubblici e aggiungerli ai tuoi preferiti. Nessun accesso richiesto.</string>
     <string name="import_stars_hint">Nome utente GitHub</string>
@@ -1049,7 +1090,6 @@
     <string name="apps_updates_banner_subtitle">Esamina o aggiorna tutto in una volta.</string>
     <string name="apps_updates_banner_title_one">1 aggiornamento disponibile</string>
     <string name="apps_updates_banner_title_other">%1$d aggiornamenti disponibili</string>
-    <string name="back_cd">Indietro</string>
     <string name="cd_back">Indietro</string>
     <string name="cd_image">Immagine</string>
     <string name="common_see_all">Vedi tutto ›</string>
@@ -1109,11 +1149,16 @@
     <string name="host_tokens_row_valid_short">Valido · %1$s</string>
     <string name="host_tokens_row_validate">Verifica</string>
     <string name="host_tokens_saved">Token salvato per %1$s</string>
+    <string name="host_tokens_load_failed">Impossibile caricare i token salvati</string>
+    <string name="host_tokens_save_failed">Impossibile salvare il token per %1$s</string>
+    <string name="host_tokens_delete_failed">Impossibile eliminare il token per %1$s</string>
     <string name="host_tokens_title">Token di autenticazione</string>
     <string name="host_tokens_undo_action">Annulla</string>
     <string name="host_tokens_undo_failed">Impossibile ripristinare il token per %1$s</string>
     <string name="host_tokens_undo_snackbar">Token per %1$s rimosso</string>
     <string name="host_tokens_validation_failed_fallback">errore sconosciuto</string>
+    <string name="host_tokens_validation_http">HTTP %1$d</string>
+    <string name="host_tokens_validation_unreachable">impossibile raggiungere il server</string>
     <string name="host_tokens_validation_host_invalid">Host non valido</string>
     <string name="host_tokens_validation_host_required">Host obbligatorio</string>
     <string name="host_tokens_validation_token_required">Token obbligatorio</string>
@@ -1283,6 +1328,12 @@
     <string name="profile_section_account">Account</string>
     <string name="appearance_section_mode">Modalità</string>
     <string name="appearance_section_display">Visualizzazione</string>
+    <string name="tweaks_accent_crimson">Cremisi</string>
+    <string name="tweaks_accent_cobalt">Cobalto</string>
+    <string name="tweaks_accent_sun">Sole</string>
+    <string name="tweaks_accent_frost">Brina</string>
+    <string name="tweaks_accent_mono">Monocromo</string>
+    <string name="tweaks_accent_wallpaper">Colori dello sfondo</string>
     <string name="theme_dynamic">Dinamico</string>
     <string name="auth_more_signin_options">Altre opzioni di accesso</string>
     <string name="auth_hide_signin_options">Nascondi opzioni</string>
@@ -1400,14 +1451,9 @@
     <string name="repo_pages_pr_draft">Bozza</string>
 
     <string name="feed_end_cap">続く · TO BE CONTINUED</string>
-    <string name="feed_layout_description_grid">Passa alla vista a griglia</string>
-    <string name="feed_layout_description_list">Passa alla vista a elenco</string>
     <string name="feed_masthead_subtitle">発見 · DISCOVER APPS</string>
     <string name="home_masthead_subtitle">ランキング · CHARTS &amp; PICKS</string>
     <string name="feed_platform_picker_title_jp">対応</string>
-    <string name="home_chart_popular_jp">人気</string>
-    <string name="home_chart_releases_jp">新着</string>
-    <string name="home_chart_trending_jp">急上昇</string>
     <string name="sidebar_browse_jp">航行</string>
     <string name="sidebar_categories_jp">部門</string>
     <string name="sidebar_nav_charts_jp">ランキング</string>
@@ -1444,7 +1490,6 @@
     <string name="home_chart_releases">Novità</string>
     <string name="home_chart_trending">Di tendenza</string>
     <string name="home_masthead_title">Classifiche</string>
-    <string name="home_platform_filter">Filtra piattaforme</string>
     <string name="paper_day">Giorno</string>
     <string name="paper_night">Notte</string>
     <string name="repo_card_details">Dettagli</string>

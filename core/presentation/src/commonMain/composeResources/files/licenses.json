@@ -1,6 +1,6 @@
 {
   "generatedAt": "2026-06-25",
-  "note": "Maintainer-curated. To regenerate, run ./gradlew :composeApp:printRuntimeDependencies and reconcile against this list.",
+  "note": "Maintainer-curated. To regenerate, run ./gradlew :androidApp:printRuntimeDependencies and reconcile against this list.",
   "libraries": [
     {"name": "Kotlin", "license": "Apache-2.0", "url": "https://github.com/JetBrains/kotlin"},
     {"name": "Compose Multiplatform", "license": "Apache-2.0", "url": "https://github.com/JetBrains/compose-multiplatform"},
@@ -18,11 +18,13 @@
     {"name": "MOKO Permissions", "license": "Apache-2.0", "url": "https://github.com/icerockdev/moko-permissions"},
     {"name": "Navigation Compose", "license": "Apache-2.0", "url": "https://developer.android.com/jetpack/androidx/releases/navigation"},
     {"name": "multiplatform-markdown-renderer", "license": "Apache-2.0", "url": "https://github.com/mikepenz/multiplatform-markdown-renderer"},
+    {"name": "MaterialKolor", "license": "MIT", "url": "https://github.com/jordond/MaterialKolor"},
     {"name": "Shizuku", "license": "Apache-2.0", "url": "https://github.com/RikkaApps/Shizuku"},
     {"name": "WorkManager", "license": "Apache-2.0", "url": "https://developer.android.com/jetpack/androidx/releases/work"},
     {"name": "KSafe", "license": "Apache-2.0", "url": "https://github.com/Anifantakis/KSafe"},
     {"name": "Material Icons Extended", "license": "Apache-2.0", "url": "https://fonts.google.com/icons"},
-    {"name": "Geist (Vercel)", "license": "OFL-1.1", "url": "https://github.com/vercel/geist-font"},
+    {"name": "Geist Mono (Vercel)", "license": "OFL-1.1", "url": "https://github.com/vercel/geist-font"},
+    {"name": "Nunito", "license": "OFL-1.1", "url": "https://fonts.google.com/specimen/Nunito"},
     {"name": "Anton", "license": "OFL-1.1", "url": "https://fonts.google.com/specimen/Anton"},
     {"name": "JetBrains Mono", "license": "OFL-1.1", "url": "https://github.com/JetBrains/JetBrainsMono"},
     {"name": "Oswald", "license": "OFL-1.1", "url": "https://fonts.google.com/specimen/Oswald"},

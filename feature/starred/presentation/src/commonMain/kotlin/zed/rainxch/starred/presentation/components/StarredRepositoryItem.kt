@@ -28,11 +28,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.stringResource
 import zed.rainxch.core.presentation.components.GitHubStoreImage
 import zed.rainxch.core.presentation.components.chips.KomiChip
@@ -88,12 +86,10 @@ fun StarredRepositoryItem(
                 ) {
                     KomiText(
                         text = repository.repoName,
-                        role = KomiTextRole.Title,
-                        fontWeight = FontWeight.SemiBold,
+                        role = KomiTextRole.CardTitle,
                         color = colors.onSurface,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
-                        uppercase = false,
                     )
 
                     Row(
@@ -103,11 +99,9 @@ fun StarredRepositoryItem(
                         KomiText(
                             text = repository.repoOwner,
                             role = KomiTextRole.Body,
-                            fontSize = 13.sp,
                             color = colors.onSurfaceVariant,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
-                            uppercase = false,
                             modifier = Modifier.weight(1f, fill = false),
                         )
 
@@ -133,11 +127,9 @@ fun StarredRepositoryItem(
                 KomiText(
                     text = description,
                     role = KomiTextRole.Body,
-                    fontSize = 13.sp,
                     color = colors.onSurfaceVariant,
                     maxLines = 3,
                     overflow = TextOverflow.Ellipsis,
-                    uppercase = false,
                 )
             }
 
@@ -175,7 +167,7 @@ fun StarredRepositoryItem(
                 if (repository.isInstalled) {
                     TonalBadge(
                         text = stringResource(Res.string.installed),
-                        container = colors.primary.copy(alpha = 0.18f),
+                        container = colors.primaryTint,
                         content = colors.primary,
                     )
                 }
@@ -183,7 +175,7 @@ fun StarredRepositoryItem(
                 repository.latestRelease?.let { version ->
                     TonalBadge(
                         text = version,
-                        container = colors.primary.copy(alpha = 0.14f),
+                        container = colors.primaryTint,
                         content = colors.primary,
                     )
                 }
@@ -228,11 +220,8 @@ private fun TonalBadge(
     ) {
         KomiText(
             text = text,
-            role = KomiTextRole.Label,
-            fontSize = 12.sp,
-            fontWeight = FontWeight.SemiBold,
+            role = KomiTextRole.LabelSmall,
             color = content,
-            uppercase = false,
         )
     }
 }

@@ -16,18 +16,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mikepenz.markdown.compose.Markdown
 import io.ktor.client.HttpClient
@@ -37,12 +33,11 @@ import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 import org.koin.core.qualifier.named
 import zed.rainxch.core.presentation.components.bars.KomiTopBar
-import zed.rainxch.core.presentation.components.buttons.KomiIconButton
 import zed.rainxch.core.presentation.components.markdown.MarkdownImageTransformer
 import zed.rainxch.core.presentation.components.markdown.githubStoreMarkdownComponents
 import zed.rainxch.core.presentation.components.markdown.rememberMarkdownColors
 import zed.rainxch.core.presentation.components.markdown.rememberMarkdownTypography
-import zed.rainxch.core.presentation.components.progress.KomiCircularProgress
+import zed.rainxch.core.presentation.components.progress.KomiLoadingIndicator
 import zed.rainxch.core.presentation.components.scaffold.KomiScaffold
 import zed.rainxch.core.presentation.components.text.KomiText
 import zed.rainxch.core.presentation.components.text.KomiTextRole
@@ -50,7 +45,6 @@ import zed.rainxch.core.presentation.locals.LocalPersonality
 import zed.rainxch.details.presentation.components.LanguagePicker
 import zed.rainxch.details.presentation.components.TranslationCard
 import zed.rainxch.githubstore.core.presentation.res.Res
-import zed.rainxch.githubstore.core.presentation.res.cd_back
 import zed.rainxch.githubstore.core.presentation.res.details_whats_new_screen_title
 
 @Composable
@@ -104,13 +98,7 @@ private fun WhatsNewScreen(
     KomiScaffold(
         topBar = {
             KomiTopBar(
-                leading = {
-                    KomiIconButton(
-                        onClick = onBack,
-                        icon = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = stringResource(Res.string.cd_back),
-                    )
-                },
+                onBack = onBack,
                 title = state.repoName,
             )
         },
@@ -121,7 +109,7 @@ private fun WhatsNewScreen(
                     Box(
                         modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center,
-                    ) { KomiCircularProgress() }
+                    ) { KomiLoadingIndicator() }
                 }
 
                 state.errorMessage != null -> {
@@ -146,11 +134,8 @@ private fun WhatsNewScreen(
                         item(key = "header") {
                             KomiText(
                                 text = stringResource(Res.string.details_whats_new_screen_title),
-                                role = KomiTextRole.Display,
-                                fontWeight = FontWeight.SemiBold,
-                                fontSize = 26.sp,
+                                role = KomiTextRole.ScreenTitle,
                                 color = personalityColors.onBackground,
-                                uppercase = false,
                             )
                         }
 
@@ -184,22 +169,18 @@ private fun WhatsNewScreen(
                                 ) {
                                     KomiText(
                                         text = release.tagName,
-                                        role = KomiTextRole.Title,
-                                        fontWeight = FontWeight.Bold,
+                                        role = KomiTextRole.CardTitle,
                                         color = personalityColors.primary,
                                         maxLines = 1,
                                         overflow = TextOverflow.Ellipsis,
                                         modifier = Modifier.weight(1f),
-                                        uppercase = false,
                                     )
 
                                     KomiText(
                                         text = release.publishedDate,
-                                        role = KomiTextRole.Label,
-                                        fontSize = 12.sp,
+                                        role = KomiTextRole.Caption,
                                         color = personalityColors.onSurfaceVariant,
                                         maxLines = 1,
-                                        uppercase = false,
                                     )
                                 }
 

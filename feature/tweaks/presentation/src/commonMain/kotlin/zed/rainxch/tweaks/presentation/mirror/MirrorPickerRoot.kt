@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Speed
 import zed.rainxch.core.presentation.components.overlays.rememberKomiToastState
 import androidx.compose.runtime.Composable
@@ -65,7 +64,6 @@ import zed.rainxch.githubstore.core.presentation.res.mirror_test_failed
 import zed.rainxch.githubstore.core.presentation.res.mirror_test_http_error
 import zed.rainxch.githubstore.core.presentation.res.mirror_test_success
 import zed.rainxch.githubstore.core.presentation.res.mirror_test_timeout
-import zed.rainxch.githubstore.core.presentation.res.navigate_back
 import zed.rainxch.tweaks.presentation.components.shell.SettingsGroup
 import zed.rainxch.tweaks.presentation.components.shell.SettingsRow
 import zed.rainxch.tweaks.presentation.components.shell.SettingsSectionHead
@@ -124,13 +122,7 @@ fun MirrorPickerRoot(
             KomiTopBar(
                 title = stringResource(Res.string.mirror_picker_title),
                 titleAccent = tweaksKicker(TweaksDecorSlot.Mirror),
-                leading = {
-                    KomiIconButton(
-                        icon = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = stringResource(Res.string.navigate_back),
-                        onClick = onNavigateBack
-                    )
-                }
+                onBack = onNavigateBack,
             )
         },
     ) { padding ->
@@ -151,7 +143,6 @@ fun MirrorPickerRoot(
                 text = stringResource(Res.string.mirror_picker_description),
                 role = KomiTextRole.Body,
                 color = colors.onSurfaceVariant,
-                uppercase = false,
             )
 
             SettingsSectionHead(
@@ -235,7 +226,6 @@ fun MirrorPickerRoot(
                     text = formatTestResult(result),
                     role = KomiTextRole.Body,
                     color = colors.onSurface,
-                    uppercase = false,
                 )
             }
 

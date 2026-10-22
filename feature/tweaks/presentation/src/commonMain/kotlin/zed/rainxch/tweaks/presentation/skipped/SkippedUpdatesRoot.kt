@@ -9,8 +9,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import zed.rainxch.core.presentation.components.overlays.rememberKomiToastState
 import zed.rainxch.core.presentation.components.buttons.KomiButton
 import zed.rainxch.core.presentation.components.buttons.KomiButtonSize
@@ -25,7 +23,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
@@ -33,11 +30,9 @@ import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import zed.rainxch.core.presentation.components.bars.KomiTopBar
-import zed.rainxch.core.presentation.components.buttons.KomiIconButton
 import zed.rainxch.core.presentation.utils.ObserveAsEvents
 import zed.rainxch.githubstore.core.presentation.res.Res
 import zed.rainxch.githubstore.core.presentation.res.mirror_picker_title
-import zed.rainxch.githubstore.core.presentation.res.navigate_back
 import zed.rainxch.githubstore.core.presentation.res.skipped_updates_empty_description
 import zed.rainxch.githubstore.core.presentation.res.skipped_updates_empty_title
 import zed.rainxch.githubstore.core.presentation.res.skipped_updates_installed_label
@@ -82,13 +77,7 @@ fun SkippedUpdatesRoot(
             KomiTopBar(
                 title = stringResource(Res.string.skipped_updates_title),
                 titleAccent = tweaksKicker(TweaksDecorSlot.Skipped),
-                leading = {
-                    KomiIconButton(
-                        icon = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = stringResource(Res.string.navigate_back),
-                        onClick = onNavigateBack
-                    )
-                }
+                onBack = onNavigateBack,
             )
         },
     ) { padding ->
@@ -104,8 +93,7 @@ fun SkippedUpdatesRoot(
                     ) {
                         KomiText(
                             text = stringResource(Res.string.skipped_updates_empty_title),
-                            role = KomiTextRole.Title,
-                            fontWeight = FontWeight.SemiBold,
+                            role = KomiTextRole.SectionTitle,
                             color = colors.onSurface,
                         )
                         Spacer(Modifier.size(8.dp))
@@ -113,7 +101,6 @@ fun SkippedUpdatesRoot(
                             text = stringResource(Res.string.skipped_updates_empty_description),
                             role = KomiTextRole.Body,
                             color = colors.onSurfaceVariant,
-                            uppercase = false,
                         )
                     }
 

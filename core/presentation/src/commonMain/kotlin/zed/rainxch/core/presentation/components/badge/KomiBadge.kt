@@ -1,8 +1,6 @@
 package zed.rainxch.core.presentation.components.badge
 
 import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -30,12 +28,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import zed.rainxch.core.presentation.components.text.KomiText
 import zed.rainxch.core.presentation.components.text.KomiTextRole
 import zed.rainxch.core.presentation.locals.LocalPersonality
@@ -84,10 +80,7 @@ fun KomiBadge(
         val popScale = remember { Animatable(if (animate && !motionOff) 0f else 1f) }
         LaunchedEffect(animate) {
             if (animate && !motionOff) {
-                popScale.animateTo(
-                    1f,
-                    spring(dampingRatio = 0.45f, stiffness = Spring.StiffnessMedium)
-                )
+                popScale.animateTo(1f, personality.motion.fastSpatial())
             }
         }
         val transformed = animate || tilt
@@ -125,12 +118,7 @@ fun KomiBadge(
                 Text(
                     text = text,
                     color = fg,
-                    style =
-                        personality.type.label.copy(
-                            fontWeight = FontWeight.W900,
-                            fontSize = metrics.font,
-                            fontFeatureSettings = "tnum",
-                        ),
+                    style = personality.type.labelSmall.copy(fontFeatureSettings = "tnum"),
                 )
             }
         }
@@ -185,7 +173,6 @@ private fun Modifier.semanticsLabel(label: String?): Modifier =
 
 private data class BadgeMetrics(
     val height: Dp,
-    val font: androidx.compose.ui.unit.TextUnit,
     val border: Dp,
     val shadow: Dp,
     val padX: Dp,
@@ -196,7 +183,6 @@ private fun badgeMetrics(size: KomiBadgeSize): BadgeMetrics =
     when (size) {
         KomiBadgeSize.Sm -> BadgeMetrics(
             height = 16.dp,
-            font = 10.5.sp,
             border = 2.dp,
             shadow = 1.5.dp,
             padX = 4.dp,
@@ -205,7 +191,6 @@ private fun badgeMetrics(size: KomiBadgeSize): BadgeMetrics =
 
         KomiBadgeSize.Md -> BadgeMetrics(
             height = 20.dp,
-            font = 12.5.sp,
             border = 2.dp,
             shadow = 2.dp,
             padX = 5.dp,

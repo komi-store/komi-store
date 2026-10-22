@@ -39,9 +39,11 @@ plugins {
     id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
 }
 
+include(":androidApp")
 include(":composeApp")
 include(":core:domain")
 include(":core:data")
+include(":core:data-aidl")
 include(":core:presentation")
 include(":feature:apps:data")
 include(":feature:apps:domain")

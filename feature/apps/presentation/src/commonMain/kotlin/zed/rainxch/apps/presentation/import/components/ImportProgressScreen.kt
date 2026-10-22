@@ -15,7 +15,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.pluralStringResource
@@ -66,11 +65,9 @@ fun ImportProgressScreen(
 
             KomiText(
                 text = headline,
-                role = KomiTextRole.Title,
-                fontWeight = FontWeight.SemiBold,
+                role = KomiTextRole.CardTitle,
                 color = colors.onSurface,
                 textAlign = TextAlign.Center,
-                uppercase = false,
                 modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite },
             )
 
