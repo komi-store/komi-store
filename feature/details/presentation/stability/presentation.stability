@@ -51,14 +51,6 @@ private fun zed.rainxch.details.presentation.PullToRefreshHost(enabled: kotlin.B
     - content: STABLE (composable function type)
 
 @Composable
-private fun zed.rainxch.details.presentation.RepoPagesActionRow(onOpenIssues: kotlin.Function0<kotlin.Unit>?, onOpenSecurity: kotlin.Function0<kotlin.Unit>?): kotlin.Unit
-  skippable: true
-  restartable: true
-  params:
-    - onOpenIssues: STABLE (function type)
-    - onOpenSecurity: STABLE (function type)
-
-@Composable
 public fun zed.rainxch.details.presentation.about.AboutRoot(repositoryId: kotlin.Long, owner: kotlin.String, repo: kotlin.String, sourceHost: kotlin.String?, translateTo: kotlin.String?, onNavigateBack: kotlin.Function0<kotlin.Unit>, onNavigateToMarkdownViewer: kotlin.Function1<kotlin.String, kotlin.Unit>, viewModel: zed.rainxch.details.presentation.about.DetailsAboutViewModel): kotlin.Unit
   skippable: true
   restartable: true
@@ -508,31 +500,44 @@ private fun zed.rainxch.details.presentation.components.SourceChip(label: kotlin
     - label: STABLE (String is immutable)
 
 @Composable
-private fun zed.rainxch.details.presentation.components.StatBox(label: kotlin.String, value: kotlin.String, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+private fun zed.rainxch.details.presentation.components.StatBox(label: kotlin.String, value: kotlin.String, onClick: kotlin.Function0<kotlin.Unit>?, modifier: androidx.compose.ui.Modifier): kotlin.Unit
   skippable: true
   restartable: true
   params:
     - label: STABLE (String is immutable)
     - value: STABLE (String is immutable)
+    - onClick: STABLE (function type)
     - modifier: STABLE (marked @Stable or @Immutable)
 
 @Composable
-public fun zed.rainxch.details.presentation.components.StatItem(label: kotlin.String, stat: kotlin.Int, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+private fun zed.rainxch.details.presentation.components.StatFrame(label: kotlin.String, onClick: kotlin.Function0<kotlin.Unit>?, modifier: androidx.compose.ui.Modifier, value: @[Composable] androidx.compose.runtime.internal.ComposableFunction0<kotlin.Unit>): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - label: STABLE (String is immutable)
+    - onClick: STABLE (function type)
+    - modifier: STABLE (marked @Stable or @Immutable)
+    - value: STABLE (composable function type)
+
+@Composable
+public fun zed.rainxch.details.presentation.components.StatItem(label: kotlin.String, stat: kotlin.Int, modifier: androidx.compose.ui.Modifier, onClick: kotlin.Function0<kotlin.Unit>?): kotlin.Unit
   skippable: true
   restartable: true
   params:
     - label: STABLE (String is immutable)
     - stat: STABLE (primitive type)
     - modifier: STABLE (marked @Stable or @Immutable)
+    - onClick: STABLE (function type)
 
 @Composable
-public fun zed.rainxch.details.presentation.components.StatItem(label: kotlin.String, stat: kotlin.Long, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+public fun zed.rainxch.details.presentation.components.StatItem(label: kotlin.String, stat: kotlin.Long, modifier: androidx.compose.ui.Modifier, onClick: kotlin.Function0<kotlin.Unit>?): kotlin.Unit
   skippable: true
   restartable: true
   params:
     - label: STABLE (String is immutable)
     - stat: STABLE (primitive type)
     - modifier: STABLE (marked @Stable or @Immutable)
+    - onClick: STABLE (function type)
 
 @Composable
 private fun zed.rainxch.details.presentation.components.TargetLanguageRow(displayName: kotlin.String, onPick: kotlin.Function0<kotlin.Unit>): kotlin.Unit
@@ -543,13 +548,14 @@ private fun zed.rainxch.details.presentation.components.TargetLanguageRow(displa
     - onPick: STABLE (function type)
 
 @Composable
-public fun zed.rainxch.details.presentation.components.TextStatItem(label: kotlin.String, value: kotlin.String, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+public fun zed.rainxch.details.presentation.components.TextStatItem(label: kotlin.String, value: kotlin.String, modifier: androidx.compose.ui.Modifier, onClick: kotlin.Function0<kotlin.Unit>?): kotlin.Unit
   skippable: true
   restartable: true
   params:
     - label: STABLE (String is immutable)
     - value: STABLE (String is immutable)
     - modifier: STABLE (marked @Stable or @Immutable)
+    - onClick: STABLE (function type)
 
 @Composable
 private fun zed.rainxch.details.presentation.components.TrailingActionPill(container: androidx.compose.ui.graphics.Color, content: androidx.compose.ui.graphics.Color, icon: androidx.compose.ui.graphics.vector.ImageVector, contentDescription: kotlin.String, onClick: kotlin.Function0<kotlin.Unit>): kotlin.Unit

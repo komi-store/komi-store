@@ -17,7 +17,7 @@ feature/details/
 
 ## Navigation
 
-`GithubStoreGraph.DetailsScreen(repositoryId, owner, repo, isComingFromUpdate, sourceHost, packageName)`. Loads by owner+name when both are set (deep links), else by `repositoryId`. Sub-routes: `DetailsAboutScreen`, `DetailsWhatsNewScreen`, `MarkdownViewerScreen(url)`; Details also opens `RepoIssuesScreen` / `RepoSecurityScreen` (feature/repo-pages).
+`GithubStoreGraph.DetailsScreen(repositoryId, owner, repo, isComingFromUpdate, sourceHost, packageName)`. Loads by owner+name when both are set (deep links), else by `repositoryId`. Sub-routes: `DetailsAboutScreen`, `DetailsWhatsNewScreen`, `MarkdownViewerScreen(url)`; Details also opens `RepoIssuesScreen` / `RepoSecurityScreen` (feature/repo-pages) from the Issues and Security stat tiles (`sections/Stats.kt`; GitHub repos only, so Forgejo repos have no Security tile).
 
 ## Notes
 

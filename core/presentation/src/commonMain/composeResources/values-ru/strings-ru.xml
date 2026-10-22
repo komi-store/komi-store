@@ -1412,8 +1412,8 @@
     <string name="repo_pages_severity_unknown">Неизвестно</string>
 
     <!-- Repo pages: details entry -->
-    <string name="repo_pages_details_issues_button">Issues</string>
     <string name="repo_pages_details_security_button">Безопасность</string>
+    <string name="repo_pages_details_security_value">Уведомления</string>
 
     <!-- Repo pages: details entry -->
     <string name="repo_pages_details_pulls_button">Pull requests</string>

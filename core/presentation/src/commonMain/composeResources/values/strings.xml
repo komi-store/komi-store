@@ -1478,8 +1478,8 @@
     <string name="repo_pages_severity_unknown">Unknown</string>
 
     <!-- Repo pages: details entry -->
-    <string name="repo_pages_details_issues_button">Issues</string>
     <string name="repo_pages_details_security_button">Security</string>
+    <string name="repo_pages_details_security_value">Advisories</string>
     <string name="repo_pages_details_pulls_button">Pull requests</string>
 
     <!-- Repo interactions: star -->

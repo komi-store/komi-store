@@ -1370,8 +1370,8 @@
     <string name="repo_pages_severity_unknown">未知</string>
 
     <!-- Repo pages: details entry -->
-    <string name="repo_pages_details_issues_button">Issues</string>
     <string name="repo_pages_details_security_button">安全</string>
+    <string name="repo_pages_details_security_value">公告</string>
 
     <!-- Repo pages: details entry -->
     <string name="repo_pages_details_pulls_button">拉取請求</string>

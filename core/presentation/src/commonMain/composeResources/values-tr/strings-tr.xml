@@ -1410,8 +1410,8 @@
     <string name="repo_pages_severity_unknown">Bilinmiyor</string>
 
     <!-- Repo pages: details entry -->
-    <string name="repo_pages_details_issues_button">Sorunlar</string>
     <string name="repo_pages_details_security_button">Güvenlik</string>
+    <string name="repo_pages_details_security_value">Bültenler</string>
 
     <!-- Repo pages: details entry -->
     <string name="repo_pages_details_pulls_button">Pull request&apos;ler</string>

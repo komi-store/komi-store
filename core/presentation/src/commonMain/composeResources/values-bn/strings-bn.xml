@@ -1400,8 +1400,8 @@
     <string name="repo_pages_severity_unknown">অজানা</string>
 
     <!-- Repo pages: details entry -->
-    <string name="repo_pages_details_issues_button">ইস্যু</string>
     <string name="repo_pages_details_security_button">সুরক্ষা</string>
+    <string name="repo_pages_details_security_value">পরামর্শ</string>
 
     <!-- Repo pages: details entry -->
     <string name="repo_pages_details_pulls_button">পুল রিকোয়েস্ট</string>

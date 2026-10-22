@@ -1367,8 +1367,8 @@
     <string name="repo_pages_severity_unknown">不明</string>
 
     <!-- Repo pages: details entry -->
-    <string name="repo_pages_details_issues_button">課題</string>
     <string name="repo_pages_details_security_button">セキュリティ</string>
+    <string name="repo_pages_details_security_value">アドバイザリ</string>
 
     <!-- Repo pages: details entry -->
     <string name="repo_pages_details_pulls_button">プルリクエスト</string>

@@ -1415,8 +1415,8 @@
     <string name="repo_pages_severity_unknown">अज्ञात</string>
 
     <!-- Repo pages: details entry -->
-    <string name="repo_pages_details_issues_button">इश्यूज़</string>
     <string name="repo_pages_details_security_button">सुरक्षा</string>
+    <string name="repo_pages_details_security_value">एडवाइज़री</string>
 
     <!-- Repo pages: details entry -->
     <string name="repo_pages_details_pulls_button">पुल रिक्वेस्ट</string>

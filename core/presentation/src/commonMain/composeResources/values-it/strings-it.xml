@@ -1413,8 +1413,8 @@
     <string name="repo_pages_severity_unknown">Sconosciuto</string>
 
     <!-- Repo pages: details entry -->
-    <string name="repo_pages_details_issues_button">Issue</string>
     <string name="repo_pages_details_security_button">Sicurezza</string>
+    <string name="repo_pages_details_security_value">Avvisi</string>
 
     <!-- Repo pages: details entry -->
     <string name="repo_pages_details_pulls_button">Pull request</string>

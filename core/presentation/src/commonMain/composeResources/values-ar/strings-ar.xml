@@ -1444,8 +1444,8 @@
     <string name="repo_pages_severity_unknown">غير معروف</string>
 
     <!-- Repo pages: details entry -->
-    <string name="repo_pages_details_issues_button">المشكلات</string>
     <string name="repo_pages_details_security_button">الأمان</string>
+    <string name="repo_pages_details_security_value">التنبيهات</string>
 
     <!-- Repo pages: details entry -->
     <string name="repo_pages_details_pulls_button">طلبات السحب</string>

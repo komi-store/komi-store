@@ -1397,8 +1397,8 @@
     <string name="repo_pages_severity_unknown">알 수 없음</string>
 
     <!-- Repo pages: details entry -->
-    <string name="repo_pages_details_issues_button">이슈</string>
     <string name="repo_pages_details_security_button">보안</string>
+    <string name="repo_pages_details_security_value">권고</string>
 
     <!-- Repo pages: details entry -->
     <string name="repo_pages_details_pulls_button">풀 리퀘스트</string>

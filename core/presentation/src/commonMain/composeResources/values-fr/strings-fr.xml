@@ -1381,8 +1381,8 @@
     <string name="repo_pages_severity_unknown">Inconnue</string>
 
     <!-- Repo pages: details entry -->
-    <string name="repo_pages_details_issues_button">Issues</string>
     <string name="repo_pages_details_security_button">Sécurité</string>
+    <string name="repo_pages_details_security_value">Avis</string>
 
     <!-- Repo pages: details entry -->
     <string name="repo_pages_details_pulls_button">Pull requests</string>

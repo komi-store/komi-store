@@ -1379,8 +1379,8 @@
     <string name="repo_pages_severity_unknown">Desconocida</string>
 
     <!-- Repo pages: details entry -->
-    <string name="repo_pages_details_issues_button">Issues</string>
     <string name="repo_pages_details_security_button">Seguridad</string>
+    <string name="repo_pages_details_security_value">Avisos</string>
 
     <!-- Repo pages: details entry -->
     <string name="repo_pages_details_pulls_button">Pull requests</string>

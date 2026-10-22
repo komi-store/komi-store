@@ -621,6 +621,8 @@ fun DetailsScreen(
                         state.stats?.let { stats ->
                             stats(
                                 repoStats = stats,
+                                onOpenIssues = onOpenIssues,
+                                onOpenSecurity = onOpenSecurity,
                             )
                         }
 
@@ -628,15 +630,6 @@ fun DetailsScreen(
                             state = state,
                             onAction = onAction,
                         )
-
-                        if (onOpenIssues != null || onOpenSecurity != null) {
-                            item(key = "repo_pages_actions") {
-                                RepoPagesActionRow(
-                                    onOpenIssues = onOpenIssues,
-                                    onOpenSecurity = onOpenSecurity,
-                                )
-                            }
-                        }
 
                         state.selectedRelease?.let { release ->
                             whatsNew(
@@ -804,35 +797,5 @@ private fun Preview() {
             onAction = {},
             toastState = KomiToastState(),
         )
-    }
-}
-
-@Composable
-private fun RepoPagesActionRow(
-    onOpenIssues: (() -> Unit)?,
-    onOpenSecurity: (() -> Unit)?,
-) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-    ) {
-        onOpenIssues?.let { open ->
-            KomiButton(
-                onClick = open,
-                label = stringResource(Res.string.repo_pages_details_issues_button),
-                variant = KomiButtonVariant.Tonal,
-                size = KomiButtonSize.Sm,
-                modifier = Modifier.weight(1f),
-            )
-        }
-        onOpenSecurity?.let { open ->
-            KomiButton(
-                onClick = open,
-                label = stringResource(Res.string.repo_pages_details_security_button),
-                variant = KomiButtonVariant.Tonal,
-                size = KomiButtonSize.Sm,
-                modifier = Modifier.weight(1f),
-            )
-        }
     }
 }
