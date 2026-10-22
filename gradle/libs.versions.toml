@@ -2,7 +2,7 @@
 agp = "9.4.1"
 composeBom = "2025.07.00"
 kermit = "2.0.8"
-kotlin = "2.4.20"
+kotlin = "2.4.21"
 ksp = "2.3.12"
 
 androidDesugarJdkLibs = "2.1.5"
@@ -27,10 +27,10 @@ androidx-test-uiautomator = "2.4.0"
 compose-ui-test = "1.10.5"
 
 # Kotlinx
-kotlinx-coroutines = "1.10.2"
-kotlinx-serialization = "1.10.0"
-kotlinx-datetime = "0.7.1"
-kotlinx-collections-immutable = "0.4.0"
+kotlinx-coroutines = "1.11.0"
+kotlinx-serialization = "1.11.0"
+kotlinx-datetime = "0.8.0"
+kotlinx-collections-immutable = "0.5.2"
 
 # Third party
 koin = "4.2.2"
@@ -42,7 +42,7 @@ sqlite = "2.6.2"
 datastore = "1.2.0"
 ksafe = "3.3.0"
 compose-jetbrains = "1.10.3"
-compose-jetbrains-material-you = "1.11.0-alpha03"
+compose-jetbrains-material-you = "1.11.0-alpha07"
 jetbrains-savedstate = "1.4.0"
 moko = "0.20.1"
 buildkonfig = "0.23.0"
