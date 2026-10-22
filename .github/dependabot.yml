@@ -11,9 +11,10 @@ updates:
       # Kermit 2.2 deprecates the tag-first log overloads used across the codebase, and warnings are errors; lift with the logging cleanup (D7 in docs/quality/findings.md).
       - dependency-name: "co.touchlab:kermit*"
         update-types: ["version-update:semver-minor", "version-update:semver-major"]
-      # Held for step 7 of the AGP 9 migration, which brings Compose Multiplatform 1.12 at a pinned version; lift then.
-      - dependency-name: "org.jetbrains.compose*"
-        update-types: ["version-update:semver-minor", "version-update:semver-major"]
+      # Material 3 has only alphas past 1.9. Its 1.13 alphas pull in Compose 1.13 alphas, so it stays on the 1.12 line
+      # Compose Multiplatform 1.12 ships with; lift with Compose Multiplatform 1.13.
+      - dependency-name: "org.jetbrains.compose.material3:*"
+        versions: ["[1.13.0-alpha01,1.13.0)"]
     groups:
       kotlin-toolchain:
         patterns:
