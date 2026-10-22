@@ -79,7 +79,6 @@ data class AppsState(
     val pendingExternalImportCount: Int = 0,
     val showImportProposalBanner: Boolean = false,
     val isExternalImportInFlight: Boolean = false,
-    val showKaoBanner: Boolean = false,
     val linkSourceHost: String? = null,
     val filteredDeviceApps: ImmutableList<DeviceAppUi> = persistentListOf(),
     val filteredLinkAssets: ImmutableList<GithubAssetUi> = persistentListOf(),

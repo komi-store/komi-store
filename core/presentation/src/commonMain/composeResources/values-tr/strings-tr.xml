@@ -1071,10 +1071,6 @@
     <string name="platform_section_linux">Linux</string>
     <string name="section_chip_your_device">Cihazınız</string>
     <string name="section_chip_for_transfer">Aktarım için</string>
-    <string name="kao_banner_title">Android'i Açık Tutun</string>
-    <string name="kao_banner_body">Google'ın geliştirici doğrulama politikası açık Android dağıtımını tehdit ediyor. Komi Store koalisyonu destekliyor.</string>
-    <string name="kao_banner_cta">Daha fazla bilgi</string>
-    <string name="kao_banner_dismiss_cd">Banner'ı kapat</string>
 
     <!-- ───── Turkish backlog top-up ───── -->
     <plurals name="custom_forges_count">

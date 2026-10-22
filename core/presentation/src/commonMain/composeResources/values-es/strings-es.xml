@@ -1040,10 +1040,6 @@
     <string name="platform_section_linux">Linux</string>
     <string name="section_chip_your_device">Tu dispositivo</string>
     <string name="section_chip_for_transfer">Para transferir</string>
-    <string name="kao_banner_title">Mantén Android abierto</string>
-    <string name="kao_banner_body">La política de verificación de desarrolladores de Google amenaza la distribución abierta de Android. Komi Store apoya a la coalición.</string>
-    <string name="kao_banner_cta">Saber más</string>
-    <string name="kao_banner_dismiss_cd">Cerrar banner</string>
 
     <!-- Translated batch: appended for parity with English source -->
     <string name="adaptive_pick_repo_subtitle">Toca cualquier tarjeta de la izquierda para ver sus detalles aquí.</string>

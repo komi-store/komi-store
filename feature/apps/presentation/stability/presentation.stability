@@ -156,15 +156,6 @@ public fun zed.rainxch.apps.presentation.components.ImportSummarySheet(summary: 
     - onDismiss: STABLE (function type)
 
 @Composable
-public fun zed.rainxch.apps.presentation.components.KaoBanner(onLearnMore: kotlin.Function0<kotlin.Unit>, onDismiss: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
-  skippable: true
-  restartable: true
-  params:
-    - onLearnMore: STABLE (function type)
-    - onDismiss: STABLE (function type)
-    - modifier: STABLE (marked @Stable or @Immutable)
-
-@Composable
 public fun zed.rainxch.apps.presentation.components.LibraryAppRow(appItem: zed.rainxch.apps.presentation.model.AppItem, onAction: kotlin.Function1<zed.rainxch.apps.presentation.AppsAction, kotlin.Unit>, onOpenRepo: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier, framed: kotlin.Boolean): kotlin.Unit
   skippable: true
   restartable: true

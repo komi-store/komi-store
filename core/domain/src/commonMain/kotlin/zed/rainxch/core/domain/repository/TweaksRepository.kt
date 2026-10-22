@@ -145,10 +145,6 @@ interface TweaksRepository {
 
     suspend fun setExternalImportBannerDismissedAtCount(count: Int)
 
-    fun getKaoBannerDismissed(): Flow<Boolean>
-
-    suspend fun setKaoBannerDismissed(dismissed: Boolean)
-
     fun getApkInspectCoachmarkShown(): Flow<Boolean>
 
     suspend fun setApkInspectCoachmarkShown(shown: Boolean)

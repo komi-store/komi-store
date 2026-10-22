@@ -43,7 +43,6 @@ import zed.rainxch.apps.presentation.model.UpdateAllProgress
 import zed.rainxch.apps.presentation.model.UpdateState
 import zed.rainxch.apps.presentation.model.VariantOption
 import zed.rainxch.apps.presentation.model.VariantPickerError
-import zed.rainxch.core.domain.helpers.BrowserHelper
 import zed.rainxch.core.domain.helpers.ShareManager
 import zed.rainxch.core.domain.logging.KomiStoreLogger
 import zed.rainxch.core.domain.model.account.github.GithubAsset
@@ -86,12 +85,10 @@ class AppsViewModel(
     private val downloadOrchestrator: DownloadOrchestrator,
     private val externalImportRepository: ExternalImportRepository,
     private val systemInstallSerializer: SystemInstallSerializer,
-    private val browserHelper: BrowserHelper,
 ) : ViewModel() {
     companion object {
         private const val BANNER_THRESHOLD = 1
         private const val UPDATE_CHECK_COOLDOWN_MS = 30 * 60 * 1000L
-        private const val KAO_OPEN_LETTER_URL = "https://keepandroidopen.org/open-letter/"
     }
 
     private var hasLoadedInitialData = false
@@ -116,7 +113,6 @@ class AppsViewModel(
                 if (!hasLoadedInitialData) {
                     loadApps()
                     observePendingExternalImports()
-                    observeKaoBannerDismissed()
                     hasLoadedInitialData = true
                 }
             }.map { it.withDerived() }
@@ -189,14 +185,6 @@ class AppsViewModel(
             updateGroups = updates.groupedByRepo(),
             idleGroups = idle.groupedByRepo(),
         )
-    }
-
-    private fun observeKaoBannerDismissed() {
-        viewModelScope.launch {
-            tweaksRepository.getKaoBannerDismissed().collect { dismissed ->
-                _state.update { it.copy(showKaoBanner = !dismissed) }
-            }
-        }
     }
 
     private fun observePendingExternalImports() {
@@ -709,18 +697,6 @@ class AppsViewModel(
                             it.expandedImportBuckets + action.bucket
                         }
                     it.copy(expandedImportBuckets = next.toImmutableSet())
-                }
-            }
-
-            AppsAction.OnDismissKaoBanner -> {
-                viewModelScope.launch {
-                    tweaksRepository.setKaoBannerDismissed(true)
-                }
-            }
-
-            AppsAction.OnKaoLearnMore -> {
-                browserHelper.openUrl(KAO_OPEN_LETTER_URL) { error ->
-                    logger.warn("Failed to open KAO open letter: $error")
                 }
             }
 

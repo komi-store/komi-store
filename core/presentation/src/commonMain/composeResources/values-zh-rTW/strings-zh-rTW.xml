@@ -1035,10 +1035,6 @@
     <string name="platform_section_linux">Linux</string>
     <string name="section_chip_your_device">你的裝置</string>
     <string name="section_chip_for_transfer">用於轉移</string>
-    <string name="kao_banner_title">保持 Android 開放</string>
-    <string name="kao_banner_body">Google 的開發者驗證政策威脅 Android 的開放分發。Komi Store 與聯盟同行。</string>
-    <string name="kao_banner_cta">瞭解更多</string>
-    <string name="kao_banner_dismiss_cd">關閉橫幅</string>
 
     <!-- Appended: translations brought to 100% parity with English source -->
     <string name="adaptive_pick_repo_subtitle">點按左側任意卡片，在此檢視詳情。</string>

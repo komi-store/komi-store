@@ -1062,10 +1062,6 @@
     <string name="platform_section_linux">Linux</string>
     <string name="section_chip_your_device">내 기기</string>
     <string name="section_chip_for_transfer">전송용</string>
-    <string name="kao_banner_title">Android를 열린 상태로</string>
-    <string name="kao_banner_body">Google의 개발자 인증 정책이 Android의 개방적인 배포를 위협합니다. Komi Store는 연합을 지지합니다.</string>
-    <string name="kao_banner_cta">자세히 보기</string>
-    <string name="kao_banner_dismiss_cd">배너 닫기</string>
 
     <!-- ───── ko 100% catch-up ───── -->
     <string name="adaptive_pick_repo_subtitle">왼쪽의 카드를 탭하면 여기에서 세부 정보를 볼 수 있어요.</string>

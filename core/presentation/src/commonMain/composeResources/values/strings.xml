@@ -1277,10 +1277,6 @@
     <string name="skipped_updates_unskip_action">Don't skip</string>
     <string name="skipped_updates_unskipped_snackbar">Update prompt enabled for %1$s</string>
     <string name="skipped_updates_unskip_failure">Couldn't update skip preference</string>
-    <string name="kao_banner_title">Keep Android Open</string>
-    <string name="kao_banner_body">Google's developer-verification policy threatens open Android distribution. Komi Store stands with the coalition.</string>
-    <string name="kao_banner_cta">Learn more</string>
-    <string name="kao_banner_dismiss_cd">Dismiss banner</string>
 
     <!-- Auto-translate -->
     <string name="translation_auto_title">Auto-translate repositories</string>

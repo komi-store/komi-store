@@ -1072,10 +1072,6 @@
     <string name="platform_section_linux">Linux</string>
     <string name="section_chip_your_device">आपका डिवाइस</string>
     <string name="section_chip_for_transfer">ट्रांसफ़र के लिए</string>
-    <string name="kao_banner_title">Android को खुला रखें</string>
-    <string name="kao_banner_body">Google की डेवलपर-सत्यापन नीति खुले Android वितरण को खतरे में डालती है। Komi Store गठबंधन के साथ है।</string>
-    <string name="kao_banner_cta">और जानें</string>
-    <string name="kao_banner_dismiss_cd">बैनर बंद करें</string>
 
     <!-- ═══════════════════════════════════════════════════════════════
          Hindi (hi) — newly translated keys

@@ -42,7 +42,6 @@ import zed.rainxch.apps.presentation.components.AdvancedAppSettingsBottomSheet
 import zed.rainxch.apps.presentation.components.AppsSectionHeader
 import zed.rainxch.apps.presentation.components.AppsTopbar
 import zed.rainxch.apps.presentation.components.ImportSummarySheet
-import zed.rainxch.apps.presentation.components.KaoBanner
 import zed.rainxch.apps.presentation.components.LinkAppBottomSheet
 import zed.rainxch.apps.presentation.components.PendingDiscardSheet
 import zed.rainxch.apps.presentation.components.PendingUninstallSheet
@@ -307,7 +306,6 @@ fun AppsScreen(
                         gridState = listState,
                         sections = listOf(
                             state.showImportProposalBanner,
-                            state.showKaoBanner,
                             state.pendingApps.isNotEmpty(),
                             state.updateApps.isNotEmpty() || state.isUpdatingAll,
                             state.inProgressDownloads.isNotEmpty(),
@@ -473,15 +471,6 @@ fun AppsScreen(
                                                 pendingCount = state.pendingExternalImportCount,
                                                 onReview = { onAction(AppsAction.OnImportProposalReview) },
                                                 onDismiss = { onAction(AppsAction.OnImportProposalDismiss) },
-                                            )
-                                        }
-                                    }
-
-                                    if (state.showKaoBanner) {
-                                        item(key = "kao-banner", span = { GridItemSpan(maxLineSpan) }) {
-                                            KaoBanner(
-                                                onLearnMore = { onAction(AppsAction.OnKaoLearnMore) },
-                                                onDismiss = { onAction(AppsAction.OnDismissKaoBanner) },
                                             )
                                         }
                                     }

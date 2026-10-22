@@ -1033,10 +1033,6 @@
     <string name="platform_section_linux">Linux</string>
     <string name="section_chip_your_device">このデバイス</string>
     <string name="section_chip_for_transfer">転送用</string>
-    <string name="kao_banner_title">Android をオープンに</string>
-    <string name="kao_banner_body">Google の開発者検証ポリシーが Android のオープンな配布を脅かしています。Komi Store は連合を支持します。</string>
-    <string name="kao_banner_cta">詳しく見る</string>
-    <string name="kao_banner_dismiss_cd">バナーを閉じる</string>
 
     <string name="adaptive_pick_repo_subtitle">左側のカードをタップすると詳細がここに表示されます。</string>
     <string name="adaptive_pick_repo_title">リポジトリを選択</string>

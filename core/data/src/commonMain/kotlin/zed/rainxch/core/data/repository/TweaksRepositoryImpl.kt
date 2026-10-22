@@ -379,13 +379,6 @@ class TweaksRepositoryImpl(
         ksafe.safePut(K_EXTERNAL_IMPORT_BANNER_DISMISSED_AT, count)
     }
 
-    override fun getKaoBannerDismissed(): Flow<Boolean> = gatedGetFlow(K_KAO_BANNER_DISMISSED, false)
-
-    override suspend fun setKaoBannerDismissed(dismissed: Boolean) {
-        migrationDeferred.await()
-        ksafe.safePut(K_KAO_BANNER_DISMISSED, dismissed)
-    }
-
     override fun getApkInspectCoachmarkShown(): Flow<Boolean> = gatedGetFlow(K_APK_INSPECT_COACHMARK_SHOWN, false)
 
     override suspend fun setApkInspectCoachmarkShown(shown: Boolean) {
@@ -528,7 +521,6 @@ class TweaksRepositoryImpl(
             MigrationEntry(booleanPreferencesKey("external_import_enabled"), K_EXTERNAL_IMPORT_ENABLED),
             MigrationEntry(booleanPreferencesKey("external_match_search_enabled"), K_EXTERNAL_MATCH_SEARCH_ENABLED),
             MigrationEntry(intPreferencesKey("external_import_banner_dismissed_at"), K_EXTERNAL_IMPORT_BANNER_DISMISSED_AT),
-            MigrationEntry(booleanPreferencesKey("kao_banner_dismissed"), K_KAO_BANNER_DISMISSED),
             MigrationEntry(booleanPreferencesKey("apk_inspect_coachmark_shown"), K_APK_INSPECT_COACHMARK_SHOWN),
             MigrationEntry(booleanPreferencesKey("channel_chip_coachmark_shown"), K_CHANNEL_CHIP_COACHMARK_SHOWN),
             MigrationEntry(booleanPreferencesKey("show_all_platforms"), K_SHOW_ALL_PLATFORMS),
@@ -605,7 +597,6 @@ class TweaksRepositoryImpl(
         private const val K_EXTERNAL_IMPORT_ENABLED = "external_import_enabled"
         private const val K_EXTERNAL_MATCH_SEARCH_ENABLED = "external_match_search_enabled"
         private const val K_EXTERNAL_IMPORT_BANNER_DISMISSED_AT = "external_import_banner_dismissed_at"
-        private const val K_KAO_BANNER_DISMISSED = "kao_banner_dismissed"
         private const val K_APK_INSPECT_COACHMARK_SHOWN = "apk_inspect_coachmark_shown"
         private const val K_CHANNEL_CHIP_COACHMARK_SHOWN = "channel_chip_coachmark_shown"
         private const val K_SHOW_ALL_PLATFORMS = "show_all_platforms"

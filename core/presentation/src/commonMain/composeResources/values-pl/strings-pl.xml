@@ -1065,10 +1065,6 @@
     <string name="platform_section_linux">Linux</string>
     <string name="section_chip_your_device">Twoje urządzenie</string>
     <string name="section_chip_for_transfer">Do transferu</string>
-    <string name="kao_banner_title">Niech Android pozostanie otwarty</string>
-    <string name="kao_banner_body">Polityka weryfikacji deweloperów Google zagraża otwartej dystrybucji Androida. Komi Store popiera koalicję.</string>
-    <string name="kao_banner_cta">Dowiedz się więcej</string>
-    <string name="kao_banner_dismiss_cd">Zamknij baner</string>
 
     <!-- ───── Polish translations added for 100% coverage ───── -->
     <string name="adaptive_pick_repo_subtitle">Dotknij dowolnej karty po lewej, aby zobaczyć jej szczegóły tutaj.</string>

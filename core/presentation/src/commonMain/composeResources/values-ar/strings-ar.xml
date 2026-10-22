@@ -1089,10 +1089,6 @@
     <string name="platform_section_linux">Linux</string>
     <string name="section_chip_your_device">جهازك</string>
     <string name="section_chip_for_transfer">للنقل</string>
-    <string name="kao_banner_title">أبقِ أندرويد مفتوحًا</string>
-    <string name="kao_banner_body">سياسة التحقق من المطورين من Google تهدد التوزيع المفتوح لأندرويد. Komi Store يدعم التحالف.</string>
-    <string name="kao_banner_cta">اعرف المزيد</string>
-    <string name="kao_banner_dismiss_cd">إغلاق البانر</string>
 
     <!-- Design refresh additions -->
     <string name="adaptive_pick_repo_subtitle">انقر على أي بطاقة على اليسار لعرض تفاصيلها هنا.</string>

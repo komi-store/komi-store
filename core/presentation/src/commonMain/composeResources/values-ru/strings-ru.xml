@@ -1065,10 +1065,6 @@
     <string name="platform_section_linux">Linux</string>
     <string name="section_chip_your_device">Это устройство</string>
     <string name="section_chip_for_transfer">Для переноса</string>
-    <string name="kao_banner_title">Сохраним Android открытым</string>
-    <string name="kao_banner_body">Политика верификации разработчиков Google угрожает открытому распространению Android. Komi Store поддерживает коалицию.</string>
-    <string name="kao_banner_cta">Подробнее</string>
-    <string name="kao_banner_dismiss_cd">Закрыть баннер</string>
 
     <!-- ───── Russian completion pass ───── -->
     <string name="adaptive_pick_repo_subtitle">Нажми на любую карточку слева, чтобы увидеть детали здесь.</string>

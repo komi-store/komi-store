@@ -1061,10 +1061,6 @@
     <string name="platform_section_linux">Linux</string>
     <string name="section_chip_your_device">আপনার ডিভাইস</string>
     <string name="section_chip_for_transfer">ট্রান্সফারের জন্য</string>
-    <string name="kao_banner_title">Android-কে উন্মুক্ত রাখুন</string>
-    <string name="kao_banner_body">Google-এর ডেভেলপার-যাচাইকরণ নীতি উন্মুক্ত Android বিতরণকে হুমকির মুখে ফেলেছে। Komi Store কোয়ালিশনের পাশে।</string>
-    <string name="kao_banner_cta">আরও জানুন</string>
-    <string name="kao_banner_dismiss_cd">ব্যানার বন্ধ করুন</string>
 
     <!-- Added: parity with English source -->
     <plurals name="custom_forges_count">
