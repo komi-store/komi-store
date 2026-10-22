@@ -94,10 +94,16 @@ internal enum class HeaderStatus(
     Installed(Res.string.installed, Icons.Rounded.CheckCircle, false),
 }
 
-internal fun headerStatusOf(app: InstalledApp): HeaderStatus =
+// The plain "Installed" status gives way to the app switcher; pending and update stay.
+internal fun headerStatusOf(
+    app: InstalledApp?,
+    showAppSwitcher: Boolean,
+): HeaderStatus? =
     when {
+        app == null -> null
         app.isPendingInstall -> HeaderStatus.Pending
         app.isUpdateAvailable -> HeaderStatus.Update
+        showAppSwitcher -> null
         else -> HeaderStatus.Installed
     }
 

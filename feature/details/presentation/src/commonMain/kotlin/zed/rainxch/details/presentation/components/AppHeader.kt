@@ -110,10 +110,7 @@ fun AppHeader(
     val personality = LocalPersonality.current
     val manga = personality is MangaPersonality
     val showAppSwitcher = installedApps.size > 1 || (installedApps.isNotEmpty() && installedApp == null)
-    val status =
-        installedApp
-            ?.takeIf { !showAppSwitcher || it.isPendingInstall || it.isUpdateAvailable }
-            ?.let(::headerStatusOf)
+    val status = headerStatusOf(installedApp, showAppSwitcher)
     val switcherApps =
         remember(installedApps, showAppSwitcher) {
             if (showAppSwitcher) installedApps.sortedBy { it.appName.lowercase() } else emptyList()
@@ -329,21 +326,23 @@ private fun DownloadRing(
     downloadStage: DownloadStage,
     progress: () -> Float,
 ) {
-    when (downloadStage) {
-        DownloadStage.DOWNLOADING -> {
-            KomiCircularProgress(
-                progress = { 1f },
-                modifier = Modifier.fillMaxSize(),
-                color = LocalPersonality.current.colors.primaryTint,
-            )
-            KomiCircularProgress(progress = progress, modifier = Modifier.fillMaxSize())
-        }
+    Box(modifier = Modifier.fillMaxSize()) {
+        when (downloadStage) {
+            DownloadStage.DOWNLOADING -> {
+                KomiCircularProgress(
+                    progress = { 1f },
+                    modifier = Modifier.fillMaxSize(),
+                    color = LocalPersonality.current.colors.primaryTint,
+                )
+                KomiCircularProgress(progress = progress, modifier = Modifier.fillMaxSize())
+            }
 
-        DownloadStage.VERIFYING, DownloadStage.INSTALLING -> {
-            KomiCircularProgress(modifier = Modifier.fillMaxSize())
-        }
+            DownloadStage.VERIFYING, DownloadStage.INSTALLING -> {
+                KomiCircularProgress(modifier = Modifier.fillMaxSize())
+            }
 
-        DownloadStage.IDLE, DownloadStage.PAUSED -> {}
+            DownloadStage.IDLE, DownloadStage.PAUSED -> {}
+        }
     }
 }
 
