@@ -74,6 +74,30 @@ class InstalledAppsUpdateCheckWindowTest {
         }
 
     @Test
+    fun a_successful_check_advances_the_revision() =
+        runBlocking {
+            withRepo { repo, db ->
+                db.installedAppDao.insertApp(
+                    app(packageName = PKG, installed = "1.0.0", installedCode = 100L),
+                )
+
+                repo.checkForUpdatesWithReleases(
+                    PKG,
+                    listOf(release(id = 200L, tag = "2.0.0", publishedAt = "2026-10-01T00:00:00Z")),
+                )
+                assertEquals(1L, db.installedAppDao.getAppByPackage(PKG)!!.updateStateRevision)
+
+                repo.checkForUpdatesWithReleases(
+                    PKG,
+                    listOf(release(id = 300L, tag = "3.0.0", publishedAt = "2026-10-02T00:00:00Z")),
+                )
+                val row = db.installedAppDao.getAppByPackage(PKG)!!
+                assertEquals(2L, row.updateStateRevision)
+                assertEquals("3.0.0", row.latestVersion)
+            }
+        }
+
+    @Test
     fun a_window_the_device_already_runs_clears_a_stale_report() =
         runBlocking {
             withRepo { repo, db ->
