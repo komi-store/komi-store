@@ -8,8 +8,8 @@ import kotlinx.collections.immutable.persistentMapOf
 import kotlinx.collections.immutable.toImmutableMap
 import kotlinx.collections.immutable.toImmutableSet
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -157,6 +157,7 @@ class DetailsViewModel(
     private val apkInspector: ApkInspector,
     private val systemInstallSerializer: zed.rainxch.core.domain.system.SystemInstallSerializer,
     private val userSessionRepository: UserSessionRepository,
+    private val appScope: CoroutineScope,
     private val packageNameParam: String? = null,
 ) : ViewModel() {
     private var hasLoadedInitialData = false
@@ -2674,7 +2675,7 @@ class DetailsViewModel(
         currentDownloadJob?.cancel()
 
         val packageKey = orchestratorKey()
-        viewModelScope.launch(NonCancellable) {
+        appScope.launch {
             try {
                 downloadOrchestrator.downgradeToDeferred(packageKey)
             } catch (e: CancellationException) {

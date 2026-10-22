@@ -8,8 +8,8 @@ import kotlinx.collections.immutable.persistentSetOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.collections.immutable.toImmutableSet
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -85,6 +85,7 @@ class AppsViewModel(
     private val downloadOrchestrator: DownloadOrchestrator,
     private val externalImportRepository: ExternalImportRepository,
     private val systemInstallSerializer: SystemInstallSerializer,
+    private val appScope: CoroutineScope,
 ) : ViewModel() {
     companion object {
         private const val BANNER_THRESHOLD = 1
@@ -2461,7 +2462,7 @@ class AppsViewModel(
         val packageNames = activeUpdates.keys.toList()
         activeUpdates.values.forEach { it.cancel() }
 
-        viewModelScope.launch(NonCancellable) {
+        appScope.launch {
             for (packageName in packageNames) {
                 try {
                     downloadOrchestrator.downgradeToDeferred(packageName)
