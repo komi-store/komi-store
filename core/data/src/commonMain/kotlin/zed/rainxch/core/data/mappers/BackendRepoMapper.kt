@@ -1,25 +1,26 @@
 package zed.rainxch.core.data.mappers
 
+import zed.rainxch.core.data.dto.BackendPlatformRelease
 import zed.rainxch.core.data.dto.BackendRepoResponse
-import zed.rainxch.core.domain.model.repository.DiscoveryPlatform
 import zed.rainxch.core.domain.model.account.github.GithubRepoSummary
 import zed.rainxch.core.domain.model.account.github.GithubUser
+import zed.rainxch.core.domain.model.repository.DiscoveryPlatform
 import kotlin.time.Clock
 import kotlin.time.Duration.Companion.days
 import kotlin.time.ExperimentalTime
 
-@OptIn(ExperimentalTime::class)
-fun BackendRepoResponse.toSummary(): GithubRepoSummary =
+fun BackendRepoResponse.toSummary(platform: DiscoveryPlatform = DiscoveryPlatform.All): GithubRepoSummary =
     GithubRepoSummary(
         id = id,
         name = name,
         fullName = fullName,
-        owner = GithubUser(
-            id = 0,
-            login = owner.login,
-            avatarUrl = owner.avatarUrl ?: "",
-            htmlUrl = "https://github.com/${owner.login}",
-        ),
+        owner =
+            GithubUser(
+                id = 0,
+                login = owner.login,
+                avatarUrl = owner.avatarUrl ?: "",
+                htmlUrl = "https://github.com/${owner.login}",
+            ),
         description = description,
         defaultBranch = defaultBranch ?: "main",
         htmlUrl = htmlUrl,
@@ -33,15 +34,21 @@ fun BackendRepoResponse.toSummary(): GithubRepoSummary =
         pushedAt = pushedAt,
         availablePlatforms = buildAvailablePlatforms(),
         downloadCount = downloadCount,
-        latestReleaseDate = latestReleaseDate?.takeIf { it.isNotBlank() }
-            ?: releaseRecency?.takeIf { it >= 0 }?.let { releaseDateFromRecencyDays(it) },
-        latestReleaseTag = latestReleaseTag,
+        latestReleaseDate = releaseDateFor(platform),
+        latestReleaseTag = platformReleaseFor(platform)?.tag ?: latestReleaseTag,
         dailyStars = dailyStars,
     )
 
+fun BackendRepoResponse.platformReleaseFor(platform: DiscoveryPlatform): BackendPlatformRelease? =
+    platformReleases?.get(platform.name.lowercase())
+
+fun BackendRepoResponse.releaseDateFor(platform: DiscoveryPlatform): String? =
+    platformReleaseFor(platform)?.publishedAt?.takeIf { it.isNotBlank() }
+        ?: latestReleaseDate?.takeIf { it.isNotBlank() }
+        ?: releaseRecency?.takeIf { it >= 0 }?.let { releaseDateFromRecencyDays(it) }
+
 @OptIn(ExperimentalTime::class)
-fun releaseDateFromRecencyDays(days: Int): String =
-    (Clock.System.now() - days.days).toString()
+fun releaseDateFromRecencyDays(days: Int): String = (Clock.System.now() - days.days).toString()
 
 private fun BackendRepoResponse.buildAvailablePlatforms(): List<DiscoveryPlatform> =
     buildList {

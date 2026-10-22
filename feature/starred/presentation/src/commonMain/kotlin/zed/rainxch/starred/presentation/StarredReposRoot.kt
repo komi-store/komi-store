@@ -1,6 +1,7 @@
 package zed.rainxch.starred.presentation
 
 import androidx.compose.foundation.clickable
+import androidx.compose.material.icons.rounded.Search
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,11 +14,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridItemSpan
 import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.filled.Sort
+import androidx.compose.material.icons.automirrored.rounded.Sort
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Star
@@ -35,6 +36,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toPersistentList
+import org.jetbrains.compose.resources.pluralStringResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import zed.rainxch.core.presentation.components.ScrollbarContainer
@@ -180,6 +182,20 @@ fun StarredReposScreen(
                                     modifier = Modifier.fillMaxSize()
                                         .arrowKeyScroll(gridState, autoFocus = true),
                                 ) {
+                                    if (state.notInstallableCount > 0) {
+                                        item(
+                                            key = "not_installable_hint",
+                                            span = StaggeredGridItemSpan.FullLine,
+                                        ) {
+                                            NotInstallableHint(
+                                                count = state.notInstallableCount,
+                                                showingAll = state.showAllStarred,
+                                                onToggle = {
+                                                    onAction(StarredReposAction.OnToggleShowAllStarred)
+                                                },
+                                            )
+                                        }
+                                    }
                                     items(
                                         items = state.filteredRepositories,
                                         key = { it.repoId },
@@ -233,7 +249,6 @@ fun StarredReposScreen(
                             text = message,
                             role = KomiTextRole.Body,
                             color = colors.onSurface,
-                            uppercase = false,
                             modifier = Modifier.weight(1f),
                         )
                         KomiButton(
@@ -288,41 +303,33 @@ private fun StarredTopBar(
         title = stringResource(Res.string.starred_repositories),
         subtitle = subtitle,
         size = KomiTopBarSize.Compact,
-        leading = {
-            KomiIconButton(
-                icon = Icons.AutoMirrored.Filled.ArrowBack,
-                contentDescription = stringResource(Res.string.navigate_back),
-                onClick = { onAction(StarredReposAction.OnNavigateBackClick) },
-                variant = KomiButtonVariant.Tonal,
-            )
-        },
-        actions = {
-            if (isSyncing) {
-                KomiCircularProgress(
-                    modifier =
-                        Modifier
-                            .size(24.dp)
-                            .padding(end = 12.dp),
-                )
-            }
+        onBack = { onAction(StarredReposAction.OnNavigateBackClick) },
+        actions = if (isSyncing || hasRepos) {
+            {
+                if (isSyncing) {
+                    KomiCircularProgress(modifier = Modifier.size(24.dp))
+                }
 
-            if (hasRepos) {
-                KomiDropdown(
-                    entries = sortEntries,
-                    value = sortRule.name,
-                    onSelect = { item ->
-                        onAction(StarredReposAction.OnSortRuleSelected(StarredSortRule.valueOf(item.id)))
-                    },
-                    trigger = { onClick ->
-                        KomiIconButton(
-                            icon = Icons.AutoMirrored.Filled.Sort,
-                            contentDescription = stringResource(Res.string.sort_label),
-                            onClick = onClick,
-                            variant = KomiButtonVariant.Tonal,
-                        )
-                    },
-                )
+                if (hasRepos) {
+                    KomiDropdown(
+                        entries = sortEntries,
+                        value = sortRule.name,
+                        onSelect = { item ->
+                            onAction(StarredReposAction.OnSortRuleSelected(StarredSortRule.valueOf(item.id)))
+                        },
+                        trigger = { onClick ->
+                            KomiIconButton(
+                                icon = Icons.AutoMirrored.Rounded.Sort,
+                                contentDescription = stringResource(Res.string.sort_label),
+                                onClick = onClick,
+                                variant = KomiButtonVariant.Tonal,
+                            )
+                        },
+                    )
+                }
             }
+        } else {
+            null
         },
     )
 }
@@ -340,16 +347,8 @@ private fun StarredSearchBar(
                 .fillMaxWidth()
                 .padding(horizontal = 12.dp, vertical = 8.dp),
         placeholder = stringResource(Res.string.search_repositories_hint),
-        leadingIcon = Icons.Filled.Search,
-        trailing = {
-            if (query.isNotEmpty()) {
-                KomiIcon(
-                    imageVector = Icons.Filled.Close,
-                    contentDescription = stringResource(Res.string.clear_search),
-                    modifier = Modifier.clickable { onQueryChange("") },
-                )
-            }
-        },
+        leadingIcon = Icons.Rounded.Search,
+        clearable = true,
     )
 }
 
@@ -372,17 +371,16 @@ private fun EmptyStateContent(
             imageVector = icon,
             contentDescription = null,
             modifier = Modifier.size(64.dp),
-            tint = colors.onSurfaceVariant.copy(alpha = 0.6f),
+            tint = colors.onSurfaceVariant,
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
         KomiText(
             text = title,
-            role = KomiTextRole.Title,
+            role = KomiTextRole.CardTitle,
             color = colors.onSurface,
             textAlign = TextAlign.Center,
-            uppercase = false,
         )
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -392,7 +390,6 @@ private fun EmptyStateContent(
             role = KomiTextRole.Body,
             color = colors.onSurfaceVariant,
             textAlign = TextAlign.Center,
-            uppercase = false,
         )
 
         if (actionText != null && onActionClick != null) {
@@ -418,6 +415,46 @@ private fun PreviewStarred() {
                     isAuthenticated = true,
                 ),
             onAction = {},
+        )
+    }
+}
+
+@Composable
+private fun NotInstallableHint(
+    count: Int,
+    showingAll: Boolean,
+    onToggle: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val colors = LocalPersonality.current.colors
+    Row(
+        modifier = modifier.fillMaxWidth().padding(horizontal = 8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        KomiText(
+            text =
+                pluralStringResource(
+                    if (showingAll) {
+                        Res.plurals.starred_including_not_installable
+                    } else {
+                        Res.plurals.starred_hidden_not_installable
+                    },
+                    count,
+                    count,
+                ),
+            role = KomiTextRole.Body,
+            color = colors.onSurfaceVariant,
+            modifier = Modifier.weight(1f),
+        )
+        KomiButton(
+            onClick = onToggle,
+            label =
+                stringResource(
+                    if (showingAll) Res.string.starred_installable_only else Res.string.starred_show_all,
+                ),
+            variant = KomiButtonVariant.Text,
+            size = KomiButtonSize.Sm,
         )
     }
 }

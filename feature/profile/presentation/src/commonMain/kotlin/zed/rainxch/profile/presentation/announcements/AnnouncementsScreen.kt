@@ -8,14 +8,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Tune
+import androidx.compose.material.icons.rounded.Tune
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.stringResource
 import zed.rainxch.core.presentation.components.bars.KomiTopBar
 import zed.rainxch.core.presentation.components.bars.KomiTopBarSize
@@ -31,7 +29,6 @@ import zed.rainxch.githubstore.core.presentation.res.announcements_empty
 import zed.rainxch.githubstore.core.presentation.res.announcements_open_mute_settings
 import zed.rainxch.githubstore.core.presentation.res.announcements_refresh_failed
 import zed.rainxch.githubstore.core.presentation.res.announcements_title
-import zed.rainxch.githubstore.core.presentation.res.navigate_back
 
 @Composable
 fun AnnouncementsScreen(
@@ -50,17 +47,10 @@ fun AnnouncementsScreen(
             KomiTopBar(
                 title = stringResource(Res.string.announcements_title),
                 size = KomiTopBarSize.Compact,
-                leading = {
-                    KomiIconButton(
-                        icon = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = stringResource(Res.string.navigate_back),
-                        onClick = onNavigateBack,
-                        variant = KomiButtonVariant.Tonal,
-                    )
-                },
+                onBack = onNavigateBack,
                 actions = {
                     KomiIconButton(
-                        icon = Icons.Filled.Tune,
+                        icon = Icons.Rounded.Tune,
                         contentDescription = stringResource(Res.string.announcements_open_mute_settings),
                         onClick = { onAction(AnnouncementsAction.OnOpenMuteSheet) },
                         variant = KomiButtonVariant.Tonal,
@@ -93,7 +83,6 @@ fun AnnouncementsScreen(
                             ),
                         role = KomiTextRole.Body,
                         color = colors.onSurfaceVariant,
-                        uppercase = false,
                     )
                 }
             } else {
@@ -106,10 +95,8 @@ fun AnnouncementsScreen(
                         item {
                             KomiText(
                                 text = stringResource(Res.string.announcements_refresh_failed),
-                                role = KomiTextRole.Label,
-                                fontSize = 11.sp,
+                                role = KomiTextRole.Caption,
                                 color = colors.onSurfaceVariant,
-                                uppercase = false,
                             )
                         }
                     }

@@ -1,4 +1,5 @@
 package zed.rainxch.core.domain.model.installation
+
 data class InstalledApp(
     val packageName: String,
     val repoId: Long,
@@ -15,6 +16,9 @@ data class InstalledApp(
     val latestAssetName: String?,
     val latestAssetUrl: String?,
     val latestAssetSize: Long?,
+    val latestReleaseId: Long? = null,
+    val latestAssetId: Long? = null,
+    val latestAssetDigest: String? = null,
     val appName: String,
     val installSource: InstallSource,
     val installedAt: Long,
@@ -29,38 +33,33 @@ data class InstalledApp(
     val isPendingInstall: Boolean = false,
     val installedVersionName: String? = null,
     val installedVersionCode: Long = 0L,
+    val installedReleaseId: Long? = null,
+    val installedAssetId: Long? = null,
+    val installedAssetDigest: String? = null,
+    val installedReleasePublishedAt: String? = null,
     val latestVersionName: String? = null,
     val latestVersionCode: Long? = null,
     val latestReleasePublishedAt: String? = null,
     val includePreReleases: Boolean = false,
-
     val assetFilterRegex: String? = null,
-
     val fallbackToOlderReleases: Boolean = false,
-
     val preferredAssetVariant: String? = null,
-
     val preferredVariantStale: Boolean = false,
-
     val preferredAssetTokens: String? = null,
-
     val assetGlobPattern: String? = null,
-
     val pickedAssetIndex: Int? = null,
-
     val pickedAssetSiblingCount: Int? = null,
-
     val pendingInstallFilePath: String? = null,
-
     val pendingInstallVersion: String? = null,
-
     val pendingInstallAssetName: String? = null,
-
+    val pendingInstallReleaseId: Long? = null,
+    val pendingInstallAssetId: Long? = null,
+    val pendingInstallAssetDigest: String? = null,
+    val pendingInstallReleasePublishedAt: String? = null,
     val skippedReleaseTag: String? = null,
     val sourceHost: String? = null,
 )
 
 fun InstalledApp?.isReallyInstalled(): Boolean = this != null && !this.isPendingInstall
 
-fun InstalledApp?.hasActualUpdate(): Boolean =
-    this != null && this.isUpdateAvailable && !this.isPendingInstall
+fun InstalledApp?.hasActualUpdate(): Boolean = this != null && this.isUpdateAvailable && !this.isPendingInstall

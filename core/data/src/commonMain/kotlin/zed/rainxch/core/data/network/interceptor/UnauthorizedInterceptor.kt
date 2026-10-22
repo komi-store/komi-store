@@ -46,13 +46,20 @@ class UnauthorizedInterceptor(
         private fun extractBearerToken(headerValue: String?): String? {
             if (headerValue.isNullOrEmpty()) return null
             val trimmed = headerValue.trim()
-            val withoutScheme = when {
-                trimmed.startsWith("Bearer ", ignoreCase = true) ->
-                    trimmed.substring("Bearer ".length)
-                trimmed.startsWith("token ", ignoreCase = true) ->
-                    trimmed.substring("token ".length)
-                else -> trimmed
-            }
+            val withoutScheme =
+                when {
+                    trimmed.startsWith("Bearer ", ignoreCase = true) -> {
+                        trimmed.substring("Bearer ".length)
+                    }
+
+                    trimmed.startsWith("token ", ignoreCase = true) -> {
+                        trimmed.substring("token ".length)
+                    }
+
+                    else -> {
+                        trimmed
+                    }
+                }
             return withoutScheme.trim().takeIf { it.isNotEmpty() }
         }
     }

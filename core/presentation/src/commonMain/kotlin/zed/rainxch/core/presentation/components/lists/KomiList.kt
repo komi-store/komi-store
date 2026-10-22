@@ -25,6 +25,8 @@ import androidx.compose.material.icons.outlined.Favorite
 import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material.icons.outlined.Schedule
 import androidx.compose.material.icons.outlined.Star
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -61,29 +63,64 @@ import zed.rainxch.core.presentation.spacing.Spacing
 
 private val SelectionBarWidth = 5.dp
 private val ClassicDividerInset = 56.dp
-private const val DisabledAlpha = 0.45f
+private const val DISABLED_ALPHA = 0.45f
 
+// Classic draws Material 3 Expressive's segmented list: one tonal tile per row, 2dp apart,
+// with the outer corners rounded more than the inner ones.
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun KomiList(
     items: ImmutableList<KomiListItem>,
     modifier: Modifier = Modifier,
 ) {
-    KomiListContainer(modifier = modifier) {
-        items.forEachIndexed { index, item ->
-            KomiListRow(
-                title = item.title,
-                subtitle = item.subtitle,
-                icon = item.icon,
-                onClick = rowClick(item),
-                onLongClick = item.onLongClick,
-                destructive = item.destructive,
-                selected = item.selected,
-                enabled = item.enabled,
-                showDivider = index < items.lastIndex,
-                trailing = { RowTrailing(item.trailing) },
-            )
+    when (val personality = LocalPersonality.current) {
+        is MangaPersonality -> {
+            KomiListContainer(modifier = modifier) {
+                items.forEachIndexed { index, item ->
+                    ItemRow(item = item, showDivider = index < items.lastIndex)
+                }
+            }
+        }
+
+        is ClassicPersonality -> {
+            Column(
+                modifier = modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap),
+            ) {
+                items.forEachIndexed { index, item ->
+                    ItemRow(
+                        item = item,
+                        showDivider = false,
+                        modifier =
+                            Modifier
+                                .clip(ListItemDefaults.segmentedShapes(index, items.size).shape)
+                                .background(personality.colors.surfaceContainer),
+                    )
+                }
+            }
         }
     }
+}
+
+@Composable
+private fun ItemRow(
+    item: KomiListItem,
+    showDivider: Boolean,
+    modifier: Modifier = Modifier,
+) {
+    KomiListRow(
+        title = item.title,
+        modifier = modifier,
+        subtitle = item.subtitle,
+        icon = item.icon,
+        onClick = rowClick(item),
+        onLongClick = item.onLongClick,
+        destructive = item.destructive,
+        selected = item.selected,
+        enabled = item.enabled,
+        showDivider = showDivider,
+        trailing = { RowTrailing(item.trailing) },
+    )
 }
 
 @Composable
@@ -95,11 +132,12 @@ fun KomiListContainer(
         is MangaPersonality -> {
             val colors = personality.colors
             Column(
-                modifier = modifier
-                    .fillMaxWidth()
-                    .hardShadow(offset = DpOffset(4.dp, 4.dp), color = colors.shadow, shape = RectangleShape)
-                    .background(color = colors.surface)
-                    .border(width = personality.shape.borderPanel, color = colors.outline),
+                modifier =
+                    modifier
+                        .fillMaxWidth()
+                        .hardShadow(offset = DpOffset(4.dp, 4.dp), color = colors.shadow, shape = RectangleShape)
+                        .background(color = colors.surface)
+                        .border(width = personality.shape.borderPanel, color = colors.outline),
                 content = content,
             )
         }
@@ -107,11 +145,12 @@ fun KomiListContainer(
         is ClassicPersonality -> {
             val colors = personality.colors
             Column(
-                modifier = modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(personality.shape.corner))
-                    .background(color = colors.surfaceContainer)
-                    .padding(6.dp),
+                modifier =
+                    modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(personality.shape.corner))
+                        .background(color = colors.surfaceContainer)
+                        .padding(6.dp),
                 content = content,
             )
         }
@@ -141,39 +180,48 @@ fun KomiListRow(
     val interaction = remember { MutableInteractionSource() }
     val hovered by interaction.collectIsHoveredAsState()
     val focused by interaction.collectIsFocusedAsState()
-    val titleColor = when {
-        destructive -> colors.error
-        selected && !isManga -> colors.onPrimaryContainer
-        else -> colors.onSurface
-    }
+    val titleColor =
+        when {
+            destructive -> colors.error
+            selected && !isManga -> colors.onPrimaryContainer
+            else -> colors.onSurface
+        }
     val subtitleColor =
-        if (selected && !isManga) colors.onPrimaryContainer.copy(alpha = 0.8f) else colors.onSurfaceVariant
-    val clickModifier = when {
-        onClick == null && onLongClick == null -> Modifier
-        isManga -> Modifier.combinedClickable(
-            interactionSource = interaction,
-            indication = null,
-            enabled = enabled,
-            onLongClick = onLongClick,
-            onClick = onClick ?: {},
-        )
+        if (selected && !isManga) colors.onPrimaryContainer else colors.onSurfaceVariant
+    val clickModifier =
+        when {
+            onClick == null && onLongClick == null -> {
+                Modifier
+            }
 
-        else -> Modifier.combinedClickable(enabled = enabled, onLongClick = onLongClick, onClick = onClick ?: {})
-    }
+            isManga -> {
+                Modifier.combinedClickable(
+                    interactionSource = interaction,
+                    indication = null,
+                    enabled = enabled,
+                    onLongClick = onLongClick,
+                    onClick = onClick ?: {},
+                )
+            }
+
+            else -> {
+                Modifier.combinedClickable(enabled = enabled, onLongClick = onLongClick, onClick = onClick ?: {})
+            }
+        }
     Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .then(if (isManga) Modifier.inkFocusRing(focused = { focused }, color = colors.primary) else Modifier)
-            .then(if (!isManga) Modifier.clip(RoundedCornerShape(shape.cornerSmall)) else Modifier)
-            .then(rowFill(selected, hovered, isManga, colors.surfaceVariant, colors.primaryContainer))
-            .then(rowDivider(showDivider, isManga, icon != null, colors.outline, colors.outlineVariant))
-            .then(selectionBar(selected && isManga, colors.primary))
-            .then(clickModifier)
-            .padding(
-                horizontal = if (isManga) 14.dp else 12.dp,
-                vertical = if (isManga) 12.dp else 10.dp,
-            )
-            .alpha(if (enabled) 1f else DisabledAlpha),
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .then(if (isManga) Modifier.inkFocusRing(focused = { focused }, color = colors.primary) else Modifier)
+                .then(if (!isManga) Modifier.clip(RoundedCornerShape(shape.cornerSmall)) else Modifier)
+                .then(rowFill(selected, hovered, isManga, colors.surfaceVariant, colors.primaryContainer))
+                .then(rowDivider(showDivider, isManga, icon != null, colors.outline, colors.outlineVariant))
+                .then(selectionBar(selected && isManga, colors.primary))
+                .then(clickModifier)
+                .padding(
+                    horizontal = if (isManga) 14.dp else 12.dp,
+                    vertical = if (isManga) 12.dp else 10.dp,
+                ).alpha(if (enabled) 1f else DISABLED_ALPHA),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(if (isManga) 14.dp else 16.dp),
     ) {
@@ -191,10 +239,8 @@ fun KomiListRow(
         Column(modifier = Modifier.weight(1f)) {
             KomiText(
                 text = title,
-                role = KomiTextRole.Label,
+                role = if (strong) KomiTextRole.CardTitle else KomiTextRole.ItemTitle,
                 color = titleColor,
-                fontWeight = if (strong) androidx.compose.ui.text.font.FontWeight.Black else null,
-                uppercase = false,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
@@ -204,7 +250,6 @@ fun KomiListRow(
                     text = it,
                     role = KomiTextRole.Body,
                     color = subtitleColor,
-                    uppercase = false,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
@@ -226,10 +271,11 @@ private fun RowLeadingIcon(
 ) {
     if (isManga) {
         Box(
-            modifier = Modifier
-                .size(42.dp)
-                .background(color = colors.background)
-                .border(width = borderWidth, color = colors.outline),
+            modifier =
+                Modifier
+                    .size(42.dp)
+                    .background(color = colors.background)
+                    .border(width = borderWidth, color = colors.outline),
             contentAlignment = Alignment.Center,
         ) {
             KomiIcon(
@@ -241,20 +287,22 @@ private fun RowLeadingIcon(
         }
     } else {
         Box(
-            modifier = Modifier
-                .size(40.dp)
-                .clip(CircleShape)
-                .background(if (selected) colors.primary else colors.surfaceContainerHigh),
+            modifier =
+                Modifier
+                    .size(40.dp)
+                    .clip(CircleShape)
+                    .background(if (selected) colors.primary else colors.surfaceContainerHigh),
             contentAlignment = Alignment.Center,
         ) {
             KomiIcon(
                 imageVector = icon,
                 contentDescription = null,
-                tint = when {
-                    selected -> colors.onPrimary
-                    destructive -> colors.error
-                    else -> colors.onSurfaceVariant
-                },
+                tint =
+                    when {
+                        selected -> colors.onPrimary
+                        destructive -> colors.error
+                        else -> colors.onSurfaceVariant
+                    },
                 modifier = Modifier.size(22.dp),
             )
         }
@@ -318,9 +366,11 @@ private fun RowTrailing(trailing: KomiListTrailing) {
         verticalAlignment = Alignment.CenterVertically,
     ) {
         when (trailing) {
-            KomiListTrailing.None -> Unit
+            KomiListTrailing.None -> {}
 
-            KomiListTrailing.Chevron -> Chevron()
+            KomiListTrailing.Chevron -> {
+                Chevron()
+            }
 
             is KomiListTrailing.Value -> {
                 KomiText(text = trailing.text, role = KomiTextRole.Mono, color = colors.onSurfaceVariant, maxLines = 1)
@@ -330,10 +380,11 @@ private fun RowTrailing(trailing: KomiListTrailing) {
 
             is KomiListTrailing.Badge -> {
                 Box(
-                    modifier = Modifier
-                        .then(if (isManga) Modifier else Modifier.clip(RoundedCornerShape(50)))
-                        .background(if (isManga) colors.primary else colors.error)
-                        .padding(horizontal = 6.dp, vertical = 2.dp),
+                    modifier =
+                        Modifier
+                            .then(if (isManga) Modifier else Modifier.clip(RoundedCornerShape(50)))
+                            .background(if (isManga) colors.primary else colors.error)
+                            .padding(horizontal = 6.dp, vertical = 2.dp),
                     contentAlignment = Alignment.Center,
                 ) {
                     KomiText(
@@ -349,16 +400,19 @@ private fun RowTrailing(trailing: KomiListTrailing) {
 
             KomiListTrailing.UnreadDot -> {
                 Box(
-                    modifier = Modifier
-                        .size(8.dp)
-                        .then(if (isManga) Modifier else Modifier.clip(CircleShape))
-                        .background(colors.error),
+                    modifier =
+                        Modifier
+                            .size(8.dp)
+                            .then(if (isManga) Modifier else Modifier.clip(CircleShape))
+                            .background(colors.error),
                 )
 
                 Chevron()
             }
 
-            is KomiListTrailing.Toggle -> KomiSwitch(checked = trailing.checked, onCheckedChange = null)
+            is KomiListTrailing.Toggle -> {
+                KomiSwitch(checked = trailing.checked, onCheckedChange = null)
+            }
         }
     }
 }
@@ -386,61 +440,63 @@ private fun rowClick(item: KomiListItem): () -> Unit {
 private fun PreviewLists() {
     Column(verticalArrangement = Arrangement.spacedBy(Spacing.lg)) {
         KomiList(
-            items = persistentListOf(
-                KomiListItem(
-                    title = "Stars",
-                    subtitle = "Your starred repositories from GitHub",
-                    icon = Icons.Outlined.Star,
-                    selected = true,
-                    onClick = {},
+            items =
+                persistentListOf(
+                    KomiListItem(
+                        title = "Stars",
+                        subtitle = "Your starred repositories from GitHub",
+                        icon = Icons.Outlined.Star,
+                        selected = true,
+                        onClick = {},
+                    ),
+                    KomiListItem(
+                        title = "Favourites",
+                        subtitle = "Saved locally",
+                        icon = Icons.Outlined.Favorite,
+                        trailing = KomiListTrailing.Value("24"),
+                        onClick = {},
+                    ),
+                    KomiListItem(
+                        title = "Recently Viewed",
+                        subtitle = "Repositories you have visited",
+                        icon = Icons.Outlined.Schedule,
+                        onClick = {},
+                    ),
                 ),
-                KomiListItem(
-                    title = "Favourites",
-                    subtitle = "Saved locally",
-                    icon = Icons.Outlined.Favorite,
-                    trailing = KomiListTrailing.Value("24"),
-                    onClick = {},
-                ),
-                KomiListItem(
-                    title = "Recently Viewed",
-                    subtitle = "Repositories you have visited",
-                    icon = Icons.Outlined.Schedule,
-                    onClick = {},
-                ),
-            ),
         )
 
         KomiList(
-            items = persistentListOf(
-                KomiListItem(
-                    title = "What's New",
-                    subtitle = "Recent releases",
-                    icon = Icons.Outlined.Campaign,
-                    trailing = KomiListTrailing.Badge(3),
-                    onClick = {},
+            items =
+                persistentListOf(
+                    KomiListItem(
+                        title = "What's New",
+                        subtitle = "Recent releases",
+                        icon = Icons.Outlined.Campaign,
+                        trailing = KomiListTrailing.Badge(3),
+                        onClick = {},
+                    ),
+                    KomiListItem(
+                        title = "Announcements",
+                        subtitle = "News and notices",
+                        icon = Icons.Outlined.Notifications,
+                        trailing = KomiListTrailing.UnreadDot,
+                        onClick = {},
+                    ),
+                    KomiListItem(
+                        title = "Push notifications",
+                        subtitle = "Toggles in place",
+                        icon = Icons.Outlined.Notifications,
+                        trailing = KomiListTrailing.Toggle(checked = true, onCheckedChange = {}),
+                        onClick = {},
+                    ),
+                    KomiListItem(
+                        title = "Logout",
+                        icon = Icons.AutoMirrored.Filled.Logout,
+                        trailing = KomiListTrailing.None,
+                        destructive = true,
+                        onClick = {},
+                    ),
                 ),
-                KomiListItem(
-                    title = "Announcements",
-                    subtitle = "News and notices",
-                    icon = Icons.Outlined.Notifications,
-                    trailing = KomiListTrailing.UnreadDot,
-                    onClick = {},
-                ),
-                KomiListItem(
-                    title = "Push notifications",
-                    subtitle = "Toggles in place",
-                    icon = Icons.Outlined.Notifications,
-                    trailing = KomiListTrailing.Toggle(checked = true, onCheckedChange = {}),
-                    onClick = {},
-                ),
-                KomiListItem(
-                    title = "Logout",
-                    icon = Icons.AutoMirrored.Filled.Logout,
-                    trailing = KomiListTrailing.None,
-                    destructive = true,
-                    onClick = {},
-                ),
-            ),
         )
     }
 }

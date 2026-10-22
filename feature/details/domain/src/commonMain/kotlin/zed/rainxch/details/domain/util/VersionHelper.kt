@@ -38,11 +38,6 @@ object VersionHelper {
         if (candidateIndex != -1 && currentIndex != -1) {
             return candidateIndex > currentIndex
         }
-        return cmp < 0
+        return false
     }
-
-    fun compareSemanticVersions(
-        a: String,
-        b: String,
-    ): Int = VersionMath.compareVersions(a, b)
 }

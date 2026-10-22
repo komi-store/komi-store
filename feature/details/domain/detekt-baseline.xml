@@ -1,0 +1,8 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues/>
+  <CurrentIssues>
+    <ID>ReturnCount:VersionHelper.kt$VersionHelper$fun isDowngradeVersion( candidate: String, current: String, allReleases: List&lt;GithubRelease&gt;, ): Boolean</ID>
+    <ID>TooManyFunctions:DetailsRepository.kt$DetailsRepository</ID>
+  </CurrentIssues>
+</SmellBaseline>

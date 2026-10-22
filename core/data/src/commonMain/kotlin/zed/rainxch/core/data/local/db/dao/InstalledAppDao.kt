@@ -58,6 +58,9 @@ interface InstalledAppDao {
         latestAssetName = :assetName,
         latestAssetUrl = :assetUrl,
         latestAssetSize = :assetSize,
+        latestReleaseId = :releaseId,
+        latestAssetId = :assetId,
+        latestAssetDigest = :assetDigest,
         releaseNotes = :releaseNotes,
         lastCheckedAt = :timestamp,
         latestVersionName = :latestVersionName,
@@ -73,6 +76,9 @@ interface InstalledAppDao {
         assetName: String?,
         assetUrl: String?,
         assetSize: Long?,
+        releaseId: Long?,
+        assetId: Long?,
+        assetDigest: String?,
         releaseNotes: String?,
         timestamp: Long,
         latestVersionName: String?,
@@ -81,10 +87,16 @@ interface InstalledAppDao {
     )
 
     @Query("UPDATE installed_apps SET includePreReleases = :enabled WHERE packageName = :packageName")
-    suspend fun updateIncludePreReleases(packageName: String, enabled: Boolean)
+    suspend fun updateIncludePreReleases(
+        packageName: String,
+        enabled: Boolean,
+    )
 
     @Query("UPDATE installed_apps SET updateCheckEnabled = :enabled WHERE packageName = :packageName")
-    suspend fun updateUpdateCheckEnabled(packageName: String, enabled: Boolean)
+    suspend fun updateUpdateCheckEnabled(
+        packageName: String,
+        enabled: Boolean,
+    )
 
     @Query(
         """
@@ -142,6 +154,19 @@ interface InstalledAppDao {
     @Query(
         """
         UPDATE installed_apps
+           SET isUpdateAvailable = 0,
+               lastCheckedAt = :timestamp
+         WHERE packageName = :packageName
+        """,
+    )
+    suspend fun clearUpdateFlagKeepBaseline(
+        packageName: String,
+        timestamp: Long,
+    )
+
+    @Query(
+        """
+        UPDATE installed_apps
            SET skippedReleaseTag = :tag,
                isUpdateAvailable = CASE WHEN :tag IS NULL THEN isUpdateAvailable ELSE 0 END
          WHERE packageName = :packageName
@@ -182,9 +207,23 @@ interface InstalledAppDao {
     @Query(
         """
         UPDATE installed_apps
+           SET installedReleaseId = NULL,
+               installedAssetId = NULL,
+               installedAssetDigest = NULL,
+               installedReleasePublishedAt = NULL
+         WHERE packageName = :packageName
+        """,
+    )
+    suspend fun clearInstallBinding(packageName: String)
+
+    // Must not touch the pending identity: callers clear the path before the system confirms the install.
+    @Query(
+        """
+        UPDATE installed_apps
            SET pendingInstallFilePath = :path,
                pendingInstallVersion = :version,
-               pendingInstallAssetName = :assetName
+               pendingInstallAssetName = :assetName,
+               isPendingInstall = CASE WHEN :path IS NULL THEN 0 ELSE 1 END
          WHERE packageName = :packageName
         """,
     )
@@ -198,11 +237,80 @@ interface InstalledAppDao {
     @Query(
         """
         UPDATE installed_apps
+           SET installedAssetDigest = :digest
+         WHERE packageName = :packageName
+        """,
+    )
+    suspend fun setInstalledAssetDigest(
+        packageName: String,
+        digest: String,
+    )
+
+    @Query(
+        """
+        UPDATE installed_apps
+           SET installedReleasePublishedAt = :publishedAt
+         WHERE packageName = :packageName
+        """,
+    )
+    suspend fun setInstalledReleasePublishedAt(
+        packageName: String,
+        publishedAt: String?,
+    )
+
+    @Query(
+        """
+        UPDATE installed_apps
+           SET pendingInstallFilePath = NULL,
+               pendingInstallVersion = NULL,
+               pendingInstallAssetName = NULL,
+               isPendingInstall = 0
+         WHERE packageName = :packageName
+           AND pendingInstallFilePath IS :path
+        """,
+    )
+    suspend fun clearPendingInstallIfPathMatches(
+        packageName: String,
+        path: String?,
+    )
+
+    @Query(
+        """
+        UPDATE installed_apps
+           SET pendingInstallFilePath = :path,
+               pendingInstallVersion = :version,
+               pendingInstallAssetName = :assetName,
+               pendingInstallReleaseId = :releaseId,
+               pendingInstallAssetId = :assetId,
+               pendingInstallAssetDigest = :digest,
+               pendingInstallReleasePublishedAt = :releasePublishedAt,
+               isPendingInstall = 1
+         WHERE packageName = :packageName
+        """,
+    )
+    @Suppress("LongParameterList")
+    suspend fun markAwaitingInstall(
+        packageName: String,
+        path: String,
+        version: String?,
+        assetName: String?,
+        releaseId: Long?,
+        assetId: Long?,
+        releasePublishedAt: String?,
+        digest: String?,
+    )
+
+    @Query(
+        """
+        UPDATE installed_apps
            SET isUpdateAvailable = 0,
                latestVersion = NULL,
                latestAssetName = NULL,
                latestAssetUrl = NULL,
                latestAssetSize = NULL,
+               latestReleaseId = NULL,
+               latestAssetId = NULL,
+               latestAssetDigest = NULL,
                latestVersionName = NULL,
                latestVersionCode = NULL,
                latestReleasePublishedAt = NULL,

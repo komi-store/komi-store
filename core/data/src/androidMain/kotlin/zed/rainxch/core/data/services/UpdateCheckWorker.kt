@@ -16,9 +16,11 @@ import androidx.work.ForegroundInfo
 import androidx.work.WorkerParameters
 import co.touchlab.kermit.Logger
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import zed.rainxch.core.data.local.db.dao.ExternalLinkDao
+import zed.rainxch.core.data.network.BackgroundRequest
 import zed.rainxch.core.domain.model.installation.InstallerType
 import zed.rainxch.core.domain.repository.ExternalImportRepository
 import zed.rainxch.core.domain.repository.InstalledAppsRepository
@@ -38,11 +40,13 @@ class UpdateCheckWorker(
     private val externalLinkDao: ExternalLinkDao by inject()
     private val packageMonitor: PackageMonitor by inject()
 
-    override suspend fun doWork(): Result =
+    override suspend fun doWork(): Result = withContext(BackgroundRequest()) { runCheck() }
+
+    private suspend fun runCheck(): Result =
         try {
             Logger.i { "UpdateCheckWorker: Starting periodic update check" }
 
-            setForeground(createForegroundInfo("Checking for updates..."))
+            setForegroundIfAllowed(createForegroundInfo("Checking for updates..."))
 
             val syncResult = syncInstalledAppsUseCase()
             if (syncResult.isFailure) {
@@ -54,7 +58,6 @@ class UpdateCheckWorker(
             val appsWithUpdates = installedAppsRepository.getAppsWithUpdates().first()
 
             if (appsWithUpdates.isNotEmpty()) {
-
                 val autoUpdateEnabled = tweaksRepository.getAutoUpdateEnabled().first()
                 val installerType = tweaksRepository.getInstallerType().first()
 
@@ -65,7 +68,6 @@ class UpdateCheckWorker(
                     }
                     UpdateScheduler.scheduleAutoUpdate(applicationContext)
                 } else {
-
                     showUpdateNotification(appsWithUpdates)
                 }
             } else {
@@ -95,9 +97,10 @@ class UpdateCheckWorker(
             val trackedFlow = installedAppsRepository.getAllInstalledApps().first()
             val tracked = trackedFlow.map { it.packageName }.toSet()
 
-            val permanent = (
-                externalLinkDao.getDoNotRescanPackageNames() +
-                    externalLinkDao.getActiveSkippedPackageNames(System.currentTimeMillis())
+            val permanent =
+                (
+                    externalLinkDao.getDoNotRescanPackageNames() +
+                        externalLinkDao.getActiveSkippedPackageNames(System.currentTimeMillis())
                 ).toSet()
 
             val delta = (installed - tracked - permanent).take(MAX_DELTA_PACKAGES).toSet()
@@ -138,7 +141,6 @@ class UpdateCheckWorker(
 
     @SuppressLint("MissingPermission")
     private suspend fun showUpdateNotification(appsWithUpdates: List<zed.rainxch.core.domain.model.installation.InstalledApp>) {
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             val granted =
                 ContextCompat.checkSelfPermission(

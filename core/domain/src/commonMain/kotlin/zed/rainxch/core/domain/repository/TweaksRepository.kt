@@ -6,10 +6,10 @@ import zed.rainxch.core.domain.model.appearance.AccentId
 import zed.rainxch.core.domain.model.appearance.AppPersonality
 import zed.rainxch.core.domain.model.appearance.AppTheme
 import zed.rainxch.core.domain.model.appearance.ContentWidth
-import zed.rainxch.core.domain.model.repository.DiscoveryPlatform
 import zed.rainxch.core.domain.model.appearance.FontTheme
-import zed.rainxch.core.domain.model.installation.InstallerType
 import zed.rainxch.core.domain.model.appearance.MangaPaperId
+import zed.rainxch.core.domain.model.installation.InstallerType
+import zed.rainxch.core.domain.model.repository.DiscoveryPlatform
 import zed.rainxch.core.domain.model.settings.TranslationProvider
 
 interface TweaksRepository {
@@ -49,6 +49,10 @@ interface TweaksRepository {
 
     suspend fun setInstallerType(type: InstallerType)
 
+    fun getExternalInstallerPackage(): Flow<String>
+
+    suspend fun setExternalInstallerPackage(packageName: String)
+
     fun getInstallerAttribution(): Flow<zed.rainxch.core.domain.model.installation.InstallerAttribution>
 
     suspend fun setInstallerAttribution(attribution: zed.rainxch.core.domain.model.installation.InstallerAttribution)
@@ -80,6 +84,10 @@ interface TweaksRepository {
     fun getScrollbarEnabled(): Flow<Boolean>
 
     suspend fun setScrollbarEnabled(enabled: Boolean)
+
+    fun getDisplayModeId(): Flow<Int>
+
+    suspend fun setDisplayModeId(modeId: Int)
 
     fun getContentWidth(): Flow<ContentWidth>
 
@@ -141,10 +149,6 @@ interface TweaksRepository {
 
     suspend fun setExternalImportBannerDismissedAtCount(count: Int)
 
-    fun getKaoBannerDismissed(): Flow<Boolean>
-
-    suspend fun setKaoBannerDismissed(dismissed: Boolean)
-
     fun getApkInspectCoachmarkShown(): Flow<Boolean>
 
     suspend fun setApkInspectCoachmarkShown(shown: Boolean)
@@ -156,6 +160,10 @@ interface TweaksRepository {
     fun getShowAllPlatforms(): Flow<Boolean>
 
     suspend fun setShowAllPlatforms(enabled: Boolean)
+
+    fun getRepoGridLayout(): Flow<Boolean>
+
+    suspend fun setRepoGridLayout(enabled: Boolean)
 
     fun getBatteryOptimizationPromptDismissed(): Flow<Boolean>
 
@@ -175,7 +183,10 @@ interface TweaksRepository {
 
     fun getAnnouncementsMutedCategories(): Flow<Set<AnnouncementCategory>>
 
-    suspend fun setAnnouncementCategoryMuted(category: AnnouncementCategory, muted: Boolean)
+    suspend fun setAnnouncementCategoryMuted(
+        category: AnnouncementCategory,
+        muted: Boolean,
+    )
 
     fun getAnnouncementsLastFetchedAt(): Flow<Long>
 
@@ -199,3 +210,6 @@ interface TweaksRepository {
 
     suspend fun removeCustomForgeHost(host: String)
 }
+
+// Matches WindowManager.LayoutParams.preferredDisplayModeId: 0 leaves the system in charge.
+const val SYSTEM_DEFAULT_DISPLAY_MODE_ID = 0

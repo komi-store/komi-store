@@ -12,7 +12,9 @@ kotlin {
 
                 implementation(projects.core.domain)
 
-                implementation(libs.bundles.landscapist)
+                implementation(libs.coil3.compose)
+                implementation(libs.coil3.network.ktor)
+                implementation(libs.coil3.svg)
 
                 implementation(libs.jetbrains.lifecycle.compose)
 
@@ -22,6 +24,19 @@ kotlin {
                 implementation(libs.markdown.renderer)
                 implementation(libs.markdown.renderer.coil3)
                 implementation(libs.highlights)
+                implementation(libs.material.kolor)
+            }
+        }
+
+        androidMain {
+            dependencies {
+                implementation(libs.androidx.core.ktx)
+            }
+        }
+
+        jvmTest {
+            dependencies {
+                implementation(kotlin("test"))
             }
         }
     }

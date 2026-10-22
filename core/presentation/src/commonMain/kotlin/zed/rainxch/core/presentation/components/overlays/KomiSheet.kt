@@ -1,8 +1,6 @@
 package zed.rainxch.core.presentation.components.overlays
 
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.snap
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -30,8 +28,9 @@ import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Surface
-import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.material3.rememberBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -47,7 +46,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import zed.rainxch.core.presentation.components.buttons.KomiButton
@@ -170,7 +168,10 @@ private fun MangaBottomSheet(
     content: @Composable ColumnScope.() -> Unit,
 ) {
     val colors = personality.colors
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val sheetState = rememberBottomSheetState(
+        initialValue = SheetValue.Hidden,
+        enabledValues = setOf(SheetValue.Hidden, SheetValue.Expanded),
+    )
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -179,7 +180,7 @@ private fun MangaBottomSheet(
         shape = RectangleShape,
         containerColor = colors.background,
         contentColor = colors.onSurface,
-        scrimColor = colors.scrim.copy(alpha = 0.5f),
+        scrimColor = colors.scrimOverlay,
         dragHandle = null,
     ) {
         Column(Modifier.fillMaxWidth()) {
@@ -220,7 +221,7 @@ private fun MangaCenterDialog(
     LaunchedEffect(Unit) { shown = true }
     val progress by animateFloatAsState(
         targetValue = if (shown) 1f else 0f,
-        animationSpec = if (motionOff) snap() else tween(personality.motion.cardEnterMs),
+        animationSpec = personality.motion.defaultSpatial(),
         label = "komiSheetPop",
     )
 
@@ -344,18 +345,15 @@ private fun MangaSheetInner(
                 )
                 KomiText(
                     text = title,
-                    role = KomiTextRole.Title,
-                    fontSize = 19.sp,
+                    role = KomiTextRole.CardTitle,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
                 if (titleJp != null) {
                     KomiText(
                         text = titleJp,
-                        role = KomiTextRole.Label,
+                        role = KomiTextRole.Caption,
                         color = colors.onSurfaceVariant,
-                        fontSize = 11.sp,
-                        uppercase = false,
                         maxLines = 1,
                     )
                 }
@@ -427,7 +425,10 @@ private fun ClassicBottomSheet(
     content: @Composable ColumnScope.() -> Unit,
 ) {
     val colors = LocalPersonality.current.colors
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val sheetState = rememberBottomSheetState(
+        initialValue = SheetValue.Hidden,
+        enabledValues = setOf(SheetValue.Hidden, SheetValue.Expanded),
+    )
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -443,7 +444,7 @@ private fun ClassicBottomSheet(
             if (title != null) {
                 KomiText(
                     text = title,
-                    role = KomiTextRole.Title,
+                    role = KomiTextRole.CardTitle,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
@@ -496,7 +497,7 @@ private fun ClassicCenterDialog(
                 if (title != null) {
                     KomiText(
                         text = title,
-                        role = KomiTextRole.Title,
+                        role = KomiTextRole.CardTitle,
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis
                     )

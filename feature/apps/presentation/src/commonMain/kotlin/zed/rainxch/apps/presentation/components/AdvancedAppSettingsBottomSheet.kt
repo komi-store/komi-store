@@ -1,6 +1,7 @@
 package zed.rainxch.apps.presentation.components
 
 import zed.rainxch.core.presentation.utils.formatFileSize
+import androidx.compose.material.icons.rounded.FilterAlt
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -24,7 +25,6 @@ import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material.icons.filled.Warning
 import zed.rainxch.core.presentation.components.buttons.KomiButton
-import zed.rainxch.core.presentation.components.buttons.KomiButtonSize
 import zed.rainxch.core.presentation.components.buttons.KomiButtonVariant
 import zed.rainxch.core.presentation.components.dividers.KomiHorizontalDivider
 import zed.rainxch.core.presentation.components.icon.KomiIcon
@@ -41,10 +41,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import kotlinx.collections.immutable.ImmutableList
 import org.jetbrains.compose.resources.pluralStringResource
 import org.jetbrains.compose.resources.stringResource
@@ -82,16 +80,13 @@ fun AdvancedAppSettingsBottomSheet(
                 Column(modifier = Modifier.weight(1f)) {
                     KomiText(
                         text = stringResource(Res.string.advanced_settings_title),
-                        role = KomiTextRole.Title,
+                        role = KomiTextRole.CardTitle,
                         color = colors.onSurface,
-                        fontWeight = FontWeight.Bold,
                     )
 
                     KomiText(
                         text = "${app.repoOwner}/${app.repoName}",
                         role = KomiTextRole.Body,
-                        fontSize = 13.sp,
-                        uppercase = false,
                         color = colors.onSurfaceVariant,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
@@ -120,17 +115,8 @@ fun AdvancedAppSettingsBottomSheet(
                 modifier = Modifier.fillMaxWidth(),
                 label = stringResource(Res.string.asset_filter_label),
                 placeholder = stringResource(Res.string.asset_filter_placeholder),
-                leadingIcon = Icons.Default.FilterAlt,
-                trailing = {
-                    if (state.advancedFilterDraft.isNotEmpty()) {
-                        KomiButton(
-                            onClick = { onAction(AppsAction.OnAdvancedClearFilter) },
-                            label = stringResource(Res.string.clear),
-                            variant = KomiButtonVariant.Text,
-                            size = KomiButtonSize.Sm,
-                        )
-                    }
-                },
+                leadingIcon = Icons.Rounded.FilterAlt,
+                onClear = { onAction(AppsAction.OnAdvancedClearFilter) },
                 helper = if (state.advancedFilterError == null) advancedSupporting else null,
                 error = if (state.advancedFilterError != null) advancedSupporting else null,
                 enabled = !state.advancedSavingFilter,
@@ -147,15 +133,13 @@ fun AdvancedAppSettingsBottomSheet(
                 Column(modifier = Modifier.weight(1f)) {
                     KomiText(
                         text = stringResource(Res.string.fallback_older_releases_title),
-                        role = KomiTextRole.Body,
+                        role = KomiTextRole.Label,
                         color = colors.onSurface,
-                        fontWeight = FontWeight.Medium,
                     )
 
                     KomiText(
                         text = stringResource(Res.string.fallback_older_releases_description),
                         role = KomiTextRole.Body,
-                        fontSize = 13.sp,
                         color = colors.onSurfaceVariant,
                     )
                 }
@@ -170,7 +154,7 @@ fun AdvancedAppSettingsBottomSheet(
             Spacer(Modifier.height(16.dp))
 
             KomiHorizontalDivider(
-                color = colors.outlineVariant.copy(alpha = 0.4f),
+                color = colors.divider,
             )
 
             Spacer(Modifier.height(16.dp))
@@ -178,7 +162,6 @@ fun AdvancedAppSettingsBottomSheet(
             KomiText(
                 text = stringResource(Res.string.advanced_filter_variant_relation),
                 role = KomiTextRole.Body,
-                fontSize = 13.sp,
                 color = colors.onSurfaceVariant,
             )
 
@@ -193,7 +176,7 @@ fun AdvancedAppSettingsBottomSheet(
             Spacer(Modifier.height(16.dp))
 
             KomiHorizontalDivider(
-                color = colors.outlineVariant.copy(alpha = 0.4f),
+                color = colors.divider,
             )
 
             Spacer(Modifier.height(16.dp))
@@ -256,10 +239,8 @@ private fun PreviewSection(
 
         KomiText(
             text = stringResource(Res.string.advanced_preview_title),
-            role = KomiTextRole.Title,
-            fontSize = 14.sp,
+            role = KomiTextRole.CardTitle,
             color = colors.onSurface,
-            fontWeight = FontWeight.SemiBold,
             modifier = Modifier.weight(1f),
         )
 
@@ -274,7 +255,7 @@ private fun PreviewSection(
             KomiIcon(
                 imageVector = Icons.Default.Refresh,
                 contentDescription = null,
-                tint = if (isLoading) colors.onSurfaceVariant.copy(alpha = 0.38f) else colors.onSurfaceVariant,
+                tint = if (isLoading) colors.disabledContent else colors.onSurfaceVariant,
             )
         }
     }
@@ -332,11 +313,8 @@ private fun PreviewSection(
                             matchedTag,
                             matchedAssets.size,
                         ),
-                    role = KomiTextRole.Body,
-                    fontSize = 13.sp,
-                    uppercase = false,
+                    role = KomiTextRole.Label,
                     color = colors.primary,
-                    fontWeight = FontWeight.Medium,
                 )
 
                 Spacer(Modifier.height(6.dp))
@@ -366,8 +344,6 @@ private fun PreviewSection(
                         KomiText(
                             text = asset.name,
                             role = KomiTextRole.Body,
-                            fontSize = 13.sp,
-                            uppercase = false,
                             color = colors.onSurface,
                             modifier = Modifier.weight(1f),
                             maxLines = 1,
@@ -376,9 +352,7 @@ private fun PreviewSection(
 
                         KomiText(
                             text = formatFileSize(asset.size),
-                            role = KomiTextRole.Label,
-                            fontSize = 11.sp,
-                            uppercase = false,
+                            role = KomiTextRole.Caption,
                             color = colors.onSurfaceVariant,
                         )
                     }
@@ -419,10 +393,8 @@ private fun VariantRow(
         Column(modifier = Modifier.weight(1f)) {
             KomiText(
                 text = stringResource(Res.string.variant_picker_title),
-                role = KomiTextRole.Body,
+                role = KomiTextRole.Label,
                 color = colors.onSurface,
-                fontWeight = FontWeight.Medium,
-                uppercase = false,
             )
 
             KomiText(
@@ -436,8 +408,6 @@ private fun VariantRow(
                             stringResource(Res.string.variant_picker_pinned, pinnedVariant)
                     },
                 role = KomiTextRole.Body,
-                fontSize = 13.sp,
-                uppercase = false,
                 color =
                     if (isStale) {
                         colors.error

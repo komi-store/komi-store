@@ -116,7 +116,7 @@ private fun mangaElevation(elevation: KomiSurfaceElevation): MangaElevation =
 @Composable
 private fun MangaSurface(
     personality: MangaPersonality,
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
     elevation: KomiSurfaceElevation,
     paper: KomiSurfacePaper,
     screentone: KomiScreentone,
@@ -136,15 +136,16 @@ private fun MangaSurface(
     val needsClip = personality.shape.corner > 0.dp
     val fill =
         when (paper) {
-            KomiSurfacePaper.Surface -> colors.surface
+            KomiSurfacePaper.Surface, KomiSurfacePaper.Tinted -> colors.surface
             KomiSurfacePaper.Background -> colors.background
         }
-    val contentInk = when (paper) {
-        KomiSurfacePaper.Surface -> colors.onSurface
-        KomiSurfacePaper.Background -> colors.onBackground
-    }
+    val contentInk =
+        when (paper) {
+            KomiSurfacePaper.Surface, KomiSurfacePaper.Tinted -> colors.onSurface
+            KomiSurfacePaper.Background -> colors.onBackground
+        }
 
-    val pressable = onClick != null
+    val pressable = onClick != null || onLongClick != null
     val tiltModifier = if (tilt != 0f) Modifier.rotate(tilt) else Modifier
 
     val depthModifier =
@@ -171,32 +172,40 @@ private fun MangaSurface(
                 ).combinedClickable(
                     interactionSource = interaction,
                     indication = null,
-                    onClick = onClick,
+                    onClick = onClick ?: {},
                     onLongClick = onLongClick,
                 )
         } else if (elev.shadow > 0.dp) {
             Modifier.hardShadow(
                 offset = DpOffset(elev.shadow, elev.shadow),
                 color = colors.shadow,
-                shape = shape
+                shape = shape,
             )
         } else {
             Modifier
         }
 
-    val toneModifier = when (screentone) {
-        KomiScreentone.None -> Modifier
-        KomiScreentone.Corner -> Modifier.screentoneCorner(
-            colors.onSurface,
-            colors.screentoneOpacity,
-            boost = screentoneBoost
-        )
+    val toneModifier =
+        when (screentone) {
+            KomiScreentone.None -> {
+                Modifier
+            }
 
-        KomiScreentone.Fill -> Modifier.screentoneFill(
-            colors.onSurface,
-            colors.screentoneOpacity
-        )
-    }
+            KomiScreentone.Corner -> {
+                Modifier.screentoneCorner(
+                    colors.onSurface,
+                    colors.screentoneOpacity,
+                    boost = screentoneBoost,
+                )
+            }
+
+            KomiScreentone.Fill -> {
+                Modifier.screentoneFill(
+                    colors.onSurface,
+                    colors.screentoneOpacity,
+                )
+            }
+        }
 
     val borderModifier =
         if (topEdgeOnly) {
@@ -204,7 +213,7 @@ private fun MangaSurface(
                 drawRect(
                     color = colors.outline,
                     topLeft = Offset.Zero,
-                    size = Size(size.width, borderWidth.toPx())
+                    size = Size(size.width, borderWidth.toPx()),
                 )
             }
         } else {
@@ -232,7 +241,7 @@ private fun MangaSurface(
 @Composable
 private fun ClassicSurface(
     personality: ClassicPersonality,
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
     elevation: KomiSurfaceElevation,
     paper: KomiSurfacePaper,
     onClick: (() -> Unit)?,
@@ -242,26 +251,19 @@ private fun ClassicSurface(
 ) {
     val colors = personality.colors
     val shape = remember(personality.shape.corner) { RoundedCornerShape(personality.shape.corner) }
+    val fill = classicFill(personality, paper, elevation)
     val border =
-        remember(personality.shape.borderPanel, colors.outlineVariant) {
-            BorderStroke(personality.shape.borderPanel, colors.outlineVariant)
-        }
-    val fill =
-        when (paper) {
-            KomiSurfacePaper.Surface -> colors.surface
-            KomiSurfacePaper.Background -> colors.background
-        }
+        if (paper == KomiSurfacePaper.Background) BorderStroke(personality.shape.borderPanel, colors.outlineVariant) else null
     val shadowElevation =
         when (elevation) {
-            KomiSurfaceElevation.Flat -> 0.dp
-            KomiSurfaceElevation.Card -> 1.dp
+            KomiSurfaceElevation.Flat, KomiSurfaceElevation.Card -> 0.dp
             KomiSurfaceElevation.Raised -> 3.dp
-            KomiSurfaceElevation.Modal -> 8.dp
+            KomiSurfaceElevation.Modal -> 6.dp
         }
 
     val clickModifier =
-        if (onClick != null) {
-            Modifier.combinedClickable(onClick = onClick, onLongClick = onLongClick)
+        if (onClick != null || onLongClick != null) {
+            Modifier.combinedClickable(onClick = onClick ?: {}, onLongClick = onLongClick)
         } else {
             Modifier
         }
@@ -269,7 +271,7 @@ private fun ClassicSurface(
         modifier = modifier,
         shape = shape,
         color = fill,
-        contentColor = colors.onSurface,
+        contentColor = if (paper == KomiSurfacePaper.Tinted) personality.colorScheme.onSecondaryContainer else colors.onSurface,
         border = border,
         shadowElevation = shadowElevation,
     ) {
@@ -277,10 +279,37 @@ private fun ClassicSurface(
     }
 }
 
+// Tonal surfaces: the container color steps up with elevation instead of drawing an outline.
+// A background-colored surface keeps the outline, since it would vanish into the page.
+private fun classicFill(
+    personality: ClassicPersonality,
+    paper: KomiSurfacePaper,
+    elevation: KomiSurfaceElevation,
+): Color {
+    val colors = personality.colors
+    return when (paper) {
+        KomiSurfacePaper.Background -> {
+            colors.background
+        }
+
+        KomiSurfacePaper.Tinted -> {
+            personality.colorScheme.secondaryContainer
+        }
+
+        KomiSurfacePaper.Surface -> {
+            when (elevation) {
+                KomiSurfaceElevation.Flat -> colors.surface
+                KomiSurfaceElevation.Card -> colors.surfaceContainer
+                KomiSurfaceElevation.Raised, KomiSurfaceElevation.Modal -> colors.surfaceContainerHigh
+            }
+        }
+    }
+}
+
 @Composable
 private fun PreviewPanelBody() {
     Column(verticalArrangement = Arrangement.spacedBy(Spacing.xs)) {
-        KomiText("Ollama", role = KomiTextRole.Title)
+        KomiText("Ollama", role = KomiTextRole.CardTitle)
         KomiText("Run large language models locally.", role = KomiTextRole.Body)
         KomiText("v0.5.4 · 174M", role = KomiTextRole.Mono)
     }
@@ -337,7 +366,7 @@ private fun KomiSurfaceMangaNightPreview() {
         KomiSurface(
             screentone = KomiScreentone.Corner,
             onClick = {},
-            contentPadding = PaddingValues(Spacing.lg)
+            contentPadding = PaddingValues(Spacing.lg),
         ) {
             PreviewPanelBody()
         }
@@ -358,7 +387,7 @@ private fun KomiSurfaceClassicDarkPreview() {
     PersonalityPreview(classicPersonality(dark = true)) {
         KomiSurface(
             elevation = KomiSurfaceElevation.Modal,
-            contentPadding = PaddingValues(Spacing.lg)
+            contentPadding = PaddingValues(Spacing.lg),
         ) {
             PreviewPanelBody()
         }

@@ -1,0 +1,47 @@
+{
+  "versionCode": 18,
+  "versionName": "1.8.3",
+  "releaseDate": "2026-05-14",
+  "showAsSheet": true,
+  "sections": [
+    {
+      "type": "NEW",
+      "bullets": [
+        "支援 Codeberg + Forgejo + Gitea。貼上 Codeberg / Forgejo 連結，或在設定 → 網路新增自託管主機。詳情、安裝、更新、搜尋 — 全部接通。",
+        "Homebrew 安裝 macOS：`brew install --cask github-store`。",
+        "GitHub 登入改用標準網頁流程 — 無需 8 位程式碼。",
+        "偏好和憑據透過 KSafe 以 AES-256-GCM 加密（Android 使用硬體 Keystore）。首次啟動時遷移。",
+        "新增 fastly.jsdelivr.net 鏡像，用於受限的 GitHub。",
+        "加入 Keep Android Open 聯盟 — 橫幅說明。"
+      ]
+    },
+    {
+      "type": "FIXED",
+      "bullets": [
+        "詳情頁的平臺標籤可開啟過濾後的 Search（之前無反應）。",
+        "Android 12 鍵盤搜尋按鈕在中文輸入法下可用。",
+        "外部連結的倉庫在詳情頁顯示一鍵解除連結的橫幅。",
+        "登入開啟預填程式碼的 URL 並複製貼上友好的程式碼。",
+        "Android 16 / 定製 ROM 上設定 + 下載閃退 — 回退到內部儲存。",
+        "Android 13+ 檢測 Magisk / KernelSU / APatch（被 SELinux 遮蔽的探測）。",
+        "已固定的變體標籤會重新整理 — 無殘留的 beta/rc 編號。",
+        "README / 釋出說明在視口銷燬間保留滾動位置。"
+      ]
+    },
+    {
+      "type": "IMPROVED",
+      "bullets": [
+        "手動關聯表單按安裝來源排序（F-Droid / Obtainium 在前，系統更新在後），每個應用帶來源標籤。",
+        "Smart match 跨 GitHub + Codeberg + 自定義程式碼託管推薦排序後的倉庫。",
+        "GFM 警示框（Note / Tip / Important / Warning / Caution）以彩色卡片呈現。",
+        "Emoji 簡寫 — :rocket: → 🚀（約 250 種）。",
+        "SVG 圖片原生渲染。主題圖片遵循淺色/深色。瀏覽器 UA 繞過 CDN 防盜鏈。",
+        "程式碼塊語法高亮（Kotlin / Java / Python / JS/TS / Rust / Swift / C# / Ruby / Shell，自適配主題）。",
+        "Markdown 完善 — HTML blockquote 與 `<pre><code>` 正確渲染，上下標 → Unicode，HTML 實體已解碼。",
+        "`<details>` 摺疊區段為可點選展開的卡片。徽章/按鈕圖片在同一行排列。",
+        "手動匹配信任你選擇的版本 — 無需重新下載驗證。",
+        "分割槽排序 — 已安裝、已加星、收藏各自記憶選擇。"
+      ]
+    }
+  ]
+}

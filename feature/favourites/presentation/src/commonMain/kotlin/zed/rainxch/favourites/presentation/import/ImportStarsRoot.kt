@@ -1,6 +1,7 @@
 package zed.rainxch.favourites.presentation.import
 
 import androidx.compose.foundation.clickable
+import androidx.compose.material.icons.rounded.Search
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,8 +16,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.FavoriteBorder
@@ -25,9 +24,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import zed.rainxch.core.presentation.components.GitHubStoreImage
 import org.jetbrains.compose.resources.stringResource
@@ -37,7 +34,6 @@ import zed.rainxch.core.presentation.components.bars.KomiTopBarSize
 import zed.rainxch.core.presentation.components.buttons.KomiButton
 import zed.rainxch.core.presentation.components.buttons.KomiButtonVariant
 import zed.rainxch.core.presentation.components.buttons.KomiButtonSize
-import zed.rainxch.core.presentation.components.buttons.KomiIconButton
 import zed.rainxch.core.presentation.components.icon.KomiIcon
 import zed.rainxch.core.presentation.components.inputs.KomiTextField
 import zed.rainxch.core.presentation.components.scaffold.KomiScaffold
@@ -46,7 +42,6 @@ import zed.rainxch.core.presentation.components.text.KomiTextRole
 import zed.rainxch.core.presentation.locals.LocalPersonality
 import zed.rainxch.core.presentation.utils.ObserveAsEvents
 import zed.rainxch.githubstore.core.presentation.res.Res
-import zed.rainxch.githubstore.core.presentation.res.clear_search
 import zed.rainxch.githubstore.core.presentation.res.import_stars_add
 import zed.rainxch.githubstore.core.presentation.res.import_stars_add_all
 import zed.rainxch.githubstore.core.presentation.res.import_stars_added
@@ -59,7 +54,6 @@ import zed.rainxch.githubstore.core.presentation.res.import_stars_search_hint
 import zed.rainxch.githubstore.core.presentation.res.import_stars_subtitle
 import zed.rainxch.githubstore.core.presentation.res.import_stars_title
 import zed.rainxch.githubstore.core.presentation.res.import_stars_try_another
-import zed.rainxch.githubstore.core.presentation.res.navigate_back
 
 @Composable
 fun ImportStarsRoot(
@@ -91,14 +85,7 @@ private fun ImportStarsScreen(
             KomiTopBar(
                 title = stringResource(Res.string.import_stars_title),
                 size = KomiTopBarSize.Compact,
-                leading = {
-                    KomiIconButton(
-                        icon = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = stringResource(Res.string.navigate_back),
-                        onClick = { onAction(ImportStarsAction.OnNavigateBack) },
-                        variant = KomiButtonVariant.Tonal,
-                    )
-                },
+                onBack = { onAction(ImportStarsAction.OnNavigateBack) },
             )
         },
     ) { padding ->
@@ -151,7 +138,6 @@ private fun UsernameInputPanel(
             KomiText(
                 text = state.errorMessage,
                 role = KomiTextRole.Body,
-                fontSize = 13.sp,
                 color = colors.error,
             )
         }
@@ -192,7 +178,6 @@ private fun ResultsPanel(
                 ),
                 role = KomiTextRole.Body,
                 color = colors.onSurfaceVariant,
-                uppercase = false,
                 modifier = Modifier.weight(1f),
             )
             KomiButton(
@@ -209,19 +194,8 @@ private fun ResultsPanel(
             onValueChange = { onAction(ImportStarsAction.OnSearchChange(it)) },
             modifier = Modifier.fillMaxWidth(),
             placeholder = stringResource(Res.string.import_stars_search_hint),
-            leadingIcon = Icons.Filled.Search,
-            trailing = {
-                if (state.searchQuery.isNotEmpty()) {
-                    KomiIcon(
-                        imageVector = Icons.Filled.Close,
-                        contentDescription = stringResource(Res.string.clear_search),
-                        tint = colors.onSurfaceVariant,
-                        modifier = Modifier
-                            .size(18.dp)
-                            .clickable { onAction(ImportStarsAction.OnClearSearch) },
-                    )
-                }
-            },
+            leadingIcon = Icons.Rounded.Search,
+            onClear = { onAction(ImportStarsAction.OnClearSearch) },
         )
 
         if (state.pendingCount > 0) {
@@ -254,7 +228,6 @@ private fun ResultsPanel(
                     },
                     role = KomiTextRole.Body,
                     color = colors.onSurfaceVariant,
-                    uppercase = false,
                 )
             }
         } else {
@@ -299,19 +272,15 @@ private fun CandidateRow(
         Column(modifier = Modifier.weight(1f)) {
             KomiText(
                 text = "${candidate.owner}/${candidate.name}",
-                role = KomiTextRole.Title,
-                fontWeight = FontWeight.SemiBold,
+                role = KomiTextRole.CardTitle,
                 color = colors.onBackground,
-                uppercase = false,
             )
 
             if (!candidate.description.isNullOrBlank()) {
                 KomiText(
                     text = candidate.description,
                     role = KomiTextRole.Body,
-                    fontSize = 13.sp,
                     color = colors.onSurfaceVariant,
-                    uppercase = false,
                     maxLines = 2,
                 )
             }

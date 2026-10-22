@@ -1,6 +1,8 @@
 package zed.rainxch.apps.presentation.components
 
 import zed.rainxch.core.presentation.utils.formatFileSize
+import androidx.compose.material.icons.rounded.Search
+import androidx.compose.material.icons.rounded.FilterAlt
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -45,10 +47,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import kotlinx.collections.immutable.ImmutableList
 import org.jetbrains.compose.resources.pluralStringResource
 import org.jetbrains.compose.resources.stringResource
@@ -153,9 +153,8 @@ private fun PickAppStep(
     ) {
         KomiText(
             text = stringResource(Res.string.link_app_title),
-            role = KomiTextRole.Title,
+            role = KomiTextRole.CardTitle,
             color = colors.onSurface,
-            fontWeight = FontWeight.Bold,
         )
 
         Spacer(Modifier.height(4.dp))
@@ -173,7 +172,8 @@ private fun PickAppStep(
             onValueChange = onSearchChange,
             modifier = Modifier.fillMaxWidth(),
             placeholder = stringResource(Res.string.search_apps_hint),
-            leadingIcon = Icons.Default.Search,
+            leadingIcon = Icons.Rounded.Search,
+            clearable = true,
         )
 
         Spacer(Modifier.height(8.dp))
@@ -193,7 +193,7 @@ private fun PickAppStep(
                 )
 
                 KomiHorizontalDivider(
-                    color = colors.outlineVariant.copy(alpha = 0.3f),
+                    color = colors.divider,
                 )
             }
 
@@ -238,12 +238,10 @@ private fun DeviceAppItem(
         ) {
             KomiText(
                 text = app.appName,
-                role = KomiTextRole.Body,
+                role = KomiTextRole.Label,
                 color = colors.onSurface,
-                fontWeight = FontWeight.Medium,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
-                uppercase = false,
             )
 
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -268,8 +266,7 @@ private fun DeviceAppItem(
                             InstallerCategory.PLAY_STORE -> stringResource(Res.string.installer_category_play_store)
                             InstallerCategory.SYSTEM_UPDATE -> stringResource(Res.string.installer_category_system_update)
                         },
-                        role = KomiTextRole.Label,
-                        fontSize = 11.sp,
+                        role = KomiTextRole.Caption,
                         color = when (app.installerCategory) {
                             InstallerCategory.SIDE_STORE -> colors.onPrimaryContainer
                             InstallerCategory.SIDELOADED -> colors.onPrimaryContainer
@@ -278,7 +275,6 @@ private fun DeviceAppItem(
                             InstallerCategory.SYSTEM_UPDATE -> colors.onSurfaceVariant
                         },
                         maxLines = 1,
-                        uppercase = false,
                         modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
                     )
                 }
@@ -288,11 +284,9 @@ private fun DeviceAppItem(
                 KomiText(
                     text = app.packageName,
                     role = KomiTextRole.Body,
-                    fontSize = 13.sp,
                     color = colors.onSurfaceVariant,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    uppercase = false,
                     modifier = Modifier.weight(1f),
                 )
             }
@@ -303,12 +297,10 @@ private fun DeviceAppItem(
         app.versionName?.let { version ->
             KomiText(
                 text = version,
-                role = KomiTextRole.Label,
-                fontSize = 12.sp,
+                role = KomiTextRole.Caption,
                 color = colors.outline,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
-                uppercase = false,
                 modifier = Modifier.widthIn(max = 96.dp),
             )
         }
@@ -348,9 +340,8 @@ private fun SmartMatchStep(
 
             KomiText(
                 text = stringResource(Res.string.link_smart_search_title),
-                role = KomiTextRole.Title,
+                role = KomiTextRole.CardTitle,
                 color = colors.onSurface,
-                fontWeight = FontWeight.Bold,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.weight(1f),
@@ -362,23 +353,19 @@ private fun SmartMatchStep(
         if (selectedApp != null) {
             KomiText(
                 text = selectedApp.appName,
-                role = KomiTextRole.Title,
+                role = KomiTextRole.CardTitle,
                 color = colors.onSurface,
-                fontWeight = FontWeight.SemiBold,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
-                uppercase = false,
                 modifier = Modifier.fillMaxWidth(),
             )
 
             KomiText(
                 text = selectedApp.packageName,
                 role = KomiTextRole.Body,
-                fontSize = 13.sp,
                 color = colors.onSurfaceVariant,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
-                uppercase = false,
                 modifier = Modifier.fillMaxWidth(),
             )
         }
@@ -426,7 +413,6 @@ private fun SmartMatchStep(
                         text = validationStatus ?: stringResource(Res.string.validating_repo),
                         role = KomiTextRole.Body,
                         color = colors.onSurfaceVariant,
-                        uppercase = false,
                     )
                 }
             }
@@ -478,7 +464,7 @@ private fun SmartMatchStep(
                         )
 
                         KomiHorizontalDivider(
-                            color = colors.outlineVariant.copy(alpha = 0.3f),
+                            color = colors.divider,
                         )
                     }
                 }
@@ -514,12 +500,10 @@ private fun SuggestionRow(
         Column(modifier = Modifier.weight(1f)) {
             KomiText(
                 text = "${suggestion.owner}/${suggestion.repo}",
-                role = KomiTextRole.Body,
+                role = KomiTextRole.Label,
                 color = colors.onSurface,
-                fontWeight = FontWeight.Medium,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
-                uppercase = false,
                 modifier = Modifier.fillMaxWidth(),
             )
             val description = suggestion.description?.takeIf { it.isNotBlank() }
@@ -527,11 +511,9 @@ private fun SuggestionRow(
                 KomiText(
                     text = description,
                     role = KomiTextRole.Body,
-                    fontSize = 13.sp,
                     color = colors.onSurfaceVariant,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
-                    uppercase = false,
                     modifier = Modifier.fillMaxWidth(),
                 )
             }
@@ -553,11 +535,9 @@ private fun SuggestionRow(
                 ) {
                     KomiText(
                         text = hostLabel,
-                        role = KomiTextRole.Label,
-                        fontSize = 11.sp,
+                        role = KomiTextRole.Caption,
                         color = hostFg,
                         maxLines = 1,
-                        uppercase = false,
                         modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
                     )
                 }
@@ -578,11 +558,9 @@ private fun SuggestionRow(
                             RepoMatchSource.FORGEJO_SEARCH -> stringResource(Res.string.match_source_search)
                             RepoMatchSource.STARRED -> stringResource(Res.string.match_source_starred)
                         },
-                        role = KomiTextRole.Label,
-                        fontSize = 11.sp,
+                        role = KomiTextRole.Caption,
                         color = colors.onPrimaryContainer,
                         maxLines = 1,
-                        uppercase = false,
                         modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
                     )
                 }
@@ -591,10 +569,8 @@ private fun SuggestionRow(
 
                 KomiText(
                     text = "${(suggestion.confidence * 100).toInt()}%",
-                    role = KomiTextRole.Label,
-                    fontSize = 11.sp,
+                    role = KomiTextRole.Caption,
                     color = colors.onSurfaceVariant,
-                    uppercase = false,
                 )
 
                 suggestion.stars?.let { stars ->
@@ -611,10 +587,8 @@ private fun SuggestionRow(
 
                     KomiText(
                         text = "$stars",
-                        role = KomiTextRole.Label,
-                        fontSize = 11.sp,
+                        role = KomiTextRole.Caption,
                         color = colors.onSurfaceVariant,
-                        uppercase = false,
                     )
                 }
             }
@@ -653,9 +627,8 @@ private fun EnterUrlStep(
 
             KomiText(
                 text = stringResource(Res.string.link_app_title),
-                role = KomiTextRole.Title,
+                role = KomiTextRole.CardTitle,
                 color = colors.onSurface,
-                fontWeight = FontWeight.Bold,
             )
         }
 
@@ -672,27 +645,22 @@ private fun EnterUrlStep(
                 Column(modifier = Modifier.weight(1f)) {
                     KomiText(
                         text = selectedApp.appName,
-                        role = KomiTextRole.Title,
+                        role = KomiTextRole.CardTitle,
                         color = colors.onSurface,
-                        fontWeight = FontWeight.SemiBold,
-                        uppercase = false,
                     )
 
                     KomiText(
                         text = selectedApp.packageName,
                         role = KomiTextRole.Body,
-                        fontSize = 13.sp,
                         color = colors.onSurfaceVariant,
-                        uppercase = false,
                     )
                 }
 
                 selectedApp.versionName?.let {
                     KomiText(
                         text = it,
-                        role = KomiTextRole.Label,
+                        role = KomiTextRole.Caption,
                         color = colors.primary,
-                        uppercase = false,
                     )
                 }
             }
@@ -730,9 +698,7 @@ private fun EnterUrlStep(
             KomiText(
                 text = validationStatus,
                 role = KomiTextRole.Body,
-                fontSize = 13.sp,
                 color = colors.onSurfaceVariant,
-                uppercase = false,
                 modifier = Modifier.fillMaxWidth(),
             )
         }
@@ -777,9 +743,8 @@ private fun PickAssetStep(
 
             KomiText(
                 text = stringResource(Res.string.select_asset_title),
-                role = KomiTextRole.Title,
+                role = KomiTextRole.CardTitle,
                 color = colors.onSurface,
-                fontWeight = FontWeight.Bold,
             )
         }
 
@@ -813,7 +778,8 @@ private fun PickAssetStep(
             modifier = Modifier.fillMaxWidth(),
             label = stringResource(Res.string.asset_filter_label),
             placeholder = stringResource(Res.string.asset_filter_placeholder),
-            leadingIcon = Icons.Default.FilterAlt,
+            leadingIcon = Icons.Rounded.FilterAlt,
+            clearable = true,
             helper = if (filterError == null) filterSupporting else null,
             error = if (filterError != null) filterSupporting else null,
             enabled = !isProcessing,
@@ -831,15 +797,13 @@ private fun PickAssetStep(
             Column(modifier = Modifier.weight(1f)) {
                 KomiText(
                     text = stringResource(Res.string.fallback_older_releases_title),
-                    role = KomiTextRole.Body,
+                    role = KomiTextRole.Label,
                     color = colors.onSurface,
-                    fontWeight = FontWeight.Medium,
                 )
 
                 KomiText(
                     text = stringResource(Res.string.fallback_older_releases_description),
                     role = KomiTextRole.Body,
-                    fontSize = 13.sp,
                     color = colors.onSurfaceVariant,
                 )
             }
@@ -870,7 +834,7 @@ private fun PickAssetStep(
                         .then(
                             if (isSelected) {
                                 Modifier.background(
-                                    colors.primaryContainer.copy(alpha = 0.3f),
+                                    colors.primaryTint,
                                     RoundedCornerShape(shape.cornerSmall),
                                 )
                             } else {
@@ -884,20 +848,16 @@ private fun PickAssetStep(
                     Column(modifier = Modifier.weight(1f)) {
                         KomiText(
                             text = asset.name,
-                            role = KomiTextRole.Body,
+                            role = if (isSelected) KomiTextRole.Label else KomiTextRole.Body,
                             color = colors.onSurface,
-                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
                             maxLines = 2,
                             overflow = TextOverflow.Ellipsis,
-                            uppercase = false,
                         )
 
                         KomiText(
                             text = formatFileSize(asset.size),
                             role = KomiTextRole.Body,
-                            fontSize = 13.sp,
                             color = colors.onSurfaceVariant,
-                            uppercase = false,
                         )
                     }
 
@@ -913,16 +873,14 @@ private fun PickAssetStep(
 
                         KomiText(
                             text = "$downloadProgress%",
-                            role = KomiTextRole.Label,
-                            fontSize = 11.sp,
+                            role = KomiTextRole.Caption,
                             color = colors.primary,
-                            uppercase = false,
                         )
                     }
                 }
 
                 KomiHorizontalDivider(
-                    color = colors.outlineVariant.copy(alpha = 0.3f),
+                    color = colors.divider,
                 )
             }
 
@@ -962,9 +920,7 @@ private fun PickAssetStep(
             KomiText(
                 text = validationStatus,
                 role = KomiTextRole.Body,
-                fontSize = 13.sp,
                 color = colors.onSurfaceVariant,
-                uppercase = false,
             )
         }
 
@@ -973,9 +929,7 @@ private fun PickAssetStep(
             KomiText(
                 text = validationError,
                 role = KomiTextRole.Body,
-                fontSize = 13.sp,
                 color = colors.error,
-                uppercase = false,
             )
         }
     }

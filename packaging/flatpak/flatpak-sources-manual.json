@@ -19,5 +19,138 @@
         "sha512": "921e2ffed05e5dc8ec622d2546641f351f0189c275578b7cd7e5e291244545980c5c946cd90b87402bb0eb03ee4a7c0e2257a9d3af3fbd00cfa2c53ae2ae05aa",
         "dest": "offline-repository/com/google/code/gson/gson-parent/2.8.9",
         "dest-filename": "gson-parent-2.8.9.pom"
+    },
+    {
+        "type": "file",
+        "url": "https://dl.google.com/dl/android/maven2/androidx/lifecycle/lifecycle-common-jvm/2.9.3/lifecycle-common-jvm-2.9.3.jar",
+        "sha512": "20b6ce1a985e807206cd0d5b9170908d4c9fe8fe00b457c5495affd9e46d3f3435e535efe5a4a4295ba0567fd863f641739b05229daf5d19a5b872a789d0882f",
+        "dest": "offline-repository/androidx/lifecycle/lifecycle-common-jvm/2.9.3",
+        "dest-filename": "lifecycle-common-jvm-2.9.3.jar"
+    },
+    {
+        "type": "file",
+        "url": "https://dl.google.com/dl/android/maven2/androidx/savedstate/savedstate-desktop/1.3.3/savedstate-desktop-1.3.3.jar",
+        "sha512": "5e2cae112f0e845f8489b6c5ad8aad7f83fa92acde868f0756a275ae518c84452b9459b7aaba77210ec5dfcbbef35fd146b607203bb6f54b1450cd6ef109e7b1",
+        "dest": "offline-repository/androidx/savedstate/savedstate-desktop/1.3.3",
+        "dest-filename": "savedstate-desktop-1.3.3.jar"
+    },
+    {
+        "type": "file",
+        "url": "https://plugins.gradle.org/m2/com/squareup/kotlinpoet-jvm/2.1.0/kotlinpoet-jvm-2.1.0.jar",
+        "sha512": "c24412d93fa08fc9a065a1c659f96bbb301d5ea2bc17308d3790a8d0972a967698de2e397db452087a71b8f47122a3024f7625b61d23cd996cdcb934894df5fd",
+        "dest": "offline-repository/com/squareup/kotlinpoet-jvm/2.1.0",
+        "dest-filename": "kotlinpoet-jvm-2.1.0.jar"
+    },
+    {
+        "type": "file",
+        "url": "https://repo1.maven.org/maven2/com/github/ajalt/clikt/clikt-jvm/5.0.3/clikt-jvm-5.0.3.jar",
+        "sha512": "0ac2aacaa23d65976b879fb246ae146f174f3ba8a18496619c52cd47e210c3ea6ce7242a5e2cba4d5254ea758828745ff7faafeee59342818fdcd7849b83bc9c",
+        "dest": "offline-repository/com/github/ajalt/clikt/clikt-jvm/5.0.3",
+        "dest-filename": "clikt-jvm-5.0.3.jar"
+    },
+    {
+        "type": "file",
+        "url": "https://repo1.maven.org/maven2/com/github/skydoves/landscapist-coil3-desktop/2.9.5/landscapist-coil3-desktop-2.9.5.jar",
+        "sha512": "18f998466be06fe9799a19b807740db5d79621d0c88d70dfe5a02be106c0dc78e35bc1905605bfaca6e05387f5283af3f1096d63f2427be3d73e368495d07560",
+        "dest": "offline-repository/com/github/skydoves/landscapist-coil3-desktop/2.9.5",
+        "dest-filename": "landscapist-coil3-desktop-2.9.5.jar"
+    },
+    {
+        "type": "file",
+        "url": "https://repo1.maven.org/maven2/com/github/skydoves/landscapist-core-desktop/2.9.5/landscapist-core-desktop-2.9.5.jar",
+        "sha512": "b7366dcfbefbd8e4d4c7919abc336ee77f99dd95b65448faf1c41010ee7a63f0e6054cd81339fc8f259ed320943a463d37696d66e50b125008baeb22ed48027a",
+        "dest": "offline-repository/com/github/skydoves/landscapist-core-desktop/2.9.5",
+        "dest-filename": "landscapist-core-desktop-2.9.5.jar"
+    },
+    {
+        "type": "file",
+        "url": "https://repo1.maven.org/maven2/com/github/skydoves/landscapist-desktop/2.9.5/landscapist-desktop-2.9.5.jar",
+        "sha512": "226693f5eb5b0e0380ad85e8c14b15ea2e9c0432488d9681668333dd18ff833bd1bca7d34b209e8987c4e4cf5aabef860baf01121bcd52d08c49e3762c698c8b",
+        "dest": "offline-repository/com/github/skydoves/landscapist-desktop/2.9.5",
+        "dest-filename": "landscapist-desktop-2.9.5.jar"
+    },
+    {
+        "type": "file",
+        "url": "https://repo1.maven.org/maven2/io/coil-kt/coil3/coil-network-okhttp-jvm/3.3.0/coil-network-okhttp-jvm-3.3.0.jar",
+        "sha512": "1f3a8d83837dcdcb79b9a3ed9bbc59a1673b573b686097324b78cb458877ac18ed03b766e33599e1345b3bb9ff2ddce057e07f92af9c3cd2bbb46f3bf3bf73a4",
+        "dest": "offline-repository/io/coil-kt/coil3/coil-network-okhttp-jvm/3.3.0",
+        "dest-filename": "coil-network-okhttp-jvm-3.3.0.jar"
+    },
+    {
+        "type": "file",
+        "url": "https://repo1.maven.org/maven2/io/github/detekt/sarif4k/sarif4k-jvm/0.5.0/sarif4k-jvm-0.5.0.jar",
+        "sha512": "0cf5510071cb8864d1a7553276c5714caf47a97176cdb7690b6d80f215711f388f8ab4ac21b55cb5609b17aa71b1ea0ae5f5121650db5a1ee993059cccde3e7a",
+        "dest": "offline-repository/io/github/detekt/sarif4k/sarif4k-jvm/0.5.0",
+        "dest-filename": "sarif4k-jvm-0.5.0.jar"
+    },
+    {
+        "type": "file",
+        "url": "https://repo1.maven.org/maven2/io/github/oshai/kotlin-logging-jvm/5.1.0/kotlin-logging-jvm-5.1.0.jar",
+        "sha512": "1c8adc1cbe449e0fa9fe5b6113d0e7a09e772bc2f31a92f99149790f0617340ba6c5d552ce5ac34871dd62d758b7363a30630894fb9d413669b9e931091aa97d",
+        "dest": "offline-repository/io/github/oshai/kotlin-logging-jvm/5.1.0",
+        "dest-filename": "kotlin-logging-jvm-5.1.0.jar"
+    },
+    {
+        "type": "file",
+        "url": "https://repo1.maven.org/maven2/org/jetbrains/compose/components/components-resources-desktop/1.10.3/components-resources-desktop-1.10.3.jar",
+        "sha512": "bc9bbf92638601da83d922fc7b8583eeafaf236d4d3dba07b2658f4706127a24021dc6c5908e009cfabad07b06ae7e87381d0b7c3445380c89ad4a5843401711",
+        "dest": "offline-repository/org/jetbrains/compose/components/components-resources-desktop/1.10.3",
+        "dest-filename": "components-resources-desktop-1.10.3.jar"
+    },
+    {
+        "type": "file",
+        "url": "https://repo1.maven.org/maven2/org/jetbrains/compose/foundation/foundation-desktop/1.10.3/foundation-desktop-1.10.3.jar",
+        "sha512": "9617b16eb194a3988f05dc05e4defb6693e5dc3ad90bb4b80a6911e174ff9c46374fe2886c1418b2a3314b72c3f80585d11a46d3928606244ca18554e0092516",
+        "dest": "offline-repository/org/jetbrains/compose/foundation/foundation-desktop/1.10.3",
+        "dest-filename": "foundation-desktop-1.10.3.jar"
+    },
+    {
+        "type": "file",
+        "url": "https://repo1.maven.org/maven2/org/jetbrains/compose/runtime/runtime-desktop/1.10.3/runtime-desktop-1.10.3.jar",
+        "sha512": "cec8fcf3ef05065a8ebc31311d6fc3b2029717d8942560ba2aeabe66e5bb08da4d440bc4ec72479d078a555cfc19eef3848cb730b344a46e3b29a9a1e4011a30",
+        "dest": "offline-repository/org/jetbrains/compose/runtime/runtime-desktop/1.10.3",
+        "dest-filename": "runtime-desktop-1.10.3.jar"
+    },
+    {
+        "type": "file",
+        "url": "https://repo1.maven.org/maven2/org/jetbrains/compose/runtime/runtime-saveable-desktop/1.9.3/runtime-saveable-desktop-1.9.3.jar",
+        "sha512": "9bfa029d2cff9a1d5c0cf01a74ba6ae50da585be27af2f1a63c3b059f7b37ef85bd8dfa21775e87bb4e6dd8654ffd90c8077f826ada81489dd7e3af0ad8519fb",
+        "dest": "offline-repository/org/jetbrains/compose/runtime/runtime-saveable-desktop/1.9.3",
+        "dest-filename": "runtime-saveable-desktop-1.9.3.jar"
+    },
+    {
+        "type": "file",
+        "url": "https://repo1.maven.org/maven2/org/jetbrains/compose/ui/ui-desktop/1.10.3/ui-desktop-1.10.3.jar",
+        "sha512": "4f85a8baffad0717b32f8bf40a35ff106e9ea699694d358dc8c8f310ba1f844ee77847e4676fdcdd5220bec11a13d0db96111ed002790a0164e64c8a2e03a0a8",
+        "dest": "offline-repository/org/jetbrains/compose/ui/ui-desktop/1.10.3",
+        "dest-filename": "ui-desktop-1.10.3.jar"
+    },
+    {
+        "type": "file",
+        "url": "https://repo1.maven.org/maven2/org/jetbrains/compose/ui/ui-graphics-desktop/1.7.3/ui-graphics-desktop-1.7.3.jar",
+        "sha512": "45080768e04f16ba8e728858240c25f76a588c424335c5864b8bd3fc9dd60d7412ab6003f5522128cbd5b14bbb0b4949a9eced564ecc57105189477313448007",
+        "dest": "offline-repository/org/jetbrains/compose/ui/ui-graphics-desktop/1.7.3",
+        "dest-filename": "ui-graphics-desktop-1.7.3.jar"
+    },
+    {
+        "type": "file",
+        "url": "https://repo1.maven.org/maven2/org/jetbrains/compose/ui/ui-tooling-preview-desktop/1.10.3/ui-tooling-preview-desktop-1.10.3.jar",
+        "sha512": "f5f2804cd8893f0f1ec9cdd31a3125e303b4cbd6e3e860ff5318d1e342d5dc171397c0f2333647c3db14eddd49809087c1bd09501c7e238bdd69b72b42e5a35c",
+        "dest": "offline-repository/org/jetbrains/compose/ui/ui-tooling-preview-desktop/1.10.3",
+        "dest-filename": "ui-tooling-preview-desktop-1.10.3.jar"
+    },
+    {
+        "type": "file",
+        "url": "https://repo1.maven.org/maven2/org/jetbrains/kotlinx/kotlinx-serialization-core-jvm/1.7.3/kotlinx-serialization-core-jvm-1.7.3.jar",
+        "sha512": "7b89cfd2eb13f75a47a2e6fc08e1731adb4ddf1533192dba467c208f2f467a9461ac019ee616347ec7b5db371322881ebec6cfb3ae8023aca1146cc9eddbef71",
+        "dest": "offline-repository/org/jetbrains/kotlinx/kotlinx-serialization-core-jvm/1.7.3",
+        "dest-filename": "kotlinx-serialization-core-jvm-1.7.3.jar"
+    },
+    {
+        "type": "file",
+        "url": "https://repo1.maven.org/maven2/org/jetbrains/kotlinx/kotlinx-serialization-json-io-jvm/1.9.0/kotlinx-serialization-json-io-jvm-1.9.0.jar",
+        "sha512": "e516a8f7418c2ab78b46f42294dad599704cf20e64184d8d3ba34373d27dc9ed48feb8f22f74f64cf69d3ef55f59056de9cedf4e8cf96979a2beb1ad23b96abf",
+        "dest": "offline-repository/org/jetbrains/kotlinx/kotlinx-serialization-json-io-jvm/1.9.0",
+        "dest-filename": "kotlinx-serialization-json-io-jvm-1.9.0.jar"
     }
 ]

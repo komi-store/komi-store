@@ -25,6 +25,7 @@ import coil3.request.ImageRequest
 import coil3.request.crossfade
 import com.mikepenz.markdown.model.ImageData
 import com.mikepenz.markdown.model.ImageTransformer
+import com.mikepenz.markdown.model.ImageWidth
 import com.mikepenz.markdown.model.PlaceholderConfig
 import io.ktor.client.HttpClient
 import io.ktor.client.request.head
@@ -145,15 +146,18 @@ class MarkdownImageTransformer(
     override fun intrinsicSize(painter: Painter): Size = painter.intrinsicSize
 
     override fun placeholderConfig(
+        link: String,
         density: Density,
         containerSize: Size,
-        intrinsicImageSize: Size,
+        imageWidth: ImageWidth,
+        imageSize: Size,
+        imageSizeChanged: ((link: String, Size) -> Unit)?,
     ): PlaceholderConfig {
         val (widthSp, heightSp) =
             when {
-                intrinsicImageSize.isUnspecified ||
-                    intrinsicImageSize.width <= 0f ||
-                    intrinsicImageSize.height <= 0f -> {
+                imageSize.isUnspecified ||
+                    imageSize.width <= 0f ||
+                    imageSize.height <= 0f -> {
                     BADGE_DEFAULT_WIDTH_SP to BADGE_DEFAULT_HEIGHT_SP
                 }
 
@@ -161,14 +165,14 @@ class MarkdownImageTransformer(
                     with(density) {
                         val containerWidthPx =
                             when {
-                                containerSize.isUnspecified -> intrinsicImageSize.width
-                                containerSize.width <= 0f -> intrinsicImageSize.width
+                                containerSize.isUnspecified -> imageSize.width
+                                containerSize.width <= 0f -> imageSize.width
                                 else -> containerSize.width
                             }
-                        val initialWidth = minOf(intrinsicImageSize.width, containerWidthPx)
+                        val initialWidth = minOf(imageSize.width, containerWidthPx)
                         val ratio =
-                            intrinsicImageSize.height /
-                                intrinsicImageSize.width.coerceAtLeast(1f)
+                            imageSize.height /
+                                imageSize.width.coerceAtLeast(1f)
                         val rawHeight = initialWidth * ratio
 
                         val maxHeightPx = RASTER_MAX_HEIGHT_DP.dp.toPx()

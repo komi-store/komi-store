@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.stringResource
 import zed.rainxch.core.presentation.components.text.KomiText
 import zed.rainxch.core.presentation.components.text.KomiTextRole
@@ -22,9 +21,7 @@ fun DeployYourOwnHint(
     KomiText(
         text = stringResource(Res.string.mirror_deploy_your_own_hint),
         role = KomiTextRole.Body,
-        fontSize = 13.sp,
         color = LocalPersonality.current.colors.primary,
-        uppercase = false,
         modifier =
             modifier
                 .fillMaxWidth()

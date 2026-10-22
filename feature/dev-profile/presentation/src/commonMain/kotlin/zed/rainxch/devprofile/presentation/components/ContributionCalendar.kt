@@ -24,9 +24,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.stringResource
 import zed.rainxch.core.presentation.components.surfaces.KomiSurface
 import zed.rainxch.core.presentation.components.text.KomiText
@@ -63,8 +61,7 @@ fun ContributionCalendarCard(
             ) {
                 KomiText(
                     text = stringResource(Res.string.dev_profile_contribution_activity),
-                    role = KomiTextRole.Title,
-                    fontWeight = FontWeight.SemiBold,
+                    role = KomiTextRole.SectionTitle,
                     color = colors.onSurface,
                 )
 
@@ -72,9 +69,7 @@ fun ContributionCalendarCard(
                     KomiText(
                         text = stringResource(Res.string.dev_profile_contributions_this_year, it.totalLastYear),
                         role = KomiTextRole.Mono,
-                        fontSize = 11.sp,
                         color = colors.onSurfaceVariant,
-                        uppercase = false,
                     )
                 }
             }
@@ -86,7 +81,6 @@ fun ContributionCalendarCard(
                     KomiText(
                         text = stringResource(Res.string.loading),
                         role = KomiTextRole.Body,
-                        fontSize = 13.sp,
                         color = colors.onSurfaceVariant,
                     )
                 }
@@ -94,7 +88,6 @@ fun ContributionCalendarCard(
                     KomiText(
                         text = stringResource(Res.string.dev_profile_contributions_load_failed),
                         role = KomiTextRole.Body,
-                        fontSize = 13.sp,
                         color = colors.onSurfaceVariant,
                     )
                 }
@@ -169,8 +162,7 @@ private fun CalendarGrid(days: List<ContributionDay>) {
     ) {
         KomiText(
             text = stringResource(Res.string.dev_profile_contributions_less),
-            role = KomiTextRole.Label,
-            fontSize = 11.sp,
+            role = KomiTextRole.Overline,
             color = colors.onSurfaceVariant,
         )
 
@@ -185,8 +177,7 @@ private fun CalendarGrid(days: List<ContributionDay>) {
 
         KomiText(
             text = stringResource(Res.string.dev_profile_contributions_more),
-            role = KomiTextRole.Label,
-            fontSize = 11.sp,
+            role = KomiTextRole.Overline,
             color = colors.onSurfaceVariant,
         )
     }

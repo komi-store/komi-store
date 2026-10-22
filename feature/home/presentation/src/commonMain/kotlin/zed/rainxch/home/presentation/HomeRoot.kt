@@ -1,93 +1,68 @@
 package zed.rainxch.home.presentation
 
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxScope
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Tune
+import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridState
+import androidx.compose.foundation.lazy.staggeredgrid.itemsIndexed
+import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalUriHandler
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
-import zed.rainxch.core.domain.isAndroid
-import zed.rainxch.core.presentation.components.buttons.KomiButton
-import zed.rainxch.core.presentation.components.buttons.KomiButtonVariant
-import zed.rainxch.core.presentation.components.buttons.KomiIconButton
-import zed.rainxch.core.presentation.components.cards.DiscoveryRepoCard
-import zed.rainxch.core.presentation.components.cards.KomiRepoCardFeed
-import zed.rainxch.core.presentation.components.dividers.KomiHorizontalDivider
-import zed.rainxch.core.presentation.components.overlays.KomiToastState
-import zed.rainxch.core.presentation.components.overlays.rememberKomiToastState
-import zed.rainxch.core.presentation.components.progress.KomiCircularProgress
-import zed.rainxch.core.presentation.components.refresh.KomiPullToRefresh
-import zed.rainxch.core.presentation.components.scaffold.KomiScaffold
-import zed.rainxch.core.presentation.components.text.KomiText
-import zed.rainxch.core.presentation.components.text.KomiTextRole
-import zed.rainxch.core.presentation.locals.LocalPersonality
-import zed.rainxch.core.presentation.personality.usesDecor
-import zed.rainxch.core.presentation.personality.ClassicPersonality
-import zed.rainxch.core.presentation.personality.MangaPersonality
-import zed.rainxch.core.presentation.utils.ObserveAsEvents
-import zed.rainxch.core.presentation.utils.constrainedContentWidth
-import zed.rainxch.githubstore.core.presentation.res.Res
-import zed.rainxch.githubstore.core.presentation.res.feed_empty_title
-import zed.rainxch.githubstore.core.presentation.res.feed_end_cap
-import zed.rainxch.githubstore.core.presentation.res.home_finding_repositories
-import zed.rainxch.githubstore.core.presentation.res.home_platform_filter
-import zed.rainxch.githubstore.core.presentation.res.home_retry
-import zed.rainxch.home.presentation.components.HomeChartTabs
 import zed.rainxch.core.domain.isDesktop
 import zed.rainxch.core.presentation.components.bars.KomiTopBar
+import zed.rainxch.core.presentation.components.bars.LocalTabCardSlot
+import zed.rainxch.core.presentation.components.cards.DiscoveryRepoCard
+import zed.rainxch.core.presentation.components.cards.KomiRepoCardFeed
+import zed.rainxch.core.presentation.components.discovery.DiscoveryChip
+import zed.rainxch.core.presentation.components.discovery.DiscoveryFeed
+import zed.rainxch.core.presentation.components.discovery.DiscoveryFeedStatus
+import zed.rainxch.core.presentation.components.discovery.DiscoveryPlatformButton
+import zed.rainxch.core.presentation.components.discovery.DiscoveryPlatformPicker
+import zed.rainxch.core.presentation.components.discovery.DiscoverySearchButton
+import zed.rainxch.core.presentation.components.overlays.KomiToastState
+import zed.rainxch.core.presentation.components.overlays.rememberKomiToastState
+import zed.rainxch.core.presentation.components.scaffold.KomiScaffold
+import zed.rainxch.core.presentation.layout.withoutBottom
+import zed.rainxch.core.presentation.utils.ObserveAsEvents
+import zed.rainxch.githubstore.core.presentation.res.Res
+import zed.rainxch.githubstore.core.presentation.res.home_chart_popular
+import zed.rainxch.githubstore.core.presentation.res.home_chart_releases
+import zed.rainxch.githubstore.core.presentation.res.home_chart_trending
 import zed.rainxch.githubstore.core.presentation.res.home_masthead_subtitle
 import zed.rainxch.githubstore.core.presentation.res.home_masthead_title
-import zed.rainxch.home.presentation.components.HomePlatformPicker
 import zed.rainxch.home.presentation.components.RepositoryActionsSheet
 import zed.rainxch.home.presentation.model.ChartTab
 import zed.rainxch.home.presentation.model.toDiscoveryUi
 
 @Composable
 fun HomeRoot(
+    onNavigateToSearch: () -> Unit,
     onNavigateToDetails: (repoId: Long) -> Unit,
     viewModel: HomeViewModel = koinViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
-    val listState = rememberLazyListState()
+    val listState = rememberLazyStaggeredGridState()
     val coroutineScope = rememberCoroutineScope()
     val toastState = rememberKomiToastState()
 
     ObserveAsEvents(viewModel.events) { event ->
         when (event) {
-            HomeEvent.OnScrollToListTop -> coroutineScope.launch {
-                listState.animateScrollToItem(0)
+            HomeEvent.OnScrollToListTop -> {
+                coroutineScope.launch {
+                    listState.animateScrollToItem(0)
+                }
             }
 
-            is HomeEvent.OnMessage -> toastState.show(event.message)
+            is HomeEvent.OnMessage -> {
+                toastState.show(event.message)
+            }
         }
     }
 
@@ -97,6 +72,7 @@ fun HomeRoot(
         listState = listState,
         onAction = { action ->
             when (action) {
+                HomeAction.OnSearchClick -> onNavigateToSearch()
                 is HomeAction.OnRepoClick -> onNavigateToDetails(action.repo.id)
                 else -> viewModel.onAction(action)
             }
@@ -104,79 +80,80 @@ fun HomeRoot(
     )
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun HomeScreen(
     state: HomeState,
     toastState: KomiToastState,
-    listState: LazyListState,
+    listState: LazyStaggeredGridState,
     onAction: (HomeAction) -> Unit,
 ) {
     val uriHandler = LocalUriHandler.current
-
-    val reachedEnd by remember {
-        derivedStateOf {
-            val info = listState.layoutInfo
-            val lastIndex = info.visibleItemsInfo.lastOrNull()?.index ?: -1
-            lastIndex >= info.totalItemsCount - 4
-        }
-    }
-
-    LaunchedEffect(reachedEnd, state.hasMore, state.isLoadingMore, state.isLoading) {
-        if (reachedEnd && state.hasMore && !state.isLoadingMore && !state.isLoading) {
-            onAction(HomeAction.OnLoadMore)
-        }
-    }
+    val chips = ChartTab.entries.map { DiscoveryChip(id = it.name, label = it.label()) }.toImmutableList()
 
     KomiScaffold(
         topBar = {
             KomiTopBar(
                 title = stringResource(Res.string.home_masthead_title),
                 titleAccent = stringResource(Res.string.home_masthead_subtitle),
-                actions = {
-                    if (!isDesktop()) {
-                        KomiIconButton(
-                            icon = Icons.Rounded.Tune,
-                            contentDescription = stringResource(Res.string.home_platform_filter),
-                            onClick = { onAction(HomeAction.OnPlatformPopupOpen) },
-                            variant = KomiButtonVariant.Primary,
-                        )
-                    }
-                }
+                // The Desktop sidebar holds the platform.
+                actions =
+                    if (isDesktop()) {
+                        null
+                    } else {
+                        {
+                            if (LocalTabCardSlot.current == null) {
+                                DiscoverySearchButton(onClick = { onAction(HomeAction.OnSearchClick) })
+                            }
+                            DiscoveryPlatformButton(
+                                platform = state.selectedPlatform,
+                                onClick = { onAction(HomeAction.OnPlatformPopupOpen) },
+                            )
+                        }
+                    },
             )
         },
-        toastState = toastState
+        toastState = toastState,
     ) { innerPadding ->
-        Box(
-            modifier = Modifier.fillMaxSize().padding(innerPadding),
-            contentAlignment = Alignment.TopCenter,
-        ) {
-            if (isAndroid()) {
-                KomiPullToRefresh(
+        DiscoveryFeed(
+            chips = chips,
+            selectedChip = state.selectedChart.name,
+            status =
+                DiscoveryFeedStatus(
+                    isLoading = state.isLoading,
                     isRefreshing = state.isRefreshing,
-                    onRefresh = { onAction(HomeAction.OnRefresh) },
-                    modifier = Modifier.fillMaxSize(),
-                ) {
-                    HomeChartFeed(
-                        state = state,
-                        listState = listState,
-                        onAction = onAction
-                    )
-                }
-            } else {
-                Box(modifier = Modifier.fillMaxSize()) {
-                    HomeChartFeed(
-                        state = state,
-                        listState = listState,
-                        onAction = onAction
-                    )
-                }
+                    isLoadingMore = state.isLoadingMore,
+                    hasMore = state.hasMore,
+                    isEmpty = state.repos.isEmpty(),
+                    errorMessage = state.errorMessage,
+                ),
+            listState = listState,
+            gridLayout = state.isGridLayout,
+            bottomInset = innerPadding.calculateBottomPadding(),
+            onSelectChip = { id -> onAction(HomeAction.OnChartSelected(ChartTab.valueOf(id))) },
+            onRefresh = { onAction(HomeAction.OnRefresh) },
+            onRetry = { onAction(HomeAction.OnRetry) },
+            onLoadMore = { onAction(HomeAction.OnLoadMore) },
+            modifier = Modifier.padding(innerPadding.withoutBottom()),
+        ) {
+            itemsIndexed(
+                items = state.repos,
+                key = { _, card -> "chart_${card.id}" },
+            ) { index, card ->
+                DiscoveryRepoCard(
+                    discoveryRepositoryUi = card.toDiscoveryUi(),
+                    onClick = { onAction(HomeAction.OnRepoClick(card.rawRepository)) },
+                    onShareClick = { onAction(HomeAction.OnShareClick(card.rawRepository)) },
+                    onLongPress = { onAction(HomeAction.OnRepoLongClick(card.id)) },
+                    rank = if (state.selectedChart == ChartTab.Popular) index + 1 else 1,
+                    feed = state.selectedChart.toFeed(),
+                    compact = state.isGridLayout,
+                    modifier = Modifier.fillMaxWidth().animateItem(),
+                )
             }
         }
 
         if (state.isPlatformPopupVisible) {
-            HomePlatformPicker(
-                platforms = state.platformOptions,
+            DiscoveryPlatformPicker(
                 selected = state.selectedPlatform,
                 onSelect = { onAction(HomeAction.OnPlatformSelected(it)) },
                 onDismiss = { onAction(HomeAction.OnPlatformPopupDismiss) },
@@ -213,87 +190,15 @@ private fun HomeScreen(
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun BoxScope.HomeChartFeed(
-    state: HomeState,
-    listState: LazyListState,
-    onAction: (HomeAction) -> Unit,
-) {
-    val colors = LocalPersonality.current.colors
-
-    LazyColumn(
-        state = listState,
-        modifier = Modifier.constrainedContentWidth().fillMaxSize().align(Alignment.TopCenter),
-        contentPadding = PaddingValues(bottom = 32.dp),
-        verticalArrangement = Arrangement.spacedBy(10.dp),
-    ) {
-        stickyHeader(key = "home_chart_tabs", contentType = "tabs") {
-            Column(modifier = Modifier.fillMaxWidth().background(colors.background)) {
-                HomeChartTabs(
-                    selected = state.selectedChart,
-                    onSelect = { onAction(HomeAction.OnChartSelected(it)) },
-                )
-
-                when (LocalPersonality.current) {
-                    is MangaPersonality -> KomiHorizontalDivider(thickness = 3.dp, color = colors.outline)
-                    is ClassicPersonality -> Unit
-                }
-            }
-        }
-
-        when {
-            state.isLoading && state.repos.isEmpty() -> {
-                item(key = "home_loading") { HomeLoading() }
-            }
-
-            state.errorMessage != null && state.repos.isEmpty() -> {
-                item(key = "home_error") {
-                    HomeError(
-                        message = state.errorMessage,
-                        onRetry = { onAction(HomeAction.OnRetry) },
-                    )
-                }
-            }
-
-            state.repos.isEmpty() -> {
-                item(key = "home_empty") { HomeEmpty() }
-            }
-
-            else -> {
-                itemsIndexed(
-                    items = state.repos,
-                    key = { _, card -> "chart_${card.id}" },
-                ) { index, card ->
-                    DiscoveryRepoCard(
-                        discoveryRepositoryUi = card.toDiscoveryUi(),
-                        onClick = { onAction(HomeAction.OnRepoClick(card.rawRepository)) },
-                        onShareClick = { onAction(HomeAction.OnShareClick(card.rawRepository)) },
-                        onLongPress = { onAction(HomeAction.OnRepoLongClick(card.id)) },
-                        rank = if (state.selectedChart == ChartTab.Popular) index + 1 else 1,
-                        feed = state.selectedChart.toFeed(),
-                        modifier = Modifier.fillMaxWidth()
-                            .padding(horizontal = 12.dp)
-                            .animateItem(),
-                    )
-                }
-
-                if (state.isLoadingMore) {
-                    item(key = "home_loading_more") {
-                        Box(
-                            modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp),
-                            contentAlignment = Alignment.Center,
-                        ) {
-                            KomiCircularProgress(modifier = Modifier.size(28.dp))
-                        }
-                    }
-                } else if (!state.hasMore) {
-                    item(key = "home_end_cap") { HomeEndCap() }
-                }
-            }
-        }
-    }
-}
+private fun ChartTab.label(): String =
+    stringResource(
+        when (this) {
+            ChartTab.Trending -> Res.string.home_chart_trending
+            ChartTab.Releases -> Res.string.home_chart_releases
+            ChartTab.Popular -> Res.string.home_chart_popular
+        },
+    )
 
 private fun ChartTab.toFeed(): KomiRepoCardFeed =
     when (this) {
@@ -301,94 +206,3 @@ private fun ChartTab.toFeed(): KomiRepoCardFeed =
         ChartTab.Releases -> KomiRepoCardFeed.Release
         ChartTab.Popular -> KomiRepoCardFeed.Popular
     }
-
-@Composable
-private fun HomeEndCap() {
-    Row(
-        modifier = Modifier.fillMaxWidth().padding(vertical = 18.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
-    ) {
-        KomiHorizontalDivider(
-            modifier = Modifier.weight(1f),
-            thickness = 2.dp,
-            color = LocalPersonality.current.colors.outline.copy(alpha = 0.4f),
-        )
-        if (LocalPersonality.current.usesDecor) {
-            KomiText(
-                text = stringResource(Res.string.feed_end_cap),
-                role = KomiTextRole.Label,
-                color = LocalPersonality.current.colors.onSurfaceVariant,
-            )
-        }
-        KomiHorizontalDivider(
-            modifier = Modifier.weight(1f),
-            thickness = 2.dp,
-            color = LocalPersonality.current.colors.outline.copy(alpha = 0.4f),
-        )
-    }
-}
-
-@Composable
-private fun HomeEmpty() {
-    Box(
-        modifier = Modifier.fillMaxWidth().padding(vertical = 96.dp),
-        contentAlignment = Alignment.Center,
-    ) {
-        KomiText(
-            text = stringResource(Res.string.feed_empty_title),
-            role = KomiTextRole.Title,
-            color = LocalPersonality.current.colors.onSurfaceVariant,
-            textAlign = TextAlign.Center,
-        )
-    }
-}
-
-@Composable
-private fun HomeLoading() {
-    Box(
-        modifier = Modifier.fillMaxWidth().padding(vertical = 96.dp),
-        contentAlignment = Alignment.Center,
-    ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            KomiCircularProgress()
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            KomiText(
-                text = stringResource(Res.string.home_finding_repositories),
-                role = KomiTextRole.Title,
-                color = LocalPersonality.current.colors.onSurfaceVariant,
-            )
-        }
-    }
-}
-
-@Composable
-private fun HomeError(
-    message: String,
-    onRetry: () -> Unit,
-) {
-    Box(
-        modifier = Modifier.fillMaxWidth().padding(horizontal = 32.dp, vertical = 96.dp),
-        contentAlignment = Alignment.Center,
-    ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            KomiText(
-                text = message,
-                role = KomiTextRole.Body,
-                color = LocalPersonality.current.colors.onSurface,
-                uppercase = false,
-            )
-
-            KomiButton(
-                onClick = onRetry,
-                label = stringResource(Res.string.home_retry),
-                variant = KomiButtonVariant.Outline,
-            )
-        }
-    }
-}

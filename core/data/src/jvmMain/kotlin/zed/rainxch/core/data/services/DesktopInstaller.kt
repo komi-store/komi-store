@@ -5,14 +5,14 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import zed.rainxch.core.data.model.LinuxPackageType
 import zed.rainxch.core.data.model.LinuxTerminal
-import zed.rainxch.core.domain.utils.AssetArchitectureMatcher
-import zed.rainxch.core.domain.utils.AssetSelector
 import zed.rainxch.core.domain.model.account.github.GithubAsset
 import zed.rainxch.core.domain.model.system.Platform
 import zed.rainxch.core.domain.model.system.SystemArchitecture
 import zed.rainxch.core.domain.system.InstallOutcome
 import zed.rainxch.core.domain.system.Installer
 import zed.rainxch.core.domain.system.InstallerInfoExtractor
+import zed.rainxch.core.domain.utils.AssetArchitectureMatcher
+import zed.rainxch.core.domain.utils.AssetSelector
 import java.awt.Desktop
 import java.awt.Toolkit
 import java.awt.datatransfer.StringSelection
@@ -36,7 +36,7 @@ class DesktopInstaller(
     private val isRunningInFlatpak: Boolean by lazy {
         try {
             File("/.flatpak-info").exists() ||
-                    System.getenv("FLATPAK_ID") != null
+                System.getenv("FLATPAK_ID") != null
         } catch (_: Exception) {
             false
         }
@@ -119,7 +119,6 @@ class DesktopInstaller(
                 }
 
                 Platform.LINUX -> {
-
                     if (isRunningInFlatpak) {
                         when (linuxPackageType) {
                             LinuxPackageType.DEB -> listOf(".deb", ".appimage", ".rpm", ".pkg.tar.zst")
@@ -297,7 +296,8 @@ class DesktopInstaller(
             return LinuxPackageType.RPM
         }
 
-        if (id in listOf(
+        if (id in
+            listOf(
                 "arch",
                 "manjaro",
                 "endeavouros",
@@ -388,7 +388,6 @@ class DesktopInstaller(
         return when (platform) {
             Platform.WINDOWS -> ext in listOf("msi", "exe")
             Platform.MACOS -> ext in listOf("dmg", "pkg")
-
             Platform.LINUX -> ext in listOf("appimage", "deb", "rpm", "pkg.tar.zst", "zst")
             else -> false
         }
@@ -411,7 +410,7 @@ class DesktopInstaller(
                         if (!canSetExecutable) {
                             throw IllegalStateException(
                                 "Unable to set executable permissions. AppImage installation requires " +
-                                        "the ability to make files executable.",
+                                    "the ability to make files executable.",
                             )
                         }
                     } finally {
@@ -460,7 +459,6 @@ class DesktopInstaller(
             }
 
             InstallOutcome.DELEGATED_TO_SYSTEM
-
         }
 
     private fun installFromFlatpak(
@@ -480,8 +478,9 @@ class DesktopInstaller(
                     Logger.i { "Arch package opened on host system for installation" }
                     showFlatpakNotification(
                         title = "Package Ready to Install",
-                        message = "The Arch package has been opened in your system's " +
-                            "package manager. Follow the prompts to complete installation.",
+                        message =
+                            "The Arch package has been opened in your system's " +
+                                "package manager. Follow the prompts to complete installation.",
                     )
                 } else {
                     Logger.w { "xdg-open exited with code $exitCode" }
@@ -512,7 +511,8 @@ class DesktopInstaller(
                         Logger.i { "Package opened on host system for installation" }
                         showFlatpakNotification(
                             title = "Package Ready to Install",
-                            message = "The ${ext.uppercase()} package has been opened in your system's " +
+                            message =
+                                "The ${ext.uppercase()} package has been opened in your system's " +
                                     "software installer. Follow the prompts to complete installation.",
                         )
                     } else {
@@ -585,14 +585,20 @@ class DesktopInstaller(
     private fun openInFileManager(file: File) {
         try {
             val fileUri = "file://${file.absolutePath}"
-            val process = ProcessBuilder(
-                "gdbus", "call",
-                "--session",
-                "--dest", "org.freedesktop.FileManager1",
-                "--object-path", "/org/freedesktop/FileManager1",
-                "--method", "org.freedesktop.FileManager1.ShowItems",
-                "['$fileUri']", "",
-            ).start()
+            val process =
+                ProcessBuilder(
+                    "gdbus",
+                    "call",
+                    "--session",
+                    "--dest",
+                    "org.freedesktop.FileManager1",
+                    "--object-path",
+                    "/org/freedesktop/FileManager1",
+                    "--method",
+                    "org.freedesktop.FileManager1.ShowItems",
+                    "['$fileUri']",
+                    "",
+                ).start()
             val exitCode = process.waitFor()
 
             if (exitCode == 0) {
@@ -624,7 +630,6 @@ class DesktopInstaller(
             }
 
             "exe" -> {
-
                 try {
                     ProcessBuilder("cmd", "/c", "start", "", file.absolutePath).start()
                 } catch (e: IOException) {
@@ -721,7 +726,6 @@ class DesktopInstaller(
         file: File,
         ext: String,
     ) {
-
         val nameLower = file.name.lowercase()
         if (nameLower.endsWith(".pkg.tar.zst")) {
             installPacmanPackage(file)
@@ -763,7 +767,7 @@ class DesktopInstaller(
                     "pkexec",
                     "sh",
                     "-c",
-                    "dpkg -i '${file.absolutePath}' || apt-get install -f -y"
+                    "dpkg -i '${file.absolutePath}' || apt-get install -f -y",
                 ),
                 listOf("gdebi-gtk", file.absolutePath),
                 null,
@@ -926,8 +930,7 @@ class DesktopInstaller(
         throw IOException("Could not install RPM package. Please install it manually.")
     }
 
-    private fun shellQuoteSingleQuotes(s: String): String =
-        "'" + s.replace("'", "'\\''") + "'"
+    private fun shellQuoteSingleQuotes(s: String): String = "'" + s.replace("'", "'\\''") + "'"
 
     private fun installPacmanPackage(file: File) {
         Logger.d { "Installing pacman package: ${file.absolutePath}" }
@@ -977,7 +980,6 @@ class DesktopInstaller(
         val quoted = shellQuoteSingleQuotes(filePath)
 
         if (availableTerminals.isEmpty()) {
-
             tryShowNotification(
                 "Install via Terminal",
                 "Run: sudo pacman -U $quoted",
@@ -1281,7 +1283,7 @@ class DesktopInstaller(
             e.printStackTrace()
             throw IllegalStateException(
                 "Failed to install AppImage: ${e.message}. " +
-                        "Please ensure you have write permissions to ~/Applications folder.",
+                    "Please ensure you have write permissions to ~/Applications folder.",
                 e,
             )
         } catch (e: SecurityException) {

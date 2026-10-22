@@ -21,10 +21,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.jetbrains.compose.resources.stringResource
 import zed.rainxch.core.presentation.components.chips.KomiChip
@@ -216,10 +214,8 @@ private fun PullRow(
                     if (pull.isDraft) {
                         KomiText(
                             text = stringResource(Res.string.repo_pages_pr_draft),
-                            role = KomiTextRole.Label,
-                            fontSize = 11.sp,
+                            role = KomiTextRole.Caption,
                             color = colors.onSurfaceVariant,
-                            uppercase = false,
                             modifier = Modifier
                                 .background(colors.surfaceContainerHigh, RoundedCornerShape(shape.cornerSmall))
                                 .padding(horizontal = 6.dp, vertical = 1.dp),
@@ -228,13 +224,10 @@ private fun PullRow(
 
                     KomiText(
                         text = pull.title,
-                        role = KomiTextRole.Title,
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.SemiBold,
+                        role = KomiTextRole.ItemTitle,
                         color = colors.onSurface,
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis,
-                        uppercase = false,
                     )
                 }
 
@@ -242,11 +235,9 @@ private fun PullRow(
                     text = "#${pull.number} · " +
                         stringResource(Res.string.repo_pages_issue_opened_by, pull.authorLogin),
                     role = KomiTextRole.Body,
-                    fontSize = 13.sp,
                     color = colors.onSurfaceVariant,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    uppercase = false,
                 )
             }
         }

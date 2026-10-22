@@ -4,7 +4,6 @@ import zed.rainxch.core.domain.model.account.github.GithubAsset
 import zed.rainxch.core.domain.model.system.SystemArchitecture
 
 object AssetSelector {
-
     private const val ARCH_EXACT = 3
     private const val ARCH_UNIVERSAL = 2
     private const val ARCH_FALLBACK = 1
@@ -15,10 +14,16 @@ object AssetSelector {
     private const val FLAVOR_UNSTABLE = 1
     private const val FLAVOR_DEBUG = 0
 
+    private const val DEVICE_VARIANT_MOBILE = 2
+    private const val DEVICE_VARIANT_DEFAULT = 1
+    private const val DEVICE_VARIANT_LEANBACK = 0
+
     private val debugRegex = boundary("debug")
     private val unstableRegex = boundary("nightly", "canary", "snapshot")
     private val preReleaseRegex =
         Regex("""(^|[^a-z0-9])(alpha|beta|rc|preview|pre)[-_.]?\d*([^a-z0-9]|$)""")
+    private val mobileRegex = boundary("mobile")
+    private val leanbackRegex = boundary("leanback")
 
     fun choose(
         assets: List<GithubAsset>,
@@ -36,6 +41,7 @@ object AssetSelector {
         compareByDescending<GithubAsset> { extensionRank(it.name, extensionPriority) }
             .thenByDescending { flavorRank(it.name) }
             .thenByDescending { archRank(it.name, deviceArch) }
+            .thenByDescending { deviceVariantRank(it.name) }
             .thenByDescending { it.size }
             .thenBy { it.name.lowercase() }
 
@@ -44,14 +50,21 @@ object AssetSelector {
         deviceArch: SystemArchitecture,
     ): Int =
         when (val match = AssetArchitectureMatcher.matchArchitecture(assetName)) {
-            AssetArchitectureMatcher.Match.Universal -> ARCH_UNIVERSAL
-            AssetArchitectureMatcher.Match.Foreign -> ARCH_INCOMPATIBLE
-            is AssetArchitectureMatcher.Match.Known ->
+            AssetArchitectureMatcher.Match.Universal -> {
+                ARCH_UNIVERSAL
+            }
+
+            AssetArchitectureMatcher.Match.Foreign -> {
+                ARCH_INCOMPATIBLE
+            }
+
+            is AssetArchitectureMatcher.Match.Known -> {
                 when {
                     match.arch == deviceArch -> ARCH_EXACT
                     isFallbackCompatible(match.arch, deviceArch) -> ARCH_FALLBACK
                     else -> ARCH_INCOMPATIBLE
                 }
+            }
         }
 
     private fun isFallbackCompatible(
@@ -74,6 +87,16 @@ object AssetSelector {
         }
     }
 
+    fun deviceVariantRank(assetName: String): Int {
+        val name = assetName.lowercase()
+        if (!name.endsWith(".apk")) return DEVICE_VARIANT_DEFAULT
+        return when {
+            mobileRegex.containsMatchIn(name) -> DEVICE_VARIANT_MOBILE
+            leanbackRegex.containsMatchIn(name) -> DEVICE_VARIANT_LEANBACK
+            else -> DEVICE_VARIANT_DEFAULT
+        }
+    }
+
     private fun extensionRank(
         assetName: String,
         extensionPriority: List<String>,
@@ -84,6 +107,5 @@ object AssetSelector {
         return if (idx == -1) -1 else extensionPriority.size - idx
     }
 
-    private fun boundary(vararg tokens: String): Regex =
-        Regex("""(^|[^a-z0-9])(${tokens.joinToString("|")})([^a-z0-9]|$)""")
+    private fun boundary(vararg tokens: String): Regex = Regex("""(^|[^a-z0-9])(${tokens.joinToString("|")})([^a-z0-9]|$)""")
 }

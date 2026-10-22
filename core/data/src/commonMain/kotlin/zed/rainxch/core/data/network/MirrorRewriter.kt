@@ -41,6 +41,12 @@ object MirrorRewriter {
             else -> null
         }
 
+    fun probeUrl(template: String?): String = mirrorProbeUrl(template) ?: PROBE_URL
+
+    fun mirrorProbeUrl(template: String?): String? = if (template == null) PROBE_URL else applyTemplate(template, PROBE_URL)
+
+    private const val PROBE_URL = "https://raw.githubusercontent.com/octocat/Hello-World/master/README"
+
     private fun applyDecomposedTemplate(
         template: String,
         githubUrl: String,
@@ -63,7 +69,11 @@ object MirrorRewriter {
     private fun decompose(githubUrl: String): Decomposed? {
         val parsed = runCatching { Url(githubUrl) }.getOrNull() ?: return null
         val host = parsed.host.lowercase()
-        val segments = parsed.encodedPath.trimStart('/').split('/').filter { it.isNotEmpty() }
+        val segments =
+            parsed.encodedPath
+                .trimStart('/')
+                .split('/')
+                .filter { it.isNotEmpty() }
         return when (host) {
             "raw.githubusercontent.com" -> {
                 if (segments.size < 4) return null
@@ -74,6 +84,7 @@ object MirrorRewriter {
                     path = segments.drop(3).joinToString("/"),
                 )
             }
+
             "github.com" -> {
                 if (segments.size < 5) return null
                 val verb = segments[2]
@@ -85,7 +96,10 @@ object MirrorRewriter {
                     path = segments.drop(4).joinToString("/"),
                 )
             }
-            else -> null
+
+            else -> {
+                null
+            }
         }
     }
 }

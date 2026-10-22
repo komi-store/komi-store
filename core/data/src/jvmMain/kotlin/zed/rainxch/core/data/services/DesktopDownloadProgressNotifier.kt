@@ -10,6 +10,7 @@ class DesktopDownloadProgressNotifier : DownloadProgressNotifier {
         percent: Int?,
         bytesDownloaded: Long,
         totalBytes: Long?,
+        paused: Boolean,
     ) = Unit
 
     override fun clearProgress(packageName: String) = Unit

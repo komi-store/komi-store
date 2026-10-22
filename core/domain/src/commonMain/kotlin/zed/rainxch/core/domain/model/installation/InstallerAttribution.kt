@@ -7,14 +7,19 @@ sealed interface InstallerAttribution {
     data object SystemDefault : InstallerAttribution
 
     @Serializable
-    data class Preset(val key: PresetKey) : InstallerAttribution
+    data class Preset(
+        val key: PresetKey,
+    ) : InstallerAttribution
 
     @Serializable
-    data class Custom(val packageName: String) : InstallerAttribution
+    data class Custom(
+        val packageName: String,
+    ) : InstallerAttribution
 
-    fun resolvePackageName(): String? = when (this) {
-        SystemDefault -> null
-        is Preset -> key.packageName
-        is Custom -> packageName.trim().takeIf { it.isNotBlank() }
-    }
+    fun resolvePackageName(): String? =
+        when (this) {
+            SystemDefault -> null
+            is Preset -> key.packageName
+            is Custom -> packageName.trim().takeIf { it.isNotBlank() }
+        }
 }

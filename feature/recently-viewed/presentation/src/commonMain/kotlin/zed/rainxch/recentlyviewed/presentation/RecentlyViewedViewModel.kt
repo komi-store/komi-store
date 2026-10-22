@@ -6,6 +6,7 @@ import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
@@ -13,6 +14,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import zed.rainxch.core.domain.repository.SeenReposRepository
+import zed.rainxch.core.presentation.utils.TimeZoneChangeSignal
 import zed.rainxch.recentlyviewed.presentation.mappers.toRecentlyViewedRepoUi
 
 class RecentlyViewedViewModel(
@@ -36,8 +38,10 @@ class RecentlyViewedViewModel(
 
     private fun loadRecentlyViewed() {
         viewModelScope.launch {
-            seenReposRepository
-                .getAllSeenRepos()
+            combine(
+                seenReposRepository.getAllSeenRepos(),
+                TimeZoneChangeSignal.revision,
+            ) { repos, _ -> repos }
                 .map { repos -> repos.map { it.toRecentlyViewedRepoUi() } }
                 .flowOn(Dispatchers.Default)
                 .collect { repos ->
@@ -50,11 +54,11 @@ class RecentlyViewedViewModel(
 
     fun onAction(action: RecentlyViewedAction) {
         when (action) {
-            RecentlyViewedAction.OnNavigateBackClick -> Unit
+            RecentlyViewedAction.OnNavigateBackClick -> {}
 
-            is RecentlyViewedAction.OnRepositoryClick -> Unit
+            is RecentlyViewedAction.OnRepositoryClick -> {}
 
-            is RecentlyViewedAction.OnDeveloperProfileClick -> Unit
+            is RecentlyViewedAction.OnDeveloperProfileClick -> {}
 
             is RecentlyViewedAction.OnRemoveFromHistory -> {
                 viewModelScope.launch {

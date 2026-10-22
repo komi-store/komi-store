@@ -8,8 +8,9 @@ interface SystemInstallSerializer {
 
     fun markCompleted(packageName: String)
 
-    companion object {
+    fun onAppResumed()
 
+    companion object {
         const val DEFAULT_TIMEOUT_MS: Long = 15_000L
     }
 }

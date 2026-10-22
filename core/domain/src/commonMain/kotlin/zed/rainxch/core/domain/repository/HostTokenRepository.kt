@@ -9,9 +9,16 @@ interface HostTokenRepository {
 
     suspend fun get(host: String): HostToken?
 
-    suspend fun set(host: String, token: String, displayName: String? = null)
+    suspend fun set(
+        host: String,
+        token: String,
+        displayName: String? = null,
+    )
 
     suspend fun delete(host: String)
 
-    suspend fun validate(host: String, token: String): Result<TokenValidation>
+    suspend fun validate(
+        host: String,
+        token: String,
+    ): Result<TokenValidation>
 }

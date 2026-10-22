@@ -1,0 +1,14 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues/>
+  <CurrentIssues>
+    <ID>CyclomaticComplexMethod:FeedRoot.kt$@Composable private fun FeedContent( listState: LazyStaggeredGridState, state: FeedState, bottomInset: Dp, onAction: (FeedAction) -&gt; Unit, modifier: Modifier = Modifier, )</ID>
+    <ID>CyclomaticComplexMethod:FeedViewModel.kt$FeedViewModel$fun onAction(action: FeedAction)</ID>
+    <ID>LongMethod:FeedViewModel.kt$FeedViewModel$fun onAction(action: FeedAction)</ID>
+    <ID>LongParameterList:FeedRepoCardMapper.kt$( isInstalled: Boolean, isUpdateAvailable: Boolean, isFavourite: Boolean, isStarred: Boolean, isSeen: Boolean, isCurrentUserOwner: Boolean, )</ID>
+    <ID>LongParameterList:FeedViewModel.kt$FeedViewModel$( private val feedRepository: FeedRepository, private val installedAppsRepository: InstalledAppsRepository, private val favouritesRepository: FavouritesRepository, private val starredRepository: StarredRepository, private val seenReposRepository: SeenReposRepository, private val hiddenReposRepository: HiddenReposRepository, private val userSessionRepository: UserSessionRepository, private val tweaksRepository: TweaksRepository, private val browseFilterStore: BrowseFilterStore, private val logger: KomiStoreLogger, private val shareManager: ShareManager, )</ID>
+    <ID>ThrowsCount:FeedViewModel.kt$FeedViewModel$fun onAction(action: FeedAction)</ID>
+    <ID>TooGenericExceptionCaught:FeedViewModel.kt$FeedViewModel$e: Throwable</ID>
+    <ID>TooManyFunctions:FeedViewModel.kt$FeedViewModel : ViewModel</ID>
+  </CurrentIssues>
+</SmellBaseline>

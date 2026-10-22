@@ -1,0 +1,58 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues/>
+  <CurrentIssues>
+    <ID>ComplexCondition:TweaksViewModel.kt$TweaksViewModel$host.contains("://") || host.contains("/") || host.contains("?") || host.contains("#")</ID>
+    <ID>CyclomaticComplexMethod:FeedbackViewModel.kt$FeedbackViewModel$fun onAction(action: FeedbackAction)</ID>
+    <ID>CyclomaticComplexMethod:HostTokensRoot.kt$@Composable private fun AddTokenDialog( state: HostTokensState, replacingExisting: HostToken?, onAction: (HostTokensAction) -&gt; Unit, )</ID>
+    <ID>CyclomaticComplexMethod:HostTokensRoot.kt$@Composable private fun TokenRow( token: HostToken, isValidating: Boolean, validation: ValidationLine?, onValidate: () -&gt; Unit, onDelete: () -&gt; Unit, onReplace: () -&gt; Unit, onEditLabel: () -&gt; Unit, onOpenManagePage: (ForgeKind) -&gt; Unit, last: Boolean, )</ID>
+    <ID>CyclomaticComplexMethod:HostTokensViewModel.kt$HostTokensViewModel$fun onAction(action: HostTokensAction)</ID>
+    <ID>CyclomaticComplexMethod:PasteProxyUrlSheet.kt$fun parseProxyUrl(raw: String): PastedProxy?</ID>
+    <ID>CyclomaticComplexMethod:TweaksKicker.kt$private fun mangaKicker(slot: TweaksDecorSlot): String</ID>
+    <ID>CyclomaticComplexMethod:TweaksRoot.kt$@Composable fun TweaksRoot( onNavigateBack: () -&gt; Unit, onNavigateToHostTokens: () -&gt; Unit, onNavigateToMirrorPicker: () -&gt; Unit, onNavigateToSkippedUpdates: () -&gt; Unit, onNavigateToHiddenRepositories: () -&gt; Unit, viewModel: TweaksViewModel = koinViewModel(), )</ID>
+    <ID>CyclomaticComplexMethod:TweaksViewModel.kt$TweaksViewModel$fun onAction(action: TweaksAction)</ID>
+    <ID>CyclomaticComplexMethod:TweaksViewModel.kt$TweaksViewModel$private fun loadProxyConfig()</ID>
+    <ID>EmptyFunctionBlock:RestartApp.android.kt${ }</ID>
+    <ID>LargeClass:TweaksViewModel.kt$TweaksViewModel : ViewModel</ID>
+    <ID>LongMethod:HostTokensViewModel.kt$HostTokensViewModel$fun onAction(action: HostTokensAction)</ID>
+    <ID>LongMethod:TweaksViewModel.kt$TweaksViewModel$fun onAction(action: TweaksAction)</ID>
+    <ID>LongParameterList:TweaksViewModel.kt$TweaksViewModel$( private val tweaksRepository: TweaksRepository, private val appVersionInfo: AppVersionInfo, private val installerStatusProvider: InstallerStatusProvider, private val proxyRepository: ProxyRepository, private val proxyTester: ProxyTester, private val updateScheduleManager: UpdateScheduleManager, private val seenReposRepository: SeenReposRepository, private val logger: KomiStoreLogger, private val aggressiveOemDetector: AggressiveOemDetector, private val cacheRepository: CacheRepository, )</ID>
+    <ID>MagicNumber:FeedbackViewModel.kt$FeedbackViewModel$250</ID>
+    <ID>MagicNumber:HostTokensViewModel.kt$HostTokensViewModel$8</ID>
+    <ID>MagicNumber:MirrorPickerViewModel.kt$MirrorPickerViewModel$200</ID>
+    <ID>MagicNumber:MirrorPickerViewModel.kt$MirrorPickerViewModel$299</ID>
+    <ID>MagicNumber:PasteProxyUrlSheet.kt$3</ID>
+    <ID>MagicNumber:PasteProxyUrlSheet.kt$65535</ID>
+    <ID>MagicNumber:SettingsSectionHead.kt$0.21f</ID>
+    <ID>MagicNumber:TweaksViewModel.kt$TweaksViewModel$1024</ID>
+    <ID>MagicNumber:TweaksViewModel.kt$TweaksViewModel$253</ID>
+    <ID>MagicNumber:TweaksViewModel.kt$TweaksViewModel$65535</ID>
+    <ID>MatchingDeclarationName:PasteProxyUrlSheet.kt$PastedProxy</ID>
+    <ID>MatchingDeclarationName:TweaksDesktopContent.kt$DesktopSection</ID>
+    <ID>MatchingDeclarationName:TweaksKicker.kt$TweaksDecorSlot</ID>
+    <ID>MaxLineLength:Installation.kt$.</ID>
+    <ID>MaxLineLength:Installation.kt$DhizukuAvailability.NOT_RUNNING -&gt; LocalStatusColors.current.statusError to stringResource(Res.string.dhizuku_status_not_running)</ID>
+    <ID>MaxLineLength:Installation.kt$DhizukuAvailability.PERMISSION_NEEDED -&gt; LocalStatusColors.current.statusWarning to stringResource(Res.string.dhizuku_status_permission_needed)</ID>
+    <ID>MaxLineLength:Installation.kt$DhizukuAvailability.UNAVAILABLE -&gt; LocalPersonality.current.colors.outline to stringResource(Res.string.dhizuku_status_not_installed)</ID>
+    <ID>MaxLineLength:Installation.kt$KomiText(text = label, role = KomiTextRole.Label, fontSize = 11.sp, color = color, fontWeight = FontWeight.Medium, uppercase = false)</ID>
+    <ID>MaxLineLength:Installation.kt$RootAvailability.PERMISSION_NEEDED -&gt; LocalStatusColors.current.statusWarning to stringResource(Res.string.root_status_permission_needed)</ID>
+    <ID>MaxLineLength:Installation.kt$ShizukuAvailability.NOT_RUNNING -&gt; LocalStatusColors.current.statusError to stringResource(Res.string.shizuku_status_not_running)</ID>
+    <ID>MaxLineLength:Installation.kt$ShizukuAvailability.PERMISSION_NEEDED -&gt; LocalStatusColors.current.statusWarning to stringResource(Res.string.shizuku_status_permission_needed)</ID>
+    <ID>MaxLineLength:Installation.kt$ShizukuAvailability.UNAVAILABLE -&gt; LocalPersonality.current.colors.outline to stringResource(Res.string.shizuku_status_not_installed)</ID>
+    <ID>NestedBlockDepth:FeedbackComposer.kt$FeedbackComposer$fun composeBody( state: FeedbackState, channel: FeedbackChannel, ): String</ID>
+    <ID>ReturnCount:PasteProxyUrlSheet.kt$fun parseProxyUrl(raw: String): PastedProxy?</ID>
+    <ID>ReturnCount:TweaksViewModel.kt$TweaksViewModel$fun onAction(action: TweaksAction)</ID>
+    <ID>ReturnCount:TweaksViewModel.kt$TweaksViewModel$private fun buildMasterProxyConfig(): ProxyConfig?</ID>
+    <ID>ReturnCount:TweaksViewModel.kt$TweaksViewModel$private fun buildMasterProxyConfigForTest(): ProxyConfig?</ID>
+    <ID>ReturnCount:TweaksViewModel.kt$TweaksViewModel$private fun buildProxyConfigForTest(scope: ProxyScope): ProxyConfig?</ID>
+    <ID>ReturnCount:TweaksViewModel.kt$TweaksViewModel$private fun isValidProxyHost(raw: String): Boolean</ID>
+    <ID>ThrowsCount:TweaksViewModel.kt$TweaksViewModel$fun onAction(action: TweaksAction)</ID>
+    <ID>TooGenericExceptionCaught:HiddenRepositoriesViewModel.kt$HiddenRepositoriesViewModel$e: Throwable</ID>
+    <ID>TooGenericExceptionCaught:RestartApp.jvm.kt$t: Throwable</ID>
+    <ID>TooGenericExceptionCaught:SkippedUpdatesViewModel.kt$SkippedUpdatesViewModel$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:TweaksViewModel.kt$TweaksViewModel$e: Exception</ID>
+    <ID>TooManyFunctions:Installation.kt$zed.rainxch.tweaks.presentation.components.sections.Installation.kt</ID>
+    <ID>TooManyFunctions:TweaksViewModel.kt$TweaksViewModel : ViewModel</ID>
+    <ID>UnusedParameter:Installation.kt$type: InstallerType</ID>
+  </CurrentIssues>
+</SmellBaseline>

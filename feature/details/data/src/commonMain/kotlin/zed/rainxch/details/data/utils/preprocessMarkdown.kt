@@ -46,7 +46,10 @@ fun preprocessMarkdown(
 
     fun shouldSkipImage(url: String): Boolean = isBadgeUrl(url)
 
-    fun resolveUrl(path: String, asImage: Boolean): String {
+    fun resolveUrl(
+        path: String,
+        asImage: Boolean,
+    ): String {
         val trimmed = path.trim()
         if (trimmed.startsWith("#") && !asImage) return trimmed
 
@@ -58,7 +61,7 @@ fun preprocessMarkdown(
                 trimmed.startsWith("tel:") ||
                 trimmed.startsWith("sms:") ||
                 trimmed.startsWith("intent:")
-        
+
         val baseForPath = if (asImage) normalizedBaseUrl else normalizedLinkBaseUrl
 
         return if (isAbsolute) {
@@ -197,11 +200,11 @@ fun preprocessMarkdown(
             val mustFlatten = isInline || isInTableCell
 
             if (mustFlatten) {
-
-                val flatBody = body
-                    .replace(Regex("""<br\s*/?>""", RegexOption.IGNORE_CASE), " ")
-                    .replace(Regex("""\s+"""), " ")
-                    .trim()
+                val flatBody =
+                    body
+                        .replace(Regex("""<br\s*/?>""", RegexOption.IGNORE_CASE), " ")
+                        .replace(Regex("""\s+"""), " ")
+                        .trim()
                 when {
                     summary.isEmpty() && flatBody.isEmpty() -> ""
                     flatBody.isEmpty() -> "**$summary**"
@@ -537,7 +540,9 @@ fun preprocessMarkdown(
             "",
         )
 
-    processed = zed.rainxch.core.domain.utils.EmojiShortcodes.render(processed)
+    processed =
+        zed.rainxch.core.domain.utils.EmojiShortcodes
+            .render(processed)
 
     processed = joinAdjacentImageLines(processed)
 
@@ -559,15 +564,21 @@ private fun longestBacktickRun(text: String): Int {
 }
 
 private fun encodeDetailsSummary(text: String): String {
-
     val safe = StringBuilder()
     text.forEach { c ->
         when (c) {
             '\n', '\r', '\t', '`', ' ', '|' -> {
-                safe.append("%").append(c.code.toString(16).padStart(2, '0').uppercase())
+                safe.append("%").append(
+                    c.code
+                        .toString(16)
+                        .padStart(2, '0')
+                        .uppercase(),
+                )
             }
 
-            else -> safe.append(c)
+            else -> {
+                safe.append(c)
+            }
         }
     }
     return safe.toString()
@@ -582,7 +593,6 @@ private fun joinAdjacentImageLines(content: String): String {
     while (i < lines.size) {
         val line = lines[i]
         if (imageOnlyLine.matches(line)) {
-
             val group = StringBuilder(line.trim())
             var j = i + 1
             while (j < lines.size && imageOnlyLine.matches(lines[j])) {
@@ -601,77 +611,108 @@ private fun joinAdjacentImageLines(content: String): String {
     return out.toString()
 }
 
-private val HTML_ENTITIES: Map<String, String> = mapOf(
+private val HTML_ENTITIES: Map<String, String> =
+    mapOf(
+        "&amp;" to "&",
+        "&lt;" to "<",
+        "&gt;" to ">",
+        "&quot;" to "\"",
+        "&apos;" to "'",
+        "&#39;" to "'",
+        "&nbsp;" to " ",
+        "&ensp;" to " ",
+        "&emsp;" to " ",
+        "&thinsp;" to " ",
+        "&hellip;" to "…",
+        "&mdash;" to "—",
+        "&ndash;" to "–",
+        "&laquo;" to "«",
+        "&raquo;" to "»",
+        "&ldquo;" to "“",
+        "&rdquo;" to "”",
+        "&lsquo;" to "‘",
+        "&rsquo;" to "’",
+        "&sbquo;" to "‚",
+        "&bdquo;" to "„",
+        "&bull;" to "•",
+        "&middot;" to "·",
+        "&sect;" to "§",
+        "&para;" to "¶",
+        "&times;" to "×",
+        "&divide;" to "÷",
+        "&plusmn;" to "±",
+        "&deg;" to "°",
+        "&micro;" to "µ",
+        "&fnof;" to "ƒ",
+        "&infin;" to "∞",
+        "&asymp;" to "≈",
+        "&ne;" to "≠",
+        "&le;" to "≤",
+        "&ge;" to "≥",
+        "&larr;" to "←",
+        "&rarr;" to "→",
+        "&uarr;" to "↑",
+        "&darr;" to "↓",
+        "&harr;" to "↔",
+        "&lArr;" to "⇐",
+        "&rArr;" to "⇒",
+        "&copy;" to "©",
+        "&reg;" to "®",
+        "&trade;" to "™",
+        "&euro;" to "€",
+        "&pound;" to "£",
+        "&yen;" to "¥",
+        "&cent;" to "¢",
+    )
 
-    "&amp;" to "&",
-    "&lt;" to "<",
-    "&gt;" to ">",
-    "&quot;" to "\"",
-    "&apos;" to "'",
-    "&#39;" to "'",
+private val SUPERSCRIPTS: Map<Char, Char> =
+    mapOf(
+        '0' to '⁰',
+        '1' to '¹',
+        '2' to '²',
+        '3' to '³',
+        '4' to '⁴',
+        '5' to '⁵',
+        '6' to '⁶',
+        '7' to '⁷',
+        '8' to '⁸',
+        '9' to '⁹',
+        '+' to '⁺',
+        '-' to '⁻',
+        '=' to '⁼',
+        '(' to '⁽',
+        ')' to '⁾',
+        'n' to 'ⁿ',
+        'i' to 'ⁱ',
+    )
 
-    "&nbsp;" to " ",
-    "&ensp;" to " ",
-    "&emsp;" to " ",
-    "&thinsp;" to " ",
-
-    "&hellip;" to "…",
-    "&mdash;" to "—",
-    "&ndash;" to "–",
-    "&laquo;" to "«",
-    "&raquo;" to "»",
-    "&ldquo;" to "“",
-    "&rdquo;" to "”",
-    "&lsquo;" to "‘",
-    "&rsquo;" to "’",
-    "&sbquo;" to "‚",
-    "&bdquo;" to "„",
-    "&bull;" to "•",
-    "&middot;" to "·",
-    "&sect;" to "§",
-    "&para;" to "¶",
-
-    "&times;" to "×",
-    "&divide;" to "÷",
-    "&plusmn;" to "±",
-    "&deg;" to "°",
-    "&micro;" to "µ",
-    "&fnof;" to "ƒ",
-    "&infin;" to "∞",
-    "&asymp;" to "≈",
-    "&ne;" to "≠",
-    "&le;" to "≤",
-    "&ge;" to "≥",
-    "&larr;" to "←",
-    "&rarr;" to "→",
-    "&uarr;" to "↑",
-    "&darr;" to "↓",
-    "&harr;" to "↔",
-    "&lArr;" to "⇐",
-    "&rArr;" to "⇒",
-
-    "&copy;" to "©",
-    "&reg;" to "®",
-    "&trade;" to "™",
-
-    "&euro;" to "€",
-    "&pound;" to "£",
-    "&yen;" to "¥",
-    "&cent;" to "¢",
-)
-
-private val SUPERSCRIPTS: Map<Char, Char> = mapOf(
-    '0' to '⁰', '1' to '¹', '2' to '²', '3' to '³', '4' to '⁴',
-    '5' to '⁵', '6' to '⁶', '7' to '⁷', '8' to '⁸', '9' to '⁹',
-    '+' to '⁺', '-' to '⁻', '=' to '⁼', '(' to '⁽', ')' to '⁾',
-    'n' to 'ⁿ', 'i' to 'ⁱ',
-)
-
-private val SUBSCRIPTS: Map<Char, Char> = mapOf(
-    '0' to '₀', '1' to '₁', '2' to '₂', '3' to '₃', '4' to '₄',
-    '5' to '₅', '6' to '₆', '7' to '₇', '8' to '₈', '9' to '₉',
-    '+' to '₊', '-' to '₋', '=' to '₌', '(' to '₍', ')' to '₎',
-    'a' to 'ₐ', 'e' to 'ₑ', 'o' to 'ₒ', 'x' to 'ₓ',
-    'h' to 'ₕ', 'k' to 'ₖ', 'l' to 'ₗ', 'm' to 'ₘ',
-    'n' to 'ₙ', 'p' to 'ₚ', 's' to 'ₛ', 't' to 'ₜ',
-)
+private val SUBSCRIPTS: Map<Char, Char> =
+    mapOf(
+        '0' to '₀',
+        '1' to '₁',
+        '2' to '₂',
+        '3' to '₃',
+        '4' to '₄',
+        '5' to '₅',
+        '6' to '₆',
+        '7' to '₇',
+        '8' to '₈',
+        '9' to '₉',
+        '+' to '₊',
+        '-' to '₋',
+        '=' to '₌',
+        '(' to '₍',
+        ')' to '₎',
+        'a' to 'ₐ',
+        'e' to 'ₑ',
+        'o' to 'ₒ',
+        'x' to 'ₓ',
+        'h' to 'ₕ',
+        'k' to 'ₖ',
+        'l' to 'ₗ',
+        'm' to 'ₘ',
+        'n' to 'ₙ',
+        'p' to 'ₚ',
+        's' to 'ₛ',
+        't' to 'ₜ',
+    )

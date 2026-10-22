@@ -18,7 +18,6 @@ actual fun restartAppAfterLanguageChange() {
             }
         }
     } catch (t: Throwable) {
-
         Logger.w(t) {
             "restartAppAfterLanguageChange: relaunch failed, falling back to plain exit"
         }

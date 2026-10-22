@@ -30,11 +30,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.stringResource
 import zed.rainxch.core.presentation.components.chips.KomiChip
 import zed.rainxch.core.presentation.components.chips.KomiChipKind
@@ -74,28 +72,26 @@ fun DeveloperRepoItem(
                     KomiText(
                         text = repository.name,
                         maxLines = 1,
-                        role = KomiTextRole.Title,
-                        fontWeight = FontWeight.SemiBold,
+                        role = KomiTextRole.CardTitle,
                         overflow = TextOverflow.Ellipsis,
                         color = colors.onSurface,
-                        uppercase = false,
                     )
 
                     val releaseDate = repository.latestReleaseAt
-                    val (label, dateString) = if (releaseDate != null) {
-                        Res.string.released_on_date to releaseDate
-                    } else {
-                        Res.string.updated_on_date to repository.updatedAt
-                    }
+                    val (label, dateString) =
+                        if (releaseDate != null) {
+                            Res.string.released_on_date to releaseDate
+                        } else {
+                            Res.string.updated_on_date to repository.updatedAt
+                        }
                     KomiText(
-                        text = stringResource(label, formatRelativeLong(dateString))
-                            .replaceFirstChar { it.uppercase() },
-                        role = KomiTextRole.Label,
-                        fontSize = 12.sp,
+                        text =
+                            stringResource(label, formatRelativeLong(dateString))
+                                .replaceFirstChar { it.uppercase() },
+                        role = KomiTextRole.Caption,
                         overflow = TextOverflow.Ellipsis,
                         color = colors.onSurfaceVariant,
                         maxLines = 1,
-                        uppercase = false,
                     )
                 }
 
@@ -113,10 +109,8 @@ fun DeveloperRepoItem(
                     text = description,
                     maxLines = 2,
                     role = KomiTextRole.Body,
-                    fontSize = 13.sp,
                     color = colors.onSurfaceVariant,
                     overflow = TextOverflow.Ellipsis,
-                    uppercase = false,
                 )
             }
 
@@ -189,9 +183,10 @@ fun DeveloperRepoItem(
                 }
             }
 
-            val showBadges = repository.hasReleases ||
-                repository.hasInstallableAssets ||
-                repository.isInstalled
+            val showBadges =
+                repository.hasReleases ||
+                    repository.hasInstallableAssets ||
+                    repository.isInstalled
             if (showBadges) {
                 Spacer(Modifier.height(10.dp))
                 FlowRow(
@@ -201,15 +196,17 @@ fun DeveloperRepoItem(
                 ) {
                     if (repository.hasInstallableAssets) {
                         TonalBadge(
-                            text = repository.latestVersion
-                                ?: stringResource(Res.string.has_release),
-                            container = colors.primary.copy(alpha = 0.14f),
+                            text =
+                                repository.latestVersion
+                                    ?: stringResource(Res.string.has_release),
+                            container = colors.primaryTint,
                             content = colors.primary,
                         )
                     } else if (repository.hasReleases) {
                         TonalBadge(
-                            text = repository.latestVersion
-                                ?: stringResource(Res.string.has_release),
+                            text =
+                                repository.latestVersion
+                                    ?: stringResource(Res.string.has_release),
                             container = colors.primaryContainer,
                             content = colors.onPrimaryContainer,
                         )
@@ -217,7 +214,7 @@ fun DeveloperRepoItem(
                     if (repository.isInstalled) {
                         TonalBadge(
                             text = stringResource(Res.string.installed),
-                            container = colors.primary.copy(alpha = 0.18f),
+                            container = colors.primaryTint,
                             content = colors.primary,
                         )
                     }
@@ -233,31 +230,38 @@ private fun FavoriteToggle(
     onClick: () -> Unit,
 ) {
     val colors = LocalPersonality.current.colors
-    val container = if (isFavorite) {
-        colors.error.copy(alpha = 0.18f)
-    } else {
-        colors.surfaceContainerHigh
-    }
-    val tint = if (isFavorite) {
-        colors.error
-    } else {
-        colors.onSurfaceVariant
-    }
+    val container =
+        if (isFavorite) {
+            colors.errorTint
+        } else {
+            colors.surfaceContainerHigh
+        }
+    val tint =
+        if (isFavorite) {
+            colors.error
+        } else {
+            colors.onSurfaceVariant
+        }
     val shape = LocalPersonality.current.shape
     Box(
-        modifier = Modifier
-            .size(38.dp)
-            .clip(RoundedCornerShape(shape.cornerSmall))
-            .background(container)
-            .clickable(onClick = onClick),
+        modifier =
+            Modifier
+                .size(38.dp)
+                .clip(RoundedCornerShape(shape.cornerSmall))
+                .background(container)
+                .clickable(onClick = onClick),
         contentAlignment = Alignment.Center,
     ) {
         KomiIcon(
             imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
-            contentDescription = stringResource(
-                if (isFavorite) Res.string.remove_from_favourites
-                else Res.string.add_to_favourites,
-            ),
+            contentDescription =
+                stringResource(
+                    if (isFavorite) {
+                        Res.string.remove_from_favourites
+                    } else {
+                        Res.string.add_to_favourites
+                    },
+                ),
             modifier = Modifier.size(18.dp),
             tint = tint,
         )
@@ -265,21 +269,23 @@ private fun FavoriteToggle(
 }
 
 @Composable
-private fun TonalBadge(text: String, container: Color, content: Color) {
+private fun TonalBadge(
+    text: String,
+    container: Color,
+    content: Color,
+) {
     val shape = LocalPersonality.current.shape
     Box(
-        modifier = Modifier
-            .clip(RoundedCornerShape(shape.cornerSmall))
-            .background(container),
+        modifier =
+            Modifier
+                .clip(RoundedCornerShape(shape.cornerSmall))
+                .background(container),
     ) {
         KomiText(
             text = text,
-            role = KomiTextRole.Label,
-            fontSize = 12.sp,
-            fontWeight = FontWeight.SemiBold,
+            role = KomiTextRole.LabelSmall,
             color = content,
             modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
-            uppercase = false,
         )
     }
 }
@@ -289,23 +295,24 @@ private fun TonalBadge(text: String, container: Color, content: Color) {
 private fun PreviewDeveloperRepoItem() {
     PersonalityPreview {
         DeveloperRepoItem(
-            repository = DeveloperRepository(
-                id = 1,
-                name = "awesome-kotlin-app",
-                fullName = "developer/awesome-kotlin-app",
-                description = "An amazing Kotlin Multiplatform application that demonstrates modern Android development",
-                htmlUrl = "",
-                stargazersCount = 2340,
-                forksCount = 456,
-                openIssuesCount = 23,
-                language = "Kotlin",
-                hasReleases = true,
-                hasInstallableAssets = true,
-                isInstalled = true,
-                isFavorite = false,
-                latestVersion = "v1.5.2",
-                updatedAt = Clock.System.now().toString(),
-            ),
+            repository =
+                DeveloperRepository(
+                    id = 1,
+                    name = "awesome-kotlin-app",
+                    fullName = "developer/awesome-kotlin-app",
+                    description = "An amazing Kotlin Multiplatform application that demonstrates modern Android development",
+                    htmlUrl = "",
+                    stargazersCount = 2340,
+                    forksCount = 456,
+                    openIssuesCount = 23,
+                    language = "Kotlin",
+                    hasReleases = true,
+                    hasInstallableAssets = true,
+                    isInstalled = true,
+                    isFavorite = false,
+                    latestVersion = "v1.5.2",
+                    updatedAt = Clock.System.now().toString(),
+                ),
             onItemClick = {},
             onToggleFavorite = {},
         )

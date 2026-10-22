@@ -1,11 +1,11 @@
 package zed.rainxch.core.data.mappers
 
-import kotlin.time.Instant
 import zed.rainxch.core.data.dto.AnnouncementDto
 import zed.rainxch.core.domain.model.announcement.Announcement
 import zed.rainxch.core.domain.model.announcement.AnnouncementCategory
 import zed.rainxch.core.domain.model.announcement.AnnouncementIconHint
 import zed.rainxch.core.domain.model.announcement.AnnouncementSeverity
+import kotlin.time.Instant
 
 fun AnnouncementDto.toDomain(
     fullLocale: String,
@@ -40,8 +40,7 @@ fun AnnouncementDto.toDomain(
     )
 }
 
-private fun String.parseInstantOrNull(): Instant? =
-    runCatching { Instant.parse(this) }.getOrNull()
+private fun String.parseInstantOrNull(): Instant? = runCatching { Instant.parse(this) }.getOrNull()
 
 private fun String.parseSeverity(): AnnouncementSeverity =
     runCatching { AnnouncementSeverity.valueOf(trim().uppercase()) }
@@ -51,5 +50,4 @@ private fun String.parseCategory(): AnnouncementCategory =
     runCatching { AnnouncementCategory.valueOf(trim().uppercase()) }
         .getOrDefault(AnnouncementCategory.NEWS)
 
-private fun String.parseIconHint(): AnnouncementIconHint? =
-    runCatching { AnnouncementIconHint.valueOf(trim().uppercase()) }.getOrNull()
+private fun String.parseIconHint(): AnnouncementIconHint? = runCatching { AnnouncementIconHint.valueOf(trim().uppercase()) }.getOrNull()

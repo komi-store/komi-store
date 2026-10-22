@@ -4,10 +4,7 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.MutableTransitionState
-import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.spring
-import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
@@ -17,6 +14,7 @@ import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -45,12 +43,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -59,6 +55,10 @@ import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.vectorResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
+import zed.rainxch.auth.presentation.mapper.hintRes
+import zed.rainxch.auth.presentation.mapper.messageRes
+import zed.rainxch.auth.presentation.mapper.titleRes
+import zed.rainxch.auth.presentation.model.AuthError
 import zed.rainxch.auth.presentation.model.AuthLoginState
 import zed.rainxch.auth.presentation.model.GithubDeviceStartUi
 import zed.rainxch.core.presentation.components.buttons.KomiButton
@@ -84,7 +84,6 @@ import zed.rainxch.githubstore.core.presentation.res.Res
 import zed.rainxch.githubstore.core.presentation.res.auth_use_device_code_instead
 import zed.rainxch.githubstore.core.presentation.res.app_icon
 import zed.rainxch.githubstore.core.presentation.res.auth_check_status
-import zed.rainxch.githubstore.core.presentation.res.auth_error_with_message
 import zed.rainxch.githubstore.core.presentation.res.auth_polling_status
 import zed.rainxch.githubstore.core.presentation.res.auth_rate_limited
 import zed.rainxch.githubstore.core.presentation.res.auth_hide_signin_options
@@ -163,10 +162,7 @@ fun AuthenticationScreen(
                         is AuthLoginState.Error -> 0.96f
                         else -> 1f
                     },
-                    animationSpec = spring(
-                        dampingRatio = Spring.DampingRatioMediumBouncy,
-                        stiffness = Spring.StiffnessLow,
-                    ),
+                    animationSpec = LocalPersonality.current.motion.fastSpatial(),
                     label = "icon_scale",
                 )
 
@@ -185,17 +181,15 @@ fun AuthenticationScreen(
 
                 Spacer(Modifier.height(24.dp))
 
+                val motion = LocalPersonality.current.motion
                 AnimatedContent(
                     targetState = state.loginState,
                     transitionSpec = {
-                        val enter = fadeIn(tween(350)) + slideInVertically(
-                            animationSpec = spring(
-                                dampingRatio = Spring.DampingRatioLowBouncy,
-                                stiffness = Spring.StiffnessMediumLow,
-                            ),
+                        val enter = fadeIn(motion.defaultEffects()) + slideInVertically(
+                            animationSpec = motion.defaultSpatial(),
                             initialOffsetY = { it / 5 },
                         )
-                        val exit = fadeOut(tween(200))
+                        val exit = fadeOut(motion.fastEffects())
                         enter togetherWith exit
                     },
                     contentKey = { it::class },
@@ -228,7 +222,7 @@ fun AuthenticationScreen(
             if (state.isPatSheetVisible) {
                 PatSignInSheet(
                     input = state.patInput,
-                    error = state.patError,
+                    error = state.patError?.let { stringResource(it.messageRes()) },
                     isSubmitting = state.isPatSubmitting,
                     onAction = onAction,
                 )
@@ -251,10 +245,8 @@ private fun StateLoggedOut(
         KomiText(
             text = stringResource(Res.string.unlock_full_experience),
             role = KomiTextRole.Display,
-            fontWeight = FontWeight.SemiBold,
             color = colors.onBackground,
             textAlign = TextAlign.Center,
-            uppercase = false,
         )
 
         Spacer(Modifier.height(20.dp))
@@ -340,7 +332,7 @@ private fun BenefitsCard() {
                 modifier = Modifier
                     .size(40.dp)
                     .clip(RoundedCornerShape(shape.corner))
-                    .background(colors.primary.copy(alpha = 0.14f)),
+                    .background(colors.primaryTint),
                 contentAlignment = Alignment.Center,
             ) {
                 KomiIcon(
@@ -357,18 +349,14 @@ private fun BenefitsCard() {
             ) {
                 KomiText(
                     text = stringResource(Res.string.more_requests),
-                    role = KomiTextRole.Title,
-                    fontWeight = FontWeight.SemiBold,
+                    role = KomiTextRole.CardTitle,
                     color = colors.onSurface,
-                    uppercase = false,
                 )
 
                 KomiText(
                     text = stringResource(Res.string.more_requests_description),
                     role = KomiTextRole.Body,
-                    fontSize = 13.sp,
                     color = colors.onSurfaceVariant,
-                    uppercase = false,
                 )
             }
         }
@@ -400,9 +388,8 @@ private fun StateDevicePrompt(
             ) {
                 KomiText(
                     text = stringResource(Res.string.enter_code_on_github),
-                    role = KomiTextRole.Label,
+                    role = KomiTextRole.Caption,
                     color = colors.onSurfaceVariant,
-                    uppercase = false,
                 )
 
                 Spacer(Modifier.height(14.dp))
@@ -412,13 +399,16 @@ private fun StateDevicePrompt(
                     horizontalArrangement = Arrangement.Center,
                     modifier = Modifier.fillMaxWidth(),
                 ) {
-                    KomiText(
+                    val type = LocalPersonality.current.type
+                    // Typed by hand on another device, so it stays monospace at screen-title size.
+                    BasicText(
                         text = authState.start.userCode,
-                        role = KomiTextRole.Mono,
-                        fontSize = 28.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = colors.onSurface,
-                        uppercase = false,
+                        style =
+                            type.mono.copy(
+                                fontSize = type.screenTitle.fontSize,
+                                lineHeight = type.screenTitle.lineHeight,
+                                color = colors.onSurface,
+                            ),
                     )
 
                     Spacer(Modifier.width(12.dp))
@@ -427,16 +417,17 @@ private fun StateDevicePrompt(
                         modifier = Modifier
                             .size(40.dp)
                             .clip(RoundedCornerShape(shape.corner))
-                            .background(colors.primary.copy(alpha = 0.14f))
+                            .background(colors.primaryTint)
                             .clickable {
                                 onAction(AuthenticationAction.CopyCode(authState.start))
                             },
                         contentAlignment = Alignment.Center,
                     ) {
+                        val motion = LocalPersonality.current.motion
                         AnimatedContent(
                             targetState = state.copied,
                             transitionSpec = {
-                                (scaleIn(spring(dampingRatio = Spring.DampingRatioMediumBouncy)) + fadeIn()) togetherWith
+                                (scaleIn(motion.fastSpatial()) + fadeIn()) togetherWith
                                     (scaleOut() + fadeOut())
                             },
                             label = "copy_icon",
@@ -456,12 +447,9 @@ private fun StateDevicePrompt(
 
                     KomiText(
                         text = info,
-                        role = KomiTextRole.Body,
-                        fontSize = 13.sp,
-                        fontWeight = FontWeight.Medium,
+                        role = KomiTextRole.Label,
                         color = colors.primary,
                         textAlign = TextAlign.Center,
-                        uppercase = false,
                     )
                 }
 
@@ -470,17 +458,17 @@ private fun StateDevicePrompt(
 
                     val animatedProgress by animateFloatAsState(
                         targetValue = authState.progressFraction,
-                        animationSpec = tween(900),
+                        animationSpec = LocalPersonality.current.motion.long(),
                         label = "countdown_progress",
                     )
                     val progressColor by animateColorAsState(
                         targetValue = if (authState.isUrgent) colors.error else colors.primary,
-                        animationSpec = tween(500),
+                        animationSpec = LocalPersonality.current.motion.defaultEffects(),
                         label = "progress_color",
                     )
                     val timerColor by animateColorAsState(
                         targetValue = if (authState.isUrgent) colors.error else colors.onSurfaceVariant,
-                        animationSpec = tween(500),
+                        animationSpec = LocalPersonality.current.motion.defaultEffects(),
                         label = "timer_color",
                     )
 
@@ -501,10 +489,7 @@ private fun StateDevicePrompt(
                         KomiText(
                             text = authState.formattedTimer,
                             role = KomiTextRole.Mono,
-                            fontSize = 12.sp,
-                            fontWeight = FontWeight.Medium,
                             color = timerColor,
-                            uppercase = false,
                         )
                     }
                 }
@@ -544,10 +529,8 @@ private fun StateDevicePrompt(
 
             KomiText(
                 text = stringResource(Res.string.auth_rate_limited, state.pollIntervalSec),
-                role = KomiTextRole.Label,
-                fontSize = 11.sp,
+                role = KomiTextRole.Caption,
                 color = colors.onSurfaceVariant,
-                uppercase = false,
             )
         }
 
@@ -570,10 +553,9 @@ private fun StatePending() {
 
         KomiText(
             text = stringResource(Res.string.waiting_for_authorization),
-            role = KomiTextRole.Title,
+            role = KomiTextRole.CardTitle,
             color = colors.onSurfaceVariant,
             textAlign = TextAlign.Center,
-            uppercase = false,
         )
     }
 }
@@ -592,13 +574,13 @@ private fun StateLoggedIn() {
 
         AnimatedVisibility(
             visibleState = checkmarkVisibility,
-            enter = scaleIn(spring(dampingRatio = Spring.DampingRatioMediumBouncy)) + fadeIn(),
+            enter = scaleIn(LocalPersonality.current.motion.fastSpatial()) + fadeIn(),
         ) {
             Box(
                 modifier = Modifier
                     .size(80.dp)
                     .clip(RoundedCornerShape(shape.cornerSmall))
-                    .background(colors.primary.copy(alpha = 0.14f)),
+                    .background(colors.primaryTint),
                 contentAlignment = Alignment.Center,
             ) {
                 KomiIcon(
@@ -614,10 +596,8 @@ private fun StateLoggedIn() {
 
         KomiText(
             text = stringResource(Res.string.signed_in),
-            role = KomiTextRole.Title,
-            fontWeight = FontWeight.SemiBold,
+            role = KomiTextRole.CardTitle,
             color = colors.onBackground,
-            uppercase = false,
         )
 
         Spacer(Modifier.height(6.dp))
@@ -626,7 +606,6 @@ private fun StateLoggedIn() {
             text = stringResource(Res.string.redirecting_message),
             role = KomiTextRole.Body,
             color = colors.onSurfaceVariant,
-            uppercase = false,
         )
     }
 }
@@ -651,7 +630,7 @@ private fun StateError(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(colors.error.copy(alpha = 0.12f))
+                    .background(colors.errorTint)
                     .padding(20.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
@@ -665,26 +644,20 @@ private fun StateError(
                 Spacer(Modifier.height(12.dp))
 
                 KomiText(
-                    text = stringResource(Res.string.auth_error_with_message, authState.message),
-                    role = KomiTextRole.Title,
-                    fontWeight = FontWeight.SemiBold,
+                    text = stringResource(authState.error.titleRes()),
+                    role = KomiTextRole.CardTitle,
                     color = colors.onSurface,
                     textAlign = TextAlign.Center,
-                    uppercase = false,
                 )
 
-                authState.recoveryHint?.let { hint ->
-                    Spacer(Modifier.height(6.dp))
+                Spacer(Modifier.height(6.dp))
 
-                    KomiText(
-                        text = hint,
-                        role = KomiTextRole.Body,
-                        fontSize = 13.sp,
-                        color = colors.onSurfaceVariant,
-                        textAlign = TextAlign.Center,
-                        uppercase = false,
-                    )
-                }
+                KomiText(
+                    text = stringResource(authState.error.hintRes()),
+                    role = KomiTextRole.Body,
+                    color = colors.onSurfaceVariant,
+                    textAlign = TextAlign.Center,
+                )
             }
         }
 
@@ -751,18 +724,14 @@ private fun PatSignInSheet(
         ) {
             KomiText(
                 text = stringResource(Res.string.pat_sheet_title),
-                role = KomiTextRole.Title,
-                fontWeight = FontWeight.SemiBold,
+                role = KomiTextRole.CardTitle,
                 color = colors.onSurface,
-                uppercase = false,
             )
 
             KomiText(
                 text = stringResource(Res.string.pat_sheet_description),
                 role = KomiTextRole.Body,
-                fontSize = 13.sp,
                 color = colors.onSurfaceVariant,
-                uppercase = false,
             )
 
             KomiButton(
@@ -823,10 +792,7 @@ private fun PreviewError() {
     PersonalityPreview {
         AuthenticationScreen(
             state = AuthenticationState(
-                loginState = AuthLoginState.Error(
-                    message = "Network timeout",
-                    recoveryHint = "Check your internet connection",
-                ),
+                loginState = AuthLoginState.Error(AuthError.Unreachable),
             ),
             onAction = {},
         )

@@ -11,10 +11,12 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import zed.rainxch.core.domain.logging.KomiStoreLogger
 import zed.rainxch.core.domain.repository.InstalledAppsRepository
 
 class SkippedUpdatesViewModel(
     private val installedAppsRepository: InstalledAppsRepository,
+    private val logger: KomiStoreLogger,
 ) : ViewModel() {
     private val _state = MutableStateFlow(SkippedUpdatesState())
     val state = _state.asStateFlow()
@@ -41,8 +43,7 @@ class SkippedUpdatesViewModel(
                         isLoading = false,
                         items = items.toImmutableList(),
                     )
-            }
-            .launchIn(viewModelScope)
+            }.launchIn(viewModelScope)
     }
 
     fun onAction(action: SkippedUpdatesAction) {
@@ -52,8 +53,10 @@ class SkippedUpdatesViewModel(
     }
 
     private fun unskip(packageName: String) {
-
-        val appName = _state.value.items.firstOrNull { it.packageName == packageName }?.appName
+        val appName =
+            _state.value.items
+                .firstOrNull { it.packageName == packageName }
+                ?.appName
         viewModelScope.launch {
             try {
                 installedAppsRepository.setSkippedReleaseTag(packageName, null)
@@ -62,7 +65,8 @@ class SkippedUpdatesViewModel(
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
-                _events.send(SkippedUpdatesEvent.Failure(e.message.orEmpty()))
+                logger.error("SkippedUpdatesViewModel: failed to unskip $packageName", e)
+                _events.send(SkippedUpdatesEvent.Failure)
             }
         }
     }

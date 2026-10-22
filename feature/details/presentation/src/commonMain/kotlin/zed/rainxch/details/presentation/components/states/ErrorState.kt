@@ -24,10 +24,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 import zed.rainxch.core.presentation.components.icon.KomiIcon
@@ -76,11 +74,9 @@ fun ErrorState(
 
                 KomiText(
                     text = stringResource(kind.titleRes),
-                    role = KomiTextRole.Title,
-                    fontWeight = FontWeight.SemiBold,
+                    role = KomiTextRole.CardTitle,
                     color = colors.onSurface,
                     textAlign = TextAlign.Center,
-                    uppercase = false,
                 )
 
                 KomiText(
@@ -95,8 +91,7 @@ fun ErrorState(
                     KomiText(
                         text = errorMessage,
                         role = KomiTextRole.Body,
-                        fontSize = 13.sp,
-                        color = colors.onSurfaceVariant.copy(alpha = 0.7f),
+                        color = colors.onSurfaceVariant,
                         textAlign = TextAlign.Center,
                         modifier = Modifier
                             .fillMaxWidth()

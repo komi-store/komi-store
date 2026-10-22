@@ -2,6 +2,7 @@ package zed.rainxch.tweaks.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.collections.immutable.toImmutableMap
 import kotlinx.collections.immutable.toImmutableSet
 import kotlinx.coroutines.CancellationException
@@ -14,20 +15,22 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.onStart
-import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
 import org.jetbrains.compose.resources.getString
 import zed.rainxch.core.domain.isDesktop
+import zed.rainxch.core.domain.logging.KomiStoreLogger
+import zed.rainxch.core.domain.model.installation.InstallerType
 import zed.rainxch.core.domain.model.settings.ProxyConfig
 import zed.rainxch.core.domain.model.settings.ProxyScope
 import zed.rainxch.core.domain.model.settings.TranslationProvider
 import zed.rainxch.core.domain.network.ProxyTestOutcome
-import zed.rainxch.core.domain.logging.KomiStoreLogger
 import zed.rainxch.core.domain.network.ProxyTester
 import zed.rainxch.core.domain.repository.CacheRepository
+import zed.rainxch.core.domain.repository.ExternalInstallerRepository
 import zed.rainxch.core.domain.repository.ProxyRepository
 import zed.rainxch.core.domain.repository.SeenReposRepository
 import zed.rainxch.core.domain.repository.TweaksRepository
@@ -35,7 +38,6 @@ import zed.rainxch.core.domain.system.AggressiveOemDetector
 import zed.rainxch.core.domain.system.AppVersionInfo
 import zed.rainxch.core.domain.system.InstallerStatusProvider
 import zed.rainxch.core.domain.system.UpdateScheduleManager
-import zed.rainxch.tweaks.presentation.model.ProxyScopeFormState
 import zed.rainxch.githubstore.core.presentation.res.Res
 import zed.rainxch.githubstore.core.presentation.res.failed_to_save_proxy_settings
 import zed.rainxch.githubstore.core.presentation.res.invalid_proxy_port
@@ -51,13 +53,16 @@ import zed.rainxch.githubstore.core.presentation.res.tweaks_clear_downloads_fail
 import zed.rainxch.githubstore.core.presentation.res.tweaks_custom_forge_invalid_hostname
 import zed.rainxch.githubstore.core.presentation.res.tweaks_custom_forge_remove_failed
 import zed.rainxch.githubstore.core.presentation.res.tweaks_custom_forge_save_failed
-import zed.rainxch.tweaks.presentation.model.ProxyType
 import zed.rainxch.tweaks.presentation.connection.parseProxyUrl
+import zed.rainxch.tweaks.presentation.model.ProxyScopeFormState
+import zed.rainxch.tweaks.presentation.model.ProxyType
 import zed.rainxch.tweaks.presentation.utils.TweaksDeepLinkBus
 import kotlin.time.Duration.Companion.milliseconds
 
+@Suppress("LongParameterList")
 class TweaksViewModel(
     private val tweaksRepository: TweaksRepository,
+    private val externalInstallerRepository: ExternalInstallerRepository,
     private val appVersionInfo: AppVersionInfo,
     private val installerStatusProvider: InstallerStatusProvider,
     private val proxyRepository: ProxyRepository,
@@ -74,7 +79,7 @@ class TweaksViewModel(
         private val IPV4_PATTERN =
             Regex(
                 "^(25[0-5]|2[0-4]\\d|[01]?\\d?\\d)" +
-                        "(\\.(25[0-5]|2[0-4]\\d|[01]?\\d?\\d)){3}$",
+                    "(\\.(25[0-5]|2[0-4]\\d|[01]?\\d?\\d)){3}$",
             )
 
         private val IPV6_PATTERN = Regex("^[0-9A-Fa-f:]+$")
@@ -82,7 +87,7 @@ class TweaksViewModel(
         private val HOSTNAME_PATTERN =
             Regex(
                 "^[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?" +
-                        "(?:\\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*$",
+                    "(?:\\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*$",
             )
     }
 
@@ -90,42 +95,45 @@ class TweaksViewModel(
     private var cacheSizeJob: Job? = null
 
     private val _state = MutableStateFlow(TweaksState())
-    val state = _state
-        .onStart {
-            if (!hasLoadedInitialData) {
-                loadCurrentTheme()
-                loadVersionName()
-                loadProxyConfig()
-                loadInstallerPreference()
-                loadAutoUpdatePreference()
-                loadUpdateCheckInterval()
-                loadUpdateCheckEnabled()
-                loadIncludePreReleases()
-                loadHideSeenEnabled()
-                loadScrollbarEnabled()
-                loadContentWidth()
-                loadTranslationSettings()
-                loadAppLanguage()
-                loadAutoTranslate()
+    val state =
+        _state
+            .onStart {
+                if (!hasLoadedInitialData) {
+                    loadCurrentTheme()
+                    loadRepoLayout()
+                    loadVersionName()
+                    loadProxyConfig()
+                    loadInstallerPreference()
+                    loadAutoUpdatePreference()
+                    loadUpdateCheckInterval()
+                    loadUpdateCheckEnabled()
+                    loadIncludePreReleases()
+                    loadHideSeenEnabled()
+                    loadScrollbarEnabled()
+                    loadContentWidth()
+                    loadDisplayModeId()
+                    loadTranslationSettings()
+                    loadAppLanguage()
+                    loadAutoTranslate()
 
-                observeShizukuStatus()
-                observeDhizukuStatus()
-                observeRootStatus()
-                observeInstallerAttribution()
-                observeMasterProxyConfig()
-                observeUseMasterFlags()
-                observeFeedbackDeepLink()
+                    observeShizukuStatus()
+                    observeDhizukuStatus()
+                    observeRootStatus()
+                    observeInstallerAttribution()
+                    observeMasterProxyConfig()
+                    observeUseMasterFlags()
+                    observeFeedbackDeepLink()
 
-                hasLoadedInitialData = true
-            }
-            refreshCacheSize()
+                    hasLoadedInitialData = true
+                }
+                refreshCacheSize()
 
-            evaluateBatteryOptimizationCard()
-        }.stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5_000L),
-            initialValue = TweaksState(),
-        )
+                evaluateBatteryOptimizationCard()
+            }.stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(5_000L),
+                initialValue = TweaksState(),
+            )
 
     private val _events = Channel<TweaksEvent>(capacity = Channel.BUFFERED)
     val events = _events.receiveAsFlow()
@@ -141,13 +149,14 @@ class TweaksViewModel(
 
     private fun refreshCacheSize() {
         if (cacheSizeJob?.isActive == true) return
-        cacheSizeJob = viewModelScope.launch {
-            cacheRepository.observeCacheSize().collect { sizeBytes ->
-                _state.update {
-                    it.copy(cacheSize = formatCacheSize(sizeBytes))
+        cacheSizeJob =
+            viewModelScope.launch {
+                cacheRepository.observeCacheSize().collect { sizeBytes ->
+                    _state.update {
+                        it.copy(cacheSize = formatCacheSize(sizeBytes))
+                    }
                 }
             }
-        }
     }
 
     private fun formatCacheSize(bytes: Long): String {
@@ -168,6 +177,14 @@ class TweaksViewModel(
 
     private fun loadVersionName() {
         _state.update { it.copy(versionName = appVersionInfo.versionName) }
+    }
+
+    private fun loadRepoLayout() {
+        viewModelScope.launch {
+            tweaksRepository.getRepoGridLayout().collect { grid ->
+                _state.update { it.copy(isRepoGridLayout = grid) }
+            }
+        }
     }
 
     private fun loadCurrentTheme() {
@@ -237,7 +254,6 @@ class TweaksViewModel(
     }
 
     private fun loadProxyConfig() {
-
         ProxyScope.entries.forEach { scope ->
             viewModelScope.launch {
                 proxyRepository.getProxyConfig(scope).collect { config ->
@@ -316,11 +332,18 @@ class TweaksViewModel(
 
     private fun loadInstallerPreference() {
         viewModelScope.launch {
-            tweaksRepository.getInstallerType().collect { type ->
-                _state.update {
-                    it.copy(installerType = type)
-                }
+            tweaksRepository.getExternalInstallerPackage().collect { packageName ->
+                _state.update { it.copy(externalInstallerPackage = packageName) }
             }
+        }
+        viewModelScope.launch {
+            tweaksRepository.getInstallerType().collect { type ->
+                _state.update { it.copy(installerType = type) }
+            }
+        }
+        viewModelScope.launch {
+            val installers = externalInstallerRepository.listInstallers()
+            _state.update { it.copy(externalInstallers = installers.toImmutableList()) }
         }
     }
 
@@ -354,22 +377,20 @@ class TweaksViewModel(
         }
     }
 
-    private fun persistInstallerAttribution(
-        attribution: zed.rainxch.core.domain.model.installation.InstallerAttribution,
-    ) {
+    private fun persistInstallerAttribution(attribution: zed.rainxch.core.domain.model.installation.InstallerAttribution) {
         viewModelScope.launch {
-            runCatching {
+            try {
                 tweaksRepository.setInstallerAttribution(attribution)
-            }.onSuccess {
                 _state.update {
                     it.copy(
                         installerAttributionCustomExpanded = false,
                         installerAttributionCustomError = null,
                     )
                 }
-            }.onFailure { error ->
-                if (error is CancellationException) throw error
-                logger.error("TweaksViewModel: failed to persist installer attribution", error)
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                logger.error("TweaksViewModel: failed to persist installer attribution", e)
                 _state.update {
                     it.copy(installerAttributionCustomError = "write_failed")
                 }
@@ -379,11 +400,11 @@ class TweaksViewModel(
 
     private fun observeInstallerAttribution() {
         viewModelScope.launch {
-            tweaksRepository.getInstallerAttribution()
+            tweaksRepository
+                .getInstallerAttribution()
                 .catch { e ->
                     logger.error("TweaksViewModel: installer attribution flow error", e)
-                }
-                .collect { attribution ->
+                }.collect { attribution ->
                     _state.update { current ->
                         val isCustom =
                             attribution is zed.rainxch.core.domain.model.installation.InstallerAttribution.Custom
@@ -393,11 +414,12 @@ class TweaksViewModel(
                         current.copy(
                             installerAttribution = attribution,
                             installerAttributionCustomDraft = customDraft,
-                            installerAttributionCustomExpanded = if (isCustom) {
-                                current.installerAttributionCustomExpanded
-                            } else {
-                                false
-                            },
+                            installerAttributionCustomExpanded =
+                                if (isCustom) {
+                                    current.installerAttributionCustomExpanded
+                                } else {
+                                    false
+                                },
                         )
                     }
                 }
@@ -462,6 +484,14 @@ class TweaksViewModel(
         }
     }
 
+    private fun loadDisplayModeId() {
+        viewModelScope.launch {
+            tweaksRepository.getDisplayModeId().collect { modeId ->
+                _state.update { it.copy(displayModeId = modeId) }
+            }
+        }
+    }
+
     private fun loadTranslationSettings() {
         viewModelScope.launch {
             tweaksRepository.getTranslationProvider().collect { provider ->
@@ -508,21 +538,23 @@ class TweaksViewModel(
     private fun evaluateBatteryOptimizationCard() {
         viewModelScope.launch {
             val dismissed =
-                runCatching {
+                try {
                     withTimeoutOrNull(BATTERY_OPT_PREF_READ_TIMEOUT_MS.milliseconds) {
                         tweaksRepository.getBatteryOptimizationPromptDismissed().firstOrNull()
                     }
-                }.onFailure { error ->
-                    if (error is CancellationException) throw error
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (e: Exception) {
                     logger.error(
                         "TweaksViewModel: failed to read battery-opt dismissed flag",
-                        error,
+                        e,
                     )
-                }.getOrNull() ?: false
+                    null
+                } ?: false
             val show =
                 aggressiveOemDetector.isAggressiveOem() &&
-                        !aggressiveOemDetector.isBatteryOptimizationIgnored() &&
-                        !dismissed
+                    !aggressiveOemDetector.isBatteryOptimizationIgnored() &&
+                    !dismissed
             _state.update { it.copy(showBatteryOptimizationCard = show) }
         }
     }
@@ -602,6 +634,12 @@ class TweaksViewModel(
                 }
             }
 
+            is TweaksAction.OnRepoLayoutSelected -> {
+                viewModelScope.launch {
+                    tweaksRepository.setRepoGridLayout(action.grid)
+                }
+            }
+
             is TweaksAction.OnDarkThemeChange -> {
                 viewModelScope.launch {
                     tweaksRepository.setDarkTheme(action.isDarkTheme)
@@ -626,6 +664,12 @@ class TweaksViewModel(
                 }
             }
 
+            is TweaksAction.OnDisplayModeSelected -> {
+                viewModelScope.launch {
+                    tweaksRepository.setDisplayModeId(action.modeId)
+                }
+            }
+
             is TweaksAction.OnProxyTypeSelected -> {
                 mutateForm(action.scope) { it.copy(type = action.type) }
 
@@ -637,18 +681,17 @@ class TweaksViewModel(
                             ProxyConfig.System
                         }
                     viewModelScope.launch {
-                        runCatching {
+                        try {
                             proxyRepository.setProxyConfig(action.scope, config)
-                        }.onSuccess {
-
                             clearDirty(action.scope)
                             _events.send(TweaksEvent.OnProxySaved)
-                        }.onFailure { error ->
-                            if (error is CancellationException) throw error
+                        } catch (e: CancellationException) {
+                            throw e
+                        } catch (e: Exception) {
+                            logger.error("TweaksViewModel: failed to save proxy config", e)
                             _events.send(
                                 TweaksEvent.OnProxySaveError(
-                                    error.message
-                                        ?: getString(Res.string.failed_to_save_proxy_settings),
+                                    getString(Res.string.failed_to_save_proxy_settings),
                                 ),
                             )
                         }
@@ -683,8 +726,14 @@ class TweaksViewModel(
 
                 val config: ProxyConfig =
                     when (form.type) {
-                        ProxyType.NONE -> ProxyConfig.None
-                        ProxyType.SYSTEM -> ProxyConfig.System
+                        ProxyType.NONE -> {
+                            ProxyConfig.None
+                        }
+
+                        ProxyType.SYSTEM -> {
+                            ProxyConfig.System
+                        }
+
                         ProxyType.HTTP, ProxyType.SOCKS -> {
                             val port =
                                 form.port
@@ -726,17 +775,17 @@ class TweaksViewModel(
                     }
 
                 viewModelScope.launch {
-                    runCatching {
+                    try {
                         proxyRepository.setProxyConfig(action.scope, config)
-                    }.onSuccess {
                         clearDirty(action.scope)
                         _events.send(TweaksEvent.OnProxySaved)
-                    }.onFailure { error ->
-                        if (error is CancellationException) throw error
+                    } catch (e: CancellationException) {
+                        throw e
+                    } catch (e: Exception) {
+                        logger.error("TweaksViewModel: failed to save proxy config", e)
                         _events.send(
                             TweaksEvent.OnProxySaveError(
-                                error.message
-                                    ?: getString(Res.string.failed_to_save_proxy_settings),
+                                getString(Res.string.failed_to_save_proxy_settings),
                             ),
                         )
                     }
@@ -753,7 +802,6 @@ class TweaksViewModel(
                         try {
                             proxyTester.test(config)
                         } catch (e: CancellationException) {
-
                             throw e
                         } catch (e: Exception) {
                             ProxyTestOutcome.Failure.Unknown(e.message)
@@ -764,9 +812,29 @@ class TweaksViewModel(
                 }
             }
 
+            is TweaksAction.OnExternalInstallerPickerOpenChanged -> {
+                _state.update { it.copy(externalInstallerPickerOpen = action.open) }
+                if (action.open) {
+                    viewModelScope.launch {
+                        val installers = externalInstallerRepository.listInstallers()
+                        _state.update { it.copy(externalInstallers = installers.toImmutableList()) }
+                    }
+                }
+            }
+
+            is TweaksAction.OnExternalInstallerSelected -> {
+                viewModelScope.launch {
+                    tweaksRepository.setExternalInstallerPackage(action.packageName)
+                    _state.update { it.copy(externalInstallerPickerOpen = false) }
+                }
+            }
+
             is TweaksAction.OnInstallerTypeSelected -> {
                 viewModelScope.launch {
                     tweaksRepository.setInstallerType(action.type)
+                }
+                if (action.type == InstallerType.THIRD_PARTY && _state.value.externalInstallerPackage.isBlank()) {
+                    onAction(TweaksAction.OnExternalInstallerPickerOpenChanged(true))
                 }
             }
 
@@ -790,7 +858,8 @@ class TweaksViewModel(
 
             is TweaksAction.OnInstallerAttributionPresetSelected -> {
                 persistInstallerAttribution(
-                    zed.rainxch.core.domain.model.installation.InstallerAttribution.Preset(action.key),
+                    zed.rainxch.core.domain.model.installation.InstallerAttribution
+                        .Preset(action.key),
                 )
             }
 
@@ -815,7 +884,7 @@ class TweaksViewModel(
             TweaksAction.OnInstallerAttributionCustomSave -> {
                 val draft = _state.value.installerAttributionCustomDraft.trim()
                 if (!zed.rainxch.core.domain.model.installation.InstallerAttributionDefaults.isValidPackageName(
-                        draft
+                        draft,
                     )
                 ) {
                     _state.update {
@@ -823,19 +892,19 @@ class TweaksViewModel(
                     }
                 } else {
                     viewModelScope.launch {
-                        runCatching {
+                        try {
                             tweaksRepository.setInstallerAttribution(
                                 zed.rainxch.core.domain.model.installation.InstallerAttribution.Custom(
-                                    draft
+                                    draft,
                                 ),
                             )
-                        }.onSuccess {
                             _state.update { it.copy(installerAttributionCustomError = null) }
-                        }.onFailure { error ->
-                            if (error is CancellationException) throw error
+                        } catch (e: CancellationException) {
+                            throw e
+                        } catch (e: Exception) {
                             logger.error(
                                 "TweaksViewModel: failed to persist installer attribution",
-                                error
+                                e,
                             )
                             _state.update { it.copy(installerAttributionCustomError = "write_failed") }
                         }
@@ -905,19 +974,19 @@ class TweaksViewModel(
             TweaksAction.OnClearDownloadsConfirm -> {
                 _state.update { it.copy(isClearDownloadsDialogVisible = false) }
                 viewModelScope.launch {
-                    runCatching {
+                    try {
                         cacheRepository.clearCache()
-                    }.onSuccess {
                         cacheSizeJob?.cancel()
                         cacheSizeJob = null
                         refreshCacheSize()
                         _events.send(TweaksEvent.OnCacheCleared)
-                    }.onFailure { error ->
-                        if (error is CancellationException) throw error
+                    } catch (e: CancellationException) {
+                        throw e
+                    } catch (e: Exception) {
+                        logger.error("TweaksViewModel: failed to clear downloads", e)
                         _events.send(
                             TweaksEvent.OnCacheClearError(
-                                error.message
-                                    ?: getString(Res.string.tweaks_clear_downloads_failed),
+                                getString(Res.string.tweaks_clear_downloads_failed),
                             ),
                         )
                     }
@@ -932,31 +1001,39 @@ class TweaksViewModel(
                 // Handled in composable
             }
 
-            TweaksAction.OnFeedbackClick ->
+            TweaksAction.OnFeedbackClick -> {
                 _state.update { it.copy(isFeedbackSheetVisible = true) }
+            }
 
-            TweaksAction.OnFeedbackDismiss ->
+            TweaksAction.OnFeedbackDismiss -> {
                 _state.update { it.copy(isFeedbackSheetVisible = false) }
+            }
 
-            TweaksAction.OnLanguagePickerOpen ->
+            TweaksAction.OnLanguagePickerOpen -> {
                 _state.update { it.copy(isLanguageSheetVisible = true, languageQuery = "") }
+            }
 
-            TweaksAction.OnLanguagePickerDismiss ->
+            TweaksAction.OnLanguagePickerDismiss -> {
                 _state.update { it.copy(isLanguageSheetVisible = false) }
+            }
 
-            is TweaksAction.OnLanguageQueryChange ->
+            is TweaksAction.OnLanguageQueryChange -> {
                 _state.update { it.copy(languageQuery = action.query) }
+            }
 
-            TweaksAction.OnTranslationProviderExpandToggle ->
+            TweaksAction.OnTranslationProviderExpandToggle -> {
                 _state.update { it.copy(translationProviderExpanded = !it.translationProviderExpanded) }
+            }
 
-            TweaksAction.OnTranslationTargetPickerOpen ->
+            TweaksAction.OnTranslationTargetPickerOpen -> {
                 _state.update { it.copy(translationTargetPickerOpen = true, languageQuery = "") }
+            }
 
-            TweaksAction.OnTranslationTargetPickerDismiss ->
+            TweaksAction.OnTranslationTargetPickerDismiss -> {
                 _state.update { it.copy(translationTargetPickerOpen = false) }
+            }
 
-            TweaksAction.OnConnectionPasteSheetOpen ->
+            TweaksAction.OnConnectionPasteSheetOpen -> {
                 _state.update {
                     it.copy(
                         connectionPasteSheetOpen = true,
@@ -964,28 +1041,32 @@ class TweaksViewModel(
                         proxyPasteUrlError = false,
                     )
                 }
+            }
 
-            TweaksAction.OnConnectionPasteSheetDismiss ->
+            TweaksAction.OnConnectionPasteSheetDismiss -> {
                 _state.update { it.copy(connectionPasteSheetOpen = false) }
+            }
 
-            TweaksAction.OnConnectionMasterExpandToggle ->
+            TweaksAction.OnConnectionMasterExpandToggle -> {
                 _state.update { it.copy(connectionMasterExpanded = !it.connectionMasterExpanded) }
+            }
 
-            is TweaksAction.OnProxyScopeExpandToggle ->
+            is TweaksAction.OnProxyScopeExpandToggle -> {
                 _state.update {
                     it.copy(
                         expandedProxyScope =
                             if (it.expandedProxyScope == action.scope) null else action.scope,
                     )
                 }
+            }
 
-            is TweaksAction.OnDesktopSectionSelected ->
+            is TweaksAction.OnDesktopSectionSelected -> {
                 _state.update { it.copy(desktopSection = action.section) }
+            }
 
             is TweaksAction.OnTranslationProviderSelected -> {
                 when (action.provider) {
                     TranslationProvider.GOOGLE -> {
-
                         _state.update { it.copy(draftTranslationProvider = null) }
                         viewModelScope.launch {
                             tweaksRepository.setTranslationProvider(action.provider)
@@ -997,7 +1078,7 @@ class TweaksViewModel(
                         val current = _state.value
                         val hasCreds =
                             current.youdaoAppKey.isNotBlank() &&
-                                    current.youdaoAppSecret.isNotBlank()
+                                current.youdaoAppSecret.isNotBlank()
                         if (hasCreds) {
                             _state.update { it.copy(draftTranslationProvider = null) }
                             viewModelScope.launch {
@@ -1005,7 +1086,6 @@ class TweaksViewModel(
                                 _events.send(TweaksEvent.OnTranslationProviderSaved)
                             }
                         } else {
-
                             _state.update {
                                 it.copy(draftTranslationProvider = TranslationProvider.YOUDAO)
                             }
@@ -1013,7 +1093,6 @@ class TweaksViewModel(
                     }
 
                     TranslationProvider.LIBRE_TRANSLATE -> {
-
                         _state.update { it.copy(draftTranslationProvider = null) }
                         viewModelScope.launch {
                             tweaksRepository.setTranslationProvider(action.provider)
@@ -1077,11 +1156,11 @@ class TweaksViewModel(
 
                     val shouldActivate =
                         current.youdaoAppKey.isNotBlank() &&
-                                current.youdaoAppSecret.isNotBlank() &&
-                                (
-                                        current.translationProvider != TranslationProvider.YOUDAO ||
-                                                current.draftTranslationProvider == TranslationProvider.YOUDAO
-                                        )
+                            current.youdaoAppSecret.isNotBlank() &&
+                            (
+                                current.translationProvider != TranslationProvider.YOUDAO ||
+                                    current.draftTranslationProvider == TranslationProvider.YOUDAO
+                            )
                     if (shouldActivate) {
                         tweaksRepository.setTranslationProvider(TranslationProvider.YOUDAO)
                     }
@@ -1112,10 +1191,10 @@ class TweaksViewModel(
                     tweaksRepository.setLibreTranslateApiKey(current.libreTranslateApiKey)
                     val shouldActivate =
                         current.libreTranslateBaseUrl.isNotBlank() &&
-                                (
-                                        current.translationProvider != TranslationProvider.LIBRE_TRANSLATE ||
-                                                current.draftTranslationProvider == TranslationProvider.LIBRE_TRANSLATE
-                                        )
+                            (
+                                current.translationProvider != TranslationProvider.LIBRE_TRANSLATE ||
+                                    current.draftTranslationProvider == TranslationProvider.LIBRE_TRANSLATE
+                            )
                     if (shouldActivate) {
                         tweaksRepository.setTranslationProvider(TranslationProvider.LIBRE_TRANSLATE)
                     }
@@ -1140,10 +1219,10 @@ class TweaksViewModel(
                     tweaksRepository.setDeeplAuthKey(current.deeplAuthKey)
                     val shouldActivate =
                         current.deeplAuthKey.isNotBlank() &&
-                                (
-                                        current.translationProvider != TranslationProvider.DEEPL ||
-                                                current.draftTranslationProvider == TranslationProvider.DEEPL
-                                        )
+                            (
+                                current.translationProvider != TranslationProvider.DEEPL ||
+                                    current.draftTranslationProvider == TranslationProvider.DEEPL
+                            )
                     if (shouldActivate) {
                         tweaksRepository.setTranslationProvider(TranslationProvider.DEEPL)
                     }
@@ -1173,10 +1252,10 @@ class TweaksViewModel(
                     tweaksRepository.setMicrosoftTranslatorRegion(current.microsoftTranslatorRegion)
                     val shouldActivate =
                         current.microsoftTranslatorKey.isNotBlank() &&
-                                (
-                                        current.translationProvider != TranslationProvider.MICROSOFT ||
-                                                current.draftTranslationProvider == TranslationProvider.MICROSOFT
-                                        )
+                            (
+                                current.translationProvider != TranslationProvider.MICROSOFT ||
+                                    current.draftTranslationProvider == TranslationProvider.MICROSOFT
+                            )
                     if (shouldActivate) {
                         tweaksRepository.setTranslationProvider(TranslationProvider.MICROSOFT)
                     }
@@ -1218,13 +1297,14 @@ class TweaksViewModel(
 
             TweaksAction.OnDismissBatteryOptimizationCard -> {
                 viewModelScope.launch {
-                    runCatching {
+                    try {
                         tweaksRepository.setBatteryOptimizationPromptDismissed(true)
-                    }.onFailure {
-                        if (it is CancellationException) throw it
+                    } catch (e: CancellationException) {
+                        throw e
+                    } catch (e: Exception) {
                         logger.error(
                             "TweaksViewModel: failed to persist battery-opt dismiss",
-                            it,
+                            e,
                         )
                     }
                     _state.update { it.copy(showBatteryOptimizationCard = false) }
@@ -1254,12 +1334,13 @@ class TweaksViewModel(
             }
 
             TweaksAction.OnAddCustomForge -> {
-                val raw = _state.value.customForgeDraft
-                    .trim()
-                    .lowercase()
-                    .removePrefix("https://")
-                    .removePrefix("http://")
-                    .substringBefore('/')
+                val raw =
+                    _state.value.customForgeDraft
+                        .trim()
+                        .lowercase()
+                        .removePrefix("https://")
+                        .removePrefix("http://")
+                        .substringBefore('/')
                 viewModelScope.launch {
                     if (raw.isEmpty() || !raw.contains('.') || raw.contains(' ')) {
                         _state.update {
@@ -1267,16 +1348,15 @@ class TweaksViewModel(
                         }
                         return@launch
                     }
-                    val result = runCatching { tweaksRepository.addCustomForgeHost(raw) }
-                    if (result.isSuccess) {
+                    try {
+                        tweaksRepository.addCustomForgeHost(raw)
                         _state.update { it.copy(customForgeDraft = "", customForgeError = null) }
-                    } else {
-
+                    } catch (e: CancellationException) {
+                        throw e
+                    } catch (e: Exception) {
+                        logger.error("TweaksViewModel: failed to add custom forge host", e)
                         _state.update {
-                            it.copy(
-                                customForgeError = result.exceptionOrNull()?.message
-                                    ?: getString(Res.string.tweaks_custom_forge_save_failed),
-                            )
+                            it.copy(customForgeError = getString(Res.string.tweaks_custom_forge_save_failed))
                         }
                     }
                 }
@@ -1284,13 +1364,14 @@ class TweaksViewModel(
 
             is TweaksAction.OnRemoveCustomForge -> {
                 viewModelScope.launch {
-                    val result = runCatching { tweaksRepository.removeCustomForgeHost(action.host) }
-                    if (result.isFailure) {
+                    try {
+                        tweaksRepository.removeCustomForgeHost(action.host)
+                    } catch (e: CancellationException) {
+                        throw e
+                    } catch (e: Exception) {
+                        logger.error("TweaksViewModel: failed to remove custom forge host", e)
                         _state.update {
-                            it.copy(
-                                customForgeError = result.exceptionOrNull()?.message
-                                    ?: getString(Res.string.tweaks_custom_forge_remove_failed),
-                            )
+                            it.copy(customForgeError = getString(Res.string.tweaks_custom_forge_remove_failed))
                         }
                     }
                 }
@@ -1307,26 +1388,26 @@ class TweaksViewModel(
                             ProxyConfig.System
                         }
                     viewModelScope.launch {
-                        runCatching {
+                        try {
                             proxyRepository.setMasterProxyConfig(config)
                             ProxyScope.entries.forEach { scope ->
                                 if (_state.value.useMain(scope)) {
                                     proxyRepository.setProxyConfig(scope, config)
                                 }
                             }
-                        }.onSuccess {
                             _state.update {
                                 it.copy(
                                     masterProxyForm = it.masterProxyForm.copy(isDraftDirty = false),
                                 )
                             }
                             _events.send(TweaksEvent.OnProxySaved)
-                        }.onFailure { error ->
-                            if (error is CancellationException) throw error
+                        } catch (e: CancellationException) {
+                            throw e
+                        } catch (e: Exception) {
+                            logger.error("TweaksViewModel: failed to save main proxy config", e)
                             _events.send(
                                 TweaksEvent.OnProxySaveError(
-                                    error.message
-                                        ?: getString(Res.string.failed_to_save_proxy_settings),
+                                    getString(Res.string.failed_to_save_proxy_settings),
                                 ),
                             )
                         }
@@ -1385,26 +1466,26 @@ class TweaksViewModel(
             TweaksAction.OnMasterProxySave -> {
                 val config = buildMasterProxyConfig() ?: return
                 viewModelScope.launch {
-                    runCatching {
+                    try {
                         proxyRepository.setMasterProxyConfig(config)
                         ProxyScope.entries.forEach { scope ->
                             if (_state.value.useMain(scope)) {
                                 proxyRepository.setProxyConfig(scope, config)
                             }
                         }
-                    }.onSuccess {
                         _state.update {
                             it.copy(
                                 masterProxyForm = it.masterProxyForm.copy(isDraftDirty = false),
                             )
                         }
                         _events.send(TweaksEvent.OnProxySaved)
-                    }.onFailure { error ->
-                        if (error is CancellationException) throw error
+                    } catch (e: CancellationException) {
+                        throw e
+                    } catch (e: Exception) {
+                        logger.error("TweaksViewModel: failed to save main proxy config", e)
                         _events.send(
                             TweaksEvent.OnProxySaveError(
-                                error.message
-                                    ?: getString(Res.string.failed_to_save_proxy_settings),
+                                getString(Res.string.failed_to_save_proxy_settings),
                             ),
                         )
                     }
@@ -1419,30 +1500,34 @@ class TweaksViewModel(
                     it.copy(masterProxyForm = it.masterProxyForm.copy(isTestInProgress = true))
                 }
                 viewModelScope.launch {
-                    val results = try {
-                        kotlinx.coroutines.coroutineScope {
-                            val search = async {
-                                runProbe(config, "https://api.github.com/zen")
+                    val results =
+                        try {
+                            kotlinx.coroutines.coroutineScope {
+                                val search =
+                                    async {
+                                        runProbe(config, "https://api.github.com/zen")
+                                    }
+                                val download =
+                                    async {
+                                        runProbe(config, "https://github.com/robots.txt")
+                                    }
+                                val translation =
+                                    async {
+                                        runProbe(config, "https://translate.disroot.org")
+                                    }
+                                Triple(search.await(), download.await(), translation.await())
                             }
-                            val download = async {
-                                runProbe(config, "https://github.com/robots.txt")
+                        } catch (e: CancellationException) {
+                            throw e
+                        } catch (_: Exception) {
+                            Triple<Long?, Long?, Long?>(null, null, null)
+                        } finally {
+                            _state.update {
+                                it.copy(
+                                    masterProxyForm = it.masterProxyForm.copy(isTestInProgress = false),
+                                )
                             }
-                            val translation = async {
-                                runProbe(config, "https://translate.disroot.org")
-                            }
-                            Triple(search.await(), download.await(), translation.await())
                         }
-                    } catch (e: CancellationException) {
-                        throw e
-                    } catch (_: Exception) {
-                        Triple<Long?, Long?, Long?>(null, null, null)
-                    } finally {
-                        _state.update {
-                            it.copy(
-                                masterProxyForm = it.masterProxyForm.copy(isTestInProgress = false),
-                            )
-                        }
-                    }
                     _events.send(
                         TweaksEvent.OnMasterProxyTestResult(
                             searchMs = results.first,
@@ -1473,7 +1558,7 @@ class TweaksViewModel(
                     )
                 }
                 viewModelScope.launch {
-                    runCatching {
+                    try {
                         proxyRepository.setUseMaster(action.scope, action.useMain)
                         if (action.useMain) {
                             val master = proxyRepository.getMasterProxyConfig().first()
@@ -1481,12 +1566,13 @@ class TweaksViewModel(
                                 proxyRepository.setProxyConfig(action.scope, master)
                             }
                         }
-                    }.onFailure { error ->
-                        if (error is CancellationException) throw error
+                    } catch (e: CancellationException) {
+                        throw e
+                    } catch (e: Exception) {
+                        logger.error("TweaksViewModel: failed to save proxy scope source", e)
                         _events.send(
                             TweaksEvent.OnProxySaveError(
-                                error.message
-                                    ?: getString(Res.string.failed_to_save_proxy_settings),
+                                getString(Res.string.failed_to_save_proxy_settings),
                             ),
                         )
                     }
@@ -1495,20 +1581,30 @@ class TweaksViewModel(
         }
     }
 
-    private suspend fun runProbe(config: ProxyConfig, url: String): Long? = try {
-        val outcome = proxyTester.test(config, url)
-        (outcome as? ProxyTestOutcome.Success)?.latencyMs
-    } catch (e: CancellationException) {
-        throw e
-    } catch (_: Exception) {
-        null
-    }
+    private suspend fun runProbe(
+        config: ProxyConfig,
+        url: String,
+    ): Long? =
+        try {
+            val outcome = proxyTester.test(config, url)
+            (outcome as? ProxyTestOutcome.Success)?.latencyMs
+        } catch (e: CancellationException) {
+            throw e
+        } catch (_: Exception) {
+            null
+        }
 
     private fun buildMasterProxyConfigForTest(): ProxyConfig? {
         val form = _state.value.masterProxyForm
         return when (form.type) {
-            ProxyType.NONE -> ProxyConfig.None
-            ProxyType.SYSTEM -> ProxyConfig.System
+            ProxyType.NONE -> {
+                ProxyConfig.None
+            }
+
+            ProxyType.SYSTEM -> {
+                ProxyConfig.System
+            }
+
             ProxyType.HTTP -> {
                 val host = form.host.trim().takeIf { it.isNotEmpty() } ?: return null
                 val port = form.port.toIntOrNull() ?: return null
@@ -1539,32 +1635,44 @@ class TweaksViewModel(
                 _state.update { state ->
                     if (state.masterProxyForm.isDraftDirty) return@update state
                     val existing = state.masterProxyForm
-                    val populated = when (config) {
-                        null -> existing.copy(type = ProxyType.NONE)
-                        is ProxyConfig.None -> existing.copy(
-                            type = ProxyType.NONE,
-                        )
+                    val populated =
+                        when (config) {
+                            null -> {
+                                existing.copy(type = ProxyType.NONE)
+                            }
 
-                        is ProxyConfig.System -> existing.copy(
-                            type = ProxyType.SYSTEM,
-                        )
+                            is ProxyConfig.None -> {
+                                existing.copy(
+                                    type = ProxyType.NONE,
+                                )
+                            }
 
-                        is ProxyConfig.Http -> existing.copy(
-                            type = ProxyType.HTTP,
-                            host = config.host,
-                            port = config.port.toString(),
-                            username = config.username.orEmpty(),
-                            password = config.password.orEmpty(),
-                        )
+                            is ProxyConfig.System -> {
+                                existing.copy(
+                                    type = ProxyType.SYSTEM,
+                                )
+                            }
 
-                        is ProxyConfig.Socks -> existing.copy(
-                            type = ProxyType.SOCKS,
-                            host = config.host,
-                            port = config.port.toString(),
-                            username = config.username.orEmpty(),
-                            password = config.password.orEmpty(),
-                        )
-                    }
+                            is ProxyConfig.Http -> {
+                                existing.copy(
+                                    type = ProxyType.HTTP,
+                                    host = config.host,
+                                    port = config.port.toString(),
+                                    username = config.username.orEmpty(),
+                                    password = config.password.orEmpty(),
+                                )
+                            }
+
+                            is ProxyConfig.Socks -> {
+                                existing.copy(
+                                    type = ProxyType.SOCKS,
+                                    host = config.host,
+                                    port = config.port.toString(),
+                                    username = config.username.orEmpty(),
+                                    password = config.password.orEmpty(),
+                                )
+                            }
+                        }
                     state.copy(masterProxyForm = populated)
                 }
             }
@@ -1595,31 +1703,40 @@ class TweaksViewModel(
     private fun buildMasterProxyConfig(): ProxyConfig? {
         val form = _state.value.masterProxyForm
         return when (form.type) {
-            ProxyType.NONE -> ProxyConfig.None
-            ProxyType.SYSTEM -> ProxyConfig.System
+            ProxyType.NONE -> {
+                ProxyConfig.None
+            }
+
+            ProxyType.SYSTEM -> {
+                ProxyConfig.System
+            }
+
             ProxyType.HTTP, ProxyType.SOCKS -> {
-                val port = form.port.toIntOrNull()?.takeIf { it in 1..65535 } ?: run {
-                    viewModelScope.launch {
-                        _events.send(
-                            TweaksEvent.OnProxySaveError(
-                                getString(Res.string.invalid_proxy_port),
-                            ),
-                        )
-                    }
-                    return null
-                }
-                val host = form.host.trim().takeIf { isValidProxyHost(it) } ?: run {
-                    val isBlank = form.host.isBlank()
-                    viewModelScope.launch {
-                        val msg = if (isBlank) {
-                            getString(Res.string.proxy_host_required)
-                        } else {
-                            getString(Res.string.proxy_host_invalid)
+                val port =
+                    form.port.toIntOrNull()?.takeIf { it in 1..65535 } ?: run {
+                        viewModelScope.launch {
+                            _events.send(
+                                TweaksEvent.OnProxySaveError(
+                                    getString(Res.string.invalid_proxy_port),
+                                ),
+                            )
                         }
-                        _events.send(TweaksEvent.OnProxySaveError(msg))
+                        return null
                     }
-                    return null
-                }
+                val host =
+                    form.host.trim().takeIf { isValidProxyHost(it) } ?: run {
+                        val isBlank = form.host.isBlank()
+                        viewModelScope.launch {
+                            val msg =
+                                if (isBlank) {
+                                    getString(Res.string.proxy_host_required)
+                                } else {
+                                    getString(Res.string.proxy_host_invalid)
+                                }
+                            _events.send(TweaksEvent.OnProxySaveError(msg))
+                        }
+                        return null
+                    }
                 val username = form.username.takeIf { it.isNotBlank() }
                 val password = form.password.takeIf { it.isNotBlank() }
                 if (form.type == ProxyType.HTTP) {
@@ -1634,8 +1751,14 @@ class TweaksViewModel(
     private fun buildProxyConfigForTest(scope: ProxyScope): ProxyConfig? {
         val form = _state.value.formFor(scope)
         return when (form.type) {
-            ProxyType.NONE -> ProxyConfig.None
-            ProxyType.SYSTEM -> ProxyConfig.System
+            ProxyType.NONE -> {
+                ProxyConfig.None
+            }
+
+            ProxyType.SYSTEM -> {
+                ProxyConfig.System
+            }
+
             ProxyType.HTTP, ProxyType.SOCKS -> {
                 val port =
                     form.port
@@ -1695,28 +1818,34 @@ class TweaksViewModel(
 
     private suspend fun ProxyTestOutcome.toEvent(): TweaksEvent =
         when (this) {
-            is ProxyTestOutcome.Success ->
+            is ProxyTestOutcome.Success -> {
                 TweaksEvent.OnProxyTestSuccess(latencyMs = latencyMs)
+            }
 
-            ProxyTestOutcome.Failure.DnsFailure ->
+            ProxyTestOutcome.Failure.DnsFailure -> {
                 TweaksEvent.OnProxyTestError(getString(Res.string.proxy_test_error_dns))
+            }
 
-            ProxyTestOutcome.Failure.ProxyUnreachable ->
+            ProxyTestOutcome.Failure.ProxyUnreachable -> {
                 TweaksEvent.OnProxyTestError(getString(Res.string.proxy_test_error_unreachable))
+            }
 
-            ProxyTestOutcome.Failure.Timeout ->
+            ProxyTestOutcome.Failure.Timeout -> {
                 TweaksEvent.OnProxyTestError(getString(Res.string.proxy_test_error_timeout))
+            }
 
-            ProxyTestOutcome.Failure.ProxyAuthRequired ->
+            ProxyTestOutcome.Failure.ProxyAuthRequired -> {
                 TweaksEvent.OnProxyTestError(getString(Res.string.proxy_test_error_auth_required))
+            }
 
-            is ProxyTestOutcome.Failure.UnexpectedResponse ->
+            is ProxyTestOutcome.Failure.UnexpectedResponse -> {
                 TweaksEvent.OnProxyTestError(
                     getString(Res.string.proxy_test_error_status, statusCode),
                 )
+            }
 
-            is ProxyTestOutcome.Failure.Unknown ->
-
+            is ProxyTestOutcome.Failure.Unknown -> {
                 TweaksEvent.OnProxyTestError(getString(Res.string.proxy_test_error_unknown))
+            }
         }
 }

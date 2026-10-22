@@ -3,20 +3,23 @@ package zed.rainxch.core.data.services
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
+import android.content.pm.ApplicationInfo
+import android.content.pm.PackageManager
+import android.content.pm.ResolveInfo
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
 import androidx.core.content.FileProvider
 import androidx.core.net.toUri
 import co.touchlab.kermit.Logger
-import zed.rainxch.core.domain.utils.AssetArchitectureMatcher
-import zed.rainxch.core.domain.utils.AssetSelector
-import zed.rainxch.core.domain.utils.isAndroidApk
 import zed.rainxch.core.domain.model.account.github.GithubAsset
 import zed.rainxch.core.domain.model.system.SystemArchitecture
 import zed.rainxch.core.domain.system.InstallOutcome
 import zed.rainxch.core.domain.system.Installer
 import zed.rainxch.core.domain.system.InstallerInfoExtractor
+import zed.rainxch.core.domain.utils.AssetArchitectureMatcher
+import zed.rainxch.core.domain.utils.AssetSelector
+import zed.rainxch.core.domain.utils.isAndroidApk
 import java.io.File
 
 class AndroidInstaller(
@@ -104,6 +107,7 @@ class AndroidInstaller(
             }
 
         if (intent.resolveActivity(context.packageManager) != null) {
+            intent.preferSystemInstaller()
             context.startActivity(intent)
             Logger.d { "APK installation intent launched" }
         } else {
@@ -112,6 +116,29 @@ class AndroidInstaller(
 
         return InstallOutcome.DELEGATED_TO_SYSTEM
     }
+
+    // With several APK installers and no default set in Android, the intent opens a chooser on every
+    // install. Default means the system installer; another one is picked in the installer setting.
+    private fun Intent.preferSystemInstaller() {
+        val packageManager = context.packageManager
+        val resolved = resolveActivity(packageManager) ?: return
+        val handlers = packageManager.defaultHandlers(this)
+        if (handlers.any { it.activityInfo.packageName == resolved.packageName }) return
+        handlers
+            .firstOrNull { it.activityInfo.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM != 0 }
+            ?.let { setPackage(it.activityInfo.packageName) }
+    }
+
+    private fun PackageManager.defaultHandlers(intent: Intent): List<ResolveInfo> =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            queryIntentActivities(
+                intent,
+                PackageManager.ResolveInfoFlags.of(PackageManager.MATCH_DEFAULT_ONLY.toLong()),
+            )
+        } else {
+            @Suppress("DEPRECATION")
+            queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY)
+        }
 
     override fun uninstall(packageName: String) {
         Logger.d { "Requesting uninstall for: $packageName" }

@@ -1,14 +1,15 @@
 package zed.rainxch.apps.data.repository
 
-import kotlinx.coroutines.CancellationException
 import io.ktor.client.HttpClient
 import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.parameter
 import io.ktor.http.HttpHeaders
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.contentOrNull
@@ -17,32 +18,33 @@ import zed.rainxch.apps.domain.model.GithubRepoInfo
 import zed.rainxch.apps.domain.model.ImportFormat
 import zed.rainxch.apps.domain.model.ImportResult
 import zed.rainxch.apps.domain.repository.AppsRepository
-import zed.rainxch.core.data.mappers.toExportedAppOrSkip
-import zed.rainxch.core.data.mappers.toObtainiumApp
-import zed.rainxch.core.domain.model.transfer.ObtainiumExport
 import zed.rainxch.core.data.dto.GithubRepoNetworkModel
 import zed.rainxch.core.data.dto.ReleaseNetwork
 import zed.rainxch.core.data.mappers.toDomain
+import zed.rainxch.core.data.mappers.toExportedAppOrSkip
+import zed.rainxch.core.data.mappers.toObtainiumApp
 import zed.rainxch.core.data.network.BackendApiClient
 import zed.rainxch.core.data.network.GitHubClientProvider
 import zed.rainxch.core.data.network.executeRequest
 import zed.rainxch.core.data.network.shouldFallbackToGithubOrRethrow
+import zed.rainxch.core.domain.helpers.AppLauncher
 import zed.rainxch.core.domain.logging.KomiStoreLogger
+import zed.rainxch.core.domain.model.account.github.GithubRelease
+import zed.rainxch.core.domain.model.account.github.isEffectivelyPreRelease
+import zed.rainxch.core.domain.model.error.RateLimitException
 import zed.rainxch.core.domain.model.installation.DeviceApp
-import zed.rainxch.core.domain.utils.VersionMath
+import zed.rainxch.core.domain.model.installation.InstallSource
+import zed.rainxch.core.domain.model.installation.InstalledApp
 import zed.rainxch.core.domain.model.transfer.ExportedApp
 import zed.rainxch.core.domain.model.transfer.ExportedAppList
-import zed.rainxch.core.domain.model.account.github.GithubRelease
-import zed.rainxch.core.domain.model.installation.InstallSource
-import zed.rainxch.core.domain.model.account.github.isEffectivelyPreRelease
-import zed.rainxch.core.domain.model.installation.InstalledApp
-import zed.rainxch.core.domain.model.error.RateLimitException
+import zed.rainxch.core.domain.model.transfer.ObtainiumExport
 import zed.rainxch.core.domain.repository.InstalledAppsRepository
 import zed.rainxch.core.domain.repository.TweaksRepository
 import zed.rainxch.core.domain.system.PackageMonitor
 import zed.rainxch.core.domain.utils.AssetVariant
-import zed.rainxch.core.domain.helpers.AppLauncher
+import zed.rainxch.core.domain.utils.VersionMath
 import kotlin.time.Clock
+import kotlin.time.TimeSource
 
 class AppsRepositoryImpl(
     private val appLauncher: AppLauncher,
@@ -86,9 +88,13 @@ class AppsRepositoryImpl(
         if (sourceHost != null) {
             return fetchForgejoLatestRelease(sourceHost, owner, repo, includePreReleases)
         }
+        val backendStart = TimeSource.Monotonic.markNow()
         val backendResult = backendApiClient.getReleases(owner, repo, perPage = 10)
         backendResult.fold(
             onSuccess = { releases ->
+                logger.debug(
+                    "Backend releases for $owner/$repo took ${backendStart.elapsedNow().inWholeMilliseconds} ms",
+                )
                 return releases
                     .asSequence()
                     .filter { it.draft != true }
@@ -98,18 +104,26 @@ class AppsRepositoryImpl(
             },
             onFailure = { error ->
                 if (!shouldFallbackToGithubOrRethrow(error)) return null
+                logger.warn(
+                    "Backend releases for $owner/$repo failed after " +
+                        "${backendStart.elapsedNow().inWholeMilliseconds} ms (${error.message}), asking GitHub directly",
+                )
             },
         )
 
+        val githubStart = TimeSource.Monotonic.markNow()
         return try {
             val releases =
-                httpClient
-                    .executeRequest<List<ReleaseNetwork>> {
-                        get("/repos/$owner/$repo/releases") {
-                            header(HttpHeaders.Accept, "application/vnd.github+json")
-                            parameter("per_page", 10)
-                        }
-                    }.getOrThrow()
+                withTimeoutOrNull(DIRECT_RELEASES_TIMEOUT_MS) {
+                    httpClient
+                        .executeRequest<List<ReleaseNetwork>> {
+                            get("/repos/$owner/$repo/releases") {
+                                header(HttpHeaders.Accept, "application/vnd.github+json")
+                                parameter("per_page", 10)
+                            }
+                        }.getOrThrow()
+                } ?: throw IllegalStateException("GitHub did not answer within ${DIRECT_RELEASES_TIMEOUT_MS / 1000} s")
+            logger.debug("GitHub releases for $owner/$repo took ${githubStart.elapsedNow().inWholeMilliseconds} ms")
 
             releases
                 .asSequence()
@@ -122,7 +136,10 @@ class AppsRepositoryImpl(
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
-            logger.error("Failed to fetch latest release for $owner/$repo: ${e.message}")
+            logger.error(
+                "Failed to fetch latest release for $owner/$repo from GitHub after " +
+                    "${githubStart.elapsedNow().inWholeMilliseconds} ms: ${e.message}",
+            )
             null
         }
     }
@@ -148,12 +165,13 @@ class AppsRepositoryImpl(
         backendResult.fold(
             onSuccess = { backendRepo ->
                 val includePreReleases = tweaksRepository.getIncludePreReleases().first()
-                val latestTag = if (includePreReleases || backendRepo.latestReleaseTag == null) {
-                    resolveLatestTagViaReleases(owner, repo, includePreReleases)
-                        ?: backendRepo.latestReleaseTag
-                } else {
-                    backendRepo.latestReleaseTag
-                }
+                val latestTag =
+                    if (includePreReleases || backendRepo.latestReleaseTag == null) {
+                        resolveLatestTagViaReleases(owner, repo, includePreReleases)
+                            ?: backendRepo.latestReleaseTag
+                    } else {
+                        backendRepo.latestReleaseTag
+                    }
                 return GithubRepoInfo(
                     id = backendRepo.id,
                     name = backendRepo.name,
@@ -252,6 +270,7 @@ class AppsRepositoryImpl(
         fallbackToOlderReleases: Boolean,
         pickedAssetName: String?,
         pickedAssetSiblingCount: Int,
+        pickedAssetReleaseTag: String?,
         preferredAssetVariant: String?,
         preferredAssetTokens: String?,
         assetGlobPattern: String?,
@@ -265,17 +284,18 @@ class AppsRepositoryImpl(
         val derivedVariant =
             preferredAssetVariant?.trim()?.takeIf { it.isNotEmpty() }
                 ?: pickedAssetName?.let {
-                    AssetVariant.deriveFromPickedAsset(it, pickedAssetSiblingCount)
+                    AssetVariant.deriveFromPickedAsset(it, pickedAssetSiblingCount, pickedAssetReleaseTag)
                 }
 
         val freshFingerprint =
             if (preferredAssetTokens == null && assetGlobPattern == null && pickedAssetName != null) {
-                AssetVariant.fingerprintFromPickedAsset(pickedAssetName, pickedAssetSiblingCount)
+                AssetVariant.fingerprintFromPickedAsset(pickedAssetName, pickedAssetSiblingCount, pickedAssetReleaseTag)
             } else {
                 null
             }
-        val resolvedTokens = preferredAssetTokens
-            ?: freshFingerprint?.tokens?.let { AssetVariant.serializeTokens(it) }
+        val resolvedTokens =
+            preferredAssetTokens
+                ?: freshFingerprint?.tokens?.let { AssetVariant.serializeTokens(it) }
         val resolvedGlob = assetGlobPattern ?: freshFingerprint?.glob
         val resolvedSiblingCount = pickedAssetSiblingCount.takeIf { it > 0 }
 
@@ -370,34 +390,44 @@ class AppsRepositoryImpl(
 
     override suspend fun exportObtainium(): String {
         val apps = appsRepository.getAllInstalledApps().first()
-        val export = ObtainiumExport(
-            apps = apps.map { it.toObtainiumApp() },
-            overrideExportFormatVersion = OBTAINIUM_EXPORT_FORMAT_VERSION,
-        )
+        val export =
+            ObtainiumExport(
+                apps = apps.map { it.toObtainiumApp() },
+                overrideExportFormatVersion = OBTAINIUM_EXPORT_FORMAT_VERSION,
+            )
         return json.encodeToString(ObtainiumExport.serializer(), export)
     }
 
     override suspend fun importApps(json: String): ImportResult {
-        val parsed = try {
-            this@AppsRepositoryImpl.json.parseToJsonElement(json)
-        } catch (e: Exception) {
-            logger.error("Import: not valid JSON: ${e.message}")
-            return ImportResult(
-                failed = 1,
-                sourceFormat = ImportFormat.UNKNOWN,
-                unknownFormatPreview = json.take(UNKNOWN_PREVIEW_CHARS),
-            )
-        }
+        val parsed =
+            try {
+                this@AppsRepositoryImpl.json.parseToJsonElement(json)
+            } catch (e: Exception) {
+                logger.error("Import: not valid JSON: ${e.message}")
+                return ImportResult(
+                    failed = 1,
+                    sourceFormat = ImportFormat.UNKNOWN,
+                    unknownFormatPreview = json.take(UNKNOWN_PREVIEW_CHARS),
+                )
+            }
 
         val format = detectFormat(parsed)
         return when (format) {
-            ImportFormat.NATIVE -> importNative(json)
-            ImportFormat.OBTAINIUM -> importObtainium(json)
-            ImportFormat.UNKNOWN -> ImportResult(
-                failed = 1,
-                sourceFormat = ImportFormat.UNKNOWN,
-                unknownFormatPreview = json.take(UNKNOWN_PREVIEW_CHARS),
-            )
+            ImportFormat.NATIVE -> {
+                importNative(json)
+            }
+
+            ImportFormat.OBTAINIUM -> {
+                importObtainium(json)
+            }
+
+            ImportFormat.UNKNOWN -> {
+                ImportResult(
+                    failed = 1,
+                    sourceFormat = ImportFormat.UNKNOWN,
+                    unknownFormatPreview = json.take(UNKNOWN_PREVIEW_CHARS),
+                )
+            }
         }
     }
 
@@ -436,15 +466,16 @@ class AppsRepositoryImpl(
     }
 
     private suspend fun importNative(rawJson: String): ImportResult {
-        val exportedList = try {
-            json.decodeFromString(ExportedAppList.serializer(), rawJson)
-        } catch (e: Exception) {
-            logger.error("Failed to parse native import JSON: ${e.message}")
-            return ImportResult(
-                failed = 1,
-                sourceFormat = ImportFormat.NATIVE,
-            )
-        }
+        val exportedList =
+            try {
+                json.decodeFromString(ExportedAppList.serializer(), rawJson)
+            } catch (e: Exception) {
+                logger.error("Failed to parse native import JSON: ${e.message}")
+                return ImportResult(
+                    failed = 1,
+                    sourceFormat = ImportFormat.NATIVE,
+                )
+            }
 
         val trackedPackages = getTrackedPackageNames()
         val imported = mutableListOf<String>()
@@ -465,13 +496,14 @@ class AppsRepositoryImpl(
                 }
 
                 val systemInfo = packageMonitor.getInstalledPackageInfo(exportedApp.packageName)
-                val deviceApp = DeviceApp(
-                    packageName = exportedApp.packageName,
-                    appName = exportedApp.repoName,
-                    versionName = systemInfo?.versionName,
-                    versionCode = systemInfo?.versionCode ?: 0L,
-                    signingFingerprint = systemInfo?.signingFingerprint,
-                )
+                val deviceApp =
+                    DeviceApp(
+                        packageName = exportedApp.packageName,
+                        appName = exportedApp.repoName,
+                        versionName = systemInfo?.versionName,
+                        versionCode = systemInfo?.versionCode ?: 0L,
+                        signingFingerprint = systemInfo?.signingFingerprint,
+                    )
                 linkAppToRepo(
                     deviceApp = deviceApp,
                     repoInfo = repoInfo,
@@ -502,15 +534,16 @@ class AppsRepositoryImpl(
     }
 
     private suspend fun importObtainium(rawJson: String): ImportResult {
-        val export = try {
-            json.decodeFromString(ObtainiumExport.serializer(), rawJson)
-        } catch (e: Exception) {
-            logger.error("Failed to parse Obtainium import JSON: ${e.message}")
-            return ImportResult(
-                failed = 1,
-                sourceFormat = ImportFormat.OBTAINIUM,
-            )
-        }
+        val export =
+            try {
+                json.decodeFromString(ObtainiumExport.serializer(), rawJson)
+            } catch (e: Exception) {
+                logger.error("Failed to parse Obtainium import JSON: ${e.message}")
+                return ImportResult(
+                    failed = 1,
+                    sourceFormat = ImportFormat.OBTAINIUM,
+                )
+            }
 
         val trackedPackages = getTrackedPackageNames()
         val imported = mutableListOf<String>()
@@ -540,13 +573,14 @@ class AppsRepositoryImpl(
                     continue
                 }
                 val systemInfo = packageMonitor.getInstalledPackageInfo(exportedApp.packageName)
-                val deviceApp = DeviceApp(
-                    packageName = exportedApp.packageName,
-                    appName = obtainiumApp.name?.takeIf { it.isNotBlank() } ?: exportedApp.repoName,
-                    versionName = systemInfo?.versionName,
-                    versionCode = systemInfo?.versionCode ?: 0L,
-                    signingFingerprint = systemInfo?.signingFingerprint,
-                )
+                val deviceApp =
+                    DeviceApp(
+                        packageName = exportedApp.packageName,
+                        appName = obtainiumApp.name?.takeIf { it.isNotBlank() } ?: exportedApp.repoName,
+                        versionName = systemInfo?.versionName,
+                        versionCode = systemInfo?.versionCode ?: 0L,
+                        signingFingerprint = systemInfo?.signingFingerprint,
+                    )
                 linkAppToRepo(
                     deviceApp = deviceApp,
                     repoInfo = repoInfo,
@@ -582,17 +616,16 @@ class AppsRepositoryImpl(
     ): GithubRelease? {
         val client = forgejoClientRegistry.clientFor(host)
         return try {
-            val releases = client.getReleases(owner, repo, perPage = 10).getOrNull()
-                ?: return null
+            val releases =
+                client.getReleases(owner, repo, perPage = 10).getOrNull()
+                    ?: return null
             releases
                 .asSequence()
                 .filter { it.draft != true }
                 .map { it.toDomain() }
                 .filter {
-
                     includePreReleases || !it.isEffectivelyPreRelease()
-                }
-                .maxByOrNull { it.publishedAt }
+                }.maxByOrNull { it.publishedAt }
         } catch (e: kotlin.coroutines.cancellation.CancellationException) {
             throw e
         } catch (e: Exception) {
@@ -611,7 +644,9 @@ class AppsRepositoryImpl(
             val repoModel = client.getRepository(owner, repo).getOrNull() ?: return null
             val latestTag = client.getLatestRelease(owner, repo).getOrNull()?.tagName
             GithubRepoInfo(
-                id = zed.rainxch.core.domain.utils.RepoIdCodec.encode(host, repoModel.id),
+                id =
+                    zed.rainxch.core.domain.utils.RepoIdCodec
+                        .encode(host, repoModel.id),
                 name = repoModel.name,
                 owner = repoModel.owner.login,
                 ownerAvatarUrl = repoModel.owner.avatarUrl,
@@ -631,5 +666,6 @@ class AppsRepositoryImpl(
     private companion object {
         const val UNKNOWN_PREVIEW_CHARS = 200
         const val OBTAINIUM_EXPORT_FORMAT_VERSION = 1
+        const val DIRECT_RELEASES_TIMEOUT_MS = 20_000L
     }
 }

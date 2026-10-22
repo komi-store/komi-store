@@ -7,5 +7,9 @@ data class UpdateInstalledAppParams(
     val assetName: String,
     val assetUrl: String,
     val releaseTag: String,
+    val releaseId: Long?,
+    val assetId: Long?,
+    val assetDigest: String?,
+    val releasePublishedAt: String? = null,
     val isPendingInstall: Boolean,
 )

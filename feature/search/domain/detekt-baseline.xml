@@ -1,0 +1,7 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues/>
+  <CurrentIssues>
+    <ID>LongParameterList:SearchRepository.kt$SearchRepository$( query: String, platform: DiscoveryPlatform, language: ProgrammingLanguage, sortBy: SortBy, sortOrder: SortOrder, page: Int, source: SearchSource = SearchSource.GitHub, )</ID>
+  </CurrentIssues>
+</SmellBaseline>

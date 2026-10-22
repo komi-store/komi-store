@@ -1,6 +1,6 @@
 package zed.rainxch.favourites.presentation
 
-import androidx.compose.foundation.clickable
+import androidx.compose.material.icons.rounded.Search
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,11 +13,9 @@ import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.filled.Sort
+import androidx.compose.material.icons.automirrored.rounded.Sort
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.PersonAdd
+import androidx.compose.material.icons.rounded.PersonAdd
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -30,11 +28,11 @@ import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
+import zed.rainxch.core.domain.utils.RepoIdCodec
 import zed.rainxch.core.presentation.components.bars.KomiTopBar
 import zed.rainxch.core.presentation.components.bars.KomiTopBarSize
 import zed.rainxch.core.presentation.components.buttons.KomiButtonVariant
 import zed.rainxch.core.presentation.components.buttons.KomiIconButton
-import zed.rainxch.core.presentation.components.icon.KomiIcon
 import zed.rainxch.core.presentation.components.inputs.KomiTextField
 import zed.rainxch.core.presentation.components.overlays.KomiDropdown
 import zed.rainxch.core.presentation.components.overlays.KomiMenuEntry
@@ -52,7 +50,7 @@ import zed.rainxch.githubstore.core.presentation.res.*
 @Composable
 fun FavouritesRoot(
     onNavigateBack: () -> Unit,
-    onNavigateToDetails: (repoId: Long) -> Unit,
+    onNavigateToDetails: (repoId: Long, owner: String, repo: String, sourceHost: String?) -> Unit,
     onNavigateToDeveloperProfile: (username: String) -> Unit,
     onNavigateToImportStars: () -> Unit,
     viewModel: FavouritesViewModel = koinViewModel(),
@@ -68,7 +66,13 @@ fun FavouritesRoot(
                 }
 
                 is FavouritesAction.OnRepositoryClick -> {
-                    onNavigateToDetails(action.favouriteRepository.repoId)
+                    val repo = action.favouriteRepository
+                    onNavigateToDetails(
+                        repo.repoId,
+                        repo.repoOwner,
+                        repo.repoName,
+                        RepoIdCodec.sourceHostOf(repo.repoId, repo.repoUrl),
+                    )
                 }
 
                 is FavouritesAction.OnDeveloperProfileClick -> {
@@ -174,17 +178,10 @@ private fun FavouritesTopbar(
     KomiTopBar(
         title = stringResource(Res.string.favourites),
         size = KomiTopBarSize.Compact,
-        leading = {
-            KomiIconButton(
-                icon = Icons.AutoMirrored.Filled.ArrowBack,
-                contentDescription = stringResource(Res.string.navigate_back),
-                onClick = { onAction(FavouritesAction.OnNavigateBackClick) },
-                variant = KomiButtonVariant.Tonal,
-            )
-        },
+        onBack = { onAction(FavouritesAction.OnNavigateBackClick) },
         actions = {
             KomiIconButton(
-                icon = Icons.Filled.PersonAdd,
+                icon = Icons.Rounded.PersonAdd,
                 contentDescription = stringResource(Res.string.import_stars_entry),
                 onClick = { onAction(FavouritesAction.OnImportStarsClick) },
                 variant = KomiButtonVariant.Tonal,
@@ -215,7 +212,7 @@ private fun FavouritesTopbar(
                     value = sortRule.name,
                     trigger = { onClick ->
                         KomiIconButton(
-                            icon = Icons.AutoMirrored.Filled.Sort,
+                            icon = Icons.AutoMirrored.Rounded.Sort,
                             contentDescription = sortContentDescription,
                             onClick = onClick,
                             variant = KomiButtonVariant.Tonal,
@@ -240,16 +237,8 @@ private fun FavouritesSearchBar(
                 .fillMaxWidth()
                 .padding(horizontal = 12.dp, vertical = 8.dp),
         placeholder = stringResource(Res.string.search_repositories_hint),
-        leadingIcon = Icons.Filled.Search,
-        trailing = {
-            if (query.isNotEmpty()) {
-                KomiIcon(
-                    imageVector = Icons.Filled.Close,
-                    contentDescription = stringResource(Res.string.clear_search),
-                    modifier = Modifier.clickable { onQueryChange("") },
-                )
-            }
-        },
+        leadingIcon = Icons.Rounded.Search,
+        clearable = true,
     )
 }
 

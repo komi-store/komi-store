@@ -6,11 +6,11 @@ import kotlinx.datetime.toLocalDateTime
 import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.stringResource
 import zed.rainxch.githubstore.core.presentation.res.*
+import kotlin.math.roundToInt
 import kotlin.time.Clock
 import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
-import kotlin.math.roundToInt
 
 @OptIn(ExperimentalTime::class)
 private fun parseIsoInstantLenient(isoInstant: String): Instant? {
@@ -111,6 +111,9 @@ fun formatIsoDate(isoTimestamp: String?): String? {
     val instant = isoTimestamp?.let { parseIsoInstantLenient(it) } ?: return null
     return instant.toLocalDateTime(TimeZone.currentSystemDefault()).date.toString()
 }
+
+@OptIn(ExperimentalTime::class)
+fun formatIsoDateOrRaw(iso: String): String = if (iso.length > 10) formatIsoDate(iso) ?: iso.take(10) else iso.take(10)
 
 @OptIn(ExperimentalTime::class)
 fun formatEpochDate(timestamp: Long): String? {

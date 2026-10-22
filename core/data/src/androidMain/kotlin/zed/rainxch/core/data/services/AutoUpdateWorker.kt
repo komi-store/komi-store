@@ -16,8 +16,10 @@ import androidx.work.ForegroundInfo
 import androidx.work.WorkerParameters
 import co.touchlab.kermit.Logger
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import zed.rainxch.core.data.network.BackgroundRequest
 import zed.rainxch.core.data.services.dhizuku.DhizukuServiceManager
 import zed.rainxch.core.data.services.dhizuku.model.DhizukuStatus
 import zed.rainxch.core.data.services.root.RootServiceManager
@@ -26,6 +28,8 @@ import zed.rainxch.core.data.services.shizuku.ShizukuServiceManager
 import zed.rainxch.core.data.services.shizuku.model.ShizukuStatus
 import zed.rainxch.core.domain.model.installation.InstalledApp
 import zed.rainxch.core.domain.model.installation.InstallerType
+import zed.rainxch.core.domain.model.installation.markPending
+import zed.rainxch.core.domain.model.installation.withLatestSnapshot
 import zed.rainxch.core.domain.network.Downloader
 import zed.rainxch.core.domain.repository.InstalledAppsRepository
 import zed.rainxch.core.domain.repository.TweaksRepository
@@ -46,28 +50,40 @@ class AutoUpdateWorker(
     private val rootServiceManager: RootServiceManager by inject()
     private val systemInstallSerializer: SystemInstallSerializer by inject()
 
-    override suspend fun doWork(): Result {
+    override suspend fun doWork(): Result = withContext(BackgroundRequest()) { runAutoUpdate() }
+
+    private suspend fun runAutoUpdate(): Result {
         return try {
             Logger.i { "AutoUpdateWorker: Starting auto-update" }
 
             val autoUpdateEnabled = tweaksRepository.getAutoUpdateEnabled().first()
             val installerType = tweaksRepository.getInstallerType().first()
 
-            val silentReady = when (installerType) {
-                InstallerType.SHIZUKU -> {
-                    shizukuServiceManager.refreshStatus()
-                    shizukuServiceManager.status.value == ShizukuStatus.READY
+            val silentReady =
+                when (installerType) {
+                    InstallerType.THIRD_PARTY -> {
+                        false
+                    }
+
+                    InstallerType.SHIZUKU -> {
+                        shizukuServiceManager.refreshStatus()
+                        shizukuServiceManager.status.value == ShizukuStatus.READY
+                    }
+
+                    InstallerType.DHIZUKU -> {
+                        dhizukuServiceManager.refreshStatus()
+                        dhizukuServiceManager.status.value == DhizukuStatus.READY
+                    }
+
+                    InstallerType.ROOT -> {
+                        rootServiceManager.refreshStatus()
+                        rootServiceManager.status.value == RootStatus.READY
+                    }
+
+                    InstallerType.DEFAULT -> {
+                        false
+                    }
                 }
-                InstallerType.DHIZUKU -> {
-                    dhizukuServiceManager.refreshStatus()
-                    dhizukuServiceManager.status.value == DhizukuStatus.READY
-                }
-                InstallerType.ROOT -> {
-                    rootServiceManager.refreshStatus()
-                    rootServiceManager.status.value == RootStatus.READY
-                }
-                InstallerType.DEFAULT -> false
-            }
 
             if (!autoUpdateEnabled || !silentReady) {
                 Logger.i {
@@ -82,13 +98,13 @@ class AutoUpdateWorker(
                 return Result.success()
             }
 
-            setForeground(createForegroundInfo("Updating apps...", 0, appsWithUpdates.size))
+            setForegroundIfAllowed(createForegroundInfo("Updating apps...", 0, appsWithUpdates.size))
 
             val successfulApps = mutableListOf<String>()
             val failedApps = mutableListOf<String>()
 
             appsWithUpdates.forEachIndexed { index, app ->
-                setForeground(
+                setForegroundIfAllowed(
                     createForegroundInfo(
                         "Updating ${app.appName}...",
                         index + 1,
@@ -157,7 +173,7 @@ class AutoUpdateWorker(
         }
 
         Logger.d { "AutoUpdateWorker: Downloading $assetName for ${app.appName}" }
-        downloader.download(assetUrl, assetName).collect {   }
+        downloader.download(assetUrl, assetName).collect { }
 
         val filePath =
             downloader.getDownloadedFilePath(assetName)
@@ -200,14 +216,19 @@ class AutoUpdateWorker(
 
         if (currentApp != null) {
             installedAppsRepository.updateApp(
-                currentApp.copy(
-                    isPendingInstall = true,
-                    latestVersion = latestVersion,
-                    latestAssetName = assetName,
-                    latestAssetUrl = assetUrl,
-                    latestVersionName = apkInfo?.versionName ?: latestVersion,
-                    latestVersionCode = apkInfo?.versionCode ?: 0L,
-                ),
+                currentApp
+                    .markPending(
+                        releaseId = currentApp.latestReleaseId,
+                        assetId = currentApp.latestAssetId,
+                        assetDigest = currentApp.latestAssetDigest,
+                        releasePublishedAt = currentApp.latestReleasePublishedAt,
+                    ).withLatestSnapshot(
+                        version = latestVersion,
+                        assetName = assetName,
+                        assetUrl = assetUrl,
+                        versionName = apkInfo?.versionName ?: latestVersion,
+                        versionCode = apkInfo?.versionCode ?: 0L,
+                    ),
             )
         }
 

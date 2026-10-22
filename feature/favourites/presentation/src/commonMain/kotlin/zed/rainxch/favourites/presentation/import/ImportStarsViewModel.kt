@@ -30,16 +30,16 @@ class ImportStarsViewModel(
     private val starredRepository: StarredRepository,
     private val favouritesRepository: FavouritesRepository,
 ) : ViewModel() {
-
     private val _state = MutableStateFlow(ImportStarsState())
-    val state = _state
-        .map { it.withDerived() }
-        .flowOn(Dispatchers.Default)
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5_000L),
-            initialValue = ImportStarsState(),
-        )
+    val state =
+        _state
+            .map { it.withDerived() }
+            .flowOn(Dispatchers.Default)
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(5_000L),
+                initialValue = ImportStarsState(),
+            )
 
     private val _events = Channel<ImportStarsEvent>(capacity = Channel.BUFFERED)
     val events = _events.receiveAsFlow()
@@ -48,15 +48,17 @@ class ImportStarsViewModel(
 
     private fun ImportStarsState.withDerived(): ImportStarsState {
         val query = searchQuery.trim().lowercase()
-        val filtered = if (query.isBlank()) {
-            candidates
-        } else {
-            candidates.filter { candidate ->
-                candidate.name.lowercase().contains(query) ||
-                    candidate.owner.lowercase().contains(query) ||
-                    (candidate.description?.lowercase()?.contains(query) == true)
-            }.toImmutableList()
-        }
+        val filtered =
+            if (query.isBlank()) {
+                candidates
+            } else {
+                candidates
+                    .filter { candidate ->
+                        candidate.name.lowercase().contains(query) ||
+                            candidate.owner.lowercase().contains(query) ||
+                            (candidate.description?.lowercase()?.contains(query) == true)
+                    }.toImmutableList()
+            }
         return copy(
             filteredCandidates = filtered,
             pendingCount = candidates.count { !it.isAlreadyFavourited },
@@ -73,7 +75,9 @@ class ImportStarsViewModel(
                 _state.update { it.copy(usernameQuery = action.query, errorMessage = null) }
             }
 
-            ImportStarsAction.OnImportClick -> importByUsername()
+            ImportStarsAction.OnImportClick -> {
+                importByUsername()
+            }
 
             ImportStarsAction.OnResetImport -> {
                 importJob?.cancel()
@@ -98,9 +102,13 @@ class ImportStarsViewModel(
                 _state.update { it.copy(searchQuery = "") }
             }
 
-            is ImportStarsAction.OnToggleFavourite -> toggleFavourite(action.candidate)
+            is ImportStarsAction.OnToggleFavourite -> {
+                toggleFavourite(action.candidate)
+            }
 
-            ImportStarsAction.OnAddAll -> addAll()
+            ImportStarsAction.OnAddAll -> {
+                addAll()
+            }
 
             is ImportStarsAction.OnCandidateClick -> {
                 viewModelScope.launch {
@@ -117,93 +125,104 @@ class ImportStarsViewModel(
     }
 
     private fun importByUsername() {
-        val username = _state.value.usernameQuery.trim().trimStart('@')
+        val username =
+            _state.value.usernameQuery
+                .trim()
+                .trimStart('@')
         if (username.isEmpty()) return
 
         importJob?.cancel()
-        importJob = viewModelScope.launch {
-            _state.update {
-                it.copy(
-                    isImporting = true,
-                    errorMessage = null,
+        importJob =
+            viewModelScope.launch {
+                _state.update {
+                    it.copy(
+                        isImporting = true,
+                        errorMessage = null,
+                    )
+                }
+
+                val favouritedIds =
+                    favouritesRepository
+                        .getAllFavorites()
+                        .first()
+                        .map { it.repoId }
+                        .toSet()
+
+                val result =
+                    runCatching {
+                        starredRepository.fetchStarredForUsername(username)
+                    }.getOrElse { Result.failure(it) }
+
+                ensureActive()
+
+                result.fold(
+                    onSuccess = { repos ->
+                        val candidates =
+                            repos.map { repo ->
+                                ImportCandidateUi(
+                                    repoId = repo.repoId,
+                                    owner = repo.repoOwner,
+                                    name = repo.repoName,
+                                    ownerAvatarUrl = repo.repoOwnerAvatarUrl,
+                                    description = repo.repoDescription,
+                                    primaryLanguage = repo.primaryLanguage,
+                                    repoUrl = repo.repoUrl,
+                                    stargazersCount = repo.stargazersCount,
+                                    isAlreadyFavourited = repo.repoId in favouritedIds,
+                                )
+                            }
+                        _state.update {
+                            it.copy(
+                                isImporting = false,
+                                importedUsername = username,
+                                candidates = candidates.toImmutableList(),
+                                phase = ImportStarsState.Phase.Results,
+                            )
+                        }
+                    },
+                    onFailure = { error ->
+                        if (error is CancellationException) throw error
+                        _state.update {
+                            it.copy(
+                                isImporting = false,
+                                errorMessage = error.message ?: "Failed to import stars",
+                            )
+                        }
+                    },
                 )
             }
-
-            val favouritedIds = favouritesRepository.getAllFavorites().first()
-                .map { it.repoId }
-                .toSet()
-
-            val result = runCatching {
-                starredRepository.fetchStarredForUsername(username)
-            }.getOrElse { Result.failure(it) }
-
-            ensureActive()
-
-            result.fold(
-                onSuccess = { repos ->
-                    val candidates = repos.map { repo ->
-                        ImportCandidateUi(
-                            repoId = repo.repoId,
-                            owner = repo.repoOwner,
-                            name = repo.repoName,
-                            ownerAvatarUrl = repo.repoOwnerAvatarUrl,
-                            description = repo.repoDescription,
-                            primaryLanguage = repo.primaryLanguage,
-                            repoUrl = repo.repoUrl,
-                            stargazersCount = repo.stargazersCount,
-                            isAlreadyFavourited = repo.repoId in favouritedIds,
-                        )
-                    }
-                    _state.update {
-                        it.copy(
-                            isImporting = false,
-                            importedUsername = username,
-                            candidates = candidates.toImmutableList(),
-                            phase = ImportStarsState.Phase.Results,
-                        )
-                    }
-                },
-                onFailure = { error ->
-                    if (error is CancellationException) throw error
-                    _state.update {
-                        it.copy(
-                            isImporting = false,
-                            errorMessage = error.message ?: "Failed to import stars",
-                        )
-                    }
-                },
-            )
-        }
     }
 
     private fun toggleFavourite(candidate: ImportCandidateUi) {
         viewModelScope.launch {
             val now = Clock.System.now().toEpochMilliseconds()
-            val favourite = FavoriteRepo(
-                repoId = candidate.repoId,
-                repoName = candidate.name,
-                repoOwner = candidate.owner,
-                repoOwnerAvatarUrl = candidate.ownerAvatarUrl,
-                repoDescription = candidate.description,
-                primaryLanguage = candidate.primaryLanguage,
-                repoUrl = candidate.repoUrl,
-                latestVersion = null,
-                latestReleaseUrl = null,
-                addedAt = now,
-                lastSyncedAt = now,
-            )
+            val favourite =
+                FavoriteRepo(
+                    repoId = candidate.repoId,
+                    repoName = candidate.name,
+                    repoOwner = candidate.owner,
+                    repoOwnerAvatarUrl = candidate.ownerAvatarUrl,
+                    repoDescription = candidate.description,
+                    primaryLanguage = candidate.primaryLanguage,
+                    repoUrl = candidate.repoUrl,
+                    latestVersion = null,
+                    latestReleaseUrl = null,
+                    addedAt = now,
+                    lastSyncedAt = now,
+                )
 
             val toggled = runCatching { favouritesRepository.toggleFavorite(favourite) }.isSuccess
             if (!toggled) return@launch
 
             _state.update { current ->
-                val updated = current.candidates.map { candidateUi ->
-                    if (candidateUi.repoId == candidate.repoId) {
-                        candidateUi.copy(isAlreadyFavourited = !candidate.isAlreadyFavourited)
-                    } else {
-                        candidateUi
+                val updated =
+                    current.candidates.map { candidateUi ->
+                        if (candidateUi.repoId == candidate.repoId) {
+                            candidateUi.copy(isAlreadyFavourited = !candidate.isAlreadyFavourited)
+                        } else {
+                            candidateUi
+                        }
                     }
-                }
                 current.copy(candidates = updated.toImmutableList())
             }
         }
@@ -221,30 +240,34 @@ class ImportStarsViewModel(
             val addedIds = mutableSetOf<Long>()
 
             for (candidate in pending) {
-                val favourite = FavoriteRepo(
-                    repoId = candidate.repoId,
-                    repoName = candidate.name,
-                    repoOwner = candidate.owner,
-                    repoOwnerAvatarUrl = candidate.ownerAvatarUrl,
-                    repoDescription = candidate.description,
-                    primaryLanguage = candidate.primaryLanguage,
-                    repoUrl = candidate.repoUrl,
-                    latestVersion = null,
-                    latestReleaseUrl = null,
-                    addedAt = now,
-                    lastSyncedAt = now,
-                )
+                val favourite =
+                    FavoriteRepo(
+                        repoId = candidate.repoId,
+                        repoName = candidate.name,
+                        repoOwner = candidate.owner,
+                        repoOwnerAvatarUrl = candidate.ownerAvatarUrl,
+                        repoDescription = candidate.description,
+                        primaryLanguage = candidate.primaryLanguage,
+                        repoUrl = candidate.repoUrl,
+                        latestVersion = null,
+                        latestReleaseUrl = null,
+                        addedAt = now,
+                        lastSyncedAt = now,
+                    )
 
                 runCatching { favouritesRepository.toggleFavorite(favourite) }
                     .onSuccess { addedIds += candidate.repoId }
             }
 
             _state.update { current ->
-                val updated = current.candidates.map { candidateUi ->
-                    if (candidateUi.repoId in addedIds) {
-                        candidateUi.copy(isAlreadyFavourited = true)
-                    } else candidateUi
-                }
+                val updated =
+                    current.candidates.map { candidateUi ->
+                        if (candidateUi.repoId in addedIds) {
+                            candidateUi.copy(isAlreadyFavourited = true)
+                        } else {
+                            candidateUi
+                        }
+                    }
 
                 current.copy(
                     candidates = updated.toImmutableList(),

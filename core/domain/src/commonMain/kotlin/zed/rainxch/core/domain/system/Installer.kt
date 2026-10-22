@@ -3,7 +3,6 @@ package zed.rainxch.core.domain.system
 import zed.rainxch.core.domain.model.account.github.GithubAsset
 import zed.rainxch.core.domain.model.system.SystemArchitecture
 
-
 interface Installer {
     suspend fun isSupported(extOrMime: String): Boolean
 

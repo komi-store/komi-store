@@ -8,20 +8,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.foundation.lazy.items
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.stringResource
 import zed.rainxch.core.presentation.components.bars.KomiTopBar
 import zed.rainxch.core.presentation.components.bars.KomiTopBarSize
-import zed.rainxch.core.presentation.components.buttons.KomiButtonVariant
-import zed.rainxch.core.presentation.components.buttons.KomiIconButton
 import zed.rainxch.core.presentation.components.scaffold.KomiScaffold
 import zed.rainxch.core.presentation.components.surfaces.KomiSurface
 import zed.rainxch.core.presentation.components.surfaces.KomiSurfaceElevation
@@ -30,7 +24,6 @@ import zed.rainxch.core.presentation.components.text.KomiTextRole
 import zed.rainxch.core.presentation.locals.LocalPersonality
 import zed.rainxch.core.domain.model.announcement.WhatsNewEntry
 import zed.rainxch.githubstore.core.presentation.res.Res
-import zed.rainxch.githubstore.core.presentation.res.navigate_back
 import zed.rainxch.githubstore.core.presentation.res.whats_new_history_empty
 import zed.rainxch.githubstore.core.presentation.res.whats_new_title
 
@@ -45,14 +38,7 @@ fun WhatsNewHistoryScreen(
             KomiTopBar(
                 title = stringResource(Res.string.whats_new_title),
                 size = KomiTopBarSize.Compact,
-                leading = {
-                    KomiIconButton(
-                        icon = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = stringResource(Res.string.navigate_back),
-                        onClick = onNavigateBack,
-                        variant = KomiButtonVariant.Tonal,
-                    )
-                },
+                onBack = onNavigateBack,
             )
         },
     ) { innerPadding ->
@@ -68,7 +54,6 @@ fun WhatsNewHistoryScreen(
                     text = stringResource(Res.string.whats_new_history_empty),
                     role = KomiTextRole.Body,
                     color = colors.onSurfaceVariant,
-                    uppercase = false,
                 )
             }
         } else {
@@ -104,17 +89,13 @@ fun WhatsNewEntryCard(entry: WhatsNewEntry) {
             Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
                 KomiText(
                     text = entry.versionName,
-                    role = KomiTextRole.Title,
-                    fontWeight = FontWeight.Bold,
+                    role = KomiTextRole.CardTitle,
                     color = colors.onSurface,
-                    uppercase = false,
                 )
                 KomiText(
                     text = entry.releaseDate,
-                    role = KomiTextRole.Label,
-                    fontSize = 12.sp,
+                    role = KomiTextRole.Caption,
                     color = colors.onSurfaceVariant,
-                    uppercase = false,
                 )
             }
 

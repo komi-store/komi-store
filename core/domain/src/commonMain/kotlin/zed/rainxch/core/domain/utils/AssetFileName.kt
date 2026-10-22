@@ -1,7 +1,6 @@
 package zed.rainxch.core.domain.utils
 
 object AssetFileName {
-
     private val FORBIDDEN = Regex("""[^a-z0-9.\-]""")
 
     private val MULTI_UNDERSCORE = Regex("_+")

@@ -15,7 +15,7 @@ object BundledMirrors {
                 id = "direct",
                 name = "Direct GitHub",
                 template = null,
-                type = MirrorType.OFFICIAL
+                type = MirrorType.OFFICIAL,
             ),
             entry(
                 id = "fastly_jsdelivr",
@@ -28,25 +28,25 @@ object BundledMirrors {
                 id = "ghfast_top",
                 name = "ghfast.top",
                 template = "https://ghfast.top/{url}",
-                type = MirrorType.COMMUNITY
+                type = MirrorType.COMMUNITY,
             ),
             entry(
                 id = "gh_proxy_com",
                 name = "gh-proxy.com",
                 template = "https://gh-proxy.com/{url}",
-                type = MirrorType.COMMUNITY
+                type = MirrorType.COMMUNITY,
             ),
             entry(
                 id = "moeyy_xyz",
                 name = "github.moeyy.xyz",
                 template = "https://github.moeyy.xyz/{url}",
-                type = MirrorType.COMMUNITY
+                type = MirrorType.COMMUNITY,
             ),
             entry(
                 id = "ghps_cc",
                 name = "ghps.cc",
                 template = "https://ghps.cc/{url}",
-                type = MirrorType.COMMUNITY
+                type = MirrorType.COMMUNITY,
             ),
             entry(
                 id = "gh_99988866_xyz",

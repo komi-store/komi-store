@@ -9,17 +9,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Search
-import zed.rainxch.core.presentation.components.buttons.KomiButton
-import zed.rainxch.core.presentation.components.buttons.KomiButtonVariant
-import zed.rainxch.core.presentation.components.icon.KomiIcon
-import zed.rainxch.core.presentation.components.text.KomiText
-import zed.rainxch.core.presentation.components.text.KomiTextRole
-import zed.rainxch.core.presentation.locals.LocalPersonality
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
@@ -27,6 +20,12 @@ import org.jetbrains.compose.resources.stringResource
 import zed.rainxch.apps.presentation.import.ExternalImportAction
 import zed.rainxch.apps.presentation.import.util.rememberPackageVisibilityRequester
 import zed.rainxch.apps.presentation.import.util.rememberSdkInt
+import zed.rainxch.core.presentation.components.buttons.KomiButton
+import zed.rainxch.core.presentation.components.buttons.KomiButtonVariant
+import zed.rainxch.core.presentation.components.icon.KomiIcon
+import zed.rainxch.core.presentation.components.text.KomiText
+import zed.rainxch.core.presentation.components.text.KomiTextRole
+import zed.rainxch.core.presentation.locals.LocalPersonality
 import zed.rainxch.githubstore.core.presentation.res.Res
 import zed.rainxch.githubstore.core.presentation.res.external_import_permission_body
 import zed.rainxch.githubstore.core.presentation.res.external_import_permission_continue
@@ -61,7 +60,6 @@ fun PermissionRationaleScreen(
             KomiText(
                 text = stringResource(Res.string.external_import_permission_title),
                 role = KomiTextRole.Display,
-                fontWeight = FontWeight.SemiBold,
                 color = colors.onSurface,
                 textAlign = TextAlign.Center,
             )
@@ -85,11 +83,12 @@ fun PermissionRationaleScreen(
                         scope.launch {
                             onAction(ExternalImportAction.OnRequestPermission)
 
-                            val action = if (requester.isGranted()) {
-                                ExternalImportAction.OnPermissionGranted(sdkInt)
-                            } else {
-                                ExternalImportAction.OnPermissionDenied(sdkInt)
-                            }
+                            val action =
+                                if (requester.isGranted()) {
+                                    ExternalImportAction.OnPermissionGranted(sdkInt)
+                                } else {
+                                    ExternalImportAction.OnPermissionDenied(sdkInt)
+                                }
                             onAction(action)
                         }
                     },

@@ -11,10 +11,12 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import zed.rainxch.core.domain.logging.KomiStoreLogger
 import zed.rainxch.core.domain.repository.HiddenReposRepository
 
 class HiddenRepositoriesViewModel(
     private val hiddenReposRepository: HiddenReposRepository,
+    private val logger: KomiStoreLogger,
 ) : ViewModel() {
     private val _state = MutableStateFlow(HiddenRepositoriesState())
     val state = _state.asStateFlow()
@@ -30,17 +32,17 @@ class HiddenRepositoriesViewModel(
                     HiddenRepositoriesState(
                         isLoading = false,
                         items =
-                            repos.map { repo ->
-                                HiddenRepoUi(
-                                    repoId = repo.repoId,
-                                    repoName = repo.repoName,
-                                    repoOwner = repo.repoOwner,
-                                    repoOwnerAvatarUrl = repo.repoOwnerAvatarUrl,
-                                )
-                            }.toImmutableList(),
+                            repos
+                                .map { repo ->
+                                    HiddenRepoUi(
+                                        repoId = repo.repoId,
+                                        repoName = repo.repoName,
+                                        repoOwner = repo.repoOwner,
+                                        repoOwnerAvatarUrl = repo.repoOwnerAvatarUrl,
+                                    )
+                                }.toImmutableList(),
                     )
-            }
-            .launchIn(viewModelScope)
+            }.launchIn(viewModelScope)
     }
 
     fun onAction(action: HiddenRepositoriesAction) {
@@ -51,9 +53,11 @@ class HiddenRepositoriesViewModel(
     }
 
     private fun unhide(repoId: Long) {
-
         val fullName =
-            _state.value.items.firstOrNull { it.repoId == repoId }?.fullName.orEmpty()
+            _state.value.items
+                .firstOrNull { it.repoId == repoId }
+                ?.fullName
+                .orEmpty()
         viewModelScope.launch {
             try {
                 hiddenReposRepository.unhide(repoId)
@@ -61,7 +65,8 @@ class HiddenRepositoriesViewModel(
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Throwable) {
-                _events.send(HiddenRepositoriesEvent.Failure(e.message.orEmpty()))
+                logger.error("HiddenRepositoriesViewModel: failed to unhide $repoId", e)
+                _events.send(HiddenRepositoriesEvent.Failure)
             }
         }
     }
@@ -74,7 +79,8 @@ class HiddenRepositoriesViewModel(
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Throwable) {
-                _events.send(HiddenRepositoriesEvent.Failure(e.message.orEmpty()))
+                logger.error("HiddenRepositoriesViewModel: failed to unhide all", e)
+                _events.send(HiddenRepositoriesEvent.Failure)
             }
         }
     }

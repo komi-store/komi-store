@@ -1,17 +1,17 @@
 [versions]
-agp = "8.13.2"
+agp = "9.4.1"
 composeBom = "2025.07.00"
 kermit = "2.0.8"
-kotlin = "2.3.10"
-ksp = "2.3.5"
+kotlin = "2.4.20"
+ksp = "2.3.12"
 
 androidDesugarJdkLibs = "2.1.5"
 androidTools = "32.0.1"
 
 # Compose
-compose-hot-reload = "1.0.0"
-compose-multiplatform = "1.10.3"
-compose-lifecycle = "2.9.6"
+compose-hot-reload = "1.2.0"
+compose-multiplatform = "1.12.2"
+compose-lifecycle = "2.11.0"
 navigation-compose = "2.9.2"
 jetbrains-core-bundle = "1.0.1"
 material-icons = "1.7.3"
@@ -19,48 +19,60 @@ material-icons = "1.7.3"
 # AndroidX
 androidx-activity = "1.12.4"
 core-splashscreen = "1.2.0"
+core-ktx = "1.16.0"
+androidx-test = "1.7.0"
+androidx-test-ext-junit = "1.3.0"
+androidx-test-espresso = "3.8.0-alpha01"
+androidx-test-uiautomator = "2.4.0"
+compose-ui-test = "1.12.1"
 
 # Kotlinx
-kotlinx-coroutines = "1.10.2"
-kotlinx-serialization = "1.10.0"
-kotlinx-datetime = "0.7.1"
-kotlinx-collections-immutable = "0.4.0"
+kotlinx-coroutines = "1.11.0"
+kotlinx-serialization = "1.11.0"
+kotlinx-datetime = "0.8.0"
+kotlinx-collections-immutable = "0.5.2"
 
 # Third party
-koin = "4.1.1"
-ktor = "3.4.0"
+koin = "4.2.2"
+ktor = "3.6.0"
 room = "2.8.4"
-slf4jSimple = "2.0.17"
-jna = "5.14.0"
+slf4jSimple = "2.0.20"
+jna = "5.19.1"
 sqlite = "2.6.2"
 datastore = "1.2.0"
-ksafe = "2.0.0"
-compose-jetbrains = "1.10.3"
-compose-jetbrains-material-you = "1.11.0-alpha03"
+ksafe = "3.3.0"
+compose-jetbrains = "1.12.2"
+compose-jetbrains-material-you = "1.12.0-alpha03"
 jetbrains-savedstate = "1.4.0"
 moko = "0.20.1"
-buildkonfig = "0.17.1"
-markdownRenderer = "0.39.2"
-landscapist = "2.9.5"
-coil3 = "3.3.0"
-highlights = "1.0.0"
+buildkonfig = "0.23.0"
+markdownRenderer = "0.46.0"
+coil3 = "3.6.3"
+highlights = "1.1.0"
+materialKolor = "5.0.1"
 shizuku = "13.1.5"
 libsu = "6.0.0"
-dhizuku = "2.5.4"
+dhizuku = "2.6.0"
 hidden-api = "4.4.0"
 jsystemthemedetector = "3.9.1"
 work = "2.11.1"
-resources="1.10.3"
+resources="1.12.2"
 
-ktlint-gradle = "12.1.1"
-flatpak-gradle-generator = "1.7.0"
+ktlint = "1.8.0"
+spotless = "8.10.4"
+detekt = "1.23.8"
+kover = "0.9.11"
+stability-analyzer = "0.15.0"
+konsist = "0.18.1"
+compose-rules = "0.6.0"
+flatpak-gradle-generator = "1.8.0"
 
 projectApplicationId = "zed.rainxch.githubstore"
-projectVersionName = "1.9.2"
-projectVersionCode = "21"
+projectVersionName = "1.9.3"
+projectVersionCode = "22"
 projectMinSdkVersion = "26"
-projectTargetSdkVersion = "36"
-projectCompileSdkVersion = "36"
+projectTargetSdkVersion = "37"
+projectCompileSdkVersion = "37"
 
 [libraries]
 # Kotlin
@@ -72,6 +84,13 @@ androidx-activity-compose = { module = "androidx.activity:activity-compose", ver
 jetbrains-compose-viewmodel = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "compose-lifecycle" }
 koin-core-viewmodel = { group = "io.insert-koin", name = "koin-core-viewmodel", version.ref = "koin" }
 core-splashscreen = { group = "androidx.core", name = "core-splashscreen", version.ref = "core-splashscreen" }
+androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "core-ktx" }
+androidx-test-runner = { module = "androidx.test:runner", version.ref = "androidx-test" }
+androidx-test-rules = { module = "androidx.test:rules", version.ref = "androidx-test" }
+androidx-test-ext-junit = { module = "androidx.test.ext:junit", version.ref = "androidx-test-ext-junit" }
+androidx-test-espresso-core = { module = "androidx.test.espresso:espresso-core", version.ref = "androidx-test-espresso" }
+androidx-test-uiautomator = { module = "androidx.test.uiautomator:uiautomator", version.ref = "androidx-test-uiautomator" }
+androidx-compose-ui-test-junit4 = { module = "androidx.compose.ui:ui-test-junit4", version.ref = "compose-ui-test" }
 
 # Kotlinx
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
@@ -99,6 +118,7 @@ ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "kto
 ktor-client-cio = { module = "io.ktor:ktor-client-cio", version.ref = "ktor" }
 ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
 ktor-client-logging = { module = "io.ktor:ktor-client-logging", version.ref = "ktor" }
+ktor-client-mock = { module = "io.ktor:ktor-client-mock", version.ref = "ktor" }
 ktor-client-auth = { module = "io.ktor:ktor-client-auth", version.ref = "ktor" }
 ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
 
@@ -112,13 +132,12 @@ ksafe = { module = "eu.anifantakis:ksafe", version.ref = "ksafe" }
 # Room
 androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
 androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
+androidx-room-testing = { module = "androidx.room:room-testing", version.ref = "room" }
 slf4j-simple = { module = "org.slf4j:slf4j-simple", version.ref = "slf4jSimple" }
 jna-platform = { module = "net.java.dev.jna:jna-platform", version.ref = "jna" }
 sqlite-bundled = { module = "androidx.sqlite:sqlite-bundled", version.ref = "sqlite" }
 
 # Image loading
-landscapist-image = { module = "com.github.skydoves:landscapist-coil3", version.ref = "landscapist" }
-landscapist-core = { module = "com.github.skydoves:landscapist-core", version.ref = "landscapist" }
 coil3-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coil3" }
 coil3-network-ktor = { module = "io.coil-kt.coil3:coil-network-ktor3", version.ref = "coil3" }
 coil3-svg = { module = "io.coil-kt.coil3:coil-svg", version.ref = "coil3" }
@@ -162,6 +181,7 @@ jetbrains-bundle = { module = "org.jetbrains.androidx.core:core-bundle", version
 markdown-renderer = { module = "com.mikepenz:multiplatform-markdown-renderer-m3", version.ref = "markdownRenderer" }
 markdown-renderer-coil3 = { module = "com.mikepenz:multiplatform-markdown-renderer-coil3", version.ref = "markdownRenderer" }
 highlights = { module = "dev.snipme:highlights", version.ref = "highlights" }
+material-kolor = { module = "com.materialkolor:material-kolor", version.ref = "materialKolor" }
 
 # WorkManager
 androidx-work-runtime = { module = "androidx.work:work-runtime-ktx", version.ref = "work" }
@@ -177,11 +197,14 @@ libsu-core = { module = "com.github.topjohnwu.libsu:core", version.ref = "libsu"
 # Dhizuku
 dhizuku-api = { module = "io.github.iamr0s:Dhizuku-API", version.ref = "dhizuku" }
 
-ktlint-gradlePlugin = { group = "org.jlleitschuh.gradle", name="ktlint-gradle", version.ref = "ktlint-gradle" }
+detekt-gradlePlugin = { group = "io.gitlab.arturbosch.detekt", name = "detekt-gradle-plugin", version.ref = "detekt" }
+stability-analyzer-gradlePlugin = { group = "com.github.skydoves", name = "compose-stability-gradle", version.ref = "stability-analyzer" }
+konsist = { group = "com.lemonappdev", name = "konsist", version.ref = "konsist" }
 
 [plugins]
 
-convention-cmp-application = { id = "zed.rainxch.convention.cmp.application", version = "unspecified" }
+convention-android-application-compose = { id = "zed.rainxch.convention.android.application.compose", version = "unspecified" }
+convention-android-library = { id = "zed.rainxch.convention.android.library", version = "unspecified" }
 convention-kmp-library = { id = "zed.rainxch.convention.kmp.library", version = "unspecified" }
 convention-cmp-library = { id = "zed.rainxch.convention.cmp.library", version = "unspecified" }
 convention-cmp-feature = { id = "zed.rainxch.convention.cmp.feature", version = "unspecified" }
@@ -196,6 +219,7 @@ android-kotlin-multiplatform-library = { id = "com.android.kotlin.multiplatform.
 
 # Kotlin
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 
 # Compose
@@ -210,6 +234,12 @@ kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 buildkonfig = { id = "com.codingfeline.buildkonfig", version.ref = "buildkonfig" }
 flatpak-gradle-generator = { id = "io.github.jwharm.flatpak-gradle-generator", version.ref = "flatpak-gradle-generator" }
 
+# Verification
+spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
+detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
+kover = { id = "org.jetbrains.kotlinx.kover", version.ref = "kover" }
+stability-analyzer = { id = "com.github.skydoves.compose.stability.analyzer", version.ref = "stability-analyzer" }
+
 [bundles]
 koin-common = [
     "koin-core",
@@ -223,11 +253,4 @@ ktor-common = [
     "ktor-serialization-kotlinx-json",
     "ktor-client-auth",
     "ktor-client-logging"
-]
-
-landscapist = [
-    "landscapist-core",
-    "landscapist-image",
-    "coil3-compose",
-    "coil3-svg",
 ]

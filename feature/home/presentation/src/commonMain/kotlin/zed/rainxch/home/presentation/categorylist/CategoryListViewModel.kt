@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.getString
+import zed.rainxch.core.domain.repository.TweaksRepository
 import zed.rainxch.githubstore.core.presentation.res.Res
 import zed.rainxch.githubstore.core.presentation.res.failed_to_load
 import zed.rainxch.home.domain.model.HomeCategory
@@ -22,8 +23,8 @@ import zed.rainxch.home.presentation.model.toHomeRepoCardUi
 class CategoryListViewModel(
     private val category: HomeCategory,
     private val homeRepository: HomeRepository,
+    private val tweaksRepository: TweaksRepository,
 ) : ViewModel() {
-
     private val _state = MutableStateFlow(CategoryListState(category = category))
     val state = _state.asStateFlow()
 
@@ -34,12 +35,19 @@ class CategoryListViewModel(
 
     init {
         loadPage(initial = true)
+        viewModelScope.launch {
+            tweaksRepository.getRepoGridLayout().collect { grid ->
+                _state.update { it.copy(isGridLayout = grid) }
+            }
+        }
     }
 
     fun onAction(action: CategoryListAction) {
         when (action) {
-            CategoryListAction.OnLoadMore ->
+            CategoryListAction.OnLoadMore -> {
                 if (!_state.value.isLoadingMore && _state.value.hasMorePages) loadPage(initial = false)
+            }
+
             CategoryListAction.OnRefresh -> {
                 nextPage = 1
                 _state.update {
@@ -51,10 +59,14 @@ class CategoryListViewModel(
                 }
                 loadPage(initial = true)
             }
-            is CategoryListAction.OnRepoClick -> viewModelScope.launch {
-                _events.send(CategoryListEvent.NavigateToDetails(action.repoId))
+
+            is CategoryListAction.OnRepoClick -> {
+                viewModelScope.launch {
+                    _events.send(CategoryListEvent.NavigateToDetails(action.repoId))
+                }
             }
-            CategoryListAction.OnNavigateBack -> Unit
+
+            CategoryListAction.OnNavigateBack -> {}
         }
     }
 
@@ -63,11 +75,12 @@ class CategoryListViewModel(
             _state.update {
                 if (initial) it.copy(isLoading = true) else it.copy(isLoadingMore = true)
             }
-            val flow = when (category) {
-                HomeCategory.HOT_RELEASE -> homeRepository.getHotReleaseRepositories(emptySet(), nextPage)
-                HomeCategory.TRENDING -> homeRepository.getTrendingRepositories(emptySet(), nextPage)
-                HomeCategory.MOST_POPULAR -> homeRepository.getMostPopular(emptySet(), nextPage)
-            }
+            val flow =
+                when (category) {
+                    HomeCategory.HOT_RELEASE -> homeRepository.getHotReleaseRepositories(emptySet(), nextPage)
+                    HomeCategory.TRENDING -> homeRepository.getTrendingRepositories(emptySet(), nextPage)
+                    HomeCategory.MOST_POPULAR -> homeRepository.getMostPopular(emptySet(), nextPage)
+                }
             runCatching { flow.firstOrNull() }
                 .onSuccess { paginated ->
                     if (paginated == null) {
@@ -81,17 +94,18 @@ class CategoryListViewModel(
                         return@onSuccess
                     }
                     val existing = _state.value.cards
-                    val incoming = paginated.repos.map { repo ->
-                        toHomeRepoCardUi(
-                            repo = repo,
-                            isInstalled = false,
-                            isUpdateAvailable = false,
-                            isFavourite = false,
-                            isStarred = false,
-                            isSeen = false,
-                            isCurrentUserOwner = false,
-                        )
-                    }
+                    val incoming =
+                        paginated.repos.map { repo ->
+                            toHomeRepoCardUi(
+                                repo = repo,
+                                isInstalled = false,
+                                isUpdateAvailable = false,
+                                isFavourite = false,
+                                isStarred = false,
+                                isSeen = false,
+                                isCurrentUserOwner = false,
+                            )
+                        }
                     val existingIds = existing.map { it.id }.toHashSet()
                     val merged = (existing + incoming.filter { it.id !in existingIds }).toImmutableList()
                     nextPage += 1
@@ -104,8 +118,7 @@ class CategoryListViewModel(
                             errorMessage = null,
                         )
                     }
-                }
-                .onFailure { e ->
+                }.onFailure { e ->
                     if (e is CancellationException) throw e
                     _state.update {
                         it.copy(

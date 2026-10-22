@@ -17,7 +17,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalUriHandler
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
 import zed.rainxch.core.presentation.components.icon.KomiIcon
@@ -34,13 +33,14 @@ fun LazyListScope.reportIssue(repoUrl: String) {
         val colors = LocalPersonality.current.colors
         val rowShape = RoundedCornerShape(LocalPersonality.current.shape.corner)
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(rowShape)
-                .border(width = 1.dp, color = colors.outline, shape = rowShape)
-                .background(colors.surface)
-                .clickable { uriHandler.openUri("${repoUrl.trimEnd('/')}/issues") }
-                .padding(horizontal = 14.dp, vertical = 12.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .clip(rowShape)
+                    .border(width = 1.dp, color = colors.outline, shape = rowShape)
+                    .background(colors.surface)
+                    .clickable { uriHandler.openUri("${repoUrl.trimEnd('/')}/issues") }
+                    .padding(horizontal = 14.dp, vertical = 12.dp),
             horizontalArrangement = Arrangement.spacedBy(12.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
@@ -52,11 +52,9 @@ fun LazyListScope.reportIssue(repoUrl: String) {
             )
             KomiText(
                 text = stringResource(Res.string.report_issue),
-                role = KomiTextRole.Title,
-                fontWeight = FontWeight.SemiBold,
+                role = KomiTextRole.CardTitle,
                 color = colors.onSurface,
                 modifier = Modifier.weight(1f),
-                uppercase = false,
             )
             KomiIcon(
                 imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,

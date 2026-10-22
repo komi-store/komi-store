@@ -7,18 +7,27 @@ import zed.rainxch.core.domain.isDesktop
 import zed.rainxch.core.domain.model.appearance.AppPersonality
 import zed.rainxch.core.domain.model.appearance.ContentWidth
 import zed.rainxch.core.domain.model.appearance.MangaPaperId
+import zed.rainxch.core.domain.repository.SYSTEM_DEFAULT_DISPLAY_MODE_ID
 import zed.rainxch.core.presentation.components.inputs.KomiSwitch
+import zed.rainxch.core.presentation.components.overlays.KomiDropdown
+import zed.rainxch.core.presentation.components.overlays.KomiMenuItem
 import zed.rainxch.core.presentation.utils.displayName
+import zed.rainxch.core.presentation.utils.rememberDisplayModeOptions
 import zed.rainxch.githubstore.core.presentation.res.*
 import zed.rainxch.tweaks.presentation.TweaksAction
 import zed.rainxch.tweaks.presentation.TweaksState
 import zed.rainxch.tweaks.presentation.components.shell.SettingsGroup
 import zed.rainxch.tweaks.presentation.components.shell.SettingsRow
+import zed.rainxch.tweaks.presentation.components.shell.SettingsValuePill
+import kotlin.math.roundToInt
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import zed.rainxch.core.presentation.components.buttons.KomiIconButtonSize
 import zed.rainxch.core.presentation.components.buttons.KomiSegmented
 import zed.rainxch.core.presentation.components.buttons.KomiSegmentedItem
+import zed.rainxch.githubstore.core.presentation.res.repo_layout_grid
+import zed.rainxch.githubstore.core.presentation.res.repo_layout_list
+import zed.rainxch.githubstore.core.presentation.res.repo_layout_title
 
 private enum class ModeChoice { LIGHT, DARK, SYSTEM }
 
@@ -55,13 +64,13 @@ fun appearanceSectionContent(
     modifier: Modifier = Modifier,
 ) {
     val desktop = isDesktop()
+    val displayModes = rememberDisplayModeOptions()
     val amoledVisible = showsAmoledToggle(state.selectedPersonality, state.isDarkTheme)
     SettingsGroup(modifier = modifier) {
         when (state.selectedPersonality) {
             AppPersonality.MANGA -> {
                 SettingsRow(
                     title = stringResource(Res.string.appearance_section_paper),
-                    last = !desktop,
                     trailing = {
                         KomiSegmented(
                             selected = state.mangaPaper,
@@ -81,7 +90,6 @@ fun appearanceSectionContent(
             AppPersonality.CLASSIC -> {
                 SettingsRow(
                     title = stringResource(Res.string.appearance_section_mode),
-                    last = !desktop && !amoledVisible,
                     trailing = {
                         KomiSegmented(
                             selected = isDarkToChoice(state.isDarkTheme),
@@ -101,7 +109,6 @@ fun appearanceSectionContent(
                     SettingsRow(
                         title = stringResource(Res.string.amoled_black_theme),
                         subtitle = stringResource(Res.string.amoled_black_description),
-                        last = !desktop,
                         trailing = {
                             KomiSwitch(
                                 checked = state.isAmoledThemeEnabled,
@@ -111,6 +118,65 @@ fun appearanceSectionContent(
                     )
                 }
             }
+        }
+
+        // How Explore, Top Charts and Search lay out repositories.
+        SettingsRow(
+            title = stringResource(Res.string.repo_layout_title),
+            last = !desktop && displayModes.isEmpty(),
+            trailing = {
+                KomiSegmented(
+                    selected = state.isRepoGridLayout,
+                    onSelect = { onAction(TweaksAction.OnRepoLayoutSelected(it)) },
+                    size = KomiIconButtonSize.Sm,
+                    items =
+                        persistentListOf(
+                            KomiSegmentedItem(value = false, title = stringResource(Res.string.repo_layout_list)),
+                            KomiSegmentedItem(value = true, title = stringResource(Res.string.repo_layout_grid)),
+                        ),
+                )
+            },
+        )
+
+        if (displayModes.isNotEmpty()) {
+            val displayModeEntries =
+                (
+                    listOf(
+                        KomiMenuItem(
+                            id = SYSTEM_DEFAULT_DISPLAY_MODE_ID.toString(),
+                            label = stringResource(Res.string.display_mode_auto),
+                        ),
+                    ) +
+                        displayModes.map { mode ->
+                            KomiMenuItem(
+                                id = mode.id.toString(),
+                                label =
+                                    stringResource(
+                                        Res.string.display_mode_option,
+                                        mode.widthPx,
+                                        mode.heightPx,
+                                        mode.refreshRate.roundToInt(),
+                                    ),
+                            )
+                        }
+                ).toImmutableList()
+            // MainActivity applies a stored mode the display no longer reports as the system default.
+            val selectedDisplayMode =
+                displayModeEntries.firstOrNull { it.id == state.displayModeId.toString() } ?: displayModeEntries.first()
+            KomiDropdown(
+                entries = displayModeEntries,
+                onSelect = { item -> onAction(TweaksAction.OnDisplayModeSelected(item.id.toInt())) },
+                value = selectedDisplayMode.id,
+                trigger = { onClick ->
+                    SettingsRow(
+                        title = stringResource(Res.string.display_mode_title),
+                        subtitle = stringResource(Res.string.display_mode_description),
+                        last = !desktop,
+                        onClick = onClick,
+                        trailing = { SettingsValuePill(value = selectedDisplayMode.label, onClick = onClick) },
+                    )
+                },
+            )
         }
 
         if (desktop) {

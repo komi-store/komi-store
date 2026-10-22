@@ -29,7 +29,6 @@
 
     <!-- Apps feature - Update states -->
     <string name="checking">Checking…</string>
-    <string name="updated_successfully">Updated successfully</string>
     <string name="error_with_message">Error: %1$s</string>
 
     <!-- Apps feature - Update all progress -->
@@ -44,7 +43,6 @@
     <string name="try_again">Try again</string>
 
     <!-- Errors -->
-    <string name="auth_error_with_message">Error: %1$s</string>
 
     <!-- Device flow -->
     <string name="enter_code_on_github">Enter this code on GitHub:</string>
@@ -80,17 +78,17 @@
     <string name="sort_by">Sort by</string>
     <string name="close">Close</string>
 
-    <string name="sort_most_stars">Most Stars</string>
-    <string name="sort_most_forks">Most Forks</string>
-    <string name="sort_best_match">Best Match</string>
-    <string name="sort_recently_released">Recently Released</string>
+    <string name="sort_most_stars">Most stars</string>
+    <string name="sort_most_forks">Most forks</string>
+    <string name="sort_best_match">Best match</string>
+    <string name="sort_recently_released">Recently released</string>
 
     <string name="sort_order_descending">Descending</string>
     <string name="sort_order_ascending">Ascending</string>
     <string name="sort_label">Sort</string>
 
     <!-- Programming languages -->
-    <string name="language_all">All Languages</string>
+    <string name="language_all">All languages</string>
     <string name="language_kotlin">Kotlin</string>
     <string name="language_java">Java</string>
     <string name="language_javascript">JavaScript</string>
@@ -142,6 +140,9 @@
     <string name="proxy_test_error_auth_required">Proxy authentication required.</string>
     <string name="proxy_test_error_status">Unexpected response: HTTP %1$d</string>
     <string name="proxy_test_error_unknown">Connection test failed</string>
+    <string name="proxy_test_master_result">Search: %1$s, Downloads: %2$s, Translation: %3$s</string>
+    <string name="proxy_test_probe_ok">%1$d ms</string>
+    <string name="proxy_test_probe_failed">failed</string>
 
     <!-- Snackbar -->
     <string name="logout_success">Logged out successfully</string>
@@ -161,6 +162,9 @@
     <string name="open_repository">Open repository</string>
     <string name="open_in_browser">Open in browser</string>
     <string name="cancel_download">Cancel download</string>
+    <string name="pause">Pause</string>
+    <string name="resume">Resume</string>
+    <string name="paused">Paused</string>
     <string name="show_install_options">Show install options</string>
 
     <string name="error_state_title_generic">Something went wrong</string>
@@ -231,8 +235,9 @@
     <!-- Uninstall / Open -->
     <string name="uninstall">Uninstall</string>
     <string name="open_app">Open</string>
-    <string name="downgrade_requires_uninstall">Downgrade requires uninstall</string>
-    <string name="downgrade_warning_message">Installing version %1$s requires uninstalling the current version (%2$s) first. Your app data will be lost.</string>
+    <string name="downgrade_warning_title">Older version selected</string>
+    <string name="downgrade_warning_message">%1$s is lower than the %2$s already installed.\nAndroid may refuse to install a lower version.\nIf it does, the installed %2$s is left as it is.</string>
+    <string name="downgrade_warning_uninstall_note">Uninstalling %1$s erases app data.</string>
     <string name="uninstall_first">Uninstall first</string>
     <string name="signing_key_changed_title">Signing key changed</string>
     <string name="signing_key_changed_message">The signing certificate for this app has changed since it was first installed.\n\nThis could mean the developer rotated their signing key, or the binary may have been tampered with.\n\nExpected: %1$s\nReceived: %2$s</string>
@@ -240,6 +245,8 @@
     <string name="verified_build">Verified build</string>
     <string name="checking_attestation">Checking\u2026</string>
     <string name="unable_to_verify_attestation">Could not verify</string>
+    <string name="details_attestation_verified_explainer">This file's SHA-256 matches a build attestation the repository published on GitHub, so it came from the repository's own build.</string>
+    <string name="details_attestation_unverified_explainer">Komi Store couldn't check this file against the repository's build attestations. That alone doesn't make it unsafe.</string>
     <string name="install_version">Install %1$s</string>
     <string name="failed_to_open_app">Failed to open %1$s</string>
     <string name="failed_to_uninstall">Failed to uninstall %1$s</string>
@@ -301,20 +308,15 @@
 
 
 
-    <string name="home_finding_repositories">Finding repositories...</string>
     <string name="home_retry">Retry</string>
     <string name="home_failed_to_load_repositories">Failed to load repositories</string>
 
     <string name="home_topbar_discover">Discover</string>
     <string name="home_masthead_title">Top Charts</string>
     <string name="home_masthead_subtitle">ランキング · CHARTS &amp; PICKS</string>
-    <string name="home_platform_filter">Filter platforms</string>
     <string name="home_chart_trending">Trending</string>
-    <string name="home_chart_trending_jp">急上昇</string>
     <string name="home_chart_releases">Releases</string>
-    <string name="home_chart_releases_jp">新着</string>
     <string name="home_chart_popular">Popular</string>
-    <string name="home_chart_popular_jp">人気</string>
     <string name="sidebar_browse">Browse</string>
     <string name="sidebar_browse_jp">航行</string>
     <string name="sidebar_platform">Platform</string>
@@ -388,6 +390,16 @@
     <string name="sign_in_required">Sign in required</string>
     <string name="sign_in_with_github_for_stars">Sign in with GitHub to see your starred repositories</string>
     <string name="no_starred_repos">No starred repositories</string>
+    <plurals name="starred_hidden_not_installable">
+        <item quantity="one">%1$d more starred repo has no installable release</item>
+        <item quantity="other">%1$d more starred repos have no installable release</item>
+    </plurals>
+    <plurals name="starred_including_not_installable">
+        <item quantity="one">Including %1$d starred repo with no installable release</item>
+        <item quantity="other">Including %1$d starred repos with no installable release</item>
+    </plurals>
+    <string name="starred_show_all">Show all</string>
+    <string name="starred_installable_only">Installable only</string>
     <string name="star_repos_hint">Star repositories on GitHub with installable releases to see them here</string>
     <string name="last_synced">Last synced</string>
     <string name="just_now">Just now</string>
@@ -414,7 +426,7 @@
     <string name="filter_installed">Installed</string>
     <string name="filter_favorites">Favorites</string>
     <string name="sort">Sort</string>
-    <string name="sort_recently_updated">Recently Updated</string>
+    <string name="sort_recently_updated">Recently updated</string>
     <string name="sort_name">Name</string>
     <string name="sort_recently_added">Recently added</string>
     <string name="sort_selected">Selected</string>
@@ -519,10 +531,16 @@
     <string name="auth_check_status">I already authorized</string>
     <string name="auth_polling_status">Checking…</string>
     <string name="auth_rate_limited">Rate limited — retrying in %1$ds</string>
+    <string name="auth_error_unreachable">Couldn't connect to GitHub</string>
+    <string name="auth_error_rate_limited">Too many sign-in attempts</string>
+    <string name="auth_hint_wait">Wait a few minutes, then try again.</string>
+    <string name="auth_error_denied">Authorization was denied</string>
+    <string name="auth_error_browser">Couldn't open the browser</string>
+    <string name="auth_hint_other_method">Use a device code or a personal access token instead.</string>
 
     <!-- Read More / Show Less -->
-    <string name="read_more">Read More</string>
-    <string name="show_less">Show Less</string>
+    <string name="read_more">Read more</string>
+    <string name="show_less">Show less</string>
 
     <string name="share_repository">Share repository</string>
     <string name="failed_to_share_link">Failed to share link</string>
@@ -545,6 +563,9 @@
     <string name="delete_downloads_confirmation_message">This will permanently remove all downloaded APKs and installers (%1$s). You can re-download them anytime.</string>
     <string name="downloads_cleared">All downloaded packages have been deleted.</string>
     <string name="clear">Clear</string>
+    <string name="show_password">Show password</string>
+    <string name="hide_password">Hide password</string>
+    <string name="show_tabs">Show tabs</string>
 
 
 
@@ -581,6 +602,12 @@
     <string name="dhizuku_start_hint">Activate Dhizuku as Device Owner to enable silent installs</string>
     <string name="installer_type_root">Root</string>
     <string name="installer_type_root_description">Silent install via Magisk, KernelSU, or APatch root</string>
+    <string name="installer_type_third_party">Third-party installer</string>
+    <string name="installer_type_third_party_description">Hand the APK to an installer app you pick, instead of the system default.</string>
+    <string name="external_installer_pick">Installer app</string>
+    <string name="external_installer_none">Not selected</string>
+    <string name="external_installer_sheet_title">Apps that can install APKs</string>
+    <string name="external_installer_empty">No installer apps found on this device.</string>
     <string name="root_status_ready">Granted</string>
     <string name="root_status_permission_needed">Allow root</string>
     <string name="root_status_unavailable">No root</string>
@@ -707,6 +734,9 @@
     <string name="scrollbar_option_description">Show scrollbar on scrollable lists (desktop)</string>
 
     <string name="content_width_title">Content width</string>
+    <string name="repo_layout_title">Repository layout</string>
+    <string name="repo_layout_list">List</string>
+    <string name="repo_layout_grid">Grid</string>
     <string name="content_width_description">Controls the maximum column width of the details screen (desktop)</string>
     <string name="content_width_compact">Compact</string>
     <string name="content_width_wide">Wide</string>
@@ -811,6 +841,8 @@
     <!-- Multi-layer variant fingerprint UX additions -->
     <string name="variant_picker_unpin">Unpin</string>
     <string name="variant_picker_pinned_badge">Pinned</string>
+    <string name="assets_section_available">Available</string>
+    <string name="assets_section_your_app">Your app</string>
     <string name="variant_picker_open">Pick variant</string>
     <string name="variant_picker_open_filter">Adjust filter</string>
     <string name="variant_first_pin_toast">Future updates will prefer the %1$s variant. Change this anytime in app settings.</string>
@@ -1000,7 +1032,7 @@
     <string name="feedback_send_via_github">Open as GitHub Issue</string>
     <string name="feedback_send_success_email">Thanks — opening your mail client.</string>
     <string name="feedback_send_success_github">Thanks — opening your browser.</string>
-    <string name="feedback_send_error">Couldn't open feedback channel: %1$s</string>
+    <string name="feedback_send_failed">Couldn't open the feedback channel</string>
 
     <!-- Tweaks feature - Custom forges -->
     <string name="custom_forges_entry_label">Custom forges</string>
@@ -1017,6 +1049,15 @@
     <!-- Mirror - Sections -->
     <string name="mirror_section_official">Official</string>
     <string name="mirror_section_community">Community</string>
+
+    <string name="mirror_pick_fastest">Pick fastest</string>
+    <string name="mirror_pick_fastest_sub">Time every mirror, pick the fastest</string>
+    <string name="mirror_measuring">Measuring from this device…</string>
+    <string name="mirror_measure_latency">Measure latency</string>
+    <string name="mirror_latency_local">%1$d ms from you</string>
+    <string name="mirror_fastest_badge">%1$s · fastest</string>
+    <string name="mirror_fastest_chosen">Switched to %1$s (%2$d ms).</string>
+    <string name="mirror_no_mirror_responded">No mirror answered. Check your connection and try again.</string>
 
     <!-- Mirror - Statuses -->
     <string name="mirror_status_ok">%1$dms</string>
@@ -1038,7 +1079,7 @@
     <string name="mirror_test_http_error">Mirror returned %1$d</string>
     <string name="mirror_test_timeout">Timed out after 5s</string>
     <string name="mirror_test_dns_fail">Could not resolve host</string>
-    <string name="mirror_test_other">Failed: %1$s</string>
+    <string name="mirror_test_failed">Connection failed</string>
 
     <!-- Mirror - Footer hint -->
     <string name="mirror_deploy_your_own_hint">All mirrors broken? You can host your own in 5 minutes — see docs.</string>
@@ -1057,35 +1098,25 @@
     <string name="apps_menu_item_active">%1$s  ✓</string>
     <string name="apps_version_update">%1$s → %2$s</string>
     <string name="apps_version_dated">%1$s (%2$s)</string>
-    <string name="apps_latest_version_placeholder">—</string>
     <string name="apps_variant_subtitle">%1$s  ·  %2$s</string>
     <string name="apps_section_header_cd">%1$s, %2$d, %3$s</string>
     <string name="apps_section_header_static_cd">%1$s, %2$d</string>
-    <string name="apps_compact_status_filter_active">monorepo filter active</string>
-    <string name="apps_compact_status_variant_pinned">variant pinned</string>
-    <string name="apps_compact_status_pre_release_on">pre-release on</string>
-    <string name="apps_compact_status_variant_stale">variant stale, action needed</string>
-    <string name="apps_compact_status_pending_install">pending install</string>
-    <string name="apps_compact_status_ready_to_install">ready to install</string>
-    <string name="apps_compact_status_updates_ignored">updates ignored</string>
     <string name="apps_ignore_updates">Ignore updates</string>
+    <string name="apps_tag_updates_ignored">Updates ignored</string>
+    <string name="apps_tag_skipped">Skipped %1$s</string>
+    <string name="apps_tag_asset_filter">Asset filter</string>
+    <string name="apps_variant_stale_pick">Variant changed. Pick it again.</string>
+    <string name="apps_no_release_found">Couldn't find a release to install.</string>
     <string name="discard_pending_install">Discard</string>
+    <string name="delete_task">Delete task</string>
     <string name="apps_updates_banner_title_one">1 update available</string>
     <string name="apps_updates_banner_title_other">%1$d updates available</string>
     <string name="apps_updates_banner_subtitle">Review or update everything at once.</string>
     <string name="apps_updates_banner_show">See list</string>
     <string name="apps_updates_banner_hide">Hide list</string>
     <string name="apps_section_pending_installs">Ready to install</string>
-    <string name="apps_two_pane_empty_title">Pick an app</string>
-    <string name="apps_two_pane_empty_subtitle">Select any app on the left to see its details and actions.</string>
-    <string name="apps_two_pane_detail_section_status">Status</string>
-    <string name="apps_two_pane_detail_section_actions">Quick actions</string>
-    <string name="apps_two_pane_detail_section_settings">Settings</string>
-    <string name="apps_two_pane_open_repo">Open repository</string>
-    <string name="apps_two_pane_installed_label">Installed</string>
-    <string name="apps_two_pane_latest_label">Latest</string>
-    <string name="apps_two_pane_pick_variant">Pick variant</string>
-    <string name="apps_two_pane_advanced_settings">Advanced settings</string>
+    <string name="apps_section_in_progress">In progress</string>
+    <string name="download_failed">Download failed</string>
     <string name="adaptive_pick_repo_title">Pick a repository</string>
     <string name="adaptive_pick_repo_subtitle">Tap any card on the left to view its details here.</string>
     <string name="translation_card_title">Translate</string>
@@ -1127,6 +1158,12 @@
     <string name="paper_night">Night</string>
     <string name="paper_nord">Nord</string>
     <string name="appearance_section_display">Display</string>
+    <string name="tweaks_accent_crimson">Crimson</string>
+    <string name="tweaks_accent_cobalt">Cobalt</string>
+    <string name="tweaks_accent_sun">Sun</string>
+    <string name="tweaks_accent_frost">Frost</string>
+    <string name="tweaks_accent_mono">Mono</string>
+    <string name="tweaks_accent_wallpaper">Wallpaper colors</string>
     <string name="auth_more_signin_options">More sign-in options</string>
     <string name="auth_hide_signin_options">Hide options</string>
     <string name="tweaks_sources_platforms_title">Discovery platforms</string>
@@ -1158,7 +1195,6 @@
     <string name="tweaks_install_method_desktop_empty_body">Silent installers and installer attribution are Android features. Desktop installs go through the OS package manager.</string>
     <string name="tweaks_stub_coming_soon_title">Coming in a follow-up</string>
     <string name="tweaks_stub_coming_soon_body">This screen is part of the in-progress redesign. The settings still work — they're just being moved here from the old layout.</string>
-    <string name="back_cd">Back</string>
     <string name="menubar_file_menu">File</string>
     <string name="menubar_go_menu">Go</string>
     <string name="menubar_file_quit">Quit</string>
@@ -1247,10 +1283,6 @@
     <string name="skipped_updates_unskip_action">Don't skip</string>
     <string name="skipped_updates_unskipped_snackbar">Update prompt enabled for %1$s</string>
     <string name="skipped_updates_unskip_failure">Couldn't update skip preference</string>
-    <string name="kao_banner_title">Keep Android Open</string>
-    <string name="kao_banner_body">Google's developer-verification policy threatens open Android distribution. Komi Store stands with the coalition.</string>
-    <string name="kao_banner_cta">Learn more</string>
-    <string name="kao_banner_dismiss_cd">Dismiss banner</string>
 
     <!-- Auto-translate -->
     <string name="translation_auto_title">Auto-translate repositories</string>
@@ -1275,7 +1307,9 @@
     <string name="host_tokens_action_add">Add token</string>
     <string name="host_tokens_action_delete">Delete</string>
     <string name="host_tokens_saved">Saved token for %1$s</string>
-    <string name="host_tokens_validation_failed">Validation failed: %1$s</string>
+    <string name="host_tokens_load_failed">Couldn't load saved tokens</string>
+    <string name="host_tokens_save_failed">Couldn't save token for %1$s</string>
+    <string name="host_tokens_delete_failed">Couldn't delete token for %1$s</string>
 
     <!-- Host tokens — picker / forge presets / inline feedback / undo -->
     <string name="host_tokens_picker_title">Add token for…</string>
@@ -1301,6 +1335,8 @@
     <string name="host_tokens_compose_replace_title">Replace token for %1$s</string>
     <string name="host_tokens_compose_add_title">Add token</string>
     <string name="host_tokens_validation_failed_fallback">unknown error</string>
+    <string name="host_tokens_validation_http">HTTP %1$d</string>
+    <string name="host_tokens_validation_unreachable">couldn't reach the server</string>
     <string name="host_tokens_undo_failed">Couldn't restore token for %1$s</string>
 
     <!-- Tweaks redesign (P14/P15/P16) -->
@@ -1442,8 +1478,8 @@
     <string name="repo_pages_severity_unknown">Unknown</string>
 
     <!-- Repo pages: details entry -->
-    <string name="repo_pages_details_issues_button">Issues</string>
     <string name="repo_pages_details_security_button">Security</string>
+    <string name="repo_pages_details_security_value">Advisories</string>
     <string name="repo_pages_details_pulls_button">Pull requests</string>
 
     <!-- Repo interactions: star -->
@@ -1489,7 +1525,7 @@
     <string name="feed_cd_profile">Profile</string>
     <string name="feed_platform_picker_title">Choose your OS</string>
     <string name="feed_platform_picker_title_jp">対応</string>
-    <string name="feed_platform_all">All Platforms</string>
+    <string name="feed_platform_all">All platforms</string>
     <string name="feed_loading">Loading the latest…</string>
     <string name="feed_empty_title">Nothing here yet</string>
     <string name="feed_empty_subtitle">No %1$s apps for %2$s yet.</string>
@@ -1505,4 +1541,14 @@
     <string name="feed_category_reading">Reading</string>
     <string name="feed_category_tools">Tools</string>
     <string name="cd_more_actions">More actions</string>
+    <string name="no_build_for_this_device">No build for this device</string>
+    <string name="newer_releases_no_build_for_device">Newer releases have no build for this device</string>
+    <string name="latest_for_platform">Latest for %1$s</string>
+    <string name="go_to_version">Go to %1$s</string>
+    <string name="get_it_on_platform">Get it on %1$s</string>
+    <string name="share_link">Share link</string>
+    <string name="display_mode_title">Refresh rate</string>
+    <string name="display_mode_description">Asks the display for a specific rate. Automatic leaves the system in charge.</string>
+    <string name="display_mode_auto">Automatic</string>
+    <string name="display_mode_option">%1$d × %2$d · %3$d Hz</string>
 </resources>

@@ -1,9 +1,9 @@
 package zed.rainxch.home.domain.repository
 
 import kotlinx.coroutines.flow.Flow
+import zed.rainxch.core.domain.model.account.github.GithubRepoSummary
 import zed.rainxch.core.domain.model.repository.DiscoveryPlatform
 import zed.rainxch.core.domain.model.repository.PaginatedDiscoveryRepositories
-import zed.rainxch.core.domain.model.account.github.GithubRepoSummary
 import zed.rainxch.home.domain.model.TopicCategory
 
 interface HomeRepository {

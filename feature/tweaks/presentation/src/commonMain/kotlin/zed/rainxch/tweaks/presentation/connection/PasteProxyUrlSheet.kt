@@ -8,9 +8,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.stringResource
 import zed.rainxch.core.presentation.components.buttons.KomiButton
 import zed.rainxch.core.presentation.components.buttons.KomiButtonVariant
@@ -103,17 +101,14 @@ fun PasteProxyUrlSheet(
         ) {
             KomiText(
                 text = stringResource(Res.string.tweaks_connection_paste_url_title),
-                role = KomiTextRole.Title,
-                fontWeight = FontWeight.SemiBold,
+                role = KomiTextRole.CardTitle,
                 color = colors.onSurface,
             )
 
             KomiText(
                 text = stringResource(Res.string.tweaks_connection_paste_url_body),
                 role = KomiTextRole.Body,
-                fontSize = 13.sp,
                 color = colors.onSurfaceVariant,
-                uppercase = false,
             )
 
             KomiTextField(

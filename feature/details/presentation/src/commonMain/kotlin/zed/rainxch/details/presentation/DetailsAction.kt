@@ -1,15 +1,23 @@
 package zed.rainxch.details.presentation
 
 import org.jetbrains.compose.resources.StringResource
-import zed.rainxch.core.domain.model.repository.DiscoveryPlatform
 import zed.rainxch.core.domain.model.account.github.GithubAsset
 import zed.rainxch.core.domain.model.account.github.GithubRelease
+import zed.rainxch.core.domain.model.repository.DiscoveryPlatform
 import zed.rainxch.details.domain.model.ReleaseCategory
 import zed.rainxch.details.presentation.model.TranslationTarget
 
 sealed interface DetailsAction {
     data class OnPlatformChipClick(
         val platform: DiscoveryPlatform,
+    ) : DetailsAction
+
+    data object OnJumpToDeviceBuild : DetailsAction
+
+    data object OnDismissPlatformHandoff : DetailsAction
+
+    data class OnShareAssetLink(
+        val assetUrl: String,
     ) : DetailsAction
 
     data object Retry : DetailsAction
@@ -22,17 +30,26 @@ sealed interface DetailsAction {
 
     data object OnDismissDowngradeWarning : DetailsAction
 
+    data object OnConfirmDowngradeInstall : DetailsAction
+
+    data object OnConfirmDowngradeUninstall : DetailsAction
+
     data object OnDismissSigningKeyWarning : DetailsAction
 
     data object OnOverrideSigningKeyWarning : DetailsAction
 
     data object UninstallApp : DetailsAction
+
     data object OnRequestUninstall : DetailsAction
+
     data object OnDismissUninstallConfirmation : DetailsAction
+
     data object OnConfirmUninstall : DetailsAction
 
     data object OnUnlinkExternalApp : DetailsAction
+
     data object OnDismissUnlinkConfirmation : DetailsAction
+
     data object OnConfirmUnlinkExternalApp : DetailsAction
 
     data class DownloadAsset(
@@ -41,7 +58,11 @@ sealed interface DetailsAction {
         val sizeBytes: Long,
     ) : DetailsAction
 
-    data object CancelCurrentDownload : DetailsAction
+    data object PauseDownload : DetailsAction
+
+    data object ResumeDownload : DetailsAction
+
+    data object DiscardDownload : DetailsAction
 
     data object OpenRepoInBrowser : DetailsAction
 
@@ -60,8 +81,6 @@ sealed interface DetailsAction {
     data object OpenWithExternalInstaller : DetailsAction
 
     data object DismissExternalInstallerPrompt : DetailsAction
-
-    data object OnToggleInstallDropdown : DetailsAction
 
     data object OnNavigateBackClick : DetailsAction
 
@@ -93,9 +112,13 @@ sealed interface DetailsAction {
 
     data object ToggleWhatsNewExpanded : DetailsAction
 
-    data class OnAboutMeasured(val heightPx: Float) : DetailsAction
+    data class OnAboutMeasured(
+        val heightPx: Float,
+    ) : DetailsAction
 
-    data class OnWhatsNewMeasured(val heightPx: Float) : DetailsAction
+    data class OnWhatsNewMeasured(
+        val heightPx: Float,
+    ) : DetailsAction
 
     data class TranslateAbout(
         val targetLanguageCode: String,
@@ -119,6 +142,10 @@ sealed interface DetailsAction {
         val release: GithubAsset,
     ) : DetailsAction
 
+    data class OnSelectInstalledApp(
+        val packageName: String,
+    ) : DetailsAction
+
     data object ToggleReleaseAssetsPicker : DetailsAction
 
     data object UnpinPreferredVariant : DetailsAction
@@ -135,7 +162,9 @@ sealed interface DetailsAction {
 
     data object OnAcknowledgeChannelChipCoachmark : DetailsAction
 
-    data class OnToggleShowAllPlatforms(val enabled: Boolean) : DetailsAction
+    data class OnToggleShowAllPlatforms(
+        val enabled: Boolean,
+    ) : DetailsAction
 
     data class OnDownloadForTransfer(
         val assetUrl: String,

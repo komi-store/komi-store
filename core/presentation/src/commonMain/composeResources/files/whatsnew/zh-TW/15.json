@@ -1,0 +1,33 @@
+{
+  "versionCode": 15,
+  "versionName": "1.8.0",
+  "releaseDate": "2026-05-01",
+  "showAsSheet": true,
+  "sections": [
+    {
+      "type": "NEW",
+      "bullets": [
+        "Komi Store 自有後端上線,登入、搜尋和發現在國內也能正常使用。",
+        "應用庫匯入:自動識別裝置上已安裝的 GitHub 來源應用。",
+        "下載鏡像系統:多源併發下載,SHA-256 完整性校驗全程把關。",
+        "OAuth 瀏覽器流程受限的網路下,可使用 Personal Access Token 登入。"
+      ]
+    },
+    {
+      "type": "IMPROVED",
+      "bullets": [
+        "應用內反饋:Bug 報告、功能建議、修改請求都可直接傳送。",
+        "詳情頁新增預釋出通道切換器,以及「切回穩定版」按鈕。",
+        "為 Arch Linux 提供原生 pkg.tar.zst 包,與 deb、rpm、AppImage 同步釋出。"
+      ]
+    },
+    {
+      "type": "FIXED",
+      "bullets": [
+        "修復 Linux Desktop 重啟後設定和應用庫被靜默清空的問題。",
+        "尊重使用者選擇的變體,所選變體不會再被靜默覆蓋。",
+        "升級 Compose Multiplatform 到 1.10.3,修復 macOS 輔助功能崩潰。"
+      ]
+    }
+  ]
+}

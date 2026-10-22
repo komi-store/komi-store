@@ -1,0 +1,12 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues/>
+  <CurrentIssues>
+    <ID>LongMethod:GithubStoreApp.kt$GithubStoreApp$private fun registerSelfAsInstalledApp()</ID>
+    <ID>MaxLineLength:GithubStoreApp.kt$GithubStoreApp$"Resolved self-update pending install: ${resolution.versionName} (code=${resolution.versionCode}, tag=${resolution.resolvedTag})"</ID>
+    <ID>NestedBlockDepth:GithubStoreApp.kt$GithubStoreApp$private suspend fun resolveSelfPendingInstall( existing: InstalledApp, repo: InstalledAppsRepository, )</ID>
+    <ID>ReturnCount:GithubStoreApp.kt$GithubStoreApp$private suspend fun normalizeSelfInstalledVersion( existing: InstalledApp, repo: InstalledAppsRepository, )</ID>
+    <ID>TooGenericExceptionCaught:GithubStoreApp.kt$GithubStoreApp$e: Exception</ID>
+    <ID>TooManyFunctions:GithubStoreApp.kt$GithubStoreApp : Application</ID>
+  </CurrentIssues>
+</SmellBaseline>

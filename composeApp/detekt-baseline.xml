@@ -1,0 +1,46 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues/>
+  <CurrentIssues>
+    <ID>CyclomaticComplexMethod:AppNavigation.kt$@Composable fun AppNavigation( navController: NavHostController, isScrollbarEnabled: Boolean, contentWidth: ContentWidth, )</ID>
+    <ID>CyclomaticComplexMethod:DeepLinkParser.kt$DeepLinkParser$fun parse(uri: String): DeepLinkDestination</ID>
+    <ID>CyclomaticComplexMethod:DeepLinkParser.kt$DeepLinkParser$private fun isStrictlyValidOwnerRepo( owner: String, repo: String, ): Boolean</ID>
+    <ID>CyclomaticComplexMethod:DeepLinkParser.kt$DeepLinkParser$private fun parseAuthCallback(uri: String): DeepLinkDestination</ID>
+    <ID>CyclomaticComplexMethod:DesktopApp.kt$fun main(args: Array&lt;String&gt;)</ID>
+    <ID>CyclomaticComplexMethod:DesktopSidebar.kt$@Composable fun DesktopSidebar( currentScreen: GithubStoreGraph?, onNavigate: (GithubStoreGraph) -&gt; Unit, rail: Boolean, unreadAnnouncementsCount: Int, modifier: Modifier = Modifier, )</ID>
+    <ID>CyclomaticComplexMethod:HandleDesktopToolbarDeeplinks.kt$@Composable fun HandleDesktopToolbarDeeplinks( deepLinkUris: ReceiveChannel&lt;String&gt;, onDeepLinkConsumed: () -&gt; Unit, navController: NavHostController, )</ID>
+    <ID>CyclomaticComplexMethod:Main.kt$@Composable fun App( deepLinkUri: String? = null, onDeepLinkConsumed: () -&gt; Unit = {}, onResolvedDarkTheme: (Boolean) -&gt; Unit = {}, onContentPainted: () -&gt; Unit = {}, )</ID>
+    <ID>CyclomaticComplexMethod:NavigationUtils.kt$fun NavBackStackEntry?.getCurrentScreen(): GithubStoreGraph?</ID>
+    <ID>FunctionNaming:WindowsDarkTitleBar.kt$DwmApi$fun DwmSetWindowAttribute( hwnd: WinDef.HWND, attribute: Int, value: IntByReference, size: Int, ): Int</ID>
+    <ID>FunctionNaming:WindowsDarkTitleBar.kt$DwmApi$fun DwmSetWindowAttribute( hwnd: WinDef.HWND, attribute: Int, value: WinDef.BOOLByReference, size: Int, ): Int</ID>
+    <ID>LongMethod:DeepLinkParser.kt$DeepLinkParser$fun parse(uri: String): DeepLinkDestination</ID>
+    <ID>LongMethod:DesktopApp.kt$fun main(args: Array&lt;String&gt;)</ID>
+    <ID>LongParameterList:MainViewModel.kt$MainViewModel$( private val tweaksRepository: TweaksRepository, private val installedAppsRepository: InstalledAppsRepository, private val userSessionRepository: UserSessionRepository, private val rateLimitRepository: RateLimitRepository, private val syncUseCase: SyncInstalledAppsUseCase, private val logger: KomiStoreLogger, private val localizationManager: LocalizationManager, )</ID>
+    <ID>MagicNumber:DeepLinkParser.kt$DeepLinkParser$100</ID>
+    <ID>MagicNumber:DeepLinkParser.kt$DeepLinkParser$16</ID>
+    <ID>MagicNumber:DeepLinkParser.kt$DeepLinkParser$256</ID>
+    <ID>MagicNumber:DeepLinkParser.kt$DeepLinkParser$3</ID>
+    <ID>MagicNumber:DeepLinkParser.kt$DeepLinkParser$39</ID>
+    <ID>MagicNumber:DeepLinkParser.kt$DeepLinkParser$64</ID>
+    <ID>MagicNumber:DesktopDeepLink.kt$DesktopDeepLink$50</ID>
+    <ID>MagicNumber:NavigationUtils.kt$3</ID>
+    <ID>MagicNumber:NavigationUtils.kt$4</ID>
+    <ID>MagicNumber:WindowsDarkTitleBar.kt$4</ID>
+    <ID>NestedBlockDepth:DeepLinkParser.kt$DeepLinkParser$private fun urlDecode(value: String): String</ID>
+    <ID>ReturnCount:DeepLinkParser.kt$DeepLinkParser$private fun extractQueryParam( uri: String, key: String, ): String?</ID>
+    <ID>ReturnCount:DeepLinkParser.kt$DeepLinkParser$private fun isStrictlyValidOwnerRepo( owner: String, repo: String, ): Boolean</ID>
+    <ID>ReturnCount:DeepLinkParser.kt$DeepLinkParser$private fun parseAuthCallback(uri: String): DeepLinkDestination</ID>
+    <ID>ReturnCount:DesktopApp.kt$private fun selectLinuxRenderBackendIfRequested()</ID>
+    <ID>ReturnCount:DesktopDeepLink.kt$DesktopDeepLink$private fun registerWindows()</ID>
+    <ID>ReturnCount:DesktopDeepLink.kt$DesktopDeepLink$private fun windowsRegistrationIsValid(expectedCommandValue: String): Boolean</ID>
+    <ID>ReturnCount:NavigationUtils.kt$fun NavBackStackEntry?.getCurrentScreen(): GithubStoreGraph?</ID>
+    <ID>ReturnCount:WindowStateStore.kt$WindowStateStore$private fun isTitleBarVisible( x: Float, y: Float, width: Float, height: Float, ): Boolean</ID>
+    <ID>ReturnCount:WindowsDarkTitleBar.kt$fun applyWindowsImmersiveDarkMode( window: Window, isDark: Boolean, )</ID>
+    <ID>TooGenericExceptionCaught:A11yCrashGuard.kt$A11yCrashGuard.FilteringEventQueue$ex: RuntimeException</ID>
+    <ID>TooGenericExceptionCaught:DesktopDeepLink.kt$DesktopDeepLink$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:MainViewModel.kt$MainViewModel$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:WhatsNewLoaderImpl.kt$WhatsNewLoaderImpl$t: Throwable</ID>
+    <ID>TooManyFunctions:DesktopDeepLink.kt$DesktopDeepLink</ID>
+    <ID>TooManyFunctions:DesktopSidebar.kt$zed.rainxch.githubstore.app.navigation.DesktopSidebar.kt</ID>
+  </CurrentIssues>
+</SmellBaseline>

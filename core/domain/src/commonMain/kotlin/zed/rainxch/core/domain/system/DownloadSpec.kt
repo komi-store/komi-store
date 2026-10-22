@@ -3,18 +3,16 @@ package zed.rainxch.core.domain.system
 import zed.rainxch.core.domain.model.account.github.GithubAsset
 
 data class DownloadSpec(
-
     val packageName: String,
-
     val repoOwner: String,
-
     val repoName: String,
-
+    val repoId: Long? = null,
+    val sourceHost: String? = null,
+    val repoOwnerAvatarUrl: String? = null,
+    val repoDescription: String? = null,
     val asset: GithubAsset,
-
     val displayAppName: String,
-
     val installPolicy: InstallPolicy,
-
     val releaseTag: String,
+    val releaseId: Long? = null,
 )

@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import org.jetbrains.compose.resources.getString
+import zed.rainxch.core.presentation.utils.toUserMessage
 import zed.rainxch.githubstore.core.presentation.res.Res
 import zed.rainxch.githubstore.core.presentation.res.failed_to_load
 import zed.rainxch.repopages.domain.model.IssueState
@@ -74,7 +74,8 @@ class PullsViewModel(
             _state.update {
                 if (append) it.copy(isLoadingMore = true) else it.copy(isLoading = true, errorMessage = null)
             }
-            repository.getPullRequests(owner, repo, filter, page)
+            repository
+                .getPullRequests(owner, repo, filter, page)
                 .onSuccess { newPulls ->
                     if (generation != requestGeneration) return@onSuccess
                     _state.update { st ->
@@ -88,14 +89,13 @@ class PullsViewModel(
                             errorMessage = null,
                         )
                     }
-                }
-                .onFailure { e ->
+                }.onFailure { e ->
                     if (generation != requestGeneration) return@onFailure
                     _state.update {
                         it.copy(
                             isLoading = false,
                             isLoadingMore = false,
-                            errorMessage = e.message ?: getString(Res.string.failed_to_load),
+                            errorMessage = e.toUserMessage(Res.string.failed_to_load),
                         )
                     }
                 }

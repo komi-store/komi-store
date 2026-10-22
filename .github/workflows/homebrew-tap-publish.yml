@@ -9,6 +9,9 @@ on:
         description: 'Release tag (e.g. v1.8.3)'
         required: true
 
+permissions:
+  contents: read
+
 jobs:
   update-cask:
     name: Update Homebrew Cask
@@ -43,8 +46,8 @@ jobs:
         run: |
           set -euo pipefail
           BASE="https://github.com/${REPO}/releases/download/${TAG}"
-          curl -fSL -o arm64.dmg "${BASE}/GitHub-Store-${VERSION}-arm64.dmg"
-          curl -fSL -o x64.dmg   "${BASE}/GitHub-Store-${VERSION}-x64.dmg"
+          curl -fSL -o arm64.dmg "${BASE}/Komi-Store-${VERSION}-arm64.dmg"
+          curl -fSL -o x64.dmg   "${BASE}/Komi-Store-${VERSION}-x64.dmg"
           ls -la *.dmg
 
       - name: Compute SHA256
@@ -59,9 +62,9 @@ jobs:
           echo "x64=$SHA_X64"
 
       - name: Checkout tap repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          repository: OpenHub-Store/homebrew-tap
+          repository: komi-store/homebrew-komi-store
           token: ${{ secrets.HOMEBREW_TAP_TOKEN }}
           path: homebrew-tap
 
@@ -74,7 +77,7 @@ jobs:
         run: |
           python3 - <<'EOF'
           import os, re, sys
-          path = "Casks/github-store.rb"
+          path = "Casks/komi-store.rb"
           version = os.environ["NEW_VERSION"]
           sha_arm = os.environ["NEW_SHA_ARM"]
           sha_intel = os.environ["NEW_SHA_INTEL"]
@@ -110,10 +113,10 @@ jobs:
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add Casks/github-store.rb
+          git add Casks/komi-store.rb
           if git diff --cached --quiet; then
             echo "Cask already up to date"
             exit 0
           fi
-          git commit -m "Bump github-store to ${VERSION}"
+          git commit -m "Bump komi-store to ${VERSION}"
           git push

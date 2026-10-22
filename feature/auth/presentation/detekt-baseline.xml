@@ -1,0 +1,25 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues/>
+  <CurrentIssues>
+    <ID>CyclomaticComplexMethod:AuthenticationViewModel.kt$AuthenticationViewModel$fun onAction(action: AuthenticationAction)</ID>
+    <ID>LargeClass:AuthenticationViewModel.kt$AuthenticationViewModel : ViewModel</ID>
+    <ID>LongMethod:AuthenticationViewModel.kt$AuthenticationViewModel$fun onAction(action: AuthenticationAction)</ID>
+    <ID>LongMethod:AuthenticationViewModel.kt$AuthenticationViewModel$private fun consumeAuthHandoff( handoffId: String, state: String, )</ID>
+    <ID>LongMethod:AuthenticationViewModel.kt$AuthenticationViewModel$private fun startLogin()</ID>
+    <ID>LongMethod:AuthenticationViewModel.kt$AuthenticationViewModel$private fun submitPat()</ID>
+    <ID>LongMethod:AuthenticationViewModel.kt$AuthenticationViewModel$private suspend fun doPoll(deviceCode: String)</ID>
+    <ID>MagicNumber:AuthenticationViewModel.kt$AuthenticationViewModel$1000</ID>
+    <ID>MagicNumber:AuthenticationViewModel.kt$AuthenticationViewModel$1000L</ID>
+    <ID>MagicNumber:AuthenticationViewModel.kt$AuthenticationViewModel$5</ID>
+    <ID>MagicNumber:AuthenticationViewModel.kt$AuthenticationViewModel$5000L</ID>
+    <ID>MagicNumber:AuthenticationViewModel.kt$AuthenticationViewModel$60</ID>
+    <ID>MagicNumber:AuthenticationViewModel.kt$AuthenticationViewModel$8</ID>
+    <ID>ReturnCount:AuthenticationViewModel.kt$AuthenticationViewModel$private fun restoreFromSavedState()</ID>
+    <ID>ReturnCount:AuthenticationViewModel.kt$AuthenticationViewModel$private fun tryPollIfReady()</ID>
+    <ID>TooGenericExceptionCaught:AuthenticationViewModel.kt$AuthenticationViewModel$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:AuthenticationViewModel.kt$AuthenticationViewModel$t: Throwable</ID>
+    <ID>TooManyFunctions:AuthenticationRoot.kt$zed.rainxch.auth.presentation.AuthenticationRoot.kt</ID>
+    <ID>TooManyFunctions:AuthenticationViewModel.kt$AuthenticationViewModel : ViewModel</ID>
+  </CurrentIssues>
+</SmellBaseline>

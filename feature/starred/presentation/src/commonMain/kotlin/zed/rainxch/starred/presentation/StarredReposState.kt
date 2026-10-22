@@ -16,4 +16,6 @@ data class StarredReposState(
     val isAuthenticated: Boolean = false,
     val searchQuery: String = "",
     val sortRule: StarredSortRule = StarredSortRule.RecentlyStarred,
+    val showAllStarred: Boolean = false,
+    val notInstallableCount: Int = 0,
 )

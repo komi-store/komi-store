@@ -8,9 +8,8 @@ fun NavBackStackEntry?.bottomNavIndex(): Int? {
     return when {
         route.contains("ExploreScreen") -> 0
         route.contains("ChartsScreen") -> 1
-        route.contains("SearchScreen") -> 2
-        route.contains("AppsScreen") -> 3
-        route.contains("ProfileScreen") -> 4
+        route.contains("AppsScreen") -> 2
+        route.contains("ProfileScreen") -> 3
         else -> null
     }
 }

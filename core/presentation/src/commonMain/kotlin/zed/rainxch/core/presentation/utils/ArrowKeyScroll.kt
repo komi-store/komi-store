@@ -4,6 +4,7 @@ import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.gestures.animateScrollBy
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -46,6 +47,26 @@ fun Modifier.arrowKeyScroll(
 @Composable
 fun Modifier.arrowKeyScroll(
     gridState: LazyStaggeredGridState,
+    autoFocus: Boolean = false,
+): Modifier =
+    arrowKeyScrollInternal(
+        autoFocus = autoFocus,
+        scrollBy = { delta -> gridState.animateScrollBy(delta) },
+        pageSize = {
+            gridState.layoutInfo.viewportSize.height
+                .toFloat()
+        },
+        scrollToTop = { gridState.animateScrollToItem(0) },
+        scrollToBottom = {
+            val last = (gridState.layoutInfo.totalItemsCount - 1).coerceAtLeast(0)
+            gridState.animateScrollToItem(last)
+            gridState.animateScrollBy(Float.MAX_VALUE)
+        },
+    )
+
+@Composable
+fun Modifier.arrowKeyScroll(
+    gridState: LazyGridState,
     autoFocus: Boolean = false,
 ): Modifier =
     arrowKeyScrollInternal(

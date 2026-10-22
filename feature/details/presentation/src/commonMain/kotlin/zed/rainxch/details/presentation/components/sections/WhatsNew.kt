@@ -30,13 +30,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.intellij.markdown.flavours.gfm.GFMFlavourDescriptor
+import org.intellij.markdown.parser.CancellationToken
 import org.intellij.markdown.parser.MarkdownParser
 import org.jetbrains.compose.resources.stringResource
 import zed.rainxch.core.domain.model.account.github.GithubRelease
@@ -49,6 +48,7 @@ import zed.rainxch.core.presentation.components.markdown.rememberMarkdownTypogra
 import zed.rainxch.core.presentation.components.text.KomiText
 import zed.rainxch.core.presentation.components.text.KomiTextRole
 import zed.rainxch.core.presentation.locals.LocalPersonality
+import zed.rainxch.core.presentation.utils.formatIsoDateOrRaw
 import zed.rainxch.githubstore.core.presentation.res.*
 
 fun LazyListScope.whatsNew(
@@ -72,11 +72,8 @@ fun LazyListScope.whatsNew(
         ) {
             KomiText(
                 text = stringResource(Res.string.whats_new),
-                role = KomiTextRole.Title,
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 22.sp,
+                role = KomiTextRole.SectionTitle,
                 color = colors.onBackground,
-                uppercase = false,
             )
         }
 
@@ -95,21 +92,17 @@ fun LazyListScope.whatsNew(
         ) {
             KomiText(
                 text = release.tagName,
-                role = KomiTextRole.Title,
-                fontWeight = FontWeight.SemiBold,
+                role = KomiTextRole.CardTitle,
                 color = colors.primary,
                 maxLines = 1,
                 overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
                 modifier = Modifier.weight(1f),
-                uppercase = false,
             )
             KomiText(
-                text = release.publishedAt.take(10),
-                role = KomiTextRole.Label,
-                fontSize = 12.sp,
+                text = formatIsoDateOrRaw(release.publishedAt),
+                role = KomiTextRole.Caption,
                 color = colors.onSurfaceVariant,
                 maxLines = 1,
-                uppercase = false,
             )
         }
     }
@@ -157,7 +150,7 @@ private fun ExpandableMarkdownContent(
     val colors = rememberMarkdownColors()
     val typography = rememberMarkdownTypography()
     val flavour = remember { GFMFlavourDescriptor() }
-    val parser = remember(flavour) { MarkdownParser(flavour) }
+    val parser = remember(flavour) { MarkdownParser(flavour, cancellationToken = CancellationToken.NonCancellable) }
     val probeClient = org.koin.compose.koinInject<io.ktor.client.HttpClient>(
         qualifier = org.koin.core.qualifier.named("test"),
     )
@@ -254,10 +247,8 @@ private fun ExpandableMarkdownContent(
                     } else {
                         stringResource(Res.string.read_more)
                     },
-                    role = KomiTextRole.Title,
-                    fontWeight = FontWeight.Bold,
+                    role = KomiTextRole.CardTitle,
                     color = personalityColors.surface,
-                    uppercase = false,
                 )
                 if (!isExpanded) {
                     KomiIcon(

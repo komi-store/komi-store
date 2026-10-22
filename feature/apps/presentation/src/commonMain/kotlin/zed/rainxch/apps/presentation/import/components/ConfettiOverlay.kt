@@ -2,7 +2,6 @@ package zed.rainxch.apps.presentation.import.components
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
@@ -18,10 +17,10 @@ import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.zIndex
-import kotlin.math.min
-import kotlin.random.Random
 import zed.rainxch.apps.presentation.import.util.LocalReducedMotion
 import zed.rainxch.core.presentation.locals.LocalPersonality
+import kotlin.math.min
+import kotlin.random.Random
 
 private data class Particle(
     val xFraction: Float,
@@ -41,51 +40,56 @@ fun ConfettiOverlay(
     if (!enabled || reducedMotion) return
 
     val colors = LocalPersonality.current.colors
-    val palette = listOf(
-        colors.primary,
-        colors.primary,
-        colors.primary,
-        colors.primaryContainer,
-        colors.error,
-    )
+    val palette =
+        listOf(
+            colors.primary,
+            colors.primary,
+            colors.primary,
+            colors.primaryContainer,
+            colors.error,
+        )
 
-    val particles = remember(palette) {
-        val rng = Random(42)
-        List(40) { index ->
+    val particles =
+        remember(palette) {
+            val rng = Random(42)
+            List(40) { index ->
 
-            val color = when {
-                index % 7 == 6 -> palette[4]
-                index % 5 == 0 -> palette[3]
-                else -> palette[index % 3]
+                val color =
+                    when {
+                        index % 7 == 6 -> palette[4]
+                        index % 5 == 0 -> palette[3]
+                        else -> palette[index % 3]
+                    }
+                Particle(
+                    xFraction = rng.nextFloat(),
+                    fallSpeed = 0.7f + rng.nextFloat() * 0.6f,
+                    rotationSpeed = (rng.nextFloat() - 0.5f) * 360f,
+                    rotationOffset = rng.nextFloat() * 360f,
+                    radiusPx = 6f + rng.nextFloat() * 6f,
+                    color = color,
+                )
             }
-            Particle(
-                xFraction = rng.nextFloat(),
-                fallSpeed = 0.7f + rng.nextFloat() * 0.6f,
-                rotationSpeed = (rng.nextFloat() - 0.5f) * 360f,
-                rotationOffset = rng.nextFloat() * 360f,
-                radiusPx = 6f + rng.nextFloat() * 6f,
-                color = color,
-            )
         }
-    }
 
     val progress = remember { Animatable(0f) }
     var size by remember { mutableStateOf(IntSize.Zero) }
 
+    val motion = LocalPersonality.current.motion
     LaunchedEffect(Unit) {
         progress.animateTo(
             targetValue = 1f,
-            animationSpec = tween(durationMillis = 1500, easing = LinearEasing),
+            animationSpec = motion.ambient(easing = LinearEasing),
         )
     }
 
     if (progress.value >= 1f) return
 
     Canvas(
-        modifier = modifier
-            .fillMaxSize()
-            .zIndex(1f)
-            .onSizeChanged { size = it },
+        modifier =
+            modifier
+                .fillMaxSize()
+                .zIndex(1f)
+                .onSizeChanged { size = it },
     ) {
         if (size.width == 0 || size.height == 0) return@Canvas
         val width = size.width.toFloat()

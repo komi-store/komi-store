@@ -23,6 +23,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Check
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.WideNavigationRailItem
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -35,10 +38,8 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
@@ -84,6 +85,9 @@ private val SidebarPlatforms =
         DiscoveryPlatform.Linux,
     )
 
+// Material's collapsed wide rail, wide enough for a label under each icon.
+private val ClassicRailWidth = 96.dp
+
 @Composable
 fun DesktopSidebar(
     currentScreen: GithubStoreGraph?,
@@ -113,8 +117,13 @@ fun DesktopSidebar(
     Column(
         modifier =
             modifier
-                .width(if (rail) 62.dp else 216.dp)
-                .fillMaxHeight()
+                .width(
+                    when {
+                        !rail -> 216.dp
+                        isManga -> 62.dp
+                        else -> ClassicRailWidth
+                    },
+                ).fillMaxHeight()
                 .background(colors.surface)
                 .drawBehind {
                     val w = (if (isManga) 3.dp else 1.dp).toPx()
@@ -222,19 +231,15 @@ private fun SidebarSideHeading(
         ) {
             KomiText(
                 text = title,
-                role = KomiTextRole.Label,
+                role = KomiTextRole.Overline,
                 color = colors.onSurfaceVariant,
-                fontSize = 11.sp,
-                fontWeight = FontWeight.W800,
                 maxLines = 1,
             )
             if (LocalPersonality.current.usesDecor) {
                 KomiText(
                     text = jp,
-                    role = KomiTextRole.Label,
-                    color = colors.onSurfaceVariant.copy(alpha = 0.7f),
-                    fontSize = 9.5.sp,
-                    uppercase = false,
+                    role = KomiTextRole.Caption,
+                    color = colors.onSurfaceVariant,
                     maxLines = 1,
                 )
             }
@@ -254,6 +259,10 @@ private fun SidebarNavRow(
 ) {
     val colors = LocalPersonality.current.colors
     val isManga = LocalPersonality.current is MangaPersonality
+    if (!isManga) {
+        ClassicNavRow(label = label, icon = icon, selected = selected, rail = rail, badgeCount = badgeCount, onClick = onClick)
+        return
+    }
     val shape = RoundedCornerShape(LocalPersonality.current.shape.cornerSmall)
     val fg = if (selected) colors.onPrimary else colors.onSurface
 
@@ -296,23 +305,48 @@ private fun SidebarNavRow(
                 text = label,
                 role = KomiTextRole.Label,
                 color = fg,
-                fontSize = 14.sp,
-                fontWeight = FontWeight.W800,
                 maxLines = 1,
                 modifier = Modifier.weight(1f),
             )
             kicker?.takeIf { LocalPersonality.current.usesDecor }?.let {
                 KomiText(
                     text = it,
-                    role = KomiTextRole.Label,
+                    role = KomiTextRole.Caption,
                     color = fg.copy(alpha = 0.8f),
-                    fontSize = 9.5.sp,
-                    uppercase = false,
                     maxLines = 1,
                 )
             }
         }
     }
+}
+
+// Material 3 Expressive's wide rail item: a pill behind the selected icon, the label under the
+// icon when the rail is collapsed and beside it when expanded.
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+private fun ClassicNavRow(
+    label: String,
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    selected: Boolean,
+    rail: Boolean,
+    badgeCount: Int,
+    onClick: () -> Unit,
+) {
+    WideNavigationRailItem(
+        selected = selected,
+        onClick = onClick,
+        icon = { NavIcon(icon, LocalContentColor.current, badgeCount) },
+        label = {
+            KomiText(
+                text = label,
+                role = if (rail) KomiTextRole.LabelSmall else KomiTextRole.Label,
+                color = LocalContentColor.current,
+                maxLines = 1,
+            )
+        },
+        railExpanded = !rail,
+        modifier = Modifier.fillMaxWidth(),
+    )
 }
 
 @Composable
@@ -391,10 +425,8 @@ private fun SidebarPlatformRow(
             } else {
                 KomiText(
                     text = label,
-                    role = KomiTextRole.Label,
+                    role = KomiTextRole.Overline,
                     color = colors.onSurface,
-                    fontSize = 9.sp,
-                    fontWeight = FontWeight.W800,
                     maxLines = 1,
                 )
             }
@@ -426,9 +458,6 @@ private fun SidebarPlatformRow(
                 text = label,
                 role = KomiTextRole.Label,
                 color = colors.onSurface,
-                fontSize = 12.5.sp,
-                fontWeight = if (selected) FontWeight.W900 else FontWeight.W700,
-                uppercase = false,
                 maxLines = 1,
             )
         }
@@ -488,9 +517,6 @@ private fun SidebarCategoryRow(
                 text = stringResource(category.sidebarLabelRes()),
                 role = KomiTextRole.Label,
                 color = if (selected) colors.onSurface else colors.onSurfaceVariant,
-                fontSize = 12.5.sp,
-                fontWeight = if (selected) FontWeight.W900 else FontWeight.W700,
-                uppercase = false,
                 maxLines = 1,
             )
         }

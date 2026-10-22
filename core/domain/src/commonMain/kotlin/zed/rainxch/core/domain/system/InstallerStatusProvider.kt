@@ -11,6 +11,8 @@ interface InstallerStatusProvider {
     val rootAvailability: StateFlow<RootAvailability>
 
     fun requestShizukuPermission()
+
     fun requestDhizukuPermission()
+
     fun requestRootPermission()
 }

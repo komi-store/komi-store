@@ -1,0 +1,13 @@
+[Desktop Entry]
+Type=Application
+Name=Komi Store
+GenericName=App Store for Open-Source Releases
+Comment=Browse and download apps from GitHub, Codeberg, and Forgejo releases
+Icon=com.kurikomi.komistore
+Exec=komistore %u
+Terminal=false
+StartupNotify=true
+Categories=Development;PackageManager;
+Keywords=GitHub;Codeberg;Forgejo;Apps;Releases;APK;Store;
+StartupWMClass=zed-rainxch-githubstore-DesktopAppKt
+MimeType=x-scheme-handler/githubstore;

@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -21,31 +22,30 @@ import androidx.compose.material.icons.outlined.Download
 import androidx.compose.material.icons.outlined.Schedule
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
-import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.ColorMatrix
-import zed.rainxch.core.presentation.components.GitHubStoreImage
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.ColorMatrix
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
+import zed.rainxch.core.domain.model.repository.DiscoveryPlatform
+import zed.rainxch.core.presentation.components.GitHubStoreImage
 import zed.rainxch.core.presentation.components.chips.KomiChip
 import zed.rainxch.core.presentation.components.chips.KomiChipKind
 import zed.rainxch.core.presentation.components.chips.KomiChipSize
-import zed.rainxch.core.domain.model.repository.DiscoveryPlatform
-import zed.rainxch.core.presentation.utils.formatReleasedAgo
-import zed.rainxch.core.presentation.utils.toLabel
 import zed.rainxch.core.presentation.components.surfaces.KomiScreentone
 import zed.rainxch.core.presentation.components.surfaces.KomiSurface
 import zed.rainxch.core.presentation.components.surfaces.KomiSurfaceElevation
@@ -64,7 +64,9 @@ import zed.rainxch.core.presentation.personality.mangaPersonality
 import zed.rainxch.core.presentation.personality.model.PersonalityColors
 import zed.rainxch.core.presentation.personality.utils.PersonalityPreview
 import zed.rainxch.core.presentation.spacing.Spacing
+import zed.rainxch.core.presentation.utils.formatReleasedAgo
 import zed.rainxch.core.presentation.utils.toIcon
+import zed.rainxch.core.presentation.utils.toLabel
 import kotlin.math.roundToInt
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -118,15 +120,15 @@ fun KomiRepoCard(
                 CardIconTile(
                     monogram = monogram ?: name.take(2),
                     imageUrl = imageUrl,
-                    size = if (compact) 52.dp else 60.dp,
-                    colors = colors
+                    size = if (compact) 40.dp else 60.dp,
+                    colors = colors,
                 )
                 Column(modifier = Modifier.weight(1f)) {
                     KomiText(
                         text = name,
-                        role = KomiTextRole.Title,
+                        role = KomiTextRole.CardTitle,
                         maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
+                        overflow = TextOverflow.Ellipsis,
                     )
                     Row(
                         modifier = Modifier.padding(top = 5.dp),
@@ -135,76 +137,103 @@ fun KomiRepoCard(
                     ) {
                         KomiText(
                             text = "@$owner",
-                            role = KomiTextRole.Body,
+                            role = KomiTextRole.Caption,
                             color = colors.onSurfaceVariant,
-                            fontSize = 12.sp,
-                            fontWeight = FontWeight.W600,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
                             modifier = Modifier.weight(1f, fill = false),
                         )
-                        Diamond(color = colors.onSurfaceVariant)
-                        KomiText(
-                            text = language,
-                            role = KomiTextRole.Body,
-                            color = colors.onSurface,
-                            fontSize = 12.sp,
-                            fontWeight = FontWeight.W800,
-                            maxLines = 1,
-                        )
+                        if (!compact) {
+                            Diamond(color = colors.onSurfaceVariant)
+                            KomiText(
+                                text = language,
+                                role = KomiTextRole.Caption,
+                                color = colors.onSurfaceVariant,
+                                maxLines = 1,
+                            )
+                        }
                     }
                 }
-                CardBadge(
-                    feed = feed,
-                    rank = rank,
-                    dailyStars = dailyStars,
-                    version = version,
-                    releasedAgoDays = releasedAgoDays,
-                    colors = colors,
-                )
+                if (!compact) {
+                    CardBadge(
+                        feed = feed,
+                        rank = rank,
+                        dailyStars = dailyStars,
+                        version = version,
+                        releasedAgoDays = releasedAgoDays,
+                        colors = colors,
+                    )
+                }
             }
 
             KomiText(
                 text = description,
                 role = KomiTextRole.Body,
                 color = colors.onSurface,
-                fontSize = 13.5.sp,
-                fontWeight = FontWeight.W500,
-                maxLines = if (compact) 1 else 2,
+                maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.padding(top = gap),
             )
 
-            FlowRow(
-                modifier = Modifier.padding(top = gap),
-                horizontalArrangement = Arrangement.spacedBy(7.dp),
-                verticalArrangement = Arrangement.spacedBy(7.dp),
-            ) {
-                platforms.forEach { platform ->
-                    KomiChip(
-                        label = platform.toLabel(),
-                        kind = KomiChipKind.Info,
-                        size = if (compact) KomiChipSize.Sm else KomiChipSize.Md,
-                        leadingContent = {
-                            Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                                platform.toIcon()?.let { icon ->
-                                    Icon(
-                                        imageVector = icon,
-                                        contentDescription = null,
-                                        modifier = Modifier.size(14.dp),
-                                        tint = colors.onSurface,
-                                    )
-                                }
-                            }
-                        },
+            if (compact && (platforms.isNotEmpty() || feed != KomiRepoCardFeed.Plain)) {
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(top = gap),
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    platforms.forEach { platform ->
+                        platform.toIcon()?.let { icon ->
+                            Icon(
+                                imageVector = icon,
+                                contentDescription = platform.toLabel(),
+                                modifier = Modifier.size(16.dp),
+                                tint = colors.onSurfaceVariant,
+                            )
+                        }
+                    }
+                    // A narrow grid card has no room for the chart badge beside the name.
+                    Spacer(Modifier.weight(1f))
+                    CardBadge(
+                        feed = feed,
+                        rank = rank,
+                        dailyStars = dailyStars,
+                        version = version,
+                        releasedAgoDays = releasedAgoDays,
+                        colors = colors,
                     )
+                }
+            } else if (platforms.isNotEmpty()) {
+                FlowRow(
+                    modifier = Modifier.padding(top = gap),
+                    horizontalArrangement = Arrangement.spacedBy(7.dp),
+                    verticalArrangement = Arrangement.spacedBy(7.dp),
+                ) {
+                    platforms.forEach { platform ->
+                        KomiChip(
+                            label = platform.toLabel(),
+                            kind = KomiChipKind.Info,
+                            size = KomiChipSize.Md,
+                            leadingContent = {
+                                Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                                    platform.toIcon()?.let { icon ->
+                                        Icon(
+                                            imageVector = icon,
+                                            contentDescription = null,
+                                            modifier = Modifier.size(14.dp),
+                                            tint = colors.onSurface,
+                                        )
+                                    }
+                                }
+                            },
+                        )
+                    }
                 }
             }
 
             HorizontalDivider(
                 modifier = Modifier.padding(top = if (compact) 9.dp else 12.dp),
                 thickness = 2.dp,
-                color = colors.outline.copy(alpha = 0.3f),
+                color = colors.divider,
             )
             Row(
                 modifier = Modifier.fillMaxWidth().padding(top = if (compact) 9.dp else 11.dp),
@@ -212,35 +241,40 @@ fun KomiRepoCard(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Row(
-                    horizontalArrangement = Arrangement.spacedBy(13.dp),
-                    verticalAlignment = Alignment.CenterVertically
+                    horizontalArrangement = Arrangement.spacedBy(if (compact) 8.dp else 13.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.weight(1f, fill = false),
                 ) {
                     Stat(
                         icon = Icons.Filled.Star,
                         value = fmtCompact(stars),
                         colors = colors,
-                        hero = true
+                        hero = true,
                     )
                     Stat(
                         icon = Icons.Outlined.Download,
                         value = fmtCompact(downloads),
-                        colors = colors
+                        colors = colors,
                     )
-                    formatReleasedAgo(releasedAt)?.let { ago ->
-                        Stat(
-                            icon = Icons.Outlined.Schedule,
-                            value = ago,
-                            colors = colors
-                        )
+                    if (!compact) {
+                        formatReleasedAgo(releasedAt)?.let { ago ->
+                            Stat(
+                                icon = Icons.Outlined.Schedule,
+                                value = ago,
+                                colors = colors,
+                            )
+                        }
                     }
                 }
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    KomiText(
-                        text = "Read",
-                        role = KomiTextRole.Label,
-                        color = colors.onSurface,
-                        fontSize = 12.5.sp
-                    )
+                    if (!compact) {
+                        KomiText(
+                            text = "Read",
+                            role = KomiTextRole.LabelSmall,
+                            color = colors.onSurface,
+                            modifier = Modifier.padding(end = 2.dp),
+                        )
+                    }
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
                         contentDescription = null,
@@ -266,10 +300,26 @@ private fun inkAvatarFilter(dark: Boolean): ColorFilter {
     return ColorFilter.colorMatrix(
         ColorMatrix(
             floatArrayOf(
-                cb * (lr * keep + saturation), cb * (lg * keep), cb * (lb * keep), 0f, t,
-                cb * (lr * keep), cb * (lg * keep + saturation), cb * (lb * keep), 0f, t,
-                cb * (lr * keep), cb * (lg * keep), cb * (lb * keep + saturation), 0f, t,
-                0f, 0f, 0f, 1f, 0f,
+                cb * (lr * keep + saturation),
+                cb * (lg * keep),
+                cb * (lb * keep),
+                0f,
+                t,
+                cb * (lr * keep),
+                cb * (lg * keep + saturation),
+                cb * (lb * keep),
+                0f,
+                t,
+                cb * (lr * keep),
+                cb * (lg * keep),
+                cb * (lb * keep + saturation),
+                0f,
+                t,
+                0f,
+                0f,
+                0f,
+                1f,
+                0f,
             ),
         ),
     )
@@ -287,7 +337,7 @@ private fun CardIconTile(
 ) {
     val hasImage = !imageUrl.isNullOrBlank()
     when (LocalPersonality.current) {
-        is MangaPersonality ->
+        is MangaPersonality -> {
             Box(
                 modifier =
                     Modifier
@@ -319,17 +369,12 @@ private fun CardIconTile(
                         colorFilter = if (colors.isDark) InkAvatarFilterNight else InkAvatarFilterDay,
                     )
                 } else {
-                    KomiText(
-                        text = monogram.uppercase(),
-                        role = KomiTextRole.Title,
-                        color = colors.onSurface,
-                        fontSize = (size.value * 0.46f).sp,
-                        maxLines = 1,
-                    )
+                    MonogramText(monogram = monogram, color = colors.onSurface, fontSize = (size.value * 0.46f).sp)
                 }
             }
+        }
 
-        is ClassicPersonality ->
+        is ClassicPersonality -> {
             Box(
                 modifier =
                     Modifier
@@ -344,15 +389,10 @@ private fun CardIconTile(
                         modifier = Modifier.matchParentSize(),
                     )
                 } else {
-                    KomiText(
-                        text = monogram.uppercase(),
-                        role = KomiTextRole.Title,
-                        color = colors.onSurface,
-                        fontSize = (size.value * 0.42f).sp,
-                        maxLines = 1,
-                    )
+                    MonogramText(monogram = monogram, color = colors.onSurface, fontSize = (size.value * 0.42f).sp)
                 }
             }
+        }
     }
 }
 
@@ -367,30 +407,39 @@ private fun CardBadge(
 ) {
     if (feed == KomiRepoCardFeed.Plain) return
     when (LocalPersonality.current) {
-        is MangaPersonality ->
+        is MangaPersonality -> {
             when (feed) {
-                KomiRepoCardFeed.Popular -> RankStamp(rank = rank, colors = colors)
-                KomiRepoCardFeed.Trending -> if (dailyStars > 0) {
-                    BurstBadge(text = "+${fmtCompact(dailyStars)}", colors = colors)
+                KomiRepoCardFeed.Popular -> {
+                    RankStamp(rank = rank, colors = colors)
                 }
 
-                KomiRepoCardFeed.Release -> NewReleaseStamp(
-                    version = version,
-                    showStamp = releasedAgoDays <= 7,
-                    colors = colors
-                )
+                KomiRepoCardFeed.Trending -> {
+                    if (dailyStars > 0) {
+                        BurstBadge(text = "+${fmtCompact(dailyStars)}", colors = colors)
+                    }
+                }
 
-                KomiRepoCardFeed.Plain -> Unit
+                KomiRepoCardFeed.Release -> {
+                    NewReleaseStamp(
+                        version = version,
+                        showStamp = releasedAgoDays <= 7,
+                        colors = colors,
+                    )
+                }
+
+                KomiRepoCardFeed.Plain -> {}
             }
+        }
 
-        is ClassicPersonality ->
+        is ClassicPersonality -> {
             ClassicBadge(
                 feed = feed,
                 rank = rank,
                 dailyStars = dailyStars,
                 releasedAgoDays = releasedAgoDays,
-                colors = colors
+                colors = colors,
             )
+        }
     }
 }
 
@@ -399,7 +448,7 @@ private fun RankStamp(
     rank: Int,
     colors: PersonalityColors,
 ) {
-    Box(modifier = Modifier.size(46.dp).rotate(-8f), contentAlignment = Alignment.Center) {
+    Box(modifier = Modifier.size(52.dp).rotate(-8f), contentAlignment = Alignment.Center) {
         Box(
             modifier =
                 Modifier
@@ -417,22 +466,12 @@ private fun RankStamp(
                     ).border(
                         width = 1.5.dp,
                         color = colors.onPrimary.copy(alpha = 0.55f),
-                        shape = CircleShape
+                        shape = CircleShape,
                     ),
         )
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            KomiText(
-                text = "NO.",
-                role = KomiTextRole.Label,
-                color = colors.onPrimary,
-                fontSize = 8.sp
-            )
-            KomiText(
-                text = rank.toString().padStart(2, '0'),
-                role = KomiTextRole.Title,
-                color = colors.onPrimary,
-                fontSize = 21.sp
-            )
+            KomiText(text = "NO.", role = KomiTextRole.Overline, color = colors.onPrimary)
+            KomiText(text = rank.toString().padStart(2, '0'), role = KomiTextRole.Numeral, color = colors.onPrimary)
         }
     }
 }
@@ -452,10 +491,9 @@ private fun BurstBadge(
         )
         KomiText(
             text = text,
-            role = KomiTextRole.Title,
+            role = KomiTextRole.Stamp,
             color = colors.onPrimary,
-            fontSize = 13.sp,
-            modifier = Modifier.rotate(-6f)
+            modifier = Modifier.rotate(-6f),
         )
     }
 }
@@ -476,19 +514,13 @@ private fun NewReleaseStamp(
                     .border(width = 2.dp, color = colors.outline)
                     .padding(horizontal = 7.dp, vertical = 3.dp),
         ) {
-            KomiText(
-                text = "New Release",
-                role = KomiTextRole.Label,
-                color = colors.onPrimary,
-                fontSize = 10.5.sp
-            )
+            KomiText(text = "New Release", role = KomiTextRole.Overline, color = colors.onPrimary)
         }
         if (version != null) {
             KomiText(
                 text = "v$version",
-                role = KomiTextRole.Title,
+                role = KomiTextRole.Mono,
                 color = colors.onSurface,
-                fontSize = 14.sp,
                 modifier = Modifier.padding(top = 4.dp),
             )
         }
@@ -510,8 +542,9 @@ private fun ClassicBadge(
             KomiRepoCardFeed.Release -> "New"
             KomiRepoCardFeed.Plain -> ""
         }
-    val show = (feed != KomiRepoCardFeed.Release || releasedAgoDays <= 7) &&
-        (feed != KomiRepoCardFeed.Trending || dailyStars > 0)
+    val show =
+        (feed != KomiRepoCardFeed.Release || releasedAgoDays <= 7) &&
+            (feed != KomiRepoCardFeed.Trending || dailyStars > 0)
     if (text.isNotEmpty() && show) {
         Box(
             modifier =
@@ -520,12 +553,7 @@ private fun ClassicBadge(
                     .background(color = colors.primaryContainer)
                     .padding(horizontal = 8.dp, vertical = 4.dp),
         ) {
-            KomiText(
-                text = text,
-                role = KomiTextRole.Label,
-                color = colors.onPrimaryContainer,
-                fontSize = 11.sp
-            )
+            KomiText(text = text, role = KomiTextRole.LabelSmall, color = colors.onPrimaryContainer)
         }
     }
 }
@@ -539,7 +567,7 @@ private fun Stat(
 ) {
     Row(
         horizontalArrangement = Arrangement.spacedBy(5.dp),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Icon(
             imageVector = icon,
@@ -547,15 +575,25 @@ private fun Stat(
             modifier = Modifier.size(15.dp),
             tint = if (hero) colors.primary else colors.onSurface,
         )
-        KomiText(
-            text = value,
-            role = KomiTextRole.Body,
-            color = colors.onSurface,
-            fontSize = 13.5.sp,
-            fontWeight = FontWeight.W800,
-            maxLines = 1,
-        )
+        KomiText(text = value, role = KomiTextRole.Caption, color = colors.onSurfaceVariant, maxLines = 1)
     }
+}
+
+// The monogram stands in for an app icon, so it scales with its tile rather than following the type scale.
+@Composable
+private fun MonogramText(
+    monogram: String,
+    color: Color,
+    fontSize: TextUnit,
+) {
+    Text(
+        text = monogram.uppercase(),
+        color = color,
+        maxLines = 1,
+        style =
+            LocalPersonality.current.type.display
+                .copy(fontSize = fontSize, lineHeight = fontSize),
+    )
 }
 
 @Composable
@@ -576,8 +614,13 @@ private fun shorten(
 ): String {
     if (zeroDecimals) return value.roundToInt().toString()
     val rounded = (value * 10).roundToInt() / 10.0
-    return if (rounded == rounded.toLong().toDouble()) rounded.toLong()
-        .toString() else rounded.toString()
+    return if (rounded == rounded.toLong().toDouble()) {
+        rounded
+            .toLong()
+            .toString()
+    } else {
+        rounded.toString()
+    }
 }
 
 @Composable
@@ -602,12 +645,13 @@ private fun PreviewCards() {
             owner = "localsend",
             language = "Dart",
             description = "Open-source AirDrop alternative — share files to nearby devices over your local network.",
-            platforms = persistentListOf(
-                DiscoveryPlatform.Android,
-                DiscoveryPlatform.Windows,
-                DiscoveryPlatform.Macos,
-                DiscoveryPlatform.Linux
-            ),
+            platforms =
+                persistentListOf(
+                    DiscoveryPlatform.Android,
+                    DiscoveryPlatform.Windows,
+                    DiscoveryPlatform.Macos,
+                    DiscoveryPlatform.Linux,
+                ),
             stars = 62100,
             downloads = 8330000,
             releasedAgoDays = 5,
@@ -644,8 +688,8 @@ private fun KomiRepoCardMangaNightPreview() {
     PersonalityPreview(
         mangaPersonality(
             paper = MangaPaper.NIGHT,
-            accent = MangaAccent.SUN
-        )
+            accent = MangaAccent.SUN,
+        ),
     ) { PreviewCards() }
 }
 

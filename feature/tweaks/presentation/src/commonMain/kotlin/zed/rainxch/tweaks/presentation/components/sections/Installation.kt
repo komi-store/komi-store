@@ -16,9 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.stringResource
 import zed.rainxch.core.domain.isDesktop
 import zed.rainxch.core.domain.model.installation.DhizukuAvailability
@@ -31,6 +29,7 @@ import zed.rainxch.core.presentation.components.buttons.KomiButton
 import zed.rainxch.core.presentation.components.buttons.KomiButtonSize
 import zed.rainxch.core.presentation.components.buttons.KomiButtonVariant
 import zed.rainxch.core.presentation.components.inputs.KomiRadioButton
+import zed.rainxch.core.presentation.components.overlays.KomiSheet
 import zed.rainxch.core.presentation.components.inputs.KomiSlider
 import zed.rainxch.core.presentation.components.inputs.KomiSwitch
 import zed.rainxch.core.presentation.components.inputs.KomiTextField
@@ -94,11 +93,11 @@ fun installSectionContent(
                 selected = state.installerType == InstallerType.ROOT,
                 onClick = { onAction(TweaksAction.OnInstallerTypeSelected(InstallerType.ROOT)) },
                 badge = { RootStatusBadge(state.rootAvailability) },
-                last = true,
             )
             if (state.installerType == InstallerType.ROOT) {
                 RootActions(state.rootAvailability) { onAction(TweaksAction.OnRequestRootPermission) }
             }
+            ThirdPartyInstallerRows(state, onAction)
         }
 
         val silentReady =
@@ -122,6 +121,73 @@ fun installSectionContent(
             SettingsGroup {
                 AttributionRows(state, onAction)
             }
+        }
+    }
+
+    ExternalInstallerPickerSheet(state, onAction)
+}
+
+@Composable
+private fun ThirdPartyInstallerRows(
+    state: TweaksState,
+    onAction: (TweaksAction) -> Unit,
+) {
+    InstallerTypeRow(
+        type = InstallerType.THIRD_PARTY,
+        title = stringResource(Res.string.installer_type_third_party),
+        description = stringResource(Res.string.installer_type_third_party_description),
+        selected = state.installerType == InstallerType.THIRD_PARTY,
+        onClick = { onAction(TweaksAction.OnInstallerTypeSelected(InstallerType.THIRD_PARTY)) },
+        last = state.installerType != InstallerType.THIRD_PARTY,
+    )
+    if (state.installerType != InstallerType.THIRD_PARTY) return
+
+    val selectedLabel =
+        state.externalInstallers
+            .firstOrNull { it.packageName == state.externalInstallerPackage }
+            ?.label
+    SettingsRow(
+        title = stringResource(Res.string.external_installer_pick),
+        subtitle =
+            selectedLabel
+                ?: state.externalInstallerPackage.ifBlank {
+                    stringResource(Res.string.external_installer_none)
+                },
+        last = true,
+        onClick = { onAction(TweaksAction.OnExternalInstallerPickerOpenChanged(true)) },
+    )
+}
+
+@Composable
+private fun ExternalInstallerPickerSheet(
+    state: TweaksState,
+    onAction: (TweaksAction) -> Unit,
+) {
+    if (!state.externalInstallerPickerOpen) return
+
+    KomiSheet(
+        onDismiss = { onAction(TweaksAction.OnExternalInstallerPickerOpenChanged(false)) },
+        title = stringResource(Res.string.external_installer_sheet_title),
+    ) {
+        if (state.externalInstallers.isEmpty()) {
+            KomiText(
+                text = stringResource(Res.string.external_installer_empty),
+                role = KomiTextRole.Body,
+                color = LocalPersonality.current.colors.onSurfaceVariant,
+            )
+        }
+        state.externalInstallers.forEach { installer ->
+            SettingsRow(
+                title = installer.label,
+                subtitle = installer.packageName,
+                onClick = { onAction(TweaksAction.OnExternalInstallerSelected(installer.packageName)) },
+                trailing = {
+                    KomiRadioButton(
+                        selected = installer.packageName == state.externalInstallerPackage,
+                        onClick = { onAction(TweaksAction.OnExternalInstallerSelected(installer.packageName)) },
+                    )
+                },
+            )
         }
     }
 }
@@ -332,9 +398,7 @@ private fun HintRow(text: String) {
     KomiText(
         text = text,
         role = KomiTextRole.Body,
-        fontSize = 13.sp,
         color = LocalPersonality.current.colors.onSurfaceVariant,
-        uppercase = false,
         modifier = Modifier.padding(horizontal = 15.dp, vertical = 6.dp),
     )
 }
@@ -378,7 +442,11 @@ private fun RootStatusBadge(availability: RootAvailability) {
 private fun StatusDot(color: Color, label: String) {
     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
         Box(modifier = Modifier.size(8.dp).clip(RoundedCornerShape(LocalPersonality.current.shape.cornerSmall)).background(color))
-        KomiText(text = label, role = KomiTextRole.Label, fontSize = 11.sp, color = color, fontWeight = FontWeight.Medium, uppercase = false)
+        KomiText(
+            text = label,
+            role = KomiTextRole.LabelSmall,
+            color = color,
+        )
     }
 }
 
@@ -412,18 +480,14 @@ private fun IntervalBlock(
     Column(modifier = Modifier.padding(start = 15.dp, end = 15.dp, top = 4.dp, bottom = 12.dp)) {
         KomiText(
             text = stringResource(Res.string.update_check_interval_title),
-            role = KomiTextRole.Label,
+            role = KomiTextRole.Caption,
             color = colors.onSurfaceVariant,
-            uppercase = false,
-            fontSize = 12.sp,
         )
         Spacer(Modifier.height(4.dp))
         KomiText(
             text = formatIntervalLabel(IntervalStops[currentIndex]),
-            role = KomiTextRole.Title,
-            fontWeight = FontWeight.SemiBold,
+            role = KomiTextRole.CardTitle,
             color = if (enabled) colors.primary else colors.onSurfaceVariant,
-            uppercase = false,
         )
         Spacer(Modifier.height(6.dp))
         KomiSlider(
@@ -447,17 +511,13 @@ private fun BatteryOptimizationGroup(
         Column(modifier = Modifier.fillMaxWidth().padding(15.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             KomiText(
                 text = stringResource(Res.string.battery_optimization_card_title),
-                role = KomiTextRole.Title,
-                fontWeight = FontWeight.SemiBold,
+                role = KomiTextRole.CardTitle,
                 color = colors.onSurface,
-                uppercase = false,
             )
             KomiText(
                 text = stringResource(Res.string.battery_optimization_card_description),
                 role = KomiTextRole.Body,
-                fontSize = 13.sp,
                 color = colors.onSurfaceVariant,
-                uppercase = false,
             )
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.End)) {
                 KomiButton(

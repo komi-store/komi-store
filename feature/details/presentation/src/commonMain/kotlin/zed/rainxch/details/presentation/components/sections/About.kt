@@ -22,16 +22,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onSizeChanged
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.mikepenz.markdown.compose.Markdown
 import com.mikepenz.markdown.model.ImageTransformer
 import com.mikepenz.markdown.model.rememberMarkdownState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.intellij.markdown.flavours.gfm.GFMFlavourDescriptor
+import org.intellij.markdown.parser.CancellationToken
 import org.intellij.markdown.parser.MarkdownParser
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
@@ -71,19 +70,14 @@ fun LazyListScope.about(
             ) {
                 KomiText(
                     text = stringResource(Res.string.about_this_app),
-                    role = KomiTextRole.Title,
-                    fontWeight = FontWeight.SemiBold,
-                    fontSize = 22.sp,
+                    role = KomiTextRole.SectionTitle,
                     color = colors.onBackground,
-                    uppercase = false,
                 )
                 readmeLanguage?.let {
                     KomiText(
                         text = it,
-                        role = KomiTextRole.Label,
-                        fontSize = 11.sp,
+                        role = KomiTextRole.Caption,
                         color = colors.outline,
-                        uppercase = false,
                     )
                 }
             }
@@ -149,7 +143,7 @@ fun MarkdownContent(
     }
 
     val flavour = remember { GFMFlavourDescriptor() }
-    val parser = remember(flavour) { MarkdownParser(flavour) }
+    val parser = remember(flavour) { MarkdownParser(flavour, cancellationToken = CancellationToken.NonCancellable) }
     val components = remember(isDark, imageTransformer) {
         githubStoreMarkdownComponents(imageTransformer, isDark)
     }

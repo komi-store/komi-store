@@ -1,0 +1,30 @@
+{
+  "versionCode": 16,
+  "versionName": "1.8.1",
+  "releaseDate": "2026-05-03",
+  "showAsSheet": true,
+  "sections": [
+    {
+      "type": "NEW",
+      "bullets": [
+        "APK Inspect:安裝前先看清 APK 內部資訊。",
+        "Dhizuku 靜默安裝:透過裝置所有者許可權繞過小米、OPPO、vivo、華為等機型的安裝確認彈窗。",
+        "Obtainium 匯入/匯出:一鍵從 Obtainium 遷移你的應用庫,也可以隨時匯出為 Obtainium 格式。",
+        "從星標新增:列出你 GitHub 星標裡釋出 APK 的倉庫。"
+      ]
+    },
+    {
+      "type": "IMPROVED",
+      "bullets": [
+        "未登入使用者也能看到「Open Issues」數量和許可證資訊了 — 資料來自後端,不消耗任何 GitHub 配額。",
+        "可完全關閉後臺更新檢查 — 如果你更喜歡手動檢查,這能省電。"
+      ]
+    },
+    {
+      "type": "FIXED",
+      "bullets": [
+        "移除液態玻璃效果 — 在深色模式下,透明背景上的圖示可能會看不清。整體介面更乾淨、對比度更高。"
+      ]
+    }
+  ]
+}

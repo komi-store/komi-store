@@ -1,0 +1,1477 @@
+<resources>
+    <string name="app_name">Komi Store</string>
+
+    <string name="navigate_back">返回</string>
+    <string name="check_for_updates">檢查更新</string>
+
+    <string name="cannot_launch">無法啟動 %1$s</string>
+    <string name="failed_to_open">無法開啟 %1$s</string>
+    <string name="failed_to_update">更新 %1$s 失敗：%2$s</string>
+    <string name="update_all_failed">全部更新失敗：%1$s</string>
+    <string name="all_apps_updated_successfully">所有應用已成功更新</string>
+    <string name="no_updates_available">暫無可用更新</string>
+
+    <string name="search_your_apps">搜尋應用</string>
+    <string name="no_apps_found">未找到應用</string>
+
+    <string name="update_all">全部更新</string>
+    <string name="update">更新</string>
+    <string name="open">開啟</string>
+    <string name="cancel">取消</string>
+
+    <string name="checking">正在檢查…</string>
+    <string name="error_with_message">錯誤：%1$s</string>
+
+    <string name="updating_x_of_y">正在更新 %1$d / %2$d</string>
+    <string name="currently_updating">當前：%1$s</string>
+
+    <string name="percent">%1$d%%</string>
+
+    <string name="waiting_for_authorization">正在等待授權…</string>
+    <string name="signed_in">登入成功！</string>
+    <string name="redirecting_message">現在可以使用應用。正在跳轉…</string>
+    <string name="try_again">重試</string>
+
+
+    <string name="enter_code_on_github">請在 GitHub 上輸入此程式碼：</string>
+    <string name="copy_code">複製程式碼</string>
+    <string name="open_github">開啟 GitHub</string>
+
+    <string name="unlock_full_experience">解鎖完整\n體驗</string>
+
+    <string name="more_requests">更多請求</string>
+    <string name="more_requests_description">
+        登入以獲得更高的 API 限額，避免中斷。
+    </string>
+
+    <string name="sign_in_with_github">使用 GitHub 登入</string>
+
+    <string name="error_unknown">未知錯誤</string>
+
+
+    <string name="search_repositories_hint">搜尋倉庫、描述…</string>
+
+    <string name="filter_by_language">按語言篩選</string>
+
+    <string name="results_found">找到 %1$d 個結果</string>
+    <string name="search_results_hidden_by_seen_filter">所有結果被'隱藏已檢視'過濾器隱藏</string>
+    <string name="show_all_results">禁用'隱藏已檢視'過濾器</string>
+    <string name="searching_for_unseen_repos">正在搜尋未檢視的倉庫…</string>
+
+    <string name="retry">重試</string>
+
+    <string name="sort_by">排序方式</string>
+    <string name="close">關閉</string>
+
+    <string name="sort_most_stars">最多星標</string>
+    <string name="sort_most_forks">最多分叉</string>
+    <string name="sort_best_match">最佳匹配</string>
+    <string name="sort_recently_released">最新發布</string>
+
+    <string name="sort_order_descending">降序</string>
+    <string name="sort_order_ascending">升序</string>
+    <string name="sort_label">排序</string>
+
+    <string name="language_all">所有語言</string>
+    <string name="language_kotlin">Kotlin</string>
+    <string name="language_java">Java</string>
+    <string name="language_javascript">JavaScript</string>
+    <string name="language_typescript">TypeScript</string>
+    <string name="language_python">Python</string>
+    <string name="language_swift">Swift</string>
+    <string name="language_rust">Rust</string>
+    <string name="language_go">Go</string>
+    <string name="language_csharp">C#</string>
+    <string name="language_cpp">C++</string>
+    <string name="language_c">C</string>
+    <string name="language_dart">Dart</string>
+    <string name="language_ruby">Ruby</string>
+    <string name="language_php">PHP</string>
+
+    <string name="search_failed">搜尋失敗</string>
+    <string name="no_repositories_found">未找到倉庫</string>
+
+    <string name="profile_title">個人資料</string>
+
+    <string name="language_follow_system">跟隨系統</string>
+    <string name="language_restart_required">重新啟動以應用新語言。</string>
+    <string name="language_restart_action">重新啟動</string>
+
+    <string name="theme_color">主題顏色</string>
+    <string name="amoled_black_theme">AMOLED 黑色主題</string>
+    <string name="amoled_black_description">深色模式下的純黑背景</string>
+
+
+    <string name="logout">退出登入</string>
+
+    <string name="logout_success">已成功退出</string>
+
+    <string name="warning">警告！</string>
+    <string name="logout_confirmation">確定要退出登入嗎？</string>
+
+    <string name="theme_forest">森林</string>
+    <string name="theme_nord">Nord</string>
+    <string name="theme_cream">Cream</string>
+    <string name="theme_plum">Plum</string>
+
+    <string name="about_this_app">關於此應用</string>
+    <string name="install_logs">安裝日誌</string>
+    <string name="whats_new">更新內容</string>
+
+    <string name="installed">已安裝</string>
+    <string name="update_available">有可用更新</string>
+    <string name="install_latest">安裝最新版本</string>
+
+    <string name="downloading">正在下載</string>
+    <string name="updating">正在更新</string>
+    <string name="verifying">正在驗證</string>
+    <string name="installing">正在安裝</string>
+
+    <string name="profile">個人資料</string>
+    <string name="forks">分支</string>
+    <string name="stars">星標</string>
+    <string name="issues">問題</string>
+    <string name="downloads">下載量</string>
+    <string name="license">許可證</string>
+    <string name="license_none">—</string>
+    <string name="fetch_more_from_github">從 GitHub 獲取更多</string>
+    <string name="fetching_from_github">正在從 GitHub 獲取…</string>
+    <string name="no_more_github_results">GitHub 上沒有更多結果</string>
+    <string name="explore_error">從 GitHub 獲取失敗，請重試。</string>
+
+    <string name="architecture_compatible">架構相容</string>
+    <string name="update_to_version">更新到 %1$s</string>
+    <string name="report_issue">報告問題</string>
+
+    <string name="installer_saved_downloads">安裝程式已儲存到下載資料夾</string>
+
+    <string name="log_download_started">開始下載</string>
+    <string name="log_downloaded">已下載</string>
+    <string name="log_update_started">開始更新</string>
+    <string name="log_installed">已安裝</string>
+    <string name="log_updated">已更新</string>
+    <string name="log_cancelled">已取消</string>
+    <string name="log_install_started">開始安裝</string>
+    <string name="log_error">錯誤</string>
+    <string name="log_error_with_message">錯誤：%1$s</string>
+
+    <string name="log_prepare_appmanager">正在為 AppManager 準備</string>
+    <string name="log_opened_appmanager">已在 AppManager 中開啟</string>
+    <string name="log_permission_blocked">安裝許可權被裝置策略阻止</string>
+    <string name="log_opened_external_installer">已在外部安裝器中開啟</string>
+    <string name="install_permission_unavailable">安裝許可權不可用</string>
+    <string name="install_permission_blocked_message">APK已成功下載，但此裝置不允許直接安裝。是否使用外部安裝器開啟？</string>
+    <string name="open_with_external_installer">使用外部安裝器開啟</string>
+    <string name="external_installer_description">使用第三方應用安裝APK</string>
+
+    <string name="error_generic">錯誤：%1$s</string>
+
+
+
+    <string name="home_retry">重試</string>
+    <string name="home_failed_to_load_repositories">載入倉庫失敗</string>
+
+    <string name="updated_on_date">%1$s 更新</string>
+
+    <string name="rate_limit_exceeded">請求次數已達上限</string>
+    <string name="rate_limit_used_all">已用完 %1$d 次 API 請求。</string>
+    <string name="rate_limit_used_all_free">已用完 %1$d 次免費 API 請求。</string>
+    <string name="rate_limit_resets_in_minutes">%1$d 分鐘後重置</string>
+    <string name="rate_limit_tip_sign_in">💡 登入後每小時可使用 5,000 次請求，而不是 60 次！</string>
+    <string name="rate_limit_sign_in">登入</string>
+    <string name="rate_limit_ok">確定</string>
+    <string name="rate_limit_close">關閉</string>
+
+    <string name="system_font">系統字型</string>
+    <string name="system_font_description">使用裝置字型以提高可讀性</string>
+
+    <string name="theme_light">淺色</string>
+    <string name="theme_dark">深色</string>
+    <string name="theme_system">跟隨系統</string>
+
+    <string name="added_to_favourites">已新增到收藏</string>
+    <string name="removed_from_favourites">已從收藏中移除</string>
+    <string name="add_to_favourites">新增到收藏</string>
+    <string name="remove_from_favourites">從收藏中移除</string>
+    <string name="favourites">收藏</string>
+
+    <string name="added_just_now">剛剛新增</string>
+    <string name="added_hours_ago">%1$d 小時前新增</string>
+    <string name="added_yesterday">昨天新增</string>
+    <string name="added_days_ago">%1$d 天前新增</string>
+    <string name="added_on_date">%1$s 新增</string>
+
+    <string name="starred_repositories">已星標的倉庫</string>
+    <string name="repository_starred">倉庫已加星標</string>
+    <string name="repository_not_starred">倉庫未加星標</string>
+    <string name="star_from_github">你可以在 GitHub 上給該倉庫加星標</string>
+    <string name="unstar_from_github">你可以在 GitHub 上取消該倉庫的星標</string>
+
+    <string name="sign_in_required">需要登入</string>
+    <string name="no_starred_repos">沒有加星標的倉庫</string>
+    <plurals name="starred_hidden_not_installable">
+        <item quantity="other">另有 %1$d 個星標倉庫沒有可安裝的版本</item>
+    </plurals>
+    <plurals name="starred_including_not_installable">
+        <item quantity="other">包括 %1$d 個沒有可安裝版本的星標倉庫</item>
+    </plurals>
+    <string name="starred_show_all">顯示全部</string>
+    <string name="starred_installable_only">僅可安裝</string>
+    <string name="sign_in_with_github_for_stars">使用 GitHub 登入以檢視加星標的倉庫</string>
+    <string name="star_repos_hint">在 GitHub 上，給存在可安裝版本的倉庫加星標以在此檢視</string>
+    <string name="last_synced">上次同步</string>
+    <string name="just_now">剛剛</string>
+    <string name="minutes_ago">%1$d 分鐘前</string>
+    <string name="hours_ago">%1$d 小時前</string>
+    <string name="days_ago">%1$d 天前</string>
+    <string name="dismiss">關閉</string>
+    <string name="sync_starred_failed">同步加星標倉庫失敗</string>
+
+
+    <!-- Developer Profile - General -->
+    <string name="failed_to_load_repositories">載入倉庫失敗</string>
+    <string name="failed_to_load_profile">載入個人資料失敗</string>
+
+    <!-- Developer Profile - Stats -->
+    <string name="repositories">倉庫</string>
+    <string name="followers">關注者</string>
+    <string name="following">正在關注</string>
+
+    <!-- Developer Profile - Filter & Sort -->
+    <string name="search_repositories">搜尋倉庫…</string>
+    <string name="clear_search">清除搜尋</string>
+    <string name="filter_with_releases">有釋出版</string>
+    <string name="filter_installed">已安裝</string>
+    <string name="filter_favorites">收藏</string>
+    <string name="sort">排序</string>
+    <string name="sort_recently_updated">最近更新</string>
+    <string name="sort_name">名稱</string>
+    <string name="sort_recently_added">最近新增</string>
+    <string name="sort_selected">已選中</string>
+
+    <!-- Developer Profile - Repository Count -->
+    <string name="repository_singular">個倉庫</string>
+    <string name="showing_x_of_y_repositories">顯示 %2$d 箇中的 %1$d 個倉庫</string>
+
+    <!-- Developer Profile - Empty States -->
+    <string name="no_repos_with_releases">沒有可安裝釋出版的倉庫</string>
+    <string name="no_installed_repos">沒有已安裝的倉庫</string>
+    <string name="no_favorite_repos">沒有收藏的倉庫</string>
+
+    <string name="has_release">有釋出版</string>
+
+    <!-- Developer Profile - Relative Time -->
+    <string name="time_years_ago">%1$d 年前</string>
+    <string name="time_months_ago">%1$d 個月前</string>
+    <string name="time_days_ago">%1$d 天前</string>
+    <string name="time_weeks_ago">%1$d 周前</string>
+    <string name="time_hours_ago">%1$d 小時前</string>
+    <string name="time_minutes_ago">%1$d 分鐘前</string>
+
+    <!-- Developer Profile - Count Formatting -->
+    <string name="count_millions">%1$dM</string>
+    <string name="count_thousands">%1$dk</string>
+
+    <string name="released_just_now">剛剛釋出</string>
+    <string name="released_hours_ago">%1$d 小時前釋出</string>
+    <string name="released_yesterday">昨天釋出</string>
+    <string name="released_days_ago">%1$d 天前釋出</string>
+    <string name="released_on_date">釋出於 %1$s</string>
+    <string name="details_last_push">最後推送：%1$s</string>
+
+    <string name="bottom_nav_explore_title">發現</string>
+    <string name="bottom_nav_search_title">搜尋</string>
+    <string name="bottom_nav_apps_title">應用庫</string>
+    <string name="bottom_nav_profile_title">個人資料</string>
+
+    <string name="forked_repository">分叉</string>
+
+    <string name="category_stable">穩定版</string>
+    <string name="category_pre_release">預釋出</string>
+    <string name="category_all">全部</string>
+    <string name="select_version">選擇版本</string>
+    <string name="pre_release_badge">預釋出</string>
+    <string name="no_version_selected">未選擇版本</string>
+    <string name="versions_title">版本</string>
+
+    <!-- Navigation & actions -->
+    <string name="open_repository">開啟倉庫</string>
+    <string name="open_in_browser">在瀏覽器中開啟</string>
+    <string name="cancel_download">取消下載</string>
+    <string name="show_install_options">顯示安裝選項</string>
+
+    <!-- Errors & states -->
+    <string name="no_description">暫無描述。</string>
+    <string name="no_release_notes">暫無發行說明。</string>
+
+    <!-- Install status -->
+    <string name="not_available">不可用</string>
+    <string name="pending_install">等待安裝</string>
+
+    <!-- Install helpers -->
+    <string name="open_in_obtainium">在 Obtainium 中開啟</string>
+    <string name="obtainium_description">自動管理更新</string>
+    <string name="inspect_with_appmanager">使用 AppManager 檢查</string>
+    <string name="appmanager_description">檢查許可權、追蹤器和安全性</string>
+
+    <!-- Uninstall / Open -->
+    <string name="uninstall">解除安裝</string>
+    <string name="open_app">開啟</string>
+    <string name="downgrade_warning_title">所選版本較舊</string>
+    <string name="downgrade_warning_message">%1$s 低於已安裝的 %2$s。\nAndroid 可能會拒絕安裝較低的版本。\n若被拒絕，已安裝的 %2$s 不受影響。</string>
+    <string name="downgrade_warning_uninstall_note">解除安裝 %1$s 會刪除應用程式資料。</string>
+    <string name="uninstall_first">先解除安裝</string>
+    <string name="install_version">安裝 %1$s</string>
+    <string name="failed_to_open_app">無法開啟 %1$s</string>
+    <string name="failed_to_uninstall">無法解除安裝 %1$s</string>
+
+    <!-- Version picker -->
+    <string name="latest_badge">最新</string>
+
+    <!-- Apps feature - Last checked -->
+    <string name="last_checked">上次檢查：%1$s</string>
+    <string name="last_checked_just_now">剛剛</string>
+    <string name="last_checked_minutes_ago">%1$d 分鐘前</string>
+    <string name="last_checked_hours_ago">%1$d 小時前</string>
+    <string name="checking_for_updates">正在檢查更新…</string>
+
+    <string name="proxy_host">主機地址</string>
+    <string name="proxy_port">埠</string>
+    <string name="proxy_username">使用者名稱（可選）</string>
+    <string name="proxy_password">密碼（可選）</string>
+    <string name="proxy_save">儲存代理</string>
+    <string name="proxy_saved">代理設定已儲存</string>
+    <string name="failed_to_save_proxy_settings">無法儲存代理設定</string>
+    <string name="proxy_host_required">必須填寫代理主機</string>
+    <string name="proxy_host_invalid">請輸入有效的主機名或 IP 地址</string>
+    <string name="invalid_proxy_port">無效的代理埠</string>
+    <string name="proxy_test_success">連線正常 (%1$d ms)</string>
+    <string name="proxy_test_error_dns">無法解析主機。請檢查代理地址。</string>
+    <string name="proxy_test_error_unreachable">無法連線到代理伺服器。</string>
+    <string name="proxy_test_error_timeout">連線超時。</string>
+    <string name="proxy_test_error_auth_required">需要代理身份驗證。</string>
+    <string name="proxy_test_error_status">意外響應：HTTP %1$d</string>
+    <string name="proxy_test_error_unknown">連線測試失敗</string>
+    <string name="proxy_test_master_result">搜尋：%1$s，下載：%2$s，翻譯：%3$s</string>
+    <string name="proxy_test_probe_ok">%1$d ms</string>
+    <string name="proxy_test_probe_failed">失敗</string>
+
+
+
+    <!-- Profile section -->
+    <string name="profile_sign_in_title">登入 GitHub</string>
+    <string name="profile_sign_in_description">解鎖完整體驗。管理您的應用、同步偏好設定，更快地瀏覽。</string>
+    <string name="profile_repos">倉庫</string>
+    <string name="profile_login">登入</string>
+    <string name="profile_stars_description">您在 GitHub 上加了星標的倉庫</string>
+    <string name="profile_favourites_description">本地儲存的收藏倉庫</string>
+
+    <!-- Session expired dialog -->
+    <string name="session_expired_title">會話已過期</string>
+    <string name="session_expired_message">您的 GitHub 會話已過期或令牌已被撤銷。請重新登入以繼續使用認證功能。</string>
+    <string name="session_expired_hint">您仍可以訪客身份瀏覽，但 API 請求次數有限。</string>
+    <string name="sign_in_again">重新登入</string>
+    <string name="continue_as_guest">以訪客身份繼續</string>
+    <string name="logout_revocation_note">這將清除您的本地會話和快取資料。要完全撤銷訪問許可權，請訪問 GitHub Settings > Applications。</string>
+    <string name="auth_error_code_expired">裝置驗證碼已過期。</string>
+    <string name="auth_hint_try_again">請重新登入以獲取新的驗證碼。</string>
+    <string name="auth_hint_check_connection">請檢查您的網路連線並重試。</string>
+    <string name="auth_hint_denied">您拒絕了授權請求。如果是誤操作，請重試。</string>
+    <string name="auth_check_status">我已經授權</string>
+    <string name="auth_polling_status">正在檢查…</string>
+    <string name="auth_rate_limited">請求過於頻繁 — 將在 %1$d 秒後重試</string>
+    <string name="auth_error_unreachable">無法連線到 GitHub</string>
+    <string name="auth_error_rate_limited">登入嘗試次數過多</string>
+    <string name="auth_hint_wait">請等待幾分鐘後重試。</string>
+    <string name="auth_error_denied">授權被拒絕</string>
+    <string name="auth_error_browser">無法開啟瀏覽器</string>
+    <string name="auth_hint_other_method">請改用裝置程式碼或個人訪問令牌。</string>
+
+    <!-- Read More / Show Less -->
+    <string name="read_more">閱讀更多</string>
+    <string name="show_less">收起</string>
+
+    <string name="share_repository">分享倉庫</string>
+    <string name="failed_to_share_link">無法分享連結</string>
+    <string name="link_copied_to_clipboard">連結已複製到剪貼簿</string>
+
+    <string name="translate_to">翻譯為…</string>
+    <string name="search_language">搜尋語言</string>
+    <string name="translation_failed">翻譯失敗，請重試。</string>
+
+    <string name="open_github_link">開啟 GitHub 連結</string>
+    <string name="clipboard_link_detected">在剪貼簿中檢測到 GitHub 連結</string>
+    <string name="detected_links">檢測到的連結</string>
+    <string name="open_in_app">在應用中開啟</string>
+    <string name="no_github_link_in_clipboard">剪貼簿中未找到 GitHub 連結</string>
+
+    <string name="clear">清除</string>
+    <string name="show_password">顯示密碼</string>
+    <string name="hide_password">隱藏密碼</string>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <string name="installer_type_default">預設</string>
+    <string name="installer_type_default_description">標準系統安裝對話方塊</string>
+    <string name="installer_type_shizuku">Shizuku</string>
+    <string name="installer_type_shizuku_description">無需確認的靜默安裝</string>
+    <string name="shizuku_status_not_installed">Shizuku 未安裝</string>
+    <string name="shizuku_status_not_running">Shizuku 未執行</string>
+    <string name="shizuku_status_permission_needed">需要許可權</string>
+    <string name="shizuku_status_ready">就緒</string>
+    <string name="shizuku_grant_permission">授予許可權</string>
+    <string name="shizuku_install_hint">安裝 Shizuku 以啟用靜默安裝</string>
+    <string name="shizuku_start_hint">啟動 Shizuku 以啟用靜默安裝</string>
+    <string name="shizuku_install_failed_fallback">Shizuku 安裝失敗，正在使用標準安裝程式</string>
+
+    <string name="auto_update_title">自動更新應用</string>
+    <string name="auto_update_description">透過 Shizuku 在後臺自動下載並安裝更新</string>
+
+    <string name="update_check_interval_title">更新檢查間隔</string>
+    <string name="update_check_interval_description">在後臺檢查應用更新的頻率</string>
+    <string name="update_check_enabled_title">後臺檢查更新</string>
+    <string name="update_check_enabled_description">在後臺週期性檢查更新。可關閉以節省電量 — 你隨時可在任意應用的詳情頁手動檢查。</string>
+    <string name="battery_optimization_card_title">允許後臺更新</string>
+    <string name="battery_optimization_card_description">你的裝置會積極結束後臺任務。把 Komi Store 加入電池最佳化白名單，定時更新檢查和靜默安裝才能穩定執行。</string>
+    <string name="battery_optimization_card_open">開啟設定</string>
+    <string name="battery_optimization_card_dismiss">稍後</string>
+
+    <string name="add_by_link">追蹤應用</string>
+    <string name="link_app_title">將應用連結到倉庫</string>
+    <string name="pick_installed_app">選擇一個已安裝的應用以連結到GitHub倉庫</string>
+    <string name="search_apps_hint">搜尋應用…</string>
+    <string name="enter_repo_url">GitHub倉庫URL</string>
+    <string name="repo_url_hint">github.com/owner/repo</string>
+    <string name="validating_repo">驗證中…</string>
+    <string name="link_and_track">連結並追蹤</string>
+    <string name="checking_release">檢查最新版本…</string>
+    <string name="verifying_signing_key">正在驗證簽名金鑰…</string>
+    <string name="package_name_mismatch">包名不匹配：APK為%1$s，但所選應用為%2$s</string>
+    <string name="signing_key_mismatch_link">簽名金鑰不匹配：此倉庫中的APK由不同的開發者簽名</string>
+    <string name="select_asset_title">選擇安裝包</string>
+    <string name="select_asset_description">選擇APK以與已安裝的應用進行驗證</string>
+    <string name="export_apps">匯出</string>
+    <string name="import_apps">匯入</string>
+    <string name="include_pre_releases_title">預設測試版渠道</string>
+    <string name="include_pre_releases_description">新追蹤的應用預設包含測試版。已追蹤的應用保留各自設定（在應用詳情頁切換）。</string>
+    <string name="confirm_uninstall_title">解除安裝應用？</string>
+    <string name="confirm_uninstall_message">確定要解除安裝%1$s嗎？此操作無法撤銷，應用資料可能會丟失。</string>
+    <string name="invalid_github_url">無效的GitHub URL。請使用格式：github.com/owner/repo</string>
+    <string name="repo_not_found">未找到倉庫：%1$s/%2$s</string>
+    <string name="rate_limit_try_again">GitHub API請求限制已超出。請稍後重試。</string>
+    <string name="failed_to_link">連結失敗：%1$s</string>
+    <string name="failed_to_load_apps">無法載入已安裝的應用</string>
+    <string name="app_linked_success">%1$s已連結到%2$s/%3$s</string>
+    <string name="export_failed">匯出失敗：%1$s</string>
+    <string name="import_failed">匯入失敗：%1$s</string>
+    <string name="signing_key_changed_title">簽名金鑰已更改</string>
+    <string name="signing_key_changed_message">此應用的簽名證書自首次安裝以來已更改。\n\n這可能意味著開發者更換了簽名金鑰，或者二進位制檔案可能已被篡改。\n\n預期：%1$s\n收到：%2$s</string>
+    <string name="install_anyway">仍然安裝</string>
+    <string name="verified_build">已驗證的構建</string>
+    <string name="checking_attestation">檢查中\u2026</string>
+    <string name="assets_title">資源</string>
+    <string name="no_assets_selected">無資源</string>
+    <string name="no_assets_in_list">此版本沒有關聯的資源</string>
+    <string name="assets_selection_label">選擇資源選項</string>
+    <string name="multiple_assets_info_dialog_title">多個資源可用</string>
+    <string name="multiple_assets_info_dialog_text">此版本有多個可安裝檔案。請檢視列表並選擇適合您裝置的檔案。</string>
+    <string name="icon_content_description_info">資訊</string>
+    <string name="select_language">選擇語言</string>
+    <string name="update_package_mismatch">包名不匹配：APK 為 %1$s，但已安裝的應用為 %2$s。更新已阻止。</string>
+    <string name="update_signing_key_mismatch">簽名金鑰不匹配：更新由不同的開發者簽名。更新已阻止。</string>
+
+    <string name="scrollbar_option_title">捲軸</string>
+    <string name="scrollbar_option_description">在可滾動列表中顯示捲軸（桌面）</string>
+    <string name="content_width_title">內容寬度</string>
+    <string name="content_width_description">詳情頁內容列的最大寬度（桌面）</string>
+    <string name="content_width_compact">緊湊</string>
+    <string name="content_width_wide">寬</string>
+    <string name="content_width_extra_wide">超寬</string>
+
+    <string name="seen_history_cleared">瀏覽記錄已清除</string>
+    <string name="seen_badge">已瀏覽</string>
+    <string name="self_owned_badge">你擁有此倉庫</string>
+    <string name="hide_repository">隱藏倉庫</string>
+
+    <string name="recently_viewed">最近檢視</string>
+    <string name="recently_viewed_remove_cd">從瀏覽記錄中移除</string>
+    <string name="profile_recently_viewed_description">你訪問過的倉庫</string>
+    <string name="delete_all">全部刪除</string>
+    <string name="delete_downloads_confirmation_title">刪除所有下載？</string>
+    <string name="delete_downloads_confirmation_message">這將永久刪除所有 APK 和安裝程式（%1$s）。你可以隨時重新下載。</string>
+    <string name="downloads_cleared">所有已下載的包已被刪除。</string>
+    <string name="unable_to_verify_attestation">無法驗證</string>
+    <string name="details_attestation_verified_explainer">此檔案的 SHA-256 與該倉庫在 GitHub 上釋出的構建證明相符，因此它來自該倉庫自己的構建。</string>
+    <string name="details_attestation_unverified_explainer">Komi Store 無法將此檔案與該倉庫的構建證明進行核對。僅憑這一點並不代表它不安全。</string>
+
+    <string name="recent_searches">最近搜尋</string>
+    <string name="clear_all_history">清除全部</string>
+    <string name="remove_search_history_item">移除</string>
+
+    <string name="tweaks_title">調整</string>
+
+    <!-- Monorepo support -->
+    <string name="asset_filter_label">資產過濾器</string>
+    <string name="asset_filter_placeholder">例如：ente-auth</string>
+    <string name="asset_filter_help">僅安裝與此模式 (regex) 匹配的資產。適用於包含多個應用的單一倉庫。</string>
+    <string name="asset_filter_invalid">無效的正規表示式</string>
+    <string name="asset_filter_no_match">沒有匹配此過濾器的資產</string>
+    <string name="asset_none_available">此版本中沒有可安裝的資產</string>
+    <plurals name="asset_filter_visible_count">
+        <item quantity="other">顯示 %2$d 個資產中的 %1$d 個</item>
+    </plurals>
+    <string name="fallback_older_releases_title">回退到舊版本</string>
+    <string name="fallback_older_releases_description">遍歷過去的版本，直到找到匹配過濾器的版本。最新版本屬於其他應用的單一倉庫需要此功能。</string>
+    <string name="advanced_settings_title">高階過濾器</string>
+    <string name="advanced_settings_description">配置此應用在倉庫中的匹配方式。當倉庫包含多個應用時使用這些設定。</string>
+    <string name="advanced_settings_open">開啟高階過濾器</string>
+    <string name="advanced_save">儲存</string>
+    <string name="advanced_preview_title">預覽</string>
+    <string name="advanced_preview_refresh">重新整理預覽</string>
+    <string name="advanced_preview_pending">輸入過濾器以預覽匹配的資產。</string>
+    <string name="advanced_preview_no_match">最近的版本中沒有匹配的資產。請啟用回退到舊版本或調整正規表示式。</string>
+    <string name="advanced_preview_failed">無法載入預覽。請檢查您的連線並重試。</string>
+    <plurals name="advanced_preview_release">
+        <item quantity="other">在 %1$s 中匹配 · %2$d 個資產</item>
+    </plurals>
+
+    <!-- Preferred-variant feature -->
+    <string name="variant_picker_title">首選變體</string>
+    <string name="variant_picker_description">選擇更新時要安裝的 APK 變體。此選擇會在不同版本之間記住。</string>
+    <string name="variant_picker_no_assets">最新版本中沒有可安裝的資產。</string>
+    <string name="variant_picker_no_pinnable">此版本沒有可固定的版本標記變體。自動選擇器將繼續為您的裝置選擇最佳資產。</string>
+    <string name="variant_picker_load_failed">無法載入變體。請檢查連線並重試。</string>
+    <string name="variant_picker_save_failed">無法儲存您的選擇。請重試。</string>
+    <string name="variant_picker_stale_title">變體已更改 — 請重新選擇</string>
+    <string name="variant_picker_stale_was">原為：%1$s</string>
+    <string name="variant_picker_auto_title">自動</string>
+    <string name="variant_picker_auto_subtitle">讓 Komi Store 為您的裝置選擇最佳變體</string>
+    <string name="markdown_alert_note">備註</string>
+    <string name="markdown_alert_tip">提示</string>
+    <string name="markdown_alert_important">重要</string>
+    <string name="markdown_alert_warning">警告</string>
+    <string name="markdown_alert_caution">注意</string>
+    <string name="variant_picker_pinned">已固定為：%1$s</string>
+    <string name="variant_stale_hint">變體已更改 — 點選更新以重新選擇</string>
+    <string name="variant_label_inline">變體：%1$s</string>
+    <string name="variant_picker_unpin">取消固定</string>
+    <string name="variant_picker_pinned_badge">已固定</string>
+    <string name="assets_section_available">可用</string>
+    <string name="assets_section_your_app">你的應用</string>
+    <string name="variant_picker_open">選擇變體</string>
+    <string name="variant_picker_open_filter">調整篩選器</string>
+    <string name="variant_first_pin_toast">將來的更新將優先使用 %1$s 變體。可以隨時在應用設定中更改。</string>
+    <string name="variant_first_pin_toast_generic">將來的更新將優先使用此變體。可以隨時在應用設定中更改。</string>
+    <string name="variant_unpinned_toast">變體固定已取消。更新將使用自動選擇器。</string>
+    <string name="advanced_filter_variant_relation">篩選器決定考慮哪些資源。變體固定決定其中哪一個被安裝。</string>
+    <string name="install">安裝</string>
+    <string name="ready_to_install">準備安裝</string>
+    <string name="install_ready">安裝（已就緒）</string>
+
+    <string name="translation_intro">選擇用於翻譯 README 的服務。</string>
+    <string name="translation_provider_title">翻譯服務</string>
+    <string name="translation_provider_description">Google 全球可用，無需配置。有道可從中國大陸訪問，但需要從有道開發者門戶獲取 API 憑據。</string>
+    <string name="translation_provider_google">Google</string>
+    <string name="translation_provider_youdao">有道</string>
+    <string name="translation_provider_saved">翻譯服務已更新</string>
+    <string name="translation_youdao_help">在 ai.youdao.com 註冊以獲取 App Key 和 App Secret。免費套餐足以滿足日常使用。</string>
+    <string name="translation_youdao_app_key">App Key</string>
+    <string name="translation_youdao_app_secret">App Secret</string>
+    <string name="translation_youdao_save">儲存憑據</string>
+    <string name="translation_youdao_saved">有道憑據已儲存</string>
+
+    <!-- Releases status card (#417 / #390 follow-up) -->
+    <string name="releases_load_failed">無法載入釋出版本</string>
+    <string name="releases_load_failed_description">請檢查網路連線後重試。</string>
+    <string name="no_releases_published">尚未釋出任何版本</string>
+    <string name="loading_releases">正在載入釋出版本…</string>
+
+    <!-- Personal Access Token sign-in (#433 follow-up) -->
+    <string name="pat_use_token_instead">遇到問題？使用 Personal Access Token</string>
+    <string name="auth_use_device_code_instead">改用裝置程式碼</string>
+    <string name="installer_category_side_store">F-Droid / Obtainium</string>
+    <string name="installer_category_sideloaded">側載</string>
+    <string name="installer_category_vendor_store">廠商應用商店</string>
+    <string name="installer_category_play_store">Play 商店</string>
+    <string name="installer_category_system_update">系統更新</string>
+    <string name="link_smart_search_title">查詢匹配倉庫</string>
+    <string name="link_smart_search_searching">正在 GitHub 上查詢匹配…</string>
+    <string name="link_smart_search_no_matches">未找到自動匹配。</string>
+    <string name="link_smart_search_failed">無法搜尋匹配項。</string>
+    <string name="link_smart_search_enter_manually">手動輸入 URL</string>
+    <string name="match_source_manifest">清單</string>
+    <string name="match_source_fingerprint">簽名</string>
+    <string name="match_source_search">搜尋</string>
+    <string name="match_source_manual">手動</string>
+    <string name="match_source_starred">已加星</string>
+    <string name="pat_sheet_title">使用 Personal Access Token 登入</string>
+    <string name="pat_sheet_description">在能訪問 GitHub 的任何裝置上建立 Personal Access Token（classic 或 fine-grained），然後貼上到下方。需要對倉庫和個人資料的讀取許可權。</string>
+    <string name="pat_open_settings">開啟 GitHub 令牌設定</string>
+    <string name="pat_input_label">Personal Access Token</string>
+    <string name="pat_input_placeholder">ghp_… 或 github_pat_…</string>
+    <string name="pat_submit">登入</string>
+    <string name="pat_cancel">取消</string>
+    <string name="pat_error_empty">請貼上令牌。</string>
+    <string name="pat_error_invalid_format">這不像是 GitHub 令牌。令牌以 ghp_ 或 github_pat_ 開頭。</string>
+    <string name="pat_error_bad_credentials">該令牌無效或已被吊銷。</string>
+    <string name="pat_error_insufficient_scope">該令牌缺少所需許可權。</string>
+    <string name="pat_error_generic">儲存令牌失敗。請重試。</string>
+
+
+    <!-- ═══════════════════════════════════════════════════════════════
+         E10 — Apps sort
+         ═══════════════════════════════════════════════════════════════ -->
+    <string name="sort_apps">應用排序</string>
+    <string name="sort_updates_first">更新優先</string>
+
+    <!-- ═══════════════════════════════════════════════════════════════
+         Pre-release channel UX (Details screen)
+         ═══════════════════════════════════════════════════════════════ -->
+    <string name="channel_chip_include_betas">包含測試版</string>
+    <string name="channel_chip_stable_only">僅穩定版</string>
+    <string name="channel_chip_coachmark_title">選擇釋出渠道</string>
+    <string name="channel_chip_coachmark_body">點按以在此應用的穩定版和測試版之間切換。</string>
+    <string name="channel_chip_coachmark_dismiss">知道了</string>
+    <string name="action_switch_to_stable">切換到 %1$s 穩定版</string>
+    <string name="stalled_project_warning_months">%1$d 個月內無穩定版釋出</string>
+    <string name="stalled_project_warning_days">%1$d 天內無穩定版釋出</string>
+    <string name="stalled_project_warning_description">目前有活躍的預釋出版本，但該專案已有一段時間未釋出穩定版。測試版可能不會收斂為穩定版。</string>
+    <string name="merged_whats_changed_title">自 %1$s 以來的變更</string>
+
+    <!-- ═══════════════════════════════════════════════════════════════
+         E1 — External import wizard
+         ═══════════════════════════════════════════════════════════════ -->
+    <string name="external_import_top_bar_title">匯入已安裝的應用</string>
+    <string name="external_import_top_bar_back">返回</string>
+    <string name="external_import_overflow_more">更多選項</string>
+    <string name="external_import_overflow_skip_remaining">跳過剩餘</string>
+    <string name="external_import_progress_scanning">正在掃描您的應用…</string>
+    <string name="external_import_progress_auto_importing">正在匯入匹配項…</string>
+    <string name="external_import_progress_working">處理中…</string>
+    <!-- Chinese uses "other" only -->
+    <plurals name="external_import_progress_subtitle_count">
+        <item quantity="other">已檢查 %1$d 個應用</item>
+    </plurals>
+    <string name="external_import_card_action_skip">跳過</string>
+    <string name="external_import_card_action_link">關聯</string>
+    <string name="external_import_card_action_more">更多匹配</string>
+    <string name="external_import_card_action_less">隱藏匹配</string>
+    <string name="external_import_card_installer_chip">透過 %1$s 安裝</string>
+    <string name="external_import_card_preselect_unknown">點選查詢倉庫</string>
+    <string name="external_import_card_expand_label">展開以檢視其他匹配</string>
+    <string name="external_import_card_collapse_label">收起卡片</string>
+    <string name="external_import_search_icon_label">搜尋 GitHub</string>
+    <string name="external_import_search_empty">無匹配結果</string>
+    <string name="external_import_search_error_default">搜尋失敗</string>
+    <string name="external_import_search_placeholder_url">貼上 github.com URL 或搜尋…</string>
+    <plurals name="external_import_completion_headline">
+        <item quantity="other">現在正在追蹤 %1$d 個應用。</item>
+    </plurals>
+    <string name="external_import_completion_skipped_subline">已跳過 %1$d 個 — 您可以在設定中重新掃描。</string>
+    <string name="external_import_completion_action_view_all">檢視全部</string>
+    <string name="external_import_empty_all_matched">全部已關聯。\n沒有需要關聯的內容。</string>
+    <string name="external_import_empty_done">完成</string>
+    <string name="external_import_empty_no_apps_title">在此裝置上未找到 GitHub 應用。</string>
+    <string name="external_import_empty_no_apps_body">這意味著所有應用都透過其他商店安裝，或者我們無法獲取已安裝應用的資訊。</string>
+    <string name="external_import_empty_grant_permission">授予許可權</string>
+    <string name="external_import_empty_ok">確定</string>
+    <string name="external_import_empty_add_manually">從其他商店新增應用</string>
+    <string name="external_import_permission_title">找到您的 GitHub 應用</string>
+    <string name="external_import_permission_body">我們可以掃描您已安裝的應用並將其與 GitHub 釋出版本匹配，讓更新檢測自動執行。\n\n為此，我們需要檢視您安裝了哪些應用。沒有許可權時我們只能看到約 5 個應用；有許可權時可以看到全部。\n\n未經您的許可，我們絕不會將您的應用列表傳送到任何地方。匹配過程在您的裝置上進行。可選的後端查詢僅傳送包名和應用標籤，以及（如有）簽名指紋、安裝來源和應用 manifest 中宣告的 GitHub 倉庫提示，絕不傳送完整的已安裝應用列表。</string>
+    <string name="external_import_permission_continue">繼續</string>
+    <string name="external_import_permission_not_now">暫不</string>
+    <plurals name="external_import_proposal_banner_headline">
+        <item quantity="other">從 GitHub 找到 %1$d 個應用</item>
+    </plurals>
+    <string name="external_import_proposal_banner_body">審閱它們以在此追蹤更新。</string>
+    <string name="external_import_proposal_banner_review">審閱</string>
+    <string name="external_import_proposal_banner_dismiss">關閉</string>
+    <string name="external_import_match_confidence_a11y">匹配置信度：%1$d 百分比</string>
+    <string name="external_import_match_confidence_chip">%1$d</string>
+    <string name="external_import_error_link_failed">無法關聯此應用 — 請重試。</string>
+    <string name="external_import_error_link_network">無法連線到 GitHub，請稍後重試。</string>
+    <string name="external_import_error_scan_failed_default">掃描失敗</string>
+    <string name="external_import_installer_obtainium">Obtainium</string>
+    <string name="external_import_installer_fdroid">F-Droid</string>
+    <string name="external_import_installer_browser">瀏覽器</string>
+    <string name="external_import_installer_sideload">Sideload</string>
+    <string name="external_import_installer_self">Komi Store</string>
+    <string name="external_import_installer_unknown">未知來源</string>
+    <string name="external_import_undo_linked">%1$s 已關聯。</string>
+    <string name="external_import_undo_skipped">%1$s 已跳過。</string>
+    <string name="external_import_undo_action">撤銷</string>
+    <string name="external_import_undo_failed">無法撤銷 — 請重試。</string>
+    <plurals name="external_import_list_remaining">
+        <item quantity="other">%1$d 個應用待審閱</item>
+    </plurals>
+    <string name="external_import_list_add_manually">未看到您的應用？手動新增</string>
+    <plurals name="external_import_auto_summary_headline">
+        <item quantity="other">已自動關聯 %1$d 個應用</item>
+    </plurals>
+    <string name="external_import_auto_summary_body">我們以高置信度識別了這些應用。您可以在每個應用的詳情中撤銷單個匹配，或立即全部撤銷。</string>
+    <plurals name="external_import_auto_summary_review_hint">
+        <item quantity="other">還有 %1$d 個需要您的確認。</item>
+    </plurals>
+    <string name="external_import_auto_summary_continue">繼續</string>
+    <string name="external_import_auto_summary_undo_all">全部撤銷</string>
+    <string name="external_import_auto_summary_more_count">+%1$d 更多</string>
+    <string name="external_import_rescan_menu">掃描 GitHub 應用</string>
+
+    <!-- ═══════════════════════════════════════════════════════════════
+         E1 — Details unlink dialog
+         ═══════════════════════════════════════════════════════════════ -->
+    <string name="details_unlink_external_app_menu">從此倉庫取消關聯</string>
+    <string name="details_unlink_external_app_dialog_title">取消關聯此應用？</string>
+    <string name="details_unlink_external_app_dialog_body">我們將停止追蹤 %1$s 作為從此倉庫安裝的應用。該應用仍保留在您的裝置上 — 僅刪除關聯。</string>
+    <string name="details_unlink_external_app_dialog_confirm">取消關聯</string>
+    <string name="details_unlink_external_app_success">已取消關聯。下次掃描時將重新建議匹配。</string>
+    <string name="details_unlink_external_app_failure">無法取消關聯 — 請重試。</string>
+    <string name="details_linked_repo_banner_title">已連結到 %1$s/%2$s</string>
+    <string name="details_linked_repo_banner_body">手動連結 — 由你驗證。解除連結以重新掃描。</string>
+
+    <!-- Details manual refresh -->
+    <string name="details_refresh">重新整理</string>
+    <string name="details_refresh_cooldown">重新整理（%1$d 秒）</string>
+    <string name="details_refresh_more_options">更多操作</string>
+    <string name="details_refresh_snackbar_cooldown">剛剛重新整理過 — 請在 %1$d 秒後重試。</string>
+    <string name="details_refresh_snackbar_budget_exhausted">重新整理服務繁忙 — 請在 %1$d 秒後重試。</string>
+    <string name="details_refresh_snackbar_archived">此倉庫已在 GitHub 上歸檔。</string>
+    <string name="details_refresh_snackbar_not_found">此倉庫在 GitHub 上已不存在。</string>
+    <string name="details_refresh_snackbar_upstream">重新整理失敗，請稍後重試。</string>
+    <string name="details_refresh_snackbar_generic">重新整理失敗。請重試。</string>
+
+    <!-- ═══════════════════════════════════════════════════════════════
+         Feedback feature
+         ═══════════════════════════════════════════════════════════════ -->
+    <string name="feedback_title">傳送反饋</string>
+    <string name="feedback_close">關閉</string>
+    <string name="feedback_category_label">類別</string>
+    <string name="feedback_category_bug">缺陷</string>
+    <string name="feedback_category_feature">功能請求</string>
+    <string name="feedback_category_change">變更請求</string>
+    <string name="feedback_category_other">其他</string>
+    <string name="feedback_topic_label">主題</string>
+    <string name="feedback_topic_install_update">安裝 / 更新</string>
+    <string name="feedback_topic_search">搜尋 &amp; 發現</string>
+    <string name="feedback_topic_details">倉庫詳情</string>
+    <string name="feedback_topic_auth">認證 &amp; 賬戶</string>
+    <string name="feedback_topic_ui">介面 / UX</string>
+    <string name="feedback_topic_translation">翻譯 / 語言</string>
+    <string name="feedback_topic_performance">效能</string>
+    <string name="feedback_topic_other">其他</string>
+    <string name="feedback_field_title">標題</string>
+    <string name="feedback_field_description">描述</string>
+    <string name="feedback_field_steps">重現步驟</string>
+    <string name="feedback_field_expected_actual">預期與實際情況</string>
+    <string name="feedback_field_use_case">使用場景</string>
+    <string name="feedback_field_proposed_solution">建議解決方案</string>
+    <string name="feedback_field_current_behaviour">當前行為</string>
+    <string name="feedback_field_desired_behaviour">期望行為</string>
+    <string name="feedback_diagnostics_header">診斷資訊</string>
+    <string name="feedback_diagnostics_include">包含診斷資訊</string>
+    <string name="feedback_send_via_email">透過電子郵件傳送</string>
+    <string name="feedback_send_via_github">新增 GitHub Issue</string>
+    <string name="feedback_send_success_email">感謝您 — 正在開啟電子郵件客戶端。</string>
+    <string name="feedback_send_success_github">感謝您 — 正在開啟瀏覽器。</string>
+    <string name="feedback_send_failed">無法開啟反饋渠道</string>
+
+    <!-- ═══════════════════════════════════════════════════════════════
+         E5 — Mirror feature
+         ═══════════════════════════════════════════════════════════════ -->
+    <!-- Tweaks - Custom forges -->
+    <string name="custom_forges_entry_label">自定義程式碼託管平臺</string>
+    <string name="custom_forges_dialog_title">自定義程式碼託管平臺</string>
+    <string name="custom_forges_dialog_help">輸入 Forgejo 或 Gitea 例項的主機名（例如 git.example.com）。在手動關聯表單中，GHS 將接受這些主機的連結。</string>
+    <string name="custom_forges_add_button">新增</string>
+    <string name="custom_forges_empty">尚無自定義程式碼託管平臺。</string>
+    <string name="done">完成</string>
+
+    <string name="mirror_picker_title">下載鏡像</string>
+    <string name="mirror_picker_description">用於下載釋出資源。GitHub API 呼叫始終直接進行。大多數使用者應保持"直連 GitHub"設定。</string>
+    <string name="mirror_section_official">官方</string>
+    <string name="mirror_section_community">社群</string>
+    <string name="mirror_pick_fastest">選擇最快</string>
+    <string name="mirror_pick_fastest_sub">測量每個鏡像，選擇最快的</string>
+    <string name="mirror_measuring">正在從此裝置測量…</string>
+    <string name="mirror_measure_latency">測量延遲</string>
+    <string name="mirror_latency_local">距你 %1$d ms</string>
+    <string name="mirror_fastest_badge">%1$s · 最快</string>
+    <string name="mirror_fastest_chosen">已切換到 %1$s（%2$d ms）。</string>
+    <string name="mirror_no_mirror_responded">沒有鏡像響應。請檢查網路連線後重試。</string>
+    <string name="mirror_status_ok">%1$dms</string>
+    <string name="mirror_status_degraded">%1$dms</string>
+    <string name="mirror_status_down">(不可用)</string>
+    <string name="mirror_status_unknown">?</string>
+    <string name="mirror_custom_label">自定義鏡像…</string>
+    <string name="mirror_custom_dialog_title">自定義鏡像</string>
+    <string name="mirror_custom_dialog_hint">https://your-mirror.example/{url}</string>
+    <string name="mirror_custom_validation_https">模板必須以 https:// 開頭</string>
+    <string name="mirror_custom_validation_template">模板必須恰好包含一次 {url}</string>
+    <string name="mirror_custom_save">儲存</string>
+    <string name="mirror_test_button">測試所選</string>
+    <string name="mirror_test_success">已在 %1$dms 內到達</string>
+    <string name="mirror_test_http_error">鏡像返回 %1$d</string>
+    <string name="mirror_test_timeout">5s 後超時</string>
+    <string name="mirror_test_dns_fail">無法解析主機</string>
+    <string name="mirror_test_failed">連線失敗</string>
+    <string name="mirror_deploy_your_own_hint">所有鏡像都不能用？可以用五分鐘來自行託管一個，點按檢視文件。</string>
+    <string name="mirror_removed_toast">%1$s 已不再可用，已切換到直連 GitHub。</string>
+
+    <!-- ───── 1.8.1 backlog ───── -->
+    <string name="add_from_starred_title">從星標新增</string>
+    <string name="announcements_acknowledge">我已閱讀</string>
+    <string name="announcements_acknowledged">已確認</string>
+    <string name="announcements_category_news">資訊</string>
+    <string name="announcements_category_privacy">隱私</string>
+    <string name="announcements_category_security">安全</string>
+    <string name="announcements_category_status">狀態</string>
+    <string name="announcements_category_survey">調查</string>
+    <string name="announcements_empty">當前沒有可分享的內容。</string>
+    <string name="announcements_mute_locked">無法關閉</string>
+    <string name="announcements_mute_settings_title">顯示來自</string>
+    <string name="announcements_open_mute_settings">開啟靜音設定</string>
+    <string name="announcements_profile_description">資訊、調查和重要通知。</string>
+    <string name="announcements_read_more">閱讀更多</string>
+    <string name="announcements_refresh_failed">無法重新整理 — 顯示快取內容。</string>
+    <string name="announcements_severity_critical">嚴重</string>
+    <string name="announcements_severity_important">重要</string>
+    <string name="announcements_severity_info">資訊</string>
+    <string name="announcements_title">公告</string>
+    <string name="announcements_view_details">檢視詳情</string>
+    <string name="apk_inspect_button_label">檢查 APK</string>
+    <string name="apk_inspect_coachmark_body">許可權、簽名、元件 — 一目瞭然地檢視 APK 的真實宣告。</string>
+    <string name="apk_inspect_coachmark_dismiss">知道了</string>
+    <string name="apk_inspect_coachmark_title">安裝前先看看</string>
+    <string name="apk_inspect_compatibility">相容性</string>
+    <string name="apk_inspect_components">元件</string>
+    <string name="apk_inspect_debuggable">可除錯構建 — 如果是正式版就有點可疑。</string>
+    <string name="apk_inspect_empty">該應用暫無可檢查的內容。</string>
+    <string name="apk_inspect_file_info">檔案</string>
+    <string name="apk_inspect_identity">身份</string>
+    <string name="apk_inspect_min_sdk">最低 SDK</string>
+    <string name="apk_inspect_permissions">許可權 (%1$d)</string>
+    <string name="apk_inspect_permissions_empty">未宣告任何許可權。</string>
+    <string name="apk_inspect_permissions_title">許可權</string>
+    <string name="apk_inspect_protection_dangerous">敏感</string>
+    <string name="apk_inspect_protection_normal">普通</string>
+    <string name="apk_inspect_protection_privileged">特權</string>
+    <string name="apk_inspect_protection_signature">簽名</string>
+    <string name="apk_inspect_protection_unknown">未知</string>
+    <string name="apk_inspect_section_activities">Activity</string>
+    <string name="apk_inspect_section_main_activity">主 Activity</string>
+    <string name="apk_inspect_section_receivers">廣播接收器</string>
+    <string name="apk_inspect_section_services">服務</string>
+    <string name="apk_inspect_signing">簽名指紋</string>
+    <string name="apk_inspect_size">大小</string>
+    <string name="apk_inspect_source_file">暫存檔案</string>
+    <string name="apk_inspect_source_installed">已安裝包</string>
+    <string name="apk_inspect_target_sdk">目標 SDK</string>
+    <string name="apk_inspect_title">APK 檢查</string>
+    <string name="apk_inspect_version_code">版本</string>
+    <string name="apps_compact_more_actions">%1$s 的更多操作</string>
+    <string name="apps_menu_item_active">%1$s  ✓</string>
+    <string name="apps_version_update">%1$s → %2$s</string>
+    <string name="apps_version_dated">%1$s (%2$s)</string>
+    <string name="apps_variant_subtitle">%1$s  ·  %2$s</string>
+    <string name="apps_section_header_cd">%1$s，%2$d，%3$s</string>
+    <string name="apps_section_header_static_cd">%1$s，%2$d</string>
+    <string name="apps_ignore_updates">忽略更新</string>
+    <string name="apps_section_collapse">摺疊分組</string>
+    <string name="apps_section_count_suffix">· %1$d</string>
+    <string name="apps_section_expand">展開分組</string>
+    <string name="apps_section_state_collapsed">已摺疊</string>
+    <string name="apps_section_state_expanded">已展開</string>
+    <string name="apps_section_up_to_date">已是最新</string>
+    <string name="confirm_discard_pending_message">放棄 %1$s 的暫存安裝包並從應用列表中移除該行？已下載的 APK 將被刪除。</string>
+    <string name="confirm_discard_pending_title">放棄待安裝項？</string>
+    <string name="dhizuku_grant_permission">授予許可權</string>
+    <string name="dhizuku_install_hint">安裝 Dhizuku 並將其啟用為 Device Owner，以啟用靜默安裝</string>
+    <string name="dhizuku_start_hint">將 Dhizuku 啟用為 Device Owner，以啟用靜默安裝</string>
+    <string name="installer_type_root">Root</string>
+    <string name="installer_type_root_description">透過 Magisk / KernelSU / APatch root 靜默安裝</string>
+    <string name="installer_type_third_party">第三方安裝程式</string>
+    <string name="installer_type_third_party_description">將 APK 交給你選擇的安裝應用程式，而非系統預設安裝程式。</string>
+    <string name="external_installer_pick">安裝應用程式</string>
+    <string name="external_installer_none">未選擇</string>
+    <string name="external_installer_sheet_title">可安裝 APK 的應用程式</string>
+    <string name="external_installer_empty">此裝置上找不到安裝應用程式。</string>
+    <string name="root_status_ready">已授權</string>
+    <string name="root_status_permission_needed">允許 Root</string>
+    <string name="root_status_unavailable">無 Root</string>
+    <string name="root_grant_permission">允許 Root 許可權</string>
+    <string name="root_unavailable_hint">此裝置未安裝 Root。請先安裝 Magisk、KernelSU 或 APatch。</string>
+    <string name="dhizuku_status_not_installed">Dhizuku 未安裝</string>
+    <string name="dhizuku_status_not_running">Dhizuku 未啟用</string>
+    <string name="dhizuku_status_permission_needed">需要許可權</string>
+    <string name="dhizuku_status_ready">就緒</string>
+    <string name="discard_pending_install">放棄</string>
+    <string name="delete_task">刪除任務</string>
+    <string name="pause">暫停</string>
+    <string name="resume">繼續</string>
+    <string name="paused">已暫停</string>
+    <string name="error_state_go_back">返回</string>
+    <string name="error_state_subtitle_generic">無法載入該倉庫。請使用下方的重試按鈕。</string>
+    <string name="error_state_subtitle_not_found">倉庫可能為私有、已重新命名或已刪除。</string>
+    <string name="error_state_subtitle_offline">檢查網路連線後重試。</string>
+    <string name="error_state_subtitle_rate_limit">GitHub 或我們的後端達到了配額上限。請稍後再試。</string>
+    <string name="error_state_title_generic">出錯了</string>
+    <string name="error_state_title_not_found">未找到倉庫</string>
+    <string name="error_state_title_offline">您處於離線狀態</string>
+    <string name="error_state_title_rate_limit">已達請求限額</string>
+    <string name="export_apps_obtainium">匯出到 Obtainium</string>
+    <string name="external_import_card_owner_byline">作者：%1$s</string>
+    <string name="external_import_card_preselect_known_prefix">我們認為這是</string>
+    <string name="failed_to_discard_pending">放棄 %1$s 的待安裝項失敗</string>
+    <string name="import_summary_already_tracked">%1$d 個已在追蹤</string>
+    <string name="import_summary_close">完成</string>
+    <string name="import_summary_collapse">隱藏詳情</string>
+    <string name="import_summary_expand">顯示詳情</string>
+    <string name="import_summary_failed">%1$d 個失敗</string>
+    <string name="import_summary_format_native">Komi Store</string>
+    <string name="import_summary_format_obtainium">Obtainium</string>
+    <string name="import_summary_imported">%1$d 個已匯入</string>
+    <string name="import_summary_non_github">%1$d 個非 GitHub</string>
+    <string name="import_summary_non_github_caption">我們暫不追蹤 GitLab、F-Droid 或 HTML 來源。</string>
+    <string name="import_summary_title">匯入結果 — %1$s</string>
+    <string name="import_summary_unknown_caption">這看起來不是 Komi Store 或 Obtainium 的匯出檔案。檔案開頭如下：</string>
+    <string name="import_summary_unknown_format">無法讀取該檔案</string>
+    <string name="installer_attribution_custom_apply">應用</string>
+    <string name="installer_attribution_custom_error">請使用有效的 Android 包名（如 com.example.installer）</string>
+    <string name="installer_attribution_custom_label">安裝器包名</string>
+    <string name="installer_attribution_description">應用可以檢視是哪個安裝器把它裝到你的裝置上。預設情況下是系統 shell。</string>
+    <string name="installer_attribution_disclosure">部分應用會檢測安裝器的變化，並可能拒絕執行或無法透過安全檢查（如 Play Integrity、銀行類應用）。</string>
+    <string name="installer_attribution_preset_custom">自定義…</string>
+    <string name="installer_attribution_preset_fdroid">F-Droid</string>
+    <string name="installer_attribution_preset_obtainium">Obtainium</string>
+    <string name="installer_attribution_preset_playstore">Play Store</string>
+    <string name="installer_attribution_preset_system">系統預設</string>
+    <string name="installer_attribution_title">安裝器歸屬</string>
+    <string name="installer_type_dhizuku">Dhizuku</string>
+    <string name="installer_type_dhizuku_description">透過 Device Owner 靜默安裝 — 跳過 OEM 的安裝提示</string>
+    <string name="rate_limit_exceeded_retry_in">已達請求限額 — %1$d 秒後重試。</string>
+    <string name="rate_limit_exceeded_signin_hint">登入 GitHub 可獲得更高配額。</string>
+    <string name="releases_unavailable_temporarily">釋出版本暫時不可用。請稍後再試。</string>
+    <string name="starred_picker_already_tracked">追蹤中</string>
+    <string name="starred_picker_apk_badge">APK</string>
+    <string name="starred_picker_empty">沒有星標倉庫。在 GitHub 上為倉庫加星即可在此處看到。</string>
+    <string name="starred_picker_filter_show_all">顯示沒有 APK 釋出的倉庫</string>
+    <string name="starred_picker_header_counts">%1$d 已加星 · %2$d 提供 APK · %3$d 個已在追蹤</string>
+    <string name="starred_picker_no_match">沒有匹配項。</string>
+    <string name="starred_picker_progress">檢查中 %1$d / %2$d…</string>
+    <string name="starred_picker_rate_limited">已達 GitHub 請求限額。繼續以恢復檢查。</string>
+    <string name="starred_picker_resume">繼續</string>
+    <string name="starred_picker_search_hint">搜尋 所有者 / 倉庫 / 描述</string>
+    <string name="starred_picker_sign_in_required">登入 GitHub 才能檢視你的星標倉庫。</string>
+    <string name="starred_picker_sort_alphabetical">A → Z</string>
+    <string name="starred_picker_sort_recent">最近加星</string>
+    <string name="starred_picker_sort_stars">星數最多</string>
+    <string name="starred_picker_star_dedup_tooltip">在 GitHub 上取消星標不會取消應用追蹤。</string>
+    <string name="starred_picker_cd_ships_apk">提供 APK</string>
+    <string name="starred_picker_cd_already_tracked">已在追蹤</string>
+    <string name="starred_picker_cd_latest">最新版本 %1$s</string>
+    <string name="import_stars_title">按使用者名稱匯入星標倉庫</string>
+    <string name="import_stars_subtitle">輸入任意 GitHub 使用者名稱，瀏覽其公開星標的倉庫並新增到收藏。無需登入。</string>
+    <string name="import_stars_hint">GitHub 使用者名稱</string>
+    <string name="import_stars_button">檢視星標倉庫</string>
+    <string name="import_stars_header_count">@%1$s · %2$d 個星標倉庫</string>
+    <string name="import_stars_search_hint">搜尋作者 / 倉庫 / 描述</string>
+    <string name="import_stars_add_all">新增 %1$d 個到收藏</string>
+    <string name="import_stars_empty">@%1$s 沒有星標的倉庫。</string>
+    <string name="import_stars_no_match">沒有匹配項。</string>
+    <string name="import_stars_add">新增星標</string>
+    <string name="import_stars_added">已加星標</string>
+    <string name="import_stars_try_another">換一個試試</string>
+    <string name="import_stars_entry">按使用者名稱匯入星標倉庫</string>
+    <string name="starred_picker_title">從星標新增</string>
+    <string name="whats_new_cta_dismiss">知道了</string>
+    <string name="whats_new_cta_history">檢視歷史版本</string>
+    <string name="whats_new_history_empty">暫無更新日誌條目。</string>
+    <string name="whats_new_profile_description">最近版本的亮點。</string>
+    <string name="whats_new_section_fixed">修復</string>
+    <string name="whats_new_section_heads_up">注意</string>
+    <string name="whats_new_section_improved">改進</string>
+    <string name="whats_new_section_new">新增</string>
+    <string name="whats_new_sheet_heading">%1$s 的更新內容</string>
+    <string name="whats_new_title">更新內容</string>
+    <string name="whats_new_version_label">版本 %1$s · %2$s</string>
+
+    <!-- Skip this version (issue #542) -->
+    <string name="apps_skip_version">跳過此版本</string>
+    <string name="apps_skip_version_unskip">不要跳過</string>
+    <string name="apps_skip_version_snackbar">已跳過 %1$s — 當有更新版本時會通知你</string>
+    <string name="apps_unskip_version_snackbar">已重新啟用更新提示</string>
+    <string name="apps_skip_version_error">無法更新偏好設定</string>
+    <string name="apps_unskip_version_error">無法恢復更新提示</string>
+    <string name="skipped_updates_entry_title">已跳過的更新</string>
+    <string name="skipped_updates_entry_description">你已選擇忽略的版本</string>
+    <string name="skipped_updates_title">已跳過的更新</string>
+    <string name="skipped_updates_empty_title">沒有跳過的版本</string>
+    <string name="skipped_updates_empty_description">在應用頁面跳過更新後，條目會顯示在這裡，可隨時撤銷。</string>
+    <string name="skipped_updates_skipped_label">已跳過 %1$s</string>
+    <string name="skipped_updates_installed_label">已安裝：%1$s</string>
+    <string name="skipped_updates_unskip_action">不要跳過</string>
+    <string name="skipped_updates_unskipped_snackbar">已為 %1$s 重新啟用更新提示</string>
+    <string name="skipped_updates_unskip_failure">無法更新偏好設定</string>
+    <string name="hidden_repositories_title">已隱藏的倉庫</string>
+    <string name="hidden_repositories_entry_description">管理從首頁和搜尋中隱藏的倉庫。</string>
+    <string name="hidden_repositories_empty_title">沒有隱藏的倉庫</string>
+    <string name="hidden_repositories_empty_description">在首頁或搜尋中長按倉庫卡片即可從發現中隱藏。</string>
+    <string name="hidden_repositories_unhide_action">取消隱藏</string>
+    <string name="hidden_repositories_unhide_all">全部取消隱藏</string>
+    <string name="hidden_repositories_unhidden_snackbar">%1$s 已重新顯示</string>
+    <string name="hidden_repositories_unhidden_all_snackbar">所有倉庫已重新顯示</string>
+    <string name="hidden_repositories_unhide_failure">無法取消隱藏。請重試。</string>
+    <string name="open_on_github">在 GitHub 開啟</string>
+    <string name="mark_as_viewed">標記為已檢視</string>
+    <string name="mark_as_unviewed">取消已檢視標記</string>
+    <string name="show_all_platforms_label">顯示所有平臺</string>
+    <string name="platform_section_android">Android</string>
+    <string name="platform_section_windows">Windows</string>
+    <string name="platform_section_macos">macOS</string>
+    <string name="platform_section_linux">Linux</string>
+    <string name="section_chip_your_device">你的裝置</string>
+    <string name="section_chip_for_transfer">用於轉移</string>
+
+    <!-- Appended: translations brought to 100% parity with English source -->
+    <string name="adaptive_pick_repo_subtitle">點按左側任意卡片，在此檢視詳情。</string>
+    <string name="adaptive_pick_repo_title">選擇一個倉庫</string>
+    <string name="apps_section_pending_installs">可以安裝</string>
+    <string name="apps_section_in_progress">進行中</string>
+    <string name="download_failed">下載失敗</string>
+    <string name="apps_updates_banner_hide">隱藏列表</string>
+    <string name="apps_updates_banner_show">檢視列表</string>
+    <string name="apps_updates_banner_subtitle">逐個審查或一鍵全部更新。</string>
+    <string name="apps_updates_banner_title_one">1 個可用更新</string>
+    <string name="apps_updates_banner_title_other">%1$d 個可用更新</string>
+    <string name="cd_back">返回</string>
+    <string name="cd_image">圖片</string>
+    <string name="common_see_all">檢視全部 ›</string>
+    <plurals name="custom_forges_count">
+        <item quantity="other">%1$d 個主機</item>
+    </plurals>
+    <string name="custom_forges_dialog_builtin_note">Codeberg、gitea.com 和 git.disroot.org 預設已被搜尋 — 無需在此新增。此列表僅用於你自己的 Forgejo 或 Gitea 自建例項。</string>
+    <string name="details_about_screen_title">關於</string>
+    <string name="details_developer_section">開發者</string>
+    <string name="details_stats_section">統計</string>
+    <string name="details_view_developer_profile">檢視資料</string>
+    <string name="details_whats_new_screen_title">更新內容</string>
+    <string name="external_import_progress_skip">跳過，稍後檢視</string>
+    <string name="feedback_hub_subtitle">每一條反饋我們都會閱讀。</string>
+    <string name="home_action_get">獲取</string>
+    <string name="home_rank_format">#%1$d</string>
+    <string name="home_section_from_your_stars">來自你的星標</string>
+    <string name="home_section_hot_releases">熱門釋出</string>
+    <string name="home_section_most_popular">最受歡迎</string>
+    <string name="home_section_trending_now">當下流行</string>
+    <string name="home_topbar_discover">發現</string>
+    <string name="home_view_all">檢視全部</string>
+    <string name="home_view_more">檢視更多</string>
+    <string name="host_tokens_action_add">新增令牌</string>
+    <string name="host_tokens_action_back">返回</string>
+    <string name="host_tokens_action_cancel">取消</string>
+    <string name="host_tokens_action_delete">刪除</string>
+    <string name="host_tokens_action_save">儲存</string>
+    <string name="host_tokens_compose_add_title">新增令牌</string>
+    <string name="host_tokens_compose_detected">檢測到：%1$s</string>
+    <string name="host_tokens_compose_field_forge_address">程式碼託管地址</string>
+    <string name="host_tokens_compose_replace_hint">留空可保留現有令牌。輸入新值以替換。</string>
+    <string name="host_tokens_compose_replace_title">替換 %1$s 的令牌</string>
+    <string name="host_tokens_compose_will_connect">將連線到 %1$s</string>
+    <plurals name="host_tokens_count">
+        <item quantity="other">%1$d 個令牌</item>
+    </plurals>
+    <string name="host_tokens_empty_subtitle">點按 + 新增個人訪問令牌</string>
+    <string name="host_tokens_empty_title">尚未儲存任何令牌</string>
+    <string name="host_tokens_entry_subtitle">每個程式碼託管站點的個人訪問令牌（GitHub、Codeberg、Forgejo）</string>
+    <string name="host_tokens_field_display_name">顯示名稱（可選）</string>
+    <string name="host_tokens_field_token">個人訪問令牌</string>
+    <string name="host_tokens_oauth_coexistence">你已透過應用使用 GitHub 登入 — 這是推薦方式。僅在瀏覽器登入無法使用（受限網路、無瀏覽器）或針對 GitHub 之外的程式碼託管站點時，才在此新增令牌。</string>
+    <string name="host_tokens_picker_open_page">開啟令牌頁面</string>
+    <string name="host_tokens_picker_other">其他程式碼託管</string>
+    <string name="host_tokens_picker_other_subtitle">Forgejo、Gitea、自建例項</string>
+    <string name="host_tokens_picker_paste">貼上令牌</string>
+    <string name="host_tokens_picker_title">為以下站點新增令牌…</string>
+    <string name="host_tokens_row_edit_label">編輯標籤</string>
+    <string name="host_tokens_row_invalid_short">無效 · %1$s</string>
+    <string name="host_tokens_row_menu">更多</string>
+    <string name="host_tokens_row_open_token_page">在 %1$s 上管理</string>
+    <string name="host_tokens_row_replace_token">替換令牌</string>
+    <string name="host_tokens_row_valid_rate">剩餘 %1$s</string>
+    <string name="host_tokens_row_valid_short">有效 · %1$s</string>
+    <string name="host_tokens_row_validate">檢查</string>
+    <string name="host_tokens_saved">已儲存 %1$s 的令牌</string>
+    <string name="host_tokens_load_failed">無法載入已儲存的令牌</string>
+    <string name="host_tokens_save_failed">無法儲存 %1$s 的令牌</string>
+    <string name="host_tokens_delete_failed">無法刪除 %1$s 的令牌</string>
+    <string name="host_tokens_title">認證令牌</string>
+    <string name="host_tokens_undo_action">撤銷</string>
+    <string name="host_tokens_undo_failed">無法恢復 %1$s 的令牌</string>
+    <string name="host_tokens_undo_snackbar">已移除 %1$s 的令牌</string>
+    <string name="host_tokens_validation_failed_fallback">未知錯誤</string>
+    <string name="host_tokens_validation_http">HTTP %1$d</string>
+    <string name="host_tokens_validation_unreachable">無法連線到伺服器</string>
+    <string name="host_tokens_validation_host_invalid">無效的主機</string>
+    <string name="host_tokens_validation_host_required">必須填寫主機</string>
+    <string name="host_tokens_validation_token_required">必須填寫令牌</string>
+    <string name="host_tokens_validation_token_short">令牌太短</string>
+    <string name="menubar_help_about">關於 Komi Store</string>
+    <string name="menubar_help_feedback">傳送反饋…</string>
+    <string name="menubar_help_licenses">開源許可證</string>
+    <string name="menubar_file_menu">檔案</string>
+    <string name="menubar_go_menu">前往</string>
+    <string name="menubar_file_quit">退出</string>
+    <string name="menubar_help_menu">幫助</string>
+    <string name="menubar_help_privacy">隱私政策</string>
+    <string name="profile_tweaks_description">應用設定、主題、網路、翻譯、高階選項。</string>
+    <string name="restart_banner_body">部分更改需要重啟後生效。</string>
+    <string name="restart_banner_later">稍後</string>
+    <string name="restart_banner_reason_language">語言</string>    <string name="restart_banner_reason_theme">主題</string>
+    <string name="restart_banner_reasons_prefix">受影響：%1$s</string>
+    <string name="restart_banner_restart_now">立即重啟</string>
+    <string name="search_clear_filter_cd">移除篩選</string>
+    <string name="search_filters_apply">完成</string>
+    <string name="search_filters_button">篩選</string>
+    <string name="search_filters_reset">全部重置</string>
+    <string name="search_filters_section_language">語言</string>
+    <string name="search_filters_section_platform">平臺</string>
+    <string name="search_filters_section_sort">排序方式</string>
+    <string name="search_filters_section_source">來源</string>
+    <string name="search_filters_title">篩選結果</string>
+    <string name="section_app_block">應用</string>
+    <string name="section_connectivity">連線</string>
+    <string name="section_installs_and_updates">安裝與更新</string>
+    <string name="section_look_and_feel">外觀與顯示</string>
+    <string name="section_privacy_and_data">隱私與資料</string>
+    <plurals name="skipped_updates_count">
+        <item quantity="other">%1$d 個應用</item>
+    </plurals>
+    <string name="translation_auto_subtitle">開啟倉庫時自動翻譯 README 和釋出說明。以應用語言為目標語言。</string>
+    <string name="translation_auto_target_followup">跟隨應用語言（%1$s）</string>
+    <string name="translation_auto_target_label">翻譯為</string>
+    <string name="translation_auto_title">自動翻譯倉庫</string>
+    <string name="translation_card_cancel">取消</string>
+    <string name="translation_card_change_language">更改語言</string>
+    <string name="translation_card_detected_source">檢測到的源語言：%1$s</string>
+    <string name="translation_card_retry">重試</string>
+    <string name="translation_card_show_original">顯示原文</string>
+    <string name="translation_card_show_translation">顯示譯文</string>
+    <string name="translation_card_subtitle_idle">將此頁面渲染為其他語言。</string>
+    <string name="translation_card_subtitle_original">顯示原文</string>
+    <string name="translation_card_subtitle_translated">已翻譯為 %1$s</string>
+    <string name="translation_card_subtitle_translating">正在翻譯…</string>
+    <string name="translation_card_target_label">目標語言</string>
+    <string name="translation_card_title">翻譯</string>
+    <string name="translation_card_translate_to">翻譯為 %1$s</string>
+    <string name="translation_deepl_auth_key">Auth 金鑰</string>
+    <string name="translation_deepl_get_free_key">獲取免費 DeepL 金鑰 →</string>
+    <string name="translation_deepl_help">在 deepl.com/pro-api 註冊。免費版金鑰以 :fx 結尾，會自動使用免費端點。專業版會保持你的文字私密；免費版可能使用提交的文字來改進模型。</string>
+    <string name="translation_deepl_save">儲存金鑰</string>
+    <string name="translation_deepl_saved">DeepL 金鑰已儲存</string>
+    <string name="translation_libre_api_key">API 金鑰（可選）</string>
+    <string name="translation_libre_base_url">例項 URL</string>
+    <string name="translation_libre_help">透過公共 Disroot 鏡像開箱即用 — 留空欄位即可使用。為獲得更高隱私性，可貼上自建 URL。僅當例項要求時才需要 API 金鑰。</string>
+    <string name="translation_libre_save">儲存設定</string>
+    <string name="translation_libre_saved">LibreTranslate 設定已儲存</string>
+    <string name="translation_microsoft_get_free_key">獲取免費 Azure 金鑰 →</string>
+    <string name="translation_microsoft_help">Azure Translator 注重隱私（預設 No-Trace — 你的文字從不儲存，也不用於訓練）。免費版每月可翻譯 200 萬字元。僅非全球資源需要填寫區域。</string>
+    <string name="translation_microsoft_key">訂閱金鑰</string>
+    <string name="translation_microsoft_region">區域（例如 westeurope，全球留空）</string>
+    <string name="translation_microsoft_save">儲存憑據</string>
+    <string name="translation_microsoft_saved">Microsoft Translator 憑據已儲存</string>
+    <string name="translation_provider_deepl">DeepL</string>
+    <string name="translation_provider_libre">LibreTranslate</string>
+    <string name="translation_provider_microsoft">Microsoft</string>
+    <string name="tweaks_app_info_app_name">Komi Store</string>
+    <string name="tweaks_app_info_licenses_subtitle">應用使用的開源庫。</string>
+    <string name="tweaks_app_info_licenses_title">開源許可證</string>
+    <string name="tweaks_app_info_privacy_policy_subtitle">在 github-store.org 上檢視。</string>
+    <string name="tweaks_app_info_privacy_policy_title">隱私政策</string>
+    <string name="tweaks_app_info_source_code_subtitle">檢視此應用的原始碼。</string>
+    <string name="tweaks_app_info_source_code_title">GitHub 上的原始碼</string>
+    <string name="tweaks_app_info_tagline">面向 GitHub、Codeberg 和 Forgejo 釋出版的跨平臺應用商店。</string>
+    <string name="tweaks_app_info_whats_new_subtitle">過往釋出說明。</string>
+    <string name="tweaks_app_info_whats_new_title">更新內容</string>
+    <string name="tweaks_connection_applies_to_all">除非下方覆蓋，否則適用於全部流量。</string>
+    <string name="tweaks_connection_custom">自定義</string>
+    <string name="tweaks_connection_intro_body">從下方選擇一種連線模式。大多數人保持 不使用代理 即可。</string>
+    <string name="tweaks_connection_intro_title">應用如何連線到網際網路</string>
+    <string name="tweaks_connection_main_section">主連線</string>
+    <string name="tweaks_connection_mode_http">HTTP/HTTPS</string>
+    <string name="tweaks_connection_mode_http_caption">大多數企業代理。</string>
+    <string name="tweaks_connection_mode_no_proxy">不使用代理</string>
+    <string name="tweaks_connection_mode_socks">SOCKS5</string>
+    <string name="tweaks_connection_mode_socks_caption">Tor、SSH 隧道。</string>
+    <string name="tweaks_connection_mode_system">系統</string>
+    <string name="tweaks_connection_overrides_body">每個範圍預設使用主連線。選擇 自定義 以保留各自的設定。</string>
+    <string name="tweaks_connection_overrides_section">分範圍覆蓋</string>
+    <string name="tweaks_connection_paste_url">貼上完整 URL</string>
+    <string name="tweaks_connection_paste_url_body">貼上完整代理 URL，我們會自動填入表單。</string>
+    <string name="tweaks_connection_paste_url_cta">使用此 URL</string>
+    <string name="tweaks_connection_paste_url_error">無法解析該 URL。</string>
+    <string name="tweaks_connection_paste_url_placeholder">scheme://user:pass@host:port</string>
+    <string name="tweaks_connection_paste_url_title">貼上代理 URL</string>
+    <string name="tweaks_connection_scope_discovery_body">GitHub API、搜尋、倉庫詳情。</string>
+    <string name="tweaks_connection_scope_discovery_title">搜尋與後設資料</string>
+    <string name="tweaks_connection_scope_download_body">APK 和資源下載。</string>
+    <string name="tweaks_connection_scope_download_title">下載</string>
+    <string name="tweaks_connection_scope_translation_body">DeepL、Microsoft、LibreTranslate 請求。</string>
+    <string name="tweaks_connection_scope_translation_title">翻譯</string>
+    <string name="tweaks_connection_test">測試</string>
+    <string name="tweaks_connection_use_main">使用主連線</string>
+    <string name="tweaks_entry_access_tokens">訪問令牌</string>
+    <string name="tweaks_entry_app_info">應用資訊</string>
+    <string name="tweaks_entry_appearance">外觀</string>
+    <string name="tweaks_entry_connection">連線</string>
+    <string name="tweaks_entry_feedback">傳送反饋</string>
+    <string name="tweaks_entry_install_method">安裝方式</string>
+    <string name="tweaks_entry_language">語言</string>
+    <string name="tweaks_entry_privacy">隱私</string>
+    <string name="tweaks_entry_sources">來源</string>
+    <string name="tweaks_entry_storage">儲存</string>
+    <string name="tweaks_entry_subtitle_tap">點按管理</string>
+    <string name="tweaks_entry_translation">翻譯</string>
+    <string name="tweaks_entry_updates">更新行為</string>
+    <string name="tweaks_install_method_desktop_empty_body">靜默安裝器和安裝器歸屬僅限 Android。桌面端安裝透過系統包管理器完成。</string>
+    <string name="tweaks_install_method_desktop_empty_title">安裝方式僅限 Android</string>
+    <string name="tweaks_language_intro_body">切換語言時應用會重啟。</string>
+    <string name="tweaks_licenses_intro_body">點按任意條目以開啟其專案頁面。</string>
+    <string name="tweaks_licenses_intro_title">Komi Store 依託於這些開源庫。</string>
+    <string name="tweaks_licenses_title">開源許可證</string>
+    <string name="tweaks_privacy_browsing_history_section">瀏覽記錄</string>
+    <string name="tweaks_privacy_clear_viewed_body">忘記你開啟過哪些倉庫。</string>
+    <string name="tweaks_privacy_clear_viewed_dialog_body">這不會取消任何星標或收藏狀態。</string>
+    <string name="tweaks_privacy_clear_viewed_dialog_confirm">清除</string>
+    <string name="tweaks_privacy_clear_viewed_dialog_title">清除瀏覽記錄？</string>
+    <string name="tweaks_privacy_clear_viewed_title">清除瀏覽記錄</string>
+    <string name="tweaks_privacy_clipboard_body">當你複製 github.com 或 codeberg.org 連結時，我們會提示你開啟。</string>
+    <string name="tweaks_privacy_clipboard_title">檢測剪貼簿中的倉庫連結</string>
+    <string name="tweaks_privacy_hidden_repos_body">你選擇從資訊流和搜尋中排除的倉庫。</string>
+    <string name="tweaks_privacy_hidden_repos_title">已隱藏的倉庫</string>
+    <string name="tweaks_privacy_hide_seen_body">在資訊流和搜尋中跳過已檢視的倉庫。</string>
+    <string name="tweaks_privacy_hide_seen_title">隱藏我已檢視過的倉庫</string>    <string name="tweaks_privacy_telemetry_collect_no_identifiers">不收集識別符號。</string>    <string name="tweaks_privacy_telemetry_collect_os">作業系統和平臺。</string>    <string name="tweaks_search_empty">沒有設定匹配 '%1$s'。</string>
+    <string name="tweaks_search_placeholder">搜尋設定</string>
+    <string name="tweaks_sources_add_a_host">新增 Forgejo 或 Gitea 主機</string>
+    <string name="tweaks_sources_added_hosts_section">已新增的主機</string>
+    <string name="tweaks_sources_github_mirror_title">GitHub 鏡像</string>
+    <string name="tweaks_sources_intro_body">應用預設搜尋 GitHub。可透過區域鏡像路由，或新增自定義的 Forgejo / Gitea 主機。</string>
+    <string name="tweaks_sources_intro_title">應用從哪裡查詢倉庫</string>
+    <string name="tweaks_sources_mirror_default">預設 (github.com)</string>
+    <string name="tweaks_storage_downloaded_apks_body">我們會保留安裝包，以便更新可以快速繼續。</string>
+    <string name="tweaks_storage_downloaded_apks_clear">清除</string>
+    <string name="tweaks_storage_downloaded_apks_title">已下載的 APK</string>
+    <string name="tweaks_storage_empty_size">0 B</string>
+    <string name="tweaks_storage_using_label">佔用：%1$s</string>
+    <string name="tweaks_stub_coming_soon_body">此頁面屬於正在進行的重新設計。設定依然有效 — 只是正從舊佈局遷移到這裡。</string>
+    <string name="tweaks_stub_coming_soon_title">後續更新中</string>
+    <plurals name="hidden_repositories_count">
+        <item quantity="other">已隱藏 %1$d 個</item>
+    </plurals>
+    <string name="tweaks_app_info_community_section">連線</string>
+    <string name="tweaks_app_info_community_title">加入社群</string>
+    <string name="tweaks_app_info_community_subtitle">6 個平臺</string>
+    <string name="tweaks_app_info_community_business_title">商務諮詢</string>
+    <string name="tweaks_app_info_community_business_subtitle">合作、媒體、整合。</string>
+    <string name="tweaks_app_info_community_business_cta">聯絡</string>
+    <string name="profile_section_library">媒體庫</string>
+    <string name="profile_section_updates">更新</string>
+    <string name="profile_section_account">賬戶</string>
+    <string name="appearance_section_mode">模式</string>
+    <string name="appearance_section_display">顯示</string>
+    <string name="tweaks_accent_crimson">緋紅</string>
+    <string name="tweaks_accent_cobalt">鈷藍</string>
+    <string name="tweaks_accent_sun">暖陽</string>
+    <string name="tweaks_accent_frost">霜白</string>
+    <string name="tweaks_accent_mono">單色</string>
+    <string name="tweaks_accent_wallpaper">桌布配色</string>
+    <string name="theme_dynamic">動態</string>
+    <string name="auth_more_signin_options">更多登入方式</string>
+    <string name="auth_hide_signin_options">隱藏選項</string>
+    <string name="tweaks_sources_platforms_title">發現哪些平臺</string>
+    <string name="tweaks_sources_platforms_body">按平臺過濾首頁內容。全部關閉則不限平臺。</string>
+    <string name="profile_entry_about_title">關於</string>
+    <string name="profile_entry_about_subtitle">版本、社群、法律</string>
+    <string name="filter_with_installable">可在此安裝</string>
+    <string name="no_repos_with_installable">沒有適用於當前平臺的可安裝資源倉庫</string>
+    <string name="interval_every_hours">每 %1$d 小時</string>
+    <string name="interval_daily">每天</string>
+    <string name="interval_every_days">每 %1$d 天</string>
+    <string name="interval_weekly">每週</string>
+    <string name="interval_biweekly">每 2 周</string>
+    <string name="interval_monthly">每 30 天</string>
+
+    <!-- Onboarding -->
+    <string name="onboarding_palette_title">選擇你的配色</string>
+    <string name="onboarding_palette_subtitle">四種配色 × 淺色、深色、AMOLED、跟隨系統。</string>
+    <string name="onboarding_signin_subtitle">星標、個人資料，以及更高的請求限額。可選 — 跳過即可匿名瀏覽。</string>
+    <string name="onboarding_signin_button">登入</string>
+    <string name="onboarding_permissions_title">兩個快速授權</string>
+    <string name="onboarding_permissions_subtitle">兩者均為可選。你隨時可以在“調整”中更改。</string>
+    <string name="onboarding_permission_notifications">通知</string>
+    <string name="onboarding_permission_notifications_desc">更新提醒與安裝進度</string>
+    <string name="onboarding_permission_install">安裝未知應用</string>
+    <string name="onboarding_permission_install_desc">在 Play 之外安裝 APK 所必需</string>
+    <string name="onboarding_permission_granted">已授權</string>
+    <string name="onboarding_permission_allow">允許</string>
+    <string name="onboarding_skip">跳過</string>
+    <string name="onboarding_get_started">開始使用</string>
+    <string name="onboarding_next">下一步</string>
+
+    <!-- Developer profile -->
+    <string name="dev_profile_contribution_activity">貢獻活動</string>
+    <string name="dev_profile_contributions_this_year">今年 %1$d 次</string>
+    <string name="dev_profile_contributions_load_failed">無法載入貢獻記錄。</string>
+    <string name="dev_profile_contributions_less">較少</string>
+    <string name="dev_profile_contributions_more">較多</string>
+    <string name="dev_profile_org_badge">組織</string>
+
+    <!-- Common -->
+    <string name="loading">正在載入…</string>
+    <string name="failed_to_load">載入失敗</string>
+    <string name="failed_to_load_details">載入詳情失敗</string>
+
+    <!-- Tweaks: licenses / app info / custom forges -->
+    <string name="tweaks_licenses_load_failed">無法載入許可證。</string>
+    <string name="tweaks_app_info_website">網站</string>
+    <string name="tweaks_clear_downloads_failed">清除下載失敗</string>
+    <string name="tweaks_custom_forge_invalid_hostname">請輸入有效的主機名（例如 forgejo.example.com）。</string>
+    <string name="tweaks_custom_forge_save_failed">無法儲存該主機。請重試。</string>
+    <string name="tweaks_custom_forge_remove_failed">無法移除該主機。請重試。</string>
+
+    <!-- Repo pages: issues -->
+    <string name="repo_pages_issues_title">Issues</string>
+    <string name="repo_pages_issues_filter_open">開啟</string>
+    <string name="repo_pages_issues_filter_closed">已關閉</string>
+    <string name="repo_pages_issues_empty_open">沒有開啟的 Issue。</string>
+    <string name="repo_pages_issues_empty_closed">沒有已關閉的 Issue。</string>
+    <string name="repo_pages_issue_comments_section">評論</string>
+    <string name="repo_pages_issue_no_body">未提供描述。</string>
+    <string name="repo_pages_issue_opened_by">由 %1$s 建立</string>
+
+    <!-- Repo pages: security -->
+    <string name="repo_pages_security_title">安全</string>
+    <string name="repo_pages_security_advisories_header">安全公告</string>
+    <string name="repo_pages_security_no_advisories">尚未釋出任何公告。</string>
+    <string name="repo_pages_security_policy_header">安全策略</string>
+    <string name="repo_pages_security_no_policy">尚未釋出安全策略。</string>
+    <string name="repo_pages_severity_critical">嚴重</string>
+    <string name="repo_pages_severity_high">高</string>
+    <string name="repo_pages_severity_medium">中</string>
+    <string name="repo_pages_severity_low">低</string>
+    <string name="repo_pages_severity_unknown">未知</string>
+
+    <!-- Repo pages: details entry -->
+    <string name="repo_pages_details_security_button">安全</string>
+    <string name="repo_pages_details_security_value">公告</string>
+
+    <!-- Repo pages: details entry -->
+    <string name="repo_pages_details_pulls_button">拉取請求</string>
+
+    <!-- Repo interactions: star -->
+    <string name="star_added">已加星</string>
+    <string name="star_removed">已取消加星</string>
+    <string name="star_sign_in_required">登入後即可為倉庫加星。</string>
+
+    <!-- Repo interactions: comments -->
+    <string name="repo_pages_comment_hint">新增評論…</string>
+    <string name="repo_pages_comment_send">傳送</string>
+    <string name="repo_pages_comment_sign_in">登入後即可評論。</string>
+    <string name="repo_pages_comment_failed">無法發表評論。</string>
+    <string name="repo_pages_comment_posted">評論已發表</string>
+
+    <!-- Repo interactions: new issue -->
+    <string name="repo_pages_new_issue">新建 Issue</string>
+    <string name="repo_pages_new_issue_title_hint">標題</string>
+    <string name="repo_pages_new_issue_body_hint">描述這個 Issue…</string>
+    <string name="repo_pages_new_issue_submit">建立</string>
+    <string name="repo_pages_new_issue_sign_in">登入後即可建立 Issue。</string>
+    <string name="repo_pages_new_issue_failed">無法建立 Issue。</string>
+    <string name="repo_pages_new_issue_created">Issue 已建立</string>
+
+    <!-- Repo interactions: reactions -->
+    <string name="repo_pages_react_sign_in">登入後即可新增回應。</string>
+    <string name="repo_pages_react_failed">無法新增回應。</string>
+    <string name="cd_thumbs_up">點贊</string>
+
+    <!-- Repo pages: pull requests -->
+    <string name="repo_pages_pulls_title">拉取請求</string>
+    <string name="repo_pages_pulls_empty_open">沒有開啟的拉取請求。</string>
+    <string name="repo_pages_pulls_empty_closed">沒有已關閉的拉取請求。</string>
+    <string name="repo_pages_pr_state_merged">已合併</string>
+    <string name="repo_pages_pr_draft">草稿</string>
+    <string name="feed_end_cap">続く · TO BE CONTINUED</string>
+    <string name="feed_masthead_subtitle">発見 · DISCOVER APPS</string>
+    <string name="home_masthead_subtitle">ランキング · CHARTS &amp; PICKS</string>
+    <string name="feed_platform_picker_title_jp">対応</string>
+    <string name="sidebar_browse_jp">航行</string>
+    <string name="sidebar_categories_jp">部門</string>
+    <string name="sidebar_nav_charts_jp">ランキング</string>
+    <string name="sidebar_nav_explore_jp">発見</string>
+    <string name="sidebar_nav_search_jp">検索</string>
+    <string name="sidebar_nav_you_jp">あなた</string>
+    <string name="sidebar_platform_jp">対応</string>
+    <string name="feed_masthead_title">Komi Store</string>
+    <string name="feed_masthead_title_accent">Store</string>
+    <string name="platform_section_ios">iOS</string>
+    <string name="paper_nord">Nord</string>
+    <string name="appearance_section_paper">紙張</string>
+    <string name="bottom_nav_top_charts_title">排行榜</string>
+    <string name="cd_more_actions">更多操作</string>
+    <string name="feed_category_ai">人工智慧</string>
+    <string name="feed_category_media">媒體</string>
+    <string name="feed_category_networking">網路</string>
+    <string name="feed_category_privacy">隱私</string>
+    <string name="feed_category_reading">閱讀</string>
+    <string name="feed_category_social">社交</string>
+    <string name="feed_category_tools">工具</string>
+    <string name="feed_cd_profile">個人資料</string>
+    <string name="feed_cd_search">搜尋</string>
+    <string name="feed_empty_reset">重置篩選器</string>
+    <string name="feed_empty_subtitle">暫無適用於 %2$s 的 %1$s 應用。</string>
+    <string name="feed_empty_title">這裡還空空如也</string>
+    <string name="feed_failed_to_load">無法載入資訊流</string>
+    <string name="feed_browsing">瀏覽</string>
+    <string name="feed_loading">正在載入最新內容…</string>
+    <string name="feed_offline">離線 — 顯示已儲存的資訊流</string>
+    <string name="feed_platform_all">所有平臺</string>
+    <string name="feed_platform_picker_title">選擇你的系統</string>
+    <string name="home_chart_popular">熱門</string>
+    <string name="home_chart_releases">新發布</string>
+    <string name="home_chart_trending">趨勢</string>
+    <string name="home_masthead_title">排行榜</string>
+    <string name="paper_day">白天</string>
+    <string name="paper_night">夜晚</string>
+    <string name="repo_card_details">詳情</string>
+    <string name="sidebar_browse">瀏覽</string>
+    <string name="sidebar_categories">分類</string>
+    <string name="sidebar_platform">平臺</string>
+    <string name="tweaks_privacy_usage_data_section">使用資料</string>
+    <string name="no_build_for_this_device">沒有適用於此裝置的版本</string>
+    <string name="newer_releases_no_build_for_device">較新的版本中沒有適用於此裝置的版本</string>
+    <string name="latest_for_platform">%1$s 最新版</string>
+    <string name="go_to_version">前往 %1$s</string>
+    <string name="get_it_on_platform">取得 %1$s 版</string>
+    <string name="share_link">分享連結</string>
+    <string name="display_mode_title">重新整理率</string>
+    <string name="display_mode_description">向螢幕要求指定的重新整理率。自動由系統決定。</string>
+    <string name="display_mode_auto">自動</string>
+    <string name="display_mode_option">%1$d × %2$d · %3$d Hz</string>
+    <string name="show_tabs">顯示分頁</string>
+    <string name="repo_layout_title">儲存庫版面配置</string>
+    <string name="repo_layout_list">清單</string>
+    <string name="repo_layout_grid">網格</string>
+    <string name="apps_tag_updates_ignored">已忽略更新</string>
+    <string name="apps_tag_skipped">已略過 %1$s</string>
+    <string name="apps_tag_asset_filter">資產篩選</string>
+    <string name="apps_variant_stale_pick">變體已變更，請重新選擇。</string>
+    <string name="apps_no_release_found">找不到可安裝的發行版本。</string>
+</resources>

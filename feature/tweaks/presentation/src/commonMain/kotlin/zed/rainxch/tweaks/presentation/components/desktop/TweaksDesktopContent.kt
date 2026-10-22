@@ -17,6 +17,8 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -25,8 +27,8 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.stringResource
+import zed.rainxch.core.presentation.components.buttons.KomiIconButton
 import zed.rainxch.core.presentation.components.text.KomiText
 import zed.rainxch.core.presentation.components.text.KomiTextRole
 import zed.rainxch.core.presentation.locals.LocalPersonality
@@ -40,6 +42,7 @@ import zed.rainxch.githubstore.core.presentation.res.section_connectivity
 import zed.rainxch.githubstore.core.presentation.res.section_look_and_feel
 import zed.rainxch.githubstore.core.presentation.res.section_privacy_and_data
 import zed.rainxch.githubstore.core.presentation.res.tweaks_title
+import zed.rainxch.githubstore.core.presentation.res.navigate_back
 import zed.rainxch.tweaks.presentation.TweaksAction
 import zed.rainxch.tweaks.presentation.TweaksState
 import zed.rainxch.core.domain.model.appearance.AppPersonality
@@ -80,6 +83,7 @@ fun TweaksDesktopContent(
     onNavigateToMirrorPicker: () -> Unit,
     onNavigateToHiddenRepositories: () -> Unit,
     onNavigateToHostTokens: () -> Unit,
+    onNavigateBack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val colors = LocalPersonality.current.colors
@@ -103,20 +107,27 @@ fun TweaksDesktopContent(
                     }
                     .padding(horizontal = 12.dp, vertical = 18.dp),
         ) {
-            KomiText(
-                text = stringResource(Res.string.tweaks_title),
-                role = KomiTextRole.Display,
-                color = colors.onSurface,
-                fontSize = 22.sp,
-                modifier = Modifier.padding(start = 6.dp),
-            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
+            ) {
+                KomiIconButton(
+                    icon = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = stringResource(Res.string.navigate_back),
+                    onClick = onNavigateBack,
+                )
+                KomiText(
+                    text = stringResource(Res.string.tweaks_title),
+                    role = KomiTextRole.ScreenTitle,
+                    color = colors.onSurface,
+                    modifier = Modifier.padding(start = 6.dp),
+                )
+            }
             tweaksKicker(TweaksDecorSlot.SettingsNavTitle)?.let { navKicker ->
                 KomiText(
                     text = navKicker,
-                    role = KomiTextRole.Label,
+                    role = KomiTextRole.Caption,
                     color = colors.onSurfaceVariant,
-                    fontSize = 10.sp,
-                    uppercase = false,
                     modifier = Modifier.padding(start = 6.dp, bottom = 14.dp),
                 )
             }
@@ -220,19 +231,15 @@ private fun NavRow(
     ) {
         KomiText(
             text = label,
-            role = if (isManga) KomiTextRole.Stamp else KomiTextRole.Label,
+            role = KomiTextRole.Label,
             color = if (active) colors.onPrimary else colors.onSurface,
-            fontSize = 14.sp,
-            uppercase = if (isManga) null else false,
             modifier = Modifier.weight(1f),
         )
         if (kicker != null) {
             KomiText(
                 text = kicker,
-                role = KomiTextRole.Label,
+                role = KomiTextRole.Caption,
                 color = if (active) colors.onPrimary else colors.onSurfaceVariant,
-                fontSize = 9.5.sp,
-                uppercase = false,
             )
         }
     }

@@ -1,0 +1,163 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues/>
+  <CurrentIssues>
+    <ID>ComplexCondition:AdaptiveListDetail.kt$saved is BooleanArray || saved !is List&lt;*&gt; || saved.isEmpty() || saved[0] != true</ID>
+    <ID>ComplexCondition:KomiDropdown.kt$isManga &amp;&amp; item.enabled &amp;&amp; (hovered || pressed)</ID>
+    <ID>ComplexCondition:TimeFormatters.kt$s.contains('T') &amp;&amp; n &gt;= 3 &amp;&amp; (s[n - 3] == '+' || s[n - 3] == '-') &amp;&amp; s[n - 2].isDigit() &amp;&amp; s[n - 1].isDigit()</ID>
+    <ID>CyclomaticComplexMethod:KomiActionRow.kt$@Composable fun KomiActionRow( items: ImmutableList&lt;KomiActionRowItem&gt;, modifier: Modifier = Modifier, size: KomiIconButtonSize = KomiIconButtonSize.Md, maxVisible: Int = Int.MAX_VALUE, showLabels: Boolean = false, )</ID>
+    <ID>CyclomaticComplexMethod:KomiBadge.kt$@Composable fun KomiBadge( modifier: Modifier = Modifier, count: Int? = null, dot: Boolean = false, tone: KomiBadgeTone = KomiBadgeTone.Alert, size: KomiBadgeSize = KomiBadgeSize.Sm, max: Int = 99, tilt: Boolean = false, animate: Boolean = false, contentDescription: String? = null, )</ID>
+    <ID>CyclomaticComplexMethod:KomiButton.kt$@Composable private fun ClassicButton( personality: ClassicPersonality, onClick: () -&gt; Unit, label: String, modifier: Modifier = Modifier, variant: KomiButtonVariant, size: KomiButtonSize, enabled: Boolean, loading: Boolean, fullWidth: Boolean, leadingIcon: ImageVector?, trailingIcon: ImageVector?, containerColor: Color, contentColor: Color, )</ID>
+    <ID>CyclomaticComplexMethod:KomiButton.kt$@Composable private fun MangaButton( personality: MangaPersonality, onClick: () -&gt; Unit, label: String, modifier: Modifier = Modifier, variant: KomiButtonVariant, size: KomiButtonSize, enabled: Boolean, loading: Boolean, emphasized: Boolean, fullWidth: Boolean, leadingIcon: ImageVector?, trailingIcon: ImageVector?, containerColor: Color, contentColor: Color, )</ID>
+    <ID>CyclomaticComplexMethod:KomiChip.kt$@Composable private fun MangaChip( personality: MangaPersonality, label: String, modifier: Modifier, kind: KomiChipKind, size: KomiChipSize, selected: Boolean, index: Int, tilt: Boolean, leadingIcon: ImageVector?, leadingContent: (@Composable () -&gt; Unit)?, count: Int?, onClick: (() -&gt; Unit)?, onRemove: (() -&gt; Unit)?, )</ID>
+    <ID>CyclomaticComplexMethod:KomiDropdown.kt$@Composable private fun KomiMenuRow( item: KomiMenuItem, selected: Boolean, onClick: () -&gt; Unit, )</ID>
+    <ID>CyclomaticComplexMethod:KomiList.kt$@OptIn(ExperimentalFoundationApi::class) @Composable fun KomiListRow( title: String, modifier: Modifier = Modifier, subtitle: String? = null, icon: ImageVector? = null, onClick: (() -&gt; Unit)? = null, onLongClick: (() -&gt; Unit)? = null, strong: Boolean = false, destructive: Boolean = false, selected: Boolean = false, enabled: Boolean = true, showDivider: Boolean = false, trailing: @Composable (() -&gt; Unit)? = null, )</ID>
+    <ID>CyclomaticComplexMethod:KomiRepoCard.kt$@OptIn(ExperimentalLayoutApi::class) @Composable fun KomiRepoCard( name: String, owner: String, language: String, description: String, platforms: ImmutableList&lt;DiscoveryPlatform&gt;, stars: Int, downloads: Int, releasedAgoDays: Int, onOpen: () -&gt; Unit, modifier: Modifier = Modifier, onLongPress: (() -&gt; Unit)? = null, monogram: String? = null, imageUrl: String? = null, feed: KomiRepoCardFeed = KomiRepoCardFeed.Plain, rank: Int = 1, version: String? = null, dailyStars: Int = 0, compact: Boolean = false, index: Int = 0, tilt: Boolean = false, releasedAt: String? = null, )</ID>
+    <ID>CyclomaticComplexMethod:KomiSurface.kt$@OptIn(ExperimentalFoundationApi::class) @Composable private fun MangaSurface( personality: MangaPersonality, modifier: Modifier = Modifier, elevation: KomiSurfaceElevation, paper: KomiSurfacePaper, screentone: KomiScreentone, screentoneBoost: Float, onClick: (() -&gt; Unit)?, onLongClick: (() -&gt; Unit)?, hoverEnabled: Boolean?, tilt: Float, topEdgeOnly: Boolean, contentPadding: PaddingValues, content: @Composable () -&gt; Unit, )</ID>
+    <ID>CyclomaticComplexMethod:KomiTextField.kt$@Composable private fun ClassicTextField( value: String, onValueChange: (String) -&gt; Unit, modifier: Modifier, label: String?, helper: String?, error: String?, placeholder: String?, leadingIcon: ImageVector?, trailing: @Composable (() -&gt; Unit)?, clearable: Boolean, multiline: Boolean, rows: Int, required: Boolean, enabled: Boolean, password: Boolean, keyboardType: KeyboardType, onCommit: (() -&gt; Unit)?, )</ID>
+    <ID>CyclomaticComplexMethod:KomiTextField.kt$@Composable private fun MangaTextField( personality: MangaPersonality, value: String, onValueChange: (String) -&gt; Unit, modifier: Modifier, label: String?, helper: String?, error: String?, placeholder: String?, leadingIcon: ImageVector?, trailing: @Composable (() -&gt; Unit)?, clearable: Boolean, multiline: Boolean, rows: Int, required: Boolean, size: KomiTextFieldSize, enabled: Boolean, password: Boolean, keyboardType: KeyboardType, onCommit: (() -&gt; Unit)?, )</ID>
+    <ID>CyclomaticComplexMethod:SyntaxHighlightedCode.kt$private fun languageOf(hint: String): SyntaxLanguage</ID>
+    <ID>CyclomaticComplexMethod:TimeFormatters.kt$@OptIn(ExperimentalTime::class) private fun parseIsoInstantLenient(isoInstant: String): Instant?</ID>
+    <ID>FunctionNaming:ScrollbarContainer.jvm.kt$private fun GridScrollbarAdapter( gridState: LazyGridState, ): GridScrollbarAdapterBase</ID>
+    <ID>FunctionNaming:ScrollbarContainer.jvm.kt$private fun StaggeredGridScrollbarAdapter( gridState: LazyStaggeredGridState, ): GridScrollbarAdapterBase</ID>
+    <ID>LongParameterList:KomiText.kt$( type: zed.rainxch.core.presentation.personality.model.PersonalityType, role: KomiTextRole, fontSize: TextUnit, fontWeight: FontWeight?, letterSpacing: TextUnit, lineHeight: TextUnit, )</ID>
+    <ID>LongParameterList:ScrollbarContainer.jvm.kt$GridScrollbarAdapterBase$( private val totalItemsCount: () -&gt; Int, private val firstVisibleIndex: () -&gt; Int?, private val firstVisibleOffsetY: () -&gt; Int, private val estimateContentSize: () -&gt; Float, private val scrollToItem: suspend (Int) -&gt; Unit, private val scrollByPixels: (Float) -&gt; Unit, private val measureResult: () -&gt; Any, )</ID>
+    <ID>MagicNumber:ClassicColors.kt$0xFF000000</ID>
+    <ID>MagicNumber:ClassicColors.kt$0xFF00164E</ID>
+    <ID>MagicNumber:ClassicColors.kt$0xFF002022</ID>
+    <ID>MagicNumber:ClassicColors.kt$0xFF00257A</ID>
+    <ID>MagicNumber:ClassicColors.kt$0xFF00363A</ID>
+    <ID>MagicNumber:ClassicColors.kt$0xFF004F54</ID>
+    <ID>MagicNumber:ClassicColors.kt$0xFF00696E</ID>
+    <ID>MagicNumber:ClassicColors.kt$0xFF1A1A1A</ID>
+    <ID>MagicNumber:ClassicColors.kt$0xFF261900</ID>
+    <ID>MagicNumber:ClassicColors.kt$0xFF2C44A8</ID>
+    <ID>MagicNumber:ClassicColors.kt$0xFF2E2E2E</ID>
+    <ID>MagicNumber:ClassicColors.kt$0xFF3B5BDB</ID>
+    <ID>MagicNumber:ClassicColors.kt$0xFF3F2E00</ID>
+    <ID>MagicNumber:ClassicColors.kt$0xFF410E0B</ID>
+    <ID>MagicNumber:ClassicColors.kt$0xFF474747</ID>
+    <ID>MagicNumber:ClassicColors.kt$0xFF4A4A4A</ID>
+    <ID>MagicNumber:ClassicColors.kt$0xFF4DD9E3</ID>
+    <ID>MagicNumber:ClassicColors.kt$0xFF5B4300</ID>
+    <ID>MagicNumber:ClassicColors.kt$0xFF690005</ID>
+    <ID>MagicNumber:ClassicColors.kt$0xFF6FF6FE</ID>
+    <ID>MagicNumber:ClassicColors.kt$0xFF7A5900</ID>
+    <ID>MagicNumber:ClassicColors.kt$0xFF93000A</ID>
+    <ID>MagicNumber:ClassicColors.kt$0xFFB3261E</ID>
+    <ID>MagicNumber:ClassicColors.kt$0xFFB6C4FF</ID>
+    <ID>MagicNumber:ClassicColors.kt$0xFFC7C7C7</ID>
+    <ID>MagicNumber:ClassicColors.kt$0xFFDCE1FF</ID>
+    <ID>MagicNumber:ClassicColors.kt$0xFFE2E2E2</ID>
+    <ID>MagicNumber:ClassicColors.kt$0xFFE4E4E4</ID>
+    <ID>MagicNumber:ClassicColors.kt$0xFFF4BE48</ID>
+    <ID>MagicNumber:ClassicColors.kt$0xFFF9DEDC</ID>
+    <ID>MagicNumber:ClassicColors.kt$0xFFFFB4AB</ID>
+    <ID>MagicNumber:ClassicColors.kt$0xFFFFDAD6</ID>
+    <ID>MagicNumber:ClassicColors.kt$0xFFFFDEA8</ID>
+    <ID>MagicNumber:ClassicColors.kt$0xFFFFFFFF</ID>
+    <ID>MagicNumber:ColorContrast.kt$0.05f</ID>
+    <ID>MagicNumber:ConstrainedContentWidth.kt$0.55f</ID>
+    <ID>MagicNumber:ConstrainedContentWidth.kt$0.75f</ID>
+    <ID>MagicNumber:ConstrainedContentWidth.kt$0.95f</ID>
+    <ID>MagicNumber:CountFormatter.kt$10.0</ID>
+    <ID>MagicNumber:CountFormatter.kt$100L</ID>
+    <ID>MagicNumber:CountFormatter.kt$100_000L</ID>
+    <ID>MagicNumber:CountFormatter.kt$1_000L</ID>
+    <ID>MagicNumber:CountFormatter.kt$1_000_000L</ID>
+    <ID>MagicNumber:ExpandableDetails.kt$16</ID>
+    <ID>MagicNumber:ExpandableDetails.kt$3</ID>
+    <ID>MagicNumber:FileSizeFormatter.kt$1_024.0</ID>
+    <ID>MagicNumber:FileSizeFormatter.kt$1_024L</ID>
+    <ID>MagicNumber:GithubStoreMarkdownComponents.kt$4</ID>
+    <ID>MagicNumber:InkModifiers.kt$0.7f</ID>
+    <ID>MagicNumber:KomiChip.kt$11.5f</ID>
+    <ID>MagicNumber:KomiChip.kt$11f</ID>
+    <ID>MagicNumber:KomiChip.kt$12f</ID>
+    <ID>MagicNumber:KomiChip.kt$14f</ID>
+    <ID>MagicNumber:KomiChip.kt$180.0</ID>
+    <ID>MagicNumber:KomiHeadline.kt$0.30f</ID>
+    <ID>MagicNumber:KomiRepoCard.kt$.5f</ID>
+    <ID>MagicNumber:KomiRepoCard.kt$0.114f</ID>
+    <ID>MagicNumber:KomiRepoCard.kt$0.15f</ID>
+    <ID>MagicNumber:KomiRepoCard.kt$0.299f</ID>
+    <ID>MagicNumber:KomiRepoCard.kt$0.587f</ID>
+    <ID>MagicNumber:KomiRepoCard.kt$0.95f</ID>
+    <ID>MagicNumber:KomiRepoCard.kt$1.02f</ID>
+    <ID>MagicNumber:KomiRepoCard.kt$1.05f</ID>
+    <ID>MagicNumber:KomiRepoCard.kt$1.15f</ID>
+    <ID>MagicNumber:KomiRepoCard.kt$10</ID>
+    <ID>MagicNumber:KomiRepoCard.kt$10.0</ID>
+    <ID>MagicNumber:KomiRepoCard.kt$10_000</ID>
+    <ID>MagicNumber:KomiRepoCard.kt$10_000_000</ID>
+    <ID>MagicNumber:KomiRepoCard.kt$1_000</ID>
+    <ID>MagicNumber:KomiRepoCard.kt$1_000.0</ID>
+    <ID>MagicNumber:KomiRepoCard.kt$1_000_000</ID>
+    <ID>MagicNumber:KomiRepoCard.kt$1_000_000.0</ID>
+    <ID>MagicNumber:KomiRepoCard.kt$255f</ID>
+    <ID>MagicNumber:KomiSheet.kt$0.21f</ID>
+    <ID>MagicNumber:KomiTextField.kt$13f</ID>
+    <ID>MagicNumber:KomiTextField.kt$15f</ID>
+    <ID>MagicNumber:KomiTextField.kt$17f</ID>
+    <ID>MagicNumber:MangaAccentSwatch.kt$0xFF1B150D</ID>
+    <ID>MagicNumber:MangaAccentSwatch.kt$0xFF1F4ED8</ID>
+    <ID>MagicNumber:MangaAccentSwatch.kt$0xFF2E3440</ID>
+    <ID>MagicNumber:MangaAccentSwatch.kt$0xFF88C0D0</ID>
+    <ID>MagicNumber:MangaAccentSwatch.kt$0xFFD8202A</ID>
+    <ID>MagicNumber:MangaAccentSwatch.kt$0xFFF5A300</ID>
+    <ID>MagicNumber:MangaAccentSwatch.kt$0xFFFFFFFF</ID>
+    <ID>MagicNumber:MangaColors.kt$0xFF000000</ID>
+    <ID>MagicNumber:MangaColors.kt$0xFF0C0A07</ID>
+    <ID>MagicNumber:MangaColors.kt$0xFF16120C</ID>
+    <ID>MagicNumber:MangaColors.kt$0xFF1B150D</ID>
+    <ID>MagicNumber:MangaColors.kt$0xFF20242E</ID>
+    <ID>MagicNumber:MangaColors.kt$0xFF211B12</ID>
+    <ID>MagicNumber:MangaColors.kt$0xFF2E3440</ID>
+    <ID>MagicNumber:MangaColors.kt$0xFF3B4252</ID>
+    <ID>MagicNumber:MangaColors.kt$0xFF434C5E</ID>
+    <ID>MagicNumber:MangaColors.kt$0xFF695F50</ID>
+    <ID>MagicNumber:MangaColors.kt$0xFF968B77</ID>
+    <ID>MagicNumber:MangaColors.kt$0xFF9AA5BD</ID>
+    <ID>MagicNumber:MangaColors.kt$0xFFB3261E</ID>
+    <ID>MagicNumber:MangaColors.kt$0xFFE5818A</ID>
+    <ID>MagicNumber:MangaColors.kt$0xFFE7DEC9</ID>
+    <ID>MagicNumber:MangaColors.kt$0xFFECEFF4</ID>
+    <ID>MagicNumber:MangaColors.kt$0xFFF0E9DA</ID>
+    <ID>MagicNumber:MangaColors.kt$0xFFF1EADC</ID>
+    <ID>MagicNumber:MangaColors.kt$0xFFFAF5EA</ID>
+    <ID>MagicNumber:MangaColors.kt$0xFFFF6B5E</ID>
+    <ID>MagicNumber:MangaColors.kt$0xFFFFFFFF</ID>
+    <ID>MagicNumber:SyntaxHighlightedCode.kt$0xFF000000</ID>
+    <ID>MagicNumber:TimeFormatters.kt$10</ID>
+    <ID>MagicNumber:TimeFormatters.kt$11</ID>
+    <ID>MagicNumber:TimeFormatters.kt$24</ID>
+    <ID>MagicNumber:TimeFormatters.kt$3</ID>
+    <ID>MagicNumber:TimeFormatters.kt$4</ID>
+    <ID>MagicNumber:TimeFormatters.kt$7</ID>
+    <ID>MatchingDeclarationName:AlertBlockQuote.kt$GithubAlertKind</ID>
+    <ID>ReturnCount:AlertBlockQuote.kt$GithubAlertKind.Companion$fun parse(blockquoteText: String): Match?</ID>
+    <ID>ReturnCount:GithubStoreMarkdownComponents.kt$private fun findChildRecursive( node: ASTNode, type: IElementType, ): ASTNode?</ID>
+    <ID>ReturnCount:GithubStoreMarkdownComponents.kt$private fun findEnclosingLinkDestination( imageNode: ASTNode, content: String, ): String?</ID>
+    <ID>ReturnCount:GridColumns.kt$fun gridColumnCount( contentWidthDp: Float, maxCardWidthDp: Float, spacingDp: Float = CardGridSpec.GridSpacing.value, ): Int</ID>
+    <ID>ReturnCount:KomiTopBar.kt$private fun mangaTitle( title: String, accentSub: String?, accent: Color, ): AnnotatedString</ID>
+    <ID>ReturnCount:MarkdownImageTransformer.kt$MarkdownImageTransformer$@Composable override fun transform(link: String): ImageData?</ID>
+    <ID>ReturnCount:ScrollbarContainer.jvm.kt$internal fun estimateGridContentHeight( totalItemsCount: Int, visibleItems: List&lt;GridItemExtent&gt;, lanes: Int, mainAxisItemSpacing: Int, contentPadding: Int, ): Float</ID>
+    <ID>ReturnCount:ScrollbarContainer.jvm.kt$private fun estimateStaggeredGridContentSize(layoutInfo: LazyStaggeredGridLayoutInfo): Float</ID>
+    <ID>ReturnCount:SyntaxHighlightedCode.kt$private fun buildHighlighted( code: String, language: SyntaxLanguage, isDark: Boolean, ): AnnotatedString</ID>
+    <ID>ReturnCount:TimeFormatters.kt$@OptIn(ExperimentalTime::class) private fun parseIsoInstantLenient(isoInstant: String): Instant?</ID>
+    <ID>TooGenericExceptionCaught:InstalledAppIcon.android.kt$t: Throwable</ID>
+    <ID>TooManyFunctions:KomiBadge.kt$zed.rainxch.core.presentation.components.badge.KomiBadge.kt</ID>
+    <ID>TooManyFunctions:KomiButton.kt$zed.rainxch.core.presentation.components.buttons.KomiButton.kt</ID>
+    <ID>TooManyFunctions:KomiChip.kt$zed.rainxch.core.presentation.components.chips.KomiChip.kt</ID>
+    <ID>TooManyFunctions:KomiFontFamily.kt$KomiFontFamily</ID>
+    <ID>TooManyFunctions:KomiList.kt$zed.rainxch.core.presentation.components.lists.KomiList.kt</ID>
+    <ID>TooManyFunctions:KomiRepoCard.kt$zed.rainxch.core.presentation.components.cards.KomiRepoCard.kt</ID>
+    <ID>TooManyFunctions:KomiSegmented.kt$zed.rainxch.core.presentation.components.buttons.KomiSegmented.kt</ID>
+    <ID>TooManyFunctions:KomiSheet.kt$zed.rainxch.core.presentation.components.overlays.KomiSheet.kt</ID>
+    <ID>TooManyFunctions:KomiSurface.kt$zed.rainxch.core.presentation.components.surfaces.KomiSurface.kt</ID>
+    <ID>TooManyFunctions:KomiTextField.kt$zed.rainxch.core.presentation.components.inputs.KomiTextField.kt</ID>
+    <ID>TooManyFunctions:KomiToast.kt$zed.rainxch.core.presentation.components.overlays.KomiToast.kt</ID>
+    <ID>TooManyFunctions:KomiTopBar.kt$zed.rainxch.core.presentation.components.bars.KomiTopBar.kt</ID>
+    <ID>UnusedPrivateMember:SyntaxHighlightedCode.kt$@Suppress("UnusedReceiverParameter") private fun MarkdownElementTypes.placeholder(): Nothing</ID>
+  </CurrentIssues>
+</SmellBaseline>

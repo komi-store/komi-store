@@ -12,4 +12,5 @@ data class CategoryListState(
     val isLoadingMore: Boolean = false,
     val hasMorePages: Boolean = true,
     val errorMessage: String? = null,
+    val isGridLayout: Boolean = false,
 )

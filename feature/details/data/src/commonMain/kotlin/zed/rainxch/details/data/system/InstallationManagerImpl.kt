@@ -32,8 +32,9 @@ class InstallationManagerImpl(
         isUpdate: Boolean,
         trackedPackageName: String?,
     ): ApkValidationResult {
-        val apkInfo = installer.getApkInfoExtractor().extractPackageInfo(filePath)
-            ?: return ApkValidationResult.ExtractionFailed
+        val apkInfo =
+            installer.getApkInfoExtractor().extractPackageInfo(filePath)
+                ?: return ApkValidationResult.ExtractionFailed
 
         if (isUpdate && trackedPackageName != null && apkInfo.packageName != trackedPackageName) {
             return ApkValidationResult.PackageMismatch(
@@ -73,6 +74,7 @@ class InstallationManagerImpl(
                 AssetVariant.fingerprintFromPickedAsset(
                     pickedAssetName = params.assetName,
                     siblingAssetCount = params.siblingAssetCount,
+                    releaseTag = params.releaseTag,
                 )
             val serializedTokens = fingerprint?.tokens?.let(AssetVariant::serializeTokens)
             val pickedIndex = params.pickedAssetIndex?.takeIf { it >= 0 }
@@ -95,7 +97,10 @@ class InstallationManagerImpl(
                     installedVersion = params.releaseTag,
                     installedAssetName = params.assetName,
                     installedAssetUrl = params.assetUrl,
-
+                    installedReleaseId = params.releaseId,
+                    installedAssetId = params.assetId,
+                    installedAssetDigest = params.assetDigest,
+                    installedReleasePublishedAt = params.releasePublishedAt,
                     latestVersion = null,
                     latestAssetName = null,
                     latestAssetUrl = null,
@@ -156,6 +161,10 @@ class InstallationManagerImpl(
         installedAppsRepository.updateAppVersion(
             packageName = params.apkInfo.packageName,
             newTag = params.releaseTag,
+            newReleaseId = params.releaseId,
+            newAssetId = params.assetId,
+            newAssetDigest = params.assetDigest,
+            newReleasePublishedAt = params.releasePublishedAt,
             newAssetName = params.assetName,
             newAssetUrl = params.assetUrl,
             newVersionName = params.apkInfo.versionName,

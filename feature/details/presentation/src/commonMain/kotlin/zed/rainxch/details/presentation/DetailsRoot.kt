@@ -4,25 +4,28 @@ import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.FavoriteBorder
-import androidx.compose.material.icons.filled.LinkOff
-import androidx.compose.material.icons.filled.OpenInBrowser
-import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material.icons.filled.Share
-import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.filled.StarBorder
+import androidx.compose.material.icons.rounded.Favorite
+import androidx.compose.material.icons.rounded.FavoriteBorder
+import androidx.compose.material.icons.rounded.LinkOff
+import androidx.compose.material.icons.rounded.OpenInBrowser
+import androidx.compose.material.icons.rounded.Refresh
+import androidx.compose.material.icons.rounded.Share
+import androidx.compose.material.icons.rounded.Star
+import androidx.compose.material.icons.rounded.StarBorder
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -33,6 +36,9 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.isCtrlPressed
@@ -42,7 +48,7 @@ import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -55,7 +61,8 @@ import org.koin.compose.viewmodel.koinViewModel
 import zed.rainxch.core.domain.isDesktop
 import zed.rainxch.core.domain.model.error.RefreshError
 import zed.rainxch.core.domain.model.installation.InstallSource
-import zed.rainxch.core.domain.model.repository.DiscoveryPlatform
+import zed.rainxch.core.domain.model.installation.isReallyInstalled
+import zed.rainxch.core.presentation.components.InstalledAppIcon
 import zed.rainxch.core.presentation.components.ScrollbarContainer
 import zed.rainxch.core.presentation.components.bars.KomiTopBar
 import zed.rainxch.core.presentation.components.buttons.KomiActionRow
@@ -63,22 +70,26 @@ import zed.rainxch.core.presentation.components.buttons.KomiActionRowItem
 import zed.rainxch.core.presentation.components.buttons.KomiButton
 import zed.rainxch.core.presentation.components.buttons.KomiButtonSize
 import zed.rainxch.core.presentation.components.buttons.KomiButtonVariant
-import zed.rainxch.core.presentation.components.buttons.KomiIconButton
 import zed.rainxch.core.presentation.components.overlays.KomiDialog
 import zed.rainxch.core.presentation.components.overlays.KomiToastState
 import zed.rainxch.core.presentation.components.overlays.rememberKomiToastState
-import zed.rainxch.core.presentation.components.progress.KomiCircularProgress
+import zed.rainxch.core.presentation.components.progress.KomiLoadingIndicator
 import zed.rainxch.core.presentation.components.refresh.KomiPullToRefresh
 import zed.rainxch.core.presentation.components.scaffold.KomiScaffold
 import zed.rainxch.core.presentation.components.text.KomiText
 import zed.rainxch.core.presentation.components.text.KomiTextRole
+import zed.rainxch.core.presentation.locals.LocalPersonality
 import zed.rainxch.core.presentation.locals.LocalScrollbarEnabled
+import zed.rainxch.core.presentation.personality.MangaPersonality
+import zed.rainxch.core.presentation.personality.utils.KomiSeededTheme
 import zed.rainxch.core.presentation.personality.utils.PersonalityPreview
 import zed.rainxch.core.presentation.utils.ObserveAsEvents
 import zed.rainxch.core.presentation.utils.arrowKeyScroll
 import zed.rainxch.core.presentation.utils.contentWidthCap
 import zed.rainxch.core.presentation.utils.isPullToRefreshSupported
+import zed.rainxch.core.presentation.utils.rememberIconSeedColor
 import zed.rainxch.details.presentation.components.ApkInspectSheet
+import zed.rainxch.details.presentation.components.PlatformHandoffSheet
 import zed.rainxch.details.presentation.components.sections.about
 import zed.rainxch.details.presentation.components.sections.header
 import zed.rainxch.details.presentation.components.sections.logs
@@ -96,7 +107,6 @@ fun DetailsRoot(
     onNavigateBack: () -> Unit,
     onNavigateToDeveloperProfile: (username: String) -> Unit,
     onOpenRepositoryInApp: (repoId: Long) -> Unit,
-    onNavigateToSearchByPlatform: (DiscoveryPlatform) -> Unit,
     onNavigateToAbout: (repoId: Long, owner: String, repo: String, sourceHost: String?, translateTo: String?) -> Unit,
     onNavigateToWhatsNew: (repoId: Long, owner: String, repo: String, sourceHost: String?) -> Unit,
     onNavigateToIssues: (owner: String, repo: String) -> Unit,
@@ -145,295 +155,372 @@ fun DetailsRoot(
         }
     }
 
-    DetailsScreen(
-        state = state,
-        toastState = toastState,
-        onAction = { action ->
-            when (action) {
-                DetailsAction.OnNavigateBackClick -> {
-                    onNavigateBack()
-                }
+    // Classic takes the page's colors from the app's icon, sheets and dialogs included.
+    val seed =
+        if (LocalPersonality.current is MangaPersonality) {
+            null
+        } else {
+            rememberIconSeedColor(
+                packageName = state.installedApp?.takeIf { it.isReallyInstalled() }?.packageName,
+                imageUrl = state.userProfile?.avatarUrl ?: state.repository?.owner?.avatarUrl,
+            )
+        }
+    KomiSeededTheme(seed = seed) {
+        DetailsScreen(
+            state = state,
+            toastState = toastState,
+            onAction = { action ->
+                when (action) {
+                    DetailsAction.OnNavigateBackClick -> {
+                        onNavigateBack()
+                    }
 
-                is DetailsAction.OpenDeveloperProfile -> {
-                    onNavigateToDeveloperProfile(action.username)
-                }
+                    is DetailsAction.OpenDeveloperProfile -> {
+                        onNavigateToDeveloperProfile(action.username)
+                    }
 
-                is DetailsAction.OnPlatformChipClick -> {
-                    onNavigateToSearchByPlatform(action.platform)
-                }
+                    is DetailsAction.OnMessage -> {
+                        coroutineScope.launch {
+                            toastState.show(getString(action.messageText))
+                        }
+                    }
 
-                is DetailsAction.OnMessage -> {
-                    coroutineScope.launch {
-                        toastState.show(getString(action.messageText))
+                    else -> {
+                        viewModel.onAction(action)
                     }
                 }
-
-                else -> {
-                    viewModel.onAction(action)
+            },
+            onTranslateLanguage = state.repository?.let { repo ->
+                { code ->
+                    onNavigateToAbout(
+                        repo.id,
+                        repo.owner.login,
+                        repo.name,
+                        repo.sourceHost,
+                        code,
+                    )
                 }
-            }
-        },
-        onTranslateLanguage = state.repository?.let { repo ->
-            { code ->
-                onNavigateToAbout(
-                    repo.id,
-                    repo.owner.login,
-                    repo.name,
-                    repo.sourceHost,
-                    code,
-                )
-            }
-        },
-        onReadMoreWhatsNew = state.repository?.let { repo ->
-            {
-                onNavigateToWhatsNew(
-                    repo.id,
-                    repo.owner.login,
-                    repo.name,
-                    repo.sourceHost,
-                )
-            }
-        },
-        onOpenIssues = state.repository?.takeIf { it.sourceHost == null }?.let { repo ->
-            { onNavigateToIssues(repo.owner.login, repo.name) }
-        },
-        onOpenSecurity = state.repository?.takeIf { it.sourceHost == null }?.let { repo ->
-            { onNavigateToSecurity(repo.owner.login, repo.name) }
-        },
-    )
+            },
+            onReadMoreWhatsNew = state.repository?.let { repo ->
+                {
+                    onNavigateToWhatsNew(
+                        repo.id,
+                        repo.owner.login,
+                        repo.name,
+                        repo.sourceHost,
+                    )
+                }
+            },
+            onOpenIssues = state.repository?.takeIf { it.sourceHost == null }?.let { repo ->
+                { onNavigateToIssues(repo.owner.login, repo.name) }
+            },
+            onOpenSecurity = state.repository?.takeIf { it.sourceHost == null }?.let { repo ->
+                { onNavigateToSecurity(repo.owner.login, repo.name) }
+            },
+        )
 
-    state.downgradeWarning?.let { warning ->
-        KomiDialog(
-            onDismissRequest = {
-                viewModel.onAction(DetailsAction.OnDismissDowngradeWarning)
-            },
-            title = {
-                KomiText(
-                    text = stringResource(Res.string.downgrade_requires_uninstall),
-                    role = KomiTextRole.Title,
-                    fontWeight = FontWeight.SemiBold,
-                    uppercase = false,
-                )
-            },
-            text = {
-                KomiText(
-                    text =
-                        stringResource(
-                            Res.string.downgrade_warning_message,
-                            warning.targetVersion,
-                            warning.currentVersion,
+        state.handoff?.let { handoff ->
+            PlatformHandoffSheet(handoff = handoff, onAction = viewModel::onAction)
+        }
+
+        state.downgradeWarning?.let { warning ->
+            KomiDialog(
+                onDismissRequest = {
+                    viewModel.onAction(DetailsAction.OnDismissDowngradeWarning)
+                },
+                title = {
+                    KomiText(
+                        text = stringResource(Res.string.downgrade_warning_title),
+                        role = KomiTextRole.CardTitle,
+                    )
+                },
+                text = {
+                    val personality = LocalPersonality.current
+                    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                        val targetName =
+                            state.installedApps.firstOrNull { it.packageName == warning.packageName }
+                                ?.appName
+                                ?: warning.packageName
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(10.dp),
+                        ) {
+                            InstalledAppIcon(
+                                packageName = warning.packageName,
+                                appName = targetName,
+                                modifier = Modifier
+                                    .size(36.dp)
+                                    .clip(RoundedCornerShape(personality.shape.cornerSmall)),
+                            )
+                            Column {
+                                KomiText(
+                                    text = targetName,
+                                    role = KomiTextRole.ItemTitle,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                )
+                                KomiText(
+                                    text = warning.packageName,
+                                    role = KomiTextRole.Caption,
+                                    color = personality.colors.onSurfaceVariant,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                )
+                            }
+                        }
+                        KomiText(
+                            text =
+                                stringResource(
+                                    Res.string.downgrade_warning_message,
+                                    warning.targetVersion,
+                                    warning.currentVersion,
+                                ),
+                            role = KomiTextRole.Body,
+                        )
+                        KomiText(
+                            text =
+                                stringResource(
+                                    Res.string.downgrade_warning_uninstall_note,
+                                    warning.currentVersion,
+                                ),
+                            role = KomiTextRole.Body,
+                            color = personality.colors.error,
+                        )
+                    }
+                },
+                confirmButton = {
+                    val personality = LocalPersonality.current
+                    val dialogSurfaceIsDark = personality.colors.surfaceContainerHigh.luminance() < 0.5f
+                    FlowRow(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                        itemVerticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        KomiButton(
+                            onClick = {
+                                viewModel.onAction(DetailsAction.OnDismissDowngradeWarning)
+                            },
+                            label = stringResource(Res.string.cancel),
+                            variant = KomiButtonVariant.Text,
+                            size = KomiButtonSize.Sm,
+                            containerColor = Color.Transparent,
+                            contentColor =
+                                if (dialogSurfaceIsDark) {
+                                    Color(0xFFBCBCBC)
+                                } else {
+                                    Color(0xFF747474)
+                                },
+                        )
+                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            KomiButton(
+                                onClick = {
+                                    viewModel.onAction(DetailsAction.OnConfirmDowngradeUninstall)
+                                },
+                                label = stringResource(Res.string.uninstall_first),
+                                variant = KomiButtonVariant.Text,
+                                size = KomiButtonSize.Sm,
+                                containerColor = Color.Transparent,
+                                contentColor = personality.colors.error,
+                            )
+                            KomiButton(
+                                onClick = {
+                                    viewModel.onAction(DetailsAction.OnConfirmDowngradeInstall)
+                                },
+                                label = stringResource(Res.string.install_anyway),
+                                variant = KomiButtonVariant.Text,
+                                size = KomiButtonSize.Sm,
+                                containerColor = Color.Transparent,
+                                contentColor =
+                                    if (dialogSurfaceIsDark) {
+                                        Color(0xFFB6C4FF)
+                                    } else {
+                                        Color(0xFF3B5BDB)
+                                    },
+                            )
+                        }
+                    }
+                },
+            )
+        }
+
+        state.signingKeyWarning?.let { warning ->
+            KomiDialog(
+                onDismissRequest = {
+                    viewModel.onAction(DetailsAction.OnDismissSigningKeyWarning)
+                },
+                title = {
+                    KomiText(
+                        text = stringResource(Res.string.signing_key_changed_title),
+                        role = KomiTextRole.CardTitle,
+                    )
+                },
+                text = {
+                    KomiText(
+                        text =
+                            stringResource(
+                                Res.string.signing_key_changed_message,
+                                warning.expectedFingerprint.take(19),
+                                warning.actualFingerprint.take(19),
+                            ),
+                        role = KomiTextRole.Body,
+                    )
+                },
+                confirmButton = {
+                    KomiButton(
+                        onClick = {
+                            viewModel.onAction(DetailsAction.OnOverrideSigningKeyWarning)
+                        },
+                        label = stringResource(Res.string.install_anyway),
+                        variant = KomiButtonVariant.Text,
+                        size = KomiButtonSize.Sm,
+                    )
+                },
+                dismissButton = {
+                    KomiButton(
+                        onClick = {
+                            viewModel.onAction(DetailsAction.OnDismissSigningKeyWarning)
+                        },
+                        label = stringResource(Res.string.cancel),
+                        variant = KomiButtonVariant.Text,
+                        size = KomiButtonSize.Sm,
+                    )
+                },
+            )
+        }
+
+        if (state.showUninstallConfirmation) {
+            val appName = state.installedApp?.appName ?: ""
+            KomiDialog(
+                onDismissRequest = {
+                    viewModel.onAction(DetailsAction.OnDismissUninstallConfirmation)
+                },
+                title = {
+                    KomiText(
+                        text = stringResource(Res.string.confirm_uninstall_title),
+                        role = KomiTextRole.CardTitle,
+                    )
+                },
+                text = {
+                    KomiText(
+                        text = stringResource(Res.string.confirm_uninstall_message, appName),
+                        role = KomiTextRole.Body,
+                    )
+                },
+                confirmButton = {
+                    KomiButton(
+                        onClick = {
+                            viewModel.onAction(DetailsAction.OnConfirmUninstall)
+                        },
+                        label = stringResource(Res.string.uninstall),
+                        variant = KomiButtonVariant.Text,
+                        size = KomiButtonSize.Sm,
+                    )
+                },
+                dismissButton = {
+                    KomiButton(
+                        onClick = {
+                            viewModel.onAction(DetailsAction.OnDismissUninstallConfirmation)
+                        },
+                        label = stringResource(Res.string.cancel),
+                        variant = KomiButtonVariant.Text,
+                        size = KomiButtonSize.Sm,
+                    )
+                },
+            )
+        }
+
+        if (state.showUnlinkConfirmation) {
+            val appName = state.installedApp?.appName ?: ""
+            KomiDialog(
+                onDismissRequest = {
+                    viewModel.onAction(DetailsAction.OnDismissUnlinkConfirmation)
+                },
+                title = {
+                    KomiText(
+                        text = stringResource(Res.string.details_unlink_external_app_dialog_title),
+                        role = KomiTextRole.CardTitle,
+                    )
+                },
+                text = {
+                    KomiText(
+                        text = stringResource(
+                            Res.string.details_unlink_external_app_dialog_body,
+                            appName
                         ),
-                    role = KomiTextRole.Body,
-                )
-            },
-            confirmButton = {
-                KomiButton(
-                    onClick = {
-                        viewModel.onAction(DetailsAction.OnDismissDowngradeWarning)
-                        viewModel.onAction(DetailsAction.UninstallApp)
-                    },
-                    label = stringResource(Res.string.uninstall_first),
-                    variant = KomiButtonVariant.Text,
-                    size = KomiButtonSize.Sm,
-                )
-            },
-            dismissButton = {
-                KomiButton(
-                    onClick = {
-                        viewModel.onAction(DetailsAction.OnDismissDowngradeWarning)
-                    },
-                    label = stringResource(Res.string.cancel),
-                    variant = KomiButtonVariant.Text,
-                    size = KomiButtonSize.Sm,
-                )
-            },
-        )
-    }
+                        role = KomiTextRole.Body,
+                    )
+                },
+                confirmButton = {
+                    KomiButton(
+                        onClick = {
+                            viewModel.onAction(DetailsAction.OnConfirmUnlinkExternalApp)
+                        },
+                        label = stringResource(Res.string.details_unlink_external_app_dialog_confirm),
+                        variant = KomiButtonVariant.Text,
+                        size = KomiButtonSize.Sm,
+                    )
+                },
+                dismissButton = {
+                    KomiButton(
+                        onClick = {
+                            viewModel.onAction(DetailsAction.OnDismissUnlinkConfirmation)
+                        },
+                        label = stringResource(Res.string.cancel),
+                        variant = KomiButtonVariant.Text,
+                        size = KomiButtonSize.Sm,
+                    )
+                },
+            )
+        }
 
-    state.signingKeyWarning?.let { warning ->
-        KomiDialog(
-            onDismissRequest = {
-                viewModel.onAction(DetailsAction.OnDismissSigningKeyWarning)
-            },
-            title = {
-                KomiText(
-                    text = stringResource(Res.string.signing_key_changed_title),
-                    role = KomiTextRole.Title,
-                    fontWeight = FontWeight.SemiBold,
-                    uppercase = false,
-                )
-            },
-            text = {
-                KomiText(
-                    text =
-                        stringResource(
-                            Res.string.signing_key_changed_message,
-                            warning.expectedFingerprint.take(19),
-                            warning.actualFingerprint.take(19),
-                        ),
-                    role = KomiTextRole.Body,
-                )
-            },
-            confirmButton = {
-                KomiButton(
-                    onClick = {
-                        viewModel.onAction(DetailsAction.OnOverrideSigningKeyWarning)
-                    },
-                    label = stringResource(Res.string.install_anyway),
-                    variant = KomiButtonVariant.Text,
-                    size = KomiButtonSize.Sm,
-                )
-            },
-            dismissButton = {
-                KomiButton(
-                    onClick = {
-                        viewModel.onAction(DetailsAction.OnDismissSigningKeyWarning)
-                    },
-                    label = stringResource(Res.string.cancel),
-                    variant = KomiButtonVariant.Text,
-                    size = KomiButtonSize.Sm,
-                )
-            },
-        )
-    }
+        if (state.showExternalInstallerPrompt) {
+            KomiDialog(
+                onDismissRequest = {
+                    viewModel.onAction(DetailsAction.DismissExternalInstallerPrompt)
+                },
+                title = {
+                    KomiText(
+                        text = stringResource(Res.string.install_permission_unavailable),
+                        role = KomiTextRole.CardTitle,
+                    )
+                },
+                text = {
+                    KomiText(
+                        text = stringResource(Res.string.install_permission_blocked_message),
+                        role = KomiTextRole.Body,
+                    )
+                },
+                confirmButton = {
+                    KomiButton(
+                        onClick = {
+                            viewModel.onAction(DetailsAction.OpenWithExternalInstaller)
+                        },
+                        label = stringResource(Res.string.open_with_external_installer),
+                        variant = KomiButtonVariant.Text,
+                        size = KomiButtonSize.Sm,
+                    )
+                },
+                dismissButton = {
+                    KomiButton(
+                        onClick = {
+                            viewModel.onAction(DetailsAction.DismissExternalInstallerPrompt)
+                        },
+                        label = stringResource(Res.string.dismiss),
+                        variant = KomiButtonVariant.Text,
+                        size = KomiButtonSize.Sm,
+                    )
+                },
+            )
+        }
 
-    if (state.showUninstallConfirmation) {
-        val appName = state.installedApp?.appName ?: ""
-        KomiDialog(
-            onDismissRequest = {
-                viewModel.onAction(DetailsAction.OnDismissUninstallConfirmation)
-            },
-            title = {
-                KomiText(
-                    text = stringResource(Res.string.confirm_uninstall_title),
-                    role = KomiTextRole.Title,
-                    fontWeight = FontWeight.SemiBold,
-                    uppercase = false,
-                )
-            },
-            text = {
-                KomiText(
-                    text = stringResource(Res.string.confirm_uninstall_message, appName),
-                    role = KomiTextRole.Body,
-                )
-            },
-            confirmButton = {
-                KomiButton(
-                    onClick = {
-                        viewModel.onAction(DetailsAction.OnConfirmUninstall)
-                    },
-                    label = stringResource(Res.string.uninstall),
-                    variant = KomiButtonVariant.Text,
-                    size = KomiButtonSize.Sm,
-                )
-            },
-            dismissButton = {
-                KomiButton(
-                    onClick = {
-                        viewModel.onAction(DetailsAction.OnDismissUninstallConfirmation)
-                    },
-                    label = stringResource(Res.string.cancel),
-                    variant = KomiButtonVariant.Text,
-                    size = KomiButtonSize.Sm,
-                )
-            },
-        )
-    }
-
-    if (state.showUnlinkConfirmation) {
-        val appName = state.installedApp?.appName ?: ""
-        KomiDialog(
-            onDismissRequest = {
-                viewModel.onAction(DetailsAction.OnDismissUnlinkConfirmation)
-            },
-            title = {
-                KomiText(
-                    text = stringResource(Res.string.details_unlink_external_app_dialog_title),
-                    role = KomiTextRole.Title,
-                    fontWeight = FontWeight.SemiBold,
-                    uppercase = false,
-                )
-            },
-            text = {
-                KomiText(
-                    text = stringResource(
-                        Res.string.details_unlink_external_app_dialog_body,
-                        appName
-                    ),
-                    role = KomiTextRole.Body,
-                )
-            },
-            confirmButton = {
-                KomiButton(
-                    onClick = {
-                        viewModel.onAction(DetailsAction.OnConfirmUnlinkExternalApp)
-                    },
-                    label = stringResource(Res.string.details_unlink_external_app_dialog_confirm),
-                    variant = KomiButtonVariant.Text,
-                    size = KomiButtonSize.Sm,
-                )
-            },
-            dismissButton = {
-                KomiButton(
-                    onClick = {
-                        viewModel.onAction(DetailsAction.OnDismissUnlinkConfirmation)
-                    },
-                    label = stringResource(Res.string.cancel),
-                    variant = KomiButtonVariant.Text,
-                    size = KomiButtonSize.Sm,
-                )
-            },
-        )
-    }
-
-    if (state.showExternalInstallerPrompt) {
-        KomiDialog(
-            onDismissRequest = {
-                viewModel.onAction(DetailsAction.DismissExternalInstallerPrompt)
-            },
-            title = {
-                KomiText(
-                    text = stringResource(Res.string.install_permission_unavailable),
-                    role = KomiTextRole.Title,
-                    fontWeight = FontWeight.SemiBold,
-                    uppercase = false,
-                )
-            },
-            text = {
-                KomiText(
-                    text = stringResource(Res.string.install_permission_blocked_message),
-                    role = KomiTextRole.Body,
-                )
-            },
-            confirmButton = {
-                KomiButton(
-                    onClick = {
-                        viewModel.onAction(DetailsAction.OpenWithExternalInstaller)
-                    },
-                    label = stringResource(Res.string.open_with_external_installer),
-                    variant = KomiButtonVariant.Text,
-                    size = KomiButtonSize.Sm,
-                )
-            },
-            dismissButton = {
-                KomiButton(
-                    onClick = {
-                        viewModel.onAction(DetailsAction.DismissExternalInstallerPrompt)
-                    },
-                    label = stringResource(Res.string.dismiss),
-                    variant = KomiButtonVariant.Text,
-                    size = KomiButtonSize.Sm,
-                )
-            },
-        )
-    }
-
-    if (state.isApkInspectSheetVisible) {
-        ApkInspectSheet(
-            inspection = state.apkInspection,
-            isLoading = state.isApkInspectLoading,
-            onDismiss = { viewModel.onAction(DetailsAction.OnDismissApkInspect) },
-        )
+        if (state.isApkInspectSheetVisible) {
+            ApkInspectSheet(
+                inspection = state.apkInspection,
+                isLoading = state.isApkInspectLoading,
+                onDismiss = { viewModel.onAction(DetailsAction.OnDismissApkInspect) },
+            )
+        }
     }
 }
 
@@ -451,18 +538,12 @@ fun DetailsScreen(
         topBar = {
             KomiTopBar(
                 title = "",
-                leading = {
-                    KomiIconButton(
-                        icon = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = stringResource(Res.string.navigate_back),
-                        onClick = { onAction(DetailsAction.OnNavigateBackClick) },
-                    )
+                onBack = { onAction(DetailsAction.OnNavigateBackClick) },
+                actions = if (state.repository != null) {
+                    { DetailsActions(state = state, onAction = onAction) }
+                } else {
+                    null
                 },
-                actions = {
-                    if (state.repository != null) {
-                        DetailsActions(state = state, onAction = onAction)
-                    }
-                }
             )
         },
         toastState = toastState
@@ -472,7 +553,7 @@ fun DetailsScreen(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center,
             ) {
-                KomiCircularProgress()
+                KomiLoadingIndicator()
             }
 
             return@KomiScaffold
@@ -556,6 +637,8 @@ fun DetailsScreen(
                         state.stats?.let { stats ->
                             stats(
                                 repoStats = stats,
+                                onOpenIssues = onOpenIssues,
+                                onOpenSecurity = onOpenSecurity,
                             )
                         }
 
@@ -563,15 +646,6 @@ fun DetailsScreen(
                             state = state,
                             onAction = onAction,
                         )
-
-                        if (onOpenIssues != null || onOpenSecurity != null) {
-                            item(key = "repo_pages_actions") {
-                                RepoPagesActionRow(
-                                    onOpenIssues = onOpenIssues,
-                                    onOpenSecurity = onOpenSecurity,
-                                )
-                            }
-                        }
 
                         state.selectedRelease?.let { release ->
                             whatsNew(
@@ -665,7 +739,7 @@ private fun DetailsActions(
     val items = buildList {
         add(
             KomiActionRowItem(
-                icon = Icons.Default.OpenInBrowser,
+                icon = Icons.Rounded.OpenInBrowser,
                 title = openLabel,
                 onClick = {
                     onAction(DetailsAction.OpenRepoInBrowser)
@@ -674,7 +748,7 @@ private fun DetailsActions(
         )
         add(
             KomiActionRowItem(
-                icon = if (state.isStarred) Icons.Default.Star else Icons.Default.StarBorder,
+                icon = if (state.isStarred) Icons.Rounded.Star else Icons.Rounded.StarBorder,
                 title = starLabel,
                 onClick = {
                     onAction(DetailsAction.OnToggleStar)
@@ -683,7 +757,7 @@ private fun DetailsActions(
         )
         add(
             KomiActionRowItem(
-                icon = if (state.isFavourite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                icon = if (state.isFavourite) Icons.Rounded.Favorite else Icons.Rounded.FavoriteBorder,
                 title = favouriteLabel,
                 onClick = {
                     onAction(DetailsAction.OnToggleFavorite)
@@ -693,7 +767,7 @@ private fun DetailsActions(
         if (state.repository?.htmlUrl != null) {
             add(
                 KomiActionRowItem(
-                    icon = Icons.Default.Share,
+                    icon = Icons.Rounded.Share,
                     title = shareLabel,
                     onClick = {
                         onAction(DetailsAction.OnShareClick)
@@ -703,7 +777,7 @@ private fun DetailsActions(
         }
         add(
             KomiActionRowItem(
-                icon = Icons.Default.Refresh,
+                icon = Icons.Rounded.Refresh,
                 title = refreshLabel,
                 onClick = {
                     onAction(DetailsAction.Refresh)
@@ -714,7 +788,7 @@ private fun DetailsActions(
         if (state.installedApp?.installSource == InstallSource.MANUAL) {
             add(
                 KomiActionRowItem(
-                    icon = Icons.Default.LinkOff,
+                    icon = Icons.Rounded.LinkOff,
                     title = stringResource(Res.string.details_unlink_external_app_menu),
                     onClick = {
                         onAction(DetailsAction.OnUnlinkExternalApp)
@@ -739,35 +813,5 @@ private fun Preview() {
             onAction = {},
             toastState = KomiToastState(),
         )
-    }
-}
-
-@Composable
-private fun RepoPagesActionRow(
-    onOpenIssues: (() -> Unit)?,
-    onOpenSecurity: (() -> Unit)?,
-) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-    ) {
-        onOpenIssues?.let { open ->
-            KomiButton(
-                onClick = open,
-                label = stringResource(Res.string.repo_pages_details_issues_button),
-                variant = KomiButtonVariant.Tonal,
-                size = KomiButtonSize.Sm,
-                modifier = Modifier.weight(1f),
-            )
-        }
-        onOpenSecurity?.let { open ->
-            KomiButton(
-                onClick = open,
-                label = stringResource(Res.string.repo_pages_details_security_button),
-                variant = KomiButtonVariant.Tonal,
-                size = KomiButtonSize.Sm,
-                modifier = Modifier.weight(1f),
-            )
-        }
     }
 }

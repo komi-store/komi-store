@@ -14,6 +14,13 @@ class DefaultSystemInstallSerializer : SystemInstallSerializer {
         timeoutMs: Long,
     ) {
         val initiallyHeldBy = pending.value
+        if (timeoutMs <= 0L) {
+            if (initiallyHeldBy != null) {
+                Logger.i { "SystemInstallSerializer: $packageName claimed the gate from $initiallyHeldBy" }
+            }
+            pending.value = packageName
+            return
+        }
         if (initiallyHeldBy != null) {
             Logger.i {
                 "SystemInstallSerializer: $packageName waiting for $initiallyHeldBy to clear " +
@@ -40,5 +47,14 @@ class DefaultSystemInstallSerializer : SystemInstallSerializer {
 
     override fun markCompleted(packageName: String) {
         pending.value = null
+    }
+
+    // The app only resumes once an installer screen it opened has closed. A cancelled one sends no
+    // package broadcast, so its hold would otherwise make the next install wait out the timeout.
+    override fun onAppResumed() {
+        val heldBy = pending.value ?: return
+        if (pending.compareAndSet(heldBy, null)) {
+            Logger.i { "SystemInstallSerializer: released $heldBy, the app is in front again" }
+        }
     }
 }

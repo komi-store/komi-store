@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.getString
 import zed.rainxch.core.domain.repository.UserSessionRepository
+import zed.rainxch.core.presentation.utils.toUserMessage
 import zed.rainxch.githubstore.core.presentation.res.Res
 import zed.rainxch.githubstore.core.presentation.res.failed_to_load
 import zed.rainxch.githubstore.core.presentation.res.repo_pages_new_issue_created
@@ -94,7 +95,8 @@ class IssuesViewModel(
         if (title.isEmpty() || _state.value.isCreatingIssue) return
         viewModelScope.launch {
             _state.update { it.copy(isCreatingIssue = true) }
-            repository.createIssue(owner, repo, title, _state.value.newIssueBody.trim())
+            repository
+                .createIssue(owner, repo, title, _state.value.newIssueBody.trim())
                 .onSuccess {
                     _state.update {
                         it.copy(
@@ -106,10 +108,9 @@ class IssuesViewModel(
                     }
                     _events.send(IssuesEvent.OnMessage(getString(Res.string.repo_pages_new_issue_created)))
                     load(IssueState.OPEN)
-                }
-                .onFailure { e ->
+                }.onFailure { e ->
                     _state.update { it.copy(isCreatingIssue = false) }
-                    _events.send(IssuesEvent.OnMessage(e.message ?: getString(Res.string.repo_pages_new_issue_failed)))
+                    _events.send(IssuesEvent.OnMessage(e.toUserMessage(Res.string.repo_pages_new_issue_failed)))
                 }
         }
     }
@@ -139,7 +140,8 @@ class IssuesViewModel(
             _state.update {
                 if (append) it.copy(isLoadingMore = true) else it.copy(isLoading = true, errorMessage = null)
             }
-            repository.getIssues(owner, repo, filter, page)
+            repository
+                .getIssues(owner, repo, filter, page)
                 .onSuccess { result ->
                     if (generation != requestGeneration) return@onSuccess
                     _state.update { st ->
@@ -153,14 +155,13 @@ class IssuesViewModel(
                             errorMessage = null,
                         )
                     }
-                }
-                .onFailure { e ->
+                }.onFailure { e ->
                     if (generation != requestGeneration) return@onFailure
                     _state.update {
                         it.copy(
                             isLoading = false,
                             isLoadingMore = false,
-                            errorMessage = e.message ?: getString(Res.string.failed_to_load),
+                            errorMessage = e.toUserMessage(Res.string.failed_to_load),
                         )
                     }
                 }

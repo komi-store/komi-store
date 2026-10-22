@@ -18,6 +18,7 @@ import zed.rainxch.core.domain.model.repository.FavoriteRepo
 import zed.rainxch.core.domain.repository.FavouritesRepository
 import zed.rainxch.core.domain.repository.TweaksRepository
 import zed.rainxch.core.domain.repository.UserSessionRepository
+import zed.rainxch.core.presentation.utils.TimeZoneChangeSignal
 import zed.rainxch.favourites.presentation.mappers.toFavouriteRepositoryUi
 import zed.rainxch.favourites.presentation.model.FavouritesSortRule
 import kotlin.time.Clock
@@ -26,7 +27,7 @@ import kotlin.time.ExperimentalTime
 class FavouritesViewModel(
     private val favouritesRepository: FavouritesRepository,
     private val tweaksRepository: TweaksRepository,
-    private val userSessionRepository: UserSessionRepository
+    private val userSessionRepository: UserSessionRepository,
 ) : ViewModel() {
     private var hasLoadedInitialData = false
 
@@ -49,16 +50,18 @@ class FavouritesViewModel(
 
     private fun FavouritesState.withDerived(): FavouritesState {
         val query = searchQuery.trim().lowercase()
-        val filtered = if (query.isBlank()) {
-            favouriteRepositories
-        } else {
-            favouriteRepositories.filter { repo ->
-                repo.repoName.lowercase().contains(query) ||
-                    repo.repoOwner.lowercase().contains(query) ||
-                    (repo.repoDescription?.lowercase()?.contains(query) == true) ||
-                    (repo.primaryLanguage?.lowercase()?.contains(query) == true)
-            }.toImmutableList()
-        }
+        val filtered =
+            if (query.isBlank()) {
+                favouriteRepositories
+            } else {
+                favouriteRepositories
+                    .filter { repo ->
+                        repo.repoName.lowercase().contains(query) ||
+                            repo.repoOwner.lowercase().contains(query) ||
+                            (repo.repoDescription?.lowercase()?.contains(query) == true) ||
+                            (repo.primaryLanguage?.lowercase()?.contains(query) == true)
+                    }.toImmutableList()
+            }
         return copy(filteredRepositories = filtered)
     }
 
@@ -68,17 +71,19 @@ class FavouritesViewModel(
                 favouritesRepository.getAllFavorites(),
                 userSessionRepository.getUser(),
                 tweaksRepository.getFavouritesSortRule(),
-            ) { favorites, user, sortStored ->
+                TimeZoneChangeSignal.revision,
+            ) { favorites, user, sortStored, _ ->
                 val sortRule = FavouritesSortRule.fromName(sortStored)
                 val currentLogin = user?.username
                 val sorted = favorites.sortedWith(favouritesComparator(sortRule))
-                val items = sorted.map { repo ->
-                    repo.toFavouriteRepositoryUi(
-                        isCurrentUserOwner =
-                            currentLogin != null &&
-                                repo.repoOwner.equals(currentLogin, ignoreCase = true),
-                    )
-                }
+                val items =
+                    sorted.map { repo ->
+                        repo.toFavouriteRepositoryUi(
+                            isCurrentUserOwner =
+                                currentLogin != null &&
+                                    repo.repoOwner.equals(currentLogin, ignoreCase = true),
+                        )
+                    }
                 items to sortRule
             }.flowOn(Dispatchers.Default)
                 .collect { (favoriteRepos, sortRule) ->
@@ -94,25 +99,27 @@ class FavouritesViewModel(
 
     private fun favouritesComparator(sortRule: FavouritesSortRule): Comparator<FavoriteRepo> =
         when (sortRule) {
-            FavouritesSortRule.RecentlyAdded ->
+            FavouritesSortRule.RecentlyAdded -> {
                 compareByDescending<FavoriteRepo> { it.addedAt }
                     .thenBy { it.repoName.lowercase() }
+            }
 
-            FavouritesSortRule.NameAsc ->
+            FavouritesSortRule.NameAsc -> {
                 compareBy<FavoriteRepo> { it.repoName.lowercase() }
                     .thenBy { it.repoOwner.lowercase() }
+            }
         }
 
     @OptIn(ExperimentalTime::class)
     fun onAction(action: FavouritesAction) {
         when (action) {
-            FavouritesAction.OnNavigateBackClick -> Unit
+            FavouritesAction.OnNavigateBackClick -> {}
 
-            is FavouritesAction.OnRepositoryClick -> Unit
+            is FavouritesAction.OnRepositoryClick -> {}
 
-            is FavouritesAction.OnDeveloperProfileClick -> Unit
+            is FavouritesAction.OnDeveloperProfileClick -> {}
 
-            FavouritesAction.OnImportStarsClick -> Unit
+            FavouritesAction.OnImportStarsClick -> {}
 
             is FavouritesAction.OnSearchChange -> {
                 _state.update { it.copy(searchQuery = action.query) }

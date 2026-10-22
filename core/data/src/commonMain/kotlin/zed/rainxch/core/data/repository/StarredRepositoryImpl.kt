@@ -10,6 +10,7 @@ import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.parameter
 import io.ktor.client.request.put
+import io.ktor.http.HttpHeaders
 import io.ktor.http.isSuccess
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -23,13 +24,16 @@ import kotlinx.coroutines.withContext
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import zed.rainxch.core.data.dto.GitHubStarredResponse
+import zed.rainxch.core.data.dto.GitHubStarredResponseWithTimestamp
+import zed.rainxch.core.data.dto.parseStarredPage
 import zed.rainxch.core.data.local.db.dao.InstalledAppDao
 import zed.rainxch.core.data.local.db.dao.StarredRepoDao
 import zed.rainxch.core.data.mappers.toDomain
 import zed.rainxch.core.data.mappers.toEntity
 import zed.rainxch.core.data.network.GitHubClientProvider
-import zed.rainxch.core.domain.model.system.Platform
+import zed.rainxch.core.data.network.gitHubJson
 import zed.rainxch.core.domain.model.error.RateLimitException
+import zed.rainxch.core.domain.model.system.Platform
 import zed.rainxch.core.domain.repository.StarredRepository
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.time.Clock
@@ -47,6 +51,7 @@ class StarredRepositoryImpl(
 
     companion object {
         private const val SYNC_THRESHOLD_MS = 24 * 60 * 60 * 1000L
+        private const val STARRED_MEDIA_TYPE = "application/vnd.github.star+json"
     }
 
     override fun getAllStarred(): Flow<List<zed.rainxch.core.domain.model.repository.StarredRepository>> =
@@ -72,14 +77,20 @@ class StarredRepositoryImpl(
                         httpClient.delete("/user/starred/$owner/$repo")
                     }
                 when {
-                    response.status.isSuccess() -> Result.success(Unit)
-                    response.status.value == 401 ->
+                    response.status.isSuccess() -> {
+                        Result.success(Unit)
+                    }
+
+                    response.status.value == 401 -> {
                         Result.failure(Exception("Authentication required. Please sign in with GitHub."))
-                    else ->
+                    }
+
+                    else -> {
                         Result.failure(Exception("Failed to update star: ${response.status.description}"))
+                    }
                 }
             } catch (e: RateLimitException) {
-                throw e
+                Result.failure(e)
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
@@ -104,67 +115,70 @@ class StarredRepositoryImpl(
                 while (true) {
                     val response =
                         httpClient.get("/users/$sanitized/starred") {
+                            header(HttpHeaders.Accept, STARRED_MEDIA_TYPE)
                             parameter("per_page", perPage)
                             parameter("page", page)
                         }
 
                     if (!response.status.isSuccess()) {
-                        val reason = when (response.status.value) {
-                            404 -> "User '$sanitized' not found."
-                            403 -> "GitHub rate limit reached. Try again later or sign in."
-                            else -> "Failed to fetch stars: ${response.status.description}"
-                        }
+                        val reason =
+                            when (response.status.value) {
+                                404 -> "User '$sanitized' not found."
+                                403 -> "GitHub rate limit reached. Try again later or sign in."
+                                else -> "Failed to fetch stars: ${response.status.description}"
+                            }
                         return@withContext Result.failure(Exception(reason))
                     }
 
-                    val repos: List<GitHubStarredResponse> = response.body()
+                    val repos = parseStarredPage(gitHubJson, response.body())
                     if (repos.isEmpty()) break
-                    allRepos.addAll(repos)
+                    allRepos.addAll(repos.map { it.repo.copy(starredAt = it.starredAt) })
                     if (repos.size < perPage) break
                     page++
                 }
 
                 val now = Clock.System.now().toEpochMilliseconds()
-                val results = coroutineScope {
-                    val semaphore = Semaphore(25)
-                    allRepos.map { repo ->
-                        async {
-                            semaphore.withPermit {
-                                val release =
-                                    checkForValidAssets(repo.owner.login, repo.name, ::matchesAnyPlatform)
-                                        ?: return@withPermit null
-                                val installedApps = installedAppsDao.getAppsByRepoId(repo.id)
-                                val firstInstalled =
-                                    installedApps.firstOrNull { !it.isPendingInstall }
-                                zed.rainxch.core.domain.model.repository.StarredRepository(
-                                    repoId = repo.id,
-                                    repoName = repo.name,
-                                    repoOwner = repo.owner.login,
-                                    repoOwnerAvatarUrl = repo.owner.avatarUrl,
-                                    repoDescription = repo.description,
-                                    primaryLanguage = repo.language,
-                                    repoUrl = repo.htmlUrl,
-                                    stargazersCount = repo.stargazersCount,
-                                    forksCount = repo.forksCount,
-                                    openIssuesCount = repo.openIssuesCount,
-                                    isInstalled = firstInstalled != null,
-                                    installedPackageName = firstInstalled?.packageName,
-                                    latestVersion = release.version,
-                                    latestReleaseUrl = release.url,
-                                    starredAt = repo.starredAt?.let {
-                                        Instant.parse(it).toEpochMilliseconds()
-                                    },
-                                    addedAt = now,
-                                    lastSyncedAt = now,
-                                )
-                            }
-                        }
-                    }.awaitAll().filterNotNull()
-                }
+                val results =
+                    coroutineScope {
+                        val semaphore = Semaphore(25)
+                        allRepos
+                            .map { repo ->
+                                async {
+                                    semaphore.withPermit {
+                                        val release =
+                                            checkForValidAssets(repo.owner.login, repo.name, ::matchesAnyPlatform)
+                                                ?: return@withPermit null
+                                        val installedApps = installedAppsDao.getAppsByRepoId(repo.id)
+                                        val firstInstalled =
+                                            installedApps.firstOrNull { !it.isPendingInstall }
+                                        zed.rainxch.core.domain.model.repository.StarredRepository(
+                                            repoId = repo.id,
+                                            repoName = repo.name,
+                                            repoOwner = repo.owner.login,
+                                            repoOwnerAvatarUrl = repo.owner.avatarUrl,
+                                            repoDescription = repo.description,
+                                            primaryLanguage = repo.language,
+                                            repoUrl = repo.htmlUrl,
+                                            stargazersCount = repo.stargazersCount,
+                                            forksCount = repo.forksCount,
+                                            openIssuesCount = repo.openIssuesCount,
+                                            isInstalled = firstInstalled != null,
+                                            installedPackageName = firstInstalled?.packageName,
+                                            latestVersion = release.version,
+                                            latestReleaseUrl = release.url,
+                                            starredAt = repo.starredAt.toEpochMillisecondsOrNull(),
+                                            addedAt = now,
+                                            lastSyncedAt = now,
+                                        )
+                                    }
+                                }
+                            }.awaitAll()
+                            .filterNotNull()
+                    }
 
                 Result.success(results)
             } catch (e: RateLimitException) {
-                throw e
+                Result.failure(e)
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
@@ -195,6 +209,7 @@ class StarredRepositoryImpl(
                 while (true) {
                     val response =
                         httpClient.get("/user/starred") {
+                            header(HttpHeaders.Accept, STARRED_MEDIA_TYPE)
                             parameter("per_page", perPage)
                             parameter("page", page)
                         }
@@ -210,11 +225,11 @@ class StarredRepositoryImpl(
                         )
                     }
 
-                    val repos: List<GitHubStarredResponse> = response.body()
+                    val repos = parseStarredPage(gitHubJson, response.body())
 
                     if (repos.isEmpty()) break
 
-                    allRepos.addAll(repos)
+                    allRepos.addAll(repos.map { it.repo.copy(starredAt = it.starredAt) })
 
                     if (repos.size < perPage) break
                     page++
@@ -229,50 +244,41 @@ class StarredRepositoryImpl(
                         allRepos.map { repo ->
                             async {
                                 semaphore.withPermit {
-                                    val release =
-                                        checkForValidAssets(repo.owner.login, repo.name)
-                                    if (release != null) {
-                                        val installedApps = installedAppsDao.getAppsByRepoId(repo.id)
-                                        val firstInstalled = installedApps.firstOrNull { !it.isPendingInstall }
-                                        zed.rainxch.core.domain.model.repository.StarredRepository(
-                                            repoId = repo.id,
-                                            repoName = repo.name,
-                                            repoOwner = repo.owner.login,
-                                            repoOwnerAvatarUrl = repo.owner.avatarUrl,
-                                            repoDescription = repo.description,
-                                            primaryLanguage = repo.language,
-                                            repoUrl = repo.htmlUrl,
-                                            stargazersCount = repo.stargazersCount,
-                                            forksCount = repo.forksCount,
-                                            openIssuesCount = repo.openIssuesCount,
-                                            isInstalled = firstInstalled != null,
-                                            installedPackageName = firstInstalled?.packageName,
-                                            latestVersion = release.version,
-                                            latestReleaseUrl = release.url,
-                                            starredAt =
-                                                repo.starredAt?.let {
-                                                    Instant.parse(it).toEpochMilliseconds()
-                                                },
-                                            addedAt = now,
-                                            lastSyncedAt = now,
-                                        )
-                                    } else {
-                                        null
-                                    }
+                                    val release = checkForValidAssets(repo.owner.login, repo.name)
+                                    val installedApps = installedAppsDao.getAppsByRepoId(repo.id)
+                                    val firstInstalled = installedApps.firstOrNull { !it.isPendingInstall }
+
+                                    zed.rainxch.core.domain.model.repository.StarredRepository(
+                                        repoId = repo.id,
+                                        repoName = repo.name,
+                                        repoOwner = repo.owner.login,
+                                        repoOwnerAvatarUrl = repo.owner.avatarUrl,
+                                        repoDescription = repo.description,
+                                        primaryLanguage = repo.language,
+                                        repoUrl = repo.htmlUrl,
+                                        stargazersCount = repo.stargazersCount,
+                                        forksCount = repo.forksCount,
+                                        openIssuesCount = repo.openIssuesCount,
+                                        isInstalled = firstInstalled != null,
+                                        installedPackageName = firstInstalled?.packageName,
+                                        latestVersion = release?.version,
+                                        latestReleaseUrl = release?.url,
+                                        starredAt = repo.starredAt.toEpochMillisecondsOrNull(),
+                                        addedAt = now,
+                                        lastSyncedAt = now,
+                                    )
                                 }
                             }
                         }
 
-                    deferredResults.awaitAll().filterNotNull().let { validRepos ->
-                        starredRepos.addAll(validRepos)
-                    }
+                    starredRepos.addAll(deferredResults.awaitAll())
                 }
 
                 starredRepoDao.replaceAllStarred(starredRepos.map { it.toEntity() })
 
                 Result.success(Unit)
             } catch (e: RateLimitException) {
-                throw e
+                Result.failure(e)
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
@@ -284,11 +290,22 @@ class StarredRepositoryImpl(
     private fun matchesPlatform(assetName: String): Boolean {
         val name = assetName.lowercase()
         return when (platform) {
-            Platform.ANDROID -> name.endsWith(".apk")
-            Platform.WINDOWS -> name.endsWith(".msi") || name.endsWith(".exe")
-            Platform.MACOS -> name.endsWith(".dmg") || name.endsWith(".pkg")
-            Platform.LINUX -> name.endsWith(".appimage") || name.endsWith(".deb") ||
-                name.endsWith(".rpm") || name.endsWith(".pkg.tar.zst")
+            Platform.ANDROID -> {
+                name.endsWith(".apk")
+            }
+
+            Platform.WINDOWS -> {
+                name.endsWith(".msi") || name.endsWith(".exe")
+            }
+
+            Platform.MACOS -> {
+                name.endsWith(".dmg") || name.endsWith(".pkg")
+            }
+
+            Platform.LINUX -> {
+                name.endsWith(".appimage") || name.endsWith(".deb") ||
+                    name.endsWith(".rpm") || name.endsWith(".pkg.tar.zst")
+            }
         }
     }
 
@@ -307,8 +324,9 @@ class StarredRepositoryImpl(
         val backendResult = backendApiClient.getReleases(owner, repo, perPage = 10)
         backendResult.fold(
             onSuccess = { releases ->
-                val stable = releases.firstOrNull { it.draft != true && it.prerelease != true }
-                    ?: return null
+                val stable =
+                    releases.firstOrNull { it.draft != true && it.prerelease != true }
+                        ?: return null
                 if (stable.assets.isEmpty()) return null
                 return if (stable.assets.any { asset -> matcher(asset.name) }) {
                     StableReleaseInfo(version = stable.tagName, url = stable.htmlUrl)
@@ -317,7 +335,11 @@ class StarredRepositoryImpl(
                 }
             },
             onFailure = { error ->
-                if (!zed.rainxch.core.data.network.shouldFallbackToGithubOrRethrow(error)) return null
+                if (!zed.rainxch.core.data.network
+                        .shouldFallbackToGithubOrRethrow(error)
+                ) {
+                    return null
+                }
             },
         )
 
@@ -380,4 +402,16 @@ class StarredRepositoryImpl(
     private data class AssetNetworkModel(
         val name: String,
     )
+}
+
+// A malformed starred_at would otherwise cancel the sync's coroutineScope; it costs only the
+// entry's ordering hint.
+internal fun String?.toEpochMillisecondsOrNull(): Long? {
+    val raw = this ?: return null
+    return try {
+        Instant.parse(raw).toEpochMilliseconds()
+    } catch (e: IllegalArgumentException) {
+        Logger.w(e) { "Unparsable starred_at '$raw'; treating the entry as oldest" }
+        null
+    }
 }

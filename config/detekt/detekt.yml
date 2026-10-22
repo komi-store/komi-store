@@ -1,0 +1,24 @@
+complexity:
+  LongMethod:
+    ignoreAnnotated: ['Composable']
+  LongParameterList:
+    ignoreAnnotated: ['Composable']
+    ignoreDefaultParameters: true
+
+naming:
+  FunctionNaming:
+    ignoreAnnotated: ['Composable']
+
+style:
+  MagicNumber:
+    ignorePropertyDeclaration: true
+    ignoreAnnotated: ['Composable', 'Preview']
+  MaxLineLength:
+    # ktlint's default; Spotless joins lines up to this length
+    maxLineLength: 140
+  UnusedPrivateMember:
+    ignoreAnnotated: ['Preview']
+  WildcardImport:
+    active: false
+  NewLineAtEndOfFile:
+    active: false

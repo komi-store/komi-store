@@ -4,10 +4,14 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.union
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -16,10 +20,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.collections.immutable.PersistentSet
 import org.jetbrains.compose.resources.stringResource
@@ -87,7 +89,7 @@ fun IssueDetailRoot(
 private fun IssueDetailScreen(
     state: IssueDetailUiState,
     toastState: KomiToastState,
-    onAction: (IssueDetailAction) -> Unit
+    onAction: (IssueDetailAction) -> Unit,
 ) {
     KomiScaffold(
         topBar = {
@@ -95,7 +97,7 @@ private fun IssueDetailScreen(
                 title = "#${state.issueNumber}",
                 onBack = {
                     onAction(IssueDetailAction.OnBackClick)
-                }
+                },
             )
         },
         toastState = toastState,
@@ -115,29 +117,37 @@ private fun IssueDetailScreen(
             }
         },
     ) { innerPadding ->
-        val content = Modifier
-            .fillMaxWidth()
-            .padding(innerPadding)
+        val content =
+            Modifier
+                .fillMaxWidth()
+                .padding(innerPadding)
         when {
-            state.isLoading -> RepoPagesLoading(content)
-            state.errorMessage != null -> RepoPagesError(
-                message = state.errorMessage,
-                onRetry = { onAction(IssueDetailAction.OnRetryClick) },
-                modifier = content
-            )
+            state.isLoading -> {
+                RepoPagesLoading(content)
+            }
 
-            state.detail != null -> IssueDetailContent(
-                detail = state.detail,
-                isReactingIssue = state.isReactingIssue,
-                reactingCommentIds = state.reactingCommentIds,
-                onReactIssue = {
-                    onAction(IssueDetailAction.OnReactIssue)
-                },
-                onReactComment = {
-                    onAction(IssueDetailAction.OnReactComment(it))
-                },
-                modifier = content,
-            )
+            state.errorMessage != null -> {
+                RepoPagesError(
+                    message = state.errorMessage,
+                    onRetry = { onAction(IssueDetailAction.OnRetryClick) },
+                    modifier = content,
+                )
+            }
+
+            state.detail != null -> {
+                IssueDetailContent(
+                    detail = state.detail,
+                    isReactingIssue = state.isReactingIssue,
+                    reactingCommentIds = state.reactingCommentIds,
+                    onReactIssue = {
+                        onAction(IssueDetailAction.OnReactIssue)
+                    },
+                    onReactComment = {
+                        onAction(IssueDetailAction.OnReactComment(it))
+                    },
+                    modifier = content,
+                )
+            }
         }
     }
 }
@@ -161,22 +171,19 @@ private fun IssueDetailContent(
             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 KomiText(
                     text = detail.title,
-                    role = KomiTextRole.Title,
-                    fontWeight = FontWeight.SemiBold,
+                    role = KomiTextRole.CardTitle,
                     color = colors.onBackground,
-                    uppercase = false,
                 )
 
                 KomiText(
-                    text = "#${detail.number} · " +
+                    text =
+                        "#${detail.number} · " +
                             stringResource(
                                 Res.string.repo_pages_issue_opened_by,
-                                detail.authorLogin
+                                detail.authorLogin,
                             ),
                     role = KomiTextRole.Body,
-                    fontSize = 13.sp,
                     color = colors.onSurfaceVariant,
-                    uppercase = false,
                 )
             }
         }
@@ -187,7 +194,7 @@ private fun IssueDetailContent(
             ) {
                 Column(
                     modifier = Modifier.padding(14.dp),
-                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                    verticalArrangement = Arrangement.spacedBy(10.dp),
                 ) {
                     if (detail.bodyMarkdown.isBlank()) {
                         KomiText(
@@ -198,7 +205,7 @@ private fun IssueDetailContent(
                     } else {
                         RepoMarkdown(
                             content = detail.bodyMarkdown,
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier.fillMaxWidth(),
                         )
                     }
 
@@ -217,10 +224,8 @@ private fun IssueDetailContent(
 
                 KomiText(
                     text = stringResource(Res.string.repo_pages_issue_comments_section),
-                    role = KomiTextRole.Title,
-                    fontWeight = FontWeight.SemiBold,
+                    role = KomiTextRole.CardTitle,
                     color = colors.onBackground,
-                    uppercase = false,
                     modifier = Modifier.padding(top = 8.dp),
                 )
             }
@@ -252,10 +257,8 @@ private fun CommentCard(
         ) {
             KomiText(
                 text = comment.authorLogin,
-                role = KomiTextRole.Label,
-                fontWeight = FontWeight.SemiBold,
+                role = KomiTextRole.LabelSmall,
                 color = colors.onSurface,
-                uppercase = false,
             )
 
             RepoMarkdown(content = comment.bodyMarkdown, modifier = Modifier.fillMaxWidth())
@@ -291,10 +294,8 @@ private fun ThumbChip(
             if (count > 0) {
                 KomiText(
                     text = count.toString(),
-                    role = KomiTextRole.Label,
-                    fontSize = 12.sp,
+                    role = KomiTextRole.Caption,
                     color = colors.onSurfaceVariant,
-                    uppercase = false,
                 )
             }
         }
@@ -316,10 +317,11 @@ private fun CommentComposer(
         elevation = KomiSurfaceElevation.Raised,
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .systemBarsPadding()
-                .padding(horizontal = 12.dp, vertical = 8.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .windowInsetsPadding(WindowInsets.systemBars.union(WindowInsets.ime))
+                    .padding(horizontal = 12.dp, vertical = 8.dp),
         ) {
             if (!isLoggedIn) {
                 KomiText(
@@ -360,44 +362,48 @@ private fun CommentComposer(
 private fun IssueDetailScreenPreview() {
     PersonalityPreview {
         IssueDetailScreen(
-            state = IssueDetailUiState(
-                issueNumber = 123,
-                detail = RepoIssueDetail(
-                    number = 123,
-                    title = "Sample Issue Title",
-                    state = IssueState.OPEN,
-                    authorLogin = "sampleuser",
-                    authorAvatarUrl = null,
-                    bodyMarkdown = "This is a sample issue body with **markdown** support.",
-                    createdAt = "2023-10-27T10:00:00Z",
-                    labels = listOf(
-                        IssueLabel(name = "bug", color = "ff0000"),
-                        IssueLabel(name = "high priority", color = "00ff00")
-                    ),
-                    comments = listOf(
-                        IssueComment(
-                            id = 1,
-                            authorLogin = "commenter1",
+            state =
+                IssueDetailUiState(
+                    issueNumber = 123,
+                    detail =
+                        RepoIssueDetail(
+                            number = 123,
+                            title = "Sample Issue Title",
+                            state = IssueState.OPEN,
+                            authorLogin = "sampleuser",
                             authorAvatarUrl = null,
-                            bodyMarkdown = "This is a comment.",
-                            createdAt = "2023-10-27T11:00:00Z",
-                            reactionThumbsUp = 5
+                            bodyMarkdown = "This is a sample issue body with **markdown** support.",
+                            createdAt = "2023-10-27T10:00:00Z",
+                            labels =
+                                listOf(
+                                    IssueLabel(name = "bug", color = "ff0000"),
+                                    IssueLabel(name = "high priority", color = "00ff00"),
+                                ),
+                            comments =
+                                listOf(
+                                    IssueComment(
+                                        id = 1,
+                                        authorLogin = "commenter1",
+                                        authorAvatarUrl = null,
+                                        bodyMarkdown = "This is a comment.",
+                                        createdAt = "2023-10-27T11:00:00Z",
+                                        reactionThumbsUp = 5,
+                                    ),
+                                    IssueComment(
+                                        id = 2,
+                                        authorLogin = "commenter2",
+                                        authorAvatarUrl = null,
+                                        bodyMarkdown = "Another comment with `code`.",
+                                        createdAt = "2023-10-27T12:00:00Z",
+                                        reactionThumbsUp = 2,
+                                    ),
+                                ),
+                            reactionThumbsUp = 10,
                         ),
-                        IssueComment(
-                            id = 2,
-                            authorLogin = "commenter2",
-                            authorAvatarUrl = null,
-                            bodyMarkdown = "Another comment with `code`.",
-                            createdAt = "2023-10-27T12:00:00Z",
-                            reactionThumbsUp = 2
-                        )
-                    ),
-                    reactionThumbsUp = 10
+                    isLoggedIn = true,
                 ),
-                isLoggedIn = true
-            ),
             toastState = rememberKomiToastState(),
-            onAction = {}
+            onAction = {},
         )
     }
 }

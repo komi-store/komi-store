@@ -14,6 +14,8 @@ sealed interface StarredReposAction {
 
     data object OnDismissError : StarredReposAction
 
+    data object OnToggleShowAllStarred : StarredReposAction
+
     data class OnRepositoryClick(
         val repository: StarredRepositoryUi,
     ) : StarredReposAction

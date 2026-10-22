@@ -23,10 +23,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.stringResource
 import zed.rainxch.core.presentation.components.buttons.KomiButton
 import zed.rainxch.core.presentation.components.buttons.KomiButtonVariant
@@ -65,9 +63,10 @@ fun TranslationCard(
 ) {
     val colors = LocalPersonality.current.colors
     val effectiveTargetCode = state.targetLanguageCode ?: deviceLanguageCode
-    val effectiveTargetName = state.targetLanguageDisplayName
-        ?: SupportedLanguages.all.firstOrNull { it.code == effectiveTargetCode }?.displayName
-        ?: effectiveTargetCode
+    val effectiveTargetName =
+        state.targetLanguageDisplayName
+            ?: SupportedLanguages.all.firstOrNull { it.code == effectiveTargetCode }?.displayName
+            ?: effectiveTargetCode
 
     KomiSurface(
         modifier = modifier.fillMaxWidth(),
@@ -106,13 +105,13 @@ fun TranslationCard(
             if (state.translatedText != null && state.detectedSourceLanguage != null) {
                 Spacer(Modifier.height(8.dp))
                 KomiText(
-                    text = stringResource(
-                        Res.string.translation_card_detected_source,
-                        SupportedLanguages.all.firstOrNull { it.code == state.detectedSourceLanguage }?.displayName
-                            ?: state.detectedSourceLanguage,
-                    ),
+                    text =
+                        stringResource(
+                            Res.string.translation_card_detected_source,
+                            SupportedLanguages.all.firstOrNull { it.code == state.detectedSourceLanguage }?.displayName
+                                ?: state.detectedSourceLanguage,
+                        ),
                     role = KomiTextRole.Body,
-                    fontSize = 13.sp,
                     color = colors.onSurfaceVariant,
                 )
             }
@@ -121,15 +120,19 @@ fun TranslationCard(
 }
 
 @Composable
-private fun Header(state: TranslationState, displayName: String) {
+private fun Header(
+    state: TranslationState,
+    displayName: String,
+) {
     val colors = LocalPersonality.current.colors
     val shape = LocalPersonality.current.shape
     Row(verticalAlignment = Alignment.CenterVertically) {
         Box(
-            modifier = Modifier
-                .size(34.dp)
-                .clip(RoundedCornerShape(shape.corner))
-                .background(colors.primary.copy(alpha = 0.14f)),
+            modifier =
+                Modifier
+                    .size(34.dp)
+                    .clip(RoundedCornerShape(shape.corner))
+                    .background(colors.primaryTint),
             contentAlignment = Alignment.Center,
         ) {
             KomiIcon(
@@ -143,24 +146,30 @@ private fun Header(state: TranslationState, displayName: String) {
         Column(modifier = Modifier.weight(1f)) {
             KomiText(
                 text = stringResource(Res.string.translation_card_title),
-                role = KomiTextRole.Title,
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 17.sp,
+                role = KomiTextRole.CardTitle,
                 color = colors.onSurface,
-                uppercase = false,
             )
-            val subtitle = when {
-                state.isTranslating -> stringResource(Res.string.translation_card_subtitle_translating)
-                state.translatedText != null && state.isShowingTranslation ->
-                    stringResource(Res.string.translation_card_subtitle_translated, displayName)
-                state.translatedText != null && !state.isShowingTranslation ->
-                    stringResource(Res.string.translation_card_subtitle_original)
-                else -> stringResource(Res.string.translation_card_subtitle_idle)
-            }
+            val subtitle =
+                when {
+                    state.isTranslating -> {
+                        stringResource(Res.string.translation_card_subtitle_translating)
+                    }
+
+                    state.translatedText != null && state.isShowingTranslation -> {
+                        stringResource(Res.string.translation_card_subtitle_translated, displayName)
+                    }
+
+                    state.translatedText != null && !state.isShowingTranslation -> {
+                        stringResource(Res.string.translation_card_subtitle_original)
+                    }
+
+                    else -> {
+                        stringResource(Res.string.translation_card_subtitle_idle)
+                    }
+                }
             KomiText(
                 text = subtitle,
                 role = KomiTextRole.Body,
-                fontSize = 13.sp,
                 color = colors.onSurfaceVariant,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
@@ -180,18 +189,18 @@ private fun TargetLanguageRow(
     Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
         KomiText(
             text = stringResource(Res.string.translation_card_target_label),
-            role = KomiTextRole.Label,
-            fontSize = 12.sp,
+            role = KomiTextRole.Overline,
             color = colors.onSurfaceVariant,
         )
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(rowShape)
-                .background(colors.surfaceContainerHigh)
-                .border(1.dp, colors.outlineVariant.copy(alpha = 0.5f), rowShape)
-                .clickable(onClick = onPick)
-                .padding(horizontal = 14.dp, vertical = 12.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .clip(rowShape)
+                    .background(colors.surfaceContainerHigh)
+                    .border(1.dp, colors.divider, rowShape)
+                    .clickable(onClick = onPick)
+                    .padding(horizontal = 14.dp, vertical = 12.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             KomiIcon(
@@ -203,13 +212,11 @@ private fun TargetLanguageRow(
             Spacer(Modifier.width(10.dp))
             KomiText(
                 text = displayName,
-                role = KomiTextRole.Body,
-                fontWeight = FontWeight.SemiBold,
+                role = KomiTextRole.Label,
                 color = colors.onSurface,
                 modifier = Modifier.weight(1f),
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
-                uppercase = false,
             )
             KomiIcon(
                 imageVector = Icons.Default.ExpandMore,
@@ -244,11 +251,12 @@ private fun ActionRow(
         state.translatedText != null -> {
             KomiButton(
                 onClick = onToggle,
-                label = if (state.isShowingTranslation) {
-                    stringResource(Res.string.translation_card_show_original)
-                } else {
-                    stringResource(Res.string.translation_card_show_translation)
-                },
+                label =
+                    if (state.isShowingTranslation) {
+                        stringResource(Res.string.translation_card_show_original)
+                    } else {
+                        stringResource(Res.string.translation_card_show_translation)
+                    },
                 variant = KomiButtonVariant.Primary,
                 modifier = Modifier.fillMaxWidth(),
             )
@@ -257,10 +265,11 @@ private fun ActionRow(
         else -> {
             KomiButton(
                 onClick = { onTranslate(effectiveTargetCode) },
-                label = stringResource(
-                    Res.string.translation_card_translate_to,
-                    effectiveTargetName,
-                ),
+                label =
+                    stringResource(
+                        Res.string.translation_card_translate_to,
+                        effectiveTargetName,
+                    ),
                 variant = KomiButtonVariant.Primary,
                 leadingIcon = Icons.Outlined.Translate,
                 modifier = Modifier.fillMaxWidth(),
@@ -277,17 +286,17 @@ private fun ErrorRow(
     val colors = LocalPersonality.current.colors
     val shape = LocalPersonality.current.shape
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(shape.corner))
-            .background(colors.error)
-            .padding(horizontal = 12.dp, vertical = 10.dp),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(shape.corner))
+                .background(colors.error)
+                .padding(horizontal = 12.dp, vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         KomiText(
             text = message,
             role = KomiTextRole.Body,
-            fontSize = 13.sp,
             color = colors.onError,
             modifier = Modifier.weight(1f),
             maxLines = 2,
@@ -295,18 +304,17 @@ private fun ErrorRow(
         )
         Spacer(Modifier.width(8.dp))
         Box(
-            modifier = Modifier
-                .clip(RoundedCornerShape(shape.cornerSmall))
-                .background(colors.error)
-                .clickable(onClick = onRetry)
-                .padding(horizontal = 12.dp, vertical = 6.dp),
+            modifier =
+                Modifier
+                    .clip(RoundedCornerShape(shape.cornerSmall))
+                    .background(colors.error)
+                    .clickable(onClick = onRetry)
+                    .padding(horizontal = 12.dp, vertical = 6.dp),
             contentAlignment = Alignment.Center,
         ) {
             KomiText(
                 text = stringResource(Res.string.translation_card_retry),
-                role = KomiTextRole.Label,
-                fontSize = 12.sp,
-                fontWeight = FontWeight.SemiBold,
+                role = KomiTextRole.Overline,
                 color = colors.onError,
             )
         }

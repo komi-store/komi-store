@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalMaterial3ExpressiveApi::class)
+
 package zed.rainxch.core.presentation.components.buttons
 
 import androidx.compose.animation.core.animateFloatAsState
@@ -28,6 +30,7 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
@@ -47,9 +50,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.IntOffset
-import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import zed.rainxch.core.presentation.components.text.KomiText
 import zed.rainxch.core.presentation.components.text.KomiTextRole
 import zed.rainxch.core.presentation.locals.LocalPersonality
@@ -79,6 +80,8 @@ fun KomiButton(
     fullWidth: Boolean = false,
     leadingIcon: ImageVector? = null,
     trailingIcon: ImageVector? = null,
+    containerColor: Color = Color.Unspecified,
+    contentColor: Color = Color.Unspecified,
 ) {
     when (val personality = LocalPersonality.current) {
         is MangaPersonality -> {
@@ -95,6 +98,8 @@ fun KomiButton(
                 fullWidth = fullWidth,
                 leadingIcon = leadingIcon,
                 trailingIcon = trailingIcon,
+                containerColor = containerColor,
+                contentColor = contentColor,
             )
         }
 
@@ -111,6 +116,8 @@ fun KomiButton(
                 fullWidth = fullWidth,
                 leadingIcon = leadingIcon,
                 trailingIcon = trailingIcon,
+                containerColor = containerColor,
+                contentColor = contentColor,
             )
         }
     }
@@ -121,7 +128,7 @@ private fun MangaButton(
     personality: MangaPersonality,
     onClick: () -> Unit,
     label: String,
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
     variant: KomiButtonVariant,
     size: KomiButtonSize,
     enabled: Boolean,
@@ -130,6 +137,8 @@ private fun MangaButton(
     fullWidth: Boolean,
     leadingIcon: ImageVector?,
     trailingIcon: ImageVector?,
+    containerColor: Color,
+    contentColor: Color,
 ) {
     val colors = personality.colors
     val metrics = buttonMetrics(size)
@@ -140,9 +149,14 @@ private fun MangaButton(
 
     val flat = variant == KomiButtonVariant.Text
     val ambientInk = LocalContentColor.current
-    val container = mangaButtonContainer(variant, colors)
-    val contentColor = mangaButtonContent(variant, colors, ambientInk)
-    val borderColor = if (container == Color.Transparent) contentColor else colors.outline
+    val overrideColorsGiven =
+        containerColor != Color.Unspecified && contentColor != Color.Unspecified
+    val container =
+        if (overrideColorsGiven) containerColor else mangaButtonContainer(variant, colors)
+    val resolvedContentColor =
+        if (overrideColorsGiven) contentColor else mangaButtonContent(variant, colors, ambientInk)
+    val borderColor =
+        if (overrideColorsGiven || container == Color.Transparent) resolvedContentColor else colors.outline
     val stamped = !flat && container != Color.Transparent
     val sweep =
         emphasized && active &&
@@ -175,14 +189,16 @@ private fun MangaButton(
         modifier =
             modifier
                 .then(if (fullWidth) Modifier.fillMaxWidth() else Modifier)
-                .inkFocusRing(focused = { focused }, color = colors.primary)
-                .then(pressModifier)
+                .inkFocusRing(
+                    focused = { focused },
+                    color = if (overrideColorsGiven) resolvedContentColor else colors.primary,
+                ).then(pressModifier)
                 .then(if (clipNeeded) Modifier.clip(shape) else Modifier)
                 .background(color = container.copy(alpha = container.alpha * alpha), shape = shape)
                 .then(
                     if (sweep) {
                         Modifier.speedLines(
-                            color = contentColor,
+                            color = resolvedContentColor,
                             opacity = 0.16f,
                         )
                     } else {
@@ -192,7 +208,7 @@ private fun MangaButton(
                     if (!flat) {
                         Modifier.border(
                             width = metrics.border,
-                            color = borderColor.copy(alpha = alpha),
+                            color = borderColor.copy(alpha = borderColor.alpha * alpha),
                             shape = shape,
                         )
                     } else {
@@ -210,10 +226,10 @@ private fun MangaButton(
     ) {
         KomiButtonContent(
             label = label,
-            contentColor = contentColor.copy(alpha = alpha),
+            contentColor = resolvedContentColor.copy(alpha = resolvedContentColor.alpha * alpha),
             iconSize = metrics.icon,
             gap = metrics.gap,
-            fontSize = metrics.font,
+            labelRole = metrics.labelRole,
             loading = loading,
             leadingIcon = leadingIcon,
             trailingIcon = trailingIcon,
@@ -226,7 +242,7 @@ private fun ClassicButton(
     personality: ClassicPersonality,
     onClick: () -> Unit,
     label: String,
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
     variant: KomiButtonVariant,
     size: KomiButtonSize,
     enabled: Boolean,
@@ -234,9 +250,12 @@ private fun ClassicButton(
     fullWidth: Boolean,
     leadingIcon: ImageVector?,
     trailingIcon: ImageVector?,
+    containerColor: Color,
+    contentColor: Color,
 ) {
     val colors = personality.colors
     val metrics = buttonMetrics(size)
+    val shapes = ButtonDefaults.shapesFor(metrics.height)
     val active = enabled && !loading
     val contentPadding = PaddingValues(horizontal = metrics.hPadding)
     val buttonModifier =
@@ -244,13 +263,50 @@ private fun ClassicButton(
             .heightIn(min = metrics.height)
             .then(if (fullWidth) Modifier.fillMaxWidth() else Modifier)
 
+    val overrideColors =
+        if (containerColor != Color.Unspecified && contentColor != Color.Unspecified) {
+            when (variant) {
+                KomiButtonVariant.Primary,
+                KomiButtonVariant.Destructive,
+                -> {
+                    ButtonDefaults.buttonColors(
+                        containerColor = containerColor,
+                        contentColor = contentColor,
+                    )
+                }
+
+                KomiButtonVariant.Tonal -> {
+                    ButtonDefaults.filledTonalButtonColors(
+                        containerColor = containerColor,
+                        contentColor = contentColor,
+                    )
+                }
+
+                KomiButtonVariant.Outline -> {
+                    ButtonDefaults.outlinedButtonColors(
+                        containerColor = containerColor,
+                        contentColor = contentColor,
+                    )
+                }
+
+                KomiButtonVariant.Text -> {
+                    ButtonDefaults.textButtonColors(
+                        containerColor = containerColor,
+                        contentColor = contentColor,
+                    )
+                }
+            }
+        } else {
+            null
+        }
+
     val content: @Composable RowScope.() -> Unit = {
         KomiButtonContent(
             label = label,
             contentColor = LocalContentColor.current,
             iconSize = metrics.icon,
             gap = metrics.gap,
-            fontSize = TextUnit.Unspecified,
+            labelRole = metrics.labelRole,
             loading = loading,
             leadingIcon = leadingIcon,
             trailingIcon = trailingIcon,
@@ -261,9 +317,11 @@ private fun ClassicButton(
         KomiButtonVariant.Primary -> {
             Button(
                 onClick = onClick,
+                shapes = shapes,
                 modifier = buttonModifier,
                 enabled = active,
                 contentPadding = contentPadding,
+                colors = overrideColors ?: ButtonDefaults.buttonColors(),
                 content = content,
             )
         }
@@ -271,9 +329,11 @@ private fun ClassicButton(
         KomiButtonVariant.Tonal -> {
             FilledTonalButton(
                 onClick = onClick,
+                shapes = shapes,
                 modifier = buttonModifier,
                 enabled = active,
                 contentPadding = contentPadding,
+                colors = overrideColors ?: ButtonDefaults.filledTonalButtonColors(),
                 content = content,
             )
         }
@@ -281,9 +341,11 @@ private fun ClassicButton(
         KomiButtonVariant.Outline -> {
             OutlinedButton(
                 onClick = onClick,
+                shapes = shapes,
                 modifier = buttonModifier,
                 enabled = active,
                 contentPadding = contentPadding,
+                colors = overrideColors ?: ButtonDefaults.outlinedButtonColors(),
                 content = content,
             )
         }
@@ -291,9 +353,11 @@ private fun ClassicButton(
         KomiButtonVariant.Text -> {
             TextButton(
                 onClick = onClick,
+                shapes = shapes,
                 modifier = buttonModifier,
                 enabled = active,
                 contentPadding = contentPadding,
+                colors = overrideColors ?: ButtonDefaults.textButtonColors(),
                 content = content,
             )
         }
@@ -301,14 +365,16 @@ private fun ClassicButton(
         KomiButtonVariant.Destructive -> {
             Button(
                 onClick = onClick,
+                shapes = shapes,
                 modifier = buttonModifier,
                 enabled = active,
                 contentPadding = contentPadding,
                 colors =
-                    ButtonDefaults.buttonColors(
-                        containerColor = colors.error,
-                        contentColor = colors.onError,
-                    ),
+                    overrideColors
+                        ?: ButtonDefaults.buttonColors(
+                            containerColor = colors.error,
+                            contentColor = colors.onError,
+                        ),
                 content = content,
             )
         }
@@ -321,7 +387,7 @@ private fun RowScope.KomiButtonContent(
     contentColor: Color,
     iconSize: Dp,
     gap: Dp,
-    fontSize: TextUnit,
+    labelRole: KomiTextRole,
     loading: Boolean,
     leadingIcon: ImageVector?,
     trailingIcon: ImageVector?,
@@ -345,11 +411,10 @@ private fun RowScope.KomiButtonContent(
 
         KomiText(
             text = label,
-            role = KomiTextRole.Label,
+            role = labelRole,
             color = contentColor,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
-            fontSize = fontSize,
         )
 
         if (trailingIcon != null && !loading) {
@@ -366,7 +431,7 @@ private fun RowScope.KomiButtonContent(
 private data class ButtonMetrics(
     val height: Dp,
     val hPadding: Dp,
-    val font: TextUnit,
+    val labelRole: KomiTextRole,
     val icon: Dp,
     val gap: Dp,
     val shadow: Dp,
@@ -375,9 +440,9 @@ private data class ButtonMetrics(
 
 private fun buttonMetrics(size: KomiButtonSize): ButtonMetrics =
     when (size) {
-        KomiButtonSize.Sm -> ButtonMetrics(34.dp, 14.dp, 12.sp, 15.dp, 7.dp, 3.dp, 2.5.dp)
-        KomiButtonSize.Md -> ButtonMetrics(44.dp, 20.dp, 13.5.sp, 18.dp, 9.dp, 4.dp, 2.5.dp)
-        KomiButtonSize.Lg -> ButtonMetrics(54.dp, 26.dp, 16.sp, 22.dp, 10.dp, 5.dp, 3.dp)
+        KomiButtonSize.Sm -> ButtonMetrics(34.dp, 14.dp, KomiTextRole.LabelSmall, 15.dp, 7.dp, 3.dp, 1.5.dp)
+        KomiButtonSize.Md -> ButtonMetrics(44.dp, 20.dp, KomiTextRole.Label, 18.dp, 9.dp, 4.dp, 2.5.dp)
+        KomiButtonSize.Lg -> ButtonMetrics(54.dp, 26.dp, KomiTextRole.LabelLarge, 22.dp, 10.dp, 5.dp, 3.dp)
     }
 
 @Composable

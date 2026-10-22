@@ -1,0 +1,53 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues/>
+  <CurrentIssues>
+    <ID>CyclomaticComplexMethod:AuthenticationRepositoryImpl.kt$AuthenticationRepositoryImpl$override suspend fun awaitDeviceToken(start: GithubDeviceStart): GithubDeviceTokenSuccess</ID>
+    <ID>LongMethod:AuthenticationRepositoryImpl.kt$AuthenticationRepositoryImpl$override suspend fun awaitDeviceToken(start: GithubDeviceStart): GithubDeviceTokenSuccess</ID>
+    <ID>MagicNumber:AuthenticationRepositoryImpl.kt$AuthenticationRepositoryImpl$10</ID>
+    <ID>MagicNumber:AuthenticationRepositoryImpl.kt$AuthenticationRepositoryImpl$100</ID>
+    <ID>MagicNumber:AuthenticationRepositoryImpl.kt$AuthenticationRepositoryImpl$1000</ID>
+    <ID>MagicNumber:AuthenticationRepositoryImpl.kt$AuthenticationRepositoryImpl$1000L</ID>
+    <ID>MagicNumber:AuthenticationRepositoryImpl.kt$AuthenticationRepositoryImpl$15_000L</ID>
+    <ID>MagicNumber:AuthenticationRepositoryImpl.kt$AuthenticationRepositoryImpl$20</ID>
+    <ID>MagicNumber:AuthenticationRepositoryImpl.kt$AuthenticationRepositoryImpl$2000</ID>
+    <ID>MagicNumber:AuthenticationRepositoryImpl.kt$AuthenticationRepositoryImpl$20_000L</ID>
+    <ID>MagicNumber:AuthenticationRepositoryImpl.kt$AuthenticationRepositoryImpl$3000</ID>
+    <ID>MagicNumber:AuthenticationRepositoryImpl.kt$AuthenticationRepositoryImpl$30_000L</ID>
+    <ID>MagicNumber:AuthenticationRepositoryImpl.kt$AuthenticationRepositoryImpl$4</ID>
+    <ID>MagicNumber:AuthenticationRepositoryImpl.kt$AuthenticationRepositoryImpl$429</ID>
+    <ID>MagicNumber:AuthenticationRepositoryImpl.kt$AuthenticationRepositoryImpl$5</ID>
+    <ID>MagicNumber:AuthenticationRepositoryImpl.kt$AuthenticationRepositoryImpl$500</ID>
+    <ID>MagicNumber:AuthenticationRepositoryImpl.kt$AuthenticationRepositoryImpl$5000</ID>
+    <ID>MagicNumber:AuthenticationRepositoryImpl.kt$AuthenticationRepositoryImpl$500L</ID>
+    <ID>MagicNumber:AuthenticationRepositoryImpl.kt$AuthenticationRepositoryImpl$599</ID>
+    <ID>MagicNumber:AuthenticationRepositoryImpl.kt$AuthenticationRepositoryImpl$8</ID>
+    <ID>MagicNumber:GitHubAuthApi.kt$GitHubAuthApi$10_000</ID>
+    <ID>MagicNumber:GitHubAuthApi.kt$GitHubAuthApi$300</ID>
+    <ID>MagicNumber:GitHubAuthApi.kt$GitHubAuthApi$30_000</ID>
+    <ID>MagicNumber:GitHubAuthApi.kt$GitHubAuthApi$400</ID>
+    <ID>MagicNumber:GitHubAuthApi.kt$GitHubAuthApi$499</ID>
+    <ID>MagicNumber:WebAuthApi.kt$WebAuthApi$200</ID>
+    <ID>MagicNumber:WebAuthApi.kt$WebAuthApi$299</ID>
+    <ID>MaxLineLength:AuthenticationRepositoryImpl.kt$AuthenticationRepositoryImpl$"Device flow started via Backend. interval=${dto.intervalSec}s expires=${dto.expiresInSec}s completeUri=${dto.verificationUriComplete != null}"</ID>
+    <ID>MaxLineLength:AuthenticationRepositoryImpl.kt$AuthenticationRepositoryImpl$"Direct device/start ALSO failed. backendClass=$backendClass backendStatus=$backendStatus backendMsg=$backendMsg | directClass=$innerClass directMsg=$innerMsg"</ID>
+    <ID>ReturnCount:AuthenticationRepositoryImpl.kt$AuthenticationRepositoryImpl$private fun looksLikePat(token: String): Boolean</ID>
+    <ID>ThrowsCount:AuthenticationRepositoryImpl.kt$AuthenticationRepositoryImpl$private suspend fun saveTokenWithVerification(token: GithubDeviceTokenSuccess)</ID>
+    <ID>TooGenericExceptionCaught:AuthenticationRepositoryImpl.kt$AuthenticationRepositoryImpl$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:AuthenticationRepositoryImpl.kt$AuthenticationRepositoryImpl$e: Throwable</ID>
+    <ID>TooGenericExceptionCaught:AuthenticationRepositoryImpl.kt$AuthenticationRepositoryImpl$inner: Throwable</ID>
+    <ID>TooGenericExceptionCaught:GitHubAuthApi.kt$GitHubAuthApi$e: Exception</ID>
+    <ID>TooGenericExceptionThrown:AuthenticationRepositoryImpl.kt$AuthenticationRepositoryImpl$throw Exception( "Authentication failed after multiple errors: ${e.message}", e, )</ID>
+    <ID>TooGenericExceptionThrown:AuthenticationRepositoryImpl.kt$AuthenticationRepositoryImpl$throw Exception( "Authentication failed: ${error?.message ?: "Unknown error"}", )</ID>
+    <ID>TooGenericExceptionThrown:AuthenticationRepositoryImpl.kt$AuthenticationRepositoryImpl$throw Exception( "Authentication was denied. Please try again if this was a mistake.", )</ID>
+    <ID>TooGenericExceptionThrown:AuthenticationRepositoryImpl.kt$AuthenticationRepositoryImpl$throw Exception( "Authorization code expired. Please try again.", )</ID>
+    <ID>TooGenericExceptionThrown:AuthenticationRepositoryImpl.kt$AuthenticationRepositoryImpl$throw Exception( "Failed to start GitHub authentication. " + "Please check your internet connection and try again.", e, )</ID>
+    <ID>TooGenericExceptionThrown:AuthenticationRepositoryImpl.kt$AuthenticationRepositoryImpl$throw Exception( "Failed to start GitHub authentication. " + "Please check your internet connection and try again.", inner, )</ID>
+    <ID>TooGenericExceptionThrown:AuthenticationRepositoryImpl.kt$AuthenticationRepositoryImpl$throw Exception( "GitHub is experiencing high traffic. Please wait a few minutes and try again.", )</ID>
+    <ID>TooGenericExceptionThrown:AuthenticationRepositoryImpl.kt$AuthenticationRepositoryImpl$throw Exception( "Invalid verification code. Please restart authentication.", )</ID>
+    <ID>TooGenericExceptionThrown:AuthenticationRepositoryImpl.kt$AuthenticationRepositoryImpl$throw Exception( "Network connection is unstable. Please check your connection and try again.", )</ID>
+    <ID>TooGenericExceptionThrown:AuthenticationRepositoryImpl.kt$AuthenticationRepositoryImpl$throw Exception("Failed to save authentication token: ${e.message}", e)</ID>
+    <ID>TooGenericExceptionThrown:AuthenticationRepositoryImpl.kt$AuthenticationRepositoryImpl$throw Exception("Token was not persisted correctly after 5 attempts")</ID>
+    <ID>TooManyFunctions:AuthenticationRepositoryImpl.kt$AuthenticationRepositoryImpl : AuthenticationRepository</ID>
+  </CurrentIssues>
+</SmellBaseline>

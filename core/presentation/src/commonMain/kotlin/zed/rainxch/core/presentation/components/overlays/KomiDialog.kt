@@ -32,7 +32,7 @@ fun KomiDialog(
     properties: DialogProperties = DialogProperties(),
 ) {
     when (LocalPersonality.current) {
-        is MangaPersonality ->
+        is MangaPersonality -> {
             Dialog(onDismissRequest = onDismissRequest, properties = properties) {
                 KomiSurface(
                     modifier = modifier.fillMaxWidth(),
@@ -53,8 +53,9 @@ fun KomiDialog(
                     }
                 }
             }
+        }
 
-        is ClassicPersonality ->
+        is ClassicPersonality -> {
             AlertDialog(
                 onDismissRequest = onDismissRequest,
                 confirmButton = confirmButton,
@@ -65,6 +66,7 @@ fun KomiDialog(
                 text = text,
                 properties = properties,
             )
+        }
     }
 }
 
@@ -77,16 +79,18 @@ fun KomiDialog(
 ) {
     Dialog(onDismissRequest = onDismissRequest, properties = properties) {
         when (LocalPersonality.current) {
-            is MangaPersonality ->
+            is MangaPersonality -> {
                 KomiSurface(
                     modifier = modifier.fillMaxWidth(),
                     elevation = KomiSurfaceElevation.Modal,
                     contentPadding = PaddingValues(20.dp),
                     content = content,
                 )
+            }
 
-            is ClassicPersonality ->
+            is ClassicPersonality -> {
                 Box(modifier = modifier) { content() }
+            }
         }
     }
 }

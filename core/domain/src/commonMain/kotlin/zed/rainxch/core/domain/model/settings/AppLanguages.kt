@@ -16,10 +16,10 @@ object AppLanguages {
             AppLanguage("ru", "Русский"),
             AppLanguage("tr", "Türkçe"),
             AppLanguage("zh-CN", "简体中文"),
+            AppLanguage("zh-TW", "繁體中文"),
         )
 
-    fun findByTag(tag: String?): AppLanguage? =
-        if (tag.isNullOrBlank()) null else ALL.find { it.tag == tag }
+    fun findByTag(tag: String?): AppLanguage? = if (tag.isNullOrBlank()) null else ALL.find { it.tag == tag }
 
     fun containsTag(tag: String?): Boolean = findByTag(tag) != null
 }

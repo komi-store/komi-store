@@ -1,7 +1,6 @@
 package zed.rainxch.tweaks.presentation.feedback.components
 
 import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -19,9 +18,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.stringResource
 import zed.rainxch.core.presentation.components.text.KomiText
 import zed.rainxch.core.presentation.components.text.KomiTextRole
@@ -41,9 +38,7 @@ fun CategorySelector(
     Column(modifier = modifier) {
         KomiText(
             text = stringResource(Res.string.feedback_category_label),
-            role = KomiTextRole.Label,
-            fontSize = 12.sp,
-            fontWeight = FontWeight.SemiBold,
+            role = KomiTextRole.Overline,
             color = colors.onSurfaceVariant,
         )
         Spacer(Modifier.height(8.dp))
@@ -76,7 +71,7 @@ internal fun FeedbackPillChip(
         } else {
             colors.surfaceContainerHigh
         },
-        animationSpec = tween(durationMillis = 180),
+        animationSpec = LocalPersonality.current.motion.fastEffects(),
         label = "chip_container",
     )
     val content by animateColorAsState(
@@ -85,7 +80,7 @@ internal fun FeedbackPillChip(
         } else {
             colors.onSurface
         },
-        animationSpec = tween(durationMillis = 180),
+        animationSpec = LocalPersonality.current.motion.fastEffects(),
         label = "chip_content",
     )
     Box(
@@ -98,11 +93,8 @@ internal fun FeedbackPillChip(
     ) {
         KomiText(
             text = label,
-            role = KomiTextRole.Label,
-            fontSize = 12.sp,
-            fontWeight = FontWeight.SemiBold,
+            role = KomiTextRole.LabelSmall,
             color = content,
-            uppercase = false,
         )
     }
 }

@@ -13,7 +13,9 @@ import kotlinx.serialization.json.Json
 import zed.rainxch.core.data.network.BACKEND_ORIGIN
 import zed.rainxch.core.data.network.WEB_ORIGIN
 
-object WebAuthApi {
+class WebAuthApi(
+    private val gitHubAuthApi: GitHubAuthApi,
+) {
     private val json =
         Json {
             ignoreUnknownKeys = true
@@ -24,55 +26,53 @@ object WebAuthApi {
         state: String,
         codeChallenge: String,
         codeVerifier: String,
-    ): Result<String> =
-        runCatching {
-            val res =
-                GitHubAuthApi.http.post("$WEB_ORIGIN/auth/register") {
-                    accept(ContentType.Application.Json)
-                    contentType(ContentType.Application.Json)
-                    headers.append(HttpHeaders.UserAgent, "GithubStore/1.0 (WebAuth)")
-                    setBody(
-                        RegisterRequest(
-                            state = state,
-                            codeChallenge = codeChallenge,
-                            codeVerifier = codeVerifier,
-                        ),
-                    )
-                }
-            val text = res.bodyAsText()
-            if (!res.status.isSuccess()) {
-                val errorBody =
-                    runCatching {
-                        json.decodeFromString(ErrorResponse.serializer(), text).error
-                    }.getOrNull() ?: text.take(200)
-                throw BackendHttpException(
-                    statusCode = res.status.value,
-                    message = "auth/register HTTP ${res.status.value}: $errorBody",
+    ): String {
+        val res =
+            gitHubAuthApi.http.post("$WEB_ORIGIN/auth/register") {
+                accept(ContentType.Application.Json)
+                contentType(ContentType.Application.Json)
+                headers.append(HttpHeaders.UserAgent, "GithubStore/1.0 (WebAuth)")
+                setBody(
+                    RegisterRequest(
+                        state = state,
+                        codeChallenge = codeChallenge,
+                        codeVerifier = codeVerifier,
+                    ),
                 )
             }
-            json.decodeFromString(RegisterResponse.serializer(), text).authUrl
+        val text = res.bodyAsText()
+        if (!res.status.isSuccess()) {
+            val errorBody =
+                runCatching {
+                    json.decodeFromString(ErrorResponse.serializer(), text).error
+                }.getOrNull() ?: text.take(200)
+            throw BackendHttpException(
+                statusCode = res.status.value,
+                message = "auth/register HTTP ${res.status.value}: $errorBody",
+            )
         }
+        return json.decodeFromString(RegisterResponse.serializer(), text).authUrl
+    }
 
-    suspend fun consumeHandoff(handoffId: String): Result<String> =
-        runCatching {
-            val res =
-                GitHubAuthApi.http.post("$BACKEND_ORIGIN/v1/oauth/handoff/$handoffId") {
-                    accept(ContentType.Application.Json)
-                    headers.append(HttpHeaders.UserAgent, "GithubStore/1.0 (WebAuth)")
-                }
-            val text = res.bodyAsText()
-            if (!res.status.isSuccess()) {
-                val errorBody =
-                    runCatching {
-                        json.decodeFromString(ErrorResponse.serializer(), text).error
-                    }.getOrNull() ?: text.take(200)
-                throw BackendHttpException(
-                    statusCode = res.status.value,
-                    message = "oauth/handoff HTTP ${res.status.value}: $errorBody",
-                )
+    suspend fun consumeHandoff(handoffId: String): String {
+        val res =
+            gitHubAuthApi.http.post("$BACKEND_ORIGIN/v1/oauth/handoff/$handoffId") {
+                accept(ContentType.Application.Json)
+                headers.append(HttpHeaders.UserAgent, "GithubStore/1.0 (WebAuth)")
             }
-            json.decodeFromString(HandoffResponse.serializer(), text).accessToken
+        val text = res.bodyAsText()
+        if (!res.status.isSuccess()) {
+            val errorBody =
+                runCatching {
+                    json.decodeFromString(ErrorResponse.serializer(), text).error
+                }.getOrNull() ?: text.take(200)
+            throw BackendHttpException(
+                statusCode = res.status.value,
+                message = "oauth/handoff HTTP ${res.status.value}: $errorBody",
+            )
         }
+        return json.decodeFromString(HandoffResponse.serializer(), text).accessToken
+    }
 
     private fun io.ktor.http.HttpStatusCode.isSuccess(): Boolean = value in 200..299
 }

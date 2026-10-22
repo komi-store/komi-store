@@ -7,57 +7,43 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.OpenInNew
-import androidx.compose.material.icons.filled.Security
-import androidx.compose.material.icons.filled.Update
-import androidx.compose.foundation.layout.Column
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.outlined.Info
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Popup
-import androidx.compose.ui.window.PopupProperties
 import kotlinx.collections.immutable.toImmutableList
 import org.jetbrains.compose.resources.stringResource
+import zed.rainxch.core.domain.model.installation.InstallSource
+import zed.rainxch.core.domain.model.installation.isReallyInstalled
+import zed.rainxch.core.domain.utils.AssetVariant
+import zed.rainxch.core.domain.utils.assetPlatformOf
 import zed.rainxch.core.presentation.components.icon.KomiIcon
-import zed.rainxch.core.presentation.components.surfaces.KomiSurface
-import zed.rainxch.core.presentation.components.surfaces.KomiSurfaceElevation
 import zed.rainxch.core.presentation.components.text.KomiText
 import zed.rainxch.core.presentation.components.text.KomiTextRole
 import zed.rainxch.core.presentation.locals.LocalPersonality
 import zed.rainxch.details.presentation.DetailsAction
 import zed.rainxch.details.presentation.DetailsState
 import zed.rainxch.details.presentation.components.AppHeader
+import zed.rainxch.details.presentation.components.InspectApkButton
 import zed.rainxch.details.presentation.components.LinkedRepoBanner
 import zed.rainxch.details.presentation.components.ReleaseAssetsPicker
 import zed.rainxch.details.presentation.components.ReleasesStatus
 import zed.rainxch.details.presentation.components.ReleasesStatusCard
-import zed.rainxch.core.domain.model.installation.InstallSource
-import zed.rainxch.core.domain.model.installation.isReallyInstalled
-import zed.rainxch.core.domain.utils.AssetVariant
-import zed.rainxch.core.domain.utils.assetPlatformOf
-import zed.rainxch.details.presentation.components.InspectApkButton
 import zed.rainxch.details.presentation.components.SmartInstallButton
 import zed.rainxch.details.presentation.components.VersionPicker
 import zed.rainxch.details.presentation.components.VersionTypePicker
 import zed.rainxch.details.presentation.model.DownloadStage
 import zed.rainxch.githubstore.core.presentation.res.Res
-import zed.rainxch.githubstore.core.presentation.res.appmanager_description
-import zed.rainxch.githubstore.core.presentation.res.external_installer_description
-import zed.rainxch.githubstore.core.presentation.res.inspect_with_appmanager
-import zed.rainxch.githubstore.core.presentation.res.obtainium_description
-import zed.rainxch.githubstore.core.presentation.res.open_in_obtainium
-import zed.rainxch.githubstore.core.presentation.res.open_with_external_installer
+import zed.rainxch.githubstore.core.presentation.res.go_to_version
+import zed.rainxch.githubstore.core.presentation.res.newer_releases_no_build_for_device
 
 fun LazyListScope.header(
     state: DetailsState,
@@ -71,12 +57,20 @@ fun LazyListScope.header(
                     release = state.selectedRelease,
                     repository = state.repository,
                     installedApp = state.installedApp,
+                    installedApps = state.installedApps,
+                    onSelectInstalledApp = { packageName ->
+                        onAction(DetailsAction.OnSelectInstalledApp(packageName))
+                    },
                     downloadStage = state.downloadStage,
                     downloadProgress = state.downloadProgressPercent,
                     isCurrentUserOwner = state.isCurrentUserOwner,
                     onPlatformClick = { platform ->
                         onAction(DetailsAction.OnPlatformChipClick(platform))
                     },
+                    platformReleases = state.platformReleases,
+                    devicePlatform = state.devicePlatform,
+                    appLabel = state.selectedAppLabel,
+                    onAppLabelClick = { onAction(DetailsAction.ToggleVersionPicker) },
                     onOwnerClick = {
                         onAction(
                             DetailsAction.OpenDeveloperProfile(
@@ -120,7 +114,6 @@ fun LazyListScope.header(
             )
         }
     } else {
-
         if (state.allReleases.isNotEmpty()) {
             item {
                 VersionTypePicker(
@@ -138,15 +131,14 @@ fun LazyListScope.header(
                     horizontalArrangement = Arrangement.spacedBy(6.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-
-                    val crossPlatformAssets = remember(state.selectedRelease) {
-                        state.selectedRelease
-                            ?.assets
-                            ?.filter {
-                                assetPlatformOf(it.name) != null
-                            }
-                            .orEmpty()
-                    }.toImmutableList()
+                    val crossPlatformAssets =
+                        remember(state.selectedRelease) {
+                            state.selectedRelease
+                                ?.assets
+                                ?.filter {
+                                    assetPlatformOf(it.name) != null
+                                }.orEmpty()
+                        }.toImmutableList()
 
                     val pinnedVariantLabel =
                         state.installedApp?.preferredAssetVariant?.let { stored ->
@@ -161,6 +153,8 @@ fun LazyListScope.header(
                         pinnedVariant = pinnedVariantLabel,
                         showAllPlatforms = state.showAllPlatforms,
                         crossPlatformAssets = crossPlatformAssets,
+                        installedApps = state.installedApps,
+                        selectedReleaseTag = state.selectedRelease?.tagName,
                         onAction = onAction,
                         modifier = Modifier.weight(.65f),
                     )
@@ -170,8 +164,23 @@ fun LazyListScope.header(
                         isPickerVisible = state.isVersionPickerVisible,
                         onAction = onAction,
                         modifier = Modifier.weight(.35f),
+                        devicePlatform = state.devicePlatform,
+                        releasePlatforms = state.releasePlatforms,
+                        deviceBuildReleaseIds = state.deviceBuildReleaseIds,
+                        releaseLines = state.releaseLines,
+                        selectedAppLabel = state.selectedAppLabel,
+                        repoName = state.repository?.name.orEmpty(),
                     )
                 }
+            }
+        }
+
+        if (state.newerReleasesLackDeviceBuild) {
+            item {
+                ReleaseHint(
+                    text = stringResource(Res.string.newer_releases_no_build_for_device),
+                    onClick = { onAction(DetailsAction.ToggleVersionPicker) },
+                )
             }
         }
 
@@ -180,11 +189,11 @@ fun LazyListScope.header(
 
             val coachmarkActive =
                 state.isApkInspectCoachmarkPending &&
-                        canInspectApk &&
-                        !state.isDownloading &&
-                        !state.isInstalling &&
-                        state.downloadStage == DownloadStage.IDLE &&
-                        !state.isApkInspectSheetVisible
+                    canInspectApk &&
+                    !state.isDownloading &&
+                    !state.isInstalling &&
+                    state.downloadStage == DownloadStage.IDLE &&
+                    !state.isApkInspectSheetVisible
             Box(
                 modifier = Modifier.fillMaxWidth(),
             ) {
@@ -212,82 +221,50 @@ fun LazyListScope.header(
                         )
                     }
                 }
+            }
+        }
 
-                if (state.isInstallDropdownExpanded) {
-                    val density = LocalDensity.current
-                    Popup(
-                        alignment = Alignment.TopStart,
-                        offset = with(density) { IntOffset(0, 20.dp.roundToPx()) },
-                        onDismissRequest = { onAction(DetailsAction.OnToggleInstallDropdown) },
-                        properties = PopupProperties(focusable = true),
-                    ) {
-                        KomiSurface(elevation = KomiSurfaceElevation.Modal) {
-                            Column(modifier = Modifier.width(300.dp)) {
-                                InstallOptionItem(
-                                    title = stringResource(Res.string.open_in_obtainium),
-                                    subtitle = stringResource(Res.string.obtainium_description),
-                                    icon = Icons.Default.Update,
-                                    onClick = { onAction(DetailsAction.OpenInObtainium) },
-                                )
-                                InstallOptionItem(
-                                    title = stringResource(Res.string.inspect_with_appmanager),
-                                    subtitle = stringResource(Res.string.appmanager_description),
-                                    icon = Icons.Default.Security,
-                                    onClick = { onAction(DetailsAction.OpenInAppManager) },
-                                )
-                                InstallOptionItem(
-                                    title = stringResource(Res.string.open_with_external_installer),
-                                    subtitle = stringResource(Res.string.external_installer_description),
-                                    icon = Icons.AutoMirrored.Filled.OpenInNew,
-                                    onClick = { onAction(DetailsAction.InstallWithExternalApp) },
-                                )
-                            }
-                        }
-                    }
-                }
+        val deviceBuildTarget = state.deviceBuildTarget
+        if (!state.selectedHasDeviceBuild && deviceBuildTarget != null) {
+            item {
+                ReleaseHint(
+                    text = stringResource(Res.string.go_to_version, deviceBuildTarget.tagName),
+                    onClick = { onAction(DetailsAction.OnJumpToDeviceBuild) },
+                    emphasized = true,
+                )
             }
         }
     }
 }
 
 @Composable
-private fun InstallOptionItem(
-    title: String,
-    subtitle: String,
-    icon: ImageVector,
+private fun ReleaseHint(
+    text: String,
     onClick: () -> Unit,
+    emphasized: Boolean = false,
 ) {
     val colors = LocalPersonality.current.colors
+    val tint = if (emphasized) colors.primary else colors.onSurfaceVariant
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick)
-            .padding(horizontal = 14.dp, vertical = 10.dp),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(LocalPersonality.current.shape.cornerSmall))
+                .clickable(onClick = onClick)
+                .padding(horizontal = 4.dp, vertical = 6.dp),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
     ) {
         KomiIcon(
-            imageVector = icon,
+            imageVector = if (emphasized) Icons.AutoMirrored.Filled.ArrowForward else Icons.Outlined.Info,
             contentDescription = null,
-            modifier = Modifier.size(20.dp),
-            tint = colors.onSurface,
+            modifier = Modifier.size(16.dp),
+            tint = tint,
         )
-        Column(modifier = Modifier.weight(1f)) {
-            KomiText(
-                text = title,
-                role = KomiTextRole.Body,
-                color = colors.onSurface,
-                uppercase = false,
-                fontSize = 14.sp,
-                fontWeight = FontWeight.W600,
-            )
-            KomiText(
-                text = subtitle,
-                role = KomiTextRole.Body,
-                color = colors.onSurfaceVariant,
-                uppercase = false,
-                fontSize = 12.sp,
-            )
-        }
+        KomiText(
+            text = text,
+            role = if (emphasized) KomiTextRole.Label else KomiTextRole.Body,
+            color = tint,
+        )
     }
 }

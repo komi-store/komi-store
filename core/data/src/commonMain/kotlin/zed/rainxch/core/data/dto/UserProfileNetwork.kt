@@ -22,4 +22,5 @@ data class UserProfileNetwork(
     @SerialName("public_gists") val publicGists: Int? = null,
     @SerialName("created_at") val createdAt: String? = null,
     @SerialName("updated_at") val updatedAt: String? = null,
+    @SerialName("type") val type: String? = null,
 )

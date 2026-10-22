@@ -1,4 +1,4 @@
-# Flatpak Packaging for GitHub Store
+# Flatpak Packaging for Komi Store
 
 ## Sandbox limitations
 
@@ -64,7 +64,7 @@ The manifest uses pre-computed SHA256 hashes. To verify or update them:
 
 ```bash
 # Gradle distribution
-curl -sL https://services.gradle.org/distributions/gradle-8.14.3-bin.zip | sha256sum
+curl -sL https://services.gradle.org/distributions/gradle-9.8.1-bin.zip | sha256sum
 
 # JBR x64 (check latest at https://github.com/JetBrains/JetBrainsRuntime/releases)
 curl -sL https://cache-redirector.jetbrains.com/intellij-jbr/jbr-21.0.10-linux-x64-b1163.105.tar.gz | sha256sum
@@ -75,50 +75,72 @@ curl -sL https://cache-redirector.jetbrains.com/intellij-jbr/jbr-21.0.10-linux-a
 
 ### 3. Update screenshot URLs
 
-Edit `zed.rainxch.githubstore.metainfo.xml` to point to hosted screenshot images.
+Edit `com.kurikomi.komistore.metainfo.xml` to point to hosted screenshot images.
 Flathub requires at least one screenshot with a publicly accessible URL.
 
 ## Building Locally
 
+Flatpak builds run on Linux only (`flatpak-builder` is not available on macOS/Windows).
+
 ```bash
 cd packaging/flatpak
 
+# For a local test build, temporarily swap the manifest's git source for a local dir:
+#   - type: dir
+#     path: ../../
+# (Flathub itself requires the pinned git source — revert before submitting.)
+
 # Build
-flatpak-builder --force-clean build-dir zed.rainxch.githubstore.yml
+flatpak-builder --force-clean build-dir com.kurikomi.komistore.yml
 
 # Test run
-flatpak-builder --run build-dir zed.rainxch.githubstore.yml githubstore
+flatpak-builder --run build-dir com.kurikomi.komistore.yml komistore
 
 # Install locally
-flatpak-builder --user --install --force-clean build-dir zed.rainxch.githubstore.yml
+flatpak-builder --user --install --force-clean build-dir com.kurikomi.komistore.yml
 ```
 
 ## Validating
 
 ```bash
 # Validate AppStream metainfo
-flatpak run org.freedesktop.appstream-glib validate zed.rainxch.githubstore.metainfo.xml
+flatpak run org.freedesktop.appstream-glib validate com.kurikomi.komistore.metainfo.xml
 
 # Lint manifest (requires org.flatpak.Builder)
-flatpak run --command=flatpak-builder-lint org.flatpak.Builder manifest zed.rainxch.githubstore.yml
+flatpak run --command=flatpak-builder-lint org.flatpak.Builder manifest com.kurikomi.komistore.yml
 ```
 
 ## Publishing to Flathub
 
-1. Fork `https://github.com/flathub/flathub`
-2. Checkout the `new-pr` branch
-3. Copy the manifest YAML and `flatpak-sources.json` to the repo root
-4. Open a PR titled "Add zed.rainxch.githubstore"
-5. Reviewers will trigger test builds with `bot, build`
-6. After approval, you get write access to `flathub/zed.rainxch.githubstore`
+Prerequisites:
+
+- **Domain verification.** The app ID `com.kurikomi.komistore` is domain-based, so
+  `kurikomi.com` must be reachable over HTTPS and host a verification token at
+  `https://kurikomi.com/.well-known/org.flathub.VerifiedApps.txt` (see Flathub docs).
+- **A real release tag.** Set the manifest's `commit:` to the SHA that `v1.9.2` points
+  to. Flathub rejects a git source without a pinned commit.
+
+Steps:
+
+1. Fork `https://github.com/flathub/flathub` (do **not** copy only the master branch).
+2. Clone the `new-pr` branch and create a feature branch off it:
+   `git clone --branch=new-pr git@github.com:<you>/flathub.git && git checkout -b komistore new-pr`
+3. Copy the manifest **and all three source JSONs** to the repo root:
+   `com.kurikomi.komistore.yml`, `flatpak-sources.json`,
+   `flatpak-sources-convention.json`, `flatpak-sources-manual.json`.
+   (The desktop entry, metainfo, launcher, and `disable-android` script are pulled
+   from the git source at build time, so they do not need copying.)
+4. Open a PR with base branch **`new-pr`**, titled `Add com.kurikomi.komistore`.
+5. Reviewers / the bot trigger test builds. Address any lint or build feedback.
+6. After approval, you get write access to `flathub/com.kurikomi.komistore`.
 
 ## File Reference
 
 | File | Purpose |
 |------|---------|
-| `zed.rainxch.githubstore.yml` | Flatpak build manifest |
-| `zed.rainxch.githubstore.desktop` | Desktop launcher entry |
-| `zed.rainxch.githubstore.metainfo.xml` | AppStream metadata for Flathub listing |
-| `githubstore.sh` | Shell launcher (invokes `java -jar` with bundled JRE) |
+| `com.kurikomi.komistore.yml` | Flatpak build manifest |
+| `com.kurikomi.komistore.desktop` | Desktop launcher entry |
+| `com.kurikomi.komistore.metainfo.xml` | AppStream metadata for Flathub listing |
+| `komistore.sh` | Shell launcher (invokes `java -jar` with bundled JRE) |
 | `disable-android-for-flatpak.sh` | Strips Android targets for sandbox build |
 | `flatpak-sources.json` | Pre-downloaded Gradle dependencies (generated) |

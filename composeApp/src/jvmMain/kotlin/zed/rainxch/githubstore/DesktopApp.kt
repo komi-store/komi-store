@@ -40,7 +40,6 @@ import zed.rainxch.githubstore.app.di.initKoin
 import zed.rainxch.githubstore.core.presentation.res.Res
 import zed.rainxch.githubstore.core.presentation.res.app_icon
 import zed.rainxch.githubstore.core.presentation.res.app_name
-import zed.rainxch.githubstore.core.presentation.res.bottom_nav_apps_title
 import zed.rainxch.githubstore.core.presentation.res.bottom_nav_explore_title
 import zed.rainxch.githubstore.core.presentation.res.bottom_nav_search_title
 import zed.rainxch.githubstore.core.presentation.res.favourites
@@ -58,6 +57,7 @@ import zed.rainxch.githubstore.desktop.WindowStateStore
 import zed.rainxch.githubstore.desktop.applyMacosWindowAppearance
 import zed.rainxch.githubstore.desktop.applyWindowsImmersiveDarkMode
 import zed.rainxch.githubstore.desktop.installMacosSystemAppearance
+import zed.rainxch.githubstore.utils.STARTUP_PREFERENCE_TIMEOUT_MS
 import java.awt.Desktop
 import java.net.URI
 import java.security.Security
@@ -65,8 +65,6 @@ import kotlin.system.exitProcess
 import kotlin.time.Duration.Companion.milliseconds
 
 private const val PRIVACY_POLICY_URL = "https://komistore.app/privacy-policy"
-
-private const val LANGUAGE_PREF_READ_TIMEOUT_MS = 2000L
 
 fun main(args: Array<String>) {
     installMacosSystemAppearance()
@@ -87,13 +85,14 @@ fun main(args: Array<String>) {
 
     initKoin()
 
+    // title/MenuBar compose outside App() and never recompose, so apply the stored language first.
     runBlocking {
         val koin = GlobalContext.get()
         val tweaksRepo = koin.get<TweaksRepository>()
         val localization = koin.get<LocalizationManager>()
         val tag =
             try {
-                withTimeoutOrNull(LANGUAGE_PREF_READ_TIMEOUT_MS.milliseconds) {
+                withTimeoutOrNull(STARTUP_PREFERENCE_TIMEOUT_MS.milliseconds) {
                     tweaksRepo.getAppLanguage().first()
                 }
             } catch (_: Exception) {
@@ -204,10 +203,6 @@ fun main(args: Array<String>) {
                     Item(
                         text = stringResource(Res.string.bottom_nav_search_title),
                         onClick = { deepLinkUri = "githubstore://search" },
-                    )
-                    Item(
-                        text = stringResource(Res.string.bottom_nav_apps_title),
-                        onClick = { deepLinkUri = "githubstore://apps" },
                     )
                     Item(
                         text = stringResource(Res.string.favourites),

@@ -6,7 +6,14 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.DialogProperties
+import org.jetbrains.compose.resources.stringResource
 import zed.rainxch.core.presentation.components.buttons.KomiButton
 import zed.rainxch.core.presentation.components.buttons.KomiButtonSize
 import zed.rainxch.core.presentation.components.buttons.KomiButtonVariant
@@ -14,14 +21,6 @@ import zed.rainxch.core.presentation.components.overlays.KomiDialog
 import zed.rainxch.core.presentation.components.text.KomiText
 import zed.rainxch.core.presentation.components.text.KomiTextRole
 import zed.rainxch.core.presentation.locals.LocalPersonality
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.DialogProperties
-import org.jetbrains.compose.resources.stringResource
 import zed.rainxch.githubstore.core.presentation.res.*
 
 @Composable
@@ -51,16 +50,14 @@ fun ClearDownloadsDialog(
         ) {
             KomiText(
                 text = stringResource(Res.string.delete_downloads_confirmation_title),
-                role = KomiTextRole.Title,
+                role = KomiTextRole.CardTitle,
                 color = colors.onSurface,
-                fontWeight = FontWeight.Bold,
             )
 
             KomiText(
                 text = stringResource(Res.string.delete_downloads_confirmation_message, cacheSize),
                 role = KomiTextRole.Body,
                 color = colors.onSurfaceVariant,
-                uppercase = false,
             )
 
             Row(

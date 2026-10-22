@@ -1,0 +1,22 @@
+name: Publish to Scoop
+
+on:
+  release:
+    types: [released]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  trigger-bucket:
+    name: Trigger Scoop bucket update
+    runs-on: ubuntu-latest
+    steps:
+      - name: Dispatch Excavator
+        env:
+          GH_TOKEN: ${{ secrets.SCOOP_BUCKET_TOKEN }}
+        run: |
+          gh api --method POST \
+            repos/komi-store/komi-store-scoop-bucket/dispatches \
+            -f event_type=komi-store-release

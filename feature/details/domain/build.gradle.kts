@@ -11,5 +11,11 @@ kotlin {
                 implementation(projects.core.domain)
             }
         }
+
+        commonTest {
+            dependencies {
+                implementation(kotlin("test"))
+            }
+        }
     }
 }

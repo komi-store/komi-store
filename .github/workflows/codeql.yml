@@ -1,0 +1,72 @@
+name: CodeQL
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+  schedule:
+    - cron: '23 3 * * 1'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+jobs:
+  analyze:
+    name: Analyze (${{ matrix.language }}${{ matrix.target && format(', {0}', matrix.target) || '' }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    permissions:
+      contents: read
+      security-events: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - language: java-kotlin
+            target: android
+            build-mode: manual
+            gradle-tasks: compileAndroidMain :androidApp:compileDebugKotlin
+          - language: java-kotlin
+            target: desktop
+            build-mode: manual
+            gradle-tasks: compileKotlinJvm
+            category: /language:java-kotlin/desktop
+          - language: actions
+            build-mode: none
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad # v6.1.0
+        if: matrix.language == 'java-kotlin'
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - uses: gradle/actions/setup-gradle@3f5f9adaf7d9fecd50b5935e54106014257a94e6 # v6.4.0
+        if: matrix.language == 'java-kotlin'
+        with:
+          cache-read-only: true
+
+      - uses: github/codeql-action/init@6f2ac81f5cd81fe351a197ba0b00d91d03cd2aee # v4.39.0
+        with:
+          languages: ${{ matrix.language }}
+          build-mode: ${{ matrix.build-mode }}
+
+      - name: Build for analysis
+        if: matrix.language == 'java-kotlin'
+        run: >-
+          ./gradlew ${{ matrix.gradle-tasks }}
+          --no-daemon --no-build-cache --no-configuration-cache
+          -Pkotlin.compiler.execution.strategy=in-process
+          -Pkotlin.incremental=false
+
+      - uses: github/codeql-action/analyze@6f2ac81f5cd81fe351a197ba0b00d91d03cd2aee # v4.39.0
+        with:
+          category: ${{ matrix.category || format('/language:{0}', matrix.language) }}

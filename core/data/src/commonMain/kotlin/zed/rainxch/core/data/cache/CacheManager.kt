@@ -119,6 +119,8 @@ class CacheManager(
         )
     }
 
+    suspend fun getCachedAt(key: String): Long? = cacheDao.getValid(key, now())?.cachedAt
+
     suspend fun invalidate(key: String) {
         memoryCacheMutex.withLock { memoryCache.remove(key) }
         cacheDao.delete(key)

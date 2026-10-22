@@ -1,0 +1,6 @@
+1 core/presentation/src/commonMain/kotlin/zed/rainxch/core/presentation/components/markdown/SyntaxHighlightedCode.kt
+30 core/presentation/src/commonMain/kotlin/zed/rainxch/core/presentation/status/StatusPalette.kt
+2 feature/apps/presentation/src/commonMain/kotlin/zed/rainxch/apps/presentation/components/DowngradeWarningColor.kt
+4 feature/details/presentation/src/commonMain/kotlin/zed/rainxch/details/presentation/DetailsRoot.kt
+2 feature/repo-pages/presentation/src/commonMain/kotlin/zed/rainxch/repopages/presentation/utils/parseLabelColor.kt
+6 feature/tweaks/presentation/src/commonMain/kotlin/zed/rainxch/tweaks/presentation/components/appearance/PersonalityTile.kt

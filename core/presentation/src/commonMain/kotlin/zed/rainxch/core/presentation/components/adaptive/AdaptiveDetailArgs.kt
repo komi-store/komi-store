@@ -11,4 +11,5 @@ data class AdaptiveDetailArgs(
     val repo: String? = null,
     val isComingFromUpdate: Boolean = false,
     val sourceHost: String? = null,
+    val packageName: String? = null,
 )

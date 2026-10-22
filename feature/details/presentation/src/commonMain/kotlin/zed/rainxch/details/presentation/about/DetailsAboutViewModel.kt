@@ -24,10 +24,10 @@ class DetailsAboutViewModel(
     private val detailsRepository: DetailsRepository,
     private val translationRepository: TranslationRepository,
 ) : ViewModel() {
-
-    private val _state = MutableStateFlow(
-        DetailsAboutState(deviceLanguageCode = translationRepository.getDeviceLanguageCode()),
-    )
+    private val _state =
+        MutableStateFlow(
+            DetailsAboutState(deviceLanguageCode = translationRepository.getDeviceLanguageCode()),
+        )
     val state = _state.asStateFlow()
 
     init {
@@ -44,12 +44,13 @@ class DetailsAboutViewModel(
         val displayName = SupportedLanguages.all.firstOrNull { it.code == targetLanguageCode }?.displayName
         _state.update {
             it.copy(
-                translation = it.translation.copy(
-                    isTranslating = true,
-                    targetLanguageCode = targetLanguageCode,
-                    targetLanguageDisplayName = displayName,
-                    error = null,
-                ),
+                translation =
+                    it.translation.copy(
+                        isTranslating = true,
+                        targetLanguageCode = targetLanguageCode,
+                        targetLanguageDisplayName = displayName,
+                        error = null,
+                    ),
             )
         }
         viewModelScope.launch {
@@ -58,23 +59,25 @@ class DetailsAboutViewModel(
             }.onSuccess { result ->
                 _state.update {
                     it.copy(
-                        translation = it.translation.copy(
-                            isTranslating = false,
-                            translatedText = result.translatedText,
-                            isShowingTranslation = true,
-                            detectedSourceLanguage = result.detectedSourceLanguage,
-                            error = null,
-                        ),
+                        translation =
+                            it.translation.copy(
+                                isTranslating = false,
+                                translatedText = result.translatedText,
+                                isShowingTranslation = true,
+                                detectedSourceLanguage = result.detectedSourceLanguage,
+                                error = null,
+                            ),
                     )
                 }
                 rebuildDisplayed()
             }.onFailure { e ->
                 _state.update {
                     it.copy(
-                        translation = it.translation.copy(
-                            isTranslating = false,
-                            error = e.message ?: getString(Res.string.translation_failed),
-                        ),
+                        translation =
+                            it.translation.copy(
+                                isTranslating = false,
+                                error = e.message ?: getString(Res.string.translation_failed),
+                            ),
                     )
                 }
             }
@@ -84,9 +87,10 @@ class DetailsAboutViewModel(
     fun toggleTranslation() {
         _state.update {
             it.copy(
-                translation = it.translation.copy(
-                    isShowingTranslation = !it.translation.isShowingTranslation,
-                ),
+                translation =
+                    it.translation.copy(
+                        isShowingTranslation = !it.translation.isShowingTranslation,
+                    ),
             )
         }
         rebuildDisplayed()
@@ -114,14 +118,15 @@ class DetailsAboutViewModel(
     }
 
     fun onLanguageQueryChange(query: String) {
-        val filtered = if (query.isBlank()) {
-            SupportedLanguages.all
-        } else {
-            SupportedLanguages.all.filter {
-                it.displayName.contains(query, ignoreCase = true) ||
-                    it.code.contains(query, ignoreCase = true)
+        val filtered =
+            if (query.isBlank()) {
+                SupportedLanguages.all
+            } else {
+                SupportedLanguages.all.filter {
+                    it.displayName.contains(query, ignoreCase = true) ||
+                        it.code.contains(query, ignoreCase = true)
+                }
             }
-        }
         _state.update { it.copy(languagePickerQuery = query, filteredLanguages = filtered.toImmutableList()) }
     }
 
@@ -129,17 +134,19 @@ class DetailsAboutViewModel(
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true, errorMessage = null) }
             runCatching {
-                val resolved = if (owner.isNotBlank() && repo.isNotBlank()) {
-                    detailsRepository.getRepositoryByOwnerAndName(owner, repo, sourceHost)
-                } else {
-                    detailsRepository.getRepositoryById(repositoryId)
-                }
-                val readme = detailsRepository.getReadme(
-                    owner = resolved.owner.login,
-                    repo = resolved.name,
-                    defaultBranch = resolved.defaultBranch,
-                    sourceHost = sourceHost,
-                )
+                val resolved =
+                    if (owner.isNotBlank() && repo.isNotBlank()) {
+                        detailsRepository.getRepositoryByOwnerAndName(owner, repo, sourceHost)
+                    } else {
+                        detailsRepository.getRepositoryById(repositoryId)
+                    }
+                val readme =
+                    detailsRepository.getReadme(
+                        owner = resolved.owner.login,
+                        repo = resolved.name,
+                        defaultBranch = resolved.defaultBranch,
+                        sourceHost = sourceHost,
+                    )
                 resolved to readme
             }.onSuccess { (resolved, readme) ->
                 _state.update {
@@ -160,11 +167,12 @@ class DetailsAboutViewModel(
     private fun rebuildDisplayed() {
         _state.update {
             val translation = it.translation
-            val displayed = if (translation.isShowingTranslation && translation.translatedText != null) {
-                translation.translatedText
-            } else {
-                it.readmeMarkdown
-            }
+            val displayed =
+                if (translation.isShowingTranslation && translation.translatedText != null) {
+                    translation.translatedText
+                } else {
+                    it.readmeMarkdown
+                }
             it.copy(displayedMarkdown = displayed)
         }
     }

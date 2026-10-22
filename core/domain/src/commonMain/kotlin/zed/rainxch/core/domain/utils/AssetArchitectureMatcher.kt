@@ -3,10 +3,13 @@ package zed.rainxch.core.domain.utils
 import zed.rainxch.core.domain.model.system.SystemArchitecture
 
 object AssetArchitectureMatcher {
-
     sealed interface Match {
-        data class Known(val arch: SystemArchitecture) : Match
+        data class Known(
+            val arch: SystemArchitecture,
+        ) : Match
+
         data object Universal : Match
+
         data object Foreign : Match
     }
 
@@ -17,13 +20,35 @@ object AssetArchitectureMatcher {
     private val x86Regex = boundary("i386", "i586", "i686", "ia32", "win32", "x86", "386")
     private val armRegex =
         boundary(
-            "armeabi-v7a", "armeabi", "armv7l", "armv7a", "armv7",
-            "armv6l", "armv6", "armhf", "armel", "arm-v7", "arm32", "v7a", "arm",
+            "armeabi-v7a",
+            "armeabi",
+            "armv7l",
+            "armv7a",
+            "armv7",
+            "armv6l",
+            "armv6",
+            "armhf",
+            "armel",
+            "arm-v7",
+            "arm32",
+            "v7a",
+            "arm",
         )
     private val foreignRegex =
         boundary(
-            "riscv64", "riscv", "ppc64le", "ppc64", "powerpc", "ppc",
-            "s390x", "loong64", "loongarch", "mips64", "mips", "sparc64", "sparc",
+            "riscv64",
+            "riscv",
+            "ppc64le",
+            "ppc64",
+            "powerpc",
+            "ppc",
+            "s390x",
+            "loong64",
+            "loongarch",
+            "mips64",
+            "mips",
+            "sparc64",
+            "sparc",
         )
 
     fun matchArchitecture(assetName: String): Match {
@@ -39,8 +64,7 @@ object AssetArchitectureMatcher {
         }
     }
 
-    fun detectArchitecture(assetName: String): SystemArchitecture? =
-        (matchArchitecture(assetName) as? Match.Known)?.arch
+    fun detectArchitecture(assetName: String): SystemArchitecture? = (matchArchitecture(assetName) as? Match.Known)?.arch
 
     fun isCompatible(
         assetName: String,
@@ -57,13 +81,25 @@ object AssetArchitectureMatcher {
         systemArch: SystemArchitecture,
     ): Boolean =
         when (systemArch) {
-            SystemArchitecture.X86_64 ->
+            SystemArchitecture.X86_64 -> {
                 assetArch == SystemArchitecture.X86_64 || assetArch == SystemArchitecture.X86
-            SystemArchitecture.AARCH64 ->
+            }
+
+            SystemArchitecture.AARCH64 -> {
                 assetArch == SystemArchitecture.AARCH64 || assetArch == SystemArchitecture.ARM
-            SystemArchitecture.X86 -> assetArch == SystemArchitecture.X86
-            SystemArchitecture.ARM -> assetArch == SystemArchitecture.ARM
-            SystemArchitecture.UNKNOWN -> true
+            }
+
+            SystemArchitecture.X86 -> {
+                assetArch == SystemArchitecture.X86
+            }
+
+            SystemArchitecture.ARM -> {
+                assetArch == SystemArchitecture.ARM
+            }
+
+            SystemArchitecture.UNKNOWN -> {
+                true
+            }
         }
 
     fun isExactMatch(
@@ -71,6 +107,5 @@ object AssetArchitectureMatcher {
         systemArch: SystemArchitecture,
     ): Boolean = detectArchitecture(assetName) == systemArch
 
-    private fun boundary(vararg tokens: String): Regex =
-        Regex("(^|[^a-z0-9])(${tokens.joinToString("|")})([^a-z0-9]|$)")
+    private fun boundary(vararg tokens: String): Regex = Regex("(^|[^a-z0-9])(${tokens.joinToString("|")})([^a-z0-9]|$)")
 }

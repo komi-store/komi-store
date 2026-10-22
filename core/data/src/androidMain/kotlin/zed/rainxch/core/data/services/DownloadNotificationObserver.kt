@@ -5,6 +5,8 @@ import co.touchlab.kermit.Logger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import zed.rainxch.core.data.download.DownloadNotificationAction
+import zed.rainxch.core.data.download.notificationActionsFor
 import zed.rainxch.core.domain.system.DownloadOrchestrator
 import zed.rainxch.core.domain.system.DownloadProgressNotifier
 import zed.rainxch.core.domain.system.DownloadStage
@@ -13,6 +15,7 @@ import zed.rainxch.core.domain.system.OrchestratedDownload
 class DownloadNotificationObserver(
     private val orchestrator: DownloadOrchestrator,
     private val notifier: DownloadProgressNotifier,
+    private val foregroundController: DownloadForegroundController,
 ) {
     @Volatile
     private var job: Job? = null
@@ -22,25 +25,23 @@ class DownloadNotificationObserver(
 
     fun start(scope: CoroutineScope) {
         if (job?.isActive == true) return
-        job = scope.launch {
-            try {
-                orchestrator.downloads.collect { snapshot ->
-                    try {
-                        reconcile(snapshot)
-                    } catch (t: Throwable) {
-
-                        Logger.w(t) { "DownloadNotificationObserver: reconcile failed, continuing" }
+        job =
+            scope.launch {
+                try {
+                    orchestrator.downloads.collect { snapshot ->
+                        try {
+                            reconcile(snapshot)
+                        } catch (t: Throwable) {
+                            Logger.w(t) { "DownloadNotificationObserver: reconcile failed, continuing" }
+                        }
                     }
+                } finally {
+                    job = null
                 }
-            } finally {
-
-                job = null
             }
-        }
     }
 
     private fun reconcile(snapshot: Map<String, OrchestratedDownload>) {
-
         val removed = lastStages.keys - snapshot.keys
         for (pkg in removed) {
             clearProgressSafely(pkg)
@@ -51,8 +52,9 @@ class DownloadNotificationObserver(
         for ((pkg, entry) in snapshot) {
             val previous = lastStages[pkg]
             val stageChanged = previous != entry.stage
-            when (entry.stage) {
-                DownloadStage.Queued, DownloadStage.Downloading -> {
+            val actions = notificationActionsFor(entry.stage)
+            when {
+                DownloadNotificationAction.PAUSE in actions -> {
                     val now = SystemClock.uptimeMillis()
                     val last = lastNotifiedAt[pkg] ?: 0L
                     val shouldPost =
@@ -60,35 +62,60 @@ class DownloadNotificationObserver(
                             entry.progressPercent == 100 ||
                             (now - last) >= PROGRESS_UPDATE_INTERVAL_MS
                     if (shouldPost) {
-                        try {
-                            notifier.notifyProgress(
-                                packageName = pkg,
-                                appName = entry.displayAppName,
-                                versionTag = entry.releaseTag.ifBlank { entry.assetName },
-                                percent = entry.progressPercent,
-                                bytesDownloaded = entry.bytesDownloaded,
-                                totalBytes = entry.totalBytes,
-                            )
-                            lastNotifiedAt[pkg] = now
-                        } catch (t: Throwable) {
-                            Logger.w(t) { "DownloadNotificationObserver: notifyProgress failed for $pkg" }
-                        }
+                        postProgress(pkg, entry, paused = false)
+                        lastNotifiedAt[pkg] = now
                     }
                 }
 
-                DownloadStage.Installing,
-                DownloadStage.AwaitingInstall,
-                DownloadStage.Completed,
-                DownloadStage.Cancelled,
-                DownloadStage.Failed,
-                -> {
-                    if (previous == DownloadStage.Queued || previous == DownloadStage.Downloading) {
+                DownloadNotificationAction.RESUME in actions -> {
+                    if (stageChanged) {
+                        postProgress(pkg, entry, paused = true)
+                        lastNotifiedAt[pkg] = SystemClock.uptimeMillis()
+                    }
+                }
+
+                else -> {
+                    if (previous != null && notificationActionsFor(previous).isNotEmpty()) {
                         clearProgressSafely(pkg)
                         lastNotifiedAt.remove(pkg)
                     }
                 }
             }
             lastStages[pkg] = entry.stage
+        }
+
+        updateForeground(snapshot)
+    }
+
+    private fun updateForeground(snapshot: Map<String, OrchestratedDownload>) {
+        val active =
+            snapshot.values.filter {
+                it.stage == DownloadStage.Queued || it.stage == DownloadStage.Downloading
+            }
+        if (active.isEmpty()) {
+            foregroundController.stop()
+        } else {
+            foregroundController.ensureRunning(active)
+        }
+    }
+
+    private fun postProgress(
+        pkg: String,
+        entry: OrchestratedDownload,
+        paused: Boolean,
+    ) {
+        try {
+            notifier.notifyProgress(
+                packageName = pkg,
+                appName = entry.displayAppName,
+                versionTag = entry.releaseTag.ifBlank { entry.assetName },
+                percent = entry.progressPercent,
+                bytesDownloaded = entry.bytesDownloaded,
+                totalBytes = entry.totalBytes,
+                paused = paused,
+            )
+        } catch (t: Throwable) {
+            Logger.w(t) { "DownloadNotificationObserver: notifyProgress failed for $pkg" }
         }
     }
 
@@ -101,7 +128,6 @@ class DownloadNotificationObserver(
     }
 
     private companion object {
-
         const val PROGRESS_UPDATE_INTERVAL_MS = 400L
     }
 }

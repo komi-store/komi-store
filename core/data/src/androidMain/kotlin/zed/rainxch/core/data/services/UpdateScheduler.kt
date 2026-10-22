@@ -7,14 +7,13 @@ import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.ExistingWorkPolicy
 import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.OutOfQuotaPolicy
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import co.touchlab.kermit.Logger
 import java.util.concurrent.TimeUnit
 
 object UpdateScheduler {
-    private const val DEFAULT_INTERVAL_HOURS = 6L
+    private const val DEFAULT_INTERVAL_HOURS = 12L
     private const val IMMEDIATE_CHECK_WORK_NAME = "github_store_immediate_update_check"
 
     fun schedule(
@@ -42,25 +41,11 @@ object UpdateScheduler {
             .getInstance(context)
             .enqueueUniquePeriodicWork(
                 uniqueWorkName = UpdateCheckWorker.WORK_NAME,
-                existingPeriodicWorkPolicy = ExistingPeriodicWorkPolicy.KEEP,
+                existingPeriodicWorkPolicy = ExistingPeriodicWorkPolicy.UPDATE,
                 request = request,
             )
 
-        val immediateRequest =
-            OneTimeWorkRequestBuilder<UpdateCheckWorker>()
-                .setConstraints(constraints)
-                .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
-                .build()
-
-        WorkManager
-            .getInstance(context)
-            .enqueueUniqueWork(
-                IMMEDIATE_CHECK_WORK_NAME,
-                ExistingWorkPolicy.REPLACE,
-                immediateRequest,
-            )
-
-        Logger.i { "UpdateScheduler: Scheduled periodic update check every ${intervalHours}h + immediate check" }
+        Logger.i { "UpdateScheduler: Scheduled periodic update check every ${intervalHours}h" }
     }
 
     fun reschedule(
@@ -109,9 +94,7 @@ object UpdateScheduler {
                     BackoffPolicy.EXPONENTIAL,
                     15,
                     TimeUnit.MINUTES,
-                )
-
-                .build()
+                ).build()
 
         WorkManager
             .getInstance(context)

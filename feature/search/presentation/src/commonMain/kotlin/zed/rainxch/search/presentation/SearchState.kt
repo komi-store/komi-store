@@ -40,6 +40,7 @@ data class SearchState(
         persistentListOf(SearchSourceUi.GitHub, SearchSourceUi.Codeberg),
     val isFiltersSheetVisible: Boolean = false,
     val activeFilterCount: Int = 0,
+    val isGridLayout: Boolean = false,
 ) {
     enum class ExploreStatus {
         IDLE,

@@ -1,0 +1,49 @@
+version: 2
+updates:
+  - package-ecosystem: gradle
+    directory: /
+    schedule:
+      interval: monthly
+    cooldown:
+      default-days: 7
+    open-pull-requests-limit: 5
+    ignore:
+      # Kermit 2.2 deprecates the tag-first log overloads used across the codebase, and warnings are errors; lift with the logging cleanup (D7 in docs/quality/findings.md).
+      - dependency-name: "co.touchlab:kermit*"
+        update-types: ["version-update:semver-minor", "version-update:semver-major"]
+      # Material 3 has only alphas past 1.9. Its 1.13 alphas pull in Compose 1.13 alphas, so it stays on the 1.12 line
+      # Compose Multiplatform 1.12 ships with; lift with Compose Multiplatform 1.13.
+      - dependency-name: "org.jetbrains.compose.material3:*"
+        versions: ["[1.13.0-alpha01,1.13.0)"]
+    groups:
+      kotlin-toolchain:
+        patterns:
+          - "org.jetbrains.kotlin*"
+          - "com.google.devtools.ksp*"
+          - "*compose.stability*"
+          - "com.github.skydoves:compose-stability*"
+          - "org.jetbrains.compose*"
+          - "com.codingfeline.buildkonfig*"
+      gradle-minor-and-patch:
+        update-types:
+          - minor
+          - patch
+        # Kotlin-coupled libraries move only with the kotlin-toolchain group; #1078 bundled Kotlin 2.4 here and broke build-logic.
+        exclude-patterns:
+          - "org.jetbrains.kotlin*"
+          - "com.google.devtools.ksp*"
+          - "*compose.stability*"
+          - "com.github.skydoves:compose-stability*"
+          - "org.jetbrains.compose*"
+          - "com.codingfeline.buildkonfig*"
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+    cooldown:
+      default-days: 7
+    groups:
+      github-actions:
+        patterns:
+          - "*"

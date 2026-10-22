@@ -11,8 +11,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
@@ -22,7 +20,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -34,7 +31,6 @@ import zed.rainxch.core.domain.isAndroid
 import zed.rainxch.core.domain.isDesktop
 import zed.rainxch.core.domain.model.settings.AppLanguages
 import zed.rainxch.core.presentation.components.bars.KomiTopBar
-import zed.rainxch.core.presentation.components.buttons.KomiIconButton
 import zed.rainxch.core.presentation.components.icon.KomiIcon
 import zed.rainxch.core.presentation.components.overlays.rememberKomiToastState
 import zed.rainxch.core.presentation.components.scaffold.KomiScaffold
@@ -105,7 +101,67 @@ fun TweaksRoot(
                 coroutineScope.launch { toastState.danger(event.message) }
             }
 
-            else -> Unit
+            TweaksEvent.OnProxySaved -> {
+                coroutineScope.launch { toastState.success(getString(Res.string.proxy_saved)) }
+            }
+
+            is TweaksEvent.OnProxySaveError -> {
+                coroutineScope.launch { toastState.danger(event.message) }
+            }
+
+            is TweaksEvent.OnProxyTestSuccess -> {
+                coroutineScope.launch {
+                    toastState.success(getString(Res.string.proxy_test_success, event.latencyMs))
+                }
+            }
+
+            is TweaksEvent.OnProxyTestError -> {
+                coroutineScope.launch { toastState.danger(event.message) }
+            }
+
+            is TweaksEvent.OnMasterProxyTestResult -> {
+                coroutineScope.launch {
+                    val latencies = listOf(event.searchMs, event.downloadMs, event.translationMs)
+                    val parts =
+                        latencies.map { ms ->
+                            if (ms != null) {
+                                getString(Res.string.proxy_test_probe_ok, ms)
+                            } else {
+                                getString(Res.string.proxy_test_probe_failed)
+                            }
+                        }
+                    val message = getString(Res.string.proxy_test_master_result, parts[0], parts[1], parts[2])
+                    when {
+                        latencies.all { it != null } -> toastState.success(message)
+                        latencies.all { it == null } -> toastState.danger(message)
+                        else -> toastState.warning(message)
+                    }
+                }
+            }
+
+            TweaksEvent.OnSeenHistoryCleared -> {
+                coroutineScope.launch { toastState.info(getString(Res.string.seen_history_cleared)) }
+            }
+
+            TweaksEvent.OnTranslationProviderSaved -> {
+                coroutineScope.launch { toastState.success(getString(Res.string.translation_provider_saved)) }
+            }
+
+            TweaksEvent.OnYoudaoCredentialsSaved -> {
+                coroutineScope.launch { toastState.success(getString(Res.string.translation_youdao_saved)) }
+            }
+
+            TweaksEvent.OnLibreTranslateCredentialsSaved -> {
+                coroutineScope.launch { toastState.success(getString(Res.string.translation_libre_saved)) }
+            }
+
+            TweaksEvent.OnDeeplCredentialsSaved -> {
+                coroutineScope.launch { toastState.success(getString(Res.string.translation_deepl_saved)) }
+            }
+
+            TweaksEvent.OnMicrosoftTranslatorCredentialsSaved -> {
+                coroutineScope.launch { toastState.success(getString(Res.string.translation_microsoft_saved)) }
+            }
         }
     }
 
@@ -132,6 +188,7 @@ fun TweaksRoot(
                 onNavigateToMirrorPicker = onNavigateToMirrorPicker,
                 onNavigateToHiddenRepositories = onNavigateToHiddenRepositories,
                 onNavigateToHostTokens = onNavigateToHostTokens,
+                onNavigateBack = onNavigateBack,
                 modifier = Modifier.fillMaxSize().padding(innerPadding),
             )
         }
@@ -141,13 +198,7 @@ fun TweaksRoot(
                 KomiTopBar(
                     title = stringResource(Res.string.tweaks_title),
                     titleAccent = tweaksKicker(TweaksDecorSlot.Settings),
-                    leading = {
-                        KomiIconButton(
-                            icon = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(Res.string.navigate_back),
-                            onClick = onNavigateBack,
-                        )
-                    }
+                    onBack = onNavigateBack,
                 )
             },
             toastState = toastState,
@@ -208,10 +259,8 @@ fun TweaksRoot(
                     tweaksKicker(TweaksDecorSlot.Footer)?.let { footer ->
                         KomiText(
                             text = footer,
-                            role = KomiTextRole.Stamp,
+                            role = KomiTextRole.Caption,
                             color = LocalPersonality.current.colors.onSurfaceVariant,
-                            fontSize = 11.sp,
-                            uppercase = false,
                             textAlign = TextAlign.Center,
                             modifier = Modifier.fillMaxWidth().padding(top = 10.dp),
                         )
@@ -256,9 +305,9 @@ fun TweaksRoot(
                     toastState.success(msg)
                 }
             },
-            onError = { error ->
+            onError = {
                 coroutineScope.launch {
-                    toastState.danger(getString(Res.string.feedback_send_error, error))
+                    toastState.danger(getString(Res.string.feedback_send_failed))
                 }
             },
         )

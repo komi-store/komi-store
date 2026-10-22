@@ -11,4 +11,6 @@ data class AppItem(
     val canSkipVersion: Boolean = false,
     val versionLabel: String = "",
     val idleVersionLabel: String = "",
+    val versionTargetVersion: String? = null,
+    val isVersionDowngrade: Boolean = false,
 )

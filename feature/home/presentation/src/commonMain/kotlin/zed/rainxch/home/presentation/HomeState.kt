@@ -17,13 +17,7 @@ data class HomeState(
     val hasMore: Boolean = true,
     val errorMessage: String? = null,
     val selectedPlatform: DiscoveryPlatform = DiscoveryPlatform.All,
-    val platformOptions: ImmutableList<DiscoveryPlatform> = persistentListOf(
-        DiscoveryPlatform.All,
-        DiscoveryPlatform.Android,
-        DiscoveryPlatform.Windows,
-        DiscoveryPlatform.Macos,
-        DiscoveryPlatform.Linux,
-    ),
     val isPlatformPopupVisible: Boolean = false,
     val actionSheetCard: HomeRepoCardUi? = null,
+    val isGridLayout: Boolean = false,
 )

@@ -21,10 +21,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.stringResource
 import zed.rainxch.core.presentation.components.GitHubStoreImage
 import zed.rainxch.core.presentation.components.dividers.KomiHorizontalDivider
@@ -69,23 +67,19 @@ fun RepositoryActionsSheet(
             Column(modifier = Modifier.weight(1f)) {
                 KomiText(
                     text = repository.fullName,
-                    role = KomiTextRole.Title,
-                    fontWeight = FontWeight.SemiBold,
+                    role = KomiTextRole.CardTitle,
                     color = colors.onSurface,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    uppercase = false,
                 )
 
                 repository.description?.let {
                     KomiText(
                         text = it,
                         role = KomiTextRole.Body,
-                        fontSize = 13.sp,
                         color = colors.onSurfaceVariant,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
-                        uppercase = false,
                     )
                 }
             }

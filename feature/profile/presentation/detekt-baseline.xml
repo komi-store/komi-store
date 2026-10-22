@@ -1,0 +1,10 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues/>
+  <CurrentIssues>
+    <ID>LongMethod:ProfileSections.kt$fun LazyListScope.profileSections( state: ProfileState, hasUnreadAnnouncements: Boolean, onAction: (ProfileAction) -&gt; Unit, )</ID>
+    <ID>TooGenericExceptionCaught:AnnouncementsViewModel.kt$AnnouncementsViewModel$t: Throwable</ID>
+    <ID>TooGenericExceptionCaught:WhatsNewViewModel.kt$WhatsNewViewModel$t: Throwable</ID>
+    <ID>UnusedParameter:MuteSettingsBottomSheet.kt$category: AnnouncementCategory</ID>
+  </CurrentIssues>
+</SmellBaseline>

@@ -9,10 +9,9 @@ import androidx.compose.material.icons.filled.Warning
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.stringResource
 import zed.rainxch.core.domain.model.error.RateLimitInfo
 import zed.rainxch.core.presentation.components.buttons.KomiButton
@@ -24,6 +23,7 @@ import zed.rainxch.core.presentation.components.text.KomiText
 import zed.rainxch.core.presentation.components.text.KomiTextRole
 import zed.rainxch.core.presentation.locals.LocalPersonality
 import zed.rainxch.core.presentation.personality.utils.PersonalityPreview
+import zed.rainxch.core.presentation.testing.KomiTestTags
 import zed.rainxch.githubstore.core.presentation.res.Res
 import zed.rainxch.githubstore.core.presentation.res.rate_limit_close
 import zed.rainxch.githubstore.core.presentation.res.rate_limit_exceeded
@@ -59,10 +59,8 @@ fun RateLimitDialog(
         title = {
             KomiText(
                 text = stringResource(Res.string.rate_limit_exceeded),
-                role = KomiTextRole.Title,
-                fontWeight = FontWeight.Black,
+                role = KomiTextRole.CardTitle,
                 color = colors.onSurface,
-                uppercase = false,
             )
         },
         text = {
@@ -84,7 +82,6 @@ fun RateLimitDialog(
                         },
                     role = KomiTextRole.Body,
                     color = colors.outline,
-                    uppercase = false,
                 )
 
                 KomiText(
@@ -93,10 +90,8 @@ fun RateLimitDialog(
                             Res.string.rate_limit_resets_in_minutes,
                             timeUntilReset,
                         ),
-                    role = KomiTextRole.Body,
-                    fontWeight = FontWeight.Bold,
+                    role = KomiTextRole.Label,
                     color = colors.onSurface,
-                    uppercase = false,
                 )
 
                 if (!isAuthenticated) {
@@ -105,9 +100,7 @@ fun RateLimitDialog(
                     KomiText(
                         text = stringResource(Res.string.rate_limit_tip_sign_in),
                         role = KomiTextRole.Body,
-                        fontSize = 13.sp,
                         color = colors.primary,
-                        uppercase = false,
                     )
                 }
             }
@@ -135,6 +128,7 @@ fun RateLimitDialog(
                 label = stringResource(Res.string.rate_limit_close),
                 variant = KomiButtonVariant.Text,
                 size = KomiButtonSize.Sm,
+                modifier = Modifier.testTag(KomiTestTags.RATE_LIMIT_DISMISS),
             )
         },
     )

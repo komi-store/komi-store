@@ -4,12 +4,6 @@ plugins {
     alias(libs.plugins.convention.buildkonfig)
 }
 
-android {
-    buildFeatures {
-        aidl = true
-    }
-}
-
 kotlin {
     sourceSets {
         commonMain {
@@ -33,6 +27,8 @@ kotlin {
 
         androidMain {
             dependencies {
+                implementation(projects.core.dataAidl)
+
                 implementation(libs.shizuku.api)
                 implementation(libs.shizuku.provider)
                 compileOnly(libs.hidden.api.stub)
@@ -50,6 +46,21 @@ kotlin {
         jvmMain {
             dependencies {
                 implementation(libs.ktor.client.okhttp)
+            }
+        }
+
+        commonTest {
+            dependencies {
+                implementation(kotlin("test"))
+            }
+        }
+
+        jvmTest {
+            dependencies {
+                implementation(kotlin("test"))
+                implementation(libs.kotlinx.coroutines.core)
+                implementation(libs.ktor.client.mock)
+                implementation(libs.androidx.room.testing)
             }
         }
     }

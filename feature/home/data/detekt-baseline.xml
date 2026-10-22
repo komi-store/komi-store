@@ -1,0 +1,36 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues/>
+  <CurrentIssues>
+    <ID>CyclomaticComplexMethod:HomeRepositoryImpl.kt$HomeRepositoryImpl$private fun calculatePlatformScore(repo: GithubRepoNetworkModel): Int</ID>
+    <ID>CyclomaticComplexMethod:HomeRepositoryImpl.kt$HomeRepositoryImpl$private fun searchReposWithInstallersFlow( platforms: Set&lt;DiscoveryPlatform&gt;, baseQuery: String, sort: String, order: String, startPage: Int, category: String, desiredCount: Int = 10, ): Flow&lt;PaginatedDiscoveryRepositories&gt;</ID>
+    <ID>CyclomaticComplexMethod:HomeRepositoryImpl.kt$HomeRepositoryImpl$private suspend fun checkRepoHasInstallers(repo: GithubRepoNetworkModel): GithubRepoSummary?</ID>
+    <ID>LongMethod:CachedRepositoriesDataSourceImpl.kt$CachedRepositoriesDataSourceImpl$private suspend fun fetchCategoryFromFallback( category: HomeCategory, platform: DiscoveryPlatform, cacheKey: CacheKey, ): CachedRepoResponse?</ID>
+    <ID>LongMethod:HomeRepositoryImpl.kt$HomeRepositoryImpl$@OptIn(ExperimentalTime::class) override fun getHotReleaseRepositories( platforms: Set&lt;DiscoveryPlatform&gt;, page: Int, ): Flow&lt;PaginatedDiscoveryRepositories&gt;</ID>
+    <ID>LongMethod:HomeRepositoryImpl.kt$HomeRepositoryImpl$@OptIn(ExperimentalTime::class) override fun getTrendingRepositories( platforms: Set&lt;DiscoveryPlatform&gt;, page: Int, ): Flow&lt;PaginatedDiscoveryRepositories&gt;</ID>
+    <ID>LongMethod:HomeRepositoryImpl.kt$HomeRepositoryImpl$private fun searchReposWithInstallersFlow( platforms: Set&lt;DiscoveryPlatform&gt;, baseQuery: String, sort: String, order: String, startPage: Int, category: String, desiredCount: Int = 10, ): Flow&lt;PaginatedDiscoveryRepositories&gt;</ID>
+    <ID>LongParameterList:HomeRepositoryImpl.kt$HomeRepositoryImpl$( platforms: Set&lt;DiscoveryPlatform&gt;, baseQuery: String, sort: String, order: String, startPage: Int, category: String, desiredCount: Int = 10, )</ID>
+    <ID>LoopWithTooManyJumpStatements:HomeRepositoryImpl.kt$HomeRepositoryImpl$while</ID>
+    <ID>MagicNumber:HomeRepositoryImpl.kt$HomeRepositoryImpl$10</ID>
+    <ID>MagicNumber:HomeRepositoryImpl.kt$HomeRepositoryImpl$100</ID>
+    <ID>MagicNumber:HomeRepositoryImpl.kt$HomeRepositoryImpl$25</ID>
+    <ID>MagicNumber:HomeRepositoryImpl.kt$HomeRepositoryImpl$3</ID>
+    <ID>MagicNumber:HomeRepositoryImpl.kt$HomeRepositoryImpl$5</ID>
+    <ID>MagicNumber:HomeRepositoryImpl.kt$HomeRepositoryImpl$50</ID>
+    <ID>MagicNumber:HomeRepositoryImpl.kt$HomeRepositoryImpl$8</ID>
+    <ID>PackageNaming:CachedRepositoriesDataSource.kt$package zed.rainxch.home.data.data_source</ID>
+    <ID>PackageNaming:CachedRepositoriesDataSourceImpl.kt$package zed.rainxch.home.data.data_source.impl</ID>
+    <ID>ReturnCount:CachedRepositoriesDataSourceImpl.kt$CachedRepositoriesDataSourceImpl$override suspend fun getCachedTopicRepos( topic: TopicCategory, platform: DiscoveryPlatform, ): CachedRepoResponse?</ID>
+    <ID>ReturnCount:CachedRepositoriesDataSourceImpl.kt$CachedRepositoriesDataSourceImpl$private suspend fun fetchCachedReposForCategory( platform: DiscoveryPlatform, category: HomeCategory, ): CachedRepoResponse?</ID>
+    <ID>ReturnCount:CachedRepositoriesDataSourceImpl.kt$CachedRepositoriesDataSourceImpl$private suspend fun fetchCategoryFromBackend( category: HomeCategory, platform: DiscoveryPlatform, ): CachedRepoResponse?</ID>
+    <ID>ReturnCount:CachedRepositoriesDataSourceImpl.kt$CachedRepositoriesDataSourceImpl$private suspend fun fetchTopicFromBackend( topic: TopicCategory, platform: DiscoveryPlatform, ): CachedRepoResponse?</ID>
+    <ID>ReturnCount:HomeRepositoryImpl.kt$HomeRepositoryImpl$override suspend fun getRepositoryById(id: Long): GithubRepoSummary?</ID>
+    <ID>ReturnCount:HomeRepositoryImpl.kt$HomeRepositoryImpl$private suspend fun checkRepoHasInstallers(repo: GithubRepoNetworkModel): GithubRepoSummary?</ID>
+    <ID>TooGenericExceptionCaught:CachedRepositoriesDataSourceImpl.kt$CachedRepositoriesDataSourceImpl$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:HomeRepositoryImpl.kt$HomeRepositoryImpl$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:HomeRepositoryImpl.kt$HomeRepositoryImpl$e: Throwable</ID>
+    <ID>TooManyFunctions:CachedRepositoriesDataSourceImpl.kt$CachedRepositoriesDataSourceImpl : CachedRepositoriesDataSource</ID>
+    <ID>TooManyFunctions:HomeRepositoryImpl.kt$HomeRepositoryImpl : HomeRepository</ID>
+    <ID>UnusedParameter:CachedRepositoriesDataSourceImpl.kt$CachedRepositoriesDataSourceImpl$category: HomeCategory</ID>
+  </CurrentIssues>
+</SmellBaseline>

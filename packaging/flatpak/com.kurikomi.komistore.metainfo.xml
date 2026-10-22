@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>com.kurikomi.komistore</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>Apache-2.0</project_license>
+
+  <name>Komi Store</name>
+  <summary>App store for GitHub, Codeberg, and Forgejo releases</summary>
+
+  <description>
+    <p>
+      Komi Store lets you browse, download, and keep track of applications
+      distributed through GitHub, Codeberg, and other Forgejo-based release pages.
+      It brings the convenience of an app store to the open-source ecosystem.
+    </p>
+    <p>Features include:</p>
+    <ul>
+      <li>Discover trending, hot, and popular repositories with installable releases</li>
+      <li>Search and filter repositories by language, topic, and more</li>
+      <li>View release notes, changelogs, and READMEs with built-in translation</li>
+      <li>Verify installs with TOFU signing-key checks and provenance attestation</li>
+      <li>Save favourites and starred repositories for quick access</li>
+      <li>Sign in with GitHub for higher API rate limits and a personalized feed</li>
+      <li>Material 3 theming with light/dark mode and 13 language translations</li>
+    </ul>
+    <p>
+      Note: inside the Flatpak sandbox, Komi Store downloads release assets to your
+      Downloads folder for you to install manually. It does not install or update
+      system packages on your behalf.
+    </p>
+  </description>
+
+  <launchable type="desktop-id">com.kurikomi.komistore.desktop</launchable>
+
+  <screenshots>
+    <screenshot type="default">
+      <caption>Home screen showing trending repositories</caption>
+      <image>https://raw.githubusercontent.com/komi-store/komi-store/main/media-resources/screenshots/desktop/desktop_linux_home.jpg</image>
+    </screenshot>
+    <screenshot>
+      <caption>Repository details with release info</caption>
+      <image>https://raw.githubusercontent.com/komi-store/komi-store/main/media-resources/screenshots/desktop/desktop_linux_details.jpg</image>
+    </screenshot>
+    <screenshot>
+      <caption>Downloading a package on Linux</caption>
+      <image>https://raw.githubusercontent.com/komi-store/komi-store/main/media-resources/screenshots/desktop/desktop_linux_installing_rpm.jpg</image>
+    </screenshot>
+    <screenshot>
+      <caption>AppImage support on Linux</caption>
+      <image>https://raw.githubusercontent.com/komi-store/komi-store/main/media-resources/screenshots/desktop/desktop_linux_appimage.jpg</image>
+    </screenshot>
+  </screenshots>
+
+  <url type="homepage">https://github.com/komi-store/komi-store</url>
+  <url type="bugtracker">https://github.com/komi-store/komi-store/issues</url>
+  <url type="vcs-browser">https://github.com/komi-store/komi-store</url>
+
+  <developer id="com.kurikomi">
+    <name>Kurikomi Labs</name>
+  </developer>
+
+  <branding>
+    <color type="primary" scheme_preference="light">#d4e9fc</color>
+    <color type="primary" scheme_preference="dark">#1a3a5c</color>
+  </branding>
+
+  <content_rating type="oars-1.1"/>
+
+  <releases>
+    <release version="1.9.2" date="2026-06-26">
+      <description>
+        <p>New Explore tab with a discovery feed of installable apps, the new Manga
+           personality theme, and fixes for Linux launch and library state.</p>
+      </description>
+    </release>
+  </releases>
+
+  <categories>
+    <category>Development</category>
+    <category>PackageManager</category>
+  </categories>
+
+  <keywords>
+    <keyword>GitHub</keyword>
+    <keyword>Codeberg</keyword>
+    <keyword>Forgejo</keyword>
+    <keyword>releases</keyword>
+    <keyword>app store</keyword>
+    <keyword>package manager</keyword>
+  </keywords>
+
+  <supports>
+    <control>pointing</control>
+    <control>keyboard</control>
+  </supports>
+
+  <requires>
+    <display_length compare="ge">768</display_length>
+  </requires>
+</component>

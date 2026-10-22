@@ -1,0 +1,20 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues/>
+  <CurrentIssues>
+    <ID>CyclomaticComplexMethod:SearchRepositoryImpl.kt$SearchRepositoryImpl$private fun assetMatchesPlatform( nameRaw: String, platform: DiscoveryPlatform, ): Boolean</ID>
+    <ID>CyclomaticComplexMethod:SearchRepositoryImpl.kt$SearchRepositoryImpl$private suspend fun tryBackendSearch( query: String, platform: DiscoveryPlatform, sortBy: SortBy, page: Int, ): PaginatedDiscoveryRepositories?</ID>
+    <ID>LongMethod:SearchRepositoryImpl.kt$SearchRepositoryImpl$private suspend fun kotlinx.coroutines.channels.ProducerScope&lt;PaginatedDiscoveryRepositories&gt;.fallbackGithubSearch( query: String, platform: DiscoveryPlatform, language: ProgrammingLanguage, sortBy: SortBy, sortOrder: SortOrder, page: Int, cacheKey: String, privateMatches: List&lt;GithubRepoSummary&gt;, )</ID>
+    <ID>LongParameterList:SearchRepositoryImpl.kt$SearchRepositoryImpl$( query: String, platform: DiscoveryPlatform, language: ProgrammingLanguage, sortBy: SortBy, sortOrder: SortOrder, page: Int, )</ID>
+    <ID>LongParameterList:SearchRepositoryImpl.kt$SearchRepositoryImpl$( query: String, platform: DiscoveryPlatform, language: ProgrammingLanguage, sortBy: SortBy, sortOrder: SortOrder, page: Int, cacheKey: String, privateMatches: List&lt;GithubRepoSummary&gt;, )</ID>
+    <ID>MagicNumber:SearchRepositoryImpl.kt$SearchRepositoryImpl$16</ID>
+    <ID>MagicNumber:SearchRepositoryImpl.kt$SearchRepositoryImpl$20</ID>
+    <ID>MagicNumber:SearchRepositoryImpl.kt$SearchRepositoryImpl$5</ID>
+    <ID>ReturnCount:SearchRepositoryImpl.kt$SearchRepositoryImpl$private fun PaginatedDiscoveryRepositories.prepend(extra: List&lt;GithubRepoSummary&gt;): PaginatedDiscoveryRepositories</ID>
+    <ID>ReturnCount:SearchRepositoryImpl.kt$SearchRepositoryImpl$private suspend fun checkRepoHasInstallers( repo: GithubRepoNetworkModel, targetPlatform: DiscoveryPlatform, ): GithubRepoSummary?</ID>
+    <ID>ReturnCount:SearchRepositoryImpl.kt$SearchRepositoryImpl$private suspend fun kotlinx.coroutines.channels.ProducerScope&lt;PaginatedDiscoveryRepositories&gt;.fallbackGithubSearch( query: String, platform: DiscoveryPlatform, language: ProgrammingLanguage, sortBy: SortBy, sortOrder: SortOrder, page: Int, cacheKey: String, privateMatches: List&lt;GithubRepoSummary&gt;, )</ID>
+    <ID>ReturnCount:SearchRepositoryImpl.kt$SearchRepositoryImpl$private suspend fun searchPrivateRepos( query: String, platform: DiscoveryPlatform, language: ProgrammingLanguage, ): List&lt;GithubRepoSummary&gt;</ID>
+    <ID>ReturnCount:SearchRepositoryImpl.kt$SearchRepositoryImpl$private suspend fun tryBackendSearch( query: String, platform: DiscoveryPlatform, sortBy: SortBy, page: Int, ): PaginatedDiscoveryRepositories?</ID>
+    <ID>TooManyFunctions:SearchRepositoryImpl.kt$SearchRepositoryImpl : SearchRepository</ID>
+  </CurrentIssues>
+</SmellBaseline>

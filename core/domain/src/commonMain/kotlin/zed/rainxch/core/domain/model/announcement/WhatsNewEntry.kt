@@ -1,4 +1,5 @@
 package zed.rainxch.core.domain.model.announcement
+
 data class WhatsNewEntry(
     val versionCode: Int,
     val versionName: String,

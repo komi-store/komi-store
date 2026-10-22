@@ -1,7 +1,7 @@
 package zed.rainxch.devprofile.presentation.components
 
 import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.tween
+import androidx.compose.material.icons.rounded.Search
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
@@ -16,16 +16,13 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Sort
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import kotlinx.collections.immutable.toImmutableList
 import org.jetbrains.compose.resources.stringResource
 import zed.rainxch.core.presentation.components.icon.KomiIcon
@@ -39,7 +36,6 @@ import zed.rainxch.devprofile.domain.model.RepoFilterType
 import zed.rainxch.devprofile.domain.model.RepoSortType
 import zed.rainxch.devprofile.presentation.DeveloperProfileAction
 import zed.rainxch.githubstore.core.presentation.res.Res
-import zed.rainxch.githubstore.core.presentation.res.clear_search
 import zed.rainxch.githubstore.core.presentation.res.filter_favorites
 import zed.rainxch.githubstore.core.presentation.res.filter_installed
 import zed.rainxch.githubstore.core.presentation.res.filter_with_installable
@@ -72,22 +68,8 @@ fun FilterSortControls(
             onValueChange = { onAction(DeveloperProfileAction.OnSearchQueryChange(it)) },
             modifier = Modifier.fillMaxWidth(),
             placeholder = stringResource(Res.string.search_repositories),
-            leadingIcon = Icons.Default.Search,
-            trailing = {
-                if (searchQuery.isNotBlank()) {
-                    Box(
-                        modifier = Modifier
-                            .clickable { onAction(DeveloperProfileAction.OnSearchQueryChange("")) },
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        KomiIcon(
-                            imageVector = Icons.Default.Close,
-                            contentDescription = stringResource(Res.string.clear_search),
-                            modifier = Modifier.size(20.dp),
-                        )
-                    }
-                }
-            },
+            leadingIcon = Icons.Rounded.Search,
+            clearable = true,
         )
 
         Row(
@@ -132,9 +114,7 @@ fun FilterSortControls(
             },
             maxLines = 1,
             role = KomiTextRole.Body,
-            fontSize = 13.sp,
             color = colors.onSurfaceVariant,
-            uppercase = false,
         )
     }
 }
@@ -152,7 +132,7 @@ private fun FilterPill(
         } else {
             colors.surfaceContainerHigh
         },
-        animationSpec = tween(durationMillis = 180),
+        animationSpec = LocalPersonality.current.motion.fastEffects(),
         label = "filter_container",
     )
     val content by animateColorAsState(
@@ -161,7 +141,7 @@ private fun FilterPill(
         } else {
             colors.onSurface
         },
-        animationSpec = tween(durationMillis = 180),
+        animationSpec = LocalPersonality.current.motion.fastEffects(),
         label = "filter_content",
     )
     Box(
@@ -174,12 +154,9 @@ private fun FilterPill(
     ) {
         KomiText(
             text = label,
-            role = KomiTextRole.Label,
-            fontSize = 12.sp,
-            fontWeight = FontWeight.SemiBold,
+            role = KomiTextRole.LabelSmall,
             color = content,
             maxLines = 1,
-            uppercase = false,
         )
     }
 }

@@ -85,6 +85,7 @@ fun mangaColors(
         surfaceContainerHigh = ink.well,
         outline = ink.ink,
         outlineVariant = ink.muted,
+        divider = ink.ink.copy(alpha = 0.4f),
         error = ink.error,
         onError = ink.onError,
         shadow = ink.shadow,

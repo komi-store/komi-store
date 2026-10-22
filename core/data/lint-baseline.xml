@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<issues format="6" by="lint 8.13.2" type="baseline" client="gradle" dependencies="false" name="AGP (8.13.2)" variant="all" version="8.13.2">
+
+    <issue
+        id="MissingPermission"
+        message="Missing permissions required by PackageInstaller.uninstall: android.permission.DELETE_PACKAGES or android.permission.REQUEST_DELETE_PACKAGES"
+        errorLine1="            installer.uninstall(packageName, pendingIntent.intentSender)"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/zed/rainxch/core/data/services/dhizuku/DhizukuInstallerServiceImpl.kt"
+            line="198"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="InlinedApi"
+        message="Field requires API level 28 (current min is 26): `android.content.pm.PackageManager#GET_SIGNING_CERTIFICATES`"
+        errorLine1="                GET_SIGNING_CERTIFICATES"
+        errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/zed/rainxch/core/data/services/AndroidInstallerInfoExtractor.kt"
+            line="69"
+            column="17"/>
+    </issue>
+
+    <issue
+        id="PrivateApi"
+        message="Accessing internal APIs via reflection is not supported and may not work on all devices or in the future"
+        errorLine1="                val cls = Class.forName(&quot;android.app.AppGlobals&quot;)"
+        errorLine2="                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/zed/rainxch/core/data/services/dhizuku/DhizukuInstallerServiceImpl.kt"
+            line="273"
+            column="27"/>
+    </issue>
+
+    <issue
+        id="BatteryLife"
+        message="Use of `REQUEST_IGNORE_BATTERY_OPTIMIZATIONS` violates the Play Store Content Policy regarding acceptable use cases, as described in https://developer.android.com/training/monitoring-device-state/doze-standby.html"
+        errorLine1="                Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS).apply {"
+        errorLine2="                                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/zed/rainxch/core/data/services/AndroidAggressiveOemDetector.kt"
+            line="30"
+            column="33"/>
+    </issue>
+
+    <issue
+        id="SpecifyForegroundServiceType"
+        message="Missing dataSync foregroundServiceType in the AndroidManifest.xml"
+        errorLine1="            ForegroundInfo("
+        errorLine2="            ^">
+        <location
+            file="src/androidMain/kotlin/zed/rainxch/core/data/services/AutoUpdateWorker.kt"
+            line="261"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="SpecifyForegroundServiceType"
+        message="Missing dataSync foregroundServiceType in the AndroidManifest.xml"
+        errorLine1="            ForegroundInfo("
+        errorLine2="            ^">
+        <location
+            file="src/androidMain/kotlin/zed/rainxch/core/data/services/UpdateCheckWorker.kt"
+            line="133"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="ObsoleteSdkInt"
+        message="Unnecessary; `SDK_INT` is always >= 26"
+        errorLine1="                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) appInfo?.minSdkVersion"
+        errorLine2="                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/zed/rainxch/core/data/services/AndroidApkInspector.kt"
+            line="128"
+            column="21"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `String.toUri` instead?"
+        errorLine1="                    data = Uri.parse(&quot;package:${context.packageName}&quot;)"
+        errorLine2="                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/zed/rainxch/core/data/services/AndroidAggressiveOemDetector.kt"
+            line="31"
+            column="28"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `String.toUri` instead?"
+        errorLine1="                    data = Uri.parse(&quot;package:${context.packageName}&quot;)"
+        errorLine2="                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/zed/rainxch/core/data/services/AndroidAggressiveOemDetector.kt"
+            line="31"
+            column="28"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `String.toUri` instead?"
+        errorLine1="                data = Uri.parse(&quot;githubstore-cancel://$packageName&quot;)"
+        errorLine2="                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/zed/rainxch/core/data/services/AndroidDownloadProgressNotifier.kt"
+            line="33"
+            column="24"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `String.toUri` instead?"
+        errorLine1="                data = Uri.parse(&quot;githubstore-cancel://$packageName&quot;)"
+        errorLine2="                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/zed/rainxch/core/data/services/AndroidDownloadProgressNotifier.kt"
+            line="33"
+            column="24"/>
+    </issue>
+
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        errorLine1="            prefs.edit().putBoolean(KEY_GRANTED_BEFORE, granted).apply()"
+        errorLine2="            ~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/zed/rainxch/core/data/services/root/RootServiceManager.kt"
+            line="28"
+            column="13"/>
+    </issue>
+
+</issues>

@@ -6,8 +6,6 @@ import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.MutableTransitionState
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -55,12 +53,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
 import zed.rainxch.core.presentation.components.text.KomiText
 import zed.rainxch.core.presentation.components.text.KomiTextRole
@@ -145,7 +141,7 @@ private fun KomiToastItem(
             if (motionOff) {
                 EnterTransition.None
             } else {
-                slideInVertically(spring(dampingRatio = 0.6f, stiffness = Spring.StiffnessMediumLow)) { it } +
+                slideInVertically(personality.motion.defaultSpatial()) { it } +
                     fadeIn() +
                     scaleIn(initialScale = 0.96f)
             },
@@ -231,8 +227,6 @@ private fun MangaToastPanel(
                     modifier = Modifier.weight(1f),
                     role = KomiTextRole.Body,
                     color = colors.onSurface,
-                    fontSize = 13.5.sp,
-                    fontWeight = FontWeight.W700,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
                 )
@@ -247,10 +241,8 @@ private fun MangaToastPanel(
                                 data.onAction?.invoke()
                                 onClose()
                             },
-                        role = KomiTextRole.Title,
+                        role = KomiTextRole.Label,
                         color = accent,
-                        fontSize = 14.sp,
-                        uppercase = true,
                     )
                 }
                 if (showX) {
@@ -311,13 +303,14 @@ private fun SfxKicker(
     val scaleAnim = remember { Animatable(0.4f) }
     val alphaAnim = remember { Animatable(0f) }
     val scope = rememberCoroutineScope()
+    val motion = personality.motion
     LaunchedEffect(Unit) {
         scope.launch {
-            alphaAnim.animateTo(1f, tween(120))
-            alphaAnim.animateTo(0f, tween(500, delayMillis = 280))
+            alphaAnim.animateTo(1f, motion.short())
+            alphaAnim.animateTo(0f, motion.long(delayMillis = motion.mediumMs))
         }
-        scaleAnim.animateTo(1.15f, tween(180))
-        scaleAnim.animateTo(1f, tween(120))
+        scaleAnim.animateTo(1.15f, motion.short())
+        scaleAnim.animateTo(1f, motion.short())
     }
     Text(
         text = text,
@@ -328,7 +321,8 @@ private fun SfxKicker(
                 alpha = alphaAnim.value
                 rotationZ = -8f
             },
-        style = personality.type.label.copy(fontWeight = FontWeight.W900, fontSize = 22.sp),
+        // A comic sound effect, so it stays in Anton; buttons no longer are.
+        style = personality.type.sectionTitle,
         color = color,
     )
 }

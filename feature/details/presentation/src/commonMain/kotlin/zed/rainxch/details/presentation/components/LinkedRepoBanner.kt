@@ -2,9 +2,9 @@ package zed.rainxch.details.presentation.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
@@ -13,9 +13,7 @@ import androidx.compose.material.icons.outlined.Link
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.stringResource
 import zed.rainxch.core.presentation.components.buttons.KomiButton
 import zed.rainxch.core.presentation.components.buttons.KomiButtonSize
@@ -62,15 +60,12 @@ fun LinkedRepoBanner(
             ) {
                 KomiText(
                     text = stringResource(Res.string.details_linked_repo_banner_title, owner, repo),
-                    role = KomiTextRole.Body,
-                    fontWeight = FontWeight.SemiBold,
+                    role = KomiTextRole.Label,
                     color = colors.onSurface,
-                    uppercase = false,
                 )
                 KomiText(
                     text = stringResource(Res.string.details_linked_repo_banner_body),
                     role = KomiTextRole.Body,
-                    fontSize = 13.sp,
                     color = colors.onSurfaceVariant,
                 )
             }

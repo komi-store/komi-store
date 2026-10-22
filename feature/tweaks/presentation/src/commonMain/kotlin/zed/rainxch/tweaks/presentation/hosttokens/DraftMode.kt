@@ -7,5 +7,7 @@ sealed interface DraftMode {
 
     data object Picker : DraftMode
 
-    data class Compose(val replacingExisting: HostToken? = null) : DraftMode
+    data class Compose(
+        val replacingExisting: HostToken? = null,
+    ) : DraftMode
 }

@@ -5,7 +5,6 @@ import java.security.SecureRandom
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 
-
 @OptIn(ExperimentalEncodingApi::class)
 object PkceGenerator {
     private val secureRandom = SecureRandom()

@@ -2,10 +2,10 @@ package zed.rainxch.core.data.mirror
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import eu.anifantakis.lib.ksafe.KSafe
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.BufferOverflow
@@ -32,6 +32,7 @@ import zed.rainxch.core.domain.model.mirror.MirrorPreference
 import zed.rainxch.core.domain.model.mirror.MirrorStatus
 import zed.rainxch.core.domain.model.mirror.MirrorType
 import zed.rainxch.core.domain.model.mirror.TrafficKind
+import zed.rainxch.core.domain.network.MirrorLatencyProbe
 import zed.rainxch.core.domain.repository.MirrorRepository
 import zed.rainxch.core.data.secure.safeDelete
 import zed.rainxch.core.data.secure.safeGet
@@ -43,18 +44,21 @@ class MirrorRepositoryImpl(
     private val ksafe: KSafe,
     private val legacyDataStore: DataStore<Preferences>,
     private val apiClient: MirrorApiClient,
+    private val latencyProbe: MirrorLatencyProbe,
     appScope: CoroutineScope,
 ) : MirrorRepository {
     private val json = Json { ignoreUnknownKeys = true }
     private val cacheTtlMs = 60L * 60 * 1000
 
     private val _catalog = MutableStateFlow<List<MirrorConfig>>(emptyList())
+    private val _measuredLatencies = MutableStateFlow<Map<String, Int>>(emptyMap())
     private val _removedNotices = MutableSharedFlow<MirrorRemoved>(
         replay = 0,
         extraBufferCapacity = 4,
         onBufferOverflow = BufferOverflow.DROP_OLDEST,
     )
     private val migrationDeferred = CompletableDeferred<Unit>()
+    private val catalogLoaded = CompletableDeferred<Unit>()
 
     init {
         appScope.launch {
@@ -80,19 +84,12 @@ class MirrorRepositoryImpl(
                             legacyKey = longPreferencesKey("mirror_cached_list_at"),
                             ksafeKey = K_CACHED_AT
                         ),
-                        MigrationEntry(
-                            legacyKey = longPreferencesKey("mirror_auto_suggest_snooze_until"),
-                            ksafeKey = K_SUGGEST_SNOOZE
-                        ),
-                        MigrationEntry(
-                            legacyKey = booleanPreferencesKey("mirror_auto_suggest_dismissed"),
-                            ksafeKey = K_SUGGEST_DISMISSED
-                        ),
                     ),
                 )
             }
             migrationDeferred.complete(Unit)
             _catalog.value = readCachedCatalogOrBundled()
+            catalogLoaded.complete(Unit)
             val cachedAt = runCatching { ksafe.safeGet(K_CACHED_AT, 0L) }.getOrDefault(0L)
             if (Clock.System.now().toEpochMilliseconds() - cachedAt > cacheTtlMs) {
                 refreshCatalog()
@@ -157,17 +154,21 @@ class MirrorRepositoryImpl(
         }
     }
 
+    override fun observeMeasuredLatencies(): Flow<Map<String, Int>> = _measuredLatencies.asStateFlow()
+
+    override suspend fun measureLatencies(): Result<Map<String, Int>> =
+        try {
+            catalogLoaded.await()
+            val measured = latencyProbe.probe(_catalog.value)
+            _measuredLatencies.value = measured
+            Result.success(measured)
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+
     override fun observeRemovedNotices(): Flow<MirrorRemoved> = _removedNotices.asSharedFlow()
-
-    override suspend fun snoozeAutoSuggest(forMs: Long) {
-        migrationDeferred.await()
-        ksafe.safePut(K_SUGGEST_SNOOZE, Clock.System.now().toEpochMilliseconds() + forMs)
-    }
-
-    override suspend fun dismissAutoSuggestPermanently() {
-        migrationDeferred.await()
-        ksafe.safePut(K_SUGGEST_DISMISSED, true)
-    }
 
     private suspend fun readCachedCatalogOrBundled(): List<MirrorConfig> {
         val cachedJson = runCatching {
@@ -232,8 +233,6 @@ class MirrorRepositoryImpl(
         const val K_CUSTOM_TEMPLATE = "mirror_custom_template"
         const val K_CACHED_JSON = "mirror_cached_list_json"
         const val K_CACHED_AT = "mirror_cached_list_at"
-        const val K_SUGGEST_SNOOZE = "mirror_auto_suggest_snooze_until"
-        const val K_SUGGEST_DISMISSED = "mirror_auto_suggest_dismissed"
         const val DIRECT_MIRROR_ID = "direct"
         const val CUSTOM_MIRROR_ID_SENTINEL = "__custom__"
     }

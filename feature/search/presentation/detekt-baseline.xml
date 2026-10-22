@@ -1,0 +1,29 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues/>
+  <CurrentIssues>
+    <ID>ComplexCondition:SearchRoot.kt$!state.isLoading &amp;&amp; !state.isLoadingMore &amp;&amp; state.errorMessage == null &amp;&amp; state.repositories.isEmpty() &amp;&amp; state.query.isNotBlank() &amp;&amp; !state.hasMorePages</ID>
+    <ID>ComplexCondition:SearchRoot.kt$lastVisible != null &amp;&amp; layoutInfo.totalItemsCount &gt; 0 &amp;&amp; !state.isLoadingMore &amp;&amp; !state.isLoading &amp;&amp; state.hasMorePages</ID>
+    <ID>ComplexCondition:SearchRoot.kt$state.query.isBlank() &amp;&amp; state.repositories.isEmpty() &amp;&amp; state.recentSearches.isNotEmpty() &amp;&amp; !state.isLoading</ID>
+    <ID>ComplexCondition:SearchRoot.kt$state.repositories.isNotEmpty() &amp;&amp; state.visibleRepos.isEmpty() &amp;&amp; state.isHideSeenEnabled &amp;&amp; !state.hasMorePages</ID>
+    <ID>ComplexCondition:SearchRoot.kt$state.repositories.isNotEmpty() &amp;&amp; state.visibleRepos.isEmpty() &amp;&amp; state.isHideSeenEnabled &amp;&amp; state.hasMorePages</ID>
+    <ID>ComplexCondition:SearchRoot.kt$state.repositories.isNotEmpty() &amp;&amp; state.visibleRepos.isEmpty() &amp;&amp; state.isHideSeenEnabled &amp;&amp; state.hasMorePages &amp;&amp; !state.isLoadingMore &amp;&amp; !state.isLoading</ID>
+    <ID>ComplexCondition:SearchRoot.kt$totalItems == 0 || currentState.isLoadingMore || currentState.isLoading || !currentState.hasMorePages</ID>
+    <ID>CyclomaticComplexMethod:ProgrammingLanguageMapper.kt$fun ProgrammingLanguageUi.label(): StringResource</ID>
+    <ID>CyclomaticComplexMethod:ProgrammingLanguageMappers.kt$fun ProgrammingLanguageUi.toDomain(): ProgrammingLanguage</ID>
+    <ID>CyclomaticComplexMethod:SearchRoot.kt$@Composable fun SearchScreen( state: SearchState, toastState: KomiToastState, onAction: (SearchAction) -&gt; Unit, )</ID>
+    <ID>CyclomaticComplexMethod:SearchViewModel.kt$SearchViewModel$fun onAction(action: SearchAction)</ID>
+    <ID>CyclomaticComplexMethod:SearchViewModel.kt$SearchViewModel$private fun performSearch(isInitial: Boolean = false)</ID>
+    <ID>LargeClass:SearchViewModel.kt$SearchViewModel : ViewModel</ID>
+    <ID>LongMethod:SearchViewModel.kt$SearchViewModel$fun onAction(action: SearchAction)</ID>
+    <ID>LongMethod:SearchViewModel.kt$SearchViewModel$private fun performExplore()</ID>
+    <ID>LongMethod:SearchViewModel.kt$SearchViewModel$private fun performSearch(isInitial: Boolean = false)</ID>
+    <ID>LongParameterList:SearchViewModel.kt$SearchViewModel$( private val searchRepository: SearchRepository, private val installedAppsRepository: InstalledAppsRepository, private val syncInstalledAppsUseCase: SyncInstalledAppsUseCase, private val favouritesRepository: FavouritesRepository, private val starredRepository: StarredRepository, private val logger: KomiStoreLogger, private val shareManager: ShareManager, private val platform: Platform, private val clipboardHelper: ClipboardHelper, private val tweaksRepository: TweaksRepository, private val seenReposRepository: SeenReposRepository, private val searchHistoryRepository: SearchHistoryRepository, private val userSessionRepository: UserSessionRepository, private val hiddenReposRepository: HiddenReposRepository, private val browseFilterStore: BrowseFilterStore, private val initialPlatform: DiscoveryPlatform? = null, )</ID>
+    <ID>MaxLineLength:SearchRoot.kt$maxCardWidth = if (state.isGridLayout) CardGridSpec.CompactMaxCardWidth else CardGridSpec.InfoMaxCardWidth</ID>
+    <ID>ThrowsCount:SearchViewModel.kt$SearchViewModel$fun onAction(action: SearchAction)</ID>
+    <ID>TooGenericExceptionCaught:SearchViewModel.kt$SearchViewModel$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:SearchViewModel.kt$SearchViewModel$e: Throwable</ID>
+    <ID>TooManyFunctions:SearchRoot.kt$zed.rainxch.search.presentation.SearchRoot.kt</ID>
+    <ID>TooManyFunctions:SearchViewModel.kt$SearchViewModel : ViewModel</ID>
+  </CurrentIssues>
+</SmellBaseline>

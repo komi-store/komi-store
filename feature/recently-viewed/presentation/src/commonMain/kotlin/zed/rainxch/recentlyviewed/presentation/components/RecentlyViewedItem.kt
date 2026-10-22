@@ -20,10 +20,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.stringResource
 import zed.rainxch.core.presentation.components.GitHubStoreImage
 import zed.rainxch.core.presentation.components.buttons.KomiButtonVariant
@@ -60,27 +58,27 @@ fun RecentlyViewedItem(
             modifier = Modifier.fillMaxWidth().padding(16.dp),
         ) {
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(shape.cornerSmall))
-                    .clickable(onClick = onDevProfileClick)
-                    .padding(vertical = 2.dp),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(shape.cornerSmall))
+                        .clickable(onClick = onDevProfileClick)
+                        .padding(vertical = 2.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 GitHubStoreImage(
                     imageModel = { repo.repoOwnerAvatarUrl },
-                    modifier = Modifier
-                        .size(28.dp)
-                        .clip(RoundedCornerShape(shape.cornerSmall)),
+                    modifier =
+                        Modifier
+                            .size(28.dp)
+                            .clip(RoundedCornerShape(shape.cornerSmall)),
                 )
 
                 KomiText(
                     text = repo.repoOwner,
-                    role = KomiTextRole.Label,
+                    role = KomiTextRole.LabelSmall,
                     color = colors.onSurfaceVariant,
-                    fontWeight = FontWeight.Medium,
-                    uppercase = false,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.weight(1f),
@@ -97,10 +95,8 @@ fun RecentlyViewedItem(
                 Column(modifier = Modifier.weight(1f)) {
                     KomiText(
                         text = repo.repoName,
-                        role = KomiTextRole.Title,
+                        role = KomiTextRole.CardTitle,
                         color = colors.onSurface,
-                        fontWeight = FontWeight.SemiBold,
-                        uppercase = false,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                     )
@@ -112,7 +108,6 @@ fun RecentlyViewedItem(
                             text = it,
                             role = KomiTextRole.Body,
                             color = colors.onSurfaceVariant,
-                            fontSize = 13.sp,
                             maxLines = 2,
                             overflow = TextOverflow.Ellipsis,
                         )

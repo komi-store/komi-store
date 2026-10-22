@@ -35,6 +35,10 @@ sealed interface TweaksAction {
         val enabled: Boolean,
     ) : TweaksAction
 
+    data class OnRepoLayoutSelected(
+        val grid: Boolean,
+    ) : TweaksAction
+
     data class OnDarkThemeChange(
         val isDarkTheme: Boolean?,
     ) : TweaksAction
@@ -49,6 +53,10 @@ sealed interface TweaksAction {
 
     data class OnContentWidthSelected(
         val width: ContentWidth,
+    ) : TweaksAction
+
+    data class OnDisplayModeSelected(
+        val modeId: Int,
     ) : TweaksAction
 
     data class OnProxyTypeSelected(
@@ -88,6 +96,14 @@ sealed interface TweaksAction {
         val scope: ProxyScope,
     ) : TweaksAction
 
+    data class OnExternalInstallerPickerOpenChanged(
+        val open: Boolean,
+    ) : TweaksAction
+
+    data class OnExternalInstallerSelected(
+        val packageName: String,
+    ) : TweaksAction
+
     data class OnInstallerTypeSelected(
         val type: InstallerType,
     ) : TweaksAction
@@ -106,7 +122,9 @@ sealed interface TweaksAction {
 
     data object OnInstallerAttributionCustomToggleExpanded : TweaksAction
 
-    data class OnInstallerAttributionCustomChanged(val value: String) : TweaksAction
+    data class OnInstallerAttributionCustomChanged(
+        val value: String,
+    ) : TweaksAction
 
     data object OnInstallerAttributionCustomSave : TweaksAction
 
@@ -152,7 +170,9 @@ sealed interface TweaksAction {
 
     data object OnLanguagePickerDismiss : TweaksAction
 
-    data class OnLanguageQueryChange(val query: String) : TweaksAction
+    data class OnLanguageQueryChange(
+        val query: String,
+    ) : TweaksAction
 
     data object OnTranslationProviderExpandToggle : TweaksAction
 
@@ -166,9 +186,13 @@ sealed interface TweaksAction {
 
     data object OnConnectionMasterExpandToggle : TweaksAction
 
-    data class OnProxyScopeExpandToggle(val scope: ProxyScope) : TweaksAction
+    data class OnProxyScopeExpandToggle(
+        val scope: ProxyScope,
+    ) : TweaksAction
 
-    data class OnDesktopSectionSelected(val section: DesktopSection) : TweaksAction
+    data class OnDesktopSectionSelected(
+        val section: DesktopSection,
+    ) : TweaksAction
 
     data object OnMirrorPickerClick : TweaksAction
 
@@ -243,26 +267,59 @@ sealed interface TweaksAction {
     data object OnReevaluateBatteryOptimizationCard : TweaksAction
 
     data object OnOpenCustomForgesDialog : TweaksAction
-    data object OnDismissCustomForgesDialog : TweaksAction
-    data class OnCustomForgeDraftChanged(val draft: String) : TweaksAction
-    data object OnAddCustomForge : TweaksAction
-    data class OnRemoveCustomForge(val host: String) : TweaksAction
 
-    data class OnMasterProxyTypeSelected(val type: ProxyType) : TweaksAction
-    data class OnMasterProxyHostChanged(val host: String) : TweaksAction
-    data class OnMasterProxyPortChanged(val port: String) : TweaksAction
-    data class OnMasterProxyUsernameChanged(val username: String) : TweaksAction
-    data class OnMasterProxyPasswordChanged(val password: String) : TweaksAction
+    data object OnDismissCustomForgesDialog : TweaksAction
+
+    data class OnCustomForgeDraftChanged(
+        val draft: String,
+    ) : TweaksAction
+
+    data object OnAddCustomForge : TweaksAction
+
+    data class OnRemoveCustomForge(
+        val host: String,
+    ) : TweaksAction
+
+    data class OnMasterProxyTypeSelected(
+        val type: ProxyType,
+    ) : TweaksAction
+
+    data class OnMasterProxyHostChanged(
+        val host: String,
+    ) : TweaksAction
+
+    data class OnMasterProxyPortChanged(
+        val port: String,
+    ) : TweaksAction
+
+    data class OnMasterProxyUsernameChanged(
+        val username: String,
+    ) : TweaksAction
+
+    data class OnMasterProxyPasswordChanged(
+        val password: String,
+    ) : TweaksAction
+
     data object OnMasterProxyPasswordVisibilityToggle : TweaksAction
+
     data object OnMasterProxySave : TweaksAction
+
     data object OnMasterProxyTest : TweaksAction
 
-    data class OnProxyPasteUrlChanged(val value: String) : TweaksAction
+    data class OnProxyPasteUrlChanged(
+        val value: String,
+    ) : TweaksAction
+
     data object OnProxyPasteUrlSubmit : TweaksAction
 
-    data class OnScopeUseMainToggled(val scope: ProxyScope, val useMain: Boolean) : TweaksAction
+    data class OnScopeUseMainToggled(
+        val scope: ProxyScope,
+        val useMain: Boolean,
+    ) : TweaksAction
 
     data object OnClearSeenHistoryRequest : TweaksAction
+
     data object OnClearSeenHistoryDismiss : TweaksAction
+
     data object OnClearSeenHistoryConfirm : TweaksAction
 }

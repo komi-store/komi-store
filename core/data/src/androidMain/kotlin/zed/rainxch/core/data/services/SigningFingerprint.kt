@@ -12,13 +12,15 @@ internal object SigningFingerprint {
                 if (sigInfo.hasMultipleSigners()) {
                     sigInfo.apkContentsSigners?.firstOrNull()
                 } else {
-
                     sigInfo.signingCertificateHistory?.lastOrNull()
                 }
             return cert?.toByteArray()?.let(::sha256)
         }
         @Suppress("DEPRECATION")
-        return info.signatures?.firstOrNull()?.toByteArray()?.let(::sha256)
+        return info.signatures
+            ?.firstOrNull()
+            ?.toByteArray()
+            ?.let(::sha256)
     }
 
     private fun sha256(bytes: ByteArray): String =

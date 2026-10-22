@@ -49,6 +49,7 @@ val viewModelsModule =
                 repoParam = params[2],
                 isComingFromUpdate = params[3],
                 sourceHostParam = if (params.size() > 4) params[4] else null,
+                packageNameParam = if (params.size() > 5) params[5] else null,
                 detailsRepository = get(),
                 downloader = get(),
                 installer = get(),
@@ -71,6 +72,7 @@ val viewModelsModule =
                 apkInspector = get(),
                 userSessionRepository = get(),
                 systemInstallSerializer = get(),
+                appScope = get(),
             )
         }
         viewModel { params ->
@@ -173,12 +175,14 @@ val viewModelsModule =
             CategoryListViewModel(
                 category = params.get(),
                 homeRepository = get(),
+                tweaksRepository = get(),
             )
         }
         viewModel {
             MirrorPickerViewModel(
                 mirrorRepository = get(),
                 testHttpClient = get(qualifier = named("test")),
+                logger = get(),
             )
         }
     }

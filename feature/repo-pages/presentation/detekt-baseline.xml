@@ -1,0 +1,11 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues/>
+  <CurrentIssues>
+    <ID>ComplexCondition:IssuesViewModel.kt$IssuesViewModel$current.isLoading || current.isLoadingMore || current.endReached || current.errorMessage != null</ID>
+    <ID>ComplexCondition:PullsViewModel.kt$PullsViewModel$current.isLoading || current.isLoadingMore || current.endReached || current.errorMessage != null</ID>
+    <ID>MagicNumber:parseLabelColor.kt$0xFF888888</ID>
+    <ID>MagicNumber:parseLabelColor.kt$16</ID>
+    <ID>MagicNumber:parseLabelColor.kt$6</ID>
+  </CurrentIssues>
+</SmellBaseline>

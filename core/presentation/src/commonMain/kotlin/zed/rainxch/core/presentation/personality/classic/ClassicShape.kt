@@ -9,7 +9,7 @@ internal val ClassicShape =
         borderButton = 1.dp,
         borderChip = 1.dp,
         corner = 16.dp,
-        cornerSmall = 10.dp,
+        cornerSmall = 12.dp,
         skewStampDeg = 0f,
         badgeRotationDeg = 0f,
     )

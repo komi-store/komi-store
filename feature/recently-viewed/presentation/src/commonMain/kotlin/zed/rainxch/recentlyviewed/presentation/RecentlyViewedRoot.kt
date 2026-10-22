@@ -10,8 +10,6 @@ import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -20,11 +18,10 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
+import zed.rainxch.core.domain.utils.RepoIdCodec
 import zed.rainxch.core.presentation.components.ScrollbarContainer
 import zed.rainxch.core.presentation.components.bars.KomiTopBar
 import zed.rainxch.core.presentation.components.bars.KomiTopBarSize
-import zed.rainxch.core.presentation.components.buttons.KomiButtonVariant
-import zed.rainxch.core.presentation.components.buttons.KomiIconButton
 import zed.rainxch.core.presentation.components.progress.KomiCircularProgress
 import zed.rainxch.core.presentation.components.scaffold.KomiScaffold
 import zed.rainxch.core.presentation.locals.LocalScrollbarEnabled
@@ -35,7 +32,7 @@ import zed.rainxch.recentlyviewed.presentation.components.RecentlyViewedItem
 @Composable
 fun RecentlyViewedRoot(
     onNavigateBack: () -> Unit,
-    onNavigateToDetails: (repoId: Long) -> Unit,
+    onNavigateToDetails: (repoId: Long, owner: String, repo: String, sourceHost: String?) -> Unit,
     onNavigateToDeveloperProfile: (username: String) -> Unit,
     viewModel: RecentlyViewedViewModel = koinViewModel(),
 ) {
@@ -50,7 +47,13 @@ fun RecentlyViewedRoot(
                 }
 
                 is RecentlyViewedAction.OnRepositoryClick -> {
-                    onNavigateToDetails(action.repo.repoId)
+                    val repo = action.repo
+                    onNavigateToDetails(
+                        repo.repoId,
+                        repo.repoOwner,
+                        repo.repoName,
+                        RepoIdCodec.sourceHostOf(repo.repoId, repo.repoUrl),
+                    )
                 }
 
                 is RecentlyViewedAction.OnDeveloperProfileClick -> {
@@ -75,14 +78,7 @@ fun RecentlyViewedScreen(
             KomiTopBar(
                 title = stringResource(Res.string.recently_viewed),
                 size = KomiTopBarSize.Compact,
-                leading = {
-                    KomiIconButton(
-                        icon = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = stringResource(Res.string.navigate_back),
-                        onClick = { onAction(RecentlyViewedAction.OnNavigateBackClick) },
-                        variant = KomiButtonVariant.Tonal,
-                    )
-                },
+                onBack = { onAction(RecentlyViewedAction.OnNavigateBackClick) },
             )
         },
     ) { innerPadding ->

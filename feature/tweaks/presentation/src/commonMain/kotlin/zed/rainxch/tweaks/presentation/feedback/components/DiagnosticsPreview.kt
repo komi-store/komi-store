@@ -8,9 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.stringResource
 import zed.rainxch.core.presentation.components.inputs.KomiSwitch
 import zed.rainxch.core.presentation.components.surfaces.KomiSurface
@@ -46,17 +44,13 @@ fun DiagnosticsPreview(
                 Column {
                     KomiText(
                         text = stringResource(Res.string.feedback_diagnostics_header),
-                        role = KomiTextRole.Title,
-                        fontWeight = FontWeight.Medium,
+                        role = KomiTextRole.CardTitle,
                         color = colors.onSurface,
-                        uppercase = false,
                     )
                     KomiText(
                         text = stringResource(Res.string.feedback_diagnostics_include),
                         role = KomiTextRole.Body,
-                        fontSize = 13.sp,
                         color = colors.onSurfaceVariant,
-                        uppercase = false,
                     )
                 }
                 KomiSwitch(
@@ -69,9 +63,7 @@ fun DiagnosticsPreview(
                 KomiText(
                     text = formatDiagnostics(diagnostics, channel),
                     role = KomiTextRole.Body,
-                    fontSize = 13.sp,
                     color = colors.onSurfaceVariant,
-                    uppercase = false,
                     modifier = Modifier.padding(top = 12.dp),
                 )
             }
@@ -79,12 +71,24 @@ fun DiagnosticsPreview(
     }
 }
 
-private fun formatDiagnostics(d: DiagnosticsInfo, channel: FeedbackChannel): String {
+private fun formatDiagnostics(
+    d: DiagnosticsInfo,
+    channel: FeedbackChannel,
+): String {
     val sb = StringBuilder()
     sb.append("- App: Komi Store v").append(d.appVersion).append('\n')
-    sb.append("- Platform: ").append(d.platform).append(' ').append(d.osVersion).append('\n')
+    sb
+        .append("- Platform: ")
+        .append(d.platform)
+        .append(' ')
+        .append(d.osVersion)
+        .append('\n')
     sb.append("- Locale: ").append(d.locale).append('\n')
-    sb.append("- Theme: ").append(d.themePalette).append(" / ").append(d.themeMode)
+    sb
+        .append("- Theme: ")
+        .append(d.themePalette)
+        .append(" / ")
+        .append(d.themeMode)
     d.installerType?.let { sb.append('\n').append("- Installer: ").append(it) }
     if (channel == FeedbackChannel.GITHUB) {
         d.githubUsername?.let { sb.append('\n').append("- GitHub user: @").append(it) }

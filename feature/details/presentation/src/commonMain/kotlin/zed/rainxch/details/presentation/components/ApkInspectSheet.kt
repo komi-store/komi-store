@@ -1,9 +1,7 @@
 package zed.rainxch.details.presentation.components
 
-import zed.rainxch.core.presentation.utils.formatFileSize
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
@@ -15,10 +13,10 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -30,6 +28,30 @@ import androidx.compose.material.icons.filled.Fingerprint
 import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material.icons.filled.PrivacyTip
 import androidx.compose.material.icons.filled.Tune
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateMapOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import org.jetbrains.compose.resources.stringResource
+import zed.rainxch.core.domain.model.apk.ApkInspection
+import zed.rainxch.core.domain.model.apk.ApkPermission
+import zed.rainxch.core.domain.model.apk.ProtectionLevel
 import zed.rainxch.core.presentation.components.icon.KomiIcon
 import zed.rainxch.core.presentation.components.overlays.KomiSheet
 import zed.rainxch.core.presentation.components.overlays.KomiSheetPlacement
@@ -38,34 +60,9 @@ import zed.rainxch.core.presentation.components.surfaces.KomiSurface
 import zed.rainxch.core.presentation.components.surfaces.KomiSurfaceElevation
 import zed.rainxch.core.presentation.components.text.KomiText
 import zed.rainxch.core.presentation.components.text.KomiTextRole
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.hapticfeedback.HapticFeedbackType
-import androidx.compose.ui.platform.LocalClipboardManager
-import androidx.compose.ui.platform.LocalHapticFeedback
-import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.runtime.mutableStateMapOf
-import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.heading
-import androidx.compose.ui.semantics.role
-import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.semantics.stateDescription
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import org.jetbrains.compose.resources.stringResource
-import androidx.compose.ui.draw.clip
-import zed.rainxch.core.domain.model.apk.ApkInspection
-import zed.rainxch.core.domain.model.apk.ApkPermission
-import zed.rainxch.core.domain.model.apk.ProtectionLevel
 import zed.rainxch.core.presentation.locals.LocalPersonality
 import zed.rainxch.core.presentation.locals.LocalStatusColors
+import zed.rainxch.core.presentation.utils.formatFileSize
 import zed.rainxch.githubstore.core.presentation.res.Res
 import zed.rainxch.githubstore.core.presentation.res.apk_inspect_compatibility
 import zed.rainxch.githubstore.core.presentation.res.apk_inspect_components
@@ -77,8 +74,6 @@ import zed.rainxch.githubstore.core.presentation.res.apk_inspect_min_sdk
 import zed.rainxch.githubstore.core.presentation.res.apk_inspect_permissions
 import zed.rainxch.githubstore.core.presentation.res.apk_inspect_permissions_empty
 import zed.rainxch.githubstore.core.presentation.res.apk_inspect_permissions_title
-import zed.rainxch.githubstore.core.presentation.res.apps_section_state_collapsed
-import zed.rainxch.githubstore.core.presentation.res.apps_section_state_expanded
 import zed.rainxch.githubstore.core.presentation.res.apk_inspect_protection_dangerous
 import zed.rainxch.githubstore.core.presentation.res.apk_inspect_protection_normal
 import zed.rainxch.githubstore.core.presentation.res.apk_inspect_protection_privileged
@@ -95,6 +90,8 @@ import zed.rainxch.githubstore.core.presentation.res.apk_inspect_source_installe
 import zed.rainxch.githubstore.core.presentation.res.apk_inspect_target_sdk
 import zed.rainxch.githubstore.core.presentation.res.apk_inspect_title
 import zed.rainxch.githubstore.core.presentation.res.apk_inspect_version_code
+import zed.rainxch.githubstore.core.presentation.res.apps_section_state_collapsed
+import zed.rainxch.githubstore.core.presentation.res.apps_section_state_expanded
 
 @Composable
 fun ApkInspectSheet(
@@ -117,9 +114,10 @@ fun ApkInspectSheet(
 @Composable
 private fun LoadingState() {
     Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(48.dp),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(48.dp),
         contentAlignment = Alignment.Center,
     ) {
         KomiCircularProgress()
@@ -130,9 +128,10 @@ private fun LoadingState() {
 private fun EmptyState() {
     val colors = LocalPersonality.current.colors
     Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(32.dp),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(32.dp),
         contentAlignment = Alignment.Center,
     ) {
         KomiText(
@@ -166,31 +165,28 @@ private fun Header(inspection: ApkInspection) {
     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
         KomiText(
             text = stringResource(Res.string.apk_inspect_title),
-            role = KomiTextRole.Label,
+            role = KomiTextRole.Overline,
             color = colors.primary,
-            fontWeight = FontWeight.SemiBold,
         )
         KomiText(
             text = inspection.appLabel,
-            role = KomiTextRole.Title,
-            fontWeight = FontWeight.SemiBold,
+            role = KomiTextRole.CardTitle,
             color = colors.onSurface,
             maxLines = 2,
             overflow = TextOverflow.Ellipsis,
             modifier = Modifier.copyableOnLongPress(inspection.appLabel),
-            uppercase = false,
         )
         KomiText(
             text = inspection.packageName,
             role = KomiTextRole.Mono,
-            fontSize = 13.sp,
             color = colors.onSurfaceVariant,
             modifier = Modifier.copyableOnLongPress(inspection.packageName),
         )
-        val sourceLabel = when (inspection.source) {
-            ApkInspection.Source.FILE -> stringResource(Res.string.apk_inspect_source_file)
-            ApkInspection.Source.INSTALLED -> stringResource(Res.string.apk_inspect_source_installed)
-        }
+        val sourceLabel =
+            when (inspection.source) {
+                ApkInspection.Source.FILE -> stringResource(Res.string.apk_inspect_source_file)
+                ApkInspection.Source.INSTALLED -> stringResource(Res.string.apk_inspect_source_installed)
+            }
         SourceChip(label = sourceLabel)
     }
 }
@@ -201,16 +197,14 @@ private fun SourceChip(label: String) {
     val shape = LocalPersonality.current.shape
     KomiText(
         text = label,
-        role = KomiTextRole.Label,
-        fontSize = 11.sp,
+        role = KomiTextRole.LabelSmall,
         color = colors.onSurfaceVariant,
-        fontWeight = FontWeight.Medium,
-        modifier = Modifier
-            .padding(top = 4.dp)
-            .clip(RoundedCornerShape(shape.cornerSmall))
-            .background(colors.surfaceContainerHigh)
-            .padding(horizontal = 12.dp, vertical = 4.dp),
-        uppercase = false,
+        modifier =
+            Modifier
+                .padding(top = 4.dp)
+                .clip(RoundedCornerShape(shape.cornerSmall))
+                .background(colors.surfaceContainerHigh)
+                .padding(horizontal = 12.dp, vertical = 4.dp),
     )
 }
 
@@ -222,9 +216,10 @@ private fun IdentitySection(inspection: ApkInspection) {
     ) {
         InspectRow(
             label = stringResource(Res.string.apk_inspect_version_code),
-            value = inspection.versionName?.let { name ->
-                inspection.versionCode?.let { code -> "$name  ($code)" } ?: name
-            } ?: inspection.versionCode?.toString() ?: "—",
+            value =
+                inspection.versionName?.let { name ->
+                    inspection.versionCode?.let { code -> "$name  ($code)" } ?: name
+                } ?: inspection.versionCode?.toString() ?: "—",
         )
         inspection.signingFingerprint?.let { fingerprint ->
             InspectRow(
@@ -306,7 +301,6 @@ private fun PermissionsSection(permissions: List<ApkPermission>) {
             KomiText(
                 text = stringResource(Res.string.apk_inspect_permissions_empty),
                 role = KomiTextRole.Body,
-                fontSize = 13.sp,
                 color = colors.onSurfaceVariant,
             )
             return@InspectSection
@@ -389,23 +383,19 @@ private fun PermissionGroupHeader(
     ) {
         KomiText(
             text = label,
-            role = KomiTextRole.Label,
-            fontWeight = FontWeight.SemiBold,
+            role = KomiTextRole.LabelSmall,
             color = color,
             modifier = Modifier.weight(1f, fill = false),
-            uppercase = false,
         )
         KomiText(
             text = count.toString(),
-            role = KomiTextRole.Label,
-            fontSize = 11.sp,
+            role = KomiTextRole.LabelSmall,
             color = color,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier
-                .clip(RoundedCornerShape(shape.cornerSmall))
-                .background(color.copy(alpha = 0.16f))
-                .padding(horizontal = 8.dp, vertical = 1.dp),
-            uppercase = false,
+            modifier =
+                Modifier
+                    .clip(RoundedCornerShape(shape.cornerSmall))
+                    .background(color.copy(alpha = 0.16f))
+                    .padding(horizontal = 8.dp, vertical = 1.dp),
         )
         Spacer(modifier = Modifier.weight(1f))
         if (collapsible) {
@@ -437,15 +427,13 @@ private fun PermissionRow(permission: ApkPermission) {
         ) {
             KomiText(
                 text = permission.displayName,
-                role = KomiTextRole.Body,
+                role = KomiTextRole.Label,
                 color = colors.onSurface,
-                fontWeight = FontWeight.SemiBold,
             )
             permission.description?.let { desc ->
                 KomiText(
                     text = desc,
                     role = KomiTextRole.Body,
-                    fontSize = 13.sp,
                     color = colors.onSurfaceVariant,
                 )
             }
@@ -453,8 +441,7 @@ private fun PermissionRow(permission: ApkPermission) {
             KomiText(
                 text = permission.name,
                 role = KomiTextRole.Mono,
-                fontSize = 11.sp,
-                color = colors.onSurfaceVariant.copy(alpha = 0.65f),
+                color = colors.onSurfaceVariant,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.copyableOnLongPress(permission.name),
@@ -462,15 +449,13 @@ private fun PermissionRow(permission: ApkPermission) {
         }
         KomiText(
             text = chipLabel,
-            role = KomiTextRole.Label,
-            fontSize = 11.sp,
+            role = KomiTextRole.LabelSmall,
             color = chipColor,
-            fontWeight = FontWeight.SemiBold,
-            modifier = Modifier
-                .clip(RoundedCornerShape(shape.cornerSmall))
-                .background(chipColor.copy(alpha = chipAlpha))
-                .padding(horizontal = 10.dp, vertical = 2.dp),
-            uppercase = false,
+            modifier =
+                Modifier
+                    .clip(RoundedCornerShape(shape.cornerSmall))
+                    .background(chipColor.copy(alpha = chipAlpha))
+                    .padding(horizontal = 10.dp, vertical = 2.dp),
         )
     }
 }
@@ -481,13 +466,13 @@ private fun defaultExpanded(level: ProtectionLevel): Boolean =
         ProtectionLevel.PRIVILEGED,
         ProtectionLevel.SIGNATURE,
         -> true
+
         ProtectionLevel.NORMAL,
         ProtectionLevel.UNKNOWN,
         -> false
     }
 
-private fun isCollapsibleByDefault(level: ProtectionLevel): Boolean =
-    level == ProtectionLevel.NORMAL || level == ProtectionLevel.UNKNOWN
+private fun isCollapsibleByDefault(level: ProtectionLevel): Boolean = level == ProtectionLevel.NORMAL || level == ProtectionLevel.UNKNOWN
 
 @Composable
 private fun ComponentsSection(inspection: ApkInspection) {
@@ -550,10 +535,11 @@ private fun InspectSection(
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Box(
-                modifier = Modifier
-                    .size(32.dp)
-                    .clip(RoundedCornerShape(personality.shape.cornerSmall))
-                    .background(colors.primary.copy(alpha = 0.14f)),
+                modifier =
+                    Modifier
+                        .size(32.dp)
+                        .clip(RoundedCornerShape(personality.shape.cornerSmall))
+                        .background(colors.primaryTint),
                 contentAlignment = Alignment.Center,
             ) {
                 KomiIcon(
@@ -566,10 +552,8 @@ private fun InspectSection(
             Spacer(Modifier.width(10.dp))
             KomiText(
                 text = title,
-                role = KomiTextRole.Title,
-                fontWeight = FontWeight.SemiBold,
+                role = KomiTextRole.CardTitle,
                 color = colors.onSurface,
-                uppercase = false,
             )
         }
         KomiSurface(
@@ -587,7 +571,11 @@ private fun InspectSection(
 }
 
 @Composable
-private fun InspectRow(label: String, value: String, monospace: Boolean = false) {
+private fun InspectRow(
+    label: String,
+    value: String,
+    monospace: Boolean = false,
+) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.Top,
@@ -598,20 +586,19 @@ private fun InspectRow(label: String, value: String, monospace: Boolean = false)
             KomiText(
                 text = label,
                 role = KomiTextRole.Body,
-                fontSize = 13.sp,
                 color = colors.onSurfaceVariant,
                 modifier = Modifier.width(120.dp),
             )
         }
-        val valueModifier = if (monospace) {
-            Modifier.weight(1f).copyableOnLongPress(value)
-        } else {
-            Modifier.weight(1f)
-        }
+        val valueModifier =
+            if (monospace) {
+                Modifier.weight(1f).copyableOnLongPress(value)
+            } else {
+                Modifier.weight(1f)
+            }
         KomiText(
             text = value,
             role = if (monospace) KomiTextRole.Mono else KomiTextRole.Body,
-            fontSize = 13.sp,
             color = colors.onSurface,
             modifier = valueModifier,
         )
@@ -625,11 +612,11 @@ private fun DangerNote(text: String) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(6.dp),
-        modifier = Modifier
-            .clip(noteShape)
-            .background(colors.error)
-            .border(1.dp, colors.error.copy(alpha = 0.35f), noteShape)
-            .padding(horizontal = 12.dp, vertical = 6.dp),
+        modifier =
+            Modifier
+                .clip(noteShape)
+                .background(colors.error)
+                .padding(horizontal = 12.dp, vertical = 6.dp),
     ) {
         KomiIcon(
             imageVector = Icons.Default.Apartment,
@@ -639,10 +626,8 @@ private fun DangerNote(text: String) {
         )
         KomiText(
             text = text,
-            role = KomiTextRole.Label,
+            role = KomiTextRole.LabelSmall,
             color = colors.onError,
-            fontWeight = FontWeight.SemiBold,
-            uppercase = false,
         )
     }
 }
@@ -678,4 +663,3 @@ private fun Modifier.copyableOnLongPress(value: String): Modifier {
         },
     )
 }
-

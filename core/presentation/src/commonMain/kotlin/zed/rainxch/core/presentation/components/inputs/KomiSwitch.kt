@@ -34,8 +34,9 @@ fun KomiSwitch(
     enabled: Boolean = true,
 ) {
     when (val personality = LocalPersonality.current) {
-        is MangaPersonality ->
+        is MangaPersonality -> {
             MangaSwitch(personality, checked, onCheckedChange, modifier, enabled)
+        }
 
         is ClassicPersonality -> {
             val colors = personality.colors
@@ -62,7 +63,7 @@ private fun MangaSwitch(
     personality: MangaPersonality,
     checked: Boolean,
     onCheckedChange: ((Boolean) -> Unit)?,
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
     enabled: Boolean,
 ) {
     val colors = personality.colors

@@ -9,19 +9,21 @@ data class AnnouncementsFeedSnapshot(
     val lastRefreshFailed: Boolean,
 ) {
     val visibleItems: List<Announcement>
-        get() = items
-            .asSequence()
-            .filter { it.id !in dismissedIds }
-            .filter { it.category !in mutedCategories || !it.category.isMutable }
-            .toList()
+        get() =
+            items
+                .asSequence()
+                .filter { it.id !in dismissedIds }
+                .filter { it.category !in mutedCategories || !it.category.isMutable }
+                .toList()
 
     val unreadCount: Int
         get() = visibleItems.count { it.id !in acknowledgedIds }
 
     val pendingCriticalAcknowledgment: Announcement?
-        get() = visibleItems.firstOrNull {
-            it.severity == AnnouncementSeverity.CRITICAL &&
-                it.requiresAcknowledgment &&
-                it.id !in acknowledgedIds
-        }
+        get() =
+            visibleItems.firstOrNull {
+                it.severity == AnnouncementSeverity.CRITICAL &&
+                    it.requiresAcknowledgment &&
+                    it.id !in acknowledgedIds
+            }
 }

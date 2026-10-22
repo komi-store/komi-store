@@ -31,13 +31,14 @@ fun VersionTypePicker(
     ) {
         items(ReleaseCategory.entries) { category ->
             KomiChip(
-                label = stringResource(
-                    when (category) {
-                        ReleaseCategory.STABLE -> Res.string.category_stable
-                        ReleaseCategory.PRE_RELEASE -> Res.string.category_pre_release
-                        ReleaseCategory.ALL -> Res.string.category_all
-                    },
-                ),
+                label =
+                    stringResource(
+                        when (category) {
+                            ReleaseCategory.STABLE -> Res.string.category_stable
+                            ReleaseCategory.PRE_RELEASE -> Res.string.category_pre_release
+                            ReleaseCategory.ALL -> Res.string.category_all
+                        },
+                    ),
                 kind = KomiChipKind.Filter,
                 selected = category == selectedCategory,
                 onClick = { onAction(DetailsAction.SelectReleaseCategory(category)) },

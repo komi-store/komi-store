@@ -15,9 +15,9 @@ kotlin {
 
                 implementation(libs.markdown.renderer)
                 implementation(libs.markdown.renderer.coil3)
-                implementation(libs.bundles.landscapist)
                 implementation(libs.coil3.compose)
                 implementation(libs.coil3.svg)
+                implementation(libs.ktor.client.core)
 
                 implementation(libs.androidx.compose.ui.tooling.preview)
                 implementation(libs.jetbrains.compose.components.resources)

@@ -21,9 +21,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -53,7 +51,7 @@ import zed.rainxch.tweaks.presentation.feedback.model.FeedbackChannel
 fun FeedbackBottomSheet(
     onDismiss: () -> Unit,
     onSent: (FeedbackChannel) -> Unit,
-    onError: (String) -> Unit,
+    onError: () -> Unit,
     viewModel: FeedbackViewModel = koinViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -61,7 +59,7 @@ fun FeedbackBottomSheet(
     ObserveAsEvents(viewModel.events) { event ->
         when (event) {
             is FeedbackEvent.OnSent -> onSent(event.channel)
-            is FeedbackEvent.OnSendError -> onError(event.message)
+            FeedbackEvent.OnSendError -> onError()
         }
     }
 
@@ -180,8 +178,7 @@ private fun FeedbackHeader(onDismiss: () -> Unit) {
     ) {
         KomiText(
             text = stringResource(Res.string.feedback_title),
-            role = KomiTextRole.Title,
-            fontWeight = FontWeight.SemiBold,
+            role = KomiTextRole.CardTitle,
             color = colors.onSurface,
         )
         KomiIconButton(
@@ -199,11 +196,8 @@ private fun SectionLabel(text: String, topGap: androidx.compose.ui.unit.Dp = 4.d
         if (topGap > 0.dp) Spacer(Modifier.height(topGap))
         KomiText(
             text = text,
-            role = KomiTextRole.Label,
-            fontSize = 12.sp,
-            fontWeight = FontWeight.SemiBold,
+            role = KomiTextRole.LabelSmall,
             color = LocalPersonality.current.colors.onSurfaceVariant,
-            uppercase = false,
         )
     }
 }

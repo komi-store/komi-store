@@ -5,8 +5,8 @@ import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import zed.rainxch.core.domain.model.repository.DiscoveryPlatform
-import zed.rainxch.core.presentation.model.DiscoveryRepositoryUi
 import zed.rainxch.core.domain.model.repository.FeedCategory
+import zed.rainxch.core.presentation.model.DiscoveryRepositoryUi
 
 @Immutable
 data class FeedState(
@@ -21,4 +21,5 @@ data class FeedState(
     val hasMore: Boolean = false,
     val isOffline: Boolean = false,
     val errorMessage: String? = null,
+    val isGridLayout: Boolean = false,
 )

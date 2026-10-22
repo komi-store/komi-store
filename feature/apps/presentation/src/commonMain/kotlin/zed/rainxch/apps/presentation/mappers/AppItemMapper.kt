@@ -4,13 +4,17 @@ import org.jetbrains.compose.resources.getString
 import zed.rainxch.apps.presentation.model.AppItem
 import zed.rainxch.apps.presentation.model.InstalledAppUi
 import zed.rainxch.apps.presentation.model.UpdateState
+import zed.rainxch.apps.presentation.resolveVersionLine
 import zed.rainxch.core.presentation.utils.formatEpochDate
-import zed.rainxch.core.presentation.utils.formatIsoDate
+import zed.rainxch.core.presentation.utils.formatIsoDateOrRaw
 import zed.rainxch.githubstore.core.presentation.res.Res
 import zed.rainxch.githubstore.core.presentation.res.apps_version_dated
 import zed.rainxch.githubstore.core.presentation.res.apps_version_update
 
-fun computeIsBusy(isPendingInstall: Boolean, updateState: UpdateState): Boolean =
+fun computeIsBusy(
+    isPendingInstall: Boolean,
+    updateState: UpdateState,
+): Boolean =
     isPendingInstall ||
         updateState is UpdateState.Downloading ||
         updateState is UpdateState.Installing ||
@@ -21,8 +25,24 @@ suspend fun InstalledAppUi.toAppItem(
     downloadProgress: Int? = null,
     error: String? = null,
 ): AppItem {
-    val canSkipVersion = isUpdateAvailable &&
-        !(latestVersion ?: latestVersionName).isNullOrBlank()
+    val canSkipVersion =
+        isUpdateAvailable &&
+            !(latestVersion ?: latestVersionName).isNullOrBlank()
+
+    val versionLine =
+        resolveVersionLine(
+            installedVersion = installedVersion,
+            isPendingInstall = isPendingInstall,
+            pendingInstallVersion = pendingInstallVersion,
+            latestVersion = latestVersion,
+        )
+    val idleLine =
+        resolveVersionLine(
+            installedVersion = installedVersion,
+            isPendingInstall = isPendingInstall,
+            pendingInstallVersion = pendingInstallVersion,
+            latestVersion = null,
+        )
 
     return AppItem(
         installedApp = this,
@@ -33,38 +53,47 @@ suspend fun InstalledAppUi.toAppItem(
         hasFilter = !assetFilterRegex.isNullOrBlank() || fallbackToOlderReleases,
         hasPin = !preferredAssetVariant.isNullOrBlank(),
         canSkipVersion = canSkipVersion,
-        versionLabel = buildVersionLabel(
-            installedVersion = installedVersion,
-            latestVersion = latestVersion,
-            latestReleasePublishedAt = latestReleasePublishedAt,
-            lastUpdatedAt = lastUpdatedAt,
-        ),
-        idleVersionLabel = buildVersionLabel(
-            installedVersion = installedVersion,
-            latestVersion = null,
-            latestReleasePublishedAt = null,
-            lastUpdatedAt = lastUpdatedAt,
-        ),
+        versionLabel =
+            buildVersionLabel(
+                installedVersion = installedVersion,
+                targetVersion = versionLine.targetVersion,
+                targetPublishedAt = if (isPendingInstall) null else latestReleasePublishedAt,
+                lastUpdatedAt = lastUpdatedAt,
+            ),
+        idleVersionLabel =
+            buildVersionLabel(
+                installedVersion = installedVersion,
+                targetVersion = idleLine.targetVersion,
+                targetPublishedAt = null,
+                lastUpdatedAt = lastUpdatedAt,
+            ),
+        versionTargetVersion = versionLine.targetVersion,
+        isVersionDowngrade = versionLine.isDowngrade,
     )
 }
 
 private suspend fun buildVersionLabel(
     installedVersion: String,
-    latestVersion: String?,
-    latestReleasePublishedAt: String?,
+    targetVersion: String?,
+    targetPublishedAt: String?,
     lastUpdatedAt: Long,
 ): String {
-    val displayDate = if (latestVersion != null) {
-        formatIsoDate(latestReleasePublishedAt)
-    } else {
-        formatEpochDate(lastUpdatedAt)
-    }
+    val displayDate =
+        if (targetVersion != null) {
+            // Release publish times can arrive as a bare date. Formatting one through the local
+            // timezone is what shifted it a day back west of UTC, so this goes through the raw-aware
+            // helper like the details and security screens do.
+            targetPublishedAt?.let { formatIsoDateOrRaw(it) }
+        } else {
+            formatEpochDate(lastUpdatedAt)
+        }
 
-    val base = if (latestVersion != null) {
-        getString(Res.string.apps_version_update, installedVersion, latestVersion)
-    } else {
-        installedVersion
-    }
+    val base =
+        if (targetVersion != null) {
+            getString(Res.string.apps_version_update, installedVersion, targetVersion)
+        } else {
+            installedVersion
+        }
 
     return if (displayDate != null) {
         getString(Res.string.apps_version_dated, base, displayDate)

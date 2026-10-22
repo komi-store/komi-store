@@ -19,27 +19,64 @@ import io.ktor.http.Parameters
 import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.serialization.json.Json
 import zed.rainxch.auth.domain.repository.RejectedKind
 import zed.rainxch.core.data.dto.GithubDeviceStartDto
 import zed.rainxch.core.data.dto.GithubDeviceTokenErrorDto
 import zed.rainxch.core.data.dto.GithubDeviceTokenSuccessDto
+import zed.rainxch.core.data.network.createPlatformHttpClient
+import zed.rainxch.core.domain.model.settings.ProxyConfig
 
+private const val HEADER_REQUEST_ID = "X-Request-ID"
+private const val REQUEST_TIMEOUT_MS = 60_000L
 
-object GitHubAuthApi {
+class GitHubAuthApi(
+    proxyConfigFlow: StateFlow<ProxyConfig>,
+    appScope: CoroutineScope,
+) {
     private val json =
         Json {
             ignoreUnknownKeys = true
             isLenient = true
         }
 
-    val http by lazy {
-        HttpClient {
+    @Volatile
+    private var currentHttp: HttpClient = buildHttp(proxyConfigFlow.value)
+
+    @Volatile
+    private var currentValidationHttp: HttpClient = buildValidationHttp(proxyConfigFlow.value)
+
+    init {
+        proxyConfigFlow
+            .drop(1)
+            .distinctUntilChanged()
+            .onEach { config ->
+                val previousHttp = currentHttp
+                val previousValidationHttp = currentValidationHttp
+                currentHttp = buildHttp(config)
+                currentValidationHttp = buildValidationHttp(config)
+                previousHttp.close()
+                previousValidationHttp.close()
+            }.launchIn(appScope)
+    }
+
+    val http: HttpClient get() = currentHttp
+
+    private val validationHttp: HttpClient get() = currentValidationHttp
+
+    private fun buildHttp(proxyConfig: ProxyConfig): HttpClient =
+        createPlatformHttpClient(proxyConfig).config {
             install(ContentNegotiation) { json(json) }
 
             install(HttpTimeout) {
-                requestTimeoutMillis = 60_000
+                requestTimeoutMillis = REQUEST_TIMEOUT_MS
                 connectTimeoutMillis = 30_000
                 socketTimeoutMillis = 30_000
             }
@@ -50,10 +87,9 @@ object GitHubAuthApi {
                 exponentialDelay()
             }
         }
-    }
 
-    private val validationHttp by lazy {
-        HttpClient {
+    private fun buildValidationHttp(proxyConfig: ProxyConfig): HttpClient =
+        createPlatformHttpClient(proxyConfig).config {
             install(ContentNegotiation) { json(json) }
             install(HttpTimeout) {
                 requestTimeoutMillis = 10_000
@@ -61,7 +97,6 @@ object GitHubAuthApi {
                 socketTimeoutMillis = 10_000
             }
         }
-    }
 
     suspend fun startDeviceFlowDirect(clientId: String): GithubDeviceStartDto =
         withRetry(maxAttempts = 3, initialDelay = 1000) {
@@ -195,7 +230,10 @@ object GitHubAuthApi {
                 error(
                     buildString {
                         append(err.error)
-                        err.errorDescription?.let { append(": "); append(it) }
+                        err.errorDescription?.let {
+                            append(": ")
+                            append(it)
+                        }
                         append(' ')
                         append(requestId.asRequestIdTag())
                     }.trim(),
@@ -267,39 +305,45 @@ object GitHubAuthApi {
         }
     }
 
-    suspend fun validatePersonalAccessToken(token: String): PatValidation {
-        return try {
-            val res = validationHttp.get("https://api.github.com/user") {
-                accept(ContentType.Application.Json)
-                header(HttpHeaders.Authorization, "Bearer $token")
-                header(HttpHeaders.UserAgent, "GithubStore/1.0 (PAT-validate)")
-            }
+    suspend fun validatePersonalAccessToken(token: String): PatValidation =
+        try {
+            val res =
+                validationHttp.get("https://api.github.com/user") {
+                    accept(ContentType.Application.Json)
+                    header(HttpHeaders.Authorization, "Bearer $token")
+                    header(HttpHeaders.UserAgent, "GithubStore/1.0 (PAT-validate)")
+                }
             val status = res.status
             when {
-                status.isSuccessLike() -> PatValidation.Valid
-                status == HttpStatusCode.Unauthorized ->
-                    PatValidation.Rejected(RejectedKind.BadCredentials)
-                status == HttpStatusCode.Forbidden ->
-                    PatValidation.Rejected(RejectedKind.InsufficientScope)
+                status.isSuccessLike() -> {
+                    PatValidation.Valid
+                }
 
-                status.value in 400..499 ->
+                status == HttpStatusCode.Unauthorized -> {
+                    PatValidation.Rejected(RejectedKind.BadCredentials)
+                }
+
+                status == HttpStatusCode.Forbidden -> {
+                    PatValidation.Rejected(RejectedKind.InsufficientScope)
+                }
+
+                status.value in 400..499 -> {
                     PatValidation.Rejected(RejectedKind.Other(status.value))
-                else -> PatValidation.Unreachable("HTTP ${status.value}")
+                }
+
+                else -> {
+                    PatValidation.Unreachable("HTTP ${status.value}")
+                }
             }
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
             PatValidation.Unreachable(e.message ?: "network error")
         }
-    }
 
-    private fun HttpStatusCode.isSuccessLike(): Boolean =
-        this in HttpStatusCode.OK..HttpStatusCode.MultipleChoices
+    private fun HttpStatusCode.isSuccessLike(): Boolean = this in HttpStatusCode.OK..HttpStatusCode.MultipleChoices
 
-    private fun String?.asRequestIdTag(): String =
-        if (this.isNullOrBlank()) "(X-Request-ID=<none>)" else "(X-Request-ID=$this)"
-
-    private const val HEADER_REQUEST_ID = "X-Request-ID"
+    private fun String?.asRequestIdTag(): String = if (this.isNullOrBlank()) "(X-Request-ID=<none>)" else "(X-Request-ID=$this)"
 
     private suspend fun <T> withRetry(
         maxAttempts: Int = 3,

@@ -1,6 +1,7 @@
 package zed.rainxch.apps.presentation.starred
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.material.icons.rounded.Search
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -12,7 +13,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -20,7 +20,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import zed.rainxch.apps.presentation.starred.components.StarredCandidateRow
@@ -29,20 +28,18 @@ import zed.rainxch.core.presentation.components.bars.KomiTopBarSize
 import zed.rainxch.core.presentation.components.buttons.KomiButton
 import zed.rainxch.core.presentation.components.buttons.KomiButtonVariant
 import zed.rainxch.core.presentation.components.buttons.KomiButtonSize
-import zed.rainxch.core.presentation.components.buttons.KomiIconButton
 import zed.rainxch.core.presentation.components.scaffold.KomiScaffold
 import zed.rainxch.core.presentation.components.chips.KomiChip
 import zed.rainxch.core.presentation.components.chips.KomiChipKind
 import zed.rainxch.core.presentation.components.inputs.KomiSwitch
 import zed.rainxch.core.presentation.components.inputs.KomiTextField
-import zed.rainxch.core.presentation.components.progress.KomiCircularProgress
+import zed.rainxch.core.presentation.components.progress.KomiLoadingIndicator
 import zed.rainxch.core.presentation.components.progress.KomiLinearProgress
 import zed.rainxch.core.presentation.components.text.KomiText
 import zed.rainxch.core.presentation.components.text.KomiTextRole
 import zed.rainxch.core.presentation.locals.LocalPersonality
 import zed.rainxch.core.presentation.utils.ObserveAsEvents
 import zed.rainxch.githubstore.core.presentation.res.Res
-import zed.rainxch.githubstore.core.presentation.res.navigate_back
 import zed.rainxch.githubstore.core.presentation.res.starred_picker_empty
 import zed.rainxch.githubstore.core.presentation.res.starred_picker_filter_show_all
 import zed.rainxch.githubstore.core.presentation.res.starred_picker_header_counts
@@ -88,14 +85,7 @@ private fun StarredPickerScreen(
             KomiTopBar(
                 title = stringResource(Res.string.starred_picker_title),
                 size = KomiTopBarSize.Compact,
-                leading = {
-                    KomiIconButton(
-                        icon = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = stringResource(Res.string.navigate_back),
-                        onClick = { onAction(StarredPickerAction.OnNavigateBack) },
-                        variant = KomiButtonVariant.Tonal,
-                    )
-                },
+                onBack = { onAction(StarredPickerAction.OnNavigateBack) },
             )
         },
     ) { padding ->
@@ -106,7 +96,7 @@ private fun StarredPickerScreen(
                         modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center,
                     ) {
-                        KomiCircularProgress()
+                        KomiLoadingIndicator()
                     }
                 }
 
@@ -123,7 +113,6 @@ private fun StarredPickerScreen(
                             },
                             role = KomiTextRole.Body,
                             color = colors.onSurfaceVariant,
-                            uppercase = false,
                         )
                     }
                 }
@@ -143,7 +132,6 @@ private fun StarredPickerScreen(
                             ),
                             role = KomiTextRole.Body,
                             color = colors.onSurfaceVariant,
-                            uppercase = false,
                         )
 
                         if (state.phase == StarredPickerState.Phase.ScanningReleases) {
@@ -165,10 +153,8 @@ private fun StarredPickerScreen(
                                         state.scanProgress,
                                         state.scanTotal,
                                     ),
-                                    role = KomiTextRole.Label,
-                                    fontSize = 11.sp,
+                                    role = KomiTextRole.Caption,
                                     color = colors.onSurfaceVariant,
-                                    uppercase = false,
                                 )
                             }
                         }
@@ -186,10 +172,8 @@ private fun StarredPickerScreen(
                                 KomiText(
                                     text = stringResource(Res.string.starred_picker_rate_limited),
                                     role = KomiTextRole.Body,
-                                    fontSize = 13.sp,
                                     color = colors.error,
                                     modifier = Modifier.weight(1f),
-                                    uppercase = false,
                                 )
 
                                 KomiButton(
@@ -208,7 +192,8 @@ private fun StarredPickerScreen(
                             onValueChange = { onAction(StarredPickerAction.OnSearchChange(it)) },
                             modifier = Modifier.fillMaxWidth(),
                             placeholder = stringResource(Res.string.starred_picker_search_hint),
-                            leadingIcon = Icons.Filled.Search,
+                            leadingIcon = Icons.Rounded.Search,
+                            clearable = true,
                         )
 
                         Spacer(Modifier.height(8.dp))
@@ -249,10 +234,8 @@ private fun StarredPickerScreen(
                             KomiText(
                                 text = stringResource(Res.string.starred_picker_filter_show_all),
                                 role = KomiTextRole.Body,
-                                fontSize = 13.sp,
                                 color = colors.onSurfaceVariant,
                                 modifier = Modifier.weight(1f),
-                                uppercase = false,
                             )
 
                             KomiSwitch(
@@ -265,10 +248,8 @@ private fun StarredPickerScreen(
 
                         KomiText(
                             text = stringResource(Res.string.starred_picker_star_dedup_tooltip),
-                            role = KomiTextRole.Label,
-                            fontSize = 11.sp,
+                            role = KomiTextRole.Caption,
                             color = colors.onSurfaceVariant,
-                            uppercase = false,
                         )
 
                         if (state.visibleCandidates.isEmpty()) {
@@ -280,7 +261,6 @@ private fun StarredPickerScreen(
                                     text = stringResource(Res.string.starred_picker_no_match),
                                     role = KomiTextRole.Body,
                                     color = colors.onSurfaceVariant,
-                                    uppercase = false,
                                 )
                             }
                         } else {

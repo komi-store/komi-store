@@ -25,10 +25,8 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import zed.rainxch.core.domain.model.appearance.AppPersonality
 import zed.rainxch.core.presentation.components.icon.KomiIcon
 import zed.rainxch.core.presentation.components.text.KomiText
@@ -56,7 +54,7 @@ fun PersonalityTile(
     val isManga = kind == AppPersonality.MANGA
     val isActiveManga = LocalPersonality.current is MangaPersonality
     val tileShape = if (isActiveManga) RectangleShape else RoundedCornerShape(LocalPersonality.current.shape.corner)
-    val borderColor = if (selected) colors.primary else colors.outline.copy(alpha = 0.45f)
+    val borderColor = if (selected) colors.primary else colors.divider
 
     Column(
         modifier =
@@ -71,8 +69,7 @@ fun PersonalityTile(
                     } else {
                         Modifier
                     },
-                )
-                .clip(tileShape)
+                ).clip(tileShape)
                 .background(colors.surface)
                 .border(if (isActiveManga) 3.dp else 1.5.dp, borderColor, tileShape)
                 .clickable(onClick = onClick),
@@ -98,9 +95,6 @@ fun PersonalityTile(
                     text = "ドン",
                     role = KomiTextRole.Label,
                     color = colors.primary,
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.Black,
-                    uppercase = false,
                     modifier =
                         Modifier
                             .align(Alignment.TopEnd)
@@ -135,15 +129,11 @@ fun PersonalityTile(
                 text = if (isManga) "Manga" else "Classic",
                 role = KomiTextRole.Stamp,
                 color = colors.onSurface,
-                fontSize = 16.sp,
             )
             KomiText(
                 text = if (isManga) "Inked comic panels" else "Clean Material 3",
-                role = KomiTextRole.Body,
+                role = KomiTextRole.LabelSmall,
                 color = colors.onSurfaceVariant,
-                fontSize = 11.sp,
-                fontWeight = FontWeight.Medium,
-                uppercase = false,
                 modifier = Modifier.padding(top = 1.dp),
             )
         }
@@ -176,8 +166,7 @@ private fun BoxScope.MiniCard(
                             .background(ClassicCard, RoundedCornerShape(14.dp))
                             .border(1.dp, ClassicBorder, RoundedCornerShape(14.dp))
                     },
-                )
-                .padding(9.dp),
+                ).padding(9.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Box(
@@ -200,8 +189,11 @@ private fun BoxScope.MiniCard(
                         .fillMaxWidth(0.7f)
                         .height(7.dp)
                         .then(
-                            if (isManga) Modifier.background(onSurface)
-                            else Modifier.background(ClassicBar, RoundedCornerShape(4.dp)),
+                            if (isManga) {
+                                Modifier.background(onSurface)
+                            } else {
+                                Modifier.background(ClassicBar, RoundedCornerShape(4.dp))
+                            },
                         ),
             )
             Spacer(Modifier.height(5.dp))
@@ -211,8 +203,11 @@ private fun BoxScope.MiniCard(
                         .fillMaxWidth(0.9f)
                         .height(5.dp)
                         .then(
-                            if (isManga) Modifier.background(onSurface.copy(alpha = 0.45f))
-                            else Modifier.background(ClassicBarFaint, RoundedCornerShape(3.dp)),
+                            if (isManga) {
+                                Modifier.background(onSurface.copy(alpha = 0.45f))
+                            } else {
+                                Modifier.background(ClassicBarFaint, RoundedCornerShape(3.dp))
+                            },
                         ),
             )
         }

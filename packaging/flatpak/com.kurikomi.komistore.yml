@@ -1,0 +1,152 @@
+app-id: com.kurikomi.komistore
+runtime: org.freedesktop.Platform
+runtime-version: '24.08'
+sdk: org.freedesktop.Sdk
+sdk-extensions:
+  - org.freedesktop.Sdk.Extension.openjdk21
+command: komistore
+
+finish-args:
+  # Network access for GitHub API calls and downloading releases
+  - --share=network
+  # Display support — X11 required (Compose/Skiko doesn't support native Wayland yet)
+  # On Wayland desktops this uses XWayland, available on all major distros
+  - --socket=x11
+  - --share=ipc
+  # GPU acceleration for Compose rendering
+  - --device=dri
+  # Download directory access for APK/release downloads
+  - --filesystem=xdg-download:rw
+
+modules:
+  # Module 1: Bundle JetBrains Runtime (JBR) 21 for optimal Compose Desktop rendering
+  # Using plain jbr (no JCEF) — app doesn't use embedded Chromium
+  - name: jbr
+    buildsystem: simple
+    build-commands:
+      - mkdir -p /app/jre
+      - tar xzf jbr-*.tar.gz -C /app/jre --strip-components=1
+    sources:
+      # x86_64
+      - type: file
+        url: https://cache-redirector.jetbrains.com/intellij-jbr/jbr-21.0.10-linux-x64-b1163.105.tar.gz
+        sha256: b6a3b13451d296140727bbde9325dd9ee422e2e9b2c6a9378f346f1b8d1111bc
+        only-arches:
+          - x86_64
+      # aarch64
+      - type: file
+        url: https://cache-redirector.jetbrains.com/intellij-jbr/jbr-21.0.10-linux-aarch64-b1163.105.tar.gz
+        sha256: 38804f526d869f5a9c49e9b90c04edcbc918b41e8e43264e5d5076d352a959bc
+        only-arches:
+          - aarch64
+
+  # Module 2: Build and install Komi Store
+  # (internal module name kept as `githubstore` — the /run/build/githubstore/
+  #  offline-repo paths below depend on it; renaming would break the offline build)
+  - name: githubstore
+    buildsystem: simple
+    build-options:
+      append-path: /usr/lib/sdk/openjdk21/bin
+      env:
+        JAVA_HOME: /usr/lib/sdk/openjdk21
+        GRADLE_USER_HOME: /run/build/githubstore/.gradle
+    build-commands:
+      # Use local Gradle distribution (no network needed)
+      - sed -i 's|distributionUrl=.*|distributionUrl=gradle-bin.zip|' gradle/wrapper/gradle-wrapper.properties
+      # Rewrite settings.gradle.kts files to use offline Maven repository
+      - |
+        python3 -c "
+        # 1. Rewrite root settings.gradle.kts
+        lines = open('settings.gradle.kts').readlines()
+        includes = [l for l in lines if l.strip().startswith('include(')]
+        with open('settings.gradle.kts', 'w') as f:
+            f.write('rootProject.name = \"GithubStore\"\n')
+            f.write('enableFeaturePreview(\"TYPESAFE_PROJECT_ACCESSORS\")\n\n')
+            f.write('pluginManagement {\n')
+            f.write('    includeBuild(\"build-logic\")\n')
+            f.write('    repositories {\n')
+            f.write('        maven { url = uri(\"/run/build/githubstore/offline-repository\") }\n')
+            f.write('    }\n')
+            f.write('}\n\n')
+            f.write('dependencyResolutionManagement {\n')
+            f.write('    repositories {\n')
+            f.write('        maven { url = uri(\"/run/build/githubstore/offline-repository\") }\n')
+            f.write('    }\n')
+            f.write('}\n\n')
+            # foojay-resolver-convention plugin removed — not needed in Flatpak
+            # (JAVA_HOME is set explicitly, no toolchain auto-download)
+            for inc in includes:
+                f.write(inc)
+        print('Rewrote root settings.gradle.kts for offline build')
+
+        # 2. Rewrite build-logic/settings.gradle.kts
+        with open('build-logic/settings.gradle.kts', 'w') as f:
+            f.write('@file:Suppress(\"UnstableApiUsage\")\n\n')
+            f.write('rootProject.name = \"build-logic\"\n\n')
+            f.write('pluginManagement {\n')
+            f.write('    repositories {\n')
+            f.write('        maven { url = uri(\"/run/build/githubstore/offline-repository\") }\n')
+            f.write('    }\n')
+            f.write('}\n\n')
+            f.write('dependencyResolutionManagement {\n')
+            f.write('    repositories {\n')
+            f.write('        maven { url = uri(\"/run/build/githubstore/offline-repository\") }\n')
+            f.write('    }\n\n')
+            f.write('    versionCatalogs {\n')
+            f.write('        create(\"libs\") {\n')
+            f.write('            from(files(\"../gradle/libs.versions.toml\"))\n')
+            f.write('        }\n')
+            f.write('    }\n')
+            f.write('}\n\n')
+            f.write('include(\":convention\")\n')
+        print('Rewrote build-logic/settings.gradle.kts for offline build')
+        "
+      # Disable Android targets (no Android SDK in Flatpak sandbox)
+      - bash packaging/flatpak/disable-android-for-flatpak.sh
+      # Build uber JAR — all deps resolved from offline-repository (local file:// Maven repo,
+      # no network needed even without --offline flag since sandbox has no network access)
+      - ./gradlew :composeApp:packageUberJarForCurrentOS
+          --no-daemon
+          --no-configuration-cache
+          -Dorg.gradle.jvmargs="-Xmx6g -XX:MaxMetaspaceSize=2g"
+          -Dorg.gradle.parallel=false
+      # Install the JAR
+      - install -Dm644 "$(find composeApp/build/compose/jars/ -name '*.jar' -type f | head -1)"
+          /app/lib/komistore.jar
+      # Install launcher script
+      - install -Dm755 packaging/flatpak/komistore.sh /app/bin/komistore
+      # Install desktop entry
+      - install -Dm644 packaging/flatpak/com.kurikomi.komistore.desktop
+          /app/share/applications/com.kurikomi.komistore.desktop
+      # Install AppStream metainfo
+      - install -Dm644 packaging/flatpak/com.kurikomi.komistore.metainfo.xml
+          /app/share/metainfo/com.kurikomi.komistore.metainfo.xml
+      # Install icon (512x512)
+      - install -Dm644 composeApp/src/jvmMain/resources/logo/app_icon.png
+          /app/share/icons/hicolor/512x512/apps/com.kurikomi.komistore.png
+    sources:
+      # Flathub requires a pinned git source — no local dirs, no floating refs.
+      # Set `commit` to the exact SHA that tag v1.9.2 points to before submitting
+      # (flatpak-builder-lint rejects a git source without a commit).
+      # Pinned commit (Flathub requires a fixed ref — no branches). Add a
+      # `tag:` line above `commit:` once a release tag includes these files.
+      - type: git
+        url: https://github.com/komi-store/komi-store.git
+        commit: f46e709c596e6579964e1b9ea5fcdc91f7497ec3
+      # Gradle distribution (referenced by gradle-wrapper.properties after sed patch)
+      - type: file
+        url: https://services.gradle.org/distributions/gradle-9.8.1-bin.zip
+        sha256: dce76f55f8e251a3a1f130eb120f30b3d271de2b76c9b0729d316b5a1b6dc01f
+        dest: gradle/wrapper
+        dest-filename: gradle-bin.zip
+      # Pre-downloaded Gradle/Maven dependencies for offline build.
+      # flatpak-sources.json            = project deps (generate-all-sources.py)
+      # flatpak-sources-convention.json = build-logic classpath, incl buildscript
+      #   transitives (e.g. gson) the cache scan can't see. Produced by build-logic's
+      #   own task: ./gradlew -p build-logic :convention:flatpakGradleGenerator
+      - flatpak-sources.json
+      - flatpak-sources-convention.json
+      # Hand-pinned artifacts neither generator captures: evicted-version POMs
+      # (e.g. gson 2.8.9, declared by kotlin-build-statistics but conflict-upgraded)
+      # that offline resolution still needs to evaluate the version conflict.
+      - flatpak-sources-manual.json

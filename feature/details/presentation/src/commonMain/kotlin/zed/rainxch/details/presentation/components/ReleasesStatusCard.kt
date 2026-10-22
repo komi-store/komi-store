@@ -15,9 +15,7 @@ import androidx.compose.material.icons.outlined.Inventory2
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.stringResource
 import zed.rainxch.core.presentation.components.buttons.KomiButton
 import zed.rainxch.core.presentation.components.icon.KomiIcon
@@ -67,15 +65,12 @@ fun ReleasesStatusCard(
                     )
                     KomiText(
                         text = stringResource(Res.string.releases_load_failed),
-                        role = KomiTextRole.Title,
+                        role = KomiTextRole.CardTitle,
                         color = colors.onSurface,
-                        fontWeight = FontWeight.SemiBold,
-                        uppercase = false,
                     )
                     KomiText(
                         text = stringResource(Res.string.releases_load_failed_description),
                         role = KomiTextRole.Body,
-                        fontSize = 13.sp,
                         color = colors.onSurfaceVariant,
                     )
                     Spacer(Modifier.height(4.dp))
@@ -110,10 +105,8 @@ fun ReleasesStatusCard(
                     )
                     KomiText(
                         text = stringResource(Res.string.no_releases_published),
-                        role = KomiTextRole.Title,
+                        role = KomiTextRole.CardTitle,
                         color = colors.onSurface,
-                        fontWeight = FontWeight.SemiBold,
-                        uppercase = false,
                     )
                 }
             }

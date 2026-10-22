@@ -1,0 +1,103 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues/>
+  <CurrentIssues>
+    <ID>ComplexCondition:applyThemeAwareImages.kt$(isDark &amp;&amp; mode == "light") || (!isDark &amp;&amp; mode == "dark")</ID>
+    <ID>CyclomaticComplexMethod:AssetPlatform.kt$fun assetPlatformOf(assetName: String): DiscoveryPlatform?</ID>
+    <ID>CyclomaticComplexMethod:AssetVariant.kt$AssetVariant$fun extractBaseStem(assetName: String): String</ID>
+    <ID>CyclomaticComplexMethod:AssetVariant.kt$AssetVariant$fun extractTokens(assetName: String): Set&lt;String&gt;</ID>
+    <ID>CyclomaticComplexMethod:InstalledAppUpdates.kt$fun InstalledApp.confirmInstall( tag: String, releaseId: Long? = null, assetId: Long? = null, assetDigest: String? = null, // Unknown must be null, never "": "" never equals a real asset name. assetName: String?, assetUrl: String?, versionName: String, versionCode: Long, signingFingerprint: String?, at: Long, isPending: Boolean = false, ): InstalledApp</ID>
+    <ID>CyclomaticComplexMethod:InstalledAppUpdates.kt$fun InstalledApp.withSettledInstallIdentity(versionCode: Long): InstalledApp</ID>
+    <ID>CyclomaticComplexMethod:SyncInstalledAppsUseCase.kt$SyncInstalledAppsUseCase$private suspend fun reconcileEnumerable(appsInDb: List&lt;InstalledApp&gt;)</ID>
+    <ID>CyclomaticComplexMethod:TrackedReleaseResolver.kt$TrackedReleaseResolver$fun resolve( releases: List&lt;GithubRelease&gt;, filter: AssetFilter?, fallbackToOlderReleases: Boolean, preferredVariant: String?, preferredTokens: Set&lt;String&gt;, preferredGlob: String?, pickedIndex: Int?, pickedSiblingCount: Int?, trackedPackageName: String, installedAssetName: String?, repoApps: List&lt;InstalledApp&gt;, installer: Installer, ): ResolvedRelease?</ID>
+    <ID>CyclomaticComplexMethod:UpdateVerdict.kt$UpdateVerdict$fun decide( installed: Installed, stored: Stored, matched: Matched, skippedTag: String?, bound: Bound? = null, selfAttestedDigest: String? = null, ): Result</ID>
+    <ID>CyclomaticComplexMethod:VersionMath.kt$VersionMath$fun preReleaseMarkerLabel(tag: String?): String?</ID>
+    <ID>LargeClass:InstalledAppUpdatesTest.kt$InstalledAppUpdatesTest</ID>
+    <ID>LargeClass:UpdateVerdictTest.kt$UpdateVerdictTest</ID>
+    <ID>LongMethod:SyncInstalledAppsUseCase.kt$SyncInstalledAppsUseCase$private suspend fun reconcileEnumerable(appsInDb: List&lt;InstalledApp&gt;)</ID>
+    <ID>LongMethod:TrackedReleaseResolver.kt$TrackedReleaseResolver$fun resolve( releases: List&lt;GithubRelease&gt;, filter: AssetFilter?, fallbackToOlderReleases: Boolean, preferredVariant: String?, preferredTokens: Set&lt;String&gt;, preferredGlob: String?, pickedIndex: Int?, pickedSiblingCount: Int?, trackedPackageName: String, installedAssetName: String?, repoApps: List&lt;InstalledApp&gt;, installer: Installer, ): ResolvedRelease?</ID>
+    <ID>LongMethod:UpdateVerdict.kt$UpdateVerdict$fun decide( installed: Installed, stored: Stored, matched: Matched, skippedTag: String?, bound: Bound? = null, selfAttestedDigest: String? = null, ): Result</ID>
+    <ID>LongParameterList:DownloadProgressNotifier.kt$DownloadProgressNotifier$( packageName: String, appName: String, versionTag: String, percent: Int?, bytesDownloaded: Long, totalBytes: Long?, paused: Boolean = false, )</ID>
+    <ID>LongParameterList:InstalledAppUpdates.kt$( tag: String, releaseId: Long? = null, assetId: Long? = null, assetDigest: String? = null, // Unknown must be null, never "": "" never equals a real asset name. assetName: String?, assetUrl: String?, versionName: String, versionCode: Long, signingFingerprint: String?, at: Long, isPending: Boolean = false, )</ID>
+    <ID>LongParameterList:InstalledAppsRepository.kt$InstalledAppsRepository$( packageName: String, newTag: String, newReleaseId: Long?, newAssetId: Long?, newAssetDigest: String?, newAssetName: String?, newAssetUrl: String?, newVersionName: String, newVersionCode: Long, signingFingerprint: String?, isPendingInstall: Boolean = true, )</ID>
+    <ID>LongParameterList:SeenReposRepository.kt$SeenReposRepository$( repoId: Long, repoName: String, repoOwner: String, repoOwnerAvatarUrl: String, repoDescription: String?, primaryLanguage: String?, repoUrl: String, )</ID>
+    <ID>LongParameterList:TrackedReleaseResolver.kt$TrackedReleaseResolver$( releases: List&lt;GithubRelease&gt;, filter: AssetFilter?, fallbackToOlderReleases: Boolean, preferredVariant: String?, preferredTokens: Set&lt;String&gt;, preferredGlob: String?, pickedIndex: Int?, pickedSiblingCount: Int?, trackedPackageName: String, installedAssetName: String?, repoApps: List&lt;InstalledApp&gt;, installer: Installer, )</ID>
+    <ID>LongParameterList:VersionMath.kt$VersionMath$( matchedReleaseId: Long?, matchedAssetId: Long?, matchedDigest: String?, matchedSize: Long?, storedReleaseId: Long?, storedAssetId: Long?, storedDigest: String?, storedSize: Long?, )</ID>
+    <ID>LoopWithTooManyJumpStatements:AssetMatchingReplayTest.kt$AssetMatchingReplayTest$for</ID>
+    <ID>LoopWithTooManyJumpStatements:AssetVariant.kt$AssetVariant$for</ID>
+    <ID>LoopWithTooManyJumpStatements:TrackedReleaseResolver.kt$TrackedReleaseResolver$for</ID>
+    <ID>MagicNumber:AssetVariant.kt$AssetVariant$3</ID>
+    <ID>MagicNumber:AssetVariant.kt$AssetVariant$6</ID>
+    <ID>MagicNumber:InstallerCategory.kt$InstallerCategory.SYSTEM_UPDATE$4</ID>
+    <ID>MagicNumber:InstallerCategory.kt$InstallerCategory.VENDOR_STORE$3</ID>
+    <ID>MagicNumber:RepositoryUrlParser.kt$RepositoryUrlParser$3</ID>
+    <ID>MagicNumber:RepositoryUrlParser.kt$RepositoryUrlParser$4</ID>
+    <ID>MagicNumber:SeparateAdjacentImageLinks.kt$64</ID>
+    <ID>MagicNumber:VersionMath.kt$VersionMath$3</ID>
+    <ID>MagicNumber:VersionMath.kt$VersionMath$4</ID>
+    <ID>MagicNumber:applyThemeAwareImages.kt$3</ID>
+    <ID>MagicNumber:applyThemeAwareImages.kt$4</ID>
+    <ID>MagicNumber:applyThemeAwareImages.kt$5</ID>
+    <ID>MagicNumber:applyThemeAwareImages.kt$6</ID>
+    <ID>MatchingDeclarationName:ExternalInstallVerdict.kt$VersionVerdict</ID>
+    <ID>MatchingDeclarationName:ReleasePlatforms.kt$PlatformRelease</ID>
+    <ID>NestedBlockDepth:SyncInstalledAppsUseCase.kt$SyncInstalledAppsUseCase$private suspend fun reconcileEnumerable(appsInDb: List&lt;InstalledApp&gt;)</ID>
+    <ID>PackageNaming:MatchingPreview.kt$package zed.rainxch.core.domain.model.smart_detect</ID>
+    <ID>PackageNaming:SyncInstalledAppsUseCase.kt$package zed.rainxch.core.domain.use_cases</ID>
+    <ID>PackageNaming:SyncInstalledAppsUseCaseParkTest.kt$package zed.rainxch.core.domain.use_cases</ID>
+    <ID>RethrowCaughtException:executeInTransaction.kt$throw e</ID>
+    <ID>ReturnCount:AppTheme.kt$AppTheme.Companion$fun fromName(name: String?): AppTheme</ID>
+    <ID>ReturnCount:AssetFilter.kt$AssetFilter.Companion$fun suggestFromAssetName(assetName: String): String?</ID>
+    <ID>ReturnCount:AssetMatchingReplayTest.kt$AssetMatchingReplayTest$fun belongsElsewhere( assetName: String, releaseTag: String, releaseAssets: List&lt;String&gt;, ): Boolean</ID>
+    <ID>ReturnCount:AssetOwnership.kt$AssetOwnership$fun canOwn( app: InstalledApp, assetName: String, ): Boolean</ID>
+    <ID>ReturnCount:AssetOwnership.kt$AssetOwnership$fun ownerOf( assetName: String, apps: List&lt;InstalledApp&gt;, releaseAssets: List&lt;GithubAsset&gt;, releaseHistory: List&lt;GithubRelease&gt;, releaseTag: String? = null, ): InstalledApp?</ID>
+    <ID>ReturnCount:AssetOwnership.kt$AssetOwnership$private fun List&lt;InstalledApp&gt;.closestVersionLine(assetName: String): InstalledApp</ID>
+    <ID>ReturnCount:AssetOwnership.kt$AssetOwnership$private fun isRename( fromAssetName: String, toAssetName: String, releaseHistory: List&lt;GithubRelease&gt;, ): Boolean</ID>
+    <ID>ReturnCount:AssetVariant.kt$AssetVariant$fun deriveFromPickedAsset( pickedAssetName: String, siblingAssetCount: Int, releaseTag: String? = null, ): String?</ID>
+    <ID>ReturnCount:AssetVariant.kt$AssetVariant$fun fingerprintFromPickedAsset( pickedAssetName: String, siblingAssetCount: Int, releaseTag: String? = null, ): VariantFingerprint?</ID>
+    <ID>ReturnCount:AssetVariant.kt$AssetVariant$fun resolveBySamePosition( assets: List&lt;GithubAsset&gt;, originalIndex: Int?, siblingCountAtPickTime: Int?, ): GithubAsset?</ID>
+    <ID>ReturnCount:AssetVariant.kt$AssetVariant$fun resolvePreferredAsset( assets: List&lt;GithubAsset&gt;, pinnedVariant: String?, pinnedTokens: Set&lt;String&gt;? = null, pinnedGlob: String? = null, releaseTag: String? = null, ): GithubAsset?</ID>
+    <ID>ReturnCount:AssetVariant.kt$AssetVariant$fun tagGlob( assetName: String, releaseTag: String?, ): String?</ID>
+    <ID>ReturnCount:AssetVariant.kt$AssetVariant$fun tagVersion(tag: String?): String?</ID>
+    <ID>ReturnCount:AssetVariant.kt$AssetVariant$private fun endsCleanly( lower: String, end: Int, ): Boolean</ID>
+    <ID>ReturnCount:AssetVariant.kt$AssetVariant$private fun isVersionLikeToken(token: String): Boolean</ID>
+    <ID>ReturnCount:AssetVariant.kt$AssetVariant$private fun startsCleanly( lower: String, at: Int, ): Boolean</ID>
+    <ID>ReturnCount:EmojiShortcodes.kt$EmojiShortcodes$fun render(input: String): String</ID>
+    <ID>ReturnCount:ExternalInstallVerdict.kt$fun resolveExternalInstallVerdict( app: InstalledApp, newVersionName: String, newVersionCode: Long, ): VersionVerdict</ID>
+    <ID>ReturnCount:ExternalInstallVerdict.kt$private fun compareAndDecide( systemVersion: String, latestVersion: String, ): VersionVerdict</ID>
+    <ID>ReturnCount:FeedCategory.kt$FeedCategory$fun matches(codes: List&lt;String&gt;): Boolean</ID>
+    <ID>ReturnCount:InstalledAppUpdates.kt$fun InstalledApp.bindingStatusAgainst(local: SystemPackageInfo): BindingStatus</ID>
+    <ID>ReturnCount:InstalledAppUpdates.kt$fun InstalledApp.pendingInstallResolution(systemInfo: SystemPackageInfo?): PendingInstallResolution</ID>
+    <ID>ReturnCount:InstallerCategory.kt$InstallerCategory.Companion$fun classify( installerPackageName: String?, isUpdatedSystemApp: Boolean, packageName: String? = null, ): InstallerCategory</ID>
+    <ID>ReturnCount:RepositoryUrlParser.kt$RepositoryUrlParser$fun parse( rawUrl: String, additionalForgejoHosts: Set&lt;String&gt; = emptySet(), ): RepositoryReference?</ID>
+    <ID>ReturnCount:TrackedReleaseResolver.kt$TrackedReleaseResolver$fun belongsElsewhere( asset: GithubAsset, releaseTag: String, releaseAssets: List&lt;GithubAsset&gt;, ): Boolean</ID>
+    <ID>ReturnCount:TrackedReleaseResolver.kt$TrackedReleaseResolver$fun resolve( releases: List&lt;GithubRelease&gt;, filter: AssetFilter?, fallbackToOlderReleases: Boolean, preferredVariant: String?, preferredTokens: Set&lt;String&gt;, preferredGlob: String?, pickedIndex: Int?, pickedSiblingCount: Int?, trackedPackageName: String, installedAssetName: String?, repoApps: List&lt;InstalledApp&gt;, installer: Installer, ): ResolvedRelease?</ID>
+    <ID>ReturnCount:VersionMath.kt$VersionMath$fun assetIdentityChanged( matchedDigest: String?, matchedSize: Long?, storedDigest: String?, storedSize: Long?, ): Boolean</ID>
+    <ID>ReturnCount:VersionMath.kt$VersionMath$fun detectScheme(version: String?): Scheme</ID>
+    <ID>ReturnCount:VersionMath.kt$VersionMath$fun isExactSameVersion( a: String?, b: String?, ): Boolean</ID>
+    <ID>ReturnCount:VersionMath.kt$VersionMath$fun isTimestampTrackedTag(version: String?): Boolean</ID>
+    <ID>ReturnCount:VersionMath.kt$VersionMath$fun isVersionNewer( candidate: String?, current: String?, ): Boolean</ID>
+    <ID>ReturnCount:VersionMath.kt$VersionMath$fun normalizeVersion(version: String?): String</ID>
+    <ID>ReturnCount:VersionMath.kt$VersionMath$fun preReleaseMarkerLabel(tag: String?): String?</ID>
+    <ID>ReturnCount:VersionMath.kt$VersionMath$fun releaseObjectChanged( matchedReleaseId: Long?, matchedAssetId: Long?, storedReleaseId: Long?, storedAssetId: Long?, ): Boolean</ID>
+    <ID>ReturnCount:VersionMath.kt$VersionMath$fun versionsReconcilable( installed: String?, latest: String?, ): Boolean</ID>
+    <ID>ReturnCount:VersionMath.kt$VersionMath$internal fun isPublishedAtAfter( candidate: String?, baseline: String?, ): Boolean</ID>
+    <ID>ReturnCount:VersionMath.kt$VersionMath$private fun compareNormalized( a: String, b: String, ): Int</ID>
+    <ID>ReturnCount:VersionMath.kt$VersionMath$private fun insertHyphenBeforeKnownMarker(s: String): String</ID>
+    <ID>ReturnCount:VersionMath.kt$VersionMath$private fun isBuildVariantMarker(preRelease: String): Boolean</ID>
+    <ID>ReturnCount:VersionMath.kt$VersionMath$private fun isMarkerWithOpaqueSuffix(version: String): Boolean</ID>
+    <ID>ReturnCount:VersionMath.kt$VersionMath$private fun parseSemanticVersion(version: String): SemanticVersion?</ID>
+    <ID>ReturnCount:VersionMath.kt$VersionMath$private fun stripBuildVariantSuffix(version: String): String</ID>
+    <ID>SpreadOperator:AssetVariant.kt$AssetVariant$(*LEADING_SEPARATORS)</ID>
+    <ID>TooGenericExceptionCaught:SyncInstalledAppsUseCase.kt$SyncInstalledAppsUseCase$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:executeInTransaction.kt$e: Exception</ID>
+    <ID>TooManyFunctions:AssetOwnership.kt$AssetOwnership</ID>
+    <ID>TooManyFunctions:AssetVariant.kt$AssetVariant</ID>
+    <ID>TooManyFunctions:ExternalImportRepository.kt$ExternalImportRepository</ID>
+    <ID>TooManyFunctions:InstalledAppUpdates.kt$zed.rainxch.core.domain.model.installation.InstalledAppUpdates.kt</ID>
+    <ID>TooManyFunctions:InstalledAppsRepository.kt$InstalledAppsRepository</ID>
+    <ID>TooManyFunctions:Installer.kt$Installer</ID>
+    <ID>TooManyFunctions:TweaksRepository.kt$TweaksRepository</ID>
+    <ID>TooManyFunctions:VersionMath.kt$VersionMath</ID>
+  </CurrentIssues>
+</SmellBaseline>

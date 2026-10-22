@@ -1,0 +1,87 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues/>
+  <CurrentIssues>
+    <ID>CyclomaticComplexMethod:DetailsRepositoryImpl.kt$DetailsRepositoryImpl$private fun spdxFromLicenseHeader(text: String): String?</ID>
+    <ID>CyclomaticComplexMethod:preprocessMarkdown.kt$fun preprocessMarkdown( markdown: String, baseUrl: String, linkBaseUrl: String = baseUrl, ): String</ID>
+    <ID>LargeClass:DetailsRepositoryImpl.kt$DetailsRepositoryImpl : DetailsRepository</ID>
+    <ID>LongMethod:DeeplTranslator.kt$DeeplTranslator$override suspend fun translate( text: String, targetLanguage: String, sourceLanguage: String, ): TranslationResult</ID>
+    <ID>LongMethod:DetailsRepositoryImpl.kt$DetailsRepositoryImpl$override suspend fun getRepoStats( owner: String, repo: String, sourceHost: String?, ): RepoStats</ID>
+    <ID>LongMethod:InstallationManagerImpl.kt$InstallationManagerImpl$@OptIn(ExperimentalTime::class) override suspend fun saveNewInstalledApp(params: SaveInstalledAppParams): InstalledApp?</ID>
+    <ID>LongMethod:LibreTranslator.kt$LibreTranslator$override suspend fun translate( text: String, targetLanguage: String, sourceLanguage: String, ): TranslationResult</ID>
+    <ID>LongMethod:MicrosoftTranslator.kt$MicrosoftTranslator$override suspend fun translate( text: String, targetLanguage: String, sourceLanguage: String, ): TranslationResult</ID>
+    <ID>LongMethod:ReadmeLocalizationHelper.kt$ReadmeLocalizationHelper$fun generateReadmeAttempts(): List&lt;ReadmeAttempt&gt;</ID>
+    <ID>LongMethod:preprocessMarkdown.kt$fun preprocessMarkdown( markdown: String, baseUrl: String, linkBaseUrl: String = baseUrl, ): String</ID>
+    <ID>LongParameterList:DetailsRepositoryImpl.kt$DetailsRepositoryImpl$( private val clientProvider: GitHubClientProvider, private val backendApiClient: BackendApiClient, private val localizationManager: LocalizationManager, private val logger: KomiStoreLogger, private val cacheManager: CacheManager, private val forgejoClientRegistry: zed.rainxch.core.data.network.ForgejoClientRegistry, private val tokenStore: TokenStore, )</ID>
+    <ID>MagicNumber:AttestationVerifierImpl.kt$AttestationVerifierImpl$8192</ID>
+    <ID>MagicNumber:DeeplTranslator.kt$DeeplTranslator$200</ID>
+    <ID>MagicNumber:DetailsRepositoryImpl.kt$DetailsRepositoryImpl$10</ID>
+    <ID>MagicNumber:DetailsRepositoryImpl.kt$DetailsRepositoryImpl$3</ID>
+    <ID>MagicNumber:DetailsRepositoryImpl.kt$DetailsRepositoryImpl$30</ID>
+    <ID>MagicNumber:DetailsRepositoryImpl.kt$DetailsRepositoryImpl$4</ID>
+    <ID>MagicNumber:DetailsRepositoryImpl.kt$DetailsRepositoryImpl$400</ID>
+    <ID>MagicNumber:DetailsRepositoryImpl.kt$DetailsRepositoryImpl$500</ID>
+    <ID>MagicNumber:DetailsRepositoryImpl.kt$DetailsRepositoryImpl$599</ID>
+    <ID>MagicNumber:InstallationManagerImpl.kt$InstallationManagerImpl$1000</ID>
+    <ID>MagicNumber:LibreTranslator.kt$LibreTranslator$200</ID>
+    <ID>MagicNumber:MicrosoftTranslator.kt$MicrosoftTranslator$200</ID>
+    <ID>MagicNumber:ReadmeLocalizationHelper.kt$ReadmeLocalizationHelper$0.15</ID>
+    <ID>MagicNumber:ReadmeLocalizationHelper.kt$ReadmeLocalizationHelper$100</ID>
+    <ID>MagicNumber:ReadmeLocalizationHelper.kt$ReadmeLocalizationHelper$1000</ID>
+    <ID>MagicNumber:ReadmeLocalizationHelper.kt$ReadmeLocalizationHelper$4</ID>
+    <ID>MagicNumber:YoudaoTranslator.kt$YoudaoTranslator$0x10</ID>
+    <ID>MagicNumber:YoudaoTranslator.kt$YoudaoTranslator$0xff</ID>
+    <ID>MagicNumber:YoudaoTranslator.kt$YoudaoTranslator$10</ID>
+    <ID>MagicNumber:YoudaoTranslator.kt$YoudaoTranslator$1000L</ID>
+    <ID>MagicNumber:YoudaoTranslator.kt$YoudaoTranslator$16</ID>
+    <ID>MagicNumber:YoudaoTranslator.kt$YoudaoTranslator$20</ID>
+    <ID>MagicNumber:preprocessMarkdown.kt$0x10FFFF</ID>
+    <ID>MagicNumber:preprocessMarkdown.kt$16</ID>
+    <ID>MagicNumber:preprocessMarkdown.kt$3</ID>
+    <ID>MagicNumber:preprocessMarkdown.kt$32</ID>
+    <ID>MagicNumber:preprocessMarkdown.kt$4</ID>
+    <ID>MagicNumber:preprocessMarkdown.kt$6</ID>
+    <ID>NestedBlockDepth:DetailsRepositoryImpl.kt$DetailsRepositoryImpl$override suspend fun fetchRawMarkdown(url: String): String?</ID>
+    <ID>PrintStackTrace:InstallationManagerImpl.kt$InstallationManagerImpl$t</ID>
+    <ID>ReturnCount:DetailsRepositoryImpl.kt$DetailsRepositoryImpl$@OptIn(ExperimentalEncodingApi::class) private fun processReadmeFromBackend( dto: GithubReadmeResponseDto, owner: String, repo: String, defaultBranch: String, ): Triple&lt;String, String?, String&gt;?</ID>
+    <ID>ReturnCount:DetailsRepositoryImpl.kt$DetailsRepositoryImpl$@OptIn(ExperimentalEncodingApi::class) private suspend fun detectForgejoLicense( client: zed.rainxch.core.data.network.ForgejoApiClient, owner: String, repo: String, ref: String, ): String?</ID>
+    <ID>ReturnCount:DetailsRepositoryImpl.kt$DetailsRepositoryImpl$@OptIn(ExperimentalEncodingApi::class) private suspend fun getForgejoReadme( owner: String, repo: String, defaultBranch: String, sourceHost: String, ): Triple&lt;String, String?, String&gt;?</ID>
+    <ID>ReturnCount:DetailsRepositoryImpl.kt$DetailsRepositoryImpl$override suspend fun getAllReleases( owner: String, repo: String, defaultBranch: String, sourceHost: String?, bypassCache: Boolean, allowStale: Boolean, preferDirectSource: Boolean, ): List&lt;GithubRelease&gt;</ID>
+    <ID>ReturnCount:DetailsRepositoryImpl.kt$DetailsRepositoryImpl$override suspend fun getLatestPublishedRelease( owner: String, repo: String, defaultBranch: String, sourceHost: String?, ): GithubRelease?</ID>
+    <ID>ReturnCount:DetailsRepositoryImpl.kt$DetailsRepositoryImpl$override suspend fun getReadme( owner: String, repo: String, defaultBranch: String, sourceHost: String?, ): Triple&lt;String, String?, String&gt;?</ID>
+    <ID>ReturnCount:DetailsRepositoryImpl.kt$DetailsRepositoryImpl$override suspend fun getRepoStats( owner: String, repo: String, sourceHost: String?, ): RepoStats</ID>
+    <ID>ReturnCount:DetailsRepositoryImpl.kt$DetailsRepositoryImpl$override suspend fun getRepositoryById(id: Long): GithubRepoSummary</ID>
+    <ID>ReturnCount:DetailsRepositoryImpl.kt$DetailsRepositoryImpl$override suspend fun getRepositoryByOwnerAndName( owner: String, name: String, sourceHost: String?, ): GithubRepoSummary</ID>
+    <ID>ReturnCount:DetailsRepositoryImpl.kt$DetailsRepositoryImpl$override suspend fun getUserProfile(username: String): GithubUserProfile</ID>
+    <ID>ReturnCount:DetailsRepositoryImpl.kt$DetailsRepositoryImpl$private suspend fun getForgejoAllReleases( owner: String, repo: String, sourceHost: String, ): List&lt;GithubRelease&gt;</ID>
+    <ID>ReturnCount:DetailsRepositoryImpl.kt$DetailsRepositoryImpl$private suspend fun getForgejoRepoStats( owner: String, repo: String, sourceHost: String, ): RepoStats</ID>
+    <ID>ReturnCount:DetailsRepositoryImpl.kt$DetailsRepositoryImpl$private suspend fun getForgejoRepository( owner: String, name: String, sourceHost: String, ): GithubRepoSummary</ID>
+    <ID>ReturnCount:DetailsRepositoryImpl.kt$DetailsRepositoryImpl$private suspend fun readReleasesFromGitHub( owner: String, repo: String, defaultBranch: String, cacheKey: String, allowStale: Boolean, ): List&lt;GithubRelease&gt;</ID>
+    <ID>ReturnCount:InstallationManagerImpl.kt$InstallationManagerImpl$override suspend fun checkSigningFingerprint(apkInfo: ApkPackageInfo): FingerprintCheckResult</ID>
+    <ID>ReturnCount:InstallationManagerImpl.kt$InstallationManagerImpl$override suspend fun validateApk( filePath: String, isUpdate: Boolean, trackedPackageName: String?, ): ApkValidationResult</ID>
+    <ID>SwallowedException:DetailsRepositoryImpl.kt$DetailsRepositoryImpl$e: IllegalArgumentException</ID>
+    <ID>ThrowsCount:DetailsRepositoryImpl.kt$DetailsRepositoryImpl$private suspend fun readReleasesFromGitHub( owner: String, repo: String, defaultBranch: String, cacheKey: String, allowStale: Boolean, ): List&lt;GithubRelease&gt;</ID>
+    <ID>TooGenericExceptionCaught:AttestationVerifierImpl.kt$AttestationVerifierImpl$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:DetailsRepositoryImpl.kt$DetailsRepositoryImpl$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:DetailsRepositoryImpl.kt$DetailsRepositoryImpl$e: Throwable</ID>
+    <ID>TooGenericExceptionCaught:DetailsRepositoryImpl.kt$DetailsRepositoryImpl$t: Throwable</ID>
+    <ID>TooGenericExceptionCaught:InstallationManagerImpl.kt$InstallationManagerImpl$t: Throwable</ID>
+    <ID>TooGenericExceptionThrown:DeeplTranslator.kt$DeeplTranslator$throw RuntimeException( "DeepL ${errorMessage?.let { "error: $it" } ?: "response missing translations"}", )</ID>
+    <ID>TooGenericExceptionThrown:DeeplTranslator.kt$DeeplTranslator$throw RuntimeException( "DeepL HTTP ${response.status.value}: ${message ?: body.take(200)}", )</ID>
+    <ID>TooGenericExceptionThrown:DeeplTranslator.kt$DeeplTranslator$throw RuntimeException( "DeepL returned non-JSON response: ${body.take(200)}", e, )</ID>
+    <ID>TooGenericExceptionThrown:DeeplTranslator.kt$DeeplTranslator$throw RuntimeException("DeepL response missing translation text")</ID>
+    <ID>TooGenericExceptionThrown:DeeplTranslator.kt$DeeplTranslator$throw RuntimeException("DeepL response missing translations")</ID>
+    <ID>TooGenericExceptionThrown:LibreTranslator.kt$LibreTranslator$throw RuntimeException( "LibreTranslate HTTP ${response.status.value}: ${message ?: body.take(200)}", )</ID>
+    <ID>TooGenericExceptionThrown:LibreTranslator.kt$LibreTranslator$throw RuntimeException( "LibreTranslate returned non-JSON response: ${body.take(200)}", e, )</ID>
+    <ID>TooGenericExceptionThrown:LibreTranslator.kt$LibreTranslator$throw RuntimeException("LibreTranslate error: $msg")</ID>
+    <ID>TooGenericExceptionThrown:LibreTranslator.kt$LibreTranslator$throw RuntimeException("LibreTranslate response missing translatedText")</ID>
+    <ID>TooGenericExceptionThrown:LibreTranslator.kt$LibreTranslator$throw RuntimeException("LibreTranslate target language required (got '$targetLanguage')")</ID>
+    <ID>TooGenericExceptionThrown:MicrosoftTranslator.kt$MicrosoftTranslator$throw RuntimeException( "Microsoft Translator HTTP ${response.status.value}: ${errorMsg ?: body.take(200)}", )</ID>
+    <ID>TooGenericExceptionThrown:MicrosoftTranslator.kt$MicrosoftTranslator$throw RuntimeException( "Microsoft Translator returned non-JSON response: ${body.take(200)}", e, )</ID>
+    <ID>TooGenericExceptionThrown:MicrosoftTranslator.kt$MicrosoftTranslator$throw RuntimeException("Microsoft Translator error: ${errorMsg ?: body}")</ID>
+    <ID>TooGenericExceptionThrown:MicrosoftTranslator.kt$MicrosoftTranslator$throw RuntimeException("Microsoft Translator response empty")</ID>
+    <ID>TooGenericExceptionThrown:MicrosoftTranslator.kt$MicrosoftTranslator$throw RuntimeException("Microsoft Translator response missing translation text")</ID>
+    <ID>TooGenericExceptionThrown:YoudaoTranslator.kt$YoudaoTranslator$throw RuntimeException("Youdao translate error: $errorCode")</ID>
+    <ID>TooManyFunctions:DetailsRepositoryImpl.kt$DetailsRepositoryImpl : DetailsRepository</ID>
+  </CurrentIssues>
+</SmellBaseline>

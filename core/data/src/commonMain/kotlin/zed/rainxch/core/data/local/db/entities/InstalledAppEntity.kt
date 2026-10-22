@@ -16,12 +16,26 @@ data class InstalledAppEntity(
     val primaryLanguage: String?,
     val repoUrl: String,
     val installedVersion: String,
+    @ColumnInfo(defaultValue = "NULL")
+    val installedReleaseId: Long? = null,
+    @ColumnInfo(defaultValue = "NULL")
+    val installedAssetId: Long? = null,
+    @ColumnInfo(defaultValue = "NULL")
+    val installedAssetDigest: String? = null,
+    @ColumnInfo(defaultValue = "NULL")
+    val installedReleasePublishedAt: String? = null,
     val installedAssetName: String?,
     val installedAssetUrl: String?,
     val latestVersion: String?,
     val latestAssetName: String?,
     val latestAssetUrl: String?,
     val latestAssetSize: Long?,
+    @ColumnInfo(defaultValue = "NULL")
+    val latestReleaseId: Long? = null,
+    @ColumnInfo(defaultValue = "NULL")
+    val latestAssetId: Long? = null,
+    @ColumnInfo(defaultValue = "NULL")
+    val latestAssetDigest: String? = null,
     val appName: String,
     val installSource: InstallSource,
     val signingFingerprint: String?,
@@ -40,31 +54,27 @@ data class InstalledAppEntity(
     val latestVersionCode: Long? = null,
     val latestReleasePublishedAt: String? = null,
     val includePreReleases: Boolean = false,
-
     val assetFilterRegex: String? = null,
-
     @ColumnInfo(defaultValue = "0")
     val fallbackToOlderReleases: Boolean = false,
-
     val preferredAssetVariant: String? = null,
-
     @ColumnInfo(defaultValue = "0")
     val preferredVariantStale: Boolean = false,
-
     val preferredAssetTokens: String? = null,
-
     val assetGlobPattern: String? = null,
-
     val pickedAssetIndex: Int? = null,
-
     val pickedAssetSiblingCount: Int? = null,
-
     val pendingInstallFilePath: String? = null,
-
     val pendingInstallVersion: String? = null,
-
     val pendingInstallAssetName: String? = null,
-
+    @ColumnInfo(defaultValue = "NULL")
+    val pendingInstallReleaseId: Long? = null,
+    @ColumnInfo(defaultValue = "NULL")
+    val pendingInstallAssetId: Long? = null,
+    @ColumnInfo(defaultValue = "NULL")
+    val pendingInstallAssetDigest: String? = null,
+    @ColumnInfo(defaultValue = "NULL")
+    val pendingInstallReleasePublishedAt: String? = null,
     @ColumnInfo(defaultValue = "NULL")
     val skippedReleaseTag: String? = null,
     @ColumnInfo(defaultValue = "NULL")

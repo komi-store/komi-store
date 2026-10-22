@@ -3,7 +3,7 @@ package zed.rainxch.githubstore.utils
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.currentBackStackEntryAsState
+import kotlinx.coroutines.channels.ReceiveChannel
 import zed.rainxch.auth.presentation.AuthDeepLinkBus
 import zed.rainxch.auth.presentation.AuthDeepLinkEvent
 import zed.rainxch.githubstore.app.deeplink.DeepLinkDestination
@@ -14,14 +14,13 @@ import zed.rainxch.tweaks.presentation.utils.TweaksDeepLinkBus
 
 @Composable
 fun HandleDesktopToolbarDeeplinks(
-    deepLinkUri: String?,
+    deepLinkUris: ReceiveChannel<String>,
     onDeepLinkConsumed: () -> Unit,
     navController: NavHostController,
 ) {
-    val currentScreen = navController.currentBackStackEntryAsState().value.getCurrentScreen()
-
-    LaunchedEffect(deepLinkUri) {
-        deepLinkUri?.let { uri ->
+    LaunchedEffect(deepLinkUris) {
+        for (uri in deepLinkUris) {
+            val currentScreen = navController.currentBackStackEntry.getCurrentScreen()
             when (val destination = DeepLinkParser.parse(uri)) {
                 is DeepLinkDestination.Repository -> {
                     navController.navigate(

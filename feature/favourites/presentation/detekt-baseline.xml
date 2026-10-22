@@ -1,0 +1,7 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues/>
+  <CurrentIssues>
+    <ID>LongMethod:ImportStarsViewModel.kt$ImportStarsViewModel$private fun importByUsername()</ID>
+  </CurrentIssues>
+</SmellBaseline>

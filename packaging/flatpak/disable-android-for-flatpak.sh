@@ -16,7 +16,7 @@ CONVENTION_DIR="build-logic/convention/src/main/kotlin"
 # ─────────────────────────────────────────────────────────────────────
 # 1. Root build.gradle.kts — comment out Android plugin declarations
 # ─────────────────────────────────────────────────────────────────────
-echo "[0/7] Removing Android & non-essential dependencies from build-logic/convention/build.gradle.kts"
+echo "[0/6] Removing Android & non-essential dependencies from build-logic/convention/build.gradle.kts"
 sed -i \
     -e '/compileOnly(libs.android.gradlePlugin)/d' \
     -e '/compileOnly(libs.android.tools.common)/d' \
@@ -43,7 +43,16 @@ import org.gradle.api.Project
 internal fun Project.configureKotlinAndroid(project: Project) {}
 KOTLIN
 
-echo "[1/7] Patching root build.gradle.kts"
+cat > "$CONVENTION_DIR/zed/rainxch/githubstore/convention/KotlinAndroidTarget.kt" << 'KOTLIN'
+package zed.rainxch.githubstore.convention
+
+import org.gradle.api.Project
+
+// Stubbed out for Flatpak build — no Android SDK available
+internal fun Project.configureAndroidTarget() {}
+KOTLIN
+
+echo "[1/6] Patching root build.gradle.kts"
 sed -i \
     -e 's|alias(libs.plugins.android.application)|// alias(libs.plugins.android.application)|' \
     -e 's|alias(libs.plugins.android.library)|// alias(libs.plugins.android.library)|' \
@@ -63,7 +72,7 @@ sed -i \
 # ─────────────────────────────────────────────────────────────────────
 CONVENTION_DIR="build-logic/convention/src/main/kotlin"
 
-echo "[2/7] Patching KmpLibraryConventionPlugin (remove Android library plugin + config)"
+echo "[2/6] Patching KmpLibraryConventionPlugin (remove Android library plugin + config)"
 cat > "$CONVENTION_DIR/KmpLibraryConventionPlugin.kt" << 'KOTLIN'
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -87,7 +96,6 @@ class KmpLibraryConventionPlugin : Plugin<Project> {
             extensions.configure<KotlinMultiplatformExtension> {
                 compilerOptions {
                     freeCompilerArgs.add("-Xexpect-actual-classes")
-                    freeCompilerArgs.add("-Xmulti-dollar-interpolation")
                     freeCompilerArgs.add("-opt-in=kotlin.RequiresOptIn")
                     freeCompilerArgs.add("-opt-in=kotlin.time.ExperimentalTime")
                 }
@@ -101,35 +109,13 @@ class KmpLibraryConventionPlugin : Plugin<Project> {
 }
 KOTLIN
 
-echo "[3/7] Patching CmpApplicationConventionPlugin (remove Android application)"
-cat > "$CONVENTION_DIR/CmpApplicationConventionPlugin.kt" << 'KOTLIN'
-import org.gradle.api.Plugin
-import org.gradle.api.Project
-import org.gradle.kotlin.dsl.dependencies
-import zed.rainxch.githubstore.convention.configureJvmTarget
-import zed.rainxch.githubstore.convention.libs
+echo "[3/6] Patching CmpLibraryConventionPlugin & CmpFeatureConventionPlugin"
 
-class CmpApplicationConventionPlugin : Plugin<Project> {
-    override fun apply(target: Project) {
-        with(target) {
-            with(pluginManager) {
-                apply("org.jetbrains.kotlin.multiplatform")
-                apply("org.jetbrains.compose")
-                apply("org.jetbrains.kotlin.plugin.compose")
-            }
-
-            configureJvmTarget()
-        }
-    }
-}
-KOTLIN
-
-echo "[4/7] Patching CmpLibraryConventionPlugin & CmpFeatureConventionPlugin"
-
-# CmpLibraryConventionPlugin — remove Android library dependency and debugImplementation
+# CmpLibraryConventionPlugin — remove the Android-only ui-tooling dependency
 sed -i \
     -e 's|apply("com.android.library")|// apply("com.android.library")|' \
     -e '/debugImplementation/d' \
+    -e '/androidRuntimeClasspath/d' \
     "$CONVENTION_DIR/CmpLibraryConventionPlugin.kt" 2>/dev/null || true
 
 sed -i \
@@ -153,7 +139,7 @@ done
 # ─────────────────────────────────────────────────────────────────────
 # 3. KotlinMultiplatform.kt — skip Android configuration
 # ─────────────────────────────────────────────────────────────────────
-echo "[5/7] Patching KotlinMultiplatform.kt"
+echo "[4/6] Patching KotlinMultiplatform.kt"
 cat > "$CONVENTION_DIR/zed/rainxch/githubstore/convention/KotlinMultiplatform.kt" << 'KOTLIN'
 package zed.rainxch.githubstore.convention
 
@@ -168,7 +154,6 @@ internal fun Project.configureKotlinMultiplatform() {
     extensions.configure<KotlinMultiplatformExtension> {
         compilerOptions {
             freeCompilerArgs.add("-Xexpect-actual-classes")
-            freeCompilerArgs.add("-Xmulti-dollar-interpolation")
             freeCompilerArgs.add("-opt-in=kotlin.RequiresOptIn")
             freeCompilerArgs.add("-opt-in=kotlin.time.ExperimentalTime")
         }
@@ -179,50 +164,10 @@ KOTLIN
 # ─────────────────────────────────────────────────────────────────────
 # 4. Module build.gradle.kts files — remove android {} blocks
 # ─────────────────────────────────────────────────────────────────────
-echo "[6/7] Removing android {} blocks from module build.gradle.kts files"
+echo "[5/6] Removing android {} blocks from module build.gradle.kts files"
 
-# composeApp — remove android {} block and its contents
-python3 -c "
-import re, sys
-
-with open('composeApp/build.gradle.kts', 'r') as f:
-    content = f.read()
-
-# Remove top-level android { ... } blocks (handles nested braces)
-def remove_block(text, keyword):
-    result = []
-    i = 0
-    while i < len(text):
-        # Look for 'android {' at line start (possibly with whitespace)
-        line_start = text.rfind('\n', 0, i) + 1
-        prefix = text[line_start:i].strip()
-        if text[i:].startswith(keyword + ' {') or text[i:].startswith(keyword + '{'):
-            if prefix == '' or prefix.endswith('\n'):
-                # Find matching closing brace
-                brace_start = text.index('{', i)
-                depth = 1
-                j = brace_start + 1
-                while j < len(text) and depth > 0:
-                    if text[j] == '{': depth += 1
-                    elif text[j] == '}': depth -= 1
-                    j += 1
-                # Skip past the block and any trailing newline
-                if j < len(text) and text[j] == '\n':
-                    j += 1
-                i = j
-                continue
-        result.append(text[i])
-        i += 1
-    return ''.join(result)
-
-content = remove_block(content, 'android')
-
-# Remove androidMain.dependencies { ... } block
-content = remove_block(content, 'androidMain.dependencies')
-
-with open('composeApp/build.gradle.kts', 'w') as f:
-    f.write(content)
-"
+# :androidApp and :core:data-aidl (the Shizuku and Dhizuku AIDL interfaces) are Android-only
+sed -i -e '/include(":androidApp")/d' -e '/include(":core:data-aidl")/d' settings.gradle.kts
 
 # All modules — remove android {} and androidMain { ... } blocks
 find . -name 'build.gradle.kts' -not -path './build-logic/*' -not -path './.flatpak-builder/*' | while read gradle_file; do
@@ -284,6 +229,17 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 
 class AndroidApplicationConventionPlugin : Plugin<Project> {
+    override fun apply(target: Project) {
+        // No-op: Android disabled for Flatpak build
+    }
+}
+KOTLIN
+
+cat > "$CONVENTION_DIR/AndroidLibraryConventionPlugin.kt" << 'KOTLIN'
+import org.gradle.api.Plugin
+import org.gradle.api.Project
+
+class AndroidLibraryConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         // No-op: Android disabled for Flatpak build
     }

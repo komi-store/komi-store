@@ -1,0 +1,18 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues/>
+  <CurrentIssues>
+    <ID>ComplexCondition:HomeRoot.kt$reachedEnd &amp;&amp; state.hasMore &amp;&amp; !state.isLoadingMore &amp;&amp; !state.isLoading</ID>
+    <ID>CyclomaticComplexMethod:HomeChartTabs.kt$@Composable private fun ChartTabSegment( tab: ChartTab, selected: Boolean, onClick: () -&gt; Unit, modifier: Modifier = Modifier, )</ID>
+    <ID>CyclomaticComplexMethod:HomeViewModel.kt$HomeViewModel$fun onAction(action: HomeAction)</ID>
+    <ID>LongMethod:CategoryListViewModel.kt$CategoryListViewModel$private fun loadPage(initial: Boolean)</ID>
+    <ID>LongMethod:HomeViewModel.kt$HomeViewModel$fun onAction(action: HomeAction)</ID>
+    <ID>LongParameterList:HomeRepoCardMapper.kt$( repo: GithubRepoSummary, isInstalled: Boolean, isUpdateAvailable: Boolean, isFavourite: Boolean, isStarred: Boolean, isSeen: Boolean, isCurrentUserOwner: Boolean, )</ID>
+    <ID>LongParameterList:HomeViewModel.kt$HomeViewModel$( private val homeRepository: HomeRepository, private val installedAppsRepository: InstalledAppsRepository, private val syncInstalledAppsUseCase: SyncInstalledAppsUseCase, private val favouritesRepository: FavouritesRepository, private val starredRepository: StarredRepository, private val tweaksRepository: TweaksRepository, private val seenReposRepository: SeenReposRepository, private val hiddenReposRepository: HiddenReposRepository, private val userSessionRepository: UserSessionRepository, private val browseFilterStore: BrowseFilterStore, private val logger: KomiStoreLogger, private val shareManager: ShareManager, )</ID>
+    <ID>ThrowsCount:HomeViewModel.kt$HomeViewModel$fun onAction(action: HomeAction)</ID>
+    <ID>TooGenericExceptionCaught:HomeViewModel.kt$HomeViewModel$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:HomeViewModel.kt$HomeViewModel$e: Throwable</ID>
+    <ID>TooGenericExceptionCaught:HomeViewModel.kt$HomeViewModel$t: Throwable</ID>
+    <ID>TooManyFunctions:HomeViewModel.kt$HomeViewModel : ViewModel</ID>
+  </CurrentIssues>
+</SmellBaseline>

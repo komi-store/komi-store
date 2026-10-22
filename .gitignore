@@ -34,7 +34,7 @@ google-services.json
 *.hprof
 .kotlin/
 
-composeApp/release/baselineProfiles/
+androidApp/release/baselineProfiles/
 
 composeApp/kotzilla.json
 
@@ -44,3 +44,6 @@ roadmap/
 **/.DS_Store
 
 .claude/komi
+.claude/settings.local.json
+.claude/worktrees/
+.gradle-local/
