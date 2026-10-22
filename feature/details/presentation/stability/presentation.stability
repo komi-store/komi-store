@@ -110,6 +110,18 @@ public fun zed.rainxch.details.presentation.components.ApkInspectSheet(inspectio
     - onDismiss: STABLE (function type)
 
 @Composable
+private fun zed.rainxch.details.presentation.components.AppChipRow(status: zed.rainxch.details.presentation.components.HeaderStatus?, installedApp: zed.rainxch.core.domain.model.installation.InstalledApp?, switcherApps: kotlin.collections.List<zed.rainxch.core.domain.model.installation.InstalledApp>, appLabel: kotlin.String?, onAppLabelClick: kotlin.Function0<kotlin.Unit>, onSelectInstalledApp: kotlin.Function1<kotlin.String, kotlin.Unit>): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - status: STABLE (class with no mutable properties)
+    - installedApp: UNSTABLE (cross-module type without @Stable/@Immutable)
+    - switcherApps: RUNTIME (requires runtime check)
+    - appLabel: STABLE (class with no mutable properties)
+    - onAppLabelClick: STABLE (function type)
+    - onSelectInstalledApp: STABLE (function type)
+
+@Composable
 public fun zed.rainxch.details.presentation.components.AppHeader(author: zed.rainxch.core.domain.model.account.github.GithubUserProfile?, repository: zed.rainxch.core.domain.model.account.github.GithubRepoSummary, release: zed.rainxch.core.domain.model.account.github.GithubRelease?, installedApp: zed.rainxch.core.domain.model.installation.InstalledApp?, modifier: androidx.compose.ui.Modifier, installedApps: kotlin.collections.List<zed.rainxch.core.domain.model.installation.InstalledApp>, onSelectInstalledApp: kotlin.Function1<kotlin.String, kotlin.Unit>, downloadStage: zed.rainxch.details.presentation.model.DownloadStage, downloadProgress: kotlin.Int?, isCurrentUserOwner: kotlin.Boolean, onPlatformClick: kotlin.Function1<zed.rainxch.core.domain.model.repository.DiscoveryPlatform, kotlin.Unit>?, platformReleases: kotlin.collections.List<zed.rainxch.core.domain.utils.PlatformRelease>, devicePlatform: zed.rainxch.core.domain.model.repository.DiscoveryPlatform?, appLabel: kotlin.String?, onAppLabelClick: kotlin.Function0<kotlin.Unit>, onOwnerClick: kotlin.Function0<kotlin.Unit>): kotlin.Unit
   skippable: true
   restartable: true
@@ -217,17 +229,45 @@ private fun zed.rainxch.details.presentation.components.Header(state: zed.rainxc
     - displayName: STABLE (String is immutable)
 
 @Composable
-private fun zed.rainxch.details.presentation.components.HeaderAvatar(avatarUrl: kotlin.String?, cornerShape: androidx.compose.foundation.shape.RoundedCornerShape, isDark: kotlin.Boolean, downloadStage: zed.rainxch.details.presentation.model.DownloadStage, accent: kotlin.Function0<androidx.compose.ui.graphics.Color>, progress: kotlin.Function0<kotlin.Float>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+private fun zed.rainxch.details.presentation.components.HeaderBody(owner: kotlin.String, avatarUrl: kotlin.String?, repository: zed.rainxch.core.domain.model.account.github.GithubRepoSummary, installedApp: zed.rainxch.core.domain.model.installation.InstalledApp?, downloadStage: zed.rainxch.details.presentation.model.DownloadStage, progress: kotlin.Function0<kotlin.Float>, isCurrentUserOwner: kotlin.Boolean, onOwnerClick: kotlin.Function0<kotlin.Unit>, chips: @[Composable] androidx.compose.runtime.internal.ComposableFunction0<kotlin.Unit>): kotlin.Unit
   skippable: true
   restartable: true
   params:
+    - owner: STABLE (String is immutable)
     - avatarUrl: STABLE (class with no mutable properties)
-    - cornerShape: STABLE (marked @Stable or @Immutable)
-    - isDark: STABLE (primitive type)
+    - repository: UNSTABLE (cross-module type without @Stable/@Immutable)
+    - installedApp: UNSTABLE (cross-module type without @Stable/@Immutable)
     - downloadStage: STABLE (class with no mutable properties)
-    - accent: STABLE (function type)
     - progress: STABLE (function type)
-    - modifier: STABLE (marked @Stable or @Immutable)
+    - isCurrentUserOwner: STABLE (primitive type)
+    - onOwnerClick: STABLE (function type)
+    - chips: STABLE (composable function type)
+
+@Composable
+private fun zed.rainxch.details.presentation.components.HeaderChips(status: zed.rainxch.details.presentation.components.HeaderStatus?, installedApp: zed.rainxch.core.domain.model.installation.InstalledApp?, switcherApps: kotlin.collections.List<zed.rainxch.core.domain.model.installation.InstalledApp>, appLabel: kotlin.String?, onAppLabelClick: kotlin.Function0<kotlin.Unit>, onSelectInstalledApp: kotlin.Function1<kotlin.String, kotlin.Unit>, isFork: kotlin.Boolean, platformReleases: kotlin.collections.List<zed.rainxch.core.domain.utils.PlatformRelease>, devicePlatform: zed.rainxch.core.domain.model.repository.DiscoveryPlatform?, onPlatformClick: kotlin.Function1<zed.rainxch.core.domain.model.repository.DiscoveryPlatform, kotlin.Unit>?): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - status: STABLE (class with no mutable properties)
+    - installedApp: UNSTABLE (cross-module type without @Stable/@Immutable)
+    - switcherApps: RUNTIME (requires runtime check)
+    - appLabel: STABLE (class with no mutable properties)
+    - onAppLabelClick: STABLE (function type)
+    - onSelectInstalledApp: STABLE (function type)
+    - isFork: STABLE (primitive type)
+    - platformReleases: RUNTIME (requires runtime check)
+    - devicePlatform: STABLE (class with no mutable properties)
+    - onPlatformClick: STABLE (function type)
+
+@Composable
+private fun zed.rainxch.details.presentation.components.HeaderPicture(installedApp: zed.rainxch.core.domain.model.installation.InstalledApp?, avatarUrl: kotlin.String?, downloadStage: zed.rainxch.details.presentation.model.DownloadStage, progress: kotlin.Function0<kotlin.Float>): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - installedApp: UNSTABLE (cross-module type without @Stable/@Immutable)
+    - avatarUrl: STABLE (class with no mutable properties)
+    - downloadStage: STABLE (class with no mutable properties)
+    - progress: STABLE (function type)
 
 @Composable
 private fun zed.rainxch.details.presentation.components.IdentitySection(inspection: zed.rainxch.core.domain.model.apk.ApkInspection): kotlin.Unit
@@ -293,13 +333,6 @@ private fun zed.rainxch.details.presentation.components.InstalledSplitRow(onUnin
     - onOpenApp: STABLE (function type)
 
 @Composable
-private fun zed.rainxch.details.presentation.components.InstalledStatusPill(installedApp: zed.rainxch.core.domain.model.installation.InstalledApp): kotlin.Unit
-  skippable: true
-  restartable: true
-  params:
-    - installedApp: UNSTABLE (cross-module type without @Stable/@Immutable)
-
-@Composable
 private fun zed.rainxch.details.presentation.components.LanguageListItem(language: zed.rainxch.details.domain.model.SupportedLanguage, isSelected: kotlin.Boolean, onClick: kotlin.Function0<kotlin.Unit>): kotlin.Unit
   skippable: true
   restartable: true
@@ -323,6 +356,13 @@ public fun zed.rainxch.details.presentation.components.LanguagePicker(isVisible:
     - onDismiss: STABLE (function type)
 
 @Composable
+private fun zed.rainxch.details.presentation.components.LastPush(repository: zed.rainxch.core.domain.model.account.github.GithubRepoSummary): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - repository: UNSTABLE (cross-module type without @Stable/@Immutable)
+
+@Composable
 public fun zed.rainxch.details.presentation.components.LinkedRepoBanner(owner: kotlin.String, repo: kotlin.String, onUnlink: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
   skippable: true
   restartable: true
@@ -337,6 +377,15 @@ private fun zed.rainxch.details.presentation.components.LoadingState(): kotlin.U
   skippable: true
   restartable: true
   params:
+
+@Composable
+private fun zed.rainxch.details.presentation.components.OwnerLine(owner: kotlin.String, isCurrentUserOwner: kotlin.Boolean, onClick: kotlin.Function0<kotlin.Unit>): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - owner: STABLE (String is immutable)
+    - isCurrentUserOwner: STABLE (primitive type)
+    - onClick: STABLE (function type)
 
 @Composable
 private fun zed.rainxch.details.presentation.components.PermissionGroupHeader(level: zed.rainxch.core.domain.model.apk.ProtectionLevel, count: kotlin.Int, expanded: kotlin.Boolean, collapsible: kotlin.Boolean, onToggle: kotlin.Function0<kotlin.Unit>): kotlin.Unit
@@ -362,6 +411,16 @@ private fun zed.rainxch.details.presentation.components.PermissionsSection(permi
   restartable: true
   params:
     - permissions: RUNTIME (requires runtime check)
+
+@Composable
+private fun zed.rainxch.details.presentation.components.PlatformChip(platform: zed.rainxch.core.domain.model.repository.DiscoveryPlatform, release: zed.rainxch.core.domain.model.account.github.GithubRelease, isDevice: kotlin.Boolean, onClick: kotlin.Function1<zed.rainxch.core.domain.model.repository.DiscoveryPlatform, kotlin.Unit>?): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - platform: STABLE (class with no mutable properties)
+    - release: UNSTABLE (cross-module type without @Stable/@Immutable)
+    - isDevice: STABLE (primitive type)
+    - onClick: STABLE (function type)
 
 @Composable
 public fun zed.rainxch.details.presentation.components.PlatformHandoffSheet(handoff: zed.rainxch.core.domain.utils.PlatformRelease, onAction: kotlin.Function1<zed.rainxch.details.presentation.DetailsAction, kotlin.Unit>): kotlin.Unit
@@ -480,6 +539,13 @@ public fun zed.rainxch.details.presentation.components.ReleasesStatusCard(status
     - modifier: STABLE (marked @Stable or @Immutable)
 
 @Composable
+private fun zed.rainxch.details.presentation.components.RepoTitle(name: kotlin.String): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - name: STABLE (String is immutable)
+
+@Composable
 private fun zed.rainxch.details.presentation.components.SectionChip(label: kotlin.String, isPrimary: kotlin.Boolean): kotlin.Unit
   skippable: true
   restartable: true
@@ -532,6 +598,21 @@ public fun zed.rainxch.details.presentation.components.StatItem(label: kotlin.St
   params:
     - label: STABLE (String is immutable)
     - stat: STABLE (primitive type)
+    - modifier: STABLE (marked @Stable or @Immutable)
+
+@Composable
+private fun zed.rainxch.details.presentation.components.StatusChip(status: zed.rainxch.details.presentation.components.HeaderStatus): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - status: STABLE (class with no mutable properties)
+
+@Composable
+private fun zed.rainxch.details.presentation.components.StatusSticker(status: zed.rainxch.details.presentation.components.HeaderStatus, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - status: STABLE (class with no mutable properties)
     - modifier: STABLE (marked @Stable or @Immutable)
 
 @Composable

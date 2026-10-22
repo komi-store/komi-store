@@ -20,6 +20,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material3.AssistChip
+import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.InputChip
 import androidx.compose.material3.Text
@@ -261,6 +262,25 @@ private fun ClassicChip(
             )
         }
 
+        KomiChipKind.Tonal -> {
+            val colors = LocalPersonality.current.colors
+            val container = if (selected) colors.primaryContainer else colors.surfaceContainerHigh
+            val content = if (selected) colors.onPrimaryContainer else colors.onSurfaceVariant
+            AssistChip(
+                onClick = onClick ?: {},
+                label = { Text(text) },
+                modifier = modifier,
+                leadingIcon = leading,
+                colors =
+                    AssistChipDefaults.assistChipColors(
+                        containerColor = container,
+                        labelColor = content,
+                        leadingIconContentColor = content,
+                    ),
+                border = null,
+            )
+        }
+
         KomiChipKind.Filter -> {
             MaterialFilterChip(
                 selected = selected,
@@ -313,7 +333,7 @@ private fun chipMetrics(
     kind: KomiChipKind,
     size: KomiChipSize,
 ): ChipMetrics {
-    val filterLike = kind != KomiChipKind.Info
+    val filterLike = kind == KomiChipKind.Filter || kind == KomiChipKind.Input
     return when {
         filterLike && size == KomiChipSize.Sm -> ChipMetrics(26.dp, 11.dp, 14.dp, 2.5.dp)
         filterLike && size == KomiChipSize.Md -> ChipMetrics(34.dp, 14.dp, 16.dp, 2.5.dp)
