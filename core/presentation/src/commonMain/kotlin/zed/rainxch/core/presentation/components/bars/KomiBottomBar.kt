@@ -33,6 +33,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kotlinx.collections.immutable.ImmutableList
@@ -51,6 +52,7 @@ import zed.rainxch.core.presentation.personality.manga.MangaPaper
 import zed.rainxch.core.presentation.personality.manga.decoration.inkFocusRing
 import zed.rainxch.core.presentation.personality.mangaPersonality
 import zed.rainxch.core.presentation.personality.utils.PersonalityPreview
+import zed.rainxch.core.presentation.testing.KomiTestTags
 
 @Composable
 fun KomiBottomBar(
@@ -112,6 +114,7 @@ private fun MangaBottomBar(
                     Modifier
                         .weight(1f)
                         .fillMaxHeight()
+                        .testTag(KomiTestTags.navItem(item.id))
                         .clickable(
                             interactionSource = interaction,
                             indication = null,
@@ -148,6 +151,7 @@ private fun MangaBottomBar(
                 Spacer(Modifier.height(4.dp))
                 KomiText(
                     text = item.label,
+                    modifier = Modifier.testTag(KomiTestTags.navLabel(item.id)),
                     role = KomiTextRole.LabelSmall,
                     color = if (selected) colors.onSurface else colors.onSurfaceVariant,
                     maxLines = 1,
@@ -204,6 +208,7 @@ internal fun ClassicNavRow(
                 label = {
                     KomiText(
                         text = item.label,
+                        modifier = Modifier.testTag(KomiTestTags.navLabel(item.id)),
                         role = KomiTextRole.LabelSmall,
                         color = LocalContentColor.current,
                         maxLines = 1,

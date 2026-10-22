@@ -209,7 +209,8 @@ interface InstalledAppDao {
         UPDATE installed_apps
            SET installedReleaseId = NULL,
                installedAssetId = NULL,
-               installedAssetDigest = NULL
+               installedAssetDigest = NULL,
+               installedReleasePublishedAt = NULL
          WHERE packageName = :packageName
         """,
     )
@@ -236,6 +237,30 @@ interface InstalledAppDao {
     @Query(
         """
         UPDATE installed_apps
+           SET installedAssetDigest = :digest
+         WHERE packageName = :packageName
+        """,
+    )
+    suspend fun setInstalledAssetDigest(
+        packageName: String,
+        digest: String,
+    )
+
+    @Query(
+        """
+        UPDATE installed_apps
+           SET installedReleasePublishedAt = :publishedAt
+         WHERE packageName = :packageName
+        """,
+    )
+    suspend fun setInstalledReleasePublishedAt(
+        packageName: String,
+        publishedAt: String?,
+    )
+
+    @Query(
+        """
+        UPDATE installed_apps
            SET pendingInstallFilePath = NULL,
                pendingInstallVersion = NULL,
                pendingInstallAssetName = NULL,
@@ -255,15 +280,24 @@ interface InstalledAppDao {
            SET pendingInstallFilePath = :path,
                pendingInstallVersion = :version,
                pendingInstallAssetName = :assetName,
+               pendingInstallReleaseId = :releaseId,
+               pendingInstallAssetId = :assetId,
+               pendingInstallAssetDigest = :digest,
+               pendingInstallReleasePublishedAt = :releasePublishedAt,
                isPendingInstall = 1
          WHERE packageName = :packageName
         """,
     )
+    @Suppress("LongParameterList")
     suspend fun markAwaitingInstall(
         packageName: String,
         path: String,
         version: String?,
         assetName: String?,
+        releaseId: Long?,
+        assetId: Long?,
+        releasePublishedAt: String?,
+        digest: String?,
     )
 
     @Query(

@@ -22,7 +22,8 @@ class CmpLibraryConventionPlugin : Plugin<Project> {
                 "commonMainImplementation"(libs.findLibrary("jetbrains-compose-material3").get())
                 "commonMainImplementation"(libs.findLibrary("jetbrains-compose-material-icons-extended").get())
 
-                "debugImplementation"(libs.findLibrary("androidx-compose-ui-tooling").get())
+                // The Android KMP library plugin has no build types, so no debugImplementation
+                "androidRuntimeClasspath"(libs.findLibrary("androidx-compose-ui-tooling").get())
             }
         }
     }

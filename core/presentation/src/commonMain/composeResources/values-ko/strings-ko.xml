@@ -929,6 +929,12 @@
     <string name="dhizuku_start_hint">자동 설치를 사용하려면 Dhizuku를 Device Owner로 활성화하세요</string>
     <string name="installer_type_root">Root</string>
     <string name="installer_type_root_description">Magisk, KernelSU 또는 APatch 루트를 사용한 무음 설치</string>
+    <string name="installer_type_third_party">서드파티 설치 프로그램</string>
+    <string name="installer_type_third_party_description">시스템 기본 설치 프로그램 대신 선택한 설치 앱으로 APK를 넘깁니다.</string>
+    <string name="external_installer_pick">설치 앱</string>
+    <string name="external_installer_none">선택 안 됨</string>
+    <string name="external_installer_sheet_title">APK를 설치할 수 있는 앱</string>
+    <string name="external_installer_empty">이 기기에서 설치 앱을 찾을 수 없습니다.</string>
     <string name="root_status_ready">허용됨</string>
     <string name="root_status_permission_needed">루트 허용</string>
     <string name="root_status_unavailable">루트 없음</string>
@@ -1062,10 +1068,6 @@
     <string name="platform_section_linux">Linux</string>
     <string name="section_chip_your_device">내 기기</string>
     <string name="section_chip_for_transfer">전송용</string>
-    <string name="kao_banner_title">Android를 열린 상태로</string>
-    <string name="kao_banner_body">Google의 개발자 인증 정책이 Android의 개방적인 배포를 위협합니다. Komi Store는 연합을 지지합니다.</string>
-    <string name="kao_banner_cta">자세히 보기</string>
-    <string name="kao_banner_dismiss_cd">배너 닫기</string>
 
     <!-- ───── ko 100% catch-up ───── -->
     <string name="adaptive_pick_repo_subtitle">왼쪽의 카드를 탭하면 여기에서 세부 정보를 볼 수 있어요.</string>
@@ -1395,8 +1397,8 @@
     <string name="repo_pages_severity_unknown">알 수 없음</string>
 
     <!-- Repo pages: details entry -->
-    <string name="repo_pages_details_issues_button">이슈</string>
     <string name="repo_pages_details_security_button">보안</string>
+    <string name="repo_pages_details_security_value">권고</string>
 
     <!-- Repo pages: details entry -->
     <string name="repo_pages_details_pulls_button">풀 리퀘스트</string>
@@ -1490,4 +1492,17 @@
     <string name="go_to_version">%1$s(으)로 이동</string>
     <string name="get_it_on_platform">%1$s용 받기</string>
     <string name="share_link">링크 공유</string>
+    <string name="display_mode_title">주사율</string>
+    <string name="display_mode_description">디스플레이에 지정한 주사율을 요청합니다. 자동은 시스템이 결정합니다.</string>
+    <string name="display_mode_auto">자동</string>
+    <string name="display_mode_option">%1$d × %2$d · %3$d Hz</string>
+    <string name="show_tabs">탭 표시</string>
+    <string name="repo_layout_title">저장소 레이아웃</string>
+    <string name="repo_layout_list">목록</string>
+    <string name="repo_layout_grid">그리드</string>
+    <string name="apps_tag_updates_ignored">업데이트 무시됨</string>
+    <string name="apps_tag_skipped">%1$s 건너뜀</string>
+    <string name="apps_tag_asset_filter">에셋 필터</string>
+    <string name="apps_variant_stale_pick">변형이 변경되었습니다. 다시 선택하세요.</string>
+    <string name="apps_no_release_found">설치할 릴리스를 찾을 수 없습니다.</string>
 </resources>

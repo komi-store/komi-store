@@ -4,7 +4,8 @@ Open-source app store for apps released on GitHub, Codeberg and other Forgejo fo
 
 ## Map
 
-- `composeApp/`: entry points, navigation (`GithubStoreGraph`, `AppNavigation`), DI wiring (`ViewModelsModule`, `initKoin`)
+- `composeApp/`: shared app code and the Desktop entry point: navigation (`GithubStoreGraph`, `AppNavigation`), DI wiring (`ViewModelsModule`, `initKoin`)
+- `androidApp/`: the Android application: `MainActivity`, `GithubStoreApp`, manifest, resources, R8 rules
 - `core/domain`: interfaces, models and pure logic, no framework imports
 - `core/data`: repositories, Ktor clients, Room, Koin modules, Android and Desktop implementations
 - `core/presentation`: the `Personality` design system, `Komi*` components, strings for 14 locales
@@ -14,7 +15,7 @@ Open-source app store for apps released on GitHub, Codeberg and other Forgejo fo
 ## Build and run
 
 ```bash
-./gradlew :composeApp:assembleDebug     # Android APK
+./gradlew :androidApp:assembleDebug     # Android APK
 ./gradlew :composeApp:run               # Desktop
 ```
 
@@ -26,9 +27,9 @@ CI runs these on every pull request. Existing findings live in committed baselin
 
 ```bash
 ./gradlew spotlessApply                  # formats the files you changed
-./gradlew compileKotlinJvm compileDebugKotlinAndroid jvmTest detekt :konsist-test:test
-./gradlew lintDebug
-./gradlew debugStabilityCheck            # its own invocation, after compileDebugKotlinAndroid
+./gradlew compileKotlinJvm compileAndroidMain :androidApp:compileDebugKotlin jvmTest detekt :konsist-test:test
+./gradlew lintDebug lintAndroidMain
+./gradlew stabilityCheck                 # its own invocation, after compileKotlinJvm compileAndroidMain
 ```
 
 In Claude Code, `/verify` runs the same steps. CI also lints agent docs with agnix. Details and baseline rules: `docs/agents/checks.md`.
@@ -52,7 +53,7 @@ The full rule set, with examples, is `docs/code-style.md`. These apply to almost
 - `docs/agents/sign-in.md`: OAuth handoff, device flow, personal access tokens, the `X-GitHub-Token` header
 - `docs/agents/forges.md`: Codeberg and Forgejo clients, per-host tokens, `RepoIdCodec`
 - `docs/agents/releases-and-assets.md`: how releases, assets and installed apps are matched
-- `docs/agents/platform.md`: silent installs, Desktop logs, encrypted storage, Gradle memory
+- `docs/agents/platform.md`: silent installs, local network access, Desktop logs, encrypted storage, Gradle memory
 - `docs/agents/translation.md`: translation providers
 - `docs/agents/distribution.md`: installers, signing, Homebrew and WinGet (maintainers)
 - `feature/<name>/CLAUDE.md`: notes for one feature

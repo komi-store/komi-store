@@ -13,6 +13,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -44,6 +45,7 @@ import zed.rainxch.core.presentation.components.text.KomiTextRole
 import zed.rainxch.core.presentation.layout.withoutBottom
 import zed.rainxch.core.presentation.locals.LocalPersonality
 import zed.rainxch.core.presentation.personality.usesDecor
+import zed.rainxch.core.presentation.testing.KomiTestTags
 import zed.rainxch.core.presentation.utils.ObserveAsEvents
 import zed.rainxch.core.presentation.utils.toLabel
 import zed.rainxch.githubstore.core.presentation.res.Res
@@ -105,6 +107,7 @@ private fun FeedScreen(
         }
 
     KomiScaffold(
+        modifier = Modifier.testTag(KomiTestTags.SCREEN_EXPLORE),
         topBar = {
             KomiTopBar(
                 title = stringResource(Res.string.feed_masthead_title),

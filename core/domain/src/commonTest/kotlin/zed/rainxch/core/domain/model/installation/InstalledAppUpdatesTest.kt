@@ -7,6 +7,60 @@ import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class InstalledAppUpdatesTest {
+    @Test
+    fun settling_a_park_the_device_already_runs_clears_the_pointer() {
+        val parked =
+            testInstalledApp(
+                isPendingInstall = true,
+                pendingInstallFilePath = "/tmp/app.apk",
+            )
+
+        val settled =
+            parked
+                .settlePendingFromSystem(versionName = "1.0.0", versionCode = 100L)
+                .clearPending()
+
+        assertFalse(settled.isPendingInstall)
+        assertEquals(null, settled.pendingInstallFilePath)
+    }
+
+    @Test
+    fun a_confirmed_install_records_the_release_timestamp() {
+        val result =
+            app().confirmInstall(
+                tag = "2.0.0",
+                releaseId = 7L,
+                assetId = 8L,
+                assetDigest = "sha256:abc",
+                releasePublishedAt = "2026-10-01T00:00:00Z",
+                assetName = "app-2.0.0.apk",
+                assetUrl = "https://dl/app-2.0.0.apk",
+                versionName = "2.0.0",
+                versionCode = 200L,
+                signingFingerprint = "SHA",
+                at = 3_000L,
+            )
+
+        assertEquals("2026-10-01T00:00:00Z", result.installedReleasePublishedAt)
+    }
+
+    @Test
+    fun a_settled_identity_adopts_the_parked_release_timestamp() {
+        val parked =
+            app(latestVersionCode = 200L).copy(
+                isPendingInstall = true,
+                pendingInstallReleaseId = 7L,
+                pendingInstallAssetId = 8L,
+                pendingInstallAssetDigest = "sha256:abc",
+                pendingInstallReleasePublishedAt = "2026-10-01T00:00:00Z",
+            )
+
+        val settled = parked.withSettledInstallIdentity(versionCode = 200L)
+
+        assertEquals("2026-10-01T00:00:00Z", settled.installedReleasePublishedAt)
+        assertEquals(null, settled.pendingInstallReleasePublishedAt)
+    }
+
     private fun app(
         installedVersion: String = "1.0.0",
         installedVersionCode: Long = 100L,

@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
 import zed.rainxch.core.domain.model.announcement.WhatsNewEntry
@@ -17,6 +18,7 @@ import zed.rainxch.core.presentation.components.overlays.KomiSheet
 import zed.rainxch.core.presentation.components.text.KomiText
 import zed.rainxch.core.presentation.components.text.KomiTextRole
 import zed.rainxch.core.presentation.locals.LocalPersonality
+import zed.rainxch.core.presentation.testing.KomiTestTags
 import zed.rainxch.githubstore.core.presentation.res.Res
 import zed.rainxch.githubstore.core.presentation.res.whats_new_cta_dismiss
 import zed.rainxch.githubstore.core.presentation.res.whats_new_cta_history
@@ -50,7 +52,7 @@ fun WhatsNewSheet(
                     onClick = onDismiss,
                     label = stringResource(Res.string.whats_new_cta_dismiss),
                     variant = KomiButtonVariant.Primary,
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth().testTag(KomiTestTags.WHATS_NEW_DISMISS),
                 )
 
                 if (showHistoryAction) {

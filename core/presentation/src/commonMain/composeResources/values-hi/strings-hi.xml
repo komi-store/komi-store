@@ -939,6 +939,12 @@
     <string name="dhizuku_start_hint">साइलेंट इंस्टॉल सक्षम करने के लिए Dhizuku को Device Owner के रूप में सक्रिय करें</string>
     <string name="installer_type_root">Root</string>
     <string name="installer_type_root_description">Magisk, KernelSU या APatch root के साथ साइलेंट इंस्टॉल</string>
+    <string name="installer_type_third_party">थर्ड-पार्टी इंस्टॉलर</string>
+    <string name="installer_type_third_party_description">सिस्टम डिफ़ॉल्ट के बजाय APK को आपके चुने हुए इंस्टॉलर ऐप को सौंपें।</string>
+    <string name="external_installer_pick">इंस्टॉलर ऐप</string>
+    <string name="external_installer_none">चयनित नहीं</string>
+    <string name="external_installer_sheet_title">APK इंस्टॉल कर सकने वाले ऐप</string>
+    <string name="external_installer_empty">इस डिवाइस पर कोई इंस्टॉलर ऐप नहीं मिला।</string>
     <string name="root_status_ready">स्वीकृत</string>
     <string name="root_status_permission_needed">Root अनुमति दें</string>
     <string name="root_status_unavailable">Root नहीं</string>
@@ -1072,10 +1078,6 @@
     <string name="platform_section_linux">Linux</string>
     <string name="section_chip_your_device">आपका डिवाइस</string>
     <string name="section_chip_for_transfer">ट्रांसफ़र के लिए</string>
-    <string name="kao_banner_title">Android को खुला रखें</string>
-    <string name="kao_banner_body">Google की डेवलपर-सत्यापन नीति खुले Android वितरण को खतरे में डालती है। Komi Store गठबंधन के साथ है।</string>
-    <string name="kao_banner_cta">और जानें</string>
-    <string name="kao_banner_dismiss_cd">बैनर बंद करें</string>
 
     <!-- ═══════════════════════════════════════════════════════════════
          Hindi (hi) — newly translated keys
@@ -1413,8 +1415,8 @@
     <string name="repo_pages_severity_unknown">अज्ञात</string>
 
     <!-- Repo pages: details entry -->
-    <string name="repo_pages_details_issues_button">इश्यूज़</string>
     <string name="repo_pages_details_security_button">सुरक्षा</string>
+    <string name="repo_pages_details_security_value">एडवाइज़री</string>
 
     <!-- Repo pages: details entry -->
     <string name="repo_pages_details_pulls_button">पुल रिक्वेस्ट</string>
@@ -1504,4 +1506,17 @@
     <string name="go_to_version">%1$s पर जाएँ</string>
     <string name="get_it_on_platform">%1$s के लिए पाएँ</string>
     <string name="share_link">लिंक साझा करें</string>
+    <string name="display_mode_title">रिफ़्रेश दर</string>
+    <string name="display_mode_description">डिस्प्ले से एक विशेष रिफ़्रेश दर माँगता है। स्वचालित में निर्णय सिस्टम का होता है।</string>
+    <string name="display_mode_auto">स्वचालित</string>
+    <string name="display_mode_option">%1$d × %2$d · %3$d Hz</string>
+    <string name="show_tabs">टैब दिखाएँ</string>
+    <string name="repo_layout_title">रिपॉज़िटरी लेआउट</string>
+    <string name="repo_layout_list">सूची</string>
+    <string name="repo_layout_grid">ग्रिड</string>
+    <string name="apps_tag_updates_ignored">अपडेट अनदेखे किए गए</string>
+    <string name="apps_tag_skipped">%1$s छोड़ा गया</string>
+    <string name="apps_tag_asset_filter">एसेट फ़िल्टर</string>
+    <string name="apps_variant_stale_pick">वेरिएंट बदल गया है। इसे फिर से चुनें।</string>
+    <string name="apps_no_release_found">इंस्टॉल करने के लिए कोई रिलीज़ नहीं मिली।</string>
 </resources>

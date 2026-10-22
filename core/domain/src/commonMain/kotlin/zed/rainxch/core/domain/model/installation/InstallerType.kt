@@ -5,6 +5,7 @@ enum class InstallerType {
     SHIZUKU,
     DHIZUKU,
     ROOT,
+    THIRD_PARTY,
     ;
 
     companion object {

@@ -902,6 +902,12 @@
     <string name="dhizuku_start_hint">将 Dhizuku 激活为 Device Owner，以启用静默安装</string>
     <string name="installer_type_root">Root</string>
     <string name="installer_type_root_description">通过 Magisk / KernelSU / APatch root 静默安装</string>
+    <string name="installer_type_third_party">第三方安装器</string>
+    <string name="installer_type_third_party_description">将 APK 交给你选择的安装应用，而不是系统默认安装器。</string>
+    <string name="external_installer_pick">安装应用</string>
+    <string name="external_installer_none">未选择</string>
+    <string name="external_installer_sheet_title">可安装 APK 的应用</string>
+    <string name="external_installer_empty">此设备上未找到安装应用。</string>
     <string name="root_status_ready">已授权</string>
     <string name="root_status_permission_needed">允许 Root</string>
     <string name="root_status_unavailable">无 Root</string>
@@ -1035,10 +1041,6 @@
     <string name="platform_section_linux">Linux</string>
     <string name="section_chip_your_device">你的设备</string>
     <string name="section_chip_for_transfer">用于转移</string>
-    <string name="kao_banner_title">保持 Android 开放</string>
-    <string name="kao_banner_body">Google 的开发者验证政策威胁 Android 的开放分发。Komi Store 与联盟同行。</string>
-    <string name="kao_banner_cta">了解更多</string>
-    <string name="kao_banner_dismiss_cd">关闭横幅</string>
 
     <!-- Appended: translations brought to 100% parity with English source -->
     <string name="adaptive_pick_repo_subtitle">点按左侧任意卡片，在此查看详情。</string>
@@ -1368,8 +1370,8 @@
     <string name="repo_pages_severity_unknown">未知</string>
 
     <!-- Repo pages: details entry -->
-    <string name="repo_pages_details_issues_button">Issues</string>
     <string name="repo_pages_details_security_button">安全</string>
+    <string name="repo_pages_details_security_value">公告</string>
 
     <!-- Repo pages: details entry -->
     <string name="repo_pages_details_pulls_button">拉取请求</string>
@@ -1459,4 +1461,17 @@
     <string name="go_to_version">前往 %1$s</string>
     <string name="get_it_on_platform">获取 %1$s 版</string>
     <string name="share_link">分享链接</string>
+    <string name="display_mode_title">刷新率</string>
+    <string name="display_mode_description">向屏幕请求指定的刷新率。自动由系统决定。</string>
+    <string name="display_mode_auto">自动</string>
+    <string name="display_mode_option">%1$d × %2$d · %3$d Hz</string>
+    <string name="show_tabs">显示标签页</string>
+    <string name="repo_layout_title">仓库布局</string>
+    <string name="repo_layout_list">列表</string>
+    <string name="repo_layout_grid">网格</string>
+    <string name="apps_tag_updates_ignored">已忽略更新</string>
+    <string name="apps_tag_skipped">已跳过 %1$s</string>
+    <string name="apps_tag_asset_filter">资源筛选</string>
+    <string name="apps_variant_stale_pick">变体已更改，请重新选择。</string>
+    <string name="apps_no_release_found">找不到可安装的发布版本。</string>
 </resources>

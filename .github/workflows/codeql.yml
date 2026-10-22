@@ -32,7 +32,7 @@ jobs:
           - language: java-kotlin
             target: android
             build-mode: manual
-            gradle-tasks: compileDebugKotlinAndroid
+            gradle-tasks: compileAndroidMain :androidApp:compileDebugKotlin
           - language: java-kotlin
             target: desktop
             build-mode: manual

@@ -8,33 +8,13 @@ updates:
       default-days: 7
     open-pull-requests-limit: 5
     ignore:
-      # Newer releases need compileSdk 37 (AndroidX Compose 1.12, lifecycle 2.11, OkHttp 5.5); lift with the compileSdk 37 upgrade. Patches still come through.
-      - dependency-name: "org.jetbrains.androidx.lifecycle:*"
-        update-types: ["version-update:semver-minor", "version-update:semver-major"]
-      - dependency-name: "io.ktor:*"
-        update-types: ["version-update:semver-minor", "version-update:semver-major"]
-      - dependency-name: "io.coil-kt.coil3:*"
-        update-types: ["version-update:semver-minor", "version-update:semver-major"]
-      - dependency-name: "com.mikepenz:multiplatform-markdown-renderer*"
-        update-types: ["version-update:semver-minor", "version-update:semver-major"]
-      - dependency-name: "io.github.iamr0s:Dhizuku-API"
-        update-types: ["version-update:semver-minor", "version-update:semver-major"]
       # Kermit 2.2 deprecates the tag-first log overloads used across the codebase, and warnings are errors; lift with the logging cleanup (D7 in docs/quality/findings.md).
       - dependency-name: "co.touchlab:kermit*"
         update-types: ["version-update:semver-minor", "version-update:semver-major"]
-      # Held for steps 6-7 of the AGP 9 migration, which bring this group at pinned versions; lift then.
-      - dependency-name: "org.jetbrains.kotlin*"
-        update-types: ["version-update:semver-minor", "version-update:semver-major"]
-      - dependency-name: "com.google.devtools.ksp*"
-        update-types: ["version-update:semver-minor", "version-update:semver-major"]
-      - dependency-name: "*compose.stability*"
-        update-types: ["version-update:semver-minor", "version-update:semver-major"]
-      - dependency-name: "com.github.skydoves:compose-stability*"
-        update-types: ["version-update:semver-minor", "version-update:semver-major"]
-      - dependency-name: "org.jetbrains.compose*"
-        update-types: ["version-update:semver-minor", "version-update:semver-major"]
-      - dependency-name: "com.codingfeline.buildkonfig*"
-        update-types: ["version-update:semver-minor", "version-update:semver-major"]
+      # Material 3 has only alphas past 1.9. Its 1.13 alphas pull in Compose 1.13 alphas, so it stays on the 1.12 line
+      # Compose Multiplatform 1.12 ships with; lift with Compose Multiplatform 1.13.
+      - dependency-name: "org.jetbrains.compose.material3:*"
+        versions: ["[1.13.0-alpha01,1.13.0)"]
     groups:
       kotlin-toolchain:
         patterns:

@@ -366,9 +366,7 @@ private fun RowTrailing(trailing: KomiListTrailing) {
         verticalAlignment = Alignment.CenterVertically,
     ) {
         when (trailing) {
-            KomiListTrailing.None -> {
-                Unit
-            }
+            KomiListTrailing.None -> {}
 
             KomiListTrailing.Chevron -> {
                 Chevron()

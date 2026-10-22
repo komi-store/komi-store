@@ -1,6 +1,6 @@
 {
   "generatedAt": "2026-06-25",
-  "note": "Maintainer-curated. To regenerate, run ./gradlew :composeApp:printRuntimeDependencies and reconcile against this list.",
+  "note": "Maintainer-curated. To regenerate, run ./gradlew :androidApp:printRuntimeDependencies and reconcile against this list.",
   "libraries": [
     {"name": "Kotlin", "license": "Apache-2.0", "url": "https://github.com/JetBrains/kotlin"},
     {"name": "Compose Multiplatform", "license": "Apache-2.0", "url": "https://github.com/JetBrains/compose-multiplatform"},

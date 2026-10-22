@@ -209,9 +209,7 @@ class FeedViewModel(
             FeedAction.OnSearchClick,
             FeedAction.OnProfileClick,
             is FeedAction.OnRepoClick,
-            -> {
-                Unit
-            }
+            -> {}
         }
     }
 

@@ -25,6 +25,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -47,6 +48,7 @@ import zed.rainxch.core.presentation.layout.rememberWidthCappedStaggeredCells
 import zed.rainxch.core.presentation.locals.LocalPersonality
 import zed.rainxch.core.presentation.personality.MangaPersonality
 import zed.rainxch.core.presentation.personality.usesDecor
+import zed.rainxch.core.presentation.testing.KomiTestTags
 import zed.rainxch.githubstore.core.presentation.res.Res
 import zed.rainxch.githubstore.core.presentation.res.feed_empty_title
 import zed.rainxch.githubstore.core.presentation.res.feed_end_cap
@@ -231,7 +233,8 @@ private fun DiscoveryChipRow(
                 .fillMaxWidth()
                 .background(colors.background)
                 .padding(top = 6.dp)
-                .drivesPullToRefresh(),
+                .drivesPullToRefresh()
+                .testTag(KomiTestTags.DISCOVERY_CHIPS),
     ) {
         LazyRow(
             modifier = Modifier.fillMaxWidth().padding(bottom = 6.dp),

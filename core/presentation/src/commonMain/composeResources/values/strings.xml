@@ -602,6 +602,12 @@
     <string name="dhizuku_start_hint">Activate Dhizuku as Device Owner to enable silent installs</string>
     <string name="installer_type_root">Root</string>
     <string name="installer_type_root_description">Silent install via Magisk, KernelSU, or APatch root</string>
+    <string name="installer_type_third_party">Third-party installer</string>
+    <string name="installer_type_third_party_description">Hand the APK to an installer app you pick, instead of the system default.</string>
+    <string name="external_installer_pick">Installer app</string>
+    <string name="external_installer_none">Not selected</string>
+    <string name="external_installer_sheet_title">Apps that can install APKs</string>
+    <string name="external_installer_empty">No installer apps found on this device.</string>
     <string name="root_status_ready">Granted</string>
     <string name="root_status_permission_needed">Allow root</string>
     <string name="root_status_unavailable">No root</string>
@@ -1277,10 +1283,6 @@
     <string name="skipped_updates_unskip_action">Don't skip</string>
     <string name="skipped_updates_unskipped_snackbar">Update prompt enabled for %1$s</string>
     <string name="skipped_updates_unskip_failure">Couldn't update skip preference</string>
-    <string name="kao_banner_title">Keep Android Open</string>
-    <string name="kao_banner_body">Google's developer-verification policy threatens open Android distribution. Komi Store stands with the coalition.</string>
-    <string name="kao_banner_cta">Learn more</string>
-    <string name="kao_banner_dismiss_cd">Dismiss banner</string>
 
     <!-- Auto-translate -->
     <string name="translation_auto_title">Auto-translate repositories</string>
@@ -1476,8 +1478,8 @@
     <string name="repo_pages_severity_unknown">Unknown</string>
 
     <!-- Repo pages: details entry -->
-    <string name="repo_pages_details_issues_button">Issues</string>
     <string name="repo_pages_details_security_button">Security</string>
+    <string name="repo_pages_details_security_value">Advisories</string>
     <string name="repo_pages_details_pulls_button">Pull requests</string>
 
     <!-- Repo interactions: star -->
@@ -1545,4 +1547,8 @@
     <string name="go_to_version">Go to %1$s</string>
     <string name="get_it_on_platform">Get it on %1$s</string>
     <string name="share_link">Share link</string>
+    <string name="display_mode_title">Refresh rate</string>
+    <string name="display_mode_description">Asks the display for a specific rate. Automatic leaves the system in charge.</string>
+    <string name="display_mode_auto">Automatic</string>
+    <string name="display_mode_option">%1$d × %2$d · %3$d Hz</string>
 </resources>

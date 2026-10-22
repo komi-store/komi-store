@@ -49,6 +49,10 @@ interface TweaksRepository {
 
     suspend fun setInstallerType(type: InstallerType)
 
+    fun getExternalInstallerPackage(): Flow<String>
+
+    suspend fun setExternalInstallerPackage(packageName: String)
+
     fun getInstallerAttribution(): Flow<zed.rainxch.core.domain.model.installation.InstallerAttribution>
 
     suspend fun setInstallerAttribution(attribution: zed.rainxch.core.domain.model.installation.InstallerAttribution)
@@ -80,6 +84,10 @@ interface TweaksRepository {
     fun getScrollbarEnabled(): Flow<Boolean>
 
     suspend fun setScrollbarEnabled(enabled: Boolean)
+
+    fun getDisplayModeId(): Flow<Int>
+
+    suspend fun setDisplayModeId(modeId: Int)
 
     fun getContentWidth(): Flow<ContentWidth>
 
@@ -140,10 +148,6 @@ interface TweaksRepository {
     fun getExternalImportBannerDismissedAtCount(): Flow<Int>
 
     suspend fun setExternalImportBannerDismissedAtCount(count: Int)
-
-    fun getKaoBannerDismissed(): Flow<Boolean>
-
-    suspend fun setKaoBannerDismissed(dismissed: Boolean)
 
     fun getApkInspectCoachmarkShown(): Flow<Boolean>
 
@@ -206,3 +210,6 @@ interface TweaksRepository {
 
     suspend fun removeCustomForgeHost(host: String)
 }
+
+// Matches WindowManager.LayoutParams.preferredDisplayModeId: 0 leaves the system in charge.
+const val SYSTEM_DEFAULT_DISPLAY_MODE_ID = 0

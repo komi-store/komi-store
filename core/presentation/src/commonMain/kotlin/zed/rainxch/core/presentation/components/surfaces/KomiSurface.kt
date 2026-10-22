@@ -136,12 +136,12 @@ private fun MangaSurface(
     val needsClip = personality.shape.corner > 0.dp
     val fill =
         when (paper) {
-            KomiSurfacePaper.Surface -> colors.surface
+            KomiSurfacePaper.Surface, KomiSurfacePaper.Tinted -> colors.surface
             KomiSurfacePaper.Background -> colors.background
         }
     val contentInk =
         when (paper) {
-            KomiSurfacePaper.Surface -> colors.onSurface
+            KomiSurfacePaper.Surface, KomiSurfacePaper.Tinted -> colors.onSurface
             KomiSurfacePaper.Background -> colors.onBackground
         }
 
@@ -251,22 +251,7 @@ private fun ClassicSurface(
 ) {
     val colors = personality.colors
     val shape = remember(personality.shape.corner) { RoundedCornerShape(personality.shape.corner) }
-    // Tonal surfaces: the container color steps up with elevation instead of drawing an outline.
-    // A background-colored surface keeps the outline, since it would vanish into the page.
-    val fill =
-        when (paper) {
-            KomiSurfacePaper.Background -> {
-                colors.background
-            }
-
-            KomiSurfacePaper.Surface -> {
-                when (elevation) {
-                    KomiSurfaceElevation.Flat -> colors.surface
-                    KomiSurfaceElevation.Card -> colors.surfaceContainer
-                    KomiSurfaceElevation.Raised, KomiSurfaceElevation.Modal -> colors.surfaceContainerHigh
-                }
-            }
-        }
+    val fill = classicFill(personality, paper, elevation)
     val border =
         if (paper == KomiSurfacePaper.Background) BorderStroke(personality.shape.borderPanel, colors.outlineVariant) else null
     val shadowElevation =
@@ -286,11 +271,38 @@ private fun ClassicSurface(
         modifier = modifier,
         shape = shape,
         color = fill,
-        contentColor = colors.onSurface,
+        contentColor = if (paper == KomiSurfacePaper.Tinted) personality.colorScheme.onSecondaryContainer else colors.onSurface,
         border = border,
         shadowElevation = shadowElevation,
     ) {
         Box(modifier = Modifier.then(clickModifier).padding(contentPadding)) { content() }
+    }
+}
+
+// Tonal surfaces: the container color steps up with elevation instead of drawing an outline.
+// A background-colored surface keeps the outline, since it would vanish into the page.
+private fun classicFill(
+    personality: ClassicPersonality,
+    paper: KomiSurfacePaper,
+    elevation: KomiSurfaceElevation,
+): Color {
+    val colors = personality.colors
+    return when (paper) {
+        KomiSurfacePaper.Background -> {
+            colors.background
+        }
+
+        KomiSurfacePaper.Tinted -> {
+            personality.colorScheme.secondaryContainer
+        }
+
+        KomiSurfacePaper.Surface -> {
+            when (elevation) {
+                KomiSurfaceElevation.Flat -> colors.surface
+                KomiSurfaceElevation.Card -> colors.surfaceContainer
+                KomiSurfaceElevation.Raised, KomiSurfaceElevation.Modal -> colors.surfaceContainerHigh
+            }
+        }
     }
 }
 

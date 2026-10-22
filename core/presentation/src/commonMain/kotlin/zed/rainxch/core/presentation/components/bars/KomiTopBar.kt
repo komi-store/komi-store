@@ -30,6 +30,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -54,6 +55,7 @@ import zed.rainxch.core.presentation.personality.manga.decoration.speedLineWash
 import zed.rainxch.core.presentation.personality.mangaPersonality
 import zed.rainxch.core.presentation.personality.utils.PersonalityPreview
 import zed.rainxch.core.presentation.spacing.Spacing
+import zed.rainxch.core.presentation.testing.KomiTestTags
 import zed.rainxch.githubstore.core.presentation.res.Res
 import zed.rainxch.githubstore.core.presentation.res.navigate_back
 import androidx.compose.material3.Text as MaterialText
@@ -195,7 +197,7 @@ private fun MangaTopBar(
         leading?.invoke()
 
         Column(
-            modifier = Modifier.weight(1f),
+            modifier = Modifier.weight(1f).testTag(KomiTestTags.TOP_BAR_CONTENT),
             horizontalAlignment = if (centerTitle) Alignment.CenterHorizontally else Alignment.Start,
         ) {
             MaterialText(

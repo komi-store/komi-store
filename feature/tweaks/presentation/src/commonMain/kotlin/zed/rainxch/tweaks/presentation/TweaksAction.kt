@@ -55,6 +55,10 @@ sealed interface TweaksAction {
         val width: ContentWidth,
     ) : TweaksAction
 
+    data class OnDisplayModeSelected(
+        val modeId: Int,
+    ) : TweaksAction
+
     data class OnProxyTypeSelected(
         val scope: ProxyScope,
         val type: ProxyType,
@@ -90,6 +94,14 @@ sealed interface TweaksAction {
 
     data class OnProxyTest(
         val scope: ProxyScope,
+    ) : TweaksAction
+
+    data class OnExternalInstallerPickerOpenChanged(
+        val open: Boolean,
+    ) : TweaksAction
+
+    data class OnExternalInstallerSelected(
+        val packageName: String,
     ) : TweaksAction
 
     data class OnInstallerTypeSelected(

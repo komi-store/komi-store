@@ -8,6 +8,8 @@ import androidx.compose.ui.text.font.FontWeight
 @Immutable
 data class PersonalityType(
     val display: TextStyle,
+    // The page's own name where it stands out, as M3 Expressive's emphasized display.
+    val displayEmphasized: TextStyle,
     val screenTitle: TextStyle,
     val sectionTitle: TextStyle,
     val cardTitle: TextStyle,
@@ -36,6 +38,7 @@ data class PersonalityType(
 
         return copy(
             display = this.display.inDisplay(),
+            displayEmphasized = displayEmphasized.inDisplay(),
             screenTitle = screenTitle.inDisplay(),
             sectionTitle = sectionTitle.inDisplay(),
             cardTitle = cardTitle.inBody(),

@@ -427,9 +427,7 @@ private fun CardBadge(
                     )
                 }
 
-                KomiRepoCardFeed.Plain -> {
-                    Unit
-                }
+                KomiRepoCardFeed.Plain -> {}
             }
         }
 

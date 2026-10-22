@@ -25,20 +25,21 @@ import kotlin.coroutines.cancellation.CancellationException
 
 expect fun createPlatformHttpClient(proxyConfig: ProxyConfig): HttpClient
 
+// Shared with parseStarredPage, so a page decodes the same way in both places.
+internal val gitHubJson =
+    Json {
+        ignoreUnknownKeys = true
+        isLenient = true
+    }
+
 fun createGitHubHttpClient(
     tokenStore: TokenStore,
     rateLimitRepository: RateLimitRepository,
     userSessionRepository: UserSessionRepository? = null,
     hostTokenRepository: HostTokenRepository? = null,
     proxyConfig: ProxyConfig = ProxyConfig.System,
-): HttpClient {
-    val json =
-        Json {
-            ignoreUnknownKeys = true
-            isLenient = true
-        }
-
-    return createPlatformHttpClient(proxyConfig)
+): HttpClient =
+    createPlatformHttpClient(proxyConfig)
         .config {
             install(RateLimitInterceptor) {
                 this.rateLimitRepository = rateLimitRepository
@@ -51,7 +52,7 @@ fun createGitHubHttpClient(
             }
 
             install(ContentNegotiation) {
-                json(json)
+                json(gitHubJson)
             }
 
             install(HttpTimeout) {
@@ -91,7 +92,6 @@ fun createGitHubHttpClient(
                 }
             }
         }.also { it.installMirrorRewrite() }
-}
 
 private fun HttpClientConfig<*>.installGitHubRetry() {
     install(HttpRequestRetry) {

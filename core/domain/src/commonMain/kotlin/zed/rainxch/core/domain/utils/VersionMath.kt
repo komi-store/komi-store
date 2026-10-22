@@ -172,6 +172,19 @@ object VersionMath {
         return runCatching { Instant.parse(trimmed) }.getOrNull()
     }
 
+    // Public comparison for callers outside this module (the update check needs it).
+    fun publishedAtAfter(
+        candidate: String?,
+        baseline: String?,
+    ): Boolean = isPublishedAtAfter(candidate, baseline)
+
+    // A stored release timestamp only counts while it parses; a corrupt value must not win
+    // over the freshly fetched window.
+    fun publishedAtOrNull(raw: String?): String? {
+        val trimmed = raw?.trim().orEmpty()
+        return trimmed.takeIf { it.isNotEmpty() && parsePublishedAtToInstant(it) != null }
+    }
+
     internal fun isPublishedAtAfter(
         candidate: String?,
         baseline: String?,

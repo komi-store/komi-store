@@ -66,9 +66,7 @@ class CategoryListViewModel(
                 }
             }
 
-            CategoryListAction.OnNavigateBack -> {
-                Unit
-            }
+            CategoryListAction.OnNavigateBack -> {}
         }
     }
 

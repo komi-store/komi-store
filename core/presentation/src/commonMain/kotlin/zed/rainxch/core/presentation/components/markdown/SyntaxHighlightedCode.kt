@@ -106,9 +106,7 @@ private fun extractFenceContent(
                 if (sawContent) body.append('\n')
             }
 
-            else -> {
-                Unit
-            }
+            else -> {}
         }
     }
     return language to body.toString()

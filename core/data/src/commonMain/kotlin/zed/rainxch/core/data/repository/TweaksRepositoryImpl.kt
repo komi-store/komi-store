@@ -36,6 +36,7 @@ import zed.rainxch.core.domain.model.installation.InstallerType
 import zed.rainxch.core.domain.model.repository.DiscoveryPlatform
 import zed.rainxch.core.domain.model.settings.AppLanguages
 import zed.rainxch.core.domain.model.settings.TranslationProvider
+import zed.rainxch.core.domain.repository.SYSTEM_DEFAULT_DISPLAY_MODE_ID
 import zed.rainxch.core.domain.repository.TweaksRepository
 
 class TweaksRepositoryImpl(
@@ -128,6 +129,13 @@ class TweaksRepositoryImpl(
 
     override fun getInstallerType(): Flow<InstallerType> =
         gatedGetFlow(K_INSTALLER_TYPE, "").map { InstallerType.fromName(it.ifEmpty { null }) }
+
+    override fun getExternalInstallerPackage(): Flow<String> = gatedGetFlow(K_EXTERNAL_INSTALLER, "")
+
+    override suspend fun setExternalInstallerPackage(packageName: String) {
+        migrationDeferred.await()
+        ksafe.safePut(K_EXTERNAL_INSTALLER, packageName)
+    }
 
     override suspend fun setInstallerType(type: InstallerType) {
         migrationDeferred.await()
@@ -239,6 +247,13 @@ class TweaksRepositoryImpl(
     override suspend fun setScrollbarEnabled(enabled: Boolean) {
         migrationDeferred.await()
         ksafe.safePut(K_SCROLLBAR_ENABLED, enabled)
+    }
+
+    override fun getDisplayModeId(): Flow<Int> = gatedGetFlow(K_DISPLAY_MODE_ID, SYSTEM_DEFAULT_DISPLAY_MODE_ID)
+
+    override suspend fun setDisplayModeId(modeId: Int) {
+        migrationDeferred.await()
+        ksafe.safePut(K_DISPLAY_MODE_ID, modeId)
     }
 
     override fun getContentWidth(): Flow<ContentWidth> =
@@ -369,13 +384,6 @@ class TweaksRepositoryImpl(
     override suspend fun setExternalImportBannerDismissedAtCount(count: Int) {
         migrationDeferred.await()
         ksafe.safePut(K_EXTERNAL_IMPORT_BANNER_DISMISSED_AT, count)
-    }
-
-    override fun getKaoBannerDismissed(): Flow<Boolean> = gatedGetFlow(K_KAO_BANNER_DISMISSED, false)
-
-    override suspend fun setKaoBannerDismissed(dismissed: Boolean) {
-        migrationDeferred.await()
-        ksafe.safePut(K_KAO_BANNER_DISMISSED, dismissed)
     }
 
     override fun getApkInspectCoachmarkShown(): Flow<Boolean> = gatedGetFlow(K_APK_INSPECT_COACHMARK_SHOWN, false)
@@ -520,7 +528,6 @@ class TweaksRepositoryImpl(
             MigrationEntry(booleanPreferencesKey("external_import_enabled"), K_EXTERNAL_IMPORT_ENABLED),
             MigrationEntry(booleanPreferencesKey("external_match_search_enabled"), K_EXTERNAL_MATCH_SEARCH_ENABLED),
             MigrationEntry(intPreferencesKey("external_import_banner_dismissed_at"), K_EXTERNAL_IMPORT_BANNER_DISMISSED_AT),
-            MigrationEntry(booleanPreferencesKey("kao_banner_dismissed"), K_KAO_BANNER_DISMISSED),
             MigrationEntry(booleanPreferencesKey("apk_inspect_coachmark_shown"), K_APK_INSPECT_COACHMARK_SHOWN),
             MigrationEntry(booleanPreferencesKey("channel_chip_coachmark_shown"), K_CHANNEL_CHIP_COACHMARK_SHOWN),
             MigrationEntry(booleanPreferencesKey("show_all_platforms"), K_SHOW_ALL_PLATFORMS),
@@ -575,6 +582,7 @@ class TweaksRepositoryImpl(
         private const val K_DISCOVERY_PLATFORMS = "discovery_platforms"
         private const val K_AUTO_DETECT_CLIPBOARD = "auto_detect_clipboard_links"
         private const val K_INSTALLER_TYPE = "installer_type"
+        private const val K_EXTERNAL_INSTALLER = "external_installer_package"
         private const val K_INSTALLER_ATTRIBUTION = "installer_attribution"
         private const val K_AUTO_UPDATE = "auto_update_enabled"
         private const val K_UPDATE_CHECK_ENABLED = "update_check_enabled"
@@ -582,6 +590,7 @@ class TweaksRepositoryImpl(
         private const val K_INCLUDE_PRE_RELEASES = "include_pre_releases"
         private const val K_HIDE_SEEN_ENABLED = "hide_seen_enabled"
         private const val K_SCROLLBAR_ENABLED = "scrollbar_enabled"
+        private const val K_DISPLAY_MODE_ID = "display_mode_id"
         private const val K_TRANSLATION_PROVIDER = "translation_provider"
         private const val K_YOUDAO_APP_KEY = "youdao_app_key"
         private const val K_YOUDAO_APP_SECRET = "youdao_app_secret"
@@ -596,7 +605,6 @@ class TweaksRepositoryImpl(
         private const val K_EXTERNAL_IMPORT_ENABLED = "external_import_enabled"
         private const val K_EXTERNAL_MATCH_SEARCH_ENABLED = "external_match_search_enabled"
         private const val K_EXTERNAL_IMPORT_BANNER_DISMISSED_AT = "external_import_banner_dismissed_at"
-        private const val K_KAO_BANNER_DISMISSED = "kao_banner_dismissed"
         private const val K_APK_INSPECT_COACHMARK_SHOWN = "apk_inspect_coachmark_shown"
         private const val K_CHANNEL_CHIP_COACHMARK_SHOWN = "channel_chip_coachmark_shown"
         private const val K_SHOW_ALL_PLATFORMS = "show_all_platforms"

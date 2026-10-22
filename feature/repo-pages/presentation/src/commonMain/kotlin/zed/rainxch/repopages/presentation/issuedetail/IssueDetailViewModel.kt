@@ -45,9 +45,7 @@ class IssueDetailViewModel(
 
     fun onAction(action: IssueDetailAction) {
         when (action) {
-            IssueDetailAction.OnBackClick -> {
-                Unit
-            }
+            IssueDetailAction.OnBackClick -> {}
 
             is IssueDetailAction.OnCommentChange -> {
                 _state.update { it.copy(commentText = action.comment) }

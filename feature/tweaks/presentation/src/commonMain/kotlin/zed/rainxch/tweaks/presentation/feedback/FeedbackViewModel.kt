@@ -134,20 +134,20 @@ class FeedbackViewModel(
         }
     }
 
+    private fun installerLabel(type: InstallerType): String =
+        when (type) {
+            InstallerType.DEFAULT -> "Default"
+            InstallerType.SHIZUKU -> "Shizuku"
+            InstallerType.ROOT -> "Root"
+            InstallerType.DHIZUKU -> "Dhizuku"
+            InstallerType.THIRD_PARTY -> "Third-party"
+        }
+
     private suspend fun collectDiagnostics(): DiagnosticsInfo {
         val installerType = tweaksRepository.getInstallerType().first()
         val platform = getPlatform()
         val installerString =
-            if (platform == Platform.ANDROID) {
-                when (installerType) {
-                    InstallerType.DEFAULT -> "Default"
-                    InstallerType.SHIZUKU -> "Shizuku"
-                    InstallerType.ROOT -> "Root"
-                    InstallerType.DHIZUKU -> "Dhizuku"
-                }
-            } else {
-                null
-            }
+            if (platform == Platform.ANDROID) installerLabel(installerType) else null
         val user = userSessionRepository.getUser().firstOrNull()
         val appLanguage = tweaksRepository.getAppLanguage().firstOrNull()
         val palette = tweaksRepository.getThemeColor().firstOrNull()

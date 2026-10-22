@@ -160,9 +160,7 @@ private fun LibraryRowContent(
         }
 
         when (progress) {
-            null -> {
-                Unit
-            }
+            null -> {}
 
             LibraryProgress.Working -> {
                 Spacer(Modifier.height(10.dp))

@@ -9,7 +9,8 @@ import androidx.compose.ui.unit.sp
 import zed.rainxch.core.presentation.personality.model.PersonalityType
 
 // Family (Nunito / Geist Mono) injected at theme time by withClassicFonts(). Nunito's rounded
-// shapes carry the look: ExtraBold headings, Bold titles and controls, Medium running text.
+// shapes carry the look: ExtraBold headings, Bold titles and controls, Medium running text, and
+// Black, set a little tighter, for the emphasized display.
 internal val ClassicType =
     PersonalityType(
         display =
@@ -18,6 +19,14 @@ internal val ClassicType =
                 fontWeight = FontWeight.ExtraBold,
                 fontSize = 32.sp,
                 lineHeight = 40.sp,
+            ),
+        displayEmphasized =
+            TextStyle(
+                fontFamily = FontFamily.Default,
+                fontWeight = FontWeight.Black,
+                fontSize = 32.sp,
+                lineHeight = 40.sp,
+                letterSpacing = (-0.02).em,
             ),
         screenTitle =
             TextStyle(

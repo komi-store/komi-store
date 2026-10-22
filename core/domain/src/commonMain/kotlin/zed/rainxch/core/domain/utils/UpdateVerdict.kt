@@ -161,6 +161,26 @@ object UpdateVerdict {
                     matchedAssetDigest = matched.assetDigest,
                 )
 
+        // Same tag, different bytes, published later: a re-released build. Version comparison
+        // cannot see it, and it is the one stable-tag case where the timestamp decides.
+        val installedBytesDiffer =
+            bound != null &&
+                VersionMath.assetBuildChanged(
+                    matchedReleaseId = null,
+                    matchedAssetId = matched.assetId,
+                    matchedDigest = matched.assetDigest,
+                    matchedSize = null,
+                    storedReleaseId = null,
+                    storedAssetId = bound.assetId,
+                    storedDigest = bound.assetDigest,
+                    storedSize = null,
+                )
+        val sameTagRebuild =
+            sameTag &&
+                bound != null &&
+                installedBytesDiffer &&
+                VersionMath.isPublishedAtAfter(matched.publishedAt, bound.releasePublishedAt)
+
         val isUpdateAvailable =
             when {
                 skipHolds -> {
@@ -169,6 +189,10 @@ object UpdateVerdict {
 
                 selfAttestedSameFile != null -> {
                     !selfAttestedSameFile
+                }
+
+                sameTagRebuild -> {
+                    true
                 }
 
                 deviceRunsMatchedRelease -> {

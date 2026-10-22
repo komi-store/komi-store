@@ -203,9 +203,7 @@ class DeveloperProfileViewModel(
             is DeveloperProfileAction.OnRepositoryClick,
             is DeveloperProfileAction.OnOpenLink,
             is DeveloperProfileAction.OnNavigateToUser,
-            -> {
-                Unit
-            }
+            -> {}
 
             is DeveloperProfileAction.OnFilterChange -> {
                 _state.update { it.copy(currentFilter = action.filter) }

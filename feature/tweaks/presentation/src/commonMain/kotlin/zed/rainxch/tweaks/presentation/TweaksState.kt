@@ -3,6 +3,7 @@ package zed.rainxch.tweaks.presentation
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.collections.immutable.ImmutableSet
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.persistentSetOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.collections.immutable.toImmutableMap
@@ -13,6 +14,7 @@ import zed.rainxch.core.domain.model.appearance.ContentWidth
 import zed.rainxch.core.domain.model.appearance.FontTheme
 import zed.rainxch.core.domain.model.appearance.MangaPaperId
 import zed.rainxch.core.domain.model.installation.DhizukuAvailability
+import zed.rainxch.core.domain.model.installation.ExternalInstallerApp
 import zed.rainxch.core.domain.model.installation.InstallerAttribution
 import zed.rainxch.core.domain.model.installation.InstallerType
 import zed.rainxch.core.domain.model.installation.RootAvailability
@@ -21,6 +23,7 @@ import zed.rainxch.core.domain.model.settings.AppLanguages
 import zed.rainxch.core.domain.model.settings.ProxyScope
 import zed.rainxch.core.domain.model.settings.SupportedTranslationLanguages
 import zed.rainxch.core.domain.model.settings.TranslationProvider
+import zed.rainxch.core.domain.repository.SYSTEM_DEFAULT_DISPLAY_MODE_ID
 import zed.rainxch.tweaks.presentation.components.desktop.DesktopSection
 import zed.rainxch.tweaks.presentation.model.LanguagePickerOption
 import zed.rainxch.tweaks.presentation.model.ProxyScopeFormState
@@ -41,6 +44,9 @@ data class TweaksState(
     val cacheSize: String = "",
     val isClearDownloadsDialogVisible: Boolean = false,
     val installerType: InstallerType = InstallerType.DEFAULT,
+    val externalInstallerPackage: String = "",
+    val externalInstallers: ImmutableList<ExternalInstallerApp> = persistentListOf(),
+    val externalInstallerPickerOpen: Boolean = false,
     val installerAttribution: InstallerAttribution = InstallerAttribution.SystemDefault,
     val installerAttributionCustomDraft: String = "",
     val installerAttributionCustomExpanded: Boolean = false,
@@ -55,6 +61,7 @@ data class TweaksState(
     val isHideSeenEnabled: Boolean = false,
     val isScrollbarEnabled: Boolean = false,
     val contentWidth: ContentWidth = ContentWidth.COMPACT,
+    val displayModeId: Int = SYSTEM_DEFAULT_DISPLAY_MODE_ID,
     val translationProvider: TranslationProvider = TranslationProvider.Default,
     val draftTranslationProvider: TranslationProvider? = null,
     val youdaoAppKey: String = "",

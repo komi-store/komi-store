@@ -2,7 +2,7 @@
 agp = "9.4.1"
 composeBom = "2025.07.00"
 kermit = "2.0.8"
-kotlin = "2.3.10"
+kotlin = "2.4.20"
 ksp = "2.3.12"
 
 androidDesugarJdkLibs = "2.1.5"
@@ -10,8 +10,8 @@ androidTools = "32.0.1"
 
 # Compose
 compose-hot-reload = "1.0.0"
-compose-multiplatform = "1.10.3"
-compose-lifecycle = "2.9.6"
+compose-multiplatform = "1.12.2"
+compose-lifecycle = "2.11.0"
 navigation-compose = "2.9.2"
 jetbrains-core-bundle = "1.0.1"
 material-icons = "1.7.3"
@@ -20,6 +20,11 @@ material-icons = "1.7.3"
 androidx-activity = "1.12.4"
 core-splashscreen = "1.2.0"
 core-ktx = "1.16.0"
+androidx-test = "1.7.0"
+androidx-test-ext-junit = "1.3.0"
+androidx-test-espresso = "3.8.0-alpha01"
+androidx-test-uiautomator = "2.4.0"
+compose-ui-test = "1.12.1"
 
 # Kotlinx
 kotlinx-coroutines = "1.10.2"
@@ -36,11 +41,11 @@ jna = "5.19.1"
 sqlite = "2.6.2"
 datastore = "1.2.0"
 ksafe = "3.3.0"
-compose-jetbrains = "1.10.3"
-compose-jetbrains-material-you = "1.11.0-alpha03"
+compose-jetbrains = "1.12.2"
+compose-jetbrains-material-you = "1.12.0-alpha03"
 jetbrains-savedstate = "1.4.0"
 moko = "0.20.1"
-buildkonfig = "0.17.1"
+buildkonfig = "0.23.0"
 markdownRenderer = "0.39.2"
 coil3 = "3.3.0"
 highlights = "1.1.0"
@@ -51,13 +56,13 @@ dhizuku = "2.5.4"
 hidden-api = "4.4.0"
 jsystemthemedetector = "3.9.1"
 work = "2.11.1"
-resources="1.10.3"
+resources="1.12.2"
 
 ktlint = "1.8.0"
 spotless = "8.10.4"
 detekt = "1.23.8"
 kover = "0.9.11"
-stability-analyzer = "0.7.0"
+stability-analyzer = "0.15.0"
 konsist = "0.18.1"
 compose-rules = "0.6.0"
 flatpak-gradle-generator = "1.8.0"
@@ -66,8 +71,8 @@ projectApplicationId = "zed.rainxch.githubstore"
 projectVersionName = "1.9.3"
 projectVersionCode = "22"
 projectMinSdkVersion = "26"
-projectTargetSdkVersion = "36"
-projectCompileSdkVersion = "36"
+projectTargetSdkVersion = "37"
+projectCompileSdkVersion = "37"
 
 [libraries]
 # Kotlin
@@ -80,6 +85,12 @@ jetbrains-compose-viewmodel = { module = "org.jetbrains.androidx.lifecycle:lifec
 koin-core-viewmodel = { group = "io.insert-koin", name = "koin-core-viewmodel", version.ref = "koin" }
 core-splashscreen = { group = "androidx.core", name = "core-splashscreen", version.ref = "core-splashscreen" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "core-ktx" }
+androidx-test-runner = { module = "androidx.test:runner", version.ref = "androidx-test" }
+androidx-test-rules = { module = "androidx.test:rules", version.ref = "androidx-test" }
+androidx-test-ext-junit = { module = "androidx.test.ext:junit", version.ref = "androidx-test-ext-junit" }
+androidx-test-espresso-core = { module = "androidx.test.espresso:espresso-core", version.ref = "androidx-test-espresso" }
+androidx-test-uiautomator = { module = "androidx.test.uiautomator:uiautomator", version.ref = "androidx-test-uiautomator" }
+androidx-compose-ui-test-junit4 = { module = "androidx.compose.ui:ui-test-junit4", version.ref = "compose-ui-test" }
 
 # Kotlinx
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
@@ -192,7 +203,7 @@ konsist = { group = "com.lemonappdev", name = "konsist", version.ref = "konsist"
 
 [plugins]
 
-convention-cmp-application = { id = "zed.rainxch.convention.cmp.application", version = "unspecified" }
+convention-android-application-compose = { id = "zed.rainxch.convention.android.application.compose", version = "unspecified" }
 convention-android-library = { id = "zed.rainxch.convention.android.library", version = "unspecified" }
 convention-kmp-library = { id = "zed.rainxch.convention.kmp.library", version = "unspecified" }
 convention-cmp-library = { id = "zed.rainxch.convention.cmp.library", version = "unspecified" }

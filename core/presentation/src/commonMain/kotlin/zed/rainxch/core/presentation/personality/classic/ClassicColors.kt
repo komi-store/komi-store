@@ -27,6 +27,22 @@ fun classicColorScheme(
     return if (dark && amoled) scheme.amoled() else scheme
 }
 
+// The same spec and style as the accents, from any seed: an app's icon color on its own page.
+fun classicSeedScheme(
+    seed: Color,
+    dark: Boolean,
+    amoled: Boolean = false,
+): ColorScheme {
+    val scheme =
+        dynamicColorScheme(
+            seedColor = seed,
+            isDark = dark,
+            style = PaletteStyle.TonalSpot,
+            specVersion = ColorSpec.SpecVersion.SPEC_2025,
+        )
+    return if (dark && amoled) scheme.amoled() else scheme
+}
+
 fun classicAccentSwatch(
     accent: AccentId,
     dark: Boolean,

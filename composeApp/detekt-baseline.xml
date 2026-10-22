@@ -15,7 +15,6 @@
     <ID>FunctionNaming:WindowsDarkTitleBar.kt$DwmApi$fun DwmSetWindowAttribute( hwnd: WinDef.HWND, attribute: Int, value: WinDef.BOOLByReference, size: Int, ): Int</ID>
     <ID>LongMethod:DeepLinkParser.kt$DeepLinkParser$fun parse(uri: String): DeepLinkDestination</ID>
     <ID>LongMethod:DesktopApp.kt$fun main(args: Array&lt;String&gt;)</ID>
-    <ID>LongMethod:GithubStoreApp.kt$GithubStoreApp$private fun registerSelfAsInstalledApp()</ID>
     <ID>LongParameterList:MainViewModel.kt$MainViewModel$( private val tweaksRepository: TweaksRepository, private val installedAppsRepository: InstalledAppsRepository, private val userSessionRepository: UserSessionRepository, private val rateLimitRepository: RateLimitRepository, private val syncUseCase: SyncInstalledAppsUseCase, private val logger: KomiStoreLogger, private val localizationManager: LocalizationManager, )</ID>
     <ID>MagicNumber:DeepLinkParser.kt$DeepLinkParser$100</ID>
     <ID>MagicNumber:DeepLinkParser.kt$DeepLinkParser$16</ID>
@@ -27,26 +26,21 @@
     <ID>MagicNumber:NavigationUtils.kt$3</ID>
     <ID>MagicNumber:NavigationUtils.kt$4</ID>
     <ID>MagicNumber:WindowsDarkTitleBar.kt$4</ID>
-    <ID>MaxLineLength:GithubStoreApp.kt$GithubStoreApp$"Resolved self-update pending install: ${resolution.versionName} (code=${resolution.versionCode}, tag=${resolution.resolvedTag})"</ID>
     <ID>NestedBlockDepth:DeepLinkParser.kt$DeepLinkParser$private fun urlDecode(value: String): String</ID>
-    <ID>NestedBlockDepth:GithubStoreApp.kt$GithubStoreApp$private suspend fun resolveSelfPendingInstall( existing: InstalledApp, repo: InstalledAppsRepository, )</ID>
     <ID>ReturnCount:DeepLinkParser.kt$DeepLinkParser$private fun extractQueryParam( uri: String, key: String, ): String?</ID>
     <ID>ReturnCount:DeepLinkParser.kt$DeepLinkParser$private fun isStrictlyValidOwnerRepo( owner: String, repo: String, ): Boolean</ID>
     <ID>ReturnCount:DeepLinkParser.kt$DeepLinkParser$private fun parseAuthCallback(uri: String): DeepLinkDestination</ID>
     <ID>ReturnCount:DesktopApp.kt$private fun selectLinuxRenderBackendIfRequested()</ID>
     <ID>ReturnCount:DesktopDeepLink.kt$DesktopDeepLink$private fun registerWindows()</ID>
     <ID>ReturnCount:DesktopDeepLink.kt$DesktopDeepLink$private fun windowsRegistrationIsValid(expectedCommandValue: String): Boolean</ID>
-    <ID>ReturnCount:GithubStoreApp.kt$GithubStoreApp$private suspend fun normalizeSelfInstalledVersion( existing: InstalledApp, repo: InstalledAppsRepository, )</ID>
     <ID>ReturnCount:NavigationUtils.kt$fun NavBackStackEntry?.getCurrentScreen(): GithubStoreGraph?</ID>
     <ID>ReturnCount:WindowStateStore.kt$WindowStateStore$private fun isTitleBarVisible( x: Float, y: Float, width: Float, height: Float, ): Boolean</ID>
     <ID>ReturnCount:WindowsDarkTitleBar.kt$fun applyWindowsImmersiveDarkMode( window: Window, isDark: Boolean, )</ID>
     <ID>TooGenericExceptionCaught:A11yCrashGuard.kt$A11yCrashGuard.FilteringEventQueue$ex: RuntimeException</ID>
     <ID>TooGenericExceptionCaught:DesktopDeepLink.kt$DesktopDeepLink$e: Exception</ID>
-    <ID>TooGenericExceptionCaught:GithubStoreApp.kt$GithubStoreApp$e: Exception</ID>
     <ID>TooGenericExceptionCaught:MainViewModel.kt$MainViewModel$e: Exception</ID>
     <ID>TooGenericExceptionCaught:WhatsNewLoaderImpl.kt$WhatsNewLoaderImpl$t: Throwable</ID>
     <ID>TooManyFunctions:DesktopDeepLink.kt$DesktopDeepLink</ID>
     <ID>TooManyFunctions:DesktopSidebar.kt$zed.rainxch.githubstore.app.navigation.DesktopSidebar.kt</ID>
-    <ID>TooManyFunctions:GithubStoreApp.kt$GithubStoreApp : Application</ID>
   </CurrentIssues>
 </SmellBaseline>
