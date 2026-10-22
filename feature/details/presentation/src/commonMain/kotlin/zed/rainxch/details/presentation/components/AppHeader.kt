@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -39,6 +40,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -71,6 +73,7 @@ import zed.rainxch.core.presentation.components.text.KomiTextRole
 import zed.rainxch.core.presentation.locals.LocalPersonality
 import zed.rainxch.core.presentation.personality.MangaPersonality
 import zed.rainxch.core.presentation.personality.manga.decoration.hardShadow
+import zed.rainxch.core.presentation.personality.model.PersonalityColors
 import zed.rainxch.core.presentation.spacing.Spacing
 import zed.rainxch.core.presentation.utils.daysSinceIso
 import zed.rainxch.core.presentation.utils.formatReleasedAgo
@@ -149,23 +152,21 @@ fun AppHeader(
             )
         }
     }
-    if (manga) {
-        Box(modifier = modifier.fillMaxWidth().padding(top = Spacing.md, end = Spacing.sm)) {
-            KomiSurface(
-                modifier = Modifier.fillMaxWidth(),
-                screentone = KomiScreentone.Corner,
-                contentPadding = PaddingValues(Spacing.lg),
-                content = body,
+    // Manga's sticker hangs off the panel's corner, so the panel leaves room for it.
+    val stickerRoom = if (manga) Modifier.padding(top = Spacing.md, end = Spacing.sm) else Modifier
+    Box(modifier = modifier.fillMaxWidth().then(stickerRoom)) {
+        KomiSurface(
+            modifier = Modifier.fillMaxWidth(),
+            screentone = KomiScreentone.Corner,
+            contentPadding = PaddingValues(Spacing.lg),
+            content = body,
+        )
+        if (manga && status != null) {
+            StatusSticker(
+                status = status,
+                modifier = Modifier.align(Alignment.TopEnd).offset(x = Spacing.sm, y = -Spacing.md),
             )
-            if (status != null) {
-                StatusSticker(
-                    status = status,
-                    modifier = Modifier.align(Alignment.TopEnd).offset(x = Spacing.sm, y = -Spacing.md),
-                )
-            }
         }
-    } else {
-        Box(modifier = modifier.fillMaxWidth().padding(vertical = Spacing.sm)) { body() }
     }
 }
 
@@ -377,7 +378,7 @@ private fun HeaderChips(
 ) {
     // Classic's Material chips already pad themselves to a 48dp touch target, so their rows need no gap.
     val rowGap = if (LocalPersonality.current is MangaPersonality) Spacing.sm else 0.dp
-    // Without selectors to scroll through, the status joins the platform chips instead of a row of its own.
+    // Without selectors to scroll through, the status sits beside the fork chip instead of in a row of its own.
     val selectors = appLabel != null || switcherApps.isNotEmpty()
     val inlineStatus = status.takeIf { !selectors }
     Column(verticalArrangement = Arrangement.spacedBy(rowGap)) {
@@ -391,7 +392,7 @@ private fun HeaderChips(
                 onSelectInstalledApp = onSelectInstalledApp,
             )
         }
-        if (inlineStatus != null || isFork || platformReleases.isNotEmpty()) {
+        if (inlineStatus != null || isFork) {
             FlowRow(
                 horizontalArrangement = Arrangement.spacedBy(Spacing.sm),
                 verticalArrangement = Arrangement.spacedBy(rowGap),
@@ -405,12 +406,20 @@ private fun HeaderChips(
                         leadingIcon = Icons.AutoMirrored.Outlined.CallSplit,
                     )
                 }
+            }
+        }
+        if (platformReleases.isNotEmpty()) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(Spacing.sm),
+            ) {
                 platformReleases.forEach { (platform, platformRelease) ->
-                    PlatformChip(
+                    PlatformTile(
                         platform = platform,
                         release = platformRelease,
                         isDevice = platform == devicePlatform,
-                        onClick = onPlatformClick,
+                        onClick = onPlatformClick?.let { handler -> { handler(platform) } },
+                        modifier = Modifier.weight(1f, fill = false).widthIn(max = 96.dp).fillMaxWidth(),
                     )
                 }
             }
@@ -418,31 +427,70 @@ private fun HeaderChips(
     }
 }
 
+// One tile per platform: its icon over the version of its newest build, or the year when that build
+// is over a year old. The device's tile is filled; in Manga every tile is inked.
 @Composable
-private fun PlatformChip(
+private fun PlatformTile(
     platform: DiscoveryPlatform,
     release: GithubRelease,
     isDevice: Boolean,
-    onClick: ((DiscoveryPlatform) -> Unit)?,
+    onClick: (() -> Unit)?,
+    modifier: Modifier = Modifier,
 ) {
-    val colors = LocalPersonality.current.colors
-    KomiChip(
-        label = platformChipLabel(platform.toLabel(), release),
-        kind = KomiChipKind.Tonal,
-        size = KomiChipSize.Sm,
-        leadingContent = {
-            platform.toIcon()?.let { icon ->
-                KomiIcon(
-                    imageVector = icon,
-                    contentDescription = null,
-                    modifier = Modifier.size(16.dp),
-                    tint = if (isDevice) colors.onSurface else colors.onSurfaceVariant,
-                )
-            }
-        },
-        onClick = onClick?.let { handler -> { handler(platform) } },
-    )
+    val personality = LocalPersonality.current
+    val colors = personality.colors
+    val manga = personality is MangaPersonality
+    val stale = (daysSinceIso(release.publishedAt) ?: 0) > STALE_PLATFORM_DAYS
+    val (container, content) = platformTileColors(colors, manga = manga, isDevice = isDevice, stale = stale)
+    val shape = if (manga) RectangleShape else RoundedCornerShape(personality.shape.cornerSmall)
+    val ink =
+        if (manga) {
+            Modifier.hardShadow(offset = DpOffset(2.dp, 2.dp), color = colors.shadow)
+        } else {
+            Modifier
+        }
+    Column(
+        modifier =
+            modifier
+                .then(ink)
+                .clip(shape)
+                .background(container)
+                .then(if (manga) Modifier.border(2.dp, colors.outline) else Modifier)
+                .then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier)
+                .padding(vertical = Spacing.sm),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(Spacing.xs),
+    ) {
+        platform.toIcon()?.let { icon ->
+            KomiIcon(
+                imageVector = icon,
+                contentDescription = platform.toLabel(),
+                tint = content,
+                modifier = Modifier.size(20.dp),
+            )
+        }
+        KomiText(
+            text = if (stale) release.publishedAt.take(4) else platformVersion(release),
+            role = KomiTextRole.LabelSmall,
+            color = content,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
+    }
 }
+
+private fun platformTileColors(
+    colors: PersonalityColors,
+    manga: Boolean,
+    isDevice: Boolean,
+    stale: Boolean,
+): Pair<Color, Color> =
+    when {
+        isDevice && manga -> colors.primary to colors.onPrimary
+        isDevice -> colors.primaryContainer to colors.onPrimaryContainer
+        stale -> (if (manga) colors.surface else colors.surfaceContainerHigh) to colors.disabledContent
+        else -> (if (manga) colors.surface else colors.surfaceContainerHigh) to colors.onSurfaceVariant
+    }
 
 // The status, the monorepo app label and one chip per installed app; the selected chip scrolls into view.
 @Composable
@@ -562,19 +610,8 @@ private fun headerStatusOf(app: InstalledApp): HeaderStatus =
         else -> HeaderStatus.Installed
     }
 
-private fun platformChipLabel(
-    platformLabel: String,
-    release: GithubRelease,
-): String {
-    val version = VersionMath.normalizeVersion(release.tagName).ifBlank { release.tagName }
-    val days = daysSinceIso(release.publishedAt)
-    val year = release.publishedAt.take(4)
-    return if (days != null && days > STALE_PLATFORM_DAYS) {
-        "$platformLabel $version · $year"
-    } else {
-        "$platformLabel $version"
-    }
-}
+private fun platformVersion(release: GithubRelease): String =
+    VersionMath.normalizeVersion(release.tagName).ifBlank { release.tagName }
 
 private const val STALE_PLATFORM_DAYS = 365
 private const val BUSY_PICTURE_SCALE = 0.72f

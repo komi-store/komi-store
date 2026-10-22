@@ -413,16 +413,6 @@ private fun zed.rainxch.details.presentation.components.PermissionsSection(permi
     - permissions: RUNTIME (requires runtime check)
 
 @Composable
-private fun zed.rainxch.details.presentation.components.PlatformChip(platform: zed.rainxch.core.domain.model.repository.DiscoveryPlatform, release: zed.rainxch.core.domain.model.account.github.GithubRelease, isDevice: kotlin.Boolean, onClick: kotlin.Function1<zed.rainxch.core.domain.model.repository.DiscoveryPlatform, kotlin.Unit>?): kotlin.Unit
-  skippable: true
-  restartable: true
-  params:
-    - platform: STABLE (class with no mutable properties)
-    - release: UNSTABLE (cross-module type without @Stable/@Immutable)
-    - isDevice: STABLE (primitive type)
-    - onClick: STABLE (function type)
-
-@Composable
 public fun zed.rainxch.details.presentation.components.PlatformHandoffSheet(handoff: zed.rainxch.core.domain.utils.PlatformRelease, onAction: kotlin.Function1<zed.rainxch.details.presentation.DetailsAction, kotlin.Unit>): kotlin.Unit
   skippable: true
   restartable: true
@@ -443,6 +433,17 @@ private fun zed.rainxch.details.presentation.components.PlatformSectionCard(plat
     - pinnedVariant: STABLE (class with no mutable properties)
     - onAssetClick: STABLE (function type)
     - variantStatuses: RUNTIME (requires runtime check)
+
+@Composable
+private fun zed.rainxch.details.presentation.components.PlatformTile(platform: zed.rainxch.core.domain.model.repository.DiscoveryPlatform, release: zed.rainxch.core.domain.model.account.github.GithubRelease, isDevice: kotlin.Boolean, onClick: kotlin.Function0<kotlin.Unit>?, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - platform: STABLE (class with no mutable properties)
+    - release: UNSTABLE (cross-module type without @Stable/@Immutable)
+    - isDevice: STABLE (primitive type)
+    - onClick: STABLE (function type)
+    - modifier: STABLE (marked @Stable or @Immutable)
 
 @Composable
 private fun zed.rainxch.details.presentation.components.PrimaryAction(modifier: androidx.compose.ui.Modifier, shape: androidx.compose.foundation.shape.RoundedCornerShape, accent: androidx.compose.ui.graphics.Color, onAccent: androidx.compose.ui.graphics.Color, enabled: kotlin.Boolean, isActiveDownload: kotlin.Boolean, isUpdateAvailable: kotlin.Boolean, isInstalled: kotlin.Boolean, buttonText: kotlin.String, primaryAsset: zed.rainxch.core.domain.model.account.github.GithubAsset?, state: zed.rainxch.details.presentation.DetailsState, progress: kotlin.Int?, onClick: kotlin.Function0<kotlin.Unit>): kotlin.Unit
