@@ -1104,6 +1104,8 @@
     <string name="details_whats_new_screen_title">नया क्या है</string>
     <string name="external_import_progress_skip">छोड़ें और बाद में समीक्षा करें</string>
     <string name="feedback_hub_subtitle">हम हर रिपोर्ट पढ़ते हैं।</string>
+    <string name="tweaks_crash_log_share">क्रैश लॉग साझा करें</string>
+    <string name="tweaks_crash_log_share_subtitle">पिछले क्रैश के बाद इस डिवाइस पर सहेजा गया</string>
     <string name="home_action_get">पाएँ</string>
     <string name="home_rank_format">#%1$d</string>
     <string name="home_section_from_your_stars">आपके स्टार से</string>

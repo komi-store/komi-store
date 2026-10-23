@@ -1,0 +1,25 @@
+{
+  "versionCode": 23,
+  "versionName": "1.9.4",
+  "releaseDate": "2026-10-23",
+  "showAsSheet": false,
+  "sections": [
+    {
+      "type": "NEW",
+      "bullets": [
+        "Komi Store 當機後，可在「調整 → 應用」中分享當機日誌。"
+      ]
+    },
+    {
+      "type": "FIXED",
+      "bullets": [
+        "在 Classic 中，已安裝應用程式的頁面不再卡住。",
+        "版本列表為空時，會先到 GitHub 確認，再顯示「尚未釋出任何版本」。",
+        "檢查更新後會立即顯示「更新」按鈕，並開啟新版本。",
+        "切換頻道或應用程式、或重試後，自動翻譯現在也會翻譯版本說明。",
+        "下載鏡像列表中一律提供 Direct GitHub。",
+        "應用程式在 Komi Store 以外更新後，更新前的簽章檢查仍保持開啟。"
+      ]
+    }
+  ]
+}

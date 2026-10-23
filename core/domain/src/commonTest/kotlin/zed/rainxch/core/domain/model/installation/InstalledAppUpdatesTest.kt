@@ -111,6 +111,22 @@ class InstalledAppUpdatesTest {
     }
 
     @Test
+    fun confirmInstallKeepsTheStoredSignerWhenNoneIsReported() {
+        val result =
+            app().confirmInstall(
+                tag = "2.0.0",
+                assetName = "a",
+                assetUrl = "u",
+                versionName = "2.0.0",
+                versionCode = 200L,
+                signingFingerprint = null,
+                at = 1L,
+            )
+
+        assertEquals("SHA", result.signingFingerprint)
+    }
+
+    @Test
     fun confirmInstallClearsUpdateFlagWhenLatestMatchesInstalled() {
         val result =
             app().confirmInstall(

@@ -445,11 +445,13 @@ private fun zed.rainxch.tweaks.presentation.components.sections.YoudaoCredential
     - onAction: STABLE (function type)
 
 @Composable
-public fun zed.rainxch.tweaks.presentation.components.sections.appSection(onOpenFeedback: kotlin.Function0<kotlin.Unit>, showHead: kotlin.Boolean): kotlin.Unit
+public fun zed.rainxch.tweaks.presentation.components.sections.appSection(hasCrashLog: kotlin.Boolean, onOpenFeedback: kotlin.Function0<kotlin.Unit>, onShareCrashLog: kotlin.Function0<kotlin.Unit>, showHead: kotlin.Boolean): kotlin.Unit
   skippable: true
   restartable: true
   params:
+    - hasCrashLog: STABLE (primitive type)
     - onOpenFeedback: STABLE (function type)
+    - onShareCrashLog: STABLE (function type)
     - showHead: STABLE (primitive type)
 
 @Composable

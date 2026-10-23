@@ -1186,6 +1186,8 @@
     <string name="tweaks_search_placeholder">Search settings</string>
     <string name="tweaks_search_empty">No settings match '%1$s'.</string>
     <string name="feedback_hub_subtitle">We read every report.</string>
+    <string name="tweaks_crash_log_share">Share crash log</string>
+    <string name="tweaks_crash_log_share_subtitle">Saved on this device after the last crash</string>
     <string name="restart_banner_body">Some changes need a restart to apply.</string>
     <string name="restart_banner_reasons_prefix">Affected: %1$s</string>
     <string name="restart_banner_reason_language">language</string>

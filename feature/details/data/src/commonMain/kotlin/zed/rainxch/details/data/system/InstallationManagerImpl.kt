@@ -11,6 +11,7 @@ import zed.rainxch.core.domain.repository.FavouritesRepository
 import zed.rainxch.core.domain.repository.InstalledAppsRepository
 import zed.rainxch.core.domain.repository.TweaksRepository
 import zed.rainxch.core.domain.system.Installer
+import zed.rainxch.core.domain.system.PackageMonitor
 import zed.rainxch.core.domain.utils.AssetVariant
 import zed.rainxch.details.domain.model.ApkValidationResult
 import zed.rainxch.details.domain.model.FingerprintCheckResult
@@ -25,6 +26,7 @@ class InstallationManagerImpl(
     private val installedAppsRepository: InstalledAppsRepository,
     private val favouritesRepository: FavouritesRepository,
     private val tweaksRepository: TweaksRepository,
+    private val packageMonitor: PackageMonitor,
     private val logger: KomiStoreLogger,
 ) : InstallationManager {
     override suspend fun validateApk(
@@ -51,7 +53,12 @@ class InstallationManagerImpl(
             installedAppsRepository.getAppByPackage(apkInfo.packageName)
                 ?: return FingerprintCheckResult.Ok
 
-        val expectedFp = existingApp.signingFingerprint ?: return FingerprintCheckResult.Ok
+        // DB may predate fingerprint recording. Fall back to the package actually installed
+        // on this device; both sides are still local signatures. Unknown stays silent.
+        val expectedFp =
+            existingApp.signingFingerprint
+                ?: packageMonitor.getInstalledPackageInfo(apkInfo.packageName)?.signingFingerprint
+                ?: return FingerprintCheckResult.Ok
         val actualFp = apkInfo.signingFingerprint ?: return FingerprintCheckResult.Ok
 
         return if (expectedFp == actualFp) {
@@ -120,7 +127,10 @@ class InstallationManagerImpl(
                     installedVersionCode = apkInfo.versionCode,
                     latestVersionName = null,
                     latestVersionCode = null,
-                    signingFingerprint = apkInfo.signingFingerprint,
+                    // Details also installs a tracked app this way, and the insert replaces its row.
+                    signingFingerprint =
+                        apkInfo.signingFingerprint
+                            ?: installedAppsRepository.getAppByPackage(apkInfo.packageName)?.signingFingerprint,
                     preferredAssetVariant = fingerprint?.variant,
                     preferredAssetTokens = serializedTokens,
                     assetGlobPattern = fingerprint?.glob,

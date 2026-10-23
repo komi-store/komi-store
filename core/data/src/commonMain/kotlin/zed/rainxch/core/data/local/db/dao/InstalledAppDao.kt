@@ -207,6 +207,18 @@ interface InstalledAppDao {
     @Query(
         """
         UPDATE installed_apps
+           SET signingFingerprint = :signingFingerprint
+         WHERE packageName = :packageName
+        """,
+    )
+    suspend fun updateSigningFingerprint(
+        packageName: String,
+        signingFingerprint: String,
+    )
+
+    @Query(
+        """
+        UPDATE installed_apps
            SET installedReleaseId = NULL,
                installedAssetId = NULL,
                installedAssetDigest = NULL,

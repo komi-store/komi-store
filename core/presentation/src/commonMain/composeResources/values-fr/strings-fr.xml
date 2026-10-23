@@ -1073,6 +1073,8 @@
     <string name="details_whats_new_screen_title">Nouveautés</string>
     <string name="external_import_progress_skip">Ignorer et examiner plus tard</string>
     <string name="feedback_hub_subtitle">Nous lisons chaque retour.</string>
+    <string name="tweaks_crash_log_share">Partager le journal de plantage</string>
+    <string name="tweaks_crash_log_share_subtitle">Enregistré sur cet appareil après le dernier plantage</string>
     <string name="home_action_get">Obtenir</string>
     <string name="home_rank_format">n°%1$d</string>
     <string name="home_section_from_your_stars">Depuis vos étoiles</string>

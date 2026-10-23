@@ -71,6 +71,11 @@ interface InstalledAppsRepository {
         isUpdateAvailable: Boolean,
     )
 
+    suspend fun updateSigningFingerprint(
+        packageName: String,
+        signingFingerprint: String,
+    )
+
     suspend fun updatePendingStatus(
         packageName: String,
         isPending: Boolean,

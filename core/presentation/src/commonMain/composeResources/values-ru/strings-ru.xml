@@ -1100,6 +1100,8 @@
     <string name="details_whats_new_screen_title">Что нового</string>
     <string name="external_import_progress_skip">Пропустить и посмотреть позже</string>
     <string name="feedback_hub_subtitle">Мы читаем каждый отзыв.</string>
+    <string name="tweaks_crash_log_share">Поделиться журналом сбоев</string>
+    <string name="tweaks_crash_log_share_subtitle">Сохранён на этом устройстве после последнего сбоя</string>
     <string name="home_action_get">Получить</string>
     <string name="home_rank_format">#%1$d</string>
     <string name="home_section_from_your_stars">Из твоих избранных</string>

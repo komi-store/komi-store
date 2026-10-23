@@ -1,0 +1,25 @@
+{
+  "versionCode": 23,
+  "versionName": "1.9.4",
+  "releaseDate": "2026-10-23",
+  "showAsSheet": false,
+  "sections": [
+    {
+      "type": "NEW",
+      "bullets": [
+        "Si Komi Store se cierra por un fallo, puedes compartir el registro de fallos desde Ajustes → Aplicación."
+      ]
+    },
+    {
+      "type": "FIXED",
+      "bullets": [
+        "Las páginas de las apps instaladas ya no se congelan en Classic.",
+        "Si la lista de versiones llega vacía, se comprueba en GitHub antes de mostrar «Aún no hay versiones publicadas».",
+        "El botón Actualizar aparece justo después de buscar actualizaciones y abre la nueva versión.",
+        "La traducción automática ahora también traduce las notas de versión al cambiar de canal o de app, o al reintentar.",
+        "Direct GitHub siempre aparece en la lista de espejos de descarga.",
+        "La comprobación de firma antes de actualizar sigue activa cuando una app se actualiza fuera de Komi Store."
+      ]
+    }
+  ]
+}

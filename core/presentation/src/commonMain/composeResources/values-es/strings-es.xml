@@ -1073,6 +1073,8 @@
     <string name="details_whats_new_screen_title">Novedades</string>
     <string name="external_import_progress_skip">Omitir y revisar después</string>
     <string name="feedback_hub_subtitle">Leemos cada reporte.</string>
+    <string name="tweaks_crash_log_share">Compartir registro de fallos</string>
+    <string name="tweaks_crash_log_share_subtitle">Guardado en este dispositivo tras el último fallo</string>
     <string name="home_action_get">Obtener</string>
     <string name="home_rank_format">#%1$d</string>
     <string name="home_section_from_your_stars">De tus favoritos</string>

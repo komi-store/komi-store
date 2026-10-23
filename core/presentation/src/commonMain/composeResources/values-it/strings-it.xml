@@ -1107,6 +1107,8 @@
     <string name="details_whats_new_screen_title">Cosa c'è di nuovo</string>
     <string name="external_import_progress_skip">Salta e rivedi più tardi</string>
     <string name="feedback_hub_subtitle">Leggiamo ogni segnalazione.</string>
+    <string name="tweaks_crash_log_share">Condividi il log degli arresti anomali</string>
+    <string name="tweaks_crash_log_share_subtitle">Salvato su questo dispositivo dopo l'ultimo arresto anomalo</string>
     <string name="home_action_get">Ottieni</string>
     <string name="home_rank_format">#%1$d</string>
     <string name="home_section_from_your_stars">Dai tuoi preferiti</string>

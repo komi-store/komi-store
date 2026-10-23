@@ -11,6 +11,10 @@
         name="ghs_internal_downloads"
         path="downloads/" />
 
+    <files-path
+        name="crash_logs"
+        path="crashes/" />
+
     <cache-path
         name="exports"
         path="exports/" />

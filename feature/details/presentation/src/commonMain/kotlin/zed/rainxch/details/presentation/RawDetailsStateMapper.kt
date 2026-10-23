@@ -6,6 +6,7 @@ import zed.rainxch.core.domain.model.account.github.isEffectivelyPreRelease
 import zed.rainxch.core.domain.utils.VersionMath
 import zed.rainxch.core.domain.utils.newestReleasePerPlatform
 import zed.rainxch.details.domain.model.ReleaseCategory
+import zed.rainxch.details.presentation.model.TranslationState
 import zed.rainxch.details.presentation.utils.releaseLineLabel
 
 internal fun RawDetailsState.toView(): DetailsState {
@@ -49,6 +50,21 @@ internal fun RawDetailsState.toView(): DetailsState {
                 }
         }
 
+    // Auto-translate (and the manual toggle) only fill the translation states; the page itself
+    // renders one text per section, so the displayed content is chosen here.
+    val shownReadme = aboutTranslation.visibleTranslation()
+    val displayedReadme = shownReadme ?: readmeMarkdown
+    val displayedReadmeLanguage =
+        if (shownReadme != null) {
+            aboutTranslation.targetLanguageDisplayName ?: readmeLanguage
+        } else {
+            readmeLanguage
+        }
+    val displayedWhatsNew =
+        whatsNewTranslation.visibleTranslation()?.let { translated ->
+            selectedRelease?.copy(description = translated)
+        } ?: selectedRelease
+
     return DetailsState(
         isLoading = isLoading,
         isCurrentUserOwner = isCurrentUserOwner,
@@ -59,7 +75,7 @@ internal fun RawDetailsState.toView(): DetailsState {
         repository = repository,
         primaryAsset = primaryAsset,
         installableAssets = installableAssets.toImmutableList(),
-        selectedRelease = selectedRelease,
+        selectedRelease = displayedWhatsNew,
         allReleases = allReleases.toImmutableList(),
         releasesLoadFailed = releasesLoadFailed,
         isRetryingReleases = isRetryingReleases,
@@ -67,8 +83,8 @@ internal fun RawDetailsState.toView(): DetailsState {
         selectedReleaseCategory = selectedReleaseCategory,
         isVersionPickerVisible = isVersionPickerVisible,
         stats = stats,
-        readmeMarkdown = readmeMarkdown,
-        readmeLanguage = readmeLanguage,
+        readmeMarkdown = displayedReadme,
+        readmeLanguage = displayedReadmeLanguage,
         installLogs = installLogs.toImmutableList(),
         isDownloading = isDownloading,
         downloadProgressPercent = downloadProgressPercent,
@@ -158,3 +174,10 @@ private fun RawDetailsState.computeIsPendingInstallReady(): Boolean {
     val assetName = primaryAsset?.name ?: return false
     return parkedVersion == tag && parkedAsset == assetName
 }
+
+private fun TranslationState.visibleTranslation(): String? =
+    if (isShowingTranslation) {
+        translatedText?.takeIf { it.isNotBlank() }
+    } else {
+        null
+    }

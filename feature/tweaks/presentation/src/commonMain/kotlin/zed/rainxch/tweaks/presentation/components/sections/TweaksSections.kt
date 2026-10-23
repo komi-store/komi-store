@@ -12,6 +12,8 @@ import zed.rainxch.githubstore.core.presentation.res.section_installs_and_update
 import zed.rainxch.githubstore.core.presentation.res.section_look_and_feel
 import zed.rainxch.githubstore.core.presentation.res.section_privacy_and_data
 import zed.rainxch.githubstore.core.presentation.res.select_language
+import zed.rainxch.githubstore.core.presentation.res.tweaks_crash_log_share
+import zed.rainxch.githubstore.core.presentation.res.tweaks_crash_log_share_subtitle
 import zed.rainxch.githubstore.core.presentation.res.tweaks_entry_access_tokens
 import zed.rainxch.githubstore.core.presentation.res.tweaks_entry_feedback
 import zed.rainxch.githubstore.core.presentation.res.tweaks_entry_subtitle_tap
@@ -117,7 +119,9 @@ fun ColumnScope.privacySection(
 
 @Composable
 fun ColumnScope.appSection(
+    hasCrashLog: Boolean,
     onOpenFeedback: () -> Unit,
+    onShareCrashLog: () -> Unit,
     showHead: Boolean = true,
 ) {
     if (showHead) SettingsSectionHead(stringResource(Res.string.section_app_block), TweaksDecorSlot.App)
@@ -126,7 +130,15 @@ fun ColumnScope.appSection(
             title = stringResource(Res.string.tweaks_entry_feedback),
             subtitle = stringResource(Res.string.feedback_hub_subtitle),
             onClick = onOpenFeedback,
-            last = true,
+            last = !hasCrashLog,
         )
+        if (hasCrashLog) {
+            SettingsDrillRow(
+                title = stringResource(Res.string.tweaks_crash_log_share),
+                subtitle = stringResource(Res.string.tweaks_crash_log_share_subtitle),
+                onClick = onShareCrashLog,
+                last = true,
+            )
+        }
     }
 }

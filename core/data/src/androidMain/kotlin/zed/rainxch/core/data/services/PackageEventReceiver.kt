@@ -228,6 +228,8 @@ class PackageEventReceiver() :
                 VersionVerdict.UNKNOWN -> app.isUpdateAvailable
             }
 
+        val installedSigner = systemInfo.signingFingerprint
+
         repo.executeInTransaction {
             repo.updateInstalledVersion(
                 packageName = packageName,
@@ -236,6 +238,11 @@ class PackageEventReceiver() :
                 installedVersionCode = systemInfo.versionCode,
                 isUpdateAvailable = newIsUpdateAvailable,
             )
+            // AutoUpdateWorker checks the signer only when one is stored, so an unreadable
+            // signer (null) must never erase it.
+            if (installedSigner != null && !installedSigner.equals(app.signingFingerprint, ignoreCase = true)) {
+                repo.updateSigningFingerprint(packageName, installedSigner)
+            }
             repo.clearInstallBinding(packageName)
         }
 

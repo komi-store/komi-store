@@ -1,0 +1,25 @@
+{
+  "versionCode": 23,
+  "versionName": "1.9.4",
+  "releaseDate": "2026-10-23",
+  "showAsSheet": false,
+  "sections": [
+    {
+      "type": "NEW",
+      "bullets": [
+        "Se Komi Store si arresta in modo anomalo, puoi condividere il log da Modifiche → App."
+      ]
+    },
+    {
+      "type": "FIXED",
+      "bullets": [
+        "Le pagine delle app installate non si bloccano più in Classic.",
+        "Se l'elenco delle release arriva vuoto, viene verificato su GitHub prima di mostrare «Nessuna release pubblicata».",
+        "Il pulsante Aggiorna compare subito dopo un controllo degli aggiornamenti e apre la nuova release.",
+        "La traduzione automatica ora copre anche le note di rilascio dopo un cambio di canale o di app, o un nuovo tentativo.",
+        "Direct GitHub è sempre presente nell'elenco dei mirror di download.",
+        "Il controllo della firma prima di un aggiornamento resta attivo quando un'app viene aggiornata fuori da Komi Store."
+      ]
+    }
+  ]
+}

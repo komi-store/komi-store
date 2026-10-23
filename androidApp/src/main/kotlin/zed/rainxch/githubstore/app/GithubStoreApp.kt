@@ -17,6 +17,7 @@ import org.koin.android.ext.koin.androidContext
 import zed.rainxch.core.data.local.db.dao.ExternalLinkDao
 import zed.rainxch.core.data.network.BackgroundRequest
 import zed.rainxch.core.data.network.ProxyManager
+import zed.rainxch.core.data.services.CrashLogs
 import zed.rainxch.core.data.services.DownloadNotificationObserver
 import zed.rainxch.core.data.services.PackageEventReceiver
 import zed.rainxch.core.data.services.UpdateScheduler
@@ -44,6 +45,7 @@ class GithubStoreApp : Application() {
 
     override fun onCreate() {
         super.onCreate()
+        CrashLogs.install(this)
 
         initKoin {
             androidContext(this@GithubStoreApp)

@@ -186,7 +186,12 @@ fun TweaksDesktopContent(
                             onNavigateToHostTokens = onNavigateToHostTokens,
                         )
 
-                    DesktopSection.APP -> appSection(onOpenFeedback = onOpenFeedback)
+                    DesktopSection.APP ->
+                        appSection(
+                            hasCrashLog = state.hasCrashLog,
+                            onOpenFeedback = onOpenFeedback,
+                            onShareCrashLog = { onAction(TweaksAction.OnShareCrashLogClick) },
+                        )
                 }
             }
         }

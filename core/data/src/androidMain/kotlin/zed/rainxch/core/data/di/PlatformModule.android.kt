@@ -11,6 +11,7 @@ import zed.rainxch.core.data.local.db.AppDatabase
 import zed.rainxch.core.data.local.db.initDatabase
 import zed.rainxch.core.data.network.AndroidDigestVerifier
 import zed.rainxch.core.data.services.AndroidApkInspector
+import zed.rainxch.core.data.services.AndroidCrashLogSharer
 import zed.rainxch.core.data.services.AndroidDownloadProgressNotifier
 import zed.rainxch.core.data.services.AndroidDownloader
 import zed.rainxch.core.data.services.AndroidFileLocationsProvider
@@ -45,6 +46,7 @@ import zed.rainxch.core.domain.network.DigestVerifier
 import zed.rainxch.core.domain.network.Downloader
 import zed.rainxch.core.domain.repository.ExternalInstallerRepository
 import zed.rainxch.core.domain.system.ApkInspector
+import zed.rainxch.core.domain.system.CrashLogSharer
 import zed.rainxch.core.domain.system.DownloadOrchestrator
 import zed.rainxch.core.domain.system.DownloadProgressNotifier
 import zed.rainxch.core.domain.system.ExternalAppScanner
@@ -125,6 +127,10 @@ actual val corePlatformModule =
         single<zed.rainxch.core.domain.system.AggressiveOemDetector> {
             zed.rainxch.core.data.services
                 .AndroidAggressiveOemDetector(context = androidContext())
+        }
+
+        single<CrashLogSharer> {
+            AndroidCrashLogSharer(context = androidContext())
         }
 
         single<PendingInstallNotifier> {

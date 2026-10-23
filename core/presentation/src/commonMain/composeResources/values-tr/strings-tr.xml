@@ -1116,6 +1116,8 @@
     <string name="details_whats_new_screen_title">Neler yeni</string>
     <string name="external_import_progress_skip">Atla ve sonra incele</string>
     <string name="feedback_hub_subtitle">Her raporu okuyoruz.</string>
+    <string name="tweaks_crash_log_share">Çökme günlüğünü paylaş</string>
+    <string name="tweaks_crash_log_share_subtitle">Son çökmeden sonra bu cihaza kaydedildi</string>
     <string name="home_action_get">Al</string>
     <string name="home_rank_format">#%1$d</string>
     <string name="home_section_from_your_stars">Yıldızlılarınızdan</string>

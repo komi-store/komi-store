@@ -1067,6 +1067,8 @@
     <string name="details_whats_new_screen_title">更新內容</string>
     <string name="external_import_progress_skip">跳過，稍後檢視</string>
     <string name="feedback_hub_subtitle">每一條反饋我們都會閱讀。</string>
+    <string name="tweaks_crash_log_share">分享當機日誌</string>
+    <string name="tweaks_crash_log_share_subtitle">上次當機後儲存在此裝置上</string>
     <string name="home_action_get">獲取</string>
     <string name="home_rank_format">#%1$d</string>
     <string name="home_section_from_your_stars">來自你的星標</string>

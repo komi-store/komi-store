@@ -1100,6 +1100,8 @@
     <string name="details_whats_new_screen_title">Co nowego</string>
     <string name="external_import_progress_skip">Pomiń i przejrzyj później</string>
     <string name="feedback_hub_subtitle">Czytamy każdą wiadomość.</string>
+    <string name="tweaks_crash_log_share">Udostępnij log awarii</string>
+    <string name="tweaks_crash_log_share_subtitle">Zapisany na tym urządzeniu po ostatniej awarii</string>
     <string name="home_action_get">Pobierz</string>
     <string name="home_rank_format">#%1$d</string>
     <string name="home_section_from_your_stars">Z Twoich gwiazdek</string>

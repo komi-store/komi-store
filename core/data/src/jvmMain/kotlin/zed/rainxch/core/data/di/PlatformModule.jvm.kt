@@ -9,6 +9,7 @@ import zed.rainxch.core.data.local.db.AppDatabase
 import zed.rainxch.core.data.local.db.initDatabase
 import zed.rainxch.core.data.network.DesktopDigestVerifier
 import zed.rainxch.core.data.services.DesktopApkInspector
+import zed.rainxch.core.data.services.DesktopCrashLogSharer
 import zed.rainxch.core.data.services.DesktopDownloadProgressNotifier
 import zed.rainxch.core.data.services.DesktopDownloader
 import zed.rainxch.core.data.services.DesktopFileLocationsProvider
@@ -35,6 +36,7 @@ import zed.rainxch.core.domain.network.DigestVerifier
 import zed.rainxch.core.domain.network.Downloader
 import zed.rainxch.core.domain.repository.ExternalInstallerRepository
 import zed.rainxch.core.domain.system.ApkInspector
+import zed.rainxch.core.domain.system.CrashLogSharer
 import zed.rainxch.core.domain.system.DownloadProgressNotifier
 import zed.rainxch.core.domain.system.ExternalAppScanner
 import zed.rainxch.core.domain.system.Installer
@@ -72,6 +74,10 @@ actual val corePlatformModule =
         single<zed.rainxch.core.domain.system.AggressiveOemDetector> {
             zed.rainxch.core.data.services
                 .DesktopAggressiveOemDetector()
+        }
+
+        single<CrashLogSharer> {
+            DesktopCrashLogSharer()
         }
 
         single<PackageMonitor> {

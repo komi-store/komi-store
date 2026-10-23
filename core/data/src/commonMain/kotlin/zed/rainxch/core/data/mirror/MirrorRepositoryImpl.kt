@@ -103,7 +103,7 @@ class MirrorRepositoryImpl(
         apiClient
             .fetchList()
             .onSuccess { response ->
-                val configs = response.mirrors.map { it.toDomain() }
+                val configs = response.mirrors.map { it.toDomain() }.withBundledDirect()
                 val previousCatalog = _catalog.value
                 _catalog.value = configs
                 ksafe.safePut(
@@ -185,6 +185,7 @@ class MirrorRepositoryImpl(
                 ).mirrors
                     .map { it.toDomain() }
                     .sortedBy { it.status.ordinal }
+                    .withBundledDirect()
             }.getOrElse { BundledMirrors.ALL.sortedBy { it.status.ordinal } }
         }
     }
@@ -237,3 +238,11 @@ class MirrorRepositoryImpl(
         const val CUSTOM_MIRROR_ID_SENTINEL = "__custom__"
     }
 }
+
+// The backend catalog can leave out Direct, and the picker only offers what the catalog lists.
+internal fun List<MirrorConfig>.withBundledDirect(): List<MirrorConfig> =
+    if (any { it.id == "direct" }) {
+        this
+    } else {
+        BundledMirrors.ALL.filter { it.id == "direct" } + this
+    }

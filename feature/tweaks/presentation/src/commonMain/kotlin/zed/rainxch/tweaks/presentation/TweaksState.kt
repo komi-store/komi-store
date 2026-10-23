@@ -79,6 +79,7 @@ data class TweaksState(
     val autoTranslateEnabled: Boolean = false,
     val autoTranslateTargetLang: String? = null,
     val isFeedbackSheetVisible: Boolean = false,
+    val hasCrashLog: Boolean = false,
     val isLanguageSheetVisible: Boolean = false,
     val languagePickerOptions: ImmutableList<LanguagePickerOption> =
         AppLanguages.ALL

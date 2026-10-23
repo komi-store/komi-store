@@ -37,6 +37,7 @@ import zed.rainxch.core.domain.model.account.github.GithubRelease
 import zed.rainxch.core.domain.model.account.github.GithubRepoSummary
 import zed.rainxch.core.domain.model.account.github.GithubUser
 import zed.rainxch.core.domain.model.account.github.GithubUserProfile
+import zed.rainxch.core.domain.model.error.RateLimitException
 import zed.rainxch.core.domain.model.error.RefreshError
 import zed.rainxch.core.domain.model.error.RefreshException
 import zed.rainxch.core.domain.utils.RepoIdCodec
@@ -358,11 +359,9 @@ class DetailsRepositoryImpl(
         val cacheKey = "details:releases:$owner/$repo"
 
         if (!bypassCache) {
-            cacheManager.get<List<GithubRelease>>(cacheKey)?.let { cached ->
-                if (cached.isNotEmpty()) {
-                    logger.debug("Cache hit for all releases $owner/$repo: ${cached.size} releases")
-                    return cached
-                }
+            cacheManager.get<List<GithubRelease>>(cacheKey)?.takeIf { it.isNotEmpty() }?.let { cached ->
+                logger.debug("Cache hit for all releases $owner/$repo: ${cached.size} releases")
+                return cached
             }
         }
 
@@ -372,7 +371,7 @@ class DetailsRepositoryImpl(
             triedDirect = true
             val direct =
                 try {
-                    readReleasesFromGitHub(owner, repo, defaultBranch, cacheKey, allowStale)
+                    readReleasesFromGitHub(owner, repo, defaultBranch, cacheKey, allowStale = false)
                 } catch (e: CancellationException) {
                     throw e
                 } catch (t: Throwable) {
@@ -398,8 +397,10 @@ class DetailsRepositoryImpl(
                         }.sortedByDescending { it.publishedAt }
                 if (result.isNotEmpty()) {
                     cacheManager.put(cacheKey, result, RELEASES)
+                    return result
                 }
-                return result
+                // The backend's copy can lag behind the host, so an empty answer is checked there unless the host was just read.
+                return if (triedDirect) result else readDirectWhenBackendEmpty(owner, repo, defaultBranch, cacheKey, allowStale)
             },
             onFailure = { e ->
                 if (!shouldFallbackToGithubOrRethrow(e, isSignedIn()) || triedDirect) {
@@ -418,6 +419,25 @@ class DetailsRepositoryImpl(
         return readReleasesFromGitHub(owner, repo, defaultBranch, cacheKey, allowStale)
     }
 
+    // Only a rate limit fails this read. Any other host failure, such as a blocked api.github.com, keeps the backend's empty answer.
+    private suspend fun readDirectWhenBackendEmpty(
+        owner: String,
+        repo: String,
+        defaultBranch: String,
+        cacheKey: String,
+        allowStale: Boolean,
+    ): List<GithubRelease> =
+        try {
+            readReleasesFromGitHub(owner, repo, defaultBranch, cacheKey, allowStale)
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: RateLimitException) {
+            throw e
+        } catch (t: Throwable) {
+            logger.debug("Direct releases read failed for empty backend $owner/$repo: ${t.message}")
+            emptyList()
+        }
+
     private suspend fun readReleasesFromGitHub(
         owner: String,
         repo: String,
@@ -433,7 +453,7 @@ class DetailsRepositoryImpl(
                             header(HttpHeaders.Accept, "application/vnd.github+json")
                             parameter("per_page", 30)
                         }
-                    }.getOrNull() ?: return emptyList()
+                    }.getOrThrow()
 
             val result =
                 releases

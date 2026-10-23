@@ -254,7 +254,11 @@ fun TweaksRoot(
                         onNavigateToHiddenRepositories = onNavigateToHiddenRepositories,
                         onNavigateToHostTokens = onNavigateToHostTokens,
                     )
-                    appSection(onOpenFeedback = { viewModel.onAction(TweaksAction.OnFeedbackClick) })
+                    appSection(
+                        hasCrashLog = state.hasCrashLog,
+                        onOpenFeedback = { viewModel.onAction(TweaksAction.OnFeedbackClick) },
+                        onShareCrashLog = { viewModel.onAction(TweaksAction.OnShareCrashLogClick) },
+                    )
 
                     tweaksKicker(TweaksDecorSlot.Footer)?.let { footer ->
                         KomiText(
