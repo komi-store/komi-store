@@ -14,6 +14,7 @@
       "type": "FIXED",
       "bullets": [
         "Les pages des applis installées ne se figent plus dans Classic.",
+        "Les tableaux des README, comme les grilles d'équipe ou de contributeurs, ne s'affichent plus comme du code.",
         "Une liste de versions vide est vérifiée sur GitHub avant d'afficher « Aucune version publiée ».",
         "Le bouton Mettre à jour apparaît juste après une vérification et ouvre la nouvelle version.",
         "La traduction automatique couvre aussi les notes de version après un changement de canal ou d'appli, ou une nouvelle tentative.",

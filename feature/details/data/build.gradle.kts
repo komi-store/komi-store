@@ -18,5 +18,11 @@ kotlin {
                 implementation(libs.bundles.koin.common)
             }
         }
+
+        commonTest {
+            dependencies {
+                implementation(kotlin("test"))
+            }
+        }
     }
 }

@@ -14,6 +14,7 @@
       "type": "FIXED",
       "bullets": [
         "App pages in Classic no longer freeze for installed apps.",
+        "README tables, like team and contributor grids, no longer show up as code.",
         "An empty release list is checked on GitHub before a repository shows \"No releases\".",
         "The Update button shows right after an update check and opens on the new release.",
         "Auto-translate now also covers release notes after you switch channel or app, or retry.",
