@@ -16,7 +16,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
@@ -46,11 +45,11 @@ internal fun StatusBadge(
     val label = stringResource(status.label)
     val shape = MaterialShapes.SoftBurst.toShape()
     KomiTooltip(text = label, modifier = modifier) {
+        // No shadow: a shadow on this burst hangs the RenderThread on many devices (1.9.3 froze Details).
         Box(
             modifier =
                 Modifier
                     .size(30.dp)
-                    .shadow(elevation = 2.dp, shape = shape)
                     .background(if (status.emphasized) colors.primary else colors.primaryContainer, shape),
             contentAlignment = Alignment.Center,
         ) {
