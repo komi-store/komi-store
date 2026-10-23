@@ -1,0 +1,25 @@
+{
+  "versionCode": 23,
+  "versionName": "1.9.4",
+  "releaseDate": "2026-10-23",
+  "showAsSheet": false,
+  "sections": [
+    {
+      "type": "NEW",
+      "bullets": [
+        "If Komi Store crashes, you can share the crash log from Tweaks → App."
+      ]
+    },
+    {
+      "type": "FIXED",
+      "bullets": [
+        "App pages in Classic no longer freeze for installed apps.",
+        "An empty release list is checked on GitHub before a repository shows \"No releases\".",
+        "The Update button shows right after an update check and opens on the new release.",
+        "Auto-translate now also covers release notes after you switch channel or app, or retry.",
+        "Direct GitHub is always offered in the download mirror list.",
+        "The signature check before an update stays on after an app is updated outside Komi Store."
+      ]
+    }
+  ]
+}
