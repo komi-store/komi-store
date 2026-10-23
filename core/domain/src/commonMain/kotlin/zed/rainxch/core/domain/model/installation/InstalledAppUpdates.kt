@@ -61,7 +61,7 @@ fun InstalledApp.confirmInstall(
         isPendingInstall = isPending,
         lastUpdatedAt = at,
         lastCheckedAt = at,
-        signingFingerprint = signingFingerprint,
+        signingFingerprint = signingFingerprint ?: this.signingFingerprint,
         pendingInstallFilePath = parkedFile,
         pendingInstallVersion = parkedVersion,
         pendingInstallAssetName = parkedAsset,
