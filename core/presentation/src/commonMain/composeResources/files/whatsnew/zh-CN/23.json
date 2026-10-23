@@ -1,0 +1,25 @@
+{
+  "versionCode": 23,
+  "versionName": "1.9.4",
+  "releaseDate": "2026-10-23",
+  "showAsSheet": false,
+  "sections": [
+    {
+      "type": "NEW",
+      "bullets": [
+        "Komi Store 崩溃后，可在“调整 → 应用”中分享崩溃日志。"
+      ]
+    },
+    {
+      "type": "FIXED",
+      "bullets": [
+        "在 Classic 中，已安装应用的页面不再卡死。",
+        "版本列表为空时，会先到 GitHub 确认，再显示“尚未发布任何版本”。",
+        "检查更新后会立即显示“更新”按钮，并打开新版本。",
+        "切换渠道或应用、或重试后，自动翻译现在也会翻译版本说明。",
+        "下载镜像列表中始终提供 Direct GitHub。",
+        "应用在 Komi Store 之外更新后，更新前的签名校验仍保持开启。"
+      ]
+    }
+  ]
+}

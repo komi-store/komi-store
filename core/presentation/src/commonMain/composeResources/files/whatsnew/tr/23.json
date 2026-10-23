@@ -1,0 +1,25 @@
+{
+  "versionCode": 23,
+  "versionName": "1.9.4",
+  "releaseDate": "2026-10-23",
+  "showAsSheet": false,
+  "sections": [
+    {
+      "type": "NEW",
+      "bullets": [
+        "Komi Store çökerse çökme günlüğünü İnce Ayarlar → Uygulama bölümünden paylaşabilirsiniz."
+      ]
+    },
+    {
+      "type": "FIXED",
+      "bullets": [
+        "Classic'te yüklü uygulamaların sayfaları artık donmuyor.",
+        "Boş gelen sürüm listesi, \"Henüz yayımlanmış sürüm yok\" gösterilmeden önce GitHub'da kontrol ediliyor.",
+        "Güncelle düğmesi güncelleme denetiminden hemen sonra görünüyor ve yeni sürümü açıyor.",
+        "Otomatik çeviri artık kanal veya uygulama değiştirdikten ya da yeniden denedikten sonra sürüm notlarını da çeviriyor.",
+        "Direct GitHub, indirme yansıları listesinde her zaman yer alıyor.",
+        "Bir uygulama Komi Store dışında güncellendiğinde de güncelleme öncesi imza denetimi açık kalıyor."
+      ]
+    }
+  ]
+}

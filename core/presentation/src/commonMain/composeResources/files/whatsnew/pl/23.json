@@ -1,0 +1,25 @@
+{
+  "versionCode": 23,
+  "versionName": "1.9.4",
+  "releaseDate": "2026-10-23",
+  "showAsSheet": false,
+  "sections": [
+    {
+      "type": "NEW",
+      "bullets": [
+        "Gdy Komi Store ulegnie awarii, log awarii udostępnisz w Ustawienia → Aplikacja."
+      ]
+    },
+    {
+      "type": "FIXED",
+      "bullets": [
+        "Strony zainstalowanych aplikacji w stylu Classic już się nie zawieszają.",
+        "Pusta lista wydań jest sprawdzana w GitHub, zanim pojawi się „Brak opublikowanych wydań”.",
+        "Przycisk Aktualizuj pojawia się zaraz po sprawdzeniu aktualizacji i otwiera nowe wydanie.",
+        "Automatyczne tłumaczenie obejmuje teraz też informacje o wydaniu po zmianie kanału lub aplikacji albo ponowieniu próby.",
+        "Direct GitHub jest zawsze dostępny na liście serwerów lustrzanych.",
+        "Sprawdzanie podpisu przed aktualizacją pozostaje włączone, gdy aplikacja zostanie zaktualizowana poza Komi Store."
+      ]
+    }
+  ]
+}
