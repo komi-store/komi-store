@@ -996,6 +996,8 @@
     <string name="import_summary_imported">%1$d تم استيراده</string>
     <string name="import_summary_non_github">%1$d ليست GitHub</string>
     <string name="import_summary_non_github_caption">لا نتتبّع GitLab أو F-Droid أو مصادر HTML بعد.</string>
+    <string name="import_summary_not_installed">%1$d غير موجودة على هذا الهاتف</string>
+    <string name="import_summary_not_installed_caption">تُستورد التطبيقات الموجودة على هذا الهاتف فقط. ثبّت البقية، ثم استورد هذا الملف مرة أخرى.</string>
     <string name="import_summary_title">نتائج الاستيراد — %1$s</string>
     <string name="import_summary_unknown_caption">لا يبدو أنه ملف تصدير من Komi Store أو Obtainium. هذه بداية الملف:</string>
     <string name="import_summary_unknown_format">تعذّر قراءة هذا الملف</string>

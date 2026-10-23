@@ -969,6 +969,8 @@
     <string name="import_summary_imported">%1$d개 가져옴</string>
     <string name="import_summary_non_github">%1$d개는 GitHub 아님</string>
     <string name="import_summary_non_github_caption">GitLab, F-Droid 또는 HTML 소스는 아직 추적하지 않습니다.</string>
+    <string name="import_summary_not_installed">%1$d개가 이 휴대폰에 없음</string>
+    <string name="import_summary_not_installed_caption">이 휴대폰에 이미 있는 앱만 가져옵니다. 나머지를 설치한 뒤 이 파일을 다시 가져오세요.</string>
     <string name="import_summary_title">가져오기 결과 — %1$s</string>
     <string name="import_summary_unknown_caption">Komi Store 또는 Obtainium 내보내기로 보이지 않습니다. 파일 시작 부분은 다음과 같습니다:</string>
     <string name="import_summary_unknown_format">이 파일을 읽을 수 없음</string>

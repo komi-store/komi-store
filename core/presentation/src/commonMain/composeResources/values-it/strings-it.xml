@@ -981,6 +981,8 @@
     <string name="import_summary_imported">%1$d importati</string>
     <string name="import_summary_non_github">%1$d non GitHub</string>
     <string name="import_summary_non_github_caption">Non tracciamo ancora GitLab, F-Droid o sorgenti HTML.</string>
+    <string name="import_summary_not_installed">%1$d non presenti su questo telefono</string>
+    <string name="import_summary_not_installed_caption">Vengono importate solo le app già presenti su questo telefono. Installa le altre, poi importa di nuovo questo file.</string>
     <string name="import_summary_title">Risultati import — %1$s</string>
     <string name="import_summary_unknown_caption">Non sembra un'esportazione di Komi Store o Obtainium. Ecco l'inizio del file:</string>
     <string name="import_summary_unknown_format">Impossibile leggere questo file</string>

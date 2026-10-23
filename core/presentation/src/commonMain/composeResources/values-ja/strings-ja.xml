@@ -940,6 +940,8 @@
     <string name="import_summary_imported">%1$d 件インポート</string>
     <string name="import_summary_non_github">%1$d 件はGitHub以外</string>
     <string name="import_summary_non_github_caption">GitLab、F-Droid、HTMLソースはまだ追跡できません。</string>
+    <string name="import_summary_not_installed">%1$d 件はこの端末にありません</string>
+    <string name="import_summary_not_installed_caption">この端末にすでにあるアプリだけがインポートされます。残りをインストールしてから、このファイルをもう一度インポートしてください。</string>
     <string name="import_summary_title">インポート結果 — %1$s</string>
     <string name="import_summary_unknown_caption">Komi StoreまたはObtainiumのエクスポートには見えません。ファイルの先頭はこちらです:</string>
     <string name="import_summary_unknown_format">このファイルを読み込めませんでした</string>

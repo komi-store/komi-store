@@ -15,6 +15,7 @@
       "bullets": [
         "Le pagine delle app installate non si bloccano più in Classic.",
         "Le tabelle dei README, come le griglie del team o dei contributori, non appaiono più come codice.",
+        "Importando un backup su un altro telefono, le app non installate lì vengono saltate invece di comparire come installate.",
         "Se l'elenco delle release arriva vuoto, viene verificato su GitHub prima di mostrare «Nessuna release pubblicata».",
         "Il pulsante Aggiorna compare subito dopo un controllo degli aggiornamenti e apre la nuova release.",
         "La traduzione automatica ora copre anche le note di rilascio dopo un cambio di canale o di app, o un nuovo tentativo.",

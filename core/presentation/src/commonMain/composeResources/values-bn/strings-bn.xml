@@ -968,6 +968,8 @@
     <string name="import_summary_imported">%1$d আমদানিকৃত</string>
     <string name="import_summary_non_github">%1$d GitHub নয়</string>
     <string name="import_summary_non_github_caption">আমরা এখনো GitLab, F-Droid বা HTML উৎস ট্র্যাক করি না।</string>
+    <string name="import_summary_not_installed">%1$d টি এই ফোনে নেই</string>
+    <string name="import_summary_not_installed_caption">শুধু এই ফোনে থাকা অ্যাপগুলোই ইমপোর্ট হয়। বাকিগুলো ইনস্টল করে ফাইলটি আবার ইমপোর্ট করুন।</string>
     <string name="import_summary_title">আমদানির ফলাফল — %1$s</string>
     <string name="import_summary_unknown_caption">এটি Komi Store বা Obtainium এক্সপোর্টের মতো দেখাচ্ছে না। ফাইলের শুরুটি এখানে:</string>
     <string name="import_summary_unknown_format">এই ফাইলটি পড়া যায়নি</string>

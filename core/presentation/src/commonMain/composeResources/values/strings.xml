@@ -670,6 +670,8 @@
     <string name="import_summary_failed">%1$d failed</string>
     <string name="import_summary_non_github">%1$d not GitHub</string>
     <string name="import_summary_non_github_caption">We don't track GitLab, F-Droid or HTML sources yet.</string>
+    <string name="import_summary_not_installed">%1$d not on this phone</string>
+    <string name="import_summary_not_installed_caption">Only apps already on this phone are imported. Install the others, then import this file again.</string>
     <string name="import_summary_close">Done</string>
     <string name="import_summary_expand">Show details</string>
     <string name="import_summary_collapse">Hide details</string>

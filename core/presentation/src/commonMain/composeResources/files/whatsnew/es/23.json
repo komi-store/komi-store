@@ -15,6 +15,7 @@
       "bullets": [
         "Las páginas de las apps instaladas ya no se congelan en Classic.",
         "Las tablas de los README, como las de equipo o colaboradores, ya no se muestran como código.",
+        "Al importar una copia de seguridad en otro teléfono, se omiten las apps que no están instaladas allí en lugar de mostrarlas como instaladas.",
         "Si la lista de versiones llega vacía, se comprueba en GitHub antes de mostrar «Aún no hay versiones publicadas».",
         "El botón Actualizar aparece justo después de buscar actualizaciones y abre la nueva versión.",
         "La traducción automática ahora también traduce las notas de versión al cambiar de canal o de app, o al reintentar.",
