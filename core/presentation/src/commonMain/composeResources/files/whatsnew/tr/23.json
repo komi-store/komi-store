@@ -14,11 +14,14 @@
       "type": "FIXED",
       "bullets": [
         "Classic'te yüklü uygulamaların sayfaları artık donmuyor.",
+        "Ekip ve katkıda bulunanlar listesi gibi README tabloları artık kod olarak görünmüyor.",
+        "Başka bir telefona yedek aktarıldığında orada yüklü olmayan uygulamalar yüklü gösterilmek yerine atlanıyor.",
         "Boş gelen sürüm listesi, \"Henüz yayımlanmış sürüm yok\" gösterilmeden önce GitHub'da kontrol ediliyor.",
         "Güncelle düğmesi güncelleme denetiminden hemen sonra görünüyor ve yeni sürümü açıyor.",
         "Otomatik çeviri artık kanal veya uygulama değiştirdikten ya da yeniden denedikten sonra sürüm notlarını da çeviriyor.",
         "Direct GitHub, indirme yansıları listesinde her zaman yer alıyor.",
-        "Bir uygulama Komi Store dışında güncellendiğinde de güncelleme öncesi imza denetimi açık kalıyor."
+        "Bir uygulama Komi Store dışında güncellendiğinde de güncelleme öncesi imza denetimi açık kalıyor.",
+        "sing-box gibi çok uzun sürüm listesi olan bir depoyu açmak artık uygulamanın çökmesine yol açmıyor."
       ]
     }
   ]

@@ -70,13 +70,13 @@ class DetailsAboutViewModel(
                     )
                 }
                 rebuildDisplayed()
-            }.onFailure { e ->
+            }.onFailure { _ ->
                 _state.update {
                     it.copy(
                         translation =
                             it.translation.copy(
                                 isTranslating = false,
-                                error = e.message ?: getString(Res.string.translation_failed),
+                                error = getString(Res.string.translation_failed),
                             ),
                     )
                 }
@@ -158,8 +158,8 @@ class DetailsAboutViewModel(
                     )
                 }
                 rebuildDisplayed()
-            }.onFailure { e ->
-                _state.update { it.copy(isLoading = false, errorMessage = e.message ?: getString(Res.string.failed_to_load)) }
+            }.onFailure { _ ->
+                _state.update { it.copy(isLoading = false, errorMessage = getString(Res.string.failed_to_load)) }
             }
         }
     }

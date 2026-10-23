@@ -501,6 +501,20 @@ fun preprocessMarkdown(
             "\n",
         )
 
+    // The renderer can't lay out HTML tables, so each cell becomes its own block. The cells'
+    // indentation goes too: after a blank line, 4+ spaces would make Markdown read them as code.
+    processed =
+        processed.replace(
+            Regex("""<table\b[^>]*>(.*?)</table>""", setOf(RegexOption.IGNORE_CASE, RegexOption.DOT_MATCHES_ALL)),
+        ) { match ->
+            val cells =
+                match.groupValues[1]
+                    .replace(Regex("""</?(?:thead|tbody|tfoot|tr|td|th)\b[^>]*>""", RegexOption.IGNORE_CASE), "\n\n")
+                    .lines()
+                    .joinToString("\n") { it.trim() }
+            "\n\n$cells\n\n"
+        }
+
     HTML_ENTITIES.forEach { (entity, char) -> processed = processed.replace(entity, char) }
 
     processed =

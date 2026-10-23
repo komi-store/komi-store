@@ -480,6 +480,7 @@ class AppsRepositoryImpl(
         val trackedPackages = getTrackedPackageNames()
         val imported = mutableListOf<String>()
         val skipped = mutableListOf<String>()
+        val notInstalled = mutableListOf<String>()
         val failed = mutableListOf<String>()
 
         for (exportedApp in exportedList.apps) {
@@ -489,20 +490,26 @@ class AppsRepositoryImpl(
                 continue
             }
             try {
+                // A row is an installed app; one saved for a missing package shows Open and Uninstall.
+                val systemInfo = packageMonitor.getInstalledPackageInfo(exportedApp.packageName)
+                if (systemInfo == null) {
+                    notInstalled += label
+                    continue
+                }
+
                 val repoInfo = fetchRepoInfo(exportedApp.repoOwner, exportedApp.repoName)
                 if (repoInfo == null) {
                     failed += label
                     continue
                 }
 
-                val systemInfo = packageMonitor.getInstalledPackageInfo(exportedApp.packageName)
                 val deviceApp =
                     DeviceApp(
                         packageName = exportedApp.packageName,
                         appName = exportedApp.repoName,
-                        versionName = systemInfo?.versionName,
-                        versionCode = systemInfo?.versionCode ?: 0L,
-                        signingFingerprint = systemInfo?.signingFingerprint,
+                        versionName = systemInfo.versionName,
+                        versionCode = systemInfo.versionCode,
+                        signingFingerprint = systemInfo.signingFingerprint,
                     )
                 linkAppToRepo(
                     deviceApp = deviceApp,
@@ -526,8 +533,10 @@ class AppsRepositoryImpl(
             imported = imported.size,
             skipped = skipped.size,
             failed = failed.size,
+            notInstalled = notInstalled.size,
             importedItems = imported.toImmutableList(),
             skippedItems = skipped.toImmutableList(),
+            notInstalledItems = notInstalled.toImmutableList(),
             failedItems = failed.toImmutableList(),
             sourceFormat = ImportFormat.NATIVE,
         )
@@ -548,6 +557,7 @@ class AppsRepositoryImpl(
         val trackedPackages = getTrackedPackageNames()
         val imported = mutableListOf<String>()
         val skipped = mutableListOf<String>()
+        val notInstalled = mutableListOf<String>()
         val failed = mutableListOf<String>()
         val nonGitHub = mutableListOf<String>()
 
@@ -555,8 +565,8 @@ class AppsRepositoryImpl(
             val mapped = obtainiumApp.toExportedAppOrSkip(json)
             val exportedApp = mapped.exported
             if (exportedApp == null) {
-                mapped.nonGitHubLabel?.let { nonGitHub += it }
-                mapped.unsupportedFailureLabel?.let { failed += it }
+                nonGitHub += listOfNotNull(mapped.nonGitHubLabel)
+                failed += listOfNotNull(mapped.unsupportedFailureLabel)
                 continue
             }
 
@@ -567,19 +577,23 @@ class AppsRepositoryImpl(
             }
 
             try {
+                val systemInfo = packageMonitor.getInstalledPackageInfo(exportedApp.packageName)
+                if (systemInfo == null) {
+                    notInstalled += label
+                    continue
+                }
                 val repoInfo = fetchRepoInfo(exportedApp.repoOwner, exportedApp.repoName)
                 if (repoInfo == null) {
                     failed += label
                     continue
                 }
-                val systemInfo = packageMonitor.getInstalledPackageInfo(exportedApp.packageName)
                 val deviceApp =
                     DeviceApp(
                         packageName = exportedApp.packageName,
                         appName = obtainiumApp.name?.takeIf { it.isNotBlank() } ?: exportedApp.repoName,
-                        versionName = systemInfo?.versionName,
-                        versionCode = systemInfo?.versionCode ?: 0L,
-                        signingFingerprint = systemInfo?.signingFingerprint,
+                        versionName = systemInfo.versionName,
+                        versionCode = systemInfo.versionCode,
+                        signingFingerprint = systemInfo.signingFingerprint,
                     )
                 linkAppToRepo(
                     deviceApp = deviceApp,
@@ -600,9 +614,11 @@ class AppsRepositoryImpl(
             skipped = skipped.size,
             failed = failed.size,
             nonGitHubSkipped = nonGitHub.size,
+            notInstalled = notInstalled.size,
             importedItems = imported.toImmutableList(),
             skippedItems = skipped.toImmutableList(),
             nonGitHubItems = nonGitHub.toImmutableList(),
+            notInstalledItems = notInstalled.toImmutableList(),
             failedItems = failed.toImmutableList(),
             sourceFormat = ImportFormat.OBTAINIUM,
         )

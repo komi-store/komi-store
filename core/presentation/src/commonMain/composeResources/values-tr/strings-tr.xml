@@ -978,6 +978,8 @@
     <string name="import_summary_imported">%1$d içe aktarıldı</string>
     <string name="import_summary_non_github">%1$d GitHub değil</string>
     <string name="import_summary_non_github_caption">Henüz GitLab, F-Droid veya HTML kaynaklarını takip etmiyoruz.</string>
+    <string name="import_summary_not_installed">%1$d tanesi bu telefonda yok</string>
+    <string name="import_summary_not_installed_caption">Yalnızca bu telefonda zaten olan uygulamalar içe aktarılır. Diğerlerini yükleyin, ardından bu dosyayı yeniden içe aktarın.</string>
     <string name="import_summary_title">İçe aktarma sonuçları — %1$s</string>
     <string name="import_summary_unknown_caption">Bu, bir Komi Store veya Obtainium dışa aktarımına benzemiyor. Dosyanın başlangıcı şöyle:</string>
     <string name="import_summary_unknown_format">Bu dosya okunamadı</string>

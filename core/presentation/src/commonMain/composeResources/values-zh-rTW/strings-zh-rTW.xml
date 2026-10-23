@@ -942,6 +942,8 @@
     <string name="import_summary_imported">%1$d 個已匯入</string>
     <string name="import_summary_non_github">%1$d 個非 GitHub</string>
     <string name="import_summary_non_github_caption">我們暫不追蹤 GitLab、F-Droid 或 HTML 來源。</string>
+    <string name="import_summary_not_installed">%1$d 個不在此手機上</string>
+    <string name="import_summary_not_installed_caption">只會匯入此手機上已有的應用程式。請先安裝其餘應用程式，再重新匯入此檔案。</string>
     <string name="import_summary_title">匯入結果 — %1$s</string>
     <string name="import_summary_unknown_caption">這看起來不是 Komi Store 或 Obtainium 的匯出檔案。檔案開頭如下：</string>
     <string name="import_summary_unknown_format">無法讀取該檔案</string>
