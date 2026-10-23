@@ -66,7 +66,7 @@ class CacheManager(
             }
         }
 
-        val entry = cacheDao.getValid(key, currentTime) ?: return null
+        val entry = readRow(key) { cacheDao.getValid(key, currentTime) } ?: return null
         val snapshot = entry.expiresAt to entry.jsonData
         memoryCacheMutex.withLock {
             memoryCache[key] = snapshot
@@ -86,7 +86,7 @@ class CacheManager(
     }
 
     suspend inline fun <reified T> getStale(key: String): T? {
-        val entry = cacheDao.getAny(key) ?: return null
+        val entry = readRow(key) { cacheDao.getAny(key) } ?: return null
         return try {
             json.decodeFromString(serializer<T>(), entry.jsonData)
         } catch (e: CancellationException) {
@@ -109,6 +109,11 @@ class CacheManager(
             memoryCache[key] = expiresAt to jsonData
         }
 
+        if (jsonData.length > MAX_DISK_CHARS) {
+            cacheDao.delete(key)
+            return
+        }
+
         cacheDao.put(
             CacheEntryEntity(
                 key = key,
@@ -119,7 +124,23 @@ class CacheManager(
         )
     }
 
-    suspend fun getCachedAt(key: String): Long? = cacheDao.getValid(key, now())?.cachedAt
+    suspend fun getCachedAt(key: String): Long? = readRow(key) { cacheDao.getValid(key, now()) }?.cachedAt
+
+    // Android reads a row through a 2 MB CursorWindow and throws SQLiteBlobTooBigException
+    // for a bigger one (sing-box's release list), so a row that can't be read is a miss.
+    @PublishedApi
+    internal suspend fun readRow(
+        key: String,
+        read: suspend () -> CacheEntryEntity?,
+    ): CacheEntryEntity? =
+        try {
+            read()
+        } catch (e: CancellationException) {
+            throw e
+        } catch (_: Exception) {
+            cacheDao.delete(key)
+            null
+        }
 
     suspend fun invalidate(key: String) {
         memoryCacheMutex.withLock { memoryCache.remove(key) }
@@ -153,5 +174,8 @@ class CacheManager(
         val SEARCH_RESULTS = 1.hours.inWholeMilliseconds
         val REPO_STATS = 6.hours.inWholeMilliseconds
         const val CLEANUP_INTERVAL_MS: Long = 60L * 60L * 1000L
+
+        // Up to 3 UTF-8 bytes a char keeps a row under the 2 MB CursorWindow; bigger values stay in memory.
+        const val MAX_DISK_CHARS = 600_000
     }
 }

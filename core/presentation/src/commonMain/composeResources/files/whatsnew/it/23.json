@@ -18,7 +18,8 @@
         "Il pulsante Aggiorna compare subito dopo un controllo degli aggiornamenti e apre la nuova release.",
         "La traduzione automatica ora copre anche le note di rilascio dopo un cambio di canale o di app, o un nuovo tentativo.",
         "Direct GitHub è sempre presente nell'elenco dei mirror di download.",
-        "Il controllo della firma prima di un aggiornamento resta attivo quando un'app viene aggiornata fuori da Komi Store."
+        "Il controllo della firma prima di un aggiornamento resta attivo quando un'app viene aggiornata fuori da Komi Store.",
+        "Aprire un repository con un elenco di release molto lungo, come sing-box, non fa più chiudere l'app."
       ]
     }
   ]

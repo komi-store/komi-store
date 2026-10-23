@@ -18,7 +18,8 @@
         "Le bouton Mettre à jour apparaît juste après une vérification et ouvre la nouvelle version.",
         "La traduction automatique couvre aussi les notes de version après un changement de canal ou d'appli, ou une nouvelle tentative.",
         "Direct GitHub figure toujours dans la liste des miroirs de téléchargement.",
-        "La vérification de signature avant une mise à jour reste active quand une appli est mise à jour hors de Komi Store."
+        "La vérification de signature avant une mise à jour reste active quand une appli est mise à jour hors de Komi Store.",
+        "Ouvrir un dépôt avec une très longue liste de versions, comme sing-box, ne fait plus planter l'appli."
       ]
     }
   ]

@@ -18,7 +18,8 @@
         "The Update button shows right after an update check and opens on the new release.",
         "Auto-translate now also covers release notes after you switch channel or app, or retry.",
         "Direct GitHub is always offered in the download mirror list.",
-        "The signature check before an update stays on after an app is updated outside Komi Store."
+        "The signature check before an update stays on after an app is updated outside Komi Store.",
+        "Opening a repository with a very long release list, like sing-box, no longer crashes the app."
       ]
     }
   ]

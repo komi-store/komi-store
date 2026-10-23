@@ -18,7 +18,8 @@
         "Przycisk Aktualizuj pojawia się zaraz po sprawdzeniu aktualizacji i otwiera nowe wydanie.",
         "Automatyczne tłumaczenie obejmuje teraz też informacje o wydaniu po zmianie kanału lub aplikacji albo ponowieniu próby.",
         "Direct GitHub jest zawsze dostępny na liście serwerów lustrzanych.",
-        "Sprawdzanie podpisu przed aktualizacją pozostaje włączone, gdy aplikacja zostanie zaktualizowana poza Komi Store."
+        "Sprawdzanie podpisu przed aktualizacją pozostaje włączone, gdy aplikacja zostanie zaktualizowana poza Komi Store.",
+        "Otwarcie repozytorium z bardzo długą listą wydań, np. sing-box, nie powoduje już awarii aplikacji."
       ]
     }
   ]
