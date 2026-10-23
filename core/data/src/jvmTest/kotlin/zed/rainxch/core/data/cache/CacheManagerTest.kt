@@ -53,7 +53,7 @@ class CacheManagerTest {
         val deleted = mutableListOf<String>()
 
         private fun read(key: String): CacheEntryEntity? {
-            if (failReads) throw IllegalStateException("Row too big to fit into CursorWindow")
+            check(!failReads) { "Row too big to fit into CursorWindow" }
             return rows[key]
         }
 
