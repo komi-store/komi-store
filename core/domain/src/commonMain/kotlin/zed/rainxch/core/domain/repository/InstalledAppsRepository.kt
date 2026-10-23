@@ -75,7 +75,7 @@ interface InstalledAppsRepository {
     // doubles source-compatible.
     suspend fun updateSigningFingerprint(
         packageName: String,
-        signingFingerprint: String?,
+        signingFingerprint: String,
     ) = Unit
 
     suspend fun updatePendingStatus(

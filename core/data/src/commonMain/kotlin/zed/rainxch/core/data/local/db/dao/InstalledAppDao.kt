@@ -213,7 +213,7 @@ interface InstalledAppDao {
     )
     suspend fun updateSigningFingerprint(
         packageName: String,
-        signingFingerprint: String?,
+        signingFingerprint: String,
     )
 
     @Query(

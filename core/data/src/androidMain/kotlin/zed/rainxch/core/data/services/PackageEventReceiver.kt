@@ -228,6 +228,14 @@ class PackageEventReceiver() :
                 VersionVerdict.UNKNOWN -> app.isUpdateAvailable
             }
 
+        val newSigningBaseline =
+            signingBaselineAfterExternalInstall(
+                packageName = packageName,
+                stored = app.signingFingerprint,
+                observed = systemInfo.signingFingerprint,
+                monitor = monitor,
+            )
+
         repo.executeInTransaction {
             repo.updateInstalledVersion(
                 packageName = packageName,
@@ -236,7 +244,9 @@ class PackageEventReceiver() :
                 installedVersionCode = systemInfo.versionCode,
                 isUpdateAvailable = newIsUpdateAvailable,
             )
-            repo.updateSigningFingerprint(packageName, systemInfo.signingFingerprint)
+            if (newSigningBaseline != null) {
+                repo.updateSigningFingerprint(packageName, newSigningBaseline)
+            }
             repo.clearInstallBinding(packageName)
         }
 
@@ -274,6 +284,38 @@ class PackageEventReceiver() :
             }
         }
     }
+
+    // AutoUpdateWorker checks the signer only when a baseline is stored, so an unreadable
+    // signer (null) must never erase one, and a new signer replaces it only as a key rotation:
+    // the installed package's lineage still holds the old certificate. Anything else keeps
+    // the old baseline so the signature-mismatch warning fires on the next update.
+    private suspend fun signingBaselineAfterExternalInstall(
+        packageName: String,
+        stored: String?,
+        observed: String?,
+        monitor: PackageMonitor,
+    ): String? =
+        when {
+            observed == null || observed.equals(stored, ignoreCase = true) -> {
+                null
+            }
+
+            stored.isNullOrBlank() -> {
+                observed
+            }
+
+            monitor.hasSigningCertificate(packageName, stored) -> {
+                observed
+            }
+
+            else -> {
+                Logger.w {
+                    "Kept the signing baseline for $packageName: the new signer $observed " +
+                        "is not a rotation of $stored"
+                }
+                null
+            }
+        }
 
     private suspend fun onPackageRemoved(packageName: String) {
         getSystemInstallSerializer().markCompleted(packageName)

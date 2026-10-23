@@ -74,6 +74,18 @@ class AndroidPackageMonitor(
             }
         }
 
+    // Below API 28 there is no lineage to ask, so a changed signer never counts as a rotation.
+    override suspend fun hasSigningCertificate(
+        packageName: String,
+        fingerprint: String,
+    ): Boolean =
+        withContext(Dispatchers.IO) {
+            val digest = SigningFingerprint.toDigest(fingerprint)
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.P &&
+                digest != null &&
+                packageManager.hasSigningCertificate(packageName, digest, PackageManager.CERT_INPUT_SHA256)
+        }
+
     override suspend fun getAllInstalledPackageNames(): Set<String> =
         withContext(Dispatchers.IO) {
             val packages =
