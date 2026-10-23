@@ -493,6 +493,11 @@ class DefaultDownloadOrchestratorAssetRefetchTest {
             isUpdateAvailable: Boolean,
         ) = Unit
 
+        override suspend fun updateSigningFingerprint(
+            packageName: String,
+            signingFingerprint: String,
+        ) = Unit
+
         override suspend fun updatePendingStatus(
             packageName: String,
             isPending: Boolean,
