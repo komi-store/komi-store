@@ -453,7 +453,7 @@ class DetailsRepositoryImpl(
                             header(HttpHeaders.Accept, "application/vnd.github+json")
                             parameter("per_page", 30)
                         }
-                    }.getOrNull() ?: return emptyList()
+                    }.getOrThrow()
 
             val result =
                 releases

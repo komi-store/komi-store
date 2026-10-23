@@ -2968,7 +2968,7 @@ class DetailsViewModel(
                         releasePlatforms = platformsByRelease(allReleases),
                         deviceBuildReleaseIds = deviceBuildIds,
                         releaseLines = releaseLines(allReleases),
-                        releasesLoadFailed = releasesFailed || allReleases.isEmpty(),
+                        releasesLoadFailed = releasesFailed,
                         isRetryingReleases = false,
                         selectedRelease = selectedRelease,
                         selectedReleaseCategory = resolvedCategory,
