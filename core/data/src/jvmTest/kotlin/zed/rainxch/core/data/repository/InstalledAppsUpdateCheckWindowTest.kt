@@ -225,11 +225,6 @@ class InstalledAppsUpdateCheckWindowTest {
 
         override suspend fun getAllInstalledApps(): List<DeviceApp> = emptyList()
 
-        override suspend fun hasSigningCertificate(
-            packageName: String,
-            fingerprint: String,
-        ): Boolean = false
-
         override fun canEnumerateInstalledPackages(): Boolean = false
     }
 

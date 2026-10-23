@@ -23,19 +23,9 @@ internal object SigningFingerprint {
             ?.let(::sha256)
     }
 
-    // Inverse of sha256 below; null when the text is not a SHA-256 fingerprint.
-    fun toDigest(fingerprint: String): ByteArray? {
-        val hex = fingerprint.trim().replace(":", "")
-        val isSha256 = hex.length == SHA256_HEX_LENGTH && hex.all { it.digitToIntOrNull(HEX_RADIX) != null }
-        return if (isSha256) hex.chunked(2).map { it.toInt(HEX_RADIX).toByte() }.toByteArray() else null
-    }
-
     private fun sha256(bytes: ByteArray): String =
         MessageDigest
             .getInstance("SHA-256")
             .digest(bytes)
             .joinToString(":") { "%02X".format(it) }
-
-    private const val SHA256_HEX_LENGTH = 64
-    private const val HEX_RADIX = 16
 }

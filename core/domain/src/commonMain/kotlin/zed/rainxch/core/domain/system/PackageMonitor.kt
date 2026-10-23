@@ -12,12 +12,5 @@ interface PackageMonitor {
 
     suspend fun getAllInstalledApps(): List<DeviceApp>
 
-    // True when the installed package is signed by this certificate fingerprint or rotated
-    // away from it, i.e. the certificate is in its signing lineage.
-    suspend fun hasSigningCertificate(
-        packageName: String,
-        fingerprint: String,
-    ): Boolean
-
     fun canEnumerateInstalledPackages(): Boolean
 }
