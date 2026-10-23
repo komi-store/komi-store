@@ -127,7 +127,10 @@ class InstallationManagerImpl(
                     installedVersionCode = apkInfo.versionCode,
                     latestVersionName = null,
                     latestVersionCode = null,
-                    signingFingerprint = apkInfo.signingFingerprint,
+                    // Details also installs a tracked app this way, and the insert replaces its row.
+                    signingFingerprint =
+                        apkInfo.signingFingerprint
+                            ?: installedAppsRepository.getAppByPackage(apkInfo.packageName)?.signingFingerprint,
                     preferredAssetVariant = fingerprint?.variant,
                     preferredAssetTokens = serializedTokens,
                     assetGlobPattern = fingerprint?.glob,
