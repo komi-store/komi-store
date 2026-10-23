@@ -2785,7 +2785,6 @@ class DetailsViewModel(
                                     repo = name,
                                     defaultBranch = repo.defaultBranch,
                                     sourceHost = sourceHostParam,
-                                    preferDirectSource = true,
                                 ),
                                 false,
                                 false,

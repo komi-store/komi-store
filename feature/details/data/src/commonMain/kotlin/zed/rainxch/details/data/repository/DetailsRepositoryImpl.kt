@@ -373,7 +373,7 @@ class DetailsRepositoryImpl(
             triedDirect = true
             val direct =
                 try {
-                    readReleasesFromGitHub(owner, repo, defaultBranch, cacheKey, allowStale)
+                    readReleasesFromGitHub(owner, repo, defaultBranch, cacheKey, allowStale = false)
                 } catch (e: CancellationException) {
                     throw e
                 } catch (t: Throwable) {
