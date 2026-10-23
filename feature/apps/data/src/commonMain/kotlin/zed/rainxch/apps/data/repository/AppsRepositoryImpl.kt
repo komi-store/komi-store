@@ -565,8 +565,8 @@ class AppsRepositoryImpl(
             val mapped = obtainiumApp.toExportedAppOrSkip(json)
             val exportedApp = mapped.exported
             if (exportedApp == null) {
-                mapped.nonGitHubLabel?.let { nonGitHub += it }
-                mapped.unsupportedFailureLabel?.let { failed += it }
+                nonGitHub += listOfNotNull(mapped.nonGitHubLabel)
+                failed += listOfNotNull(mapped.unsupportedFailureLabel)
                 continue
             }
 
