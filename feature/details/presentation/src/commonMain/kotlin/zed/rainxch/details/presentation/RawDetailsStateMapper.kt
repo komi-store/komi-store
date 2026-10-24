@@ -85,6 +85,8 @@ internal fun RawDetailsState.toView(): DetailsState {
         stats = stats,
         readmeMarkdown = displayedReadme,
         readmeLanguage = displayedReadmeLanguage,
+        sectionsDeferred = sectionsDeferred,
+        isLoadingDeferredSections = isLoadingDeferredSections,
         installLogs = installLogs.toImmutableList(),
         isDownloading = isDownloading,
         downloadProgressPercent = downloadProgressPercent,

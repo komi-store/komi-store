@@ -123,7 +123,6 @@ fun appearanceSectionContent(
         // How Explore, Top Charts and Search lay out repositories.
         SettingsRow(
             title = stringResource(Res.string.repo_layout_title),
-            last = !desktop && displayModes.isEmpty(),
             trailing = {
                 KomiSegmented(
                     selected = state.isRepoGridLayout,
@@ -134,6 +133,18 @@ fun appearanceSectionContent(
                             KomiSegmentedItem(value = false, title = stringResource(Res.string.repo_layout_list)),
                             KomiSegmentedItem(value = true, title = stringResource(Res.string.repo_layout_grid)),
                         ),
+                )
+            },
+        )
+
+        SettingsRow(
+            title = stringResource(Res.string.tweaks_detail_auto_load_sections_title),
+            subtitle = stringResource(Res.string.tweaks_detail_auto_load_sections_description),
+            last = !desktop && displayModes.isEmpty(),
+            trailing = {
+                KomiSwitch(
+                    checked = state.isDetailAutoLoadSectionsEnabled,
+                    onCheckedChange = { onAction(TweaksAction.OnDetailAutoLoadSectionsToggled(it)) },
                 )
             },
         )

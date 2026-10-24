@@ -24,6 +24,8 @@ sealed interface DetailsAction {
 
     data object RetryReleases : DetailsAction
 
+    data object LoadDeferredSections : DetailsAction
+
     data object Refresh : DetailsAction
 
     data object InstallPrimary : DetailsAction

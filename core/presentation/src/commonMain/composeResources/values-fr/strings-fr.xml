@@ -1494,4 +1494,11 @@
     <string name="tweaks_diagnostics_share_action">Partager</string>
     <string name="tweaks_diagnostics_warning">Les journaux restent sur cet appareil et peuvent contenir des données de l’application. Rien n’est envoyé automatiquement.</string>
     <string name="tweaks_diagnostics_share_error">Impossible de préparer les journaux de diagnostic</string>
+
+    <!-- Details content deferred until asked -->
+    <string name="tweaks_detail_auto_load_sections_title">README et notes de version</string>
+    <string name="tweaks_detail_auto_load_sections_description">Chargés automatiquement à l’ouverture d’une page de détails. Désactivé, ils sont récupérés et analysés seulement après Charger le contenu.</string>
+    <string name="details_sections_deferred_title">README et notes de version</string>
+    <string name="details_sections_deferred_body">Pas encore chargés. Charger le contenu les récupère et les affiche pour ce dépôt.</string>
+    <string name="details_sections_deferred_load">Charger le contenu</string>
 </resources>

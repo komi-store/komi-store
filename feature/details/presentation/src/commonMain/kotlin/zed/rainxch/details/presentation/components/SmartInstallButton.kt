@@ -76,6 +76,7 @@ import zed.rainxch.githubstore.core.presentation.res.open_with_external_installe
 import zed.rainxch.githubstore.core.presentation.res.architecture_compatible
 import zed.rainxch.githubstore.core.presentation.res.details_attestation_unverified_explainer
 import zed.rainxch.githubstore.core.presentation.res.details_attestation_verified_explainer
+import zed.rainxch.githubstore.core.presentation.res.details_sections_deferred_load
 import zed.rainxch.githubstore.core.presentation.res.checking_attestation
 import zed.rainxch.githubstore.core.presentation.res.delete_task
 import zed.rainxch.githubstore.core.presentation.res.downloading
@@ -153,9 +154,13 @@ fun SmartInstallButton(
             )
     val showUpdateAffordance = isUpdateAvailable && selectedIsLatestRelease
 
-    val enabled = remember(primaryAsset, isDownloading, isInstalling) {
-        primaryAsset != null && !isDownloading && !isInstalling
-    } && !primaryCooldown.active
+    val deferredLoadPending =
+        primaryAsset == null && (state.sectionsDeferred || state.isLoadingDeferredSections)
+    val deferredLoadReady = deferredLoadPending && !state.isLoadingDeferredSections
+    val enabled =
+        remember(primaryAsset, isDownloading, isInstalling, deferredLoadReady) {
+            (primaryAsset != null || deferredLoadReady) && !isDownloading && !isInstalling
+        } && !primaryCooldown.active
     val isActiveDownload = state.isDownloading || state.downloadStage != DownloadStage.IDLE
 
     if (isSameVersionInstalled && !isActiveDownload) {
@@ -179,6 +184,7 @@ fun SmartInstallButton(
     }
 
     val buttonText = when {
+        deferredLoadPending -> stringResource(Res.string.details_sections_deferred_load)
         !enabled && primaryAsset == null && !state.selectedHasDeviceBuild ->
             stringResource(Res.string.no_build_for_this_device)
         !enabled && primaryAsset == null -> stringResource(Res.string.not_available)
@@ -234,7 +240,9 @@ fun SmartInstallButton(
                 state = state,
                 progress = progress,
                 onClick = {
-                    if (!state.isDownloading && state.downloadStage == DownloadStage.IDLE) {
+                    if (deferredLoadReady) {
+                        onAction(DetailsAction.LoadDeferredSections)
+                    } else if (!state.isDownloading && state.downloadStage == DownloadStage.IDLE) {
                         primaryCooldown.run {
                             if (showUpdateAffordance) {
                                 onAction(DetailsAction.UpdateApp)

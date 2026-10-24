@@ -1484,4 +1484,11 @@
     <string name="tweaks_diagnostics_share_action">分享</string>
     <string name="tweaks_diagnostics_warning">日志只保留在本设备上，可能包含应用数据。不会自动上传任何内容。</string>
     <string name="tweaks_diagnostics_share_error">无法准备诊断日志</string>
+
+    <!-- Details content deferred until asked -->
+    <string name="tweaks_detail_auto_load_sections_title">README 和发行说明</string>
+    <string name="tweaks_detail_auto_load_sections_description">打开详情页时自动加载。关闭后，只有点按加载内容才会获取并解析它们。</string>
+    <string name="details_sections_deferred_title">README 和发行说明</string>
+    <string name="details_sections_deferred_body">尚未加载。点按加载内容即可获取并显示此仓库的内容。</string>
+    <string name="details_sections_deferred_load">加载内容</string>
 </resources>

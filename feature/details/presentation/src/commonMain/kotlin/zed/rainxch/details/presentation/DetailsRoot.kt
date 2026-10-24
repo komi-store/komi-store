@@ -91,6 +91,7 @@ import zed.rainxch.core.presentation.utils.rememberIconSeedColor
 import zed.rainxch.details.presentation.components.ApkInspectSheet
 import zed.rainxch.details.presentation.components.PlatformHandoffSheet
 import zed.rainxch.details.presentation.components.sections.about
+import zed.rainxch.details.presentation.components.sections.deferredSections
 import zed.rainxch.details.presentation.components.sections.header
 import zed.rainxch.details.presentation.components.sections.logs
 import zed.rainxch.details.presentation.components.sections.releaseChannel
@@ -646,6 +647,13 @@ fun DetailsScreen(
                             state = state,
                             onAction = onAction,
                         )
+
+                        if (state.sectionsDeferred) {
+                            deferredSections(
+                                isLoading = state.isLoadingDeferredSections,
+                                onLoad = { onAction(DetailsAction.LoadDeferredSections) },
+                            )
+                        }
 
                         state.selectedRelease?.let { release ->
                             whatsNew(

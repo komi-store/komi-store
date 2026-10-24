@@ -60,6 +60,7 @@ data class TweaksState(
     val includePreReleases: Boolean = false,
     val isHideSeenEnabled: Boolean = false,
     val isScrollbarEnabled: Boolean = false,
+    val isDetailAutoLoadSectionsEnabled: Boolean = true,
     val contentWidth: ContentWidth = ContentWidth.COMPACT,
     val displayModeId: Int = SYSTEM_DEFAULT_DISPLAY_MODE_ID,
     val translationProvider: TranslationProvider = TranslationProvider.Default,

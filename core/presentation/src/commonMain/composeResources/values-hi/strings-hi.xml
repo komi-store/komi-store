@@ -1529,4 +1529,11 @@
     <string name="tweaks_diagnostics_share_action">शेयर करें</string>
     <string name="tweaks_diagnostics_warning">लॉग इसी डिवाइस पर रहते हैं और उनमें ऐप का डेटा हो सकता है। कुछ भी अपने आप अपलोड नहीं होता।</string>
     <string name="tweaks_diagnostics_share_error">डायग्नोस्टिक लॉग तैयार नहीं हो सके</string>
+
+    <!-- Details content deferred until asked -->
+    <string name="tweaks_detail_auto_load_sections_title">README और रिलीज़ नोट्स</string>
+    <string name="tweaks_detail_auto_load_sections_description">विवरण पृष्ठ खोलने पर अपने आप लोड होते हैं। बंद होने पर सामग्री लोड करें दबाने के बाद ही इन्हें लाया और पढ़ा जाता है।</string>
+    <string name="details_sections_deferred_title">README और रिलीज़ नोट्स</string>
+    <string name="details_sections_deferred_body">अभी लोड नहीं हुए। सामग्री लोड करें इन्हें इस रिपॉज़िटरी के लिए लाकर दिखाता है।</string>
+    <string name="details_sections_deferred_load">सामग्री लोड करें</string>
 </resources>

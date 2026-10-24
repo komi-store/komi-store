@@ -1514,4 +1514,11 @@
     <string name="tweaks_diagnostics_share_action">শেয়ার</string>
     <string name="tweaks_diagnostics_warning">লগগুলো এই ডিভাইসেই থাকে এবং অ্যাপের ডেটা থাকতে পারে। স্বয়ংক্রিয়ভাবে কিছু আপলোড হয় না।</string>
     <string name="tweaks_diagnostics_share_error">ডায়াগনস্টিক লগ প্রস্তুত করা যায়নি</string>
+
+    <!-- Details content deferred until asked -->
+    <string name="tweaks_detail_auto_load_sections_title">README ও রিলিজ নোট</string>
+    <string name="tweaks_detail_auto_load_sections_description">বিস্তারিত পৃষ্ঠা খোলার সময় স্বয়ংক্রিয়ভাবে লোড হয়। বন্ধ থাকলে কনটেন্ট লোড করুন চাপার পরেই এগুলো আনা ও বিশ্লেষণ করা হয়।</string>
+    <string name="details_sections_deferred_title">README ও রিলিজ নোট</string>
+    <string name="details_sections_deferred_body">এখনও লোড হয়নি। কনটেন্ট লোড করুন এই রিপোজিটরির জন্য এনে দেখাবে।</string>
+    <string name="details_sections_deferred_load">কনটেন্ট লোড করুন</string>
 </resources>

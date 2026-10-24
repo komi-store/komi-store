@@ -161,6 +161,10 @@ interface TweaksRepository {
 
     suspend fun setShowAllPlatforms(enabled: Boolean)
 
+    fun getDetailAutoLoadSections(): Flow<Boolean>
+
+    suspend fun setDetailAutoLoadSections(enabled: Boolean)
+
     fun getRepoGridLayout(): Flow<Boolean>
 
     suspend fun setRepoGridLayout(enabled: Boolean)

@@ -37,6 +37,7 @@ import zed.rainxch.core.domain.helpers.ShareManager
 import zed.rainxch.core.domain.logging.KomiStoreLogger
 import zed.rainxch.core.domain.model.account.github.GithubAsset
 import zed.rainxch.core.domain.model.account.github.GithubRelease
+import zed.rainxch.core.domain.model.account.github.GithubRepoSummary
 import zed.rainxch.core.domain.model.account.github.isEffectivelyPreRelease
 import zed.rainxch.core.domain.model.apk.ApkPackageInfo
 import zed.rainxch.core.domain.model.error.RateLimitException
@@ -178,6 +179,9 @@ class DetailsViewModel(
     private var aboutTranslationJob: Job? = null
     private var whatsNewTranslationJob: Job? = null
 
+    // Fixed on the first load so the page cannot start fetching after a later setting change.
+    private var sectionsGate: DeferredSectionsGate? = null
+
     // Set once the user picks a release, asset, channel or installed app; an update check then
     // leaves the selection where they put it.
     private var hasUserPickedRelease = false
@@ -299,8 +303,16 @@ class DetailsViewModel(
                 retryReleases()
             }
 
+            DetailsAction.LoadDeferredSections -> {
+                loadDeferredSections()
+            }
+
             DetailsAction.Refresh -> {
-                refresh()
+                if (_state.value.sectionsDeferred || _state.value.isLoadingDeferredSections) {
+                    loadDeferredSections()
+                } else {
+                    refresh()
+                }
             }
 
             DetailsAction.OnDismissDowngradeWarning -> {
@@ -761,6 +773,22 @@ class DetailsViewModel(
         val mergedChangelog: String?,
         val mergedChangelogBaseTag: String?,
         val latestStableHasInstallableAsset: Boolean,
+    )
+
+    private data class ReleasesRead(
+        val releases: List<GithubRelease> = emptyList(),
+        val failed: Boolean = false,
+        val fromCache: Boolean = false,
+    )
+
+    private data class ReleaseSections(
+        val installedApp: InstalledApp?,
+        val selectedRelease: GithubRelease?,
+        val selectedReleaseCategory: ReleaseCategory,
+        val installableAssets: List<GithubAsset>,
+        val primaryAsset: GithubAsset?,
+        val deviceBuildReleaseIds: ImmutableSet<Long>,
+        val insights: ReleaseInsights,
     )
 
     @OptIn(ExperimentalTime::class)
@@ -2743,6 +2771,7 @@ class DetailsViewModel(
         viewModelScope.launch {
             try {
                 rateLimited.set(false)
+                val gate = sectionsGateForSession()
 
                 _state.value = _state.value.copy(isLoading = true, errorMessage = null)
 
@@ -2821,35 +2850,8 @@ class DetailsViewModel(
 
                 val allReleasesDeferred =
                     async {
-                        val cachedReleases =
-                            detailsRepository.getCachedReleases(
-                                owner = owner,
-                                repo = name,
-                                sourceHost = sourceHostParam,
-                            )
-                        if (cachedReleases != null) {
-                            return@async Triple(cachedReleases.releases, false, true)
-                        }
-                        try {
-                            Triple(
-                                detailsRepository.getAllReleases(
-                                    owner = owner,
-                                    repo = name,
-                                    defaultBranch = repo.defaultBranch,
-                                    sourceHost = sourceHostParam,
-                                ),
-                                false,
-                                false,
-                            )
-                        } catch (_: RateLimitException) {
-                            rateLimited.set(true)
-                            Triple(emptyList<GithubRelease>(), true, false)
-                        } catch (e: CancellationException) {
-                            throw e
-                        } catch (t: Throwable) {
-                            logger.warn("Failed to load releases: ${t.message}")
-                            Triple(emptyList<GithubRelease>(), true, false)
-                        }
+                        if (gate.isDeferred) return@async ReleasesRead()
+                        readReleases(repo)
                     }
 
                 val statsDeferred =
@@ -2872,21 +2874,8 @@ class DetailsViewModel(
 
                 val readmeDeferred =
                     async {
-                        try {
-                            detailsRepository.getReadme(
-                                owner = owner,
-                                repo = name,
-                                defaultBranch = repo.defaultBranch,
-                                sourceHost = sourceHostParam,
-                            )
-                        } catch (_: RateLimitException) {
-                            rateLimited.set(true)
-                            null
-                        } catch (e: CancellationException) {
-                            throw e
-                        } catch (_: Throwable) {
-                            null
-                        }
+                        if (gate.isDeferred) return@async null
+                        readReadme(repo)
                     }
 
                 val userProfileDeferred =
@@ -2938,7 +2927,7 @@ class DetailsViewModel(
                 val isObtainiumEnabled = platform == Platform.ANDROID
                 val isAppManagerEnabled = platform == Platform.ANDROID
 
-                val (allReleases, releasesFailed, releasesFromCache) = allReleasesDeferred.await()
+                val releasesRead = allReleasesDeferred.await()
                 val stats = statsDeferred.await()
                 val readme = readmeDeferred.await()
                 val userProfile = userProfileDeferred.await()
@@ -2955,98 +2944,53 @@ class DetailsViewModel(
                             isLoading = false,
                             errorMessage = null,
                             releasesLoadFailed = true,
+                            sectionsDeferred = gate.isDeferred,
                         )
                     return@launch
                 }
 
-                val installedAssetName =
-                    installedApp?.let {
-                        it.installedAssetName ?: it.latestAssetName ?: it.pendingInstallAssetName
-                    }
-                val installedVersionTag = installedApp?.installedVersion
-                val installedRelease =
-                    allReleases.firstOrNull {
-                        VersionMath.isExactSameVersion(it.tagName, installedVersionTag)
-                    } ?: allReleases.firstOrNull {
-                        VersionMath.isSameVersion(it.tagName, installedVersionTag)
-                    }
-                val installedIsPreRelease = installedRelease?.isEffectivelyPreRelease() == true
-                val installedChannel =
-                    if (installedIsPreRelease) {
-                        ReleaseCategory.PRE_RELEASE
-                    } else {
-                        ReleaseCategory.STABLE
-                    }
-                val deviceBuildIds = deviceBuildReleaseIds(allReleases)
-                val selectedRelease =
-                    allReleases.updateTargetOf(installedApp)
-                        ?: installedApp?.let { app ->
-                            allReleases.firstOwnedBy(
-                                app = app,
-                                category = installedChannel,
-                                repoApps = allInstalledApps,
-                                anchorAssetName = installedAssetName,
-                            )
-                        }
-                        ?: allReleases.filter { it.id in deviceBuildIds }.firstInCategory(installedChannel)
-                        ?: allReleases.firstInCategory(installedChannel)
-                        ?: allReleases.firstInCategory(ReleaseCategory.ALL)
-                val resolvedCategory =
-                    if (selectedRelease?.isEffectivelyPreRelease() == true) {
-                        ReleaseCategory.PRE_RELEASE
-                    } else {
-                        ReleaseCategory.STABLE
-                    }
-
-                val (installable, primary) =
-                    recomputeAssetsForRelease(
-                        selectedRelease,
-                        installedApp,
-                        installedAssetName,
-                    )
-
+                val sections = resolveReleaseSections(releasesRead.releases, allInstalledApps, installedApp)
                 val isObtainiumAvailable = installer.isObtainiumInstalled()
                 val isAppManagerAvailable = installer.isAppManagerInstalled()
 
-                logger.debug("Loaded repo: ${repo.name}, installedApp: ${installedApp?.packageName}")
-
-                val insights = computeReleaseInsights(allReleases, installedApp)
+                logger.debug("Loaded repo: ${repo.name}, installedApp: ${sections.installedApp?.packageName}")
 
                 _state.value =
                     _state.value.copy(
                         isLoading = false,
                         errorMessage = null,
                         repository = repo,
-                        allReleases = allReleases,
-                        releasePlatforms = platformsByRelease(allReleases),
-                        deviceBuildReleaseIds = deviceBuildIds,
-                        releaseLines = releaseLines(allReleases),
-                        releasesLoadFailed = releasesFailed,
+                        allReleases = releasesRead.releases,
+                        releasePlatforms = platformsByRelease(releasesRead.releases),
+                        deviceBuildReleaseIds = sections.deviceBuildReleaseIds,
+                        releaseLines = releaseLines(releasesRead.releases),
+                        releasesLoadFailed = releasesRead.failed,
                         isRetryingReleases = false,
-                        selectedRelease = selectedRelease,
-                        selectedReleaseCategory = resolvedCategory,
+                        selectedRelease = sections.selectedRelease,
+                        selectedReleaseCategory = sections.selectedReleaseCategory,
                         stats = stats,
                         readmeMarkdown = readme?.first,
                         readmeLanguage = readme?.second,
-                        installableAssets = installable,
-                        primaryAsset = primary,
+                        sectionsDeferred = gate.isDeferred,
+                        installableAssets = sections.installableAssets,
+                        primaryAsset = sections.primaryAsset,
                         userProfile = userProfile,
                         systemArchitecture = installer.detectSystemArchitecture(),
                         isObtainiumAvailable = isObtainiumAvailable,
                         isObtainiumEnabled = isObtainiumEnabled,
                         isAppManagerAvailable = isAppManagerAvailable,
                         isAppManagerEnabled = isAppManagerEnabled,
-                        installedApp = installedApp,
+                        installedApp = sections.installedApp,
                         deviceLanguageCode = translationRepository.getDeviceLanguageCode(),
                         isComingFromUpdate = isComingFromUpdate,
-                        stalledStableSinceDays = insights.stalledStableSinceDays,
-                        mergedChangelog = insights.mergedChangelog,
-                        mergedChangelogBaseTag = insights.mergedChangelogBaseTag,
+                        stalledStableSinceDays = sections.insights.stalledStableSinceDays,
+                        mergedChangelog = sections.insights.mergedChangelog,
+                        mergedChangelogBaseTag = sections.insights.mergedChangelogBaseTag,
                         latestStableHasInstallableAsset =
-                            insights.latestStableHasInstallableAsset,
+                            sections.insights.latestStableHasInstallableAsset,
                     )
 
-                if (releasesFromCache) {
+                if (releasesRead.fromCache) {
                     revalidateReleases()
                 }
 
@@ -3054,7 +2998,7 @@ class DetailsViewModel(
 
                 maybeAutoTranslate(
                     readmeBody = readme?.first,
-                    releaseDescription = selectedRelease?.description,
+                    releaseDescription = sections.selectedRelease?.description,
                 )
             } catch (e: RateLimitException) {
                 logger.error("Rate limited: ${e.message}")
@@ -3086,6 +3030,188 @@ class DetailsViewModel(
                         isLoading = false,
                         errorMessage = t.message ?: getString(Res.string.failed_to_load_details),
                     )
+            }
+        }
+    }
+
+    private suspend fun sectionsGateForSession(): DeferredSectionsGate {
+        sectionsGate?.let { return it }
+        val autoLoad =
+            try {
+                tweaksRepository.getDetailAutoLoadSections().first()
+            } catch (e: CancellationException) {
+                throw e
+            } catch (t: Throwable) {
+                logger.warn("Could not read the detail sections setting: ${t.message}")
+                true
+            }
+        return DeferredSectionsGate(autoLoad).also { sectionsGate = it }
+    }
+
+    private suspend fun readReleases(repo: GithubRepoSummary): ReleasesRead =
+        try {
+            val cachedReleases =
+                detailsRepository.getCachedReleases(
+                    owner = repo.owner.login,
+                    repo = repo.name,
+                    sourceHost = sourceHostParam,
+                )
+            if (cachedReleases != null) {
+                ReleasesRead(cachedReleases.releases, failed = false, fromCache = true)
+            } else {
+                ReleasesRead(
+                    releases =
+                        detailsRepository.getAllReleases(
+                            owner = repo.owner.login,
+                            repo = repo.name,
+                            defaultBranch = repo.defaultBranch,
+                            sourceHost = sourceHostParam,
+                        ),
+                    failed = false,
+                    fromCache = false,
+                )
+            }
+        } catch (_: RateLimitException) {
+            rateLimited.set(true)
+            ReleasesRead(failed = true)
+        } catch (e: CancellationException) {
+            throw e
+        } catch (t: Throwable) {
+            logger.warn("Failed to load releases: ${t.message}")
+            ReleasesRead(failed = true)
+        }
+
+    private suspend fun readReadme(repo: GithubRepoSummary): Triple<String, String?, String>? =
+        try {
+            detailsRepository.getReadme(
+                owner = repo.owner.login,
+                repo = repo.name,
+                defaultBranch = repo.defaultBranch,
+                sourceHost = sourceHostParam,
+            )
+        } catch (_: RateLimitException) {
+            rateLimited.set(true)
+            null
+        } catch (e: CancellationException) {
+            throw e
+        } catch (_: Throwable) {
+            null
+        }
+
+    private fun resolveReleaseSections(
+        releases: List<GithubRelease>,
+        allInstalledApps: List<InstalledApp>,
+        installedApp: InstalledApp?,
+    ): ReleaseSections {
+        val installedAssetName =
+            installedApp?.let {
+                it.installedAssetName ?: it.latestAssetName ?: it.pendingInstallAssetName
+            }
+        val installedVersionTag = installedApp?.installedVersion
+        val installedRelease =
+            releases.firstOrNull {
+                VersionMath.isExactSameVersion(it.tagName, installedVersionTag)
+            } ?: releases.firstOrNull {
+                VersionMath.isSameVersion(it.tagName, installedVersionTag)
+            }
+        val installedChannel =
+            if (installedRelease?.isEffectivelyPreRelease() == true) {
+                ReleaseCategory.PRE_RELEASE
+            } else {
+                ReleaseCategory.STABLE
+            }
+        val deviceBuildIds = deviceBuildReleaseIds(releases)
+        val selectedRelease =
+            releases.updateTargetOf(installedApp)
+                ?: installedApp?.let { app ->
+                    releases.firstOwnedBy(
+                        app = app,
+                        category = installedChannel,
+                        repoApps = allInstalledApps,
+                        anchorAssetName = installedAssetName,
+                    )
+                }
+                ?: releases.filter { it.id in deviceBuildIds }.firstInCategory(installedChannel)
+                ?: releases.firstInCategory(installedChannel)
+                ?: releases.firstInCategory(ReleaseCategory.ALL)
+        val resolvedCategory =
+            if (selectedRelease?.isEffectivelyPreRelease() == true) {
+                ReleaseCategory.PRE_RELEASE
+            } else {
+                ReleaseCategory.STABLE
+            }
+        val (installable, primary) =
+            recomputeAssetsForRelease(selectedRelease, installedApp, installedAssetName)
+        return ReleaseSections(
+            installedApp = installedApp,
+            selectedRelease = selectedRelease,
+            selectedReleaseCategory = resolvedCategory,
+            installableAssets = installable,
+            primaryAsset = primary,
+            deviceBuildReleaseIds = deviceBuildIds,
+            insights = computeReleaseInsights(releases, installedApp),
+        )
+    }
+
+    private fun loadDeferredSections() {
+        val repo = _state.value.repository ?: return
+        val gate = sectionsGate ?: return
+        if (canRequestDeferredSections(gate)) {
+            startDeferredSectionsLoad(repo)
+        }
+    }
+
+    private fun canRequestDeferredSections(gate: DeferredSectionsGate): Boolean =
+        !_state.value.isLoadingDeferredSections && gate.requestLoad()
+
+    private fun startDeferredSectionsLoad(repo: GithubRepoSummary) {
+        _state.update { it.copy(isLoadingDeferredSections = true) }
+        viewModelScope.launch {
+            try {
+                rateLimited.set(false)
+                val releasesRead = readReleases(repo)
+                val readme = readReadme(repo)
+                val sections =
+                    resolveReleaseSections(
+                        releases = releasesRead.releases,
+                        allInstalledApps = _state.value.installedApps,
+                        installedApp = _state.value.installedApp,
+                    )
+                _state.update {
+                    it.copy(
+                        installedApp = sections.installedApp,
+                        allReleases = releasesRead.releases,
+                        releasePlatforms = platformsByRelease(releasesRead.releases),
+                        deviceBuildReleaseIds = sections.deviceBuildReleaseIds,
+                        releaseLines = releaseLines(releasesRead.releases),
+                        releasesLoadFailed = releasesRead.failed,
+                        selectedRelease = sections.selectedRelease,
+                        selectedReleaseCategory = sections.selectedReleaseCategory,
+                        installableAssets = sections.installableAssets,
+                        primaryAsset = sections.primaryAsset,
+                        stalledStableSinceDays = sections.insights.stalledStableSinceDays,
+                        mergedChangelog = sections.insights.mergedChangelog,
+                        mergedChangelogBaseTag = sections.insights.mergedChangelogBaseTag,
+                        latestStableHasInstallableAsset =
+                            sections.insights.latestStableHasInstallableAsset,
+                        readmeMarkdown = readme?.first,
+                        readmeLanguage = readme?.second,
+                    )
+                }
+                if (releasesRead.fromCache) {
+                    revalidateReleases()
+                }
+                maybeAutoTranslate(
+                    readmeBody = readme?.first,
+                    releaseDescription = sections.selectedRelease?.description,
+                )
+            } catch (e: CancellationException) {
+                throw e
+            } catch (t: Throwable) {
+                logger.warn("Deferred sections load failed: ${t.message}")
+                _state.update { it.copy(releasesLoadFailed = true) }
+            } finally {
+                _state.update { it.copy(isLoadingDeferredSections = false, sectionsDeferred = false) }
             }
         }
     }

@@ -1525,4 +1525,11 @@
     <string name="tweaks_diagnostics_share_action">Paylaş</string>
     <string name="tweaks_diagnostics_warning">Günlükler bu cihazda kalır ve uygulama verileri içerebilir. Hiçbir şey otomatik olarak yüklenmez.</string>
     <string name="tweaks_diagnostics_share_error">Tanılama günlükleri hazırlanamadı</string>
+
+    <!-- Details content deferred until asked -->
+    <string name="tweaks_detail_auto_load_sections_title">README ve sürüm notları</string>
+    <string name="tweaks_detail_auto_load_sections_description">Ayrıntı sayfası açıldığında otomatik yüklenir. Kapalıyken yalnızca İçeriği yükle düğmesine basınca getirilip ayrıştırılır.</string>
+    <string name="details_sections_deferred_title">README ve sürüm notları</string>
+    <string name="details_sections_deferred_body">Henüz yüklenmedi. İçeriği yükle, bu depo için bunları getirip gösterir.</string>
+    <string name="details_sections_deferred_load">İçeriği yükle</string>
 </resources>

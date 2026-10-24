@@ -1493,4 +1493,11 @@
     <string name="tweaks_diagnostics_share_action">Compartir</string>
     <string name="tweaks_diagnostics_warning">Los registros se quedan en este dispositivo y pueden contener datos de la app. No se sube nada automáticamente.</string>
     <string name="tweaks_diagnostics_share_error">No se pudieron preparar los registros de diagnóstico</string>
+
+    <!-- Details content deferred until asked -->
+    <string name="tweaks_detail_auto_load_sections_title">README y notas de versión</string>
+    <string name="tweaks_detail_auto_load_sections_description">Se cargan automáticamente al abrir una página de detalles. Si está desactivado, se obtienen y analizan solo al pulsar Cargar contenido.</string>
+    <string name="details_sections_deferred_title">README y notas de versión</string>
+    <string name="details_sections_deferred_body">Aún no se han cargado. Cargar contenido los obtiene y los muestra para este repositorio.</string>
+    <string name="details_sections_deferred_load">Cargar contenido</string>
 </resources>

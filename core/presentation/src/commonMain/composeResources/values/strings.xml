@@ -1561,4 +1561,11 @@
     <string name="tweaks_diagnostics_share_action">Share</string>
     <string name="tweaks_diagnostics_warning">Logs stay on this device and may contain app data. Nothing is uploaded automatically.</string>
     <string name="tweaks_diagnostics_share_error">Couldn\'t prepare the diagnostic logs</string>
+
+    <!-- Details content deferred until asked -->
+    <string name="tweaks_detail_auto_load_sections_title">README and release notes</string>
+    <string name="tweaks_detail_auto_load_sections_description">Automatically load them when a detail page opens. Turn off to fetch and parse only after you tap Load content.</string>
+    <string name="details_sections_deferred_title">README and release notes</string>
+    <string name="details_sections_deferred_body">Not loaded yet. Load content fetches and shows them for this repository.</string>
+    <string name="details_sections_deferred_load">Load content</string>
 </resources>

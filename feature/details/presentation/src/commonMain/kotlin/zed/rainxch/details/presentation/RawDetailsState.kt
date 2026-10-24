@@ -42,6 +42,8 @@ internal data class RawDetailsState(
     val stats: RepoStats? = null,
     val readmeMarkdown: String? = null,
     val readmeLanguage: String? = null,
+    val sectionsDeferred: Boolean = false,
+    val isLoadingDeferredSections: Boolean = false,
     val installLogs: List<InstallLogItem> = emptyList(),
     val isDownloading: Boolean = false,
     val downloadProgressPercent: Int? = null,

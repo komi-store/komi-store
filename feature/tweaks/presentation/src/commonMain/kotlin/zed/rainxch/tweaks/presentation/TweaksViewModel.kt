@@ -115,6 +115,7 @@ class TweaksViewModel(
                     loadIncludePreReleases()
                     loadHideSeenEnabled()
                     loadScrollbarEnabled()
+                    loadDetailAutoLoadSections()
                     loadContentWidth()
                     loadDisplayModeId()
                     loadTranslationSettings()
@@ -481,6 +482,16 @@ class TweaksViewModel(
         }
     }
 
+    private fun loadDetailAutoLoadSections() {
+        viewModelScope.launch {
+            tweaksRepository.getDetailAutoLoadSections().collect { enabled ->
+                _state.update {
+                    it.copy(isDetailAutoLoadSectionsEnabled = enabled)
+                }
+            }
+        }
+    }
+
     private fun loadContentWidth() {
         viewModelScope.launch {
             tweaksRepository.getContentWidth().collect { width ->
@@ -660,6 +671,12 @@ class TweaksViewModel(
             is TweaksAction.OnScrollbarToggled -> {
                 viewModelScope.launch {
                     tweaksRepository.setScrollbarEnabled(action.enabled)
+                }
+            }
+
+            is TweaksAction.OnDetailAutoLoadSectionsToggled -> {
+                viewModelScope.launch {
+                    tweaksRepository.setDetailAutoLoadSections(action.enabled)
                 }
             }
 

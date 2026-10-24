@@ -1528,4 +1528,11 @@
     <string name="tweaks_diagnostics_share_action">Condividi</string>
     <string name="tweaks_diagnostics_warning">I log restano su questo dispositivo e possono contenere dati dell’app. Nulla viene caricato automaticamente.</string>
     <string name="tweaks_diagnostics_share_error">Impossibile preparare i log di diagnostica</string>
+
+    <!-- Details content deferred until asked -->
+    <string name="tweaks_detail_auto_load_sections_title">README e note di aggiornamento</string>
+    <string name="tweaks_detail_auto_load_sections_description">Caricati automaticamente quando si apre una pagina dei dettagli. Se disattivato, vengono scaricati e analizzati solo dopo Carica contenuti.</string>
+    <string name="details_sections_deferred_title">README e note di aggiornamento</string>
+    <string name="details_sections_deferred_body">Non ancora caricati. Carica contenuti li scarica e li mostra per questo repository.</string>
+    <string name="details_sections_deferred_load">Carica contenuti</string>
 </resources>

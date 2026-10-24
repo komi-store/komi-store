@@ -1559,4 +1559,11 @@
     <string name="tweaks_diagnostics_share_action">مشاركة</string>
     <string name="tweaks_diagnostics_warning">تبقى السجلات على هذا الجهاز وقد تحتوي على بيانات التطبيق. لا يُرفع أي شيء تلقائيًا.</string>
     <string name="tweaks_diagnostics_share_error">تعذّر تجهيز سجلات التشخيص</string>
+
+    <!-- Details content deferred until asked -->
+    <string name="tweaks_detail_auto_load_sections_title">README وملاحظات الإصدار</string>
+    <string name="tweaks_detail_auto_load_sections_description">تُحمَّل تلقائيًا عند فتح صفحة التفاصيل. عند الإيقاف تُجلب وتُحلَّل فقط بعد النقر على تحميل المحتوى.</string>
+    <string name="details_sections_deferred_title">README وملاحظات الإصدار</string>
+    <string name="details_sections_deferred_body">لم يتم تحميلها بعد. تحميل المحتوى يجلبها ويعرضها لهذا المستودع.</string>
+    <string name="details_sections_deferred_load">تحميل المحتوى</string>
 </resources>
