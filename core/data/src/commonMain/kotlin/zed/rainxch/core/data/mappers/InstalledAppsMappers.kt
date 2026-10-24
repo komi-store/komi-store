@@ -66,6 +66,7 @@ fun InstalledApp.toEntity(): InstalledAppEntity =
         pendingInstallStartedAt = pendingInstallStartedAt,
         skippedReleaseTag = skippedReleaseTag,
         sourceHost = sourceHost,
+        updateStateRevision = updateStateRevision,
     )
 
 @Suppress("LongMethod")
@@ -131,4 +132,5 @@ fun InstalledAppEntity.toDomain(): InstalledApp =
         pendingInstallStartedAt = pendingInstallStartedAt,
         skippedReleaseTag = skippedReleaseTag,
         sourceHost = sourceHost,
+        updateStateRevision = updateStateRevision,
     )

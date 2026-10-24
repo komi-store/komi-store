@@ -68,6 +68,7 @@ data class InstalledApp(
     val pendingInstallStartedAt: Long? = null,
     val skippedReleaseTag: String? = null,
     val sourceHost: String? = null,
+    val updateStateRevision: Long = 0,
 )
 
 fun InstalledApp?.isReallyInstalled(): Boolean = this != null && !this.isPendingInstall

@@ -332,22 +332,38 @@ class InstalledAppsRepositoryImpl(
             val resolvedLatestVersionCode =
                 if (matchedRelease.tagName == app.latestVersion) app.latestVersionCode else null
 
-            installedAppsDao.updateVersionInfo(
-                packageName = packageName,
-                available = isUpdateAvailable,
-                version = matchedRelease.tagName,
-                assetName = primaryAsset.name,
-                assetUrl = primaryAsset.downloadUrl,
-                assetSize = primaryAsset.size,
-                releaseId = matchedRelease.id,
-                assetId = primaryAsset.id,
-                assetDigest = primaryAsset.digest,
-                releaseNotes = matchedRelease.description ?: "",
-                timestamp = System.currentTimeMillis(),
-                latestVersionName = matchedRelease.tagName,
-                latestVersionCode = resolvedLatestVersionCode,
-                latestReleasePublishedAt = matchedRelease.publishedAt,
-            )
+            val expectedRevision = app.updateStateRevision
+            val written =
+                installedAppsDao.updateVersionInfo(
+                    packageName = packageName,
+                    available = isUpdateAvailable,
+                    version = matchedRelease.tagName,
+                    assetName = primaryAsset.name,
+                    assetUrl = primaryAsset.downloadUrl,
+                    assetSize = primaryAsset.size,
+                    releaseId = matchedRelease.id,
+                    assetId = primaryAsset.id,
+                    assetDigest = primaryAsset.digest,
+                    releaseNotes = matchedRelease.description ?: "",
+                    timestamp = System.currentTimeMillis(),
+                    latestVersionName = matchedRelease.tagName,
+                    latestVersionCode = resolvedLatestVersionCode,
+                    latestReleasePublishedAt = matchedRelease.publishedAt,
+                    expectedRevision = expectedRevision,
+                    nextRevision = expectedRevision + 1,
+                )
+            if (written == 0) {
+                // Another check (or a full-row write) advanced the revision while this one was
+                // judging a stale snapshot. The stored state is the only truth now: report it
+                // instead of the result this check failed to persist, and do not run the
+                // adoption writes that belong to the result that was just discarded.
+                Logger.w {
+                    "Discarded a stale update check for ${app.appName}: " +
+                        "stored revision moved past $expectedRevision"
+                }
+                return installedAppsDao.getAppByPackage(packageName)?.isUpdateAvailable
+                    ?: app.isUpdateAvailable
+            }
 
             val shouldRewriteTag =
                 UpdateVerdict.shouldAdoptMatchedTag(

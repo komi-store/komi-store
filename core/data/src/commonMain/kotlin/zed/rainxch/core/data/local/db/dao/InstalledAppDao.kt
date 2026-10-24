@@ -50,6 +50,8 @@ interface InstalledAppDao {
     @Query("SELECT packageName FROM installed_apps")
     suspend fun getTrackedPackageNames(): List<String>
 
+    // A check writes only against the revision it read, so a stale or cached result cannot
+    // overwrite a newer one while a fresh refresh is still accepted.
     @Query(
         """
     UPDATE installed_apps
@@ -65,10 +67,13 @@ interface InstalledAppDao {
         lastCheckedAt = :timestamp,
         latestVersionName = :latestVersionName,
         latestVersionCode = :latestVersionCode,
-        latestReleasePublishedAt = :latestReleasePublishedAt
+        latestReleasePublishedAt = :latestReleasePublishedAt,
+        updateStateRevision = :nextRevision
     WHERE packageName = :packageName
+      AND updateStateRevision = :expectedRevision
 """,
     )
+    @Suppress("LongParameterList")
     suspend fun updateVersionInfo(
         packageName: String,
         available: Boolean,
@@ -84,7 +89,9 @@ interface InstalledAppDao {
         latestVersionName: String?,
         latestVersionCode: Long?,
         latestReleasePublishedAt: String?,
-    )
+        expectedRevision: Long,
+        nextRevision: Long,
+    ): Int
 
     @Query("UPDATE installed_apps SET includePreReleases = :enabled WHERE packageName = :packageName")
     suspend fun updateIncludePreReleases(

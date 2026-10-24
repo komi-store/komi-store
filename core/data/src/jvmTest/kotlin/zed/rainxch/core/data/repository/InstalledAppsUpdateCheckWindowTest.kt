@@ -14,6 +14,7 @@ import kotlinx.coroutines.runBlocking
 import zed.rainxch.core.data.data_source.TokenStore
 import zed.rainxch.core.data.dto.GithubDeviceTokenSuccessDto
 import zed.rainxch.core.data.local.db.AppDatabase
+import zed.rainxch.core.data.local.db.dao.InstalledAppDao
 import zed.rainxch.core.data.local.db.entities.InstalledAppEntity
 import zed.rainxch.core.data.network.BackendApiClient
 import zed.rainxch.core.data.network.DesktopDigestVerifier
@@ -70,6 +71,30 @@ class InstalledAppsUpdateCheckWindowTest {
                 assertEquals(200L, row.latestReleaseId)
                 assertEquals("2026-10-01T00:00:00Z", row.latestReleasePublishedAt)
                 assertTrue(row.lastCheckedAt > 0L)
+            }
+        }
+
+    @Test
+    fun a_successful_check_advances_the_revision() =
+        runBlocking {
+            withRepo { repo, db ->
+                db.installedAppDao.insertApp(
+                    app(packageName = PKG, installed = "1.0.0", installedCode = 100L),
+                )
+
+                repo.checkForUpdatesWithReleases(
+                    PKG,
+                    listOf(release(id = 200L, tag = "2.0.0", publishedAt = "2026-10-01T00:00:00Z")),
+                )
+                assertEquals(1L, db.installedAppDao.getAppByPackage(PKG)!!.updateStateRevision)
+
+                repo.checkForUpdatesWithReleases(
+                    PKG,
+                    listOf(release(id = 300L, tag = "3.0.0", publishedAt = "2026-10-02T00:00:00Z")),
+                )
+                val row = db.installedAppDao.getAppByPackage(PKG)!!
+                assertEquals(2L, row.updateStateRevision)
+                assertEquals("3.0.0", row.latestVersion)
             }
         }
 
@@ -169,7 +194,40 @@ class InstalledAppsUpdateCheckWindowTest {
             }
         }
 
-    private suspend fun withRepo(block: suspend (InstalledAppsRepositoryImpl, AppDatabase) -> Unit) {
+    @Test
+    fun a_rejected_write_reports_the_stored_state_and_skips_adoption() =
+        runBlocking {
+            withRepo(installedAppsDao = { db -> ConflictingRevisionDao(db.installedAppDao) }) { repo, db ->
+                db.installedAppDao.insertApp(
+                    app(packageName = PKG, installed = "1.0.0", installedCode = 200L)
+                        .copy(
+                            latestVersion = "2.0.0",
+                            latestVersionCode = 200L,
+                            isUpdateAvailable = true,
+                        ),
+                )
+
+                val updated =
+                    repo.checkForUpdatesWithReleases(
+                        PKG,
+                        listOf(release(id = 200L, tag = "2.0.0", publishedAt = "2026-10-01T00:00:00Z")),
+                    )
+
+                // The concurrent writer's flag is the stored truth, not this check's verdict.
+                assertTrue(updated)
+                val row = db.installedAppDao.getAppByPackage(PKG)!!
+                assertEquals(1L, row.updateStateRevision)
+                assertEquals("9.9.9", row.latestVersion)
+                assertTrue(row.isUpdateAvailable)
+                // The adoption that belonged to the discarded verdict must not run.
+                assertEquals("1.0.0", row.installedVersion)
+            }
+        }
+
+    private suspend fun withRepo(
+        installedAppsDao: (AppDatabase) -> InstalledAppDao = { it.installedAppDao },
+        block: suspend (InstalledAppsRepositoryImpl, AppDatabase) -> Unit,
+    ) {
         val db =
             Room
                 .inMemoryDatabaseBuilder<AppDatabase>()
@@ -177,7 +235,7 @@ class InstalledAppsUpdateCheckWindowTest {
                 .setQueryCoroutineContext(Dispatchers.IO)
                 .build()
         try {
-            block(newRepo(db), db)
+            block(newRepo(db, installedAppsDao(db)), db)
         } finally {
             db.close()
         }
@@ -188,10 +246,13 @@ class InstalledAppsUpdateCheckWindowTest {
     // host.
     private val offlineProxy = ProxyConfig.Http(host = "127.0.0.1", port = 9)
 
-    private fun newRepo(db: AppDatabase): InstalledAppsRepositoryImpl =
+    private fun newRepo(
+        db: AppDatabase,
+        installedAppsDao: InstalledAppDao,
+    ): InstalledAppsRepositoryImpl =
         InstalledAppsRepositoryImpl(
             database = db,
-            installedAppsDao = db.installedAppDao,
+            installedAppsDao = installedAppsDao,
             historyDao = db.updateHistoryDao,
             installer = FakeInstaller(),
             clientProvider =
@@ -411,5 +472,58 @@ class InstalledAppsUpdateCheckWindowTest {
 
     private companion object {
         const val PKG = "com.example.app"
+    }
+}
+
+// Simulates a concurrent writer that advances the revision between the check's read and its
+// write, so the repository must notice the compare-and-set failing.
+private class ConflictingRevisionDao(
+    private val delegate: InstalledAppDao,
+) : InstalledAppDao by delegate {
+    @Suppress("LongParameterList")
+    override suspend fun updateVersionInfo(
+        packageName: String,
+        available: Boolean,
+        version: String?,
+        assetName: String?,
+        assetUrl: String?,
+        assetSize: Long?,
+        releaseId: Long?,
+        assetId: Long?,
+        assetDigest: String?,
+        releaseNotes: String?,
+        timestamp: Long,
+        latestVersionName: String?,
+        latestVersionCode: Long?,
+        latestReleasePublishedAt: String?,
+        expectedRevision: Long,
+        nextRevision: Long,
+    ): Int {
+        val current = checkNotNull(delegate.getAppByPackage(packageName))
+        delegate.updateApp(
+            current.copy(
+                updateStateRevision = current.updateStateRevision + 1,
+                latestVersion = "9.9.9",
+                isUpdateAvailable = true,
+            ),
+        )
+        return delegate.updateVersionInfo(
+            packageName = packageName,
+            available = available,
+            version = version,
+            assetName = assetName,
+            assetUrl = assetUrl,
+            assetSize = assetSize,
+            releaseId = releaseId,
+            assetId = assetId,
+            assetDigest = assetDigest,
+            releaseNotes = releaseNotes,
+            timestamp = timestamp,
+            latestVersionName = latestVersionName,
+            latestVersionCode = latestVersionCode,
+            latestReleasePublishedAt = latestReleasePublishedAt,
+            expectedRevision = expectedRevision,
+            nextRevision = nextRevision,
+        )
     }
 }

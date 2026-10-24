@@ -49,6 +49,7 @@ class AppDatabaseMigrationTest {
                     val app = assertNotNull(db.installedAppDao.getAppByPackage(PACKAGE), "v$version")
                     assertEquals("1.0.0", app.installedVersion, "v$version")
                     assertEquals(InstallSource.THIS_APP, app.installSource, "v$version")
+                    assertEquals(0L, app.updateStateRevision, "v$version")
 
                     val favourite = assertNotNull(db.favoriteRepoDao.getFavoriteById(REPO_ID), "v$version")
                     assertEquals("repo", favourite.repoName, "v$version")
