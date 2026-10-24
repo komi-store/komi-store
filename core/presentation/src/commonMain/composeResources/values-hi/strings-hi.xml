@@ -1106,8 +1106,6 @@
     <string name="details_whats_new_screen_title">नया क्या है</string>
     <string name="external_import_progress_skip">छोड़ें और बाद में समीक्षा करें</string>
     <string name="feedback_hub_subtitle">हम हर रिपोर्ट पढ़ते हैं।</string>
-    <string name="tweaks_crash_log_share">क्रैश लॉग साझा करें</string>
-    <string name="tweaks_crash_log_share_subtitle">पिछले क्रैश के बाद इस डिवाइस पर सहेजा गया</string>
     <string name="home_action_get">पाएँ</string>
     <string name="home_rank_format">#%1$d</string>
     <string name="home_section_from_your_stars">आपके स्टार से</string>
@@ -1523,4 +1521,12 @@
     <string name="apps_tag_asset_filter">एसेट फ़िल्टर</string>
     <string name="apps_variant_stale_pick">वेरिएंट बदल गया है। इसे फिर से चुनें।</string>
     <string name="apps_no_release_found">इंस्टॉल करने के लिए कोई रिलीज़ नहीं मिली।</string>
+
+    <!-- Tweaks: developer diagnostics -->
+    <string name="tweaks_diagnostics_section_title">डेवलपर और निदान</string>
+    <string name="tweaks_diagnostics_share_title">डायग्नोस्टिक लॉग शेयर करें</string>
+    <string name="tweaks_diagnostics_share_body">सत्र लॉग, नवीनतम क्रैश रिपोर्ट और डिवाइस की जानकारी को एक टेक्स्ट फ़ाइल में जोड़ता है।</string>
+    <string name="tweaks_diagnostics_share_action">शेयर करें</string>
+    <string name="tweaks_diagnostics_warning">लॉग इसी डिवाइस पर रहते हैं और उनमें ऐप का डेटा हो सकता है। कुछ भी अपने आप अपलोड नहीं होता।</string>
+    <string name="tweaks_diagnostics_share_error">डायग्नोस्टिक लॉग तैयार नहीं हो सके</string>
 </resources>

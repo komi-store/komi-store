@@ -1108,8 +1108,6 @@
     <string name="details_whats_new_screen_title">নতুন কী আছে</string>
     <string name="external_import_progress_skip">বাদ দিন এবং পরে পর্যালোচনা করুন</string>
     <string name="feedback_hub_subtitle">আমরা প্রতিটি রিপোর্ট পড়ি।</string>
-    <string name="tweaks_crash_log_share">ক্র্যাশ লগ শেয়ার করুন</string>
-    <string name="tweaks_crash_log_share_subtitle">শেষ ক্র্যাশের পর এই ডিভাইসে সংরক্ষিত</string>
     <string name="home_action_get">নিন</string>
     <string name="home_rank_format">#%1$d</string>
     <string name="home_section_from_your_stars">আপনার স্টার থেকে</string>
@@ -1508,4 +1506,12 @@
     <string name="apps_tag_asset_filter">অ্যাসেট ফিল্টার</string>
     <string name="apps_variant_stale_pick">ভ্যারিয়েন্ট পরিবর্তিত হয়েছে। আবার নির্বাচন করুন।</string>
     <string name="apps_no_release_found">ইনস্টল করার জন্য কোনো রিলিজ পাওয়া যায়নি।</string>
+
+    <!-- Tweaks: developer diagnostics -->
+    <string name="tweaks_diagnostics_section_title">ডেভেলপার ও ডায়াগনস্টিকস</string>
+    <string name="tweaks_diagnostics_share_title">ডায়াগনস্টিক লগ শেয়ার করুন</string>
+    <string name="tweaks_diagnostics_share_body">সেশন লগ, সর্বশেষ ক্র্যাশ রিপোর্ট ও ডিভাইসের তথ্য একটি টেক্সট ফাইলে একসাথে করে।</string>
+    <string name="tweaks_diagnostics_share_action">শেয়ার</string>
+    <string name="tweaks_diagnostics_warning">লগগুলো এই ডিভাইসেই থাকে এবং অ্যাপের ডেটা থাকতে পারে। স্বয়ংক্রিয়ভাবে কিছু আপলোড হয় না।</string>
+    <string name="tweaks_diagnostics_share_error">ডায়াগনস্টিক লগ প্রস্তুত করা যায়নি</string>
 </resources>

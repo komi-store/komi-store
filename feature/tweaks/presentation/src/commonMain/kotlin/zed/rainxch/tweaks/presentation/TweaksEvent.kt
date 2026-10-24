@@ -40,4 +40,6 @@ sealed interface TweaksEvent {
     data object OnMicrosoftTranslatorCredentialsSaved : TweaksEvent
 
     data object OnAppLanguageChangeRequiresRestart : TweaksEvent
+
+    data object OnDiagnosticsShareFailed : TweaksEvent
 }

@@ -1118,8 +1118,6 @@
     <string name="details_whats_new_screen_title">Neler yeni</string>
     <string name="external_import_progress_skip">Atla ve sonra incele</string>
     <string name="feedback_hub_subtitle">Her raporu okuyoruz.</string>
-    <string name="tweaks_crash_log_share">Çökme günlüğünü paylaş</string>
-    <string name="tweaks_crash_log_share_subtitle">Son çökmeden sonra bu cihaza kaydedildi</string>
     <string name="home_action_get">Al</string>
     <string name="home_rank_format">#%1$d</string>
     <string name="home_section_from_your_stars">Yıldızlılarınızdan</string>
@@ -1519,4 +1517,12 @@
     <string name="apps_tag_asset_filter">Varlık filtresi</string>
     <string name="apps_variant_stale_pick">Varyant değişti. Yeniden seçin.</string>
     <string name="apps_no_release_found">Yüklenecek bir sürüm bulunamadı.</string>
+
+    <!-- Tweaks: developer diagnostics -->
+    <string name="tweaks_diagnostics_section_title">Geliştirici ve tanılama</string>
+    <string name="tweaks_diagnostics_share_title">Tanılama günlüklerini paylaş</string>
+    <string name="tweaks_diagnostics_share_body">Oturum günlüğünü, son çökme raporunu ve cihaz bilgilerini tek bir metin dosyasında birleştirir.</string>
+    <string name="tweaks_diagnostics_share_action">Paylaş</string>
+    <string name="tweaks_diagnostics_warning">Günlükler bu cihazda kalır ve uygulama verileri içerebilir. Hiçbir şey otomatik olarak yüklenmez.</string>
+    <string name="tweaks_diagnostics_share_error">Tanılama günlükleri hazırlanamadı</string>
 </resources>

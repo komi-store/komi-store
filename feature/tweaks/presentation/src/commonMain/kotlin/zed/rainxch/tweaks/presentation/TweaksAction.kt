@@ -166,8 +166,6 @@ sealed interface TweaksAction {
 
     data object OnFeedbackDismiss : TweaksAction
 
-    data object OnShareCrashLogClick : TweaksAction
-
     data object OnLanguagePickerOpen : TweaksAction
 
     data object OnLanguagePickerDismiss : TweaksAction
@@ -324,4 +322,6 @@ sealed interface TweaksAction {
     data object OnClearSeenHistoryDismiss : TweaksAction
 
     data object OnClearSeenHistoryConfirm : TweaksAction
+
+    data object OnShareDiagnosticLogs : TweaksAction
 }

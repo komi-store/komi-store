@@ -1,9 +1,7 @@
 package zed.rainxch.core.data.services
 
 import android.content.Context
-import android.content.Intent
 import android.os.Build
-import androidx.core.content.FileProvider
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -24,22 +22,6 @@ object CrashLogs {
     }
 
     fun latest(context: Context): File? = crashDir(context).listFiles()?.filter { it.isFile }?.maxByOrNull { it.lastModified() }
-
-    fun shareIntent(context: Context): Intent? {
-        val file = latest(context) ?: return null
-        val uri =
-            FileProvider.getUriForFile(
-                context,
-                "${context.packageName}.fileprovider",
-                file,
-            )
-        return Intent(Intent.ACTION_SEND).apply {
-            type = "text/plain"
-            putExtra(Intent.EXTRA_STREAM, uri)
-            putExtra(Intent.EXTRA_SUBJECT, "Komi Store crash log")
-            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-        }
-    }
 
     private fun write(
         context: Context,

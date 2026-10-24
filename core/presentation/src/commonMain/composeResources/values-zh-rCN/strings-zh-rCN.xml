@@ -1069,8 +1069,6 @@
     <string name="details_whats_new_screen_title">更新内容</string>
     <string name="external_import_progress_skip">跳过，稍后查看</string>
     <string name="feedback_hub_subtitle">每一条反馈我们都会阅读。</string>
-    <string name="tweaks_crash_log_share">分享崩溃日志</string>
-    <string name="tweaks_crash_log_share_subtitle">上次崩溃后保存在此设备上</string>
     <string name="home_action_get">获取</string>
     <string name="home_rank_format">#%1$d</string>
     <string name="home_section_from_your_stars">来自你的星标</string>
@@ -1478,4 +1476,12 @@
     <string name="apps_tag_asset_filter">资源筛选</string>
     <string name="apps_variant_stale_pick">变体已更改，请重新选择。</string>
     <string name="apps_no_release_found">找不到可安装的发布版本。</string>
+
+    <!-- Tweaks: developer diagnostics -->
+    <string name="tweaks_diagnostics_section_title">开发者与诊断</string>
+    <string name="tweaks_diagnostics_share_title">分享诊断日志</string>
+    <string name="tweaks_diagnostics_share_body">将会话日志、最近的崩溃报告和设备信息合并为一个文本文件。</string>
+    <string name="tweaks_diagnostics_share_action">分享</string>
+    <string name="tweaks_diagnostics_warning">日志只保留在本设备上，可能包含应用数据。不会自动上传任何内容。</string>
+    <string name="tweaks_diagnostics_share_error">无法准备诊断日志</string>
 </resources>

@@ -21,6 +21,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
 import org.jetbrains.compose.resources.getString
+import zed.rainxch.core.domain.diagnostics.DiagnosticSessionController
+import zed.rainxch.core.domain.helpers.ShareManager
 import zed.rainxch.core.domain.isDesktop
 import zed.rainxch.core.domain.logging.KomiStoreLogger
 import zed.rainxch.core.domain.model.installation.InstallerType
@@ -36,7 +38,6 @@ import zed.rainxch.core.domain.repository.SeenReposRepository
 import zed.rainxch.core.domain.repository.TweaksRepository
 import zed.rainxch.core.domain.system.AggressiveOemDetector
 import zed.rainxch.core.domain.system.AppVersionInfo
-import zed.rainxch.core.domain.system.CrashLogSharer
 import zed.rainxch.core.domain.system.InstallerStatusProvider
 import zed.rainxch.core.domain.system.UpdateScheduleManager
 import zed.rainxch.githubstore.core.presentation.res.Res
@@ -73,10 +74,12 @@ class TweaksViewModel(
     private val logger: KomiStoreLogger,
     private val aggressiveOemDetector: AggressiveOemDetector,
     private val cacheRepository: CacheRepository,
-    private val crashLogSharer: CrashLogSharer,
+    private val diagnosticSession: DiagnosticSessionController,
+    private val shareManager: ShareManager,
 ) : ViewModel() {
     private companion object {
         private const val BATTERY_OPT_PREF_READ_TIMEOUT_MS: Long = 1_000
+        private const val DIAGNOSTIC_BUNDLE_FILE_NAME = "komi-store-diagnostics.txt"
 
         private val IPV4_PATTERN =
             Regex(
@@ -117,7 +120,6 @@ class TweaksViewModel(
                     loadTranslationSettings()
                     loadAppLanguage()
                     loadAutoTranslate()
-                    loadCrashLogAvailability()
 
                     observeShizukuStatus()
                     observeDhizukuStatus()
@@ -180,13 +182,6 @@ class TweaksViewModel(
 
     private fun loadVersionName() {
         _state.update { it.copy(versionName = appVersionInfo.versionName) }
-    }
-
-    private fun loadCrashLogAvailability() {
-        viewModelScope.launch {
-            val hasCrashLog = crashLogSharer.hasCrashLog()
-            _state.update { it.copy(hasCrashLog = hasCrashLog) }
-        }
     }
 
     private fun loadRepoLayout() {
@@ -1019,10 +1014,6 @@ class TweaksViewModel(
                 _state.update { it.copy(isFeedbackSheetVisible = false) }
             }
 
-            TweaksAction.OnShareCrashLogClick -> {
-                crashLogSharer.shareLatest()
-            }
-
             TweaksAction.OnLanguagePickerOpen -> {
                 _state.update { it.copy(isLanguageSheetVisible = true, languageQuery = "") }
             }
@@ -1592,6 +1583,37 @@ class TweaksViewModel(
                     }
                 }
             }
+
+            TweaksAction.OnShareDiagnosticLogs -> {
+                viewModelScope.launch { shareDiagnostics() }
+            }
+        }
+    }
+
+    @Suppress("TooGenericExceptionCaught")
+    private suspend fun shareDiagnostics() {
+        val bundle =
+            try {
+                diagnosticSession.buildShareBundle()
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                logger.error("TweaksViewModel: failed to build diagnostic logs", e)
+                null
+            }
+        if (bundle == null) {
+            _events.send(TweaksEvent.OnDiagnosticsShareFailed)
+            return
+        }
+        try {
+            shareManager.shareFile(
+                fileName = DIAGNOSTIC_BUNDLE_FILE_NAME,
+                content = bundle,
+                mimeType = "text/plain",
+            )
+        } catch (e: Exception) {
+            logger.error("TweaksViewModel: failed to share diagnostic logs", e)
+            _events.send(TweaksEvent.OnDiagnosticsShareFailed)
         }
     }
 

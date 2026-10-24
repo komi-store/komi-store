@@ -36,6 +36,8 @@ import zed.rainxch.core.domain.repository.TweaksRepository
 import zed.rainxch.core.domain.system.PackageMonitor
 import zed.rainxch.core.domain.system.SystemInstallSerializer
 import zed.rainxch.githubstore.app.di.initKoin
+import zed.rainxch.githubstore.app.diagnostics.DiagnosticSession
+import zed.rainxch.githubstore.app.diagnostics.diagnosticSessionModule
 
 class GithubStoreApp : Application() {
     private var packageEventReceiver: PackageEventReceiver? = null
@@ -47,8 +49,11 @@ class GithubStoreApp : Application() {
         super.onCreate()
         CrashLogs.install(this)
 
+        DiagnosticSession.install(this)
+
         initKoin {
             androidContext(this@GithubStoreApp)
+            modules(diagnosticSessionModule)
         }
 
         appScope.launch {

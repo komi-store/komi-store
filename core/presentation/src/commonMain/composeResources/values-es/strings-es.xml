@@ -1075,8 +1075,6 @@
     <string name="details_whats_new_screen_title">Novedades</string>
     <string name="external_import_progress_skip">Omitir y revisar después</string>
     <string name="feedback_hub_subtitle">Leemos cada reporte.</string>
-    <string name="tweaks_crash_log_share">Compartir registro de fallos</string>
-    <string name="tweaks_crash_log_share_subtitle">Guardado en este dispositivo tras el último fallo</string>
     <string name="home_action_get">Obtener</string>
     <string name="home_rank_format">#%1$d</string>
     <string name="home_section_from_your_stars">De tus favoritos</string>
@@ -1487,4 +1485,12 @@
     <string name="apps_tag_asset_filter">Filtro de recursos</string>
     <string name="apps_variant_stale_pick">La variante cambió. Vuelve a elegirla.</string>
     <string name="apps_no_release_found">No se encontró una versión para instalar.</string>
+
+    <!-- Tweaks: developer diagnostics -->
+    <string name="tweaks_diagnostics_section_title">Desarrollador y diagnóstico</string>
+    <string name="tweaks_diagnostics_share_title">Compartir registros de diagnóstico</string>
+    <string name="tweaks_diagnostics_share_body">Combina el registro de la sesión, el último informe de fallos y los datos del dispositivo en un solo archivo de texto.</string>
+    <string name="tweaks_diagnostics_share_action">Compartir</string>
+    <string name="tweaks_diagnostics_warning">Los registros se quedan en este dispositivo y pueden contener datos de la app. No se sube nada automáticamente.</string>
+    <string name="tweaks_diagnostics_share_error">No se pudieron preparar los registros de diagnóstico</string>
 </resources>

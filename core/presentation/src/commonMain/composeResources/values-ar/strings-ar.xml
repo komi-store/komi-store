@@ -1128,8 +1128,6 @@
     <string name="details_whats_new_screen_title">ما الجديد</string>
     <string name="external_import_progress_skip">تخطّي والمراجعة لاحقاً</string>
     <string name="feedback_hub_subtitle">نقرأ كل تقرير.</string>
-    <string name="tweaks_crash_log_share">مشاركة سجل الأعطال</string>
-    <string name="tweaks_crash_log_share_subtitle">محفوظ على هذا الجهاز بعد آخر عطل</string>
     <string name="home_action_get">الحصول</string>
     <string name="home_rank_format">#%1$d</string>
     <string name="home_section_from_your_stars">من مستودعاتك المميّزة</string>
@@ -1553,4 +1551,12 @@
     <string name="apps_tag_asset_filter">عامل تصفية الأصول</string>
     <string name="apps_variant_stale_pick">تغيّر المتغير. اختره مرة أخرى.</string>
     <string name="apps_no_release_found">تعذّر العثور على إصدار للتثبيت.</string>
+
+    <!-- Tweaks: developer diagnostics -->
+    <string name="tweaks_diagnostics_section_title">المطوّر والتشخيص</string>
+    <string name="tweaks_diagnostics_share_title">مشاركة سجلات التشخيص</string>
+    <string name="tweaks_diagnostics_share_body">يجمع سجل الجلسة وآخر تقرير تعطل ومعلومات الجهاز في ملف نصي واحد.</string>
+    <string name="tweaks_diagnostics_share_action">مشاركة</string>
+    <string name="tweaks_diagnostics_warning">تبقى السجلات على هذا الجهاز وقد تحتوي على بيانات التطبيق. لا يُرفع أي شيء تلقائيًا.</string>
+    <string name="tweaks_diagnostics_share_error">تعذّر تجهيز سجلات التشخيص</string>
 </resources>

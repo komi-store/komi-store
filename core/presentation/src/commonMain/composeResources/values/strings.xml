@@ -1188,8 +1188,6 @@
     <string name="tweaks_search_placeholder">Search settings</string>
     <string name="tweaks_search_empty">No settings match '%1$s'.</string>
     <string name="feedback_hub_subtitle">We read every report.</string>
-    <string name="tweaks_crash_log_share">Share crash log</string>
-    <string name="tweaks_crash_log_share_subtitle">Saved on this device after the last crash</string>
     <string name="restart_banner_body">Some changes need a restart to apply.</string>
     <string name="restart_banner_reasons_prefix">Affected: %1$s</string>
     <string name="restart_banner_reason_language">language</string>
@@ -1555,4 +1553,12 @@
     <string name="display_mode_description">Asks the display for a specific rate. Automatic leaves the system in charge.</string>
     <string name="display_mode_auto">Automatic</string>
     <string name="display_mode_option">%1$d × %2$d · %3$d Hz</string>
+
+    <!-- Tweaks: developer diagnostics -->
+    <string name="tweaks_diagnostics_section_title">Developer &amp; diagnostics</string>
+    <string name="tweaks_diagnostics_share_title">Share diagnostic logs</string>
+    <string name="tweaks_diagnostics_share_body">Combines the session log, the latest crash report and device details into one text file.</string>
+    <string name="tweaks_diagnostics_share_action">Share</string>
+    <string name="tweaks_diagnostics_warning">Logs stay on this device and may contain app data. Nothing is uploaded automatically.</string>
+    <string name="tweaks_diagnostics_share_error">Couldn\'t prepare the diagnostic logs</string>
 </resources>

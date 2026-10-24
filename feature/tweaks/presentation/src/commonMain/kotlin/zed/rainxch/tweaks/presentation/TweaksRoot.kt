@@ -46,6 +46,7 @@ import zed.rainxch.tweaks.presentation.components.LanguagePickerSheet
 import zed.rainxch.tweaks.presentation.components.desktop.TweaksDesktopContent
 import zed.rainxch.tweaks.presentation.components.sections.appSection
 import zed.rainxch.tweaks.presentation.components.sections.connectivitySection
+import zed.rainxch.tweaks.presentation.components.sections.diagnosticsSection
 import zed.rainxch.tweaks.presentation.components.sections.installsSection
 import zed.rainxch.tweaks.presentation.components.sections.lookAndFeelSection
 import zed.rainxch.tweaks.presentation.components.sections.privacySection
@@ -162,6 +163,10 @@ fun TweaksRoot(
             TweaksEvent.OnMicrosoftTranslatorCredentialsSaved -> {
                 coroutineScope.launch { toastState.success(getString(Res.string.translation_microsoft_saved)) }
             }
+
+            TweaksEvent.OnDiagnosticsShareFailed -> {
+                coroutineScope.launch { toastState.danger(getString(Res.string.tweaks_diagnostics_share_error)) }
+            }
         }
     }
 
@@ -254,11 +259,10 @@ fun TweaksRoot(
                         onNavigateToHiddenRepositories = onNavigateToHiddenRepositories,
                         onNavigateToHostTokens = onNavigateToHostTokens,
                     )
-                    appSection(
-                        hasCrashLog = state.hasCrashLog,
-                        onOpenFeedback = { viewModel.onAction(TweaksAction.OnFeedbackClick) },
-                        onShareCrashLog = { viewModel.onAction(TweaksAction.OnShareCrashLogClick) },
-                    )
+                    appSection(onOpenFeedback = { viewModel.onAction(TweaksAction.OnFeedbackClick) })
+                    if (isAndroid()) {
+                        diagnosticsSection(onAction = viewModel::onAction)
+                    }
 
                     tweaksKicker(TweaksDecorSlot.Footer)?.let { footer ->
                         KomiText(

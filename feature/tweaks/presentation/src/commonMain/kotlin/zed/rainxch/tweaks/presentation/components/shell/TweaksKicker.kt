@@ -11,6 +11,7 @@ enum class TweaksDecorSlot {
     InstallsUpdates,
     PrivacyData,
     App,
+    Diagnostics,
     Personality,
     Accent,
     Mirror,
@@ -40,6 +41,7 @@ private fun mangaKicker(slot: TweaksDecorSlot): String =
         TweaksDecorSlot.InstallsUpdates -> "導入"
         TweaksDecorSlot.PrivacyData -> "個人情報"
         TweaksDecorSlot.App -> "アプリ"
+        TweaksDecorSlot.Diagnostics -> "診断"
         TweaksDecorSlot.Personality -> "個性"
         TweaksDecorSlot.Accent -> "色"
         TweaksDecorSlot.Mirror -> "ミラー"

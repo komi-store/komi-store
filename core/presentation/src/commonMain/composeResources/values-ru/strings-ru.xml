@@ -1102,8 +1102,6 @@
     <string name="details_whats_new_screen_title">Что нового</string>
     <string name="external_import_progress_skip">Пропустить и посмотреть позже</string>
     <string name="feedback_hub_subtitle">Мы читаем каждый отзыв.</string>
-    <string name="tweaks_crash_log_share">Поделиться журналом сбоев</string>
-    <string name="tweaks_crash_log_share_subtitle">Сохранён на этом устройстве после последнего сбоя</string>
     <string name="home_action_get">Получить</string>
     <string name="home_rank_format">#%1$d</string>
     <string name="home_section_from_your_stars">Из твоих избранных</string>
@@ -1521,4 +1519,12 @@
     <string name="apps_tag_asset_filter">Фильтр ресурсов</string>
     <string name="apps_variant_stale_pick">Вариант изменился. Выберите его снова.</string>
     <string name="apps_no_release_found">Не удалось найти выпуск для установки.</string>
+
+    <!-- Tweaks: developer diagnostics -->
+    <string name="tweaks_diagnostics_section_title">Разработчик и диагностика</string>
+    <string name="tweaks_diagnostics_share_title">Поделиться журналами диагностики</string>
+    <string name="tweaks_diagnostics_share_body">Объединяет журнал сеанса, последний отчёт о сбое и сведения об устройстве в один текстовый файл.</string>
+    <string name="tweaks_diagnostics_share_action">Поделиться</string>
+    <string name="tweaks_diagnostics_warning">Журналы остаются на этом устройстве и могут содержать данные приложения. Ничего не отправляется автоматически.</string>
+    <string name="tweaks_diagnostics_share_error">Не удалось подготовить журналы диагностики</string>
 </resources>

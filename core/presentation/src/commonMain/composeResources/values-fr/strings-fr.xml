@@ -1075,8 +1075,6 @@
     <string name="details_whats_new_screen_title">Nouveautés</string>
     <string name="external_import_progress_skip">Ignorer et examiner plus tard</string>
     <string name="feedback_hub_subtitle">Nous lisons chaque retour.</string>
-    <string name="tweaks_crash_log_share">Partager le journal de plantage</string>
-    <string name="tweaks_crash_log_share_subtitle">Enregistré sur cet appareil après le dernier plantage</string>
     <string name="home_action_get">Obtenir</string>
     <string name="home_rank_format">n°%1$d</string>
     <string name="home_section_from_your_stars">Depuis vos étoiles</string>
@@ -1488,4 +1486,12 @@
     <string name="apps_tag_asset_filter">Filtre de ressources</string>
     <string name="apps_variant_stale_pick">La variante a changé. Sélectionnez-la à nouveau.</string>
     <string name="apps_no_release_found">Aucune version à installer n’a été trouvée.</string>
+
+    <!-- Tweaks: developer diagnostics -->
+    <string name="tweaks_diagnostics_section_title">Développeur et diagnostics</string>
+    <string name="tweaks_diagnostics_share_title">Partager les journaux de diagnostic</string>
+    <string name="tweaks_diagnostics_share_body">Regroupe le journal de la session, le dernier rapport de plantage et les informations de l’appareil dans un seul fichier texte.</string>
+    <string name="tweaks_diagnostics_share_action">Partager</string>
+    <string name="tweaks_diagnostics_warning">Les journaux restent sur cet appareil et peuvent contenir des données de l’application. Rien n’est envoyé automatiquement.</string>
+    <string name="tweaks_diagnostics_share_error">Impossible de préparer les journaux de diagnostic</string>
 </resources>

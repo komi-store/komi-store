@@ -1109,8 +1109,6 @@
     <string name="details_whats_new_screen_title">Cosa c'è di nuovo</string>
     <string name="external_import_progress_skip">Salta e rivedi più tardi</string>
     <string name="feedback_hub_subtitle">Leggiamo ogni segnalazione.</string>
-    <string name="tweaks_crash_log_share">Condividi il log degli arresti anomali</string>
-    <string name="tweaks_crash_log_share_subtitle">Salvato su questo dispositivo dopo l'ultimo arresto anomalo</string>
     <string name="home_action_get">Ottieni</string>
     <string name="home_rank_format">#%1$d</string>
     <string name="home_section_from_your_stars">Dai tuoi preferiti</string>
@@ -1522,4 +1520,12 @@
     <string name="apps_tag_asset_filter">Filtro asset</string>
     <string name="apps_variant_stale_pick">La variante è cambiata. Selezionala di nuovo.</string>
     <string name="apps_no_release_found">Impossibile trovare una release da installare.</string>
+
+    <!-- Tweaks: developer diagnostics -->
+    <string name="tweaks_diagnostics_section_title">Sviluppatore e diagnostica</string>
+    <string name="tweaks_diagnostics_share_title">Condividi i log di diagnostica</string>
+    <string name="tweaks_diagnostics_share_body">Unisce il log della sessione, l’ultimo rapporto di crash e i dati del dispositivo in un unico file di testo.</string>
+    <string name="tweaks_diagnostics_share_action">Condividi</string>
+    <string name="tweaks_diagnostics_warning">I log restano su questo dispositivo e possono contenere dati dell’app. Nulla viene caricato automaticamente.</string>
+    <string name="tweaks_diagnostics_share_error">Impossibile preparare i log di diagnostica</string>
 </resources>

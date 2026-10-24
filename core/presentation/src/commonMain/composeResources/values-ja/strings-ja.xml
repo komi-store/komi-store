@@ -1066,8 +1066,6 @@
     <string name="details_whats_new_screen_title">新着情報</string>
     <string name="external_import_progress_skip">スキップして後で確認</string>
     <string name="feedback_hub_subtitle">すべてのご報告に目を通しています。</string>
-    <string name="tweaks_crash_log_share">クラッシュログを共有</string>
-    <string name="tweaks_crash_log_share_subtitle">前回のクラッシュ時にこのデバイスに保存されました</string>
     <string name="home_action_get">取得</string>
     <string name="home_rank_format">第%1$d位</string>
     <string name="home_section_from_your_stars">スター付きから</string>
@@ -1477,4 +1475,12 @@
     <string name="apps_tag_asset_filter">アセットフィルター</string>
     <string name="apps_variant_stale_pick">バリアントが変更されました。もう一度選択してください。</string>
     <string name="apps_no_release_found">インストールできるリリースが見つかりませんでした。</string>
+
+    <!-- Tweaks: developer diagnostics -->
+    <string name="tweaks_diagnostics_section_title">開発者と診断</string>
+    <string name="tweaks_diagnostics_share_title">診断ログを共有</string>
+    <string name="tweaks_diagnostics_share_body">セッションログ、直近のクラッシュレポート、端末情報を 1 つのテキストファイルにまとめます。</string>
+    <string name="tweaks_diagnostics_share_action">共有</string>
+    <string name="tweaks_diagnostics_warning">ログはこの端末に残り、アプリのデータが含まれる場合があります。自動でアップロードされることはありません。</string>
+    <string name="tweaks_diagnostics_share_error">診断ログを準備できませんでした</string>
 </resources>

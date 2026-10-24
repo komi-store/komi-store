@@ -1096,8 +1096,6 @@
     <string name="details_whats_new_screen_title">새로운 기능</string>
     <string name="external_import_progress_skip">건너뛰고 나중에 검토</string>
     <string name="feedback_hub_subtitle">모든 신고를 확인합니다.</string>
-    <string name="tweaks_crash_log_share">크래시 로그 공유</string>
-    <string name="tweaks_crash_log_share_subtitle">마지막 크래시 후 이 기기에 저장됨</string>
     <string name="home_action_get">받기</string>
     <string name="home_rank_format">#%1$d</string>
     <string name="home_section_from_your_stars">내 별표 저장소</string>
@@ -1509,4 +1507,12 @@
     <string name="apps_tag_asset_filter">에셋 필터</string>
     <string name="apps_variant_stale_pick">변형이 변경되었습니다. 다시 선택하세요.</string>
     <string name="apps_no_release_found">설치할 릴리스를 찾을 수 없습니다.</string>
+
+    <!-- Tweaks: developer diagnostics -->
+    <string name="tweaks_diagnostics_section_title">개발자 및 진단</string>
+    <string name="tweaks_diagnostics_share_title">진단 로그 공유</string>
+    <string name="tweaks_diagnostics_share_body">세션 로그, 최근 비정상 종료 보고서, 기기 정보를 하나의 텍스트 파일로 묶습니다.</string>
+    <string name="tweaks_diagnostics_share_action">공유</string>
+    <string name="tweaks_diagnostics_warning">로그는 이 기기에 남으며 앱 데이터가 포함될 수 있습니다. 자동으로 업로드되지 않습니다.</string>
+    <string name="tweaks_diagnostics_share_error">진단 로그를 준비하지 못했습니다</string>
 </resources>
