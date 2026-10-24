@@ -1559,4 +1559,8 @@
     <string name="tweaks_diagnostics_share_action">مشاركة</string>
     <string name="tweaks_diagnostics_warning">تبقى السجلات على هذا الجهاز وقد تحتوي على بيانات التطبيق. لا يُرفع أي شيء تلقائيًا.</string>
     <string name="tweaks_diagnostics_share_error">تعذّر تجهيز سجلات التشخيص</string>
+
+    <!-- Tweaks: detail page theme -->
+    <string name="detail_follow_app_theme_title">صفحات التفاصيل تتبع سمة التطبيق</string>
+    <string name="detail_follow_app_theme_description">يستخدم قسم «حول» وملاحظات الإصدار سمة التطبيق الفاتحة أو الداكنة. عند الإيقاف تتبع إعداد النظام.</string>
 </resources>

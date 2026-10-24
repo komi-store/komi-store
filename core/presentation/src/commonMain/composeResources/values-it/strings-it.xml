@@ -1528,4 +1528,8 @@
     <string name="tweaks_diagnostics_share_action">Condividi</string>
     <string name="tweaks_diagnostics_warning">I log restano su questo dispositivo e possono contenere dati dell’app. Nulla viene caricato automaticamente.</string>
     <string name="tweaks_diagnostics_share_error">Impossibile preparare i log di diagnostica</string>
+
+    <!-- Tweaks: detail page theme -->
+    <string name="detail_follow_app_theme_title">Le pagine dei dettagli seguono il tema dell’app</string>
+    <string name="detail_follow_app_theme_description">Informazioni e note di rilascio usano il tema chiaro o scuro dell’app. Disattiva per seguire l’impostazione di sistema.</string>
 </resources>

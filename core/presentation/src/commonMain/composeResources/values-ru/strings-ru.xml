@@ -1527,4 +1527,8 @@
     <string name="tweaks_diagnostics_share_action">Поделиться</string>
     <string name="tweaks_diagnostics_warning">Журналы остаются на этом устройстве и могут содержать данные приложения. Ничего не отправляется автоматически.</string>
     <string name="tweaks_diagnostics_share_error">Не удалось подготовить журналы диагностики</string>
+
+    <!-- Tweaks: detail page theme -->
+    <string name="detail_follow_app_theme_title">Страницы сведений следуют теме приложения</string>
+    <string name="detail_follow_app_theme_description">Разделы «О приложении» и примечания к выпуску используют светлую или тёмную тему приложения. Выключите, чтобы следовать системной настройке.</string>
 </resources>

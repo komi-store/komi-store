@@ -16,6 +16,7 @@ data class MainState(
     val mangaPaper: MangaPaperId = MangaPaperId.DAY,
     val isAmoledTheme: Boolean = false,
     val isDarkTheme: Boolean? = null,
+    val detailFollowAppTheme: Boolean = true,
     val isScrollbarEnabled: Boolean = false,
     val contentWidth: ContentWidth = ContentWidth.COMPACT,
     val appLanguageTag: String? = null,

@@ -84,6 +84,13 @@ class TweaksRepositoryImpl(
         if (isDarkTheme == null) ksafe.safeDelete(K_IS_DARK) else ksafe.safePut(K_IS_DARK, isDarkTheme)
     }
 
+    override fun getDetailFollowAppTheme(): Flow<Boolean> = gatedGetFlow(K_DETAIL_FOLLOW_APP_THEME, true)
+
+    override suspend fun setDetailFollowAppTheme(enabled: Boolean) {
+        migrationDeferred.await()
+        ksafe.safePut(K_DETAIL_FOLLOW_APP_THEME, enabled)
+    }
+
     override fun getAmoledTheme(): Flow<Boolean> = gatedGetFlow(K_AMOLED, false)
 
     override suspend fun setAmoledTheme(enabled: Boolean) {
@@ -576,6 +583,7 @@ class TweaksRepositoryImpl(
         private const val K_THEME = "app_theme"
         private const val K_AMOLED = "amoled_theme"
         private const val K_IS_DARK = "is_dark_theme"
+        private const val K_DETAIL_FOLLOW_APP_THEME = "detail_follow_app_theme"
         private const val K_FONT = "font_theme"
         private const val K_PERSONALITY = "app_personality"
         private const val K_ACCENT = "app_accent"

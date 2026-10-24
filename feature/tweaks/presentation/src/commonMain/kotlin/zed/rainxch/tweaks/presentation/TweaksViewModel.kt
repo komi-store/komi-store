@@ -106,6 +106,7 @@ class TweaksViewModel(
                 if (!hasLoadedInitialData) {
                     loadCurrentTheme()
                     loadRepoLayout()
+                    loadDetailFollowAppTheme()
                     loadVersionName()
                     loadProxyConfig()
                     loadInstallerPreference()
@@ -188,6 +189,14 @@ class TweaksViewModel(
         viewModelScope.launch {
             tweaksRepository.getRepoGridLayout().collect { grid ->
                 _state.update { it.copy(isRepoGridLayout = grid) }
+            }
+        }
+    }
+
+    private fun loadDetailFollowAppTheme() {
+        viewModelScope.launch {
+            tweaksRepository.getDetailFollowAppTheme().collect { enabled ->
+                _state.update { it.copy(detailFollowAppTheme = enabled) }
             }
         }
     }
@@ -648,6 +657,12 @@ class TweaksViewModel(
             is TweaksAction.OnDarkThemeChange -> {
                 viewModelScope.launch {
                     tweaksRepository.setDarkTheme(action.isDarkTheme)
+                }
+            }
+
+            is TweaksAction.OnDetailFollowAppThemeToggled -> {
+                viewModelScope.launch {
+                    tweaksRepository.setDetailFollowAppTheme(action.enabled)
                 }
             }
 

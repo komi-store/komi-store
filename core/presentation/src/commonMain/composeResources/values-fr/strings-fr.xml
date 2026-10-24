@@ -1494,4 +1494,8 @@
     <string name="tweaks_diagnostics_share_action">Partager</string>
     <string name="tweaks_diagnostics_warning">Les journaux restent sur cet appareil et peuvent contenir des données de l’application. Rien n’est envoyé automatiquement.</string>
     <string name="tweaks_diagnostics_share_error">Impossible de préparer les journaux de diagnostic</string>
+
+    <!-- Tweaks: detail page theme -->
+    <string name="detail_follow_app_theme_title">Les pages de détails suivent le thème de l’application</string>
+    <string name="detail_follow_app_theme_description">À propos et les notes de version utilisent le thème clair ou sombre de l’application. Désactivez pour suivre le réglage du système.</string>
 </resources>

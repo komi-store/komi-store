@@ -1527,4 +1527,8 @@
     <string name="tweaks_diagnostics_share_action">Udostępnij</string>
     <string name="tweaks_diagnostics_warning">Logi pozostają na tym urządzeniu i mogą zawierać dane aplikacji. Nic nie jest wysyłane automatycznie.</string>
     <string name="tweaks_diagnostics_share_error">Nie udało się przygotować logów diagnostycznych</string>
+
+    <!-- Tweaks: detail page theme -->
+    <string name="detail_follow_app_theme_title">Strony szczegółów zgodne z motywem aplikacji</string>
+    <string name="detail_follow_app_theme_description">Informacje i notatki do wydania używają jasnego lub ciemnego motywu aplikacji. Wyłącz, aby korzystać z ustawień systemowych.</string>
 </resources>

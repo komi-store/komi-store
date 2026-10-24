@@ -131,6 +131,12 @@ class MainViewModel(
         }
 
         viewModelScope.launch {
+            tweaksRepository.getDetailFollowAppTheme().collect { enabled ->
+                _state.update { it.copy(detailFollowAppTheme = enabled) }
+            }
+        }
+
+        viewModelScope.launch {
             tweaksRepository.getScrollbarEnabled().collect { enabled ->
                 _state.update { it.copy(isScrollbarEnabled = enabled) }
             }

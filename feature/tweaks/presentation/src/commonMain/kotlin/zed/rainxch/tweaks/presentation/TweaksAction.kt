@@ -43,6 +43,10 @@ sealed interface TweaksAction {
         val isDarkTheme: Boolean?,
     ) : TweaksAction
 
+    data class OnDetailFollowAppThemeToggled(
+        val enabled: Boolean,
+    ) : TweaksAction
+
     data class OnFontThemeSelected(
         val fontTheme: FontTheme,
     ) : TweaksAction

@@ -4,6 +4,7 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -23,6 +24,8 @@ import org.koin.compose.viewmodel.koinViewModel
 import zed.rainxch.core.domain.model.appearance.AccentId
 import zed.rainxch.core.domain.model.appearance.AppPersonality
 import zed.rainxch.core.presentation.ProfileAvatarSpec
+import zed.rainxch.core.presentation.locals.LocalAppDarkTheme
+import zed.rainxch.core.presentation.locals.LocalDetailFollowAppTheme
 import zed.rainxch.core.presentation.personality.classic.systemWallpaperColorScheme
 import zed.rainxch.core.presentation.personality.classicPersonality
 import zed.rainxch.core.presentation.personality.mangaPersonality
@@ -133,57 +136,62 @@ fun App(
             }
         }
 
-    PersonalityTheme(personality, languageTag = mainState.appLanguageTag) {
-        AppNavigation(
-            navController = navController,
-            isScrollbarEnabled = mainState.isScrollbarEnabled,
-            contentWidth = mainState.contentWidth,
-        )
-
-        if (mainState.showRateLimitDialog && mainState.rateLimitInfo != null && !onAuthScreen) {
-            RateLimitDialog(
-                rateLimitInfo = mainState.rateLimitInfo!!,
-                isAuthenticated = mainState.isLoggedIn,
-                onDismiss = {
-                    mainViewModel.onAction(MainAction.DismissRateLimitDialog)
-                },
-                onSignIn = {
-                    mainViewModel.onAction(MainAction.DismissRateLimitDialog)
-
-                    navController.navigate(GithubStoreGraph.AuthenticationScreen)
-                },
+    CompositionLocalProvider(
+        LocalAppDarkTheme provides resolvedDarkTheme,
+        LocalDetailFollowAppTheme provides mainState.detailFollowAppTheme,
+    ) {
+        PersonalityTheme(personality, languageTag = mainState.appLanguageTag) {
+            AppNavigation(
+                navController = navController,
+                isScrollbarEnabled = mainState.isScrollbarEnabled,
+                contentWidth = mainState.contentWidth,
             )
-        }
 
-        if (mainState.showSessionExpiredDialog) {
-            SessionExpiredDialog(
-                onDismiss = {
-                    mainViewModel.onAction(MainAction.DismissSessionExpiredDialog)
-                },
-                onSignIn = {
-                    mainViewModel.onAction(MainAction.DismissSessionExpiredDialog)
-                    navController.navigate(GithubStoreGraph.AuthenticationScreen)
-                },
-            )
-        }
+            if (mainState.showRateLimitDialog && mainState.rateLimitInfo != null && !onAuthScreen) {
+                RateLimitDialog(
+                    rateLimitInfo = mainState.rateLimitInfo!!,
+                    isAuthenticated = mainState.isLoggedIn,
+                    onDismiss = {
+                        mainViewModel.onAction(MainAction.DismissRateLimitDialog)
+                    },
+                    onSignIn = {
+                        mainViewModel.onAction(MainAction.DismissRateLimitDialog)
 
-        val pendingEntry by whatsNewViewModel.pendingEntry.collectAsStateWithLifecycle()
-
-        pendingEntry?.let { entryToShow ->
-            val onHomeScreen = currentScreen is GithubStoreGraph.ExploreScreen
-
-            if (onHomeScreen && !mainState.showRateLimitDialog) {
-                val hasHistory by whatsNewViewModel.hasHistory.collectAsStateWithLifecycle()
-
-                WhatsNewSheet(
-                    entry = entryToShow,
-                    showHistoryAction = hasHistory,
-                    onDismiss = { whatsNewViewModel.markSeen() },
-                    onViewHistory = {
-                        whatsNewViewModel.markSeen()
-                        navController.navigate(GithubStoreGraph.WhatsNewHistoryScreen)
+                        navController.navigate(GithubStoreGraph.AuthenticationScreen)
                     },
                 )
+            }
+
+            if (mainState.showSessionExpiredDialog) {
+                SessionExpiredDialog(
+                    onDismiss = {
+                        mainViewModel.onAction(MainAction.DismissSessionExpiredDialog)
+                    },
+                    onSignIn = {
+                        mainViewModel.onAction(MainAction.DismissSessionExpiredDialog)
+                        navController.navigate(GithubStoreGraph.AuthenticationScreen)
+                    },
+                )
+            }
+
+            val pendingEntry by whatsNewViewModel.pendingEntry.collectAsStateWithLifecycle()
+
+            pendingEntry?.let { entryToShow ->
+                val onHomeScreen = currentScreen is GithubStoreGraph.ExploreScreen
+
+                if (onHomeScreen && !mainState.showRateLimitDialog) {
+                    val hasHistory by whatsNewViewModel.hasHistory.collectAsStateWithLifecycle()
+
+                    WhatsNewSheet(
+                        entry = entryToShow,
+                        showHistoryAction = hasHistory,
+                        onDismiss = { whatsNewViewModel.markSeen() },
+                        onViewHistory = {
+                            whatsNewViewModel.markSeen()
+                            navController.navigate(GithubStoreGraph.WhatsNewHistoryScreen)
+                        },
+                    )
+                }
             }
         }
     }

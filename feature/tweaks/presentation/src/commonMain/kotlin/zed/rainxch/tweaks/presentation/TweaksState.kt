@@ -37,6 +37,7 @@ data class TweaksState(
     val isAmoledThemeEnabled: Boolean = false,
     val isRepoGridLayout: Boolean = false,
     val isDarkTheme: Boolean? = null,
+    val detailFollowAppTheme: Boolean = true,
     val versionName: String = "",
     val proxyForms: ImmutableMap<ProxyScope, ProxyScopeFormState> =
         ProxyScope.entries.associateWith { ProxyScopeFormState() }.toImmutableMap(),

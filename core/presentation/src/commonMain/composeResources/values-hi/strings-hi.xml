@@ -1529,4 +1529,8 @@
     <string name="tweaks_diagnostics_share_action">शेयर करें</string>
     <string name="tweaks_diagnostics_warning">लॉग इसी डिवाइस पर रहते हैं और उनमें ऐप का डेटा हो सकता है। कुछ भी अपने आप अपलोड नहीं होता।</string>
     <string name="tweaks_diagnostics_share_error">डायग्नोस्टिक लॉग तैयार नहीं हो सके</string>
+
+    <!-- Tweaks: detail page theme -->
+    <string name="detail_follow_app_theme_title">विवरण पृष्ठ ऐप थीम का अनुसरण करते हैं</string>
+    <string name="detail_follow_app_theme_description">परिचय और रिलीज़ नोट्स ऐप की लाइट या डार्क थीम का उपयोग करते हैं। बंद करने पर सिस्टम सेटिंग का पालन होगा।</string>
 </resources>

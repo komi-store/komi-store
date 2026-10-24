@@ -1,6 +1,5 @@
 package zed.rainxch.details.presentation.components.sections
 
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -39,6 +38,7 @@ import zed.rainxch.core.presentation.components.progress.KomiCircularProgress
 import zed.rainxch.core.presentation.components.text.KomiText
 import zed.rainxch.core.presentation.components.text.KomiTextRole
 import zed.rainxch.core.presentation.locals.LocalPersonality
+import zed.rainxch.core.presentation.locals.detailPageDarkTheme
 import zed.rainxch.core.presentation.components.markdown.MarkdownImageTransformer
 import zed.rainxch.core.presentation.components.markdown.githubStoreMarkdownComponents
 import zed.rainxch.core.presentation.components.markdown.rememberMarkdownColors
@@ -86,7 +86,7 @@ fun LazyListScope.about(
     }
 
     item(key = "about_markdown") {
-        val isDark = isSystemInDarkTheme()
+        val isDark = detailPageDarkTheme()
         val raw = applyThemeAwareImages(readmeMarkdown, isDark = isDark)
 
         val probeClient = koinInject<io.ktor.client.HttpClient>(

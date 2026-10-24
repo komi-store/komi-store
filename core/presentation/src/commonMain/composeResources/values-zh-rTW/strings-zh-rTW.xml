@@ -1484,4 +1484,8 @@
     <string name="tweaks_diagnostics_share_action">分享</string>
     <string name="tweaks_diagnostics_warning">記錄只保留在這部裝置上，可能包含應用程式資料。不會自動上傳任何內容。</string>
     <string name="tweaks_diagnostics_share_error">無法準備診斷記錄</string>
+
+    <!-- Tweaks: detail page theme -->
+    <string name="detail_follow_app_theme_title">詳細頁面跟隨應用程式主題</string>
+    <string name="detail_follow_app_theme_description">關於與發行說明使用應用程式目前的淺色或深色主題；關閉後改為跟隨系統設定。</string>
 </resources>

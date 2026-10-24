@@ -1493,4 +1493,8 @@
     <string name="tweaks_diagnostics_share_action">Compartir</string>
     <string name="tweaks_diagnostics_warning">Los registros se quedan en este dispositivo y pueden contener datos de la app. No se sube nada automáticamente.</string>
     <string name="tweaks_diagnostics_share_error">No se pudieron preparar los registros de diagnóstico</string>
+
+    <!-- Tweaks: detail page theme -->
+    <string name="detail_follow_app_theme_title">Las páginas de detalles siguen el tema de la app</string>
+    <string name="detail_follow_app_theme_description">Acerca de y las notas de la versión usan el tema claro u oscuro de la app. Desactívalo para seguir el ajuste del sistema.</string>
 </resources>

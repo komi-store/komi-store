@@ -1561,4 +1561,8 @@
     <string name="tweaks_diagnostics_share_action">Share</string>
     <string name="tweaks_diagnostics_warning">Logs stay on this device and may contain app data. Nothing is uploaded automatically.</string>
     <string name="tweaks_diagnostics_share_error">Couldn\'t prepare the diagnostic logs</string>
+
+    <!-- Tweaks: detail page theme -->
+    <string name="detail_follow_app_theme_title">Detail pages follow app theme</string>
+    <string name="detail_follow_app_theme_description">About and release notes use the app\'s light or dark theme. Turn off to follow the system setting.</string>
 </resources>

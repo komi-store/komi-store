@@ -2,7 +2,6 @@ package zed.rainxch.details.presentation.markdownviewer
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -37,6 +36,7 @@ import zed.rainxch.core.presentation.components.scaffold.KomiScaffold
 import zed.rainxch.core.presentation.components.text.KomiText
 import zed.rainxch.core.presentation.components.text.KomiTextRole
 import zed.rainxch.core.presentation.locals.LocalPersonality
+import zed.rainxch.core.presentation.locals.detailPageDarkTheme
 import zed.rainxch.details.presentation.components.LanguagePicker
 import zed.rainxch.details.presentation.components.TranslationCard
 import zed.rainxch.details.presentation.utils.ProvideLanguageLinkInterceptor
@@ -78,7 +78,7 @@ private fun MarkdownViewerScreen(
     onClearTranslation: () -> Unit,
     onNavigateToMarkdownViewer: (String) -> Unit,
 ) {
-    val isDark = isSystemInDarkTheme()
+    val isDark = detailPageDarkTheme()
     val probeClient = koinInject<HttpClient>(qualifier = named("test"))
     val imageTransformer = remember(probeClient) { MarkdownImageTransformer(probeClient) }
     val colors = rememberMarkdownColors()

@@ -120,6 +120,17 @@ fun appearanceSectionContent(
             }
         }
 
+        SettingsRow(
+            title = stringResource(Res.string.detail_follow_app_theme_title),
+            subtitle = stringResource(Res.string.detail_follow_app_theme_description),
+            trailing = {
+                KomiSwitch(
+                    checked = state.detailFollowAppTheme,
+                    onCheckedChange = { onAction(TweaksAction.OnDetailFollowAppThemeToggled(it)) },
+                )
+            },
+        )
+
         // How Explore, Top Charts and Search lay out repositories.
         SettingsRow(
             title = stringResource(Res.string.repo_layout_title),

@@ -1514,4 +1514,8 @@
     <string name="tweaks_diagnostics_share_action">শেয়ার</string>
     <string name="tweaks_diagnostics_warning">লগগুলো এই ডিভাইসেই থাকে এবং অ্যাপের ডেটা থাকতে পারে। স্বয়ংক্রিয়ভাবে কিছু আপলোড হয় না।</string>
     <string name="tweaks_diagnostics_share_error">ডায়াগনস্টিক লগ প্রস্তুত করা যায়নি</string>
+
+    <!-- Tweaks: detail page theme -->
+    <string name="detail_follow_app_theme_title">বিস্তারিত পৃষ্ঠাগুলো অ্যাপের থিম অনুসরণ করে</string>
+    <string name="detail_follow_app_theme_description">সম্পর্কে ও রিলিজ নোট অ্যাপের লাইট বা ডার্ক থিম ব্যবহার করে। বন্ধ করলে সিস্টেম সেটিং অনুসরণ করবে।</string>
 </resources>

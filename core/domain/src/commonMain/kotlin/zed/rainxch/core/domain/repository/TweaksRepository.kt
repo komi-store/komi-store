@@ -21,6 +21,10 @@ interface TweaksRepository {
 
     suspend fun setDarkTheme(isDarkTheme: Boolean?)
 
+    fun getDetailFollowAppTheme(): Flow<Boolean>
+
+    suspend fun setDetailFollowAppTheme(enabled: Boolean)
+
     fun getAmoledTheme(): Flow<Boolean>
 
     suspend fun setAmoledTheme(enabled: Boolean)

@@ -1484,4 +1484,8 @@
     <string name="tweaks_diagnostics_share_action">分享</string>
     <string name="tweaks_diagnostics_warning">日志只保留在本设备上，可能包含应用数据。不会自动上传任何内容。</string>
     <string name="tweaks_diagnostics_share_error">无法准备诊断日志</string>
+
+    <!-- Tweaks: detail page theme -->
+    <string name="detail_follow_app_theme_title">详情页跟随应用主题</string>
+    <string name="detail_follow_app_theme_description">关于和发行说明使用应用当前的浅色或深色主题；关闭后改为跟随系统设置。</string>
 </resources>

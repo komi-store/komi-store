@@ -48,6 +48,7 @@ import zed.rainxch.core.presentation.components.markdown.rememberMarkdownTypogra
 import zed.rainxch.core.presentation.components.text.KomiText
 import zed.rainxch.core.presentation.components.text.KomiTextRole
 import zed.rainxch.core.presentation.locals.LocalPersonality
+import zed.rainxch.core.presentation.locals.detailPageDarkTheme
 import zed.rainxch.core.presentation.utils.formatIsoDateOrRaw
 import zed.rainxch.githubstore.core.presentation.res.*
 
@@ -131,7 +132,7 @@ private fun ExpandableMarkdownContent(
     onMeasured: (Float) -> Unit,
 ) {
     val raw = release.description ?: stringResource(Res.string.no_release_notes)
-    val isDark = androidx.compose.foundation.isSystemInDarkTheme()
+    val isDark = detailPageDarkTheme()
 
     var fullChunks by remember(raw, isDark) { mutableStateOf<List<String>?>(null) }
     LaunchedEffect(raw, isDark) {
