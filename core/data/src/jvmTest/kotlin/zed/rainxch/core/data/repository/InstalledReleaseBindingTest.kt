@@ -1,5 +1,8 @@
 package zed.rainxch.core.data.repository
 
+import zed.rainxch.core.data.local.db.entities.InstalledAppEntity
+import zed.rainxch.core.domain.model.account.github.GithubAsset
+import zed.rainxch.core.domain.model.installation.InstallSource
 import kotlin.test.Test
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
@@ -59,4 +62,80 @@ class InstalledReleaseBindingTest {
     fun a_missing_installed_timestamp_is_not_a_suspicion() {
         assertFalse(shouldConfirmDigest(input(installedPublishedAt = null)))
     }
+
+    @Test
+    fun a_stored_digest_that_names_other_bytes_contradicts_the_release() {
+        assertTrue(
+            identityContradicts(
+                entity(installedAssetDigest = "sha256:bbbb"),
+                asset(digest = "sha256:aaaa"),
+            ),
+        )
+    }
+
+    @Test
+    fun a_matching_digest_does_not_contradict_the_release() {
+        assertFalse(
+            identityContradicts(
+                entity(installedAssetDigest = "sha256:aaaa"),
+                asset(digest = "sha256:aaaa"),
+            ),
+        )
+    }
+
+    @Test
+    fun a_legacy_row_naming_another_asset_contradicts_the_release() {
+        assertTrue(identityContradicts(entity(installedAssetId = 700L), asset(id = 899L)))
+    }
+
+    @Test
+    fun a_row_without_any_identity_contradicts_nothing() {
+        assertFalse(identityContradicts(entity(installedAssetId = null), asset()))
+    }
+
+    private fun entity(
+        installedAssetId: Long? = 899L,
+        installedAssetDigest: String? = null,
+    ): InstalledAppEntity =
+        InstalledAppEntity(
+            packageName = "com.example.app",
+            repoId = 1L,
+            repoName = "repo",
+            repoOwner = "owner",
+            repoOwnerAvatarUrl = "",
+            repoDescription = null,
+            primaryLanguage = null,
+            repoUrl = "https://github.com/owner/repo",
+            installedVersion = "2.0.5",
+            installedAssetName = "app.apk",
+            installedAssetUrl = "https://dl/app.apk",
+            latestVersion = null,
+            latestAssetName = null,
+            latestAssetUrl = null,
+            latestAssetSize = null,
+            appName = "App",
+            installSource = InstallSource.THIS_APP,
+            signingFingerprint = null,
+            installedAt = 1L,
+            lastCheckedAt = 1L,
+            lastUpdatedAt = 1L,
+            isUpdateAvailable = false,
+            systemArchitecture = "X64",
+            fileExtension = "apk",
+            installedAssetId = installedAssetId,
+            installedAssetDigest = installedAssetDigest,
+        )
+
+    private fun asset(
+        id: Long = 899L,
+        digest: String? = "sha256:aaaa",
+    ): GithubAsset =
+        GithubAsset(
+            id = id,
+            name = "app.apk",
+            contentType = "application/vnd.android.package-archive",
+            size = 1024L,
+            downloadUrl = "https://dl/app.apk",
+            digest = digest,
+        )
 }

@@ -12,7 +12,6 @@ import kotlinx.coroutines.sync.withLock
 import zed.rainxch.core.data.local.db.AppDatabase
 import zed.rainxch.core.data.local.db.dao.InstalledAppDao
 import zed.rainxch.core.data.local.db.dao.UpdateHistoryDao
-import zed.rainxch.core.data.local.db.dao.adoptMatchedTag
 import zed.rainxch.core.data.local.db.dao.recordUnmatchedRelease
 import zed.rainxch.core.data.local.db.entities.InstalledAppEntity
 import zed.rainxch.core.data.local.db.entities.UpdateHistoryEntity
@@ -269,6 +268,16 @@ class InstalledAppsRepositoryImpl(
                 } else {
                     null
                 }
+            if (selfAttestedDigest != null && selfAttestedDigest == primaryAsset.digest) {
+                rebindProvenIdentity(
+                    dao = installedAppsDao,
+                    app = app,
+                    matchedRelease = matchedRelease,
+                    matchedAsset = primaryAsset,
+                    matchedDigest = selfAttestedDigest,
+                    boundAt = System.currentTimeMillis(),
+                )
+            }
 
             val verdict =
                 UpdateVerdict.decide(
@@ -346,12 +355,16 @@ class InstalledAppsRepositoryImpl(
                     installedTag = app.installedVersion,
                     matchedTag = matchedRelease.tagName,
                     deviceRunsMatchedRelease = verdict.deviceRunsMatchedRelease,
+                    identityContradicts = identityContradicts(app, primaryAsset),
                 )
             if (shouldRewriteTag) {
-                installedAppsDao.adoptMatchedTag(
+                adoptTagWhenProven(
+                    dao = installedAppsDao,
                     app = app,
-                    matchedTag = matchedRelease.tagName,
+                    matchedRelease = matchedRelease,
+                    matchedAsset = primaryAsset,
                     isUpdateAvailable = isUpdateAvailable,
+                    boundAt = System.currentTimeMillis(),
                 )
             }
 

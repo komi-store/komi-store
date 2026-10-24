@@ -326,6 +326,89 @@ class SyncInstalledAppsUseCaseParkTest {
     }
 
     @Test
+    fun theNextSyncKeepsTheBindingAHandedOffParkJustSettled() = runBlocking {
+        val parked =
+            parked(
+                pendingInstallStartedAt = 1_000L,
+                pendingInstallReleaseId = 900L,
+                pendingInstallAssetId = 800L,
+                pendingInstallAssetDigest = "sha256:new",
+            ).copy(pendingInstallVersionCode = 100L)
+        val repo = RecordingInstalledAppsRepository(listOf(parked))
+        val info =
+            systemInfo(
+                parked.packageName,
+                versionName = "1.0.0",
+                versionCode = 100L,
+                lastUpdateTime = 2_000L,
+            )
+        val monitor = FakePackageMonitor(packageName = parked.packageName, systemInfo = info)
+
+        SyncInstalledAppsUseCase(monitor, repo, Platform.ANDROID, NoOpLogger)()
+        SyncInstalledAppsUseCase(monitor, repo, Platform.ANDROID, NoOpLogger)()
+
+        assertTrue(repo.clearedBindings.isEmpty(), "the binding written by the settlement must survive")
+        assertEquals(2_000L, repo.updatedApps.first().lastUpdatedAt)
+        assertEquals(2_000L, repo.updatedApps.first().boundAt)
+    }
+
+    @Test
+    fun aForeignSameVersionInstallStillDropsTheBinding() = runBlocking {
+        val installed =
+            parked(
+                isPendingInstall = false,
+                pendingFilePath = null,
+                pendingInstallStartedAt = null,
+                installedVersionName = "1.0.0",
+                installedVersionCode = 100L,
+            ).copy(boundAt = 1_000L)
+        val repo = RecordingInstalledAppsRepository(listOf(installed))
+        val monitor = FakePackageMonitor(
+            packageName = installed.packageName,
+            systemInfo =
+                systemInfo(
+                    installed.packageName,
+                    versionName = "1.0.0",
+                    versionCode = 100L,
+                    lastUpdateTime = 9_000L,
+                ),
+        )
+
+        SyncInstalledAppsUseCase(monitor, repo, Platform.ANDROID, NoOpLogger)()
+
+        assertEquals(listOf(installed.packageName), repo.clearedBindings)
+    }
+
+    @Test
+    fun aLegacyRowWithoutBoundAtKeepsItsBinding() = runBlocking {
+        val installed =
+            parked(
+                isPendingInstall = false,
+                pendingFilePath = null,
+                installedVersionName = "1.0.0",
+                installedVersionCode = 100L,
+            )
+        val repo = RecordingInstalledAppsRepository(listOf(installed))
+        val monitor = FakePackageMonitor(
+            packageName = installed.packageName,
+            systemInfo =
+                systemInfo(
+                    installed.packageName,
+                    versionName = "1.0.0",
+                    versionCode = 100L,
+                    lastUpdateTime = 9_000L,
+                ),
+        )
+
+        SyncInstalledAppsUseCase(monitor, repo, Platform.ANDROID, NoOpLogger)()
+
+        assertTrue(
+            repo.clearedBindings.isEmpty(),
+            "NULL boundAt means provenance was never recorded; keep the binding",
+        )
+    }
+
+    @Test
     fun aPendingFlagWithoutAParkResolvesInsteadOfHoldingTheRow() = runBlocking {
         val orphaned = parked(pendingFilePath = null)
         val repo = RecordingInstalledAppsRepository(listOf(orphaned))
@@ -443,6 +526,7 @@ class SyncInstalledAppsUseCaseParkTest {
         val pendingStatusWrites = mutableListOf<Pair<String, Boolean>>()
         val discardCalls = mutableListOf<DiscardCall>()
         val deletedPackages = mutableListOf<String>()
+        val clearedBindings = mutableListOf<String>()
 
         val cleanupLog = mutableListOf<String>()
 
@@ -539,7 +623,25 @@ class SyncInstalledAppsUseCaseParkTest {
             isPendingInstall: Boolean,
         ) = Unit
 
-        override suspend fun clearInstallBinding(packageName: String) = Unit
+        override suspend fun clearInstallBinding(packageName: String) {
+            clearedBindings += packageName
+            apps =
+                apps.map {
+                    if (it.packageName == packageName) {
+                        it.copy(
+                            installedReleaseId = null,
+                            installedAssetId = null,
+                            installedAssetDigest = null,
+                            installedReleasePublishedAt = null,
+                            installedAssetName = null,
+                            installedAssetUrl = null,
+                            boundAt = null,
+                        )
+                    } else {
+                        it
+                    }
+                }
+        }
 
         override suspend fun updateInstalledVersion(
             packageName: String,

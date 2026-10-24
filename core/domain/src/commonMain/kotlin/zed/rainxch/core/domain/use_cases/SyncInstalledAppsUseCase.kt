@@ -14,6 +14,7 @@ import zed.rainxch.core.domain.model.installation.SystemPackageInfo
 import zed.rainxch.core.domain.model.installation.bindingStatusAgainst
 import zed.rainxch.core.domain.model.installation.deviceChangeAgainst
 import zed.rainxch.core.domain.model.installation.hasPendingIdentity
+import zed.rainxch.core.domain.model.installation.installedAfterBinding
 import zed.rainxch.core.domain.model.installation.installedAfterPark
 import zed.rainxch.core.domain.model.installation.observeExternalInstall
 import zed.rainxch.core.domain.model.installation.pendingInstallResolution
@@ -379,8 +380,24 @@ class SyncInstalledAppsUseCase(
         try {
             val local = systemInfo ?: return
 
-            val binding = app.bindingStatusAgainst(local)
-            val change = app.deviceChangeAgainst(local)
+            val current =
+                if (!app.isPendingInstall && !app.hasPendingIdentity && app.installedAfterBinding(local)) {
+                    // An install happened after the last recorded settlement. Drop the binding
+                    // instead of trusting it (#998), and make the local snapshot match the
+                    // cleared row so the following observeExternalInstall cannot write the old
+                    // identity back.
+                    installedAppsRepository.clearInstallBinding(app.packageName)
+                    logger.info(
+                        "Dropped the install binding for ${app.packageName}: " +
+                            "an install happened after the recorded settlement",
+                    )
+                    app.withoutBinding()
+                } else {
+                    app
+                }
+
+            val binding = current.bindingStatusAgainst(local)
+            val change = current.deviceChangeAgainst(local)
 
             if (binding is BindingStatus.Intact && change == DeviceChange.NONE) {
                 logger.debug("Binding intact and unchanged for ${app.packageName}; no write")
@@ -396,7 +413,7 @@ class SyncInstalledAppsUseCase(
             }
 
             if (change != DeviceChange.NONE) {
-                val observed = app.observeExternalInstall(
+                val observed = current.observeExternalInstall(
                     versionName = local.versionName,
                     versionCode = local.versionCode,
                     signingFingerprint = local.signingFingerprint,
@@ -512,3 +529,14 @@ private data class ParkedCleanup(
     val deleteRow: Boolean,
     val reason: String,
 )
+
+private fun InstalledApp.withoutBinding(): InstalledApp =
+    copy(
+        installedReleaseId = null,
+        installedAssetId = null,
+        installedAssetDigest = null,
+        installedReleasePublishedAt = null,
+        installedAssetName = null,
+        installedAssetUrl = null,
+        boundAt = null,
+    )

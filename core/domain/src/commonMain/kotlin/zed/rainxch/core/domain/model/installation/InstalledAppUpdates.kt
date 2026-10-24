@@ -49,6 +49,7 @@ fun InstalledApp.confirmInstall(
         installedAssetId = assetId,
         installedAssetDigest = assetDigest,
         installedReleasePublishedAt = releasePublishedAt,
+        boundAt = if (isPending) null else at,
         isUpdateAvailable =
             when {
                 latestIsSkipped -> false
@@ -87,6 +88,7 @@ fun InstalledApp.resolvePendingFromSystem(
         installedVersionCode = reached.versionCode,
         isUpdateAvailable = updateFlagAgainstSnapshot(reached.versionCode, reached.versionName),
         lastUpdatedAt = at,
+        boundAt = at,
     )
 
 // The device runs the parked build byte for byte even when the version number did not
@@ -172,6 +174,15 @@ fun InstalledApp.installedAfter(info: SystemPackageInfo?): Boolean {
     return updatedAt > lastUpdatedAt
 }
 
+// Only a proven binding can be invalidated by a timestamp: NULL means the row predates
+// provenance tracking, so a legacy row keeps its binding.
+@Suppress("ReturnCount")
+fun InstalledApp.installedAfterBinding(info: SystemPackageInfo?): Boolean {
+    val bound = boundAt ?: return false
+    val updatedAt = info?.lastUpdateTime ?: return false
+    return updatedAt > bound
+}
+
 // Used only when an install event (broadcast, or lastUpdateTime past the park) proves the
 // parked file landed. The version fields may not have moved, so the parked identity wins.
 fun InstalledApp.resolvePendingFromProvenEvent(
@@ -198,6 +209,7 @@ fun InstalledApp.resolvePendingFromProvenEvent(
             if (parkedIdentity) pendingInstallReleasePublishedAt else installedReleasePublishedAt,
         isUpdateAvailable = updateFlagAgainstSnapshot(versionCode, versionName),
         lastUpdatedAt = at,
+        boundAt = at,
         pendingInstallReleaseId = null,
         pendingInstallAssetId = null,
         pendingInstallAssetDigest = null,
@@ -410,6 +422,9 @@ fun InstalledApp.observeExternalInstall(
         installedAssetId = null,
         installedAssetDigest = null,
         installedReleasePublishedAt = null,
+        installedAssetName = null,
+        installedAssetUrl = null,
+        boundAt = null,
         isUpdateAvailable = updateFlagAgainstSnapshot(versionCode, versionName ?: adoptedTag),
     )
 }

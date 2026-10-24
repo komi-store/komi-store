@@ -216,13 +216,45 @@ interface InstalledAppDao {
         signingFingerprint: String,
     )
 
+    // A proven binding is written in one statement: the tag and the identity fields must
+    // never diverge, otherwise the next check reads an installed version it cannot explain.
+    @Query(
+        """
+        UPDATE installed_apps
+           SET installedVersion = :installedVersion,
+               installedVersionName = :installedVersionName,
+               installedVersionCode = :installedVersionCode,
+               installedReleaseId = :releaseId,
+               installedAssetId = :assetId,
+               installedAssetDigest = :digest,
+               installedReleasePublishedAt = :releasePublishedAt,
+               boundAt = :boundAt
+         WHERE packageName = :packageName
+        """,
+    )
+    @Suppress("LongParameterList")
+    suspend fun adoptMatchedTagWithIdentity(
+        packageName: String,
+        installedVersion: String,
+        installedVersionName: String?,
+        installedVersionCode: Long,
+        releaseId: Long?,
+        assetId: Long?,
+        digest: String?,
+        releasePublishedAt: String?,
+        boundAt: Long?,
+    )
+
     @Query(
         """
         UPDATE installed_apps
            SET installedReleaseId = NULL,
                installedAssetId = NULL,
                installedAssetDigest = NULL,
-               installedReleasePublishedAt = NULL
+               installedReleasePublishedAt = NULL,
+               installedAssetName = NULL,
+               installedAssetUrl = NULL,
+               boundAt = NULL
          WHERE packageName = :packageName
         """,
     )
@@ -244,18 +276,6 @@ interface InstalledAppDao {
         path: String?,
         version: String?,
         assetName: String?,
-    )
-
-    @Query(
-        """
-        UPDATE installed_apps
-           SET installedAssetDigest = :digest
-         WHERE packageName = :packageName
-        """,
-    )
-    suspend fun setInstalledAssetDigest(
-        packageName: String,
-        digest: String,
     )
 
     @Query(

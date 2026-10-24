@@ -235,7 +235,13 @@ object UpdateVerdict {
         installedTag: String?,
         matchedTag: String,
         deviceRunsMatchedRelease: Boolean = false,
-    ): Boolean = installedTag != matchedTag && (codesAlreadyMatch || deviceRunsMatchedRelease)
+        // A stored identity that names different bytes must not be relabelled with the
+        // matched tag: the row would then describe a release it never installed.
+        identityContradicts: Boolean = false,
+    ): Boolean =
+        installedTag != matchedTag &&
+            !identityContradicts &&
+            (codesAlreadyMatch || deviceRunsMatchedRelease)
 
     fun isSameFile(
         installedAssetId: Long?,

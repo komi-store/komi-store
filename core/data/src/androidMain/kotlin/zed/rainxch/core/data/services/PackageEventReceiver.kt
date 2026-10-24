@@ -21,6 +21,7 @@ import zed.rainxch.core.domain.model.installation.PendingInstallResolution
 import zed.rainxch.core.domain.model.installation.SystemPackageInfo
 import zed.rainxch.core.domain.model.installation.externalInstallUpdateFlag
 import zed.rainxch.core.domain.model.installation.hasPendingIdentity
+import zed.rainxch.core.domain.model.installation.installedAfterBinding
 import zed.rainxch.core.domain.model.installation.pendingInstallResolution
 import zed.rainxch.core.domain.model.installation.resolvePendingFromProvenEvent
 import zed.rainxch.core.domain.model.installation.tagForObservedBuild
@@ -241,9 +242,7 @@ class PackageEventReceiver() :
             systemInfo.versionCode != app.installedVersionCode ||
                 systemInfo.versionName != app.installedVersionName
         if (!versionChanged) {
-            Logger.d {
-                "Broadcast touch with no version change: $packageName (v${systemInfo.versionName})"
-            }
+            handleUnchangedVersion(packageName, app, repo, systemInfo)
             return
         }
 
@@ -310,6 +309,55 @@ class PackageEventReceiver() :
                 Logger.w {
                     "External-install re-validation failed for $packageName: ${e.message}"
                 }
+            }
+        }
+    }
+
+    // Android sends ADDED and REPLACED for the same install, and Shizuku/Dhizuku write the
+    // identity before the broadcast arrives. Only a system install timestamp newer than our
+    // recorded binding proves that somebody else installed over it.
+    private suspend fun handleUnchangedVersion(
+        packageName: String,
+        app: InstalledApp,
+        repo: InstalledAppsRepository,
+        systemInfo: SystemPackageInfo,
+    ) {
+        if (!app.installedAfterBinding(systemInfo)) {
+            Logger.d {
+                "Broadcast touch with no version change: $packageName (v${systemInfo.versionName})"
+            }
+            return
+        }
+        // A same-version install happened after our binding: it is foreign, so the provenance
+        // claim must go. Also clear the stale update flag before the backstop check, otherwise
+        // the UI shows one forced update for an install that may already be the latest build.
+        val installedSigner = systemInfo.signingFingerprint
+        repo.executeInTransaction {
+            repo.updateInstalledVersion(
+                packageName = packageName,
+                installedVersion = app.tagForObservedBuild(systemInfo.versionName, systemInfo.versionCode),
+                installedVersionName = systemInfo.versionName,
+                installedVersionCode = systemInfo.versionCode,
+                isUpdateAvailable = false,
+            )
+            // AutoUpdateWorker checks the signer only when one is stored, so an unreadable
+            // signer (null) must never erase it.
+            if (installedSigner != null && !installedSigner.equals(app.signingFingerprint, ignoreCase = true)) {
+                repo.updateSigningFingerprint(packageName, installedSigner)
+            }
+            repo.clearInstallBinding(packageName)
+        }
+        Logger.i {
+            "Dropped the binding for $packageName: a same-version install happened " +
+                "after the recorded binding"
+        }
+        getBackstopScope().launch {
+            try {
+                repo.checkForUpdates(packageName)
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                Logger.e(e) { "Backstop update check failed for $packageName" }
             }
         }
     }

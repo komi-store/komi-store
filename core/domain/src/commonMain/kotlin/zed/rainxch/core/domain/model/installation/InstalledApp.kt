@@ -37,6 +37,10 @@ data class InstalledApp(
     val installedAssetId: Long? = null,
     val installedAssetDigest: String? = null,
     val installedReleasePublishedAt: String? = null,
+    // When the store last asserted this row's installed identity. NULL means the row predates
+    // provenance tracking, so its binding is kept: an install timestamp after this point is
+    // the proof that a foreign install happened and the identity can no longer be trusted.
+    val boundAt: Long? = null,
     val pendingInstallVersionCode: Long? = null,
     val latestVersionName: String? = null,
     val latestVersionCode: Long? = null,

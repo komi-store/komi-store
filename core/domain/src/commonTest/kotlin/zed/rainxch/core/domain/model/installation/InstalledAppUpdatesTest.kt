@@ -4,6 +4,7 @@ import zed.rainxch.core.domain.utils.UpdateVerdict
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 class InstalledAppUpdatesTest {
@@ -84,6 +85,7 @@ class InstalledAppUpdatesTest {
         val settled = parked.resolvePendingFromSystem(resolution)
 
         assertEquals(2_000L, settled.lastUpdatedAt)
+        assertEquals(2_000L, settled.boundAt)
         assertFalse(settled.installedAfter(info), "the install must not be read as a foreign one next sync")
     }
 
@@ -106,7 +108,21 @@ class InstalledAppUpdatesTest {
             )
 
         assertEquals(3_000L, settled.lastUpdatedAt)
+        assertEquals(3_000L, settled.boundAt)
         assertFalse(settled.installedAfter(packageInfo(lastUpdateTime = 2_500L)))
+    }
+
+    @Test
+    fun only_a_recorded_binding_can_be_invalidated_by_the_install_time() {
+        val bound = testInstalledApp().copy(boundAt = 1_000L)
+
+        assertTrue(bound.installedAfterBinding(packageInfo(lastUpdateTime = 2_000L)))
+        assertFalse(bound.installedAfterBinding(packageInfo(lastUpdateTime = 1_000L)))
+        assertFalse(bound.installedAfterBinding(packageInfo(lastUpdateTime = null)))
+        assertFalse(
+            testInstalledApp().installedAfterBinding(packageInfo(lastUpdateTime = 2_000L)),
+            "a row without boundAt predates provenance tracking and keeps its binding",
+        )
     }
 
     @Test
@@ -619,6 +635,26 @@ class InstalledAppUpdatesTest {
                 versionCode = 100L,
             )
         assertFalse(result.isUpdateAvailable)
+    }
+
+    @Test
+    fun observeExternalInstallClearsTheWholeBinding() {
+        val result =
+            app()
+                .copy(
+                    boundAt = 1_000L,
+                    installedAssetName = "old.apk",
+                    installedAssetUrl = "https://example.test/old.apk",
+                ).observeExternalInstall(
+                    versionName = "2.0.0",
+                    versionCode = 200L,
+                )
+        assertNull(result.boundAt)
+        assertNull(result.installedAssetName)
+        assertNull(result.installedAssetUrl)
+        assertNull(result.installedReleaseId)
+        assertNull(result.installedAssetId)
+        assertNull(result.installedAssetDigest)
     }
 
     @Test

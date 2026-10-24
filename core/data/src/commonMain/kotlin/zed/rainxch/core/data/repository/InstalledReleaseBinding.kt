@@ -36,9 +36,16 @@ internal suspend fun resolveInstalledBinding(
             verifier = verifier,
         )
     if (confirmedDigest != null && confirmedDigest == matchedAsset.digest) {
-        // The installed bytes are the release's bytes: bind them once so later checks compare
-        // digests instead of hashing the APK again.
-        dao.setInstalledAssetDigest(app.packageName, confirmedDigest)
+        // The installed bytes are the release's bytes: bind the tag and the identity in one
+        // statement so later checks compare digests instead of hashing the APK again.
+        rebindProvenIdentity(
+            dao = dao,
+            app = app,
+            matchedRelease = matchedRelease,
+            matchedAsset = matchedAsset,
+            matchedDigest = confirmedDigest,
+            boundAt = System.currentTimeMillis(),
+        )
     }
     return UpdateVerdict.Bound(
         assetId = app.installedAssetId,

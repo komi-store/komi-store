@@ -1262,6 +1262,25 @@ class UpdateVerdictTest {
     }
 
     @Test
+    fun a_contradicting_identity_blocks_the_tag_adoption() {
+        assertTrue(
+            UpdateVerdict.shouldAdoptMatchedTag(
+                codesAlreadyMatch = true,
+                installedTag = "1.0.0",
+                matchedTag = "2.0.0",
+            ),
+        )
+        assertFalse(
+            UpdateVerdict.shouldAdoptMatchedTag(
+                codesAlreadyMatch = true,
+                installedTag = "1.0.0",
+                matchedTag = "2.0.0",
+                identityContradicts = true,
+            ),
+        )
+    }
+
+    @Test
     fun a_skipped_tag_outranks_attested_difference() {
         val result =
             decide(
