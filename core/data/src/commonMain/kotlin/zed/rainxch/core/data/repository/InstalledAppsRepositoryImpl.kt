@@ -269,6 +269,9 @@ class InstalledAppsRepositoryImpl(
                 } else {
                     null
                 }
+            if (selfAttestedDigest != null && selfAttestedDigest == primaryAsset.digest) {
+                rebindProvenIdentity(installedAppsDao, app, matchedRelease, primaryAsset, selfAttestedDigest, System.currentTimeMillis())
+            }
 
             val verdict =
                 UpdateVerdict.decide(
@@ -346,12 +349,16 @@ class InstalledAppsRepositoryImpl(
                     installedTag = app.installedVersion,
                     matchedTag = matchedRelease.tagName,
                     deviceRunsMatchedRelease = verdict.deviceRunsMatchedRelease,
+                    identityContradicts = identityContradicts(app, primaryAsset),
                 )
             if (shouldRewriteTag) {
-                installedAppsDao.adoptMatchedTag(
-                    app = app,
-                    matchedTag = matchedRelease.tagName,
-                    isUpdateAvailable = isUpdateAvailable,
+                adoptTagWhenProven(
+                    installedAppsDao,
+                    app,
+                    matchedRelease,
+                    primaryAsset,
+                    isUpdateAvailable,
+                    System.currentTimeMillis(),
                 )
             }
 
@@ -510,6 +517,9 @@ class InstalledAppsRepositoryImpl(
                             assetId = app.latestAssetId,
                             assetDigest = app.latestAssetDigest,
                             releasePublishedAt = app.latestReleasePublishedAt,
+                            // The caller marks a download it is about to hand to the
+                            // installer, so this is the moment the 24h window starts.
+                            startedAt = System.currentTimeMillis(),
                         )
                     } else {
                         it.clearPending()

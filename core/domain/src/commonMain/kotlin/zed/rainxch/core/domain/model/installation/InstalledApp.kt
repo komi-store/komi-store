@@ -37,6 +37,8 @@ data class InstalledApp(
     val installedAssetId: Long? = null,
     val installedAssetDigest: String? = null,
     val installedReleasePublishedAt: String? = null,
+    val boundAt: Long? = null,
+    val pendingInstallVersionCode: Long? = null,
     val latestVersionName: String? = null,
     val latestVersionCode: Long? = null,
     val latestReleasePublishedAt: String? = null,
@@ -56,6 +58,11 @@ data class InstalledApp(
     val pendingInstallAssetId: Long? = null,
     val pendingInstallAssetDigest: String? = null,
     val pendingInstallReleasePublishedAt: String? = null,
+    // When the parked APK was handed to the installer. PackageManager.lastUpdateTime after
+    // this moment proves the install happened, even when the version fields did not move.
+    // Null while the download is only waiting for the user to tap Install: a deferred park
+    // must not expire.
+    val pendingInstallStartedAt: Long? = null,
     val skippedReleaseTag: String? = null,
     val sourceHost: String? = null,
 )

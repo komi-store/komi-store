@@ -10,15 +10,21 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import zed.rainxch.core.data.local.db.dao.ExternalLinkDao
+import zed.rainxch.core.domain.model.installation.InstalledApp
 import zed.rainxch.core.domain.model.installation.ParkedInstallDisposal
 import zed.rainxch.core.domain.model.installation.PendingInstallResolution
+import zed.rainxch.core.domain.model.installation.SystemPackageInfo
 import zed.rainxch.core.domain.model.installation.externalInstallUpdateFlag
+import zed.rainxch.core.domain.model.installation.hasPendingIdentity
+import zed.rainxch.core.domain.model.installation.installedAfterBinding
 import zed.rainxch.core.domain.model.installation.pendingInstallResolution
+import zed.rainxch.core.domain.model.installation.resolvePendingFromProvenEvent
 import zed.rainxch.core.domain.model.installation.tagForObservedBuild
-import zed.rainxch.core.domain.model.installation.withSettledInstallIdentity
 import zed.rainxch.core.domain.repository.ExternalImportRepository
 import zed.rainxch.core.domain.repository.InstalledAppsRepository
 import zed.rainxch.core.domain.system.ExternalLinkState
@@ -26,6 +32,7 @@ import zed.rainxch.core.domain.system.PackageMonitor
 import zed.rainxch.core.domain.system.SystemInstallSerializer
 import zed.rainxch.core.domain.utils.VersionVerdict
 import zed.rainxch.core.domain.utils.resolveExternalInstallVerdict
+import java.util.concurrent.ConcurrentHashMap
 
 class PackageEventReceiver() :
     BroadcastReceiver(),
@@ -45,6 +52,9 @@ class PackageEventReceiver() :
     private var explicitSystemInstallSerializer: SystemInstallSerializer? = null
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+    private val eventLocks = ConcurrentHashMap<String, Mutex>()
+
+    private fun lockFor(packageName: String): Mutex = eventLocks.getOrPut(packageName) { Mutex() }
 
     constructor(
         installedAppsRepository: InstalledAppsRepository,
@@ -89,21 +99,28 @@ class PackageEventReceiver() :
 
         Logger.d { "PackageEventReceiver: ${intent?.action} for $packageName" }
 
-        try {
-            when (intent?.action) {
-                Intent.ACTION_PACKAGE_ADDED,
-                Intent.ACTION_PACKAGE_REPLACED,
-                Intent.ACTION_MY_PACKAGE_REPLACED,
-                -> {
-                    scope.launch { onPackageInstalled(packageName) }
-                }
+        // Keep the process alive until the DB settlement finishes. Doing the work in a
+        // fire-and-forget launch lets Android kill the process as soon as onReceive returns.
+        val pendingResult = goAsync()
+        scope.launch {
+            try {
+                lockFor(packageName).withLock {
+                    when (intent?.action) {
+                        Intent.ACTION_PACKAGE_ADDED,
+                        Intent.ACTION_PACKAGE_REPLACED,
+                        Intent.ACTION_MY_PACKAGE_REPLACED,
+                        -> onPackageInstalled(packageName)
 
-                Intent.ACTION_PACKAGE_FULLY_REMOVED -> {
-                    scope.launch { onPackageRemoved(packageName) }
+                        Intent.ACTION_PACKAGE_FULLY_REMOVED -> onPackageRemoved(packageName)
+                    }
                 }
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                Logger.e { "PackageEventReceiver: Failed to handle ${intent?.action}: ${e.message}" }
+            } finally {
+                pendingResult.finish()
             }
-        } catch (e: Exception) {
-            Logger.e { "PackageEventReceiver: Failed to handle ${intent?.action}: ${e.message}" }
         }
     }
 
@@ -116,57 +133,7 @@ class PackageEventReceiver() :
             val app = repo.getAppByPackage(packageName)
 
             if (app != null) {
-                if (app.isPendingInstall) {
-                    val resolution =
-                        app.pendingInstallResolution(monitor.getInstalledPackageInfo(packageName))
-                    when (resolution) {
-                        PendingInstallResolution.Keep -> {
-                            Logger.i {
-                                "Kept parked install via broadcast (target not proven): $packageName"
-                            }
-                        }
-
-                        is PendingInstallResolution.Reached -> {
-                            val settled = app.withSettledInstallIdentity(resolution.versionCode)
-                            repo.updateAppVersion(
-                                packageName = packageName,
-                                newTag = resolution.resolvedTag,
-                                newReleaseId = settled.installedReleaseId,
-                                newAssetId = settled.installedAssetId,
-                                newAssetDigest = settled.installedAssetDigest,
-                                newReleasePublishedAt = settled.installedReleasePublishedAt,
-                                newAssetName = app.latestAssetName ?: "",
-                                newAssetUrl = app.latestAssetUrl ?: "",
-                                newVersionName = resolution.versionName,
-                                newVersionCode = resolution.versionCode,
-                                signingFingerprint = app.signingFingerprint,
-                                isPendingInstall = true,
-                            )
-                            try {
-                                val disposal =
-                                    repo.discardParkedInstall(packageName, app.pendingInstallFilePath)
-                                if (disposal == ParkedInstallDisposal.Retained) {
-                                    Logger.w {
-                                        "Parked install not fully discarded for $packageName; " +
-                                            "the next sync will retry"
-                                    }
-                                }
-                            } catch (e: CancellationException) {
-                                throw e
-                            } catch (e: Exception) {
-                                Logger.e(e) {
-                                    "Parked install not discarded for $packageName; the next sync will retry"
-                                }
-                            }
-                            Logger.i {
-                                "Update confirmed via broadcast: $packageName " +
-                                    "(v${resolution.versionName}, tag=${resolution.resolvedTag})"
-                            }
-                        }
-                    }
-                } else {
-                    handleExternalInstall(packageName, app, repo, monitor)
-                }
+                handleTrackedInstall(packageName, app, repo, monitor)
             }
         } catch (e: CancellationException) {
             throw e
@@ -197,6 +164,73 @@ class PackageEventReceiver() :
             state != ExternalLinkState.NEVER_ASK.name
     }
 
+    private suspend fun handleTrackedInstall(
+        packageName: String,
+        app: InstalledApp,
+        repo: InstalledAppsRepository,
+        monitor: PackageMonitor,
+    ) {
+        if (!app.isPendingInstall && !app.hasPendingIdentity) {
+            handleExternalInstall(packageName, app, repo, monitor)
+            return
+        }
+        if (app.pendingInstallStartedAt == null) {
+            // A park that was never handed to an installer cannot be settled by an
+            // unrelated install event: treat that event as an external install instead.
+            handleExternalInstall(packageName, app, repo, monitor)
+            return
+        }
+        val systemInfo = monitor.getInstalledPackageInfo(packageName)
+        val resolution = app.pendingInstallResolution(systemInfo)
+        val tag =
+            when (resolution) {
+                is PendingInstallResolution.Reached -> {
+                    resolution.resolvedTag
+                }
+
+                // Keep means the parked target is not proven on the device. Never settle a
+                // park from an unrelated install; leave it for a real proof.
+                PendingInstallResolution.Keep -> {
+                    null
+                }
+            }
+        if (tag == null || systemInfo == null) {
+            Logger.i { "Kept parked install via broadcast (target not proven): $packageName" }
+        } else {
+            settlePendingFromEvent(packageName, app, repo, tag, systemInfo)
+        }
+    }
+
+    private suspend fun settlePendingFromEvent(
+        packageName: String,
+        app: InstalledApp,
+        repo: InstalledAppsRepository,
+        tag: String,
+        systemInfo: SystemPackageInfo,
+    ) {
+        val settled =
+            app.resolvePendingFromProvenEvent(
+                tag = tag,
+                versionName = systemInfo.versionName,
+                versionCode = systemInfo.versionCode,
+                at = systemInfo.lastUpdateTime ?: System.currentTimeMillis(),
+            )
+        repo.updateApp(settled)
+        try {
+            val disposal = repo.discardParkedInstall(packageName, app.pendingInstallFilePath)
+            if (disposal == ParkedInstallDisposal.Retained) {
+                Logger.w { "Parked install not fully discarded for $packageName; the next sync will retry" }
+            }
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            Logger.e(e) { "Parked install not discarded for $packageName; the next sync will retry" }
+        }
+        Logger.i {
+            "Update settled via broadcast: $packageName (v${systemInfo.versionName}, tag=$tag)"
+        }
+    }
+
     private suspend fun handleExternalInstall(
         packageName: String,
         app: zed.rainxch.core.domain.model.installation.InstalledApp,
@@ -208,8 +242,42 @@ class PackageEventReceiver() :
             systemInfo.versionCode != app.installedVersionCode ||
                 systemInfo.versionName != app.installedVersionName
         if (!versionChanged) {
-            Logger.d {
-                "Broadcast touch with no version change: $packageName (v${systemInfo.versionName})"
+            // Android sends ADDED and REPLACED for the same install, and Shizuku/Dhizuku write
+            // the identity before the broadcast arrives. When the system's install timestamp is
+            // not newer than our recorded settlement, this touch repeats an install we already
+            // bound ourselves, so the binding must stay.
+            if (app.installedAfterBinding(systemInfo)) {
+                // A same-version install happened after our binding: it is foreign, so the
+                // provenance claim must go. Also clear the stale update flag before the
+                // backstop check, otherwise the UI shows one forced update for an install
+                // that may already be the latest build.
+                repo.executeInTransaction {
+                    repo.updateInstalledVersion(
+                        packageName = packageName,
+                        installedVersion = app.tagForObservedBuild(systemInfo.versionName, systemInfo.versionCode),
+                        installedVersionName = systemInfo.versionName,
+                        installedVersionCode = systemInfo.versionCode,
+                        isUpdateAvailable = false,
+                    )
+                    repo.clearInstallBinding(packageName)
+                }
+                Logger.i {
+                    "Dropped the binding for $packageName: a same-version install happened " +
+                        "after the recorded binding"
+                }
+                getBackstopScope().launch {
+                    try {
+                        repo.checkForUpdates(packageName)
+                    } catch (e: CancellationException) {
+                        throw e
+                    } catch (e: Exception) {
+                        Logger.e(e) { "Backstop update check failed for $packageName" }
+                    }
+                }
+            } else {
+                Logger.d {
+                    "Broadcast touch with no version change: $packageName (v${systemInfo.versionName})"
+                }
             }
             return
         }

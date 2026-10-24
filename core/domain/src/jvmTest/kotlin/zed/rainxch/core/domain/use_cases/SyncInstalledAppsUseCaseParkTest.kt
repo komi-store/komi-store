@@ -142,7 +142,13 @@ class SyncInstalledAppsUseCaseParkTest {
 
     @Test
     fun deletingAnUninstalledRowDiscardsItsParkBeforeTheRowGoes() = runBlocking {
-        val abandoned = parked(packageName = "com.example.abandoned", installedAt = 0L)
+        val abandoned =
+            parked(
+                packageName = "com.example.abandoned",
+                installedAt = 0L,
+                // Handed to the installer long ago and never reached the system.
+                pendingInstallStartedAt = 0L,
+            )
         val tracked = parked(
             packageName = "com.example.tracked",
             isPendingInstall = false,
@@ -171,7 +177,12 @@ class SyncInstalledAppsUseCaseParkTest {
 
     @Test
     fun aParkThatIsNotGoneKeepsItsRow() = runBlocking {
-        val abandoned = parked(packageName = "com.example.abandoned", installedAt = 0L)
+        val abandoned =
+            parked(
+                packageName = "com.example.abandoned",
+                installedAt = 0L,
+                pendingInstallStartedAt = 0L,
+            )
         val repo = RecordingInstalledAppsRepository(listOf(abandoned))
         repo.discardOutcome = ParkedInstallDisposal.Retained
         val monitor = FakePackageMonitor(
@@ -267,6 +278,133 @@ class SyncInstalledAppsUseCaseParkTest {
     }
 
     @Test
+    fun anAbandonedParkIsDroppedAfterTheInstallTimeout() = runBlocking {
+        val abandoned =
+            parked(
+                pendingInstallStartedAt = 1L,
+                pendingInstallAssetDigest = "sha256:new",
+            )
+        val repo = RecordingInstalledAppsRepository(listOf(abandoned))
+        val monitor = FakePackageMonitor(
+            packageName = abandoned.packageName,
+            systemInfo = systemInfo(abandoned.packageName, versionName = "1.0.0", versionCode = 100L),
+        )
+
+        SyncInstalledAppsUseCase(monitor, repo, Platform.ANDROID, NoOpLogger)()
+
+        assertEquals(listOf(abandoned.packageName to false), repo.pendingStatusWrites)
+        assertEquals(listOf(null as String?), repo.pendingPathWrites)
+        assertEquals(listOf(abandoned.packageName), repo.discardedPackages)
+    }
+
+    @Test
+    fun aDeferredParkWithoutAHandoffNeverExpires() = runBlocking {
+        // A finished download parked for the user has no start time; only handing it to the
+        // installer starts the 24h window. An old installedAt must not make it stale.
+        val deferred =
+            parked(
+                installedAt = 1L,
+                pendingInstallStartedAt = null,
+                pendingInstallAssetDigest = "sha256:new",
+            )
+        val repo = RecordingInstalledAppsRepository(listOf(deferred))
+        val monitor = FakePackageMonitor(
+            packageName = deferred.packageName,
+            systemInfo = null,
+            allPackageNames = (1..20).map { "com.example.filler$it" }.toSet(),
+        )
+
+        SyncInstalledAppsUseCase(monitor, repo, Platform.ANDROID, NoOpLogger)()
+
+        assertTrue(repo.pendingStatusWrites.isEmpty())
+        assertTrue(repo.pendingPathWrites.isEmpty())
+        assertTrue(repo.discardedPackages.isEmpty())
+        assertTrue(repo.deletedPackages.isEmpty(), "a deferred download must not be swept")
+    }
+
+    @Test
+    fun aHandedOffParkThatNeverReachedTheSystemExpiresAfterTheTimeout() = runBlocking {
+        val handedOff =
+            parked(
+                installedAt = 1L,
+                pendingInstallStartedAt = 1L,
+                pendingInstallAssetDigest = "sha256:new",
+            )
+        val repo = RecordingInstalledAppsRepository(listOf(handedOff))
+        val monitor = FakePackageMonitor(
+            packageName = handedOff.packageName,
+            systemInfo = null,
+            allPackageNames = (1..20).map { "com.example.filler$it" }.toSet(),
+        )
+
+        SyncInstalledAppsUseCase(monitor, repo, Platform.ANDROID, NoOpLogger)()
+
+        assertEquals(listOf(handedOff.packageName), repo.deletedPackages)
+    }
+
+    @Test
+    fun theNextSyncKeepsTheBindingAHandedOffParkJustSettled() = runBlocking {
+        val parked =
+            parked(
+                pendingInstallStartedAt = 1_000L,
+                pendingInstallReleaseId = 900L,
+                pendingInstallAssetId = 800L,
+                pendingInstallAssetDigest = "sha256:new",
+            ).copy(pendingInstallVersionCode = 100L)
+        val repo = RecordingInstalledAppsRepository(listOf(parked))
+        val info = systemInfo(parked.packageName, versionName = "1.0.0", versionCode = 100L, lastUpdateTime = 2_000L)
+        val monitor = FakePackageMonitor(packageName = parked.packageName, systemInfo = info)
+
+        SyncInstalledAppsUseCase(monitor, repo, Platform.ANDROID, NoOpLogger)()
+        SyncInstalledAppsUseCase(monitor, repo, Platform.ANDROID, NoOpLogger)()
+
+        assertTrue(repo.clearedBindings.isEmpty(), "the binding written by the settlement must survive")
+        assertEquals(2_000L, repo.updatedApps.first().lastUpdatedAt)
+        assertEquals(2_000L, repo.updatedApps.first().boundAt)
+    }
+
+    @Test
+    fun aForeignSameVersionInstallStillDropsTheBinding() = runBlocking {
+        val installed =
+            parked(
+                isPendingInstall = false,
+                pendingFilePath = null,
+                pendingInstallStartedAt = null,
+                installedVersionName = "1.0.0",
+                installedVersionCode = 100L,
+            ).copy(boundAt = 1_000L)
+        val repo = RecordingInstalledAppsRepository(listOf(installed))
+        val monitor = FakePackageMonitor(
+            packageName = installed.packageName,
+            systemInfo = systemInfo(installed.packageName, versionName = "1.0.0", versionCode = 100L, lastUpdateTime = 9_000L),
+        )
+
+        SyncInstalledAppsUseCase(monitor, repo, Platform.ANDROID, NoOpLogger)()
+
+        assertEquals(listOf(installed.packageName), repo.clearedBindings)
+    }
+
+    @Test
+    fun aLegacyRowWithoutBoundAtKeepsItsBinding() = runBlocking {
+        val installed =
+            parked(
+                isPendingInstall = false,
+                pendingFilePath = null,
+                installedVersionName = "1.0.0",
+                installedVersionCode = 100L,
+            )
+        val repo = RecordingInstalledAppsRepository(listOf(installed))
+        val monitor = FakePackageMonitor(
+            packageName = installed.packageName,
+            systemInfo = systemInfo(installed.packageName, versionName = "1.0.0", versionCode = 100L, lastUpdateTime = 9_000L),
+        )
+
+        SyncInstalledAppsUseCase(monitor, repo, Platform.ANDROID, NoOpLogger)()
+
+        assertTrue(repo.clearedBindings.isEmpty(), "NULL boundAt means provenance was never recorded; keep the binding")
+    }
+
+    @Test
     fun aFreshParkIsLeftAloneBeforeItsInstallIsAttempted() = runBlocking {
         val fresh = parked(installedAt = System.currentTimeMillis())
         val repo = RecordingInstalledAppsRepository(listOf(fresh))
@@ -294,6 +432,10 @@ class SyncInstalledAppsUseCaseParkTest {
         pendingFilePath: String? = "/data/parked.apk",
         isPendingInstall: Boolean = true,
         installedAt: Long = 1_000L,
+        pendingInstallStartedAt: Long? = null,
+        pendingInstallReleaseId: Long? = null,
+        pendingInstallAssetId: Long? = null,
+        pendingInstallAssetDigest: String? = null,
     ): InstalledApp = testInstalledApp(
         packageName = packageName,
         installedVersion = installedVersion,
@@ -304,6 +446,10 @@ class SyncInstalledAppsUseCaseParkTest {
         pendingInstallFilePath = pendingFilePath,
         isPendingInstall = isPendingInstall,
         installedAt = installedAt,
+        pendingInstallStartedAt = pendingInstallStartedAt,
+        pendingInstallReleaseId = pendingInstallReleaseId,
+        pendingInstallAssetId = pendingInstallAssetId,
+        pendingInstallAssetDigest = pendingInstallAssetDigest,
         latestReleasePublishedAt = "2026-08-01T00:00:00Z",
     )
 
@@ -311,12 +457,14 @@ class SyncInstalledAppsUseCaseParkTest {
         packageName: String,
         versionName: String,
         versionCode: Long,
+        lastUpdateTime: Long? = null,
     ): SystemPackageInfo = SystemPackageInfo(
         packageName = packageName,
         versionName = versionName,
         versionCode = versionCode,
         isInstalled = true,
         signingFingerprint = "SHA",
+        lastUpdateTime = lastUpdateTime,
     )
 
     private class FakePackageMonitor(
@@ -357,6 +505,7 @@ class SyncInstalledAppsUseCaseParkTest {
         val pendingStatusWrites = mutableListOf<Pair<String, Boolean>>()
         val discardCalls = mutableListOf<DiscardCall>()
         val deletedPackages = mutableListOf<String>()
+        val clearedBindings = mutableListOf<String>()
 
         val cleanupLog = mutableListOf<String>()
 
@@ -453,7 +602,25 @@ class SyncInstalledAppsUseCaseParkTest {
             isPendingInstall: Boolean,
         ) = Unit
 
-        override suspend fun clearInstallBinding(packageName: String) = Unit
+        override suspend fun clearInstallBinding(packageName: String) {
+            clearedBindings += packageName
+            apps =
+                apps.map {
+                    if (it.packageName == packageName) {
+                        it.copy(
+                            installedReleaseId = null,
+                            installedAssetId = null,
+                            installedAssetDigest = null,
+                            installedReleasePublishedAt = null,
+                            installedAssetName = null,
+                            installedAssetUrl = null,
+                            boundAt = null,
+                        )
+                    } else {
+                        it
+                    }
+                }
+        }
 
         override suspend fun updateInstalledVersion(
             packageName: String,

@@ -204,6 +204,35 @@ interface InstalledAppDao {
         isUpdateAvailable: Boolean,
     )
 
+    // A proven binding is written in one statement: the tag and the identity fields must
+    // never diverge, otherwise the next check reads an installed version it cannot explain.
+    @Query(
+        """
+        UPDATE installed_apps
+           SET installedVersion = :installedVersion,
+               installedVersionName = :installedVersionName,
+               installedVersionCode = :installedVersionCode,
+               installedReleaseId = :releaseId,
+               installedAssetId = :assetId,
+               installedAssetDigest = :digest,
+               installedReleasePublishedAt = :releasePublishedAt,
+               boundAt = :boundAt
+         WHERE packageName = :packageName
+        """,
+    )
+    @Suppress("LongParameterList")
+    suspend fun adoptMatchedTagWithIdentity(
+        packageName: String,
+        installedVersion: String,
+        installedVersionName: String?,
+        installedVersionCode: Long,
+        releaseId: Long?,
+        assetId: Long?,
+        digest: String?,
+        releasePublishedAt: String?,
+        boundAt: Long?,
+    )
+
     @Query(
         """
         UPDATE installed_apps
@@ -222,7 +251,10 @@ interface InstalledAppDao {
            SET installedReleaseId = NULL,
                installedAssetId = NULL,
                installedAssetDigest = NULL,
-               installedReleasePublishedAt = NULL
+               installedReleasePublishedAt = NULL,
+               installedAssetName = NULL,
+               installedAssetUrl = NULL,
+               boundAt = NULL
          WHERE packageName = :packageName
         """,
     )
@@ -249,18 +281,6 @@ interface InstalledAppDao {
     @Query(
         """
         UPDATE installed_apps
-           SET installedAssetDigest = :digest
-         WHERE packageName = :packageName
-        """,
-    )
-    suspend fun setInstalledAssetDigest(
-        packageName: String,
-        digest: String,
-    )
-
-    @Query(
-        """
-        UPDATE installed_apps
            SET installedReleasePublishedAt = :publishedAt
          WHERE packageName = :packageName
         """,
@@ -270,12 +290,19 @@ interface InstalledAppDao {
         publishedAt: String?,
     )
 
+    // Discarding a park drops every trace of the target: a leftover identity or start time
+    // would be adopted by the next unrelated install.
     @Query(
         """
         UPDATE installed_apps
            SET pendingInstallFilePath = NULL,
                pendingInstallVersion = NULL,
                pendingInstallAssetName = NULL,
+               pendingInstallReleaseId = NULL,
+               pendingInstallAssetId = NULL,
+               pendingInstallAssetDigest = NULL,
+               pendingInstallReleasePublishedAt = NULL,
+               pendingInstallStartedAt = NULL,
                isPendingInstall = 0
          WHERE packageName = :packageName
            AND pendingInstallFilePath IS :path
@@ -286,6 +313,8 @@ interface InstalledAppDao {
         path: String?,
     )
 
+    // Parking a finished download for the user must not start the expiry clock: the 24h
+    // window starts only when the APK is handed to the installer.
     @Query(
         """
         UPDATE installed_apps
@@ -296,6 +325,7 @@ interface InstalledAppDao {
                pendingInstallAssetId = :assetId,
                pendingInstallAssetDigest = :digest,
                pendingInstallReleasePublishedAt = :releasePublishedAt,
+               pendingInstallStartedAt = NULL,
                isPendingInstall = 1
          WHERE packageName = :packageName
         """,

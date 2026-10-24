@@ -4,6 +4,7 @@ import zed.rainxch.core.domain.utils.UpdateVerdict
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 class InstalledAppUpdatesTest {
@@ -22,6 +23,111 @@ class InstalledAppUpdatesTest {
 
         assertFalse(settled.isPendingInstall)
         assertEquals(null, settled.pendingInstallFilePath)
+    }
+
+    @Test
+    fun a_same_code_install_adopts_the_parked_identity() {
+        val parked =
+            testInstalledApp(
+                installedVersion = "testbuild-d",
+                installedVersionCode = 22L,
+                installedAssetId = 1L,
+                installedAssetDigest = "sha256:old",
+                isPendingInstall = true,
+                pendingInstallFilePath = "/tmp/a.apk",
+                pendingInstallVersion = "testbuild-a",
+                pendingInstallReleaseId = 900L,
+                pendingInstallAssetId = 800L,
+                pendingInstallAssetDigest = "sha256:new",
+                pendingInstallStartedAt = 1_000L,
+            )
+
+        val settled =
+            parked.resolvePendingFromProvenEvent(
+                tag = "testbuild-a",
+                versionName = "1.9.3",
+                versionCode = 22L,
+            )
+
+        assertEquals(900L, settled.installedReleaseId)
+        assertEquals(800L, settled.installedAssetId)
+        assertEquals("sha256:new", settled.installedAssetDigest)
+        assertFalse(settled.isPendingInstall)
+        assertEquals(null, settled.pendingInstallAssetDigest)
+        assertEquals(null, settled.pendingInstallStartedAt)
+    }
+
+    @Test
+    fun a_park_older_than_the_install_time_proves_the_install() {
+        val parked =
+            testInstalledApp(
+                isPendingInstall = true,
+                pendingInstallStartedAt = 1_000L,
+            )
+        assertTrue(parked.installedAfterPark(packageInfo(lastUpdateTime = 2_000L)))
+        assertFalse(parked.installedAfterPark(packageInfo(lastUpdateTime = 500L)))
+        assertTrue(parked.installedAfterPark(packageInfo(lastUpdateTime = 1_000L)))
+        assertFalse(parked.installedAfterPark(packageInfo(lastUpdateTime = null)))
+    }
+
+    @Test
+    fun settling_by_the_system_time_records_it_as_the_settlement() {
+        val parked =
+            testInstalledApp(
+                isPendingInstall = true,
+                pendingInstallReleaseId = 900L,
+                pendingInstallStartedAt = 1_000L,
+                lastUpdatedAt = 500L,
+            )
+        val info = packageInfo(versionName = "2.0.0", versionCode = 200L, lastUpdateTime = 2_000L)
+
+        val resolution = parked.pendingInstallResolution(info) as PendingInstallResolution.Reached
+        val settled = parked.resolvePendingFromSystem(resolution)
+
+        assertEquals(2_000L, settled.lastUpdatedAt)
+        assertFalse(settled.installedAfter(info), "the install must not be read as a foreign one next sync")
+    }
+
+    @Test
+    fun settling_a_proven_event_records_the_settlement_time() {
+        val parked =
+            testInstalledApp(
+                isPendingInstall = true,
+                pendingInstallReleaseId = 900L,
+                pendingInstallStartedAt = 1_000L,
+                lastUpdatedAt = 500L,
+            )
+
+        val settled =
+            parked.resolvePendingFromProvenEvent(
+                tag = "2.0.0",
+                versionName = "2.0.0",
+                versionCode = 200L,
+                at = 3_000L,
+            )
+
+        assertEquals(3_000L, settled.lastUpdatedAt)
+        assertFalse(settled.installedAfter(packageInfo(lastUpdateTime = 2_500L)))
+    }
+
+    @Test
+    fun clear_pending_drops_a_leftover_identity_and_start_time() {
+        val parked =
+            testInstalledApp(
+                isPendingInstall = true,
+                pendingInstallReleaseId = 900L,
+                pendingInstallAssetId = 800L,
+                pendingInstallAssetDigest = "sha256:new",
+                pendingInstallStartedAt = 1_000L,
+            )
+
+        val cleared = parked.clearPending()
+
+        assertFalse(cleared.isPendingInstall)
+        assertEquals(null, cleared.pendingInstallReleaseId)
+        assertEquals(null, cleared.pendingInstallAssetId)
+        assertEquals(null, cleared.pendingInstallAssetDigest)
+        assertEquals(null, cleared.pendingInstallStartedAt)
     }
 
     @Test
@@ -60,6 +166,20 @@ class InstalledAppUpdatesTest {
         assertEquals("2026-10-01T00:00:00Z", settled.installedReleasePublishedAt)
         assertEquals(null, settled.pendingInstallReleasePublishedAt)
     }
+
+    private fun packageInfo(
+        versionName: String = "1.0.0",
+        versionCode: Long = 100L,
+        lastUpdateTime: Long? = null,
+    ): SystemPackageInfo =
+        SystemPackageInfo(
+            packageName = "com.example.app",
+            versionName = versionName,
+            versionCode = versionCode,
+            isInstalled = true,
+            signingFingerprint = null,
+            lastUpdateTime = lastUpdateTime,
+        )
 
     private fun app(
         installedVersion: String = "1.0.0",
@@ -500,6 +620,26 @@ class InstalledAppUpdatesTest {
                 versionCode = 100L,
             )
         assertFalse(result.isUpdateAvailable)
+    }
+
+    @Test
+    fun observeExternalInstallClearsTheWholeBinding() {
+        val result =
+            app()
+                .copy(
+                    boundAt = 1_000L,
+                    installedAssetName = "old.apk",
+                    installedAssetUrl = "https://example.test/old.apk",
+                ).observeExternalInstall(
+                    versionName = "2.0.0",
+                    versionCode = 200L,
+                )
+        assertNull(result.boundAt)
+        assertNull(result.installedAssetName)
+        assertNull(result.installedAssetUrl)
+        assertNull(result.installedReleaseId)
+        assertNull(result.installedAssetId)
+        assertNull(result.installedAssetDigest)
     }
 
     @Test

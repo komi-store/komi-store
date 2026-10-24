@@ -185,12 +185,19 @@ class AppsDownloadMirrorTest {
                 releaseId = 99L,
             )
 
-        val marked = installedApp().markDownloadedUpdate(recovered, versionName = null, versionCode = null)
+        val marked =
+            installedApp().markDownloadedUpdate(
+                recovered,
+                versionName = null,
+                versionCode = null,
+                startedAt = 7_000L,
+            )
 
         assertTrue(marked.isPendingInstall)
         assertEquals(99L, marked.pendingInstallReleaseId)
         assertEquals(43L, marked.pendingInstallAssetId)
         assertEquals("sha256:new", marked.pendingInstallAssetDigest)
+        assertEquals(7_000L, marked.pendingInstallStartedAt)
         assertEquals("v2", marked.latestVersion)
         assertEquals("https://example.invalid/v2/name.apk", marked.latestAssetUrl)
         assertEquals("v2", marked.latestVersionName)

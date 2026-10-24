@@ -161,8 +161,13 @@ class DefaultDownloadOrchestratorParkTest {
             assertEquals("github.com", adopted.sourceHost)
             assertTrue(adopted.isPendingInstall)
             assertEquals(parkedPath, adopted.pendingInstallFilePath)
-            assertEquals("v3.4.1", adopted.installedVersion)
-            assertEquals("joplin-3.4.1.apk", adopted.installedAssetName)
+            assertEquals("", adopted.installedVersion)
+            assertEquals(null, adopted.installedAssetName)
+            assertEquals(null, adopted.installedVersionName)
+            assertEquals(0L, adopted.installedVersionCode)
+            assertEquals("v3.4.1", adopted.pendingInstallVersion)
+            assertEquals("joplin-3.4.1.apk", adopted.pendingInstallAssetName)
+            assertEquals(true, adopted.pendingInstallStartedAt != null)
         }
 
     @Test
