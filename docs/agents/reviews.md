@@ -190,16 +190,18 @@ Details and the cards both need reviews, and features don't depend on each other
 - `core/domain`: the `model/reviews` models and `ReviewsRepository`. Every failure is a `ReviewException(kind: ReviewError)`.
 - `core/data`: `BackendReviewsApi` (on `BackendApiClient.request`) and `ReviewsRepositoryImpl`. `ReviewsRepository.changes` emits a repo after the viewer posts, edits or deletes, so Details refreshes its section.
 - `core/presentation/components/reviews`: `ReviewCard`, `RatingSummaryPanel`, `StarRating`, `StarRatingInput` and the `ReviewUi` models.
-- `feature/reviews/presentation`: the full screen, `GithubStoreGraph.ReviewsScreen(owner, repo, sourceHost, openComposer, version, appLabel)`.
+- `feature/reviews/presentation`: the full screen, `GithubStoreGraph.ReviewsScreen(owner, repo, sourceHost, openComposer, composerRating, version, appLabel)`.
 
 Behaviour:
 
 - **Errors:** error codes map to `ReviewError` and then to string resources. 400 and 413 are invalid input; a plain 404 or 5xx is unavailable.
 - **Token:** sent only on `/mine`, the writes and moderation. Never on the public reads, so they stay shared and anonymous.
-- **Details:** a Ratings & reviews section with the summary, the top 3 reviews, Write a review (opens the screen with the composer, prefilled with the installed version, else the selected release, and the monorepo app label) and See all. It's hidden while the backend can't be reached, and Write is hidden for the repo's owner.
-- **Full screen:** sort and star filter with paging; the viewer's own review is pinned on top (the public list is a CDN copy that can lag a write) and says when a moderator hid it; votes are optimistic (tapping your current vote again takes it back); report and reply sheets.
-- **Moderation screen** (`GithubStoreGraph.ReviewModerationScreen`), opened from the Reviews top bar when `isModerator`: the Reported and Hidden queues, with hide, dismiss, unhide, delete and ban.
-- **Stars on cards:** `CompactRating` (stars plus "4.3 (128)") sits under the owner line of `KomiRepoCard`, apart from the stats row, whose star is GitHub stars. Catalog cards read `rating` through `GithubRepoSummary.rating` and the Home cache; Library rows and group headers read one `/reviews/summaries` call from `AppsViewModel`, made again only when the set of repos changes.
+- **Details:** a Ratings & reviews section with the summary, Rate this app (five stars; a tap opens the screen with the composer at that rating, prefilled with the installed version, else the selected release, and the monorepo app label), the top 3 reviews and See all. It's hidden while the backend can't be reached, and the stars are hidden for the repo's owner.
+- **Full screen:** sort and star filter with paging; the viewer's own review is pinned on top (the public list is a CDN copy that can lag a write) and says when a moderator hid it; votes are optimistic (tapping your current vote again takes it back), sent in tap order per review, and a failure falls back to the last vote the server accepted; report and reply sheets.
+- **After the viewer's own write:** for five minutes (the list's `s-maxage`) the repo's list reads carry a `fresh` nonce, which the backend ignores, so they skip the CDN's copy and show the write.
+- **Signed in** means a stored token (`isUserLoggedIn`), not a fetched profile. Signing in from the Reviews screen returns to it, and a pending composer opens once `/mine` loads.
+- **Moderation screen** (`GithubStoreGraph.ReviewModerationScreen`), opened from the Reviews top bar when `isModerator`: the Reported and Hidden queues, with hide, dismiss, unhide, delete and ban. Decisions take reviews out of the server's queue, so the next page is the one holding the first unseen review (`items / 20 + 1`).
+- **Stars on cards:** `CompactRating` (stars plus "4.3 (128)") sits under the owner line of `KomiRepoCard`, apart from the stats row, whose star is GitHub stars. Catalog cards read `rating` through `GithubRepoSummary.rating` and the Home cache; Library rows and group headers read one `/reviews/summaries` call from `AppsViewModel`, made again only when the set of repos changes (or, after a failure, on a change five minutes later). The keys go out as written; a host that fails loses only its own rows.
 
 ## Rollout
 

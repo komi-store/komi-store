@@ -7,11 +7,14 @@ import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.getString
 import zed.rainxch.core.domain.getPlatform
@@ -64,6 +67,17 @@ class ReviewsViewModel(
     private var summary: RatingSummary? = null
     private var mine: Review? = null
     private var votes: Map<String, ReviewVote> = emptyMap()
+
+    // The votes the server last accepted, which a failed tap falls back to.
+    private var confirmedVotes: Map<String, ReviewVote> = emptyMap()
+
+    // One lock per review sends its votes in tap order; the tap count tells which tap is the newest.
+    private val voteLocks = mutableMapOf<String, Mutex>()
+    private val voteTaps = mutableMapOf<String, Int>()
+
+    // The token decides whether the viewer is signed in. The profile only supplies their id, and a
+    // failed /user call must not read as signed out.
+    private var signedIn = false
     private var viewerId: Long? = null
     private var requestGeneration = 0
     private var composerPending = openComposer
@@ -79,12 +93,21 @@ class ReviewsViewModel(
         load()
         viewModelScope.launch {
             userSessionRepository
-                .getUser()
-                .map { it?.id?.toLong() }
+                .isUserLoggedIn()
                 .distinctUntilChanged()
-                .collect { id ->
-                    viewerId = id
-                    _state.update { it.copy(isLoggedIn = id != null) }
+                .collectLatest { loggedIn ->
+                    signedIn = loggedIn
+                    viewerId =
+                        if (loggedIn) {
+                            userSessionRepository
+                                .getUser()
+                                .firstOrNull()
+                                ?.id
+                                ?.toLong()
+                        } else {
+                            null
+                        }
+                    _state.update { it.copy(isLoggedIn = loggedIn) }
                     loadMine()
                 }
         }
@@ -259,9 +282,10 @@ class ReviewsViewModel(
 
     private suspend fun loadMine() {
         mineLoaded = false
-        if (viewerId == null) {
+        if (!signedIn) {
             mine = null
             votes = emptyMap()
+            confirmedVotes = emptyMap()
             _state.update {
                 it.copy(mine = null, canReview = false, cannotReviewReason = null, canReply = false, isModerator = false)
             }
@@ -274,6 +298,8 @@ class ReviewsViewModel(
                 mineLoaded = true
                 mine = state.review
                 votes = state.votes
+                confirmedVotes = state.votes
+                viewerId = viewerId ?: state.review?.author?.id
                 _state.update {
                     it.copy(
                         canReview = state.canReview,
@@ -308,6 +334,8 @@ class ReviewsViewModel(
     }
 
     private fun openComposer() {
+        // Without sign-in or /mine yet, the composer opens by itself once both are in.
+        if (!signedIn || !mineLoaded) composerPending = true
         requireSignIn {
             if (!mineLoaded) {
                 composerPending = true
@@ -380,7 +408,7 @@ class ReviewsViewModel(
                 .onSuccess {
                     if (previous != null && !previous.hidden) adjustSummary(removed = previous.rating, added = null)
                     mine = null
-                    loaded = loaded.filterNot { r -> r.author.id == viewerId }
+                    loaded = loaded.filterNot { r -> r.id == previous?.id }
                     _state.update { it.copy(composer = null) }
                     publishReviews()
                     message(Res.string.reviews_deleted)
@@ -412,13 +440,25 @@ class ReviewsViewModel(
         direction: ReviewVote,
     ) {
         requireSignIn {
+            // The viewer's earlier votes come with /mine; a tap before it would count from nothing.
+            if (!mineLoaded) return@requireSignIn
             val previous = votes[reviewId]
             val next = direction.takeUnless { it == previous }
             applyVote(reviewId, from = previous, to = next)
+            val tap = (voteTaps[reviewId] ?: 0) + 1
+            voteTaps[reviewId] = tap
+            val lock = voteLocks.getOrPut(reviewId) { Mutex() }
             viewModelScope.launch {
-                repository.setVote(reviewId, next).onFailure { error ->
-                    applyVote(reviewId, from = next, to = previous)
-                    message(error.reviewMessage())
+                lock.withLock {
+                    repository
+                        .setVote(reviewId, next)
+                        .onSuccess { confirmedVotes = confirmedVotes.withVote(reviewId, next) }
+                        .onFailure { error ->
+                            // A newer tap is queued behind this one and settles the vote itself.
+                            if (voteTaps[reviewId] != tap) return@onFailure
+                            applyVote(reviewId, from = votes[reviewId], to = confirmedVotes[reviewId])
+                            message(error.reviewMessage())
+                        }
                 }
             }
         }
@@ -429,7 +469,7 @@ class ReviewsViewModel(
         from: ReviewVote?,
         to: ReviewVote?,
     ) {
-        votes = if (to == null) votes - reviewId else votes + (reviewId to to)
+        votes = votes.withVote(reviewId, to)
         val delta = (to?.value ?: 0) - (from?.value ?: 0)
         loaded = loaded.map { r -> if (r.id == reviewId) r.copy(score = r.score + delta) else r }
         publishReviews()
@@ -492,8 +532,13 @@ class ReviewsViewModel(
         }
     }
 
+    private fun Map<String, ReviewVote>.withVote(
+        reviewId: String,
+        vote: ReviewVote?,
+    ): Map<String, ReviewVote> = if (vote == null) this - reviewId else this + (reviewId to vote)
+
     private fun requireSignIn(block: () -> Unit) {
-        if (viewerId == null) {
+        if (!signedIn) {
             viewModelScope.launch { _events.send(ReviewsEvent.OnNavigateToAuthentication) }
             return
         }

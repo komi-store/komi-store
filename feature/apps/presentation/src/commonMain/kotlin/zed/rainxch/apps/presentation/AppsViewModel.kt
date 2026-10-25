@@ -94,6 +94,7 @@ class AppsViewModel(
     companion object {
         private const val BANNER_THRESHOLD = 1
         private const val UPDATE_CHECK_COOLDOWN_MS = 30 * 60 * 1000L
+        private const val RATINGS_RETRY_MS = 5 * 60 * 1000L
     }
 
     private var hasLoadedInitialData = false
@@ -109,6 +110,7 @@ class AppsViewModel(
 
     private var ratingsByRepo: Map<Long, RepoRating> = emptyMap()
     private var ratedTargets: Set<ReviewTarget> = emptySet()
+    private var ratingsFailedAt: Long? = null
     private var ratingsJob: Job? = null
 
     private val orchestratedStages = mutableMapOf<String, OrchestratorStage>()
@@ -285,13 +287,15 @@ class AppsViewModel(
     }
 
     // Library rows don't come from catalog responses, so their stars come from one summaries call, made
-    // again only when the set of repos changes. A failed call leaves the rows without stars and retries
-    // on the next change.
+    // again only when the set of repos changes. A failed call leaves the rows without stars; it's tried
+    // again on a change after a few minutes, not on every database write that follows.
     private fun refreshRatings(apps: List<InstalledApp>) {
         val targets = apps.associate { it.repoId to ReviewTarget(owner = it.repoOwner, name = it.repoName, host = it.sourceHost) }
         val wanted = targets.values.toSet()
-        if (wanted == ratedTargets) return
+        val retryDue = ratingsFailedAt?.let { System.currentTimeMillis() - it > RATINGS_RETRY_MS } ?: false
+        if (wanted == ratedTargets && !retryDue) return
         ratedTargets = wanted
+        ratingsFailedAt = null
         ratingsJob?.cancel()
         ratingsJob =
             viewModelScope.launch {
@@ -305,7 +309,7 @@ class AppsViewModel(
                             )
                         }
                         filterApps()
-                    }.onFailure { ratedTargets = emptySet() }
+                    }.onFailure { ratingsFailedAt = System.currentTimeMillis() }
             }
     }
 

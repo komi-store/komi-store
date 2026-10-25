@@ -772,9 +772,20 @@ fun AppNavigation(
                             composable<GithubStoreGraph.AuthenticationScreen> {
                                 AuthenticationRoot(
                                     onNavigateToHome = {
-                                        navController.navigate(GithubStoreGraph.ExploreScreen) {
-                                            popUpTo(0) {
-                                                inclusive = true
+                                        // Signing in to write a review goes back to it; the Reviews screen
+                                        // picks the session up and opens the composer it was asked for.
+                                        val fromReviews =
+                                            navController.previousBackStackEntry
+                                                ?.destination
+                                                ?.route
+                                                ?.contains("ReviewsScreen") == true
+                                        if (fromReviews) {
+                                            navController.navigateUp()
+                                        } else {
+                                            navController.navigate(GithubStoreGraph.ExploreScreen) {
+                                                popUpTo(0) {
+                                                    inclusive = true
+                                                }
                                             }
                                         }
                                     },

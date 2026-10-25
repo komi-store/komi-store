@@ -39,11 +39,13 @@ import kotlin.coroutines.cancellation.CancellationException
 class BackendReviewsApi(
     private val client: BackendApiClient,
 ) {
+    // [fresh] is a nonce the backend ignores: a URL no one has asked for yet skips the CDN's copy.
     suspend fun getReviews(
         target: ReviewTarget,
         sort: String,
         rating: Int?,
         page: Int,
+        fresh: Long? = null,
     ): Result<BackendReviewsPageDto> =
         call(authed = false) {
             val response =
@@ -53,6 +55,7 @@ class BackendReviewsApi(
                     if (rating != null) parameter("rating", rating)
                     parameter("page", page)
                     parameter("limit", PAGE_SIZE)
+                    if (fresh != null) parameter("fresh", fresh)
                 }
             response.bodyOrFailure()
         }
