@@ -121,8 +121,3 @@ data class BackendModerationReportDto(
     val note: String? = null,
     val createdAt: String? = null,
 )
-
-@Serializable
-data class BackendModerationReasonDto(
-    val reason: String? = null,
-)

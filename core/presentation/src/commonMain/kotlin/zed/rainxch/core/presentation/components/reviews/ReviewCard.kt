@@ -23,6 +23,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import kotlinx.collections.immutable.toImmutableList
@@ -237,7 +238,8 @@ private fun ReplyBlock(reply: ReviewReplyUi) {
         verticalArrangement = Arrangement.spacedBy(6.dp),
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Avatar(url = reply.authorAvatarUrl, size = 20)
+            // The block is surfaceVariant already, so the empty-avatar circle needs another fill to show.
+            Avatar(url = reply.authorAvatarUrl, size = 20, placeholder = colors.surface)
             Spacer(Modifier.size(8.dp))
             KomiText(
                 text = stringResource(Res.string.reviews_reply_from, reply.authorLogin),
@@ -310,6 +312,7 @@ private class MenuAction(
 private fun Avatar(
     url: String?,
     size: Int,
+    placeholder: Color = LocalPersonality.current.colors.surfaceVariant,
 ) {
     GitHubStoreImage(
         imageModel = { url },
@@ -317,7 +320,7 @@ private fun Avatar(
             Modifier
                 .size(size.dp)
                 .clip(CircleShape)
-                .background(LocalPersonality.current.colors.surfaceVariant),
+                .background(placeholder),
         showLoadingIndicator = false,
     )
 }

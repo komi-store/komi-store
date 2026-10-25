@@ -87,13 +87,13 @@ class ReviewsRepositoryImpl(
     ): Result<Unit> =
         when (decision) {
             ModerationDecision.DELETE -> api.deleteAsModerator(reviewId)
-            else -> api.moderate(reviewId, decision.name.lowercase(), reason = null)
+            else -> api.moderate(reviewId, decision.name.lowercase())
         }
 
     override suspend fun setBanned(
         githubId: Long,
         banned: Boolean,
-    ): Result<Unit> = api.setBanned(githubId, banned, reason = null)
+    ): Result<Unit> = api.setBanned(githubId, banned)
 
     private companion object {
         const val SUMMARIES_PER_CALL = 50

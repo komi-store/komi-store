@@ -21,7 +21,6 @@ import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.contentOrNull
 import zed.rainxch.core.data.dto.BackendModerationQueueDto
-import zed.rainxch.core.data.dto.BackendModerationReasonDto
 import zed.rainxch.core.data.dto.BackendMyReviewDto
 import zed.rainxch.core.data.dto.BackendReviewDraftDto
 import zed.rainxch.core.data.dto.BackendReviewDto
@@ -165,17 +164,14 @@ class BackendReviewsApi(
             response.bodyOrFailure()
         }
 
-    // action is hide, unhide or dismiss.
+    // action is hide, unhide or dismiss. The optional reason isn't offered in the app, so no body is sent.
     suspend fun moderate(
         reviewId: String,
         action: String,
-        reason: String?,
     ): Result<Unit> =
         call(authed = true) { token ->
             post("reviews/moderation/item/$reviewId/$action") {
                 header(X_GITHUB_TOKEN_HEADER, token)
-                contentType(ContentType.Application.Json)
-                setBody(BackendModerationReasonDto(reason))
             }.emptyOrFailure()
         }
 
@@ -189,17 +185,12 @@ class BackendReviewsApi(
     suspend fun setBanned(
         githubId: Long,
         banned: Boolean,
-        reason: String?,
     ): Result<Unit> =
         call(authed = true) { token ->
             val path = "reviews/moderation/users/$githubId/ban"
             val response =
                 if (banned) {
-                    post(path) {
-                        header(X_GITHUB_TOKEN_HEADER, token)
-                        contentType(ContentType.Application.Json)
-                        setBody(BackendModerationReasonDto(reason))
-                    }
+                    post(path) { header(X_GITHUB_TOKEN_HEADER, token) }
                 } else {
                     delete(path) { header(X_GITHUB_TOKEN_HEADER, token) }
                 }
