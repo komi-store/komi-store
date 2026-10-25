@@ -18,6 +18,9 @@ fun FavoriteRepo.toEntity(): FavoriteRepoEntity =
         latestReleaseUrl = latestReleaseUrl,
         addedAt = addedAt,
         lastSyncedAt = lastSyncedAt,
+        stargazersCount = stargazersCount,
+        platforms = platforms.toPlatformsColumn(),
+        sourceHost = sourceHost,
     )
 
 fun FavoriteRepoEntity.toDomain(): FavoriteRepo =
@@ -35,4 +38,7 @@ fun FavoriteRepoEntity.toDomain(): FavoriteRepo =
         latestReleaseUrl = latestReleaseUrl,
         addedAt = addedAt,
         lastSyncedAt = lastSyncedAt,
+        stargazersCount = stargazersCount,
+        platforms = platforms.toPlatforms(),
+        sourceHost = sourceHost,
     )

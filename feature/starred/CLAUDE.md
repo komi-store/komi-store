@@ -30,3 +30,5 @@ feature/starred/presentation/
 - Starring happens in Details (`setStarred`). This screen does not unstar; the heart on each row toggles favourites.
 - Inline search bar when the list is non-empty; filters name / owner / description / language client-side. `OnRefresh` clears the active query so the refreshed list isn't masked behind a stale filter.
 - `StarredRepositoryUi.isCurrentUserOwner` set when the signed-in user owns the repo.
+- Since DB v22 the sync also keeps the platforms of each repo's latest stable release (`assetPlatformOf` over its assets).
+- Rows are `KomiLibraryRow` (core/presentation): the app's icon (the installed one when it's on the device) on a cookie plate, name, owner, description, then install status, stars, platforms and the newest version, with when the list got the repo underneath. Install status is live: the VM combines the list with `InstalledAppsRepository.getAllInstalledApps()` through `installsByRepo()`. The heart is `KomiFavouriteToggle`.

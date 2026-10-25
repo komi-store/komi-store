@@ -1,5 +1,6 @@
 package zed.rainxch.core.data.local.db.entities
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
@@ -14,4 +15,12 @@ data class SeenRepoEntity(
     val primaryLanguage: String?,
     val repoUrl: String,
     val seenAt: Long,
+    @ColumnInfo(defaultValue = "NULL")
+    val stargazersCount: Int? = null,
+    @ColumnInfo(defaultValue = "NULL")
+    val platforms: String? = null,
+    @ColumnInfo(defaultValue = "NULL")
+    val latestVersion: String? = null,
+    @ColumnInfo(defaultValue = "NULL")
+    val sourceHost: String? = null,
 )

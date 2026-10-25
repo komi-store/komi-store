@@ -852,6 +852,10 @@ class SearchViewModel(
                             repoDescription = repo.description,
                             primaryLanguage = repo.language,
                             repoUrl = repo.htmlUrl,
+                            stargazersCount = repo.stargazersCount,
+                            platforms = repo.availablePlatforms,
+                            latestVersion = repo.latestReleaseTag,
+                            sourceHost = repo.sourceHost,
                         )
                     } catch (e: CancellationException) {
                         throw e

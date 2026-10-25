@@ -243,11 +243,6 @@
     <string name="remove_from_favourites">প্রিয় তালিকা থেকে সরান</string>
     <string name="favourites">প্রিয়</string>
 
-    <string name="added_just_now">এইমাত্র যোগ করা হয়েছে</string>
-    <string name="added_hours_ago">%1$d ঘণ্টা আগে যোগ করা হয়েছে</string>
-    <string name="added_yesterday">গতকাল যোগ করা হয়েছে</string>
-    <string name="added_days_ago">%1$d দিন আগে যোগ করা হয়েছে</string>
-    <string name="added_on_date">%1$s তারিখে যোগ করা হয়েছে</string>
 
     <string name="starred_repositories">স্টার করা রিপোজিটরি</string>
     <string name="repository_starred">রিপোজিটরি স্টার করা হয়েছে</string>
@@ -540,6 +535,13 @@
 
     <string name="recently_viewed">সাম্প্রতিক দেখা</string>
     <string name="recently_viewed_remove_cd">ইতিহাস থেকে সরান</string>
+    <string name="library_viewed">দেখা হয়েছে %1$s</string>
+    <string name="library_added">যোগ করা হয়েছে %1$s</string>
+    <string name="library_starred">স্টার দেওয়া হয়েছে %1$s</string>
+    <string name="history_today">আজ</string>
+    <string name="history_yesterday">গতকাল</string>
+    <string name="history_this_week">এই সপ্তাহে</string>
+    <string name="history_earlier">আগের</string>
     <string name="profile_recently_viewed_description">আপনি যেসব রিপোজিটরি দেখেছেন</string>
     <string name="delete_all">সব মুছুন</string>
     <string name="delete_downloads_confirmation_title">সব ডাউনলোড মুছবেন?</string>

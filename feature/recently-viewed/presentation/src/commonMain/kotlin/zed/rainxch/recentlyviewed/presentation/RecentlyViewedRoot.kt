@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridItemSpan
 import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
 import androidx.compose.runtime.Composable
@@ -16,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import zed.rainxch.core.domain.utils.RepoIdCodec
@@ -24,10 +26,14 @@ import zed.rainxch.core.presentation.components.bars.KomiTopBar
 import zed.rainxch.core.presentation.components.bars.KomiTopBarSize
 import zed.rainxch.core.presentation.components.progress.KomiCircularProgress
 import zed.rainxch.core.presentation.components.scaffold.KomiScaffold
+import zed.rainxch.core.presentation.components.text.KomiText
+import zed.rainxch.core.presentation.components.text.KomiTextRole
+import zed.rainxch.core.presentation.locals.LocalPersonality
 import zed.rainxch.core.presentation.locals.LocalScrollbarEnabled
 import zed.rainxch.core.presentation.utils.arrowKeyScroll
 import zed.rainxch.githubstore.core.presentation.res.*
 import zed.rainxch.recentlyviewed.presentation.components.RecentlyViewedItem
+import zed.rainxch.recentlyviewed.presentation.model.HistoryDay
 
 @Composable
 fun RecentlyViewedRoot(
@@ -106,23 +112,28 @@ fun RecentlyViewedScreen(
                     contentPadding = PaddingValues(horizontal = 8.dp, vertical = 12.dp),
                     modifier = Modifier.fillMaxSize().arrowKeyScroll(gridState, autoFocus = true),
                 ) {
-                    items(
-                        items = state.repositories,
-                        key = { it.repoId },
-                    ) { repo ->
-                        RecentlyViewedItem(
-                            repo = repo,
-                            onItemClick = {
-                                onAction(RecentlyViewedAction.OnRepositoryClick(repo))
-                            },
-                            onRemoveClick = {
-                                onAction(RecentlyViewedAction.OnRemoveFromHistory(repo))
-                            },
-                            onDevProfileClick = {
-                                onAction(RecentlyViewedAction.OnDeveloperProfileClick(repo.repoOwner))
-                            },
-                            modifier = Modifier.animateItem(),
-                        )
+                    state.sections.forEach { section ->
+                        item(key = "day-${section.day}", span = StaggeredGridItemSpan.FullLine) {
+                            DayHeader(day = section.day, modifier = Modifier.animateItem())
+                        }
+                        items(
+                            items = section.repos,
+                            key = { it.repoId },
+                        ) { repo ->
+                            RecentlyViewedItem(
+                                repo = repo,
+                                onItemClick = {
+                                    onAction(RecentlyViewedAction.OnRepositoryClick(repo))
+                                },
+                                onRemoveClick = {
+                                    onAction(RecentlyViewedAction.OnRemoveFromHistory(repo))
+                                },
+                                onDevProfileClick = {
+                                    onAction(RecentlyViewedAction.OnDeveloperProfileClick(repo.repoOwner))
+                                },
+                                modifier = Modifier.animateItem(),
+                            )
+                        }
                     }
                 }
             }
@@ -135,3 +146,24 @@ fun RecentlyViewedScreen(
         }
     }
 }
+
+@Composable
+private fun DayHeader(
+    day: HistoryDay,
+    modifier: Modifier = Modifier,
+) {
+    KomiText(
+        text = stringResource(day.label()),
+        role = KomiTextRole.Overline,
+        color = LocalPersonality.current.colors.primary,
+        modifier = modifier.padding(start = 8.dp, top = 8.dp),
+    )
+}
+
+private fun HistoryDay.label(): StringResource =
+    when (this) {
+        HistoryDay.Today -> Res.string.history_today
+        HistoryDay.Yesterday -> Res.string.history_yesterday
+        HistoryDay.ThisWeek -> Res.string.history_this_week
+        HistoryDay.Earlier -> Res.string.history_earlier
+    }

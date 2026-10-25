@@ -42,7 +42,7 @@ public fun zed.rainxch.starred.presentation.StarredReposScreen(state: zed.rainxc
   skippable: true
   restartable: true
   params:
-    - state: STABLE (class with no mutable properties)
+    - state: UNKNOWN (interface or non-final class; concrete implementation unknown)
     - onAction: STABLE (function type)
 
 @Composable
@@ -65,14 +65,6 @@ private fun zed.rainxch.starred.presentation.StarredTopBar(subtitle: kotlin.Stri
     - onAction: STABLE (function type)
 
 @Composable
-private fun zed.rainxch.starred.presentation.components.FavoriteToggle(favorited: kotlin.Boolean, onClick: kotlin.Function0<kotlin.Unit>): kotlin.Unit
-  skippable: true
-  restartable: true
-  params:
-    - favorited: STABLE (primitive type)
-    - onClick: STABLE (function type)
-
-@Composable
 public fun zed.rainxch.starred.presentation.components.StarredRepositoryItem(repository: zed.rainxch.starred.presentation.model.StarredRepositoryUi, onToggleFavoriteClick: kotlin.Function0<kotlin.Unit>, onItemClick: kotlin.Function0<kotlin.Unit>, onDevProfileClick: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
   skippable: true
   restartable: true
@@ -82,21 +74,4 @@ public fun zed.rainxch.starred.presentation.components.StarredRepositoryItem(rep
     - onItemClick: STABLE (function type)
     - onDevProfileClick: STABLE (function type)
     - modifier: STABLE (marked @Stable or @Immutable)
-
-@Composable
-private fun zed.rainxch.starred.presentation.components.StatChipNeutral(icon: androidx.compose.ui.graphics.vector.ImageVector, label: kotlin.String): kotlin.Unit
-  skippable: true
-  restartable: true
-  params:
-    - icon: STABLE (marked @Stable or @Immutable)
-    - label: STABLE (String is immutable)
-
-@Composable
-private fun zed.rainxch.starred.presentation.components.TonalBadge(text: kotlin.String, container: androidx.compose.ui.graphics.Color, content: androidx.compose.ui.graphics.Color): kotlin.Unit
-  skippable: true
-  restartable: true
-  params:
-    - text: STABLE (String is immutable)
-    - container: STABLE (marked @Stable or @Immutable)
-    - content: STABLE (marked @Stable or @Immutable)
 

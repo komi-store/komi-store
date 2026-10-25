@@ -3,12 +3,10 @@ package zed.rainxch.core.presentation.utils
 import androidx.compose.runtime.Composable
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
-import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.stringResource
 import zed.rainxch.githubstore.core.presentation.res.*
 import kotlin.math.roundToInt
 import kotlin.time.Clock
-import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 
@@ -106,6 +104,12 @@ fun formatRelativeLong(isoInstant: String): String {
     }
 }
 
+// For use inside a sentence ("Viewed just now"), so the first letter is lowered.
+@OptIn(ExperimentalTime::class)
+@Composable
+fun formatRelativeLong(epochMillis: Long): String =
+    formatRelativeLong(Instant.fromEpochMilliseconds(epochMillis).toString()).replaceFirstChar { it.lowercase() }
+
 @OptIn(ExperimentalTime::class)
 fun formatIsoDate(isoTimestamp: String?): String? {
     val instant = isoTimestamp?.let { parseIsoInstantLenient(it) } ?: return null
@@ -135,41 +139,5 @@ fun formatLastChecked(timestamp: Long): String {
         minutes < 1 -> stringResource(Res.string.last_checked_just_now)
         minutes < 60 -> stringResource(Res.string.last_checked_minutes_ago, minutes.toInt())
         else -> stringResource(Res.string.last_checked_hours_ago, hours.toInt())
-    }
-}
-
-@OptIn(ExperimentalTime::class)
-suspend fun formatAddedAt(epochMillis: Long): String {
-    val updated = Instant.fromEpochMilliseconds(epochMillis)
-    val now = Clock.System.now()
-    val diff: Duration = now - updated
-
-    val hoursDiff = diff.inWholeHours
-    val daysDiff = diff.inWholeDays
-
-    return when {
-        hoursDiff < 1 -> {
-            getString(Res.string.added_just_now)
-        }
-
-        hoursDiff < 24 -> {
-            getString(Res.string.added_hours_ago, hoursDiff)
-        }
-
-        daysDiff == 1L -> {
-            getString(Res.string.added_yesterday)
-        }
-
-        daysDiff < 7 -> {
-            getString(Res.string.added_days_ago, daysDiff)
-        }
-
-        else -> {
-            val date =
-                updated
-                    .toLocalDateTime(TimeZone.currentSystemDefault())
-                    .date
-            getString(Res.string.added_on_date, date.toString())
-        }
     }
 }

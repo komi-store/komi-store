@@ -1700,6 +1700,14 @@ class DetailsViewModel(
                         latestReleaseUrl = selectedRelease?.htmlUrl,
                         addedAt = System.now().toEpochMilliseconds(),
                         lastSyncedAt = System.now().toEpochMilliseconds(),
+                        stargazersCount = repo.stargazersCount,
+                        // The platforms of the version saved above; a repo read in Details often has none of its own.
+                        platforms =
+                            selectedRelease
+                                ?.let { _state.value.releasePlatforms[it.id] }
+                                ?.toList()
+                                ?.ifEmpty { null } ?: repo.availablePlatforms,
+                        sourceHost = repo.sourceHost,
                     )
 
                 favouritesRepository.toggleFavorite(favoriteRepo)
@@ -3041,6 +3049,22 @@ class DetailsViewModel(
                 logger.debug("Loaded repo: ${repo.name}, installedApp: ${installedApp?.packageName}")
 
                 val insights = computeReleaseInsights(allReleases, installedApp)
+                val releasePlatformsById = platformsByRelease(allReleases)
+                // The repo as first read can lack its platforms and newest tag; the history row gets
+                // them from the releases.
+                val newestStable = allReleases.firstOrNull { !it.isEffectivelyPreRelease() }
+                launch {
+                    seenReposRepository.markAsSeen(
+                        repo.copy(
+                            availablePlatforms =
+                                newestStable
+                                    ?.let { releasePlatformsById[it.id] }
+                                    ?.toList()
+                                    ?.ifEmpty { null } ?: repo.availablePlatforms,
+                            latestReleaseTag = newestStable?.tagName ?: repo.latestReleaseTag,
+                        ),
+                    )
+                }
 
                 _state.value =
                     _state.value.copy(
@@ -3048,7 +3072,7 @@ class DetailsViewModel(
                         errorMessage = null,
                         repository = repo,
                         allReleases = allReleases,
-                        releasePlatforms = platformsByRelease(allReleases),
+                        releasePlatforms = releasePlatformsById,
                         deviceBuildReleaseIds = deviceBuildIds,
                         releaseLines = releaseLines(allReleases),
                         releasesLoadFailed = releasesFailed,

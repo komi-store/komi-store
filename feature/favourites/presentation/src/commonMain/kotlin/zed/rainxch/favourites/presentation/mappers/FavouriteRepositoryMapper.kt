@@ -1,10 +1,14 @@
 package zed.rainxch.favourites.presentation.mappers
 
+import kotlinx.collections.immutable.toImmutableList
 import zed.rainxch.core.domain.model.repository.FavoriteRepo
-import zed.rainxch.core.presentation.utils.formatAddedAt
+import zed.rainxch.core.presentation.model.LibraryInstall
 import zed.rainxch.favourites.presentation.model.FavouriteRepository
 
-suspend fun FavoriteRepo.toFavouriteRepositoryUi(isCurrentUserOwner: Boolean = false): FavouriteRepository =
+fun FavoriteRepo.toFavouriteRepositoryUi(
+    isCurrentUserOwner: Boolean,
+    install: LibraryInstall?,
+): FavouriteRepository =
     FavouriteRepository(
         repoId = repoId,
         repoName = repoName,
@@ -13,8 +17,13 @@ suspend fun FavoriteRepo.toFavouriteRepositoryUi(isCurrentUserOwner: Boolean = f
         repoDescription = repoDescription,
         primaryLanguage = primaryLanguage,
         repoUrl = repoUrl,
+        addedAt = addedAt,
         latestRelease = latestVersion,
         latestReleaseUrl = latestReleaseUrl,
-        addedAtFormatter = formatAddedAt(addedAt),
+        stars = stargazersCount,
+        platforms = platforms.toImmutableList(),
+        sourceHost = sourceHost,
+        installedPackageName = install?.packageName,
+        status = install?.status,
         isCurrentUserOwner = isCurrentUserOwner,
     )

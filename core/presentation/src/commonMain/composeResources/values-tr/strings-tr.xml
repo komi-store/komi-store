@@ -242,11 +242,6 @@
     <string name="remove_from_favourites">Favorilerden kaldır</string>
     <string name="favourites">Favoriler</string>
 
-    <string name="added_just_now">şimdi eklendi</string>
-    <string name="added_hours_ago">%1$d saat önce eklendi</string>
-    <string name="added_yesterday">dün eklendi</string>
-    <string name="added_days_ago">%1$d gün önce eklendi</string>
-    <string name="added_on_date">%1$s tarihinde eklendi</string>
 
     <string name="starred_repositories">Yıldızlı Repolar</string>
     <string name="repository_starred">Repo yıldızlandı</string>
@@ -538,6 +533,13 @@
 
     <string name="recently_viewed">Son görüntülenenler</string>
     <string name="recently_viewed_remove_cd">Geçmişten kaldır</string>
+    <string name="library_viewed">%1$s görüntülendi</string>
+    <string name="library_added">%1$s eklendi</string>
+    <string name="library_starred">%1$s yıldızlandı</string>
+    <string name="history_today">Bugün</string>
+    <string name="history_yesterday">Dün</string>
+    <string name="history_this_week">Bu hafta</string>
+    <string name="history_earlier">Daha önce</string>
     <string name="profile_recently_viewed_description">Ziyaret ettiğiniz depolar</string>
     <string name="delete_all">Tümünü sil</string>
     <string name="delete_downloads_confirmation_title">Tüm indirmeler silinsin mi?</string>

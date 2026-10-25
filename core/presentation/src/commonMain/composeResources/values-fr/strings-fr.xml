@@ -193,11 +193,6 @@
     <string name="remove_from_favourites">Retirer des favoris</string>
     <string name="favourites">Favoris</string>
 
-    <string name="added_just_now">ajouté à l'instant</string>
-    <string name="added_hours_ago">ajouté il y a %1$d heure(s)</string>
-    <string name="added_yesterday">ajouté hier</string>
-    <string name="added_days_ago">ajouté il y a %1$d jour(s)</string>
-    <string name="added_on_date">ajouté le %1$s</string>
 
     <string name="starred_repositories">Dépôts Étoilés</string>
     <string name="repository_starred">Le dépôt est étoilé</string>
@@ -508,6 +503,13 @@
 
     <string name="recently_viewed">Récemment consultés</string>
     <string name="recently_viewed_remove_cd">Retirer de l'historique</string>
+    <string name="library_viewed">Vu %1$s</string>
+    <string name="library_added">Ajouté %1$s</string>
+    <string name="library_starred">Étoile ajoutée %1$s</string>
+    <string name="history_today">Aujourd'hui</string>
+    <string name="history_yesterday">Hier</string>
+    <string name="history_this_week">Cette semaine</string>
+    <string name="history_earlier">Plus tôt</string>
     <string name="profile_recently_viewed_description">Dépôts que vous avez visités</string>
     <string name="delete_all">Tout supprimer</string>
     <string name="delete_downloads_confirmation_title">Supprimer tous les téléchargements ?</string>

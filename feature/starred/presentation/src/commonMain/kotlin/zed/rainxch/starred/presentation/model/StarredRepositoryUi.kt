@@ -1,5 +1,10 @@
 package zed.rainxch.starred.presentation.model
 
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
+import zed.rainxch.core.domain.model.repository.DiscoveryPlatform
+import zed.rainxch.core.presentation.components.cards.KomiLibraryStatus
+
 data class StarredRepositoryUi(
     val repoId: Long,
     val repoName: String,
@@ -17,4 +22,7 @@ data class StarredRepositoryUi(
     val latestRelease: String?,
     val latestReleaseUrl: String?,
     val starredAt: Long?,
+    val platforms: ImmutableList<DiscoveryPlatform> = persistentListOf(),
+    val installedPackageName: String? = null,
+    val status: KomiLibraryStatus? = null,
 )

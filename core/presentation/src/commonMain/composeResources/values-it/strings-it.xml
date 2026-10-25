@@ -239,11 +239,6 @@
     <string name="remove_from_favourites">Rimuovi dai preferiti</string>
     <string name="favourites">Preferiti</string>
 
-    <string name="added_just_now">aggiunto poco fa</string>
-    <string name="added_hours_ago">aggiunto %1$d ora(e) fa</string>
-    <string name="added_yesterday">aggiunto ieri</string>
-    <string name="added_days_ago">aggiunto %1$d giorno(i) fa</string>
-    <string name="added_on_date">aggiunto il %1$s</string>
 
     <string name="starred_repositories">Repository preferiti</string>
     <string name="repository_starred">Il repository è nei preferiti</string>
@@ -540,6 +535,13 @@
 
     <string name="recently_viewed">Visualizzati di recente</string>
     <string name="recently_viewed_remove_cd">Rimuovi dalla cronologia</string>
+    <string name="library_viewed">Visto %1$s</string>
+    <string name="library_added">Aggiunto %1$s</string>
+    <string name="library_starred">Stella aggiunta %1$s</string>
+    <string name="history_today">Oggi</string>
+    <string name="history_yesterday">Ieri</string>
+    <string name="history_this_week">Questa settimana</string>
+    <string name="history_earlier">Precedenti</string>
     <string name="profile_recently_viewed_description">Repository che hai visitato</string>
     <string name="delete_all">Elimina tutto</string>
     <string name="delete_downloads_confirmation_title">Eliminare tutti i download?</string>

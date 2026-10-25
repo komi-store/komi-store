@@ -1,5 +1,6 @@
 package zed.rainxch.core.data.local.db.entities
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
@@ -23,4 +24,6 @@ data class StarredRepositoryEntity(
     val starredAt: Long?,
     val addedAt: Long,
     val lastSyncedAt: Long,
+    @ColumnInfo(defaultValue = "NULL")
+    val platforms: String? = null,
 )

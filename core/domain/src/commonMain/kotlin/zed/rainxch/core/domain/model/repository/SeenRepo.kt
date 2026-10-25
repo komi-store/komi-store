@@ -9,4 +9,8 @@ data class SeenRepo(
     val primaryLanguage: String?,
     val repoUrl: String,
     val seenAt: Long,
+    val stargazersCount: Int? = null,
+    val platforms: List<DiscoveryPlatform> = emptyList(),
+    val latestVersion: String? = null,
+    val sourceHost: String? = null,
 )

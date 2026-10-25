@@ -195,11 +195,6 @@
     <string name="remove_from_favourites">從收藏中移除</string>
     <string name="favourites">收藏</string>
 
-    <string name="added_just_now">剛剛新增</string>
-    <string name="added_hours_ago">%1$d 小時前新增</string>
-    <string name="added_yesterday">昨天新增</string>
-    <string name="added_days_ago">%1$d 天前新增</string>
-    <string name="added_on_date">%1$s 新增</string>
 
     <string name="starred_repositories">已星標的倉庫</string>
     <string name="repository_starred">倉庫已加星標</string>
@@ -505,6 +500,13 @@
 
     <string name="recently_viewed">最近檢視</string>
     <string name="recently_viewed_remove_cd">從瀏覽記錄中移除</string>
+    <string name="library_viewed">%1$s瀏覽</string>
+    <string name="library_added">%1$s新增</string>
+    <string name="library_starred">%1$s加星號</string>
+    <string name="history_today">今天</string>
+    <string name="history_yesterday">昨天</string>
+    <string name="history_this_week">本週</string>
+    <string name="history_earlier">更早</string>
     <string name="profile_recently_viewed_description">你訪問過的倉庫</string>
     <string name="delete_all">全部刪除</string>
     <string name="delete_downloads_confirmation_title">刪除所有下載？</string>

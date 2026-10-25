@@ -16,9 +16,10 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import zed.rainxch.core.domain.model.repository.FavoriteRepo
 import zed.rainxch.core.domain.repository.FavouritesRepository
+import zed.rainxch.core.domain.repository.InstalledAppsRepository
 import zed.rainxch.core.domain.repository.TweaksRepository
 import zed.rainxch.core.domain.repository.UserSessionRepository
-import zed.rainxch.core.presentation.utils.TimeZoneChangeSignal
+import zed.rainxch.core.presentation.model.installsByRepo
 import zed.rainxch.favourites.presentation.mappers.toFavouriteRepositoryUi
 import zed.rainxch.favourites.presentation.model.FavouritesSortRule
 import kotlin.time.Clock
@@ -28,6 +29,7 @@ class FavouritesViewModel(
     private val favouritesRepository: FavouritesRepository,
     private val tweaksRepository: TweaksRepository,
     private val userSessionRepository: UserSessionRepository,
+    private val installedAppsRepository: InstalledAppsRepository,
 ) : ViewModel() {
     private var hasLoadedInitialData = false
 
@@ -71,17 +73,19 @@ class FavouritesViewModel(
                 favouritesRepository.getAllFavorites(),
                 userSessionRepository.getUser(),
                 tweaksRepository.getFavouritesSortRule(),
-                TimeZoneChangeSignal.revision,
-            ) { favorites, user, sortStored, _ ->
+                installedAppsRepository.getAllInstalledApps(),
+            ) { favorites, user, sortStored, apps ->
                 val sortRule = FavouritesSortRule.fromName(sortStored)
                 val currentLogin = user?.username
                 val sorted = favorites.sortedWith(favouritesComparator(sortRule))
+                val installs = apps.installsByRepo()
                 val items =
                     sorted.map { repo ->
                         repo.toFavouriteRepositoryUi(
                             isCurrentUserOwner =
                                 currentLogin != null &&
                                     repo.repoOwner.equals(currentLogin, ignoreCase = true),
+                            install = installs[repo.repoId],
                         )
                     }
                 items to sortRule
@@ -153,6 +157,9 @@ class FavouritesViewModel(
                             latestReleaseUrl = repo.latestReleaseUrl,
                             addedAt = Clock.System.now().toEpochMilliseconds(),
                             lastSyncedAt = Clock.System.now().toEpochMilliseconds(),
+                            stargazersCount = repo.stars,
+                            platforms = repo.platforms,
+                            sourceHost = repo.sourceHost,
                         )
 
                     favouritesRepository.toggleFavorite(favoriteRepo)

@@ -20,9 +20,11 @@ import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.getString
 import zed.rainxch.core.domain.model.repository.FavoriteRepo
 import zed.rainxch.core.domain.repository.FavouritesRepository
+import zed.rainxch.core.domain.repository.InstalledAppsRepository
 import zed.rainxch.core.domain.repository.StarredRepository
 import zed.rainxch.core.domain.repository.TweaksRepository
 import zed.rainxch.core.domain.repository.UserSessionRepository
+import zed.rainxch.core.presentation.model.installsByRepo
 import zed.rainxch.core.presentation.utils.toUserMessage
 import zed.rainxch.githubstore.core.presentation.res.*
 import zed.rainxch.starred.presentation.mappers.toStarredRepositoryUi
@@ -36,6 +38,7 @@ class StarredReposViewModel(
     private val starredRepository: StarredRepository,
     private val favouritesRepository: FavouritesRepository,
     private val tweaksRepository: TweaksRepository,
+    private val installedAppsRepository: InstalledAppsRepository,
 ) : ViewModel() {
     private var hasLoadedInitialData = false
 
@@ -112,10 +115,12 @@ class StarredReposViewModel(
                 favouritesRepository.getAllFavorites(),
                 userSessionRepository.getUser(),
                 tweaksRepository.getStarredSortRule(),
-            ) { starred, favorites, user, sortStored ->
+                installedAppsRepository.getAllInstalledApps(),
+            ) { starred, favorites, user, sortStored, apps ->
                 val sortRule = StarredSortRule.fromName(sortStored)
                 val favoriteIds = favorites.map { it.repoId }.toSet()
                 val currentLogin = user?.username
+                val installs = apps.installsByRepo()
 
                 val items =
                     starred.map {
@@ -124,6 +129,7 @@ class StarredReposViewModel(
                             isCurrentUserOwner =
                                 currentLogin != null &&
                                     it.repoOwner.equals(currentLogin, ignoreCase = true),
+                            install = installs[it.repoId],
                         )
                     }
 
@@ -259,6 +265,8 @@ class StarredReposViewModel(
                             latestReleaseUrl = repo.latestReleaseUrl,
                             addedAt = Clock.System.now().toEpochMilliseconds(),
                             lastSyncedAt = Clock.System.now().toEpochMilliseconds(),
+                            stargazersCount = repo.stargazersCount,
+                            platforms = repo.platforms,
                         )
 
                     favouritesRepository.toggleFavorite(favoriteRepo)
