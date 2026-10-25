@@ -8,6 +8,9 @@ data class SystemPackageInfo(
     val signingFingerprint: String?,
     // Null on desktop, which has no installed APK to read.
     val apkPath: String? = null,
+    // PackageManager's install timestamp: it moves on every install, even when the version
+    // fields stay the same, so a park older than this proves the install ran.
+    val lastUpdateTime: Long? = null,
 ) {
     companion object {
         const val UNKNOWN_VERSION_NAME: String = "unknown"

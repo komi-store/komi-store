@@ -23,4 +23,5 @@ val MIGRATIONS: Array<Migration> =
         MIGRATION_17_18,
         MIGRATION_19_20,
         MIGRATION_20_21,
+        MIGRATION_21_22,
     )

@@ -61,6 +61,7 @@ internal class ParkedInstallSettler(
                 .settlePendingFromSystem(
                     versionName = system.versionName,
                     versionCode = system.versionCode,
+                    at = system.lastUpdateTime,
                 ).clearPending()
                 .toEntity(),
         )

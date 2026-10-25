@@ -510,6 +510,9 @@ class InstalledAppsRepositoryImpl(
                             assetId = app.latestAssetId,
                             assetDigest = app.latestAssetDigest,
                             releasePublishedAt = app.latestReleasePublishedAt,
+                            // The caller marks a download it is about to hand to the
+                            // installer, so this is the moment the 24h window starts.
+                            startedAt = System.currentTimeMillis(),
                         )
                     } else {
                         it.clearPending()

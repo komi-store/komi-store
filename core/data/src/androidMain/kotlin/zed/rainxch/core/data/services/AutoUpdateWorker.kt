@@ -222,6 +222,7 @@ class AutoUpdateWorker(
                         assetId = currentApp.latestAssetId,
                         assetDigest = currentApp.latestAssetDigest,
                         releasePublishedAt = currentApp.latestReleasePublishedAt,
+                        startedAt = System.currentTimeMillis(),
                     ).withLatestSnapshot(
                         version = latestVersion,
                         assetName = assetName,

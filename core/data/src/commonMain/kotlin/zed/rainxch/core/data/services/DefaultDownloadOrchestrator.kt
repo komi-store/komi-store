@@ -520,6 +520,9 @@ class DefaultDownloadOrchestrator(
                         assetDigest = spec.asset.digest,
                         releasePublishedAt =
                             app.latestReleasePublishedAt.takeIf { app.latestReleaseId == spec.releaseId },
+                        // The APK is about to be handed to the installer: the 24h settle
+                        // window starts here.
+                        startedAt = System.currentTimeMillis(),
                     ).withLatestSnapshot(
                         version = spec.releaseTag,
                         assetName = spec.asset.name,
@@ -567,6 +570,10 @@ class DefaultDownloadOrchestrator(
             throw e
         } catch (e: Exception) {
             Logger.e(e) { "Orchestrator: failed to persist pending install path" }
+            // Do not announce a park that the DB does not know about: without the path the
+            // row can never be settled and the user sees a pending install that cannot finish.
+            markFailed(spec.packageName, e.message)
+            return
         }
         if (notify) {
             pendingInstallNotifier.notifyPending(
@@ -684,6 +691,15 @@ class DefaultDownloadOrchestrator(
             }
 
             if (entry.stage == DownloadStage.AwaitingInstall) {
+                // Cancelling the park must drop the parked identity and its start time too:
+                // a leftover would be adopted by the next unrelated install.
+                try {
+                    installedAppsRepository.updatePendingStatus(packageName, false)
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (e: Exception) {
+                    Logger.w(e) { "Orchestrator: failed to clear pending identity on cancel" }
+                }
                 try {
                     installedAppsRepository.setPendingInstallFilePath(packageName, null)
                 } catch (e: CancellationException) {
@@ -786,6 +802,15 @@ class DefaultDownloadOrchestrator(
                         Logger.w(e) { "Orchestrator: could not delete finished file $path" }
                     }
                 }
+                // Discarding the park drops the identity and start time with it; a leftover
+                // would be adopted by the next unrelated install.
+                try {
+                    installedAppsRepository.updatePendingStatus(packageName, false)
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (e: Exception) {
+                    Logger.w(e) { "Orchestrator: failed to clear pending identity on discard" }
+                }
             }
         }
     }
@@ -825,6 +850,7 @@ class DefaultDownloadOrchestrator(
         return try {
             installer.ensurePermissionsOrThrow(ext)
             systemInstallSerializer.awaitFreeAndMarkPending(packageName, timeoutMs = 0L)
+            markInstallHandoff(packageName)
             val outcome = installer.install(filePath, ext)
             delegated = outcome == InstallOutcome.DELEGATED_TO_SYSTEM
             adoptUntrackedDownload(entry, filePath, outcome)
@@ -864,6 +890,29 @@ class DefaultDownloadOrchestrator(
         }
     }
 
+    // The APK is about to be handed to the installer: start the settle window from here,
+    // not from the download that may have been deferred for days.
+    private suspend fun markInstallHandoff(packageName: String) {
+        try {
+            val app = installedAppsRepository.getAppByPackage(packageName) ?: return
+            if (!app.isPendingInstall) return
+            installedAppsRepository.updateApp(
+                app.markPending(
+                    releaseId = app.pendingInstallReleaseId,
+                    assetId = app.pendingInstallAssetId,
+                    assetDigest = app.pendingInstallAssetDigest,
+                    releasePublishedAt = app.pendingInstallReleasePublishedAt,
+                    startedAt = System.currentTimeMillis(),
+                ),
+            )
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            Logger.w(e) { "Orchestrator: failed to record the install hand-off for $packageName" }
+        }
+    }
+
+    @Suppress("CyclomaticComplexMethod", "LongMethod", "ReturnCount")
     private suspend fun adoptUntrackedDownload(
         entry: OrchestratedDownload?,
         filePath: String,
@@ -895,9 +944,12 @@ class DefaultDownloadOrchestrator(
                     repoDescription = entry.repoDescription,
                     primaryLanguage = null,
                     repoUrl = "https://${entry.sourceHost ?: "github.com"}/${entry.repoOwner}/${entry.repoName}",
-                    installedVersion = entry.releaseTag,
-                    installedAssetName = entry.assetName,
-                    installedAssetUrl = entry.downloadUrl,
+                    // A pending hand-off has not installed anything yet: keep the target in the
+                    // pending fields and leave the installed identity unset until the system
+                    // proves the package landed.
+                    installedVersion = if (isPending) "" else entry.releaseTag,
+                    installedAssetName = entry.assetName.takeUnless { isPending },
+                    installedAssetUrl = entry.downloadUrl.takeUnless { isPending },
                     latestVersion = null,
                     latestAssetName = null,
                     latestAssetUrl = null,
@@ -913,13 +965,18 @@ class DefaultDownloadOrchestrator(
                     systemArchitecture = installer.detectSystemArchitecture().name,
                     fileExtension = entry.assetName.substringAfterLast('.', ""),
                     isPendingInstall = isPending,
-                    installedVersionName = apkInfo.versionName,
-                    installedVersionCode = apkInfo.versionCode,
-                    installedAssetId = entry.assetId.takeIf { it > 0L },
-                    installedAssetDigest = entry.assetDigest,
+                    installedVersionName = apkInfo.versionName.takeUnless { isPending },
+                    installedVersionCode = if (isPending) 0L else apkInfo.versionCode,
+                    installedAssetId = entry.assetId.takeIf { !isPending && it > 0L },
+                    installedAssetDigest = entry.assetDigest.takeUnless { isPending },
                     pendingInstallFilePath = filePath.takeIf { isPending },
                     pendingInstallVersion = entry.releaseTag.takeIf { isPending },
                     pendingInstallAssetName = entry.assetName.takeIf { isPending },
+                    pendingInstallReleaseId = entry.releaseId.takeIf { isPending },
+                    pendingInstallAssetId = entry.assetId.takeIf { isPending && it > 0L },
+                    pendingInstallAssetDigest = entry.assetDigest.takeIf { isPending },
+                    pendingInstallStartedAt = now.takeIf { isPending },
+                    pendingInstallVersionCode = apkInfo.versionCode.takeIf { isPending },
                     sourceHost = entry.sourceHost,
                 ),
             )

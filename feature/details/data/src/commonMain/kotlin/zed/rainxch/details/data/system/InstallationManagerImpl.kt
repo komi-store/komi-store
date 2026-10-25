@@ -91,6 +91,7 @@ class InstallationManagerImpl(
                 runCatching { tweaksRepository.getIncludePreReleases().first() }
                     .getOrDefault(false)
 
+            val now = System.now().toEpochMilliseconds()
             val installedApp =
                 InstalledApp(
                     packageName = apkInfo.packageName,
@@ -114,9 +115,9 @@ class InstallationManagerImpl(
                     latestAssetSize = null,
                     appName = apkInfo.appName,
                     installSource = InstallSource.THIS_APP,
-                    installedAt = System.now().toEpochMilliseconds(),
-                    lastCheckedAt = System.now().toEpochMilliseconds(),
-                    lastUpdatedAt = System.now().toEpochMilliseconds(),
+                    installedAt = now,
+                    lastCheckedAt = now,
+                    lastUpdatedAt = now,
                     isUpdateAvailable = false,
                     updateCheckEnabled = true,
                     releaseNotes = "",
@@ -142,6 +143,18 @@ class InstallationManagerImpl(
                         params.releaseTag.takeIf { params.pendingInstallFilePath != null },
                     pendingInstallAssetName =
                         params.assetName.takeIf { params.pendingInstallFilePath != null },
+                    pendingInstallReleaseId =
+                        params.releaseId.takeIf { params.pendingInstallFilePath != null },
+                    pendingInstallAssetId =
+                        params.assetId.takeIf { params.pendingInstallFilePath != null },
+                    pendingInstallAssetDigest =
+                        params.assetDigest.takeIf { params.pendingInstallFilePath != null },
+                    pendingInstallReleasePublishedAt =
+                        params.releasePublishedAt.takeIf { params.pendingInstallFilePath != null },
+                    pendingInstallStartedAt =
+                        now.takeIf { params.pendingInstallFilePath != null },
+                    pendingInstallVersionCode =
+                        apkInfo.versionCode.takeIf { params.pendingInstallFilePath != null },
                     sourceHost = params.sourceHost,
                 )
 

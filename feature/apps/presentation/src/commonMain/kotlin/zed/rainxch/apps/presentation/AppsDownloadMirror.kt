@@ -51,11 +51,15 @@ internal fun InstalledApp.markDownloadedUpdate(
     download: OrchestratedDownload,
     versionName: String?,
     versionCode: Long?,
+    // The caller marks the park right before handing the APK to the installer. A deferred
+    // download must pass null so its 24h window has not started yet.
+    startedAt: Long?,
 ): InstalledApp =
     markPending(
         releaseId = download.releaseId,
         assetId = download.assetId,
         assetDigest = download.assetDigest,
+        startedAt = startedAt,
     ).withLatestSnapshot(
         version = download.releaseTag,
         assetName = download.assetName,
