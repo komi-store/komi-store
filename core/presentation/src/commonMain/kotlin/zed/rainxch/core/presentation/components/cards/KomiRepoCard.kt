@@ -46,8 +46,7 @@ import zed.rainxch.core.presentation.components.GitHubStoreImage
 import zed.rainxch.core.presentation.components.chips.KomiChip
 import zed.rainxch.core.presentation.components.chips.KomiChipKind
 import zed.rainxch.core.presentation.components.chips.KomiChipSize
-import zed.rainxch.core.presentation.components.reviews.StarRating
-import zed.rainxch.core.presentation.components.reviews.formatAverage
+import zed.rainxch.core.presentation.components.reviews.CompactRating
 import zed.rainxch.core.presentation.components.surfaces.KomiScreentone
 import zed.rainxch.core.presentation.components.surfaces.KomiSurface
 import zed.rainxch.core.presentation.components.surfaces.KomiSurfaceElevation
@@ -159,19 +158,11 @@ fun KomiRepoCard(
                     }
                     // The review rating sits apart from the stats row, whose star is GitHub stars.
                     if (ratingAverage != null && ratingCount > 0) {
-                        Row(
+                        CompactRating(
+                            average = ratingAverage,
+                            count = ratingCount,
                             modifier = Modifier.padding(top = 4.dp),
-                            horizontalArrangement = Arrangement.spacedBy(5.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                        ) {
-                            StarRating(rating = ratingAverage, starSize = 12.dp)
-                            KomiText(
-                                text = "${formatAverage(ratingAverage)} (${fmtCompact(ratingCount)})",
-                                role = KomiTextRole.Caption,
-                                color = colors.onSurfaceVariant,
-                                maxLines = 1,
-                            )
-                        }
+                        )
                     }
                 }
                 if (!compact) {

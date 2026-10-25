@@ -21,7 +21,10 @@ import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.pluralStringResource
 import org.jetbrains.compose.resources.stringResource
 import zed.rainxch.core.presentation.components.icon.KomiIcon
+import zed.rainxch.core.presentation.components.text.KomiText
+import zed.rainxch.core.presentation.components.text.KomiTextRole
 import zed.rainxch.core.presentation.locals.LocalPersonality
+import zed.rainxch.core.presentation.utils.formatCompactCount
 import zed.rainxch.githubstore.core.presentation.res.Res
 import zed.rainxch.githubstore.core.presentation.res.reviews_rated
 import zed.rainxch.githubstore.core.presentation.res.reviews_stars
@@ -88,6 +91,28 @@ fun StarRatingInput(
                 )
             }
         }
+    }
+}
+
+// Stars plus "4.3 (128)", for a card or list row with no room for the full summary.
+@Composable
+fun CompactRating(
+    average: Double,
+    count: Int,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        modifier = modifier,
+        horizontalArrangement = Arrangement.spacedBy(5.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        StarRating(rating = average, starSize = 12.dp)
+        KomiText(
+            text = "${formatAverage(average)} (${formatCompactCount(count)})",
+            role = KomiTextRole.Caption,
+            color = LocalPersonality.current.colors.onSurfaceVariant,
+            maxLines = 1,
+        )
     }
 }
 

@@ -1806,6 +1806,15 @@ private fun zed.rainxch.core.presentation.components.reviews.Avatar(url: kotlin.
     - placeholder: STABLE (marked @Stable or @Immutable)
 
 @Composable
+public fun zed.rainxch.core.presentation.components.reviews.CompactRating(average: kotlin.Double, count: kotlin.Int, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - average: STABLE (primitive type)
+    - count: STABLE (primitive type)
+    - modifier: STABLE (marked @Stable or @Immutable)
+
+@Composable
 private fun zed.rainxch.core.presentation.components.reviews.ExpandableText(text: kotlin.String): kotlin.Unit
   skippable: true
   restartable: true

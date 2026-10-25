@@ -15,6 +15,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import zed.rainxch.apps.presentation.model.InstalledAppUi
 import zed.rainxch.core.presentation.components.GitHubStoreImage
+import zed.rainxch.core.presentation.components.reviews.CompactRating
 import zed.rainxch.core.presentation.components.text.KomiText
 import zed.rainxch.core.presentation.components.text.KomiTextRole
 import zed.rainxch.core.presentation.locals.LocalPersonality
@@ -23,6 +24,8 @@ import zed.rainxch.core.presentation.locals.LocalPersonality
 fun AppGroupHeader(
     app: InstalledAppUi,
     modifier: Modifier = Modifier,
+    ratingAverage: Double? = null,
+    ratingCount: Int = 0,
 ) {
     val colors = LocalPersonality.current.colors
     val shape = LocalPersonality.current.shape
@@ -53,5 +56,6 @@ fun AppGroupHeader(
         )
 
         app.sourceHost?.let { SourceChip(host = it) }
+        ratingAverage?.let { CompactRating(average = it, count = ratingCount) }
     }
 }

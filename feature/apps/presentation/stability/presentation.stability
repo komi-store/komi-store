@@ -60,12 +60,14 @@ public fun zed.rainxch.apps.presentation.components.AdvancedAppSettingsBottomShe
     - onAction: STABLE (function type)
 
 @Composable
-public fun zed.rainxch.apps.presentation.components.AppGroupHeader(app: zed.rainxch.apps.presentation.model.InstalledAppUi, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+public fun zed.rainxch.apps.presentation.components.AppGroupHeader(app: zed.rainxch.apps.presentation.model.InstalledAppUi, modifier: androidx.compose.ui.Modifier, ratingAverage: kotlin.Double?, ratingCount: kotlin.Int): kotlin.Unit
   skippable: true
   restartable: true
   params:
     - app: STABLE (class with no mutable properties)
     - modifier: STABLE (marked @Stable or @Immutable)
+    - ratingAverage: STABLE (class with no mutable properties)
+    - ratingCount: STABLE (primitive type)
 
 @Composable
 private fun zed.rainxch.apps.presentation.components.AppMenu(appItem: zed.rainxch.apps.presentation.model.AppItem, onAction: kotlin.Function1<zed.rainxch.apps.presentation.AppsAction, kotlin.Unit>): kotlin.Unit
@@ -183,12 +185,14 @@ public fun zed.rainxch.apps.presentation.components.LibraryDownloadRow(download:
     - modifier: STABLE (marked @Stable or @Immutable)
 
 @Composable
-public fun zed.rainxch.apps.presentation.components.LibraryGroup(header: zed.rainxch.apps.presentation.model.InstalledAppUi, modifier: androidx.compose.ui.Modifier, content: @[Composable] @[ExtensionFunctionType] androidx.compose.runtime.internal.ComposableFunction1<androidx.compose.foundation.layout.ColumnScope, kotlin.Unit>): kotlin.Unit
+public fun zed.rainxch.apps.presentation.components.LibraryGroup(header: zed.rainxch.apps.presentation.model.InstalledAppUi, modifier: androidx.compose.ui.Modifier, ratingAverage: kotlin.Double?, ratingCount: kotlin.Int, content: @[Composable] @[ExtensionFunctionType] androidx.compose.runtime.internal.ComposableFunction1<androidx.compose.foundation.layout.ColumnScope, kotlin.Unit>): kotlin.Unit
   skippable: true
   restartable: true
   params:
     - header: STABLE (class with no mutable properties)
     - modifier: STABLE (marked @Stable or @Immutable)
+    - ratingAverage: STABLE (class with no mutable properties)
+    - ratingCount: STABLE (primitive type)
     - content: STABLE (composable function type)
 
 @Composable
@@ -251,12 +255,14 @@ private fun zed.rainxch.apps.presentation.components.MainAction(appItem: zed.rai
     - onAction: STABLE (function type)
 
 @Composable
-private fun zed.rainxch.apps.presentation.components.OwnerLine(owner: kotlin.String?, sourceHost: kotlin.String?): kotlin.Unit
+private fun zed.rainxch.apps.presentation.components.OwnerLine(owner: kotlin.String?, sourceHost: kotlin.String?, ratingAverage: kotlin.Double?, ratingCount: kotlin.Int): kotlin.Unit
   skippable: true
   restartable: true
   params:
     - owner: STABLE (class with no mutable properties)
     - sourceHost: STABLE (class with no mutable properties)
+    - ratingAverage: STABLE (class with no mutable properties)
+    - ratingCount: STABLE (primitive type)
 
 @Composable
 public fun zed.rainxch.apps.presentation.components.PendingDiscardSheet(app: zed.rainxch.apps.presentation.model.InstalledAppUi, onAction: kotlin.Function1<zed.rainxch.apps.presentation.AppsAction, kotlin.Unit>): kotlin.Unit

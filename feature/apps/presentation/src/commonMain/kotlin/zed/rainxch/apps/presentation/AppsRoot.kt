@@ -608,7 +608,8 @@ private fun LibraryGroupItem(
         LibraryAppRow(appItem = single, onAction = onAction, onOpenRepo = { onOpenRepo(single.installedApp) })
         return
     }
-    LibraryGroup(header = group.items.first().installedApp) {
+    val first = group.items.first()
+    LibraryGroup(header = first.installedApp, ratingAverage = first.ratingAverage, ratingCount = first.ratingCount) {
         group.items.forEachIndexed { index, appItem ->
             if (index > 0) LibraryGroupDivider()
             LibraryAppRow(

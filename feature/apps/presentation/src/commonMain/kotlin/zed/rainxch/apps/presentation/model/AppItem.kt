@@ -13,4 +13,6 @@ data class AppItem(
     val idleVersionLabel: String = "",
     val versionTargetVersion: String? = null,
     val isVersionDowngrade: Boolean = false,
+    val ratingAverage: Double? = null,
+    val ratingCount: Int = 0,
 )

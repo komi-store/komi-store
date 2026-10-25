@@ -51,7 +51,10 @@ import zed.rainxch.core.domain.model.installation.InstalledApp
 import zed.rainxch.core.domain.model.installation.InstallerType
 import zed.rainxch.core.domain.network.Downloader
 import zed.rainxch.core.domain.repository.ExternalImportRepository
+import zed.rainxch.core.domain.model.reviews.RepoRating
+import zed.rainxch.core.domain.model.reviews.ReviewTarget
 import zed.rainxch.core.domain.repository.InstalledAppsRepository
+import zed.rainxch.core.domain.repository.ReviewsRepository
 import zed.rainxch.core.domain.repository.TweaksRepository
 import zed.rainxch.core.domain.system.DownloadOrchestrator
 import zed.rainxch.core.domain.system.DownloadSpec
@@ -85,6 +88,7 @@ class AppsViewModel(
     private val downloadOrchestrator: DownloadOrchestrator,
     private val externalImportRepository: ExternalImportRepository,
     private val systemInstallSerializer: SystemInstallSerializer,
+    private val reviewsRepository: ReviewsRepository,
     private val appScope: CoroutineScope,
 ) : ViewModel() {
     companion object {
@@ -102,6 +106,10 @@ class AppsViewModel(
     private var localBannerDismissedAtCount: Int = 0
 
     private var advancedPreviewJob: Job? = null
+
+    private var ratingsByRepo: Map<Long, RepoRating> = emptyMap()
+    private var ratedTargets: Set<ReviewTarget> = emptySet()
+    private var ratingsJob: Job? = null
 
     private val orchestratedStages = mutableMapOf<String, OrchestratorStage>()
 
@@ -237,11 +245,12 @@ class AppsViewModel(
                                         it.installedApp.packageName == app.packageName
                                     }
                                 add(
-                                    app.toAppItem(
-                                        updateState = existing?.updateState ?: UpdateState.Idle,
-                                        downloadProgress = existing?.downloadProgress,
-                                        error = existing?.error,
-                                    ),
+                                    app
+                                        .toAppItem(
+                                            updateState = existing?.updateState ?: UpdateState.Idle,
+                                            downloadProgress = existing?.downloadProgress,
+                                            error = existing?.error,
+                                        ).withRating(ratingsByRepo[app.repoId]),
                                 )
                             }
                         }.sortedWith(appComparator(sortRule))
@@ -261,6 +270,7 @@ class AppsViewModel(
 
                     reapplyOrchestratorStages()
                     filterApps()
+                    refreshRatings(apps)
                 }
             } catch (e: CancellationException) {
                 throw e
@@ -274,6 +284,34 @@ class AppsViewModel(
             autoCheckForUpdatesIfNeeded()
         }
     }
+
+    // Library rows don't come from catalog responses, so their stars come from one summaries call, made
+    // again only when the set of repos changes. A failed call leaves the rows without stars and retries
+    // on the next change.
+    private fun refreshRatings(apps: List<InstalledApp>) {
+        val targets = apps.associate { it.repoId to ReviewTarget(owner = it.repoOwner, name = it.repoName, host = it.sourceHost) }
+        val wanted = targets.values.toSet()
+        if (wanted == ratedTargets) return
+        ratedTargets = wanted
+        ratingsJob?.cancel()
+        ratingsJob =
+            viewModelScope.launch {
+                reviewsRepository
+                    .getSummaries(wanted.toList())
+                    .onSuccess { byTarget ->
+                        ratingsByRepo = targets.mapNotNull { (repoId, target) -> byTarget[target]?.let { repoId to it } }.toMap()
+                        _state.update { st ->
+                            st.copy(
+                                apps = st.apps.map { it.withRating(ratingsByRepo[it.installedApp.repoId]) }.toImmutableList(),
+                            )
+                        }
+                        filterApps()
+                    }.onFailure { ratedTargets = emptySet() }
+            }
+    }
+
+    private fun AppItem.withRating(rating: RepoRating?): AppItem =
+        copy(ratingAverage = rating?.average, ratingCount = rating?.count ?: 0)
 
     private fun autoCheckForUpdatesIfNeeded() {
         val now = System.currentTimeMillis()

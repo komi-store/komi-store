@@ -29,6 +29,7 @@ import zed.rainxch.apps.presentation.model.InstalledAppUi
 import zed.rainxch.core.presentation.components.InstalledAppIcon
 import zed.rainxch.core.presentation.components.dividers.KomiHorizontalDivider
 import zed.rainxch.core.presentation.components.progress.KomiLinearProgress
+import zed.rainxch.core.presentation.components.reviews.CompactRating
 import zed.rainxch.core.presentation.components.surfaces.KomiSurface
 import zed.rainxch.core.presentation.components.text.KomiText
 import zed.rainxch.core.presentation.components.text.KomiTextRole
@@ -60,6 +61,8 @@ data class LibraryRowApp(
     val avatarUrl: String?,
     val apkFilePath: String?,
     val sourceHost: String?,
+    val ratingAverage: Double? = null,
+    val ratingCount: Int = 0,
 )
 
 // Every Library item is this row: the icon, the name, the owner and source, one status line, tags
@@ -128,7 +131,12 @@ private fun LibraryRowContent(
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
-                OwnerLine(owner = app.owner.takeIf { showOwner }, sourceHost = app.sourceHost)
+                OwnerLine(
+                    owner = app.owner.takeIf { showOwner },
+                    sourceHost = app.sourceHost,
+                    ratingAverage = app.ratingAverage.takeIf { showOwner && app.ratingCount > 0 },
+                    ratingCount = app.ratingCount,
+                )
                 KomiText(
                     text = status,
                     role = KomiTextRole.Body,
@@ -183,8 +191,10 @@ private fun LibraryRowContent(
 private fun OwnerLine(
     owner: String?,
     sourceHost: String?,
+    ratingAverage: Double?,
+    ratingCount: Int,
 ) {
-    if (owner == null && sourceHost == null) return
+    if (owner == null && sourceHost == null && ratingAverage == null) return
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(6.dp),
@@ -200,6 +210,7 @@ private fun OwnerLine(
             )
         }
         sourceHost?.let { SourceChip(host = it) }
+        ratingAverage?.let { CompactRating(average = it, count = ratingCount) }
     }
 }
 
@@ -235,12 +246,16 @@ private fun LibraryStatusTone.color(): Color {
 fun LibraryGroup(
     header: InstalledAppUi,
     modifier: Modifier = Modifier,
+    ratingAverage: Double? = null,
+    ratingCount: Int = 0,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     KomiSurface(modifier = modifier.fillMaxWidth()) {
         Column {
             AppGroupHeader(
                 app = header,
+                ratingAverage = ratingAverage.takeIf { ratingCount > 0 },
+                ratingCount = ratingCount,
                 modifier = Modifier.padding(start = 14.dp, end = 14.dp, top = 12.dp, bottom = 2.dp),
             )
             content()

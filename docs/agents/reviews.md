@@ -198,7 +198,7 @@ Behaviour:
 - **Details:** a Ratings & reviews section with the summary, the top 3 reviews, Write a review (opens the screen with the composer, prefilled with the installed version, else the selected release, and the monorepo app label) and See all. It's hidden while the backend can't be reached, and Write is hidden for the repo's owner.
 - **Full screen:** sort and star filter with paging; the viewer's own review is pinned on top (the public list is a CDN copy that can lag a write) and says when a moderator hid it; helpful votes are optimistic; report and reply sheets.
 - **Moderation screen** (`GithubStoreGraph.ReviewModerationScreen`), opened from the Reviews top bar when `isModerator`: the Reported and Hidden queues, with hide, dismiss, unhide, delete and ban.
-- **Later:** stars on cards (catalog cards from `rating`, Library rows from `/reviews/summaries`).
+- **Stars on cards:** `CompactRating` (stars plus "4.3 (128)") sits under the owner line of `KomiRepoCard`, apart from the stats row, whose star is GitHub stars. Catalog cards read `rating` through `GithubRepoSummary.rating` and the Home cache; Library rows and group headers read one `/reviews/summaries` call from `AppsViewModel`, made again only when the set of repos changes.
 
 ## Rollout
 

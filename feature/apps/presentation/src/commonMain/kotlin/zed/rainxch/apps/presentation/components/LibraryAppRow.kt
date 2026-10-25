@@ -70,6 +70,8 @@ fun LibraryAppRow(
                 avatarUrl = app.repoOwnerAvatarUrl,
                 apkFilePath = app.pendingInstallFilePath,
                 sourceHost = app.sourceHost,
+                ratingAverage = appItem.ratingAverage,
+                ratingCount = appItem.ratingCount,
             ),
         status = status,
         statusTone = tone,
