@@ -223,7 +223,7 @@
     <string name="rate_limit_used_all">%1$d개의 API 요청을 모두 사용했습니다.</string>
     <string name="rate_limit_used_all_free">%1$d개의 무료 API 요청을 모두 사용했습니다.</string>
     <string name="rate_limit_resets_in_minutes">%1$d분 후 초기화</string>
-    <string name="rate_limit_tip_sign_in">💡 로그인하면 시간당 60회 대신 5,000회 요청을 사용할 수 있습니다!</string>
+    <string name="rate_limit_tip_sign_in">로그인하면 시간당 60회 대신 5,000회 요청을 사용할 수 있습니다!</string>
     <string name="rate_limit_sign_in">로그인</string>
     <string name="rate_limit_ok">확인</string>
     <string name="rate_limit_close">닫기</string>
@@ -909,8 +909,7 @@
     <string name="apk_inspect_title">APK 검사</string>
     <string name="apk_inspect_version_code">버전</string>
     <string name="apps_compact_more_actions">%1$s에 대한 추가 작업</string>
-    <string name="apps_menu_item_active">%1$s  ✓</string>
-    <string name="apps_version_update">%1$s → %2$s</string>
+    <string name="apps_version_update_cd">%1$s에서 %2$s(으)로</string>
     <string name="apps_version_dated">%1$s (%2$s)</string>
     <string name="apps_variant_subtitle">%1$s  ·  %2$s</string>
     <string name="apps_section_header_cd">%1$s, %2$d, %3$s</string>
@@ -1001,7 +1000,7 @@
     <string name="starred_picker_resume">재개</string>
     <string name="starred_picker_search_hint">소유자 / 저장소 / 설명 검색</string>
     <string name="starred_picker_sign_in_required">별표한 저장소를 보려면 GitHub에 로그인하세요.</string>
-    <string name="starred_picker_sort_alphabetical">A → Z</string>
+    <string name="starred_picker_sort_alphabetical">A부터 Z까지</string>
     <string name="starred_picker_sort_recent">최근 별표</string>
     <string name="starred_picker_sort_stars">별표 많은 순</string>
     <string name="starred_picker_star_dedup_tooltip">GitHub에서 별표를 해제해도 앱 추적이 해제되지는 않습니다.</string>
@@ -1202,7 +1201,7 @@
     <string name="translation_card_title">번역</string>
     <string name="translation_card_translate_to">%1$s(으)로 번역</string>
     <string name="translation_deepl_auth_key">인증 키</string>
-    <string name="translation_deepl_get_free_key">무료 DeepL 키 받기 →</string>
+    <string name="translation_deepl_get_free_key">무료 DeepL 키 받기</string>
     <string name="translation_deepl_help">deepl.com/pro-api에서 가입하세요. 무료 등급 키는 :fx로 끝나며 무료 엔드포인트를 자동으로 사용합니다. Pro 등급은 텍스트를 비공개로 유지합니다. 무료 등급은 제출된 텍스트를 모델 개선에 사용할 수 있습니다.</string>
     <string name="translation_deepl_save">키 저장</string>
     <string name="translation_deepl_saved">DeepL 키가 저장되었습니다</string>
@@ -1211,7 +1210,7 @@
     <string name="translation_libre_help">번들된 Disroot 미러를 통해 기본으로 동작합니다 — 필드를 비워두면 사용됩니다. 더 강한 프라이버시를 원하면 자체 호스팅 URL을 붙여넣으세요. API 키는 인스턴스에서 요구하는 경우에만 필요합니다.</string>
     <string name="translation_libre_save">설정 저장</string>
     <string name="translation_libre_saved">LibreTranslate 설정이 저장되었습니다</string>
-    <string name="translation_microsoft_get_free_key">무료 Azure 키 받기 →</string>
+    <string name="translation_microsoft_get_free_key">무료 Azure 키 받기</string>
     <string name="translation_microsoft_help">Azure Translator는 프라이버시를 존중합니다 (기본 No-Trace — 텍스트가 저장되거나 학습에 사용되지 않습니다). 무료 등급은 월 200만 자를 제공합니다. 지역은 글로벌이 아닌 리소스에만 필요합니다.</string>
     <string name="translation_microsoft_key">구독 키</string>
     <string name="translation_microsoft_region">지역 (예: westeurope, 글로벌은 비워두세요)</string>
@@ -1558,7 +1557,6 @@
     <string name="reviews_sort_newest">최신순</string>
     <string name="reviews_sort_highest">평점 높은 순</string>
     <string name="reviews_sort_lowest">평점 낮은 순</string>
-    <string name="reviews_filter_stars">%1$d★</string>
     <string name="reviews_hidden_notice">운영자가 이 리뷰를 숨겼습니다. 나만 볼 수 있으며 평점에 반영되지 않습니다.</string>
     <string name="reviews_composer_title_new">이 앱 평가하기</string>
     <string name="reviews_composer_title_edit">내 리뷰 수정</string>

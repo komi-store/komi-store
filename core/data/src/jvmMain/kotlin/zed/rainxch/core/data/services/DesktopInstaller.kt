@@ -545,7 +545,7 @@ class DesktopInstaller(
 
                 showFlatpakNotification(
                     title = "AppImage Downloaded",
-                    message = "Right-click → Properties → mark as executable, then double-click to run.",
+                    message = "Open its Properties, mark it as executable, then double-click it to run.",
                 )
 
                 openInFileManager(file)

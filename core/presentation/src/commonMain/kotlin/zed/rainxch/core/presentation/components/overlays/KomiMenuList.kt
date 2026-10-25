@@ -34,6 +34,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.toggleableState
+import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import kotlinx.collections.immutable.ImmutableList
@@ -165,7 +168,14 @@ private fun ClassicMenuItem(
             onClick = onClick,
             text = text,
             shape = shapes.shape,
+            modifier = Modifier.checkedState(item.checked),
             leadingIcon = leadingIcon,
+            trailingIcon =
+                if (item.checked == true) {
+                    { Icon(imageVector = Icons.Rounded.Check, contentDescription = null, modifier = Modifier.size(MenuIconSize)) }
+                } else {
+                    null
+                },
             enabled = item.enabled,
             colors =
                 if (item.tone == KomiMenuTone.Danger) {
@@ -233,6 +243,7 @@ private fun MangaMenuRow(
         modifier =
             Modifier
                 .fillMaxWidth()
+                .checkedState(item.checked)
                 .heightIn(min = 40.dp)
                 .hoverable(interaction, enabled = item.enabled)
                 .inkFocusRing(focused = { focused }, color = colors.primary)
@@ -272,7 +283,7 @@ private fun MangaMenuRow(
                 )
             }
         }
-        if (selected) {
+        if (selected || item.checked == true) {
             Icon(
                 imageVector = Icons.Default.Check,
                 contentDescription = null,
@@ -282,6 +293,9 @@ private fun MangaMenuRow(
         }
     }
 }
+
+private fun Modifier.checkedState(checked: Boolean?): Modifier =
+    if (checked == null) this else semantics { toggleableState = ToggleableState(checked) }
 
 // Material's menu icon size; custom vectors would otherwise draw at their own size.
 private val MenuIconSize = 24.dp

@@ -4,12 +4,12 @@ import org.jetbrains.compose.resources.getString
 import zed.rainxch.apps.presentation.model.AppItem
 import zed.rainxch.apps.presentation.model.InstalledAppUi
 import zed.rainxch.apps.presentation.model.UpdateState
+import zed.rainxch.apps.presentation.model.VersionLabel
 import zed.rainxch.apps.presentation.resolveVersionLine
 import zed.rainxch.core.presentation.utils.formatEpochDate
 import zed.rainxch.core.presentation.utils.formatIsoDateOrRaw
 import zed.rainxch.githubstore.core.presentation.res.Res
 import zed.rainxch.githubstore.core.presentation.res.apps_version_dated
-import zed.rainxch.githubstore.core.presentation.res.apps_version_update
 
 fun computeIsBusy(
     isPendingInstall: Boolean,
@@ -77,7 +77,7 @@ private suspend fun buildVersionLabel(
     targetVersion: String?,
     targetPublishedAt: String?,
     lastUpdatedAt: Long,
-): String {
+): VersionLabel {
     val displayDate =
         if (targetVersion != null) {
             // Release publish times can arrive as a bare date. Formatting one through the local
@@ -88,16 +88,17 @@ private suspend fun buildVersionLabel(
             formatEpochDate(lastUpdatedAt)
         }
 
-    val base =
-        if (targetVersion != null) {
-            getString(Res.string.apps_version_update, installedVersion, targetVersion)
+    val base = targetVersion ?: installedVersion
+    val dated =
+        if (displayDate != null) {
+            getString(Res.string.apps_version_dated, base, displayDate)
         } else {
-            installedVersion
+            base
         }
 
-    return if (displayDate != null) {
-        getString(Res.string.apps_version_dated, base, displayDate)
+    return if (targetVersion != null) {
+        VersionLabel(text = installedVersion, target = dated)
     } else {
-        base
+        VersionLabel(text = dated)
     }
 }

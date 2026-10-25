@@ -224,7 +224,7 @@
     <string name="rate_limit_used_all">Tüm %1$d API isteklerini kullandınız.</string>
     <string name="rate_limit_used_all_free">Tüm %1$d ücretsiz API isteğinizi kullandınız.</string>
     <string name="rate_limit_resets_in_minutes">%1$d dakika içinde yenilenir</string>
-    <string name="rate_limit_tip_sign_in">💡 Saat başı 60 yerine 5.000 istek için giriş yapın!</string>
+    <string name="rate_limit_tip_sign_in">Saat başı 60 yerine 5.000 istek için giriş yapın!</string>
     <string name="rate_limit_sign_in">Giriş Yap</string>
     <string name="rate_limit_ok">Tamam</string>
     <string name="rate_limit_close">Kapat</string>
@@ -918,8 +918,7 @@
     <string name="apk_inspect_title">APK İncele</string>
     <string name="apk_inspect_version_code">Sürüm</string>
     <string name="apps_compact_more_actions">%1$s için diğer işlemler</string>
-    <string name="apps_menu_item_active">%1$s  ✓</string>
-    <string name="apps_version_update">%1$s → %2$s</string>
+    <string name="apps_version_update_cd">%1$s sürümünden %2$s sürümüne</string>
     <string name="apps_version_dated">%1$s (%2$s)</string>
     <string name="apps_variant_subtitle">%1$s  ·  %2$s</string>
     <string name="apps_section_header_cd">%1$s, %2$d, %3$s</string>
@@ -1010,7 +1009,7 @@
     <string name="starred_picker_resume">Sürdür</string>
     <string name="starred_picker_search_hint">Sahip / repo / açıklama ara</string>
     <string name="starred_picker_sign_in_required">Yıldızlı repolarınızı görmek için GitHub'a giriş yapın.</string>
-    <string name="starred_picker_sort_alphabetical">A → Z</string>
+    <string name="starred_picker_sort_alphabetical">A'dan Z'ye</string>
     <string name="starred_picker_sort_recent">Son yıldızlananlar</string>
     <string name="starred_picker_sort_stars">En çok yıldız</string>
     <string name="starred_picker_star_dedup_tooltip">GitHub'da yıldızı kaldırmak uygulamanın takibini bırakmaz.</string>
@@ -1218,7 +1217,7 @@
     <string name="translation_card_title">Çevir</string>
     <string name="translation_card_translate_to">%1$s diline çevir</string>
     <string name="translation_deepl_auth_key">Yetkilendirme anahtarı</string>
-    <string name="translation_deepl_get_free_key">Ücretsiz DeepL anahtarı alın →</string>
+    <string name="translation_deepl_get_free_key">Ücretsiz DeepL anahtarı alın</string>
     <string name="translation_deepl_help">deepl.com/pro-api adresinden kaydolun. Ücretsiz anahtarlar :fx ile biter ve otomatik olarak ücretsiz uç noktayı kullanır. Pro katmanı metninizi gizli tutar; Ücretsiz katman gönderilen metni model geliştirmek için kullanabilir.</string>
     <string name="translation_deepl_save">Anahtarı kaydet</string>
     <string name="translation_deepl_saved">DeepL anahtarı kaydedildi</string>
@@ -1227,7 +1226,7 @@
     <string name="translation_libre_help">Public Disroot aynası aracılığıyla kutudan çıkar çıkmaz çalışır — kullanmak için alanları boş bırakın. Daha fazla gizlilik için kendi self-hosted URL'nizi yapıştırın. API anahtarı yalnızca sunucu istiyorsa gereklidir.</string>
     <string name="translation_libre_save">Ayarları kaydet</string>
     <string name="translation_libre_saved">LibreTranslate ayarları kaydedildi</string>
-    <string name="translation_microsoft_get_free_key">Ücretsiz Azure anahtarı alın →</string>
+    <string name="translation_microsoft_get_free_key">Ücretsiz Azure anahtarı alın</string>
     <string name="translation_microsoft_help">Azure Translator gizliliğe saygılıdır (varsayılan olarak No-Trace — metniniz asla saklanmaz veya eğitim için kullanılmaz). Ücretsiz katman aylık 2M karakteri kapsar. Bölge yalnızca global olmayan kaynaklar için gereklidir.</string>
     <string name="translation_microsoft_key">Abonelik anahtarı</string>
     <string name="translation_microsoft_region">Bölge (ör. westeurope, Global için boş bırakın)</string>
@@ -1571,7 +1570,6 @@
     <string name="reviews_sort_newest">En yeni</string>
     <string name="reviews_sort_highest">En yüksek puan</string>
     <string name="reviews_sort_lowest">En düşük puan</string>
-    <string name="reviews_filter_stars">%1$d★</string>
     <string name="reviews_hidden_notice">Bir moderatör bu yorumu gizledi. Yalnızca siz görebilirsiniz ve puana dahil edilmez.</string>
     <string name="reviews_composer_title_new">Bu uygulamayı puanlayın</string>
     <string name="reviews_composer_title_edit">Yorumunuzu düzenleyin</string>

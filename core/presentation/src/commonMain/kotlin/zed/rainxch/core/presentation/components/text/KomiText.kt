@@ -2,6 +2,7 @@ package zed.rainxch.core.presentation.components.text
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.text.InlineTextContent
 import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -14,6 +15,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import kotlinx.collections.immutable.ImmutableMap
+import kotlinx.collections.immutable.persistentMapOf
 import zed.rainxch.core.presentation.locals.LocalPersonality
 import zed.rainxch.core.presentation.locals.appLocale
 import zed.rainxch.core.presentation.personality.classicPersonality
@@ -56,6 +59,7 @@ fun KomiText(
     maxLines: Int = Int.MAX_VALUE,
     overflow: TextOverflow = TextOverflow.Clip,
     textAlign: TextAlign? = null,
+    inlineContent: ImmutableMap<String, InlineTextContent> = persistentMapOf(),
     onTextLayout: ((TextLayoutResult) -> Unit)? = null,
 ) {
     val personality = LocalPersonality.current
@@ -66,6 +70,7 @@ fun KomiText(
         maxLines = maxLines,
         overflow = overflow,
         textAlign = textAlign,
+        inlineContent = inlineContent,
         onTextLayout = onTextLayout ?: {},
         style = role.style(personality.type),
     )

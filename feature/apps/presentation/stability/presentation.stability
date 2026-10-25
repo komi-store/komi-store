@@ -203,13 +203,12 @@ public fun zed.rainxch.apps.presentation.components.LibraryGroupDivider(modifier
     - modifier: STABLE (marked @Stable or @Immutable)
 
 @Composable
-public fun zed.rainxch.apps.presentation.components.LibraryRow(app: zed.rainxch.apps.presentation.components.LibraryRowApp, status: kotlin.String, statusTone: zed.rainxch.apps.presentation.components.LibraryStatusTone, onClick: kotlin.Function0<kotlin.Unit>?, modifier: androidx.compose.ui.Modifier, tags: kotlinx.collections.immutable.ImmutableList<kotlin.String>, progress: zed.rainxch.apps.presentation.components.LibraryProgress?, framed: kotlin.Boolean, actions: @[Composable] @[ExtensionFunctionType] androidx.compose.runtime.internal.ComposableFunction1<androidx.compose.foundation.layout.RowScope, kotlin.Unit>): kotlin.Unit
+public fun zed.rainxch.apps.presentation.components.LibraryRow(app: zed.rainxch.apps.presentation.components.LibraryRowApp, status: zed.rainxch.apps.presentation.components.LibraryStatus, onClick: kotlin.Function0<kotlin.Unit>?, modifier: androidx.compose.ui.Modifier, tags: kotlinx.collections.immutable.ImmutableList<kotlin.String>, progress: zed.rainxch.apps.presentation.components.LibraryProgress?, framed: kotlin.Boolean, actions: @[Composable] @[ExtensionFunctionType] androidx.compose.runtime.internal.ComposableFunction1<androidx.compose.foundation.layout.RowScope, kotlin.Unit>): kotlin.Unit
   skippable: true
   restartable: true
   params:
     - app: STABLE (class with no mutable properties)
-    - status: STABLE (String is immutable)
-    - statusTone: STABLE (class with no mutable properties)
+    - status: STABLE (class with no mutable properties)
     - onClick: STABLE (function type)
     - modifier: STABLE (marked @Stable or @Immutable)
     - tags: STABLE (known stable type)
@@ -218,13 +217,12 @@ public fun zed.rainxch.apps.presentation.components.LibraryRow(app: zed.rainxch.
     - actions: STABLE (composable function type)
 
 @Composable
-private fun zed.rainxch.apps.presentation.components.LibraryRowContent(app: zed.rainxch.apps.presentation.components.LibraryRowApp, status: kotlin.String, statusTone: zed.rainxch.apps.presentation.components.LibraryStatusTone, tags: kotlinx.collections.immutable.ImmutableList<kotlin.String>, progress: zed.rainxch.apps.presentation.components.LibraryProgress?, showOwner: kotlin.Boolean, actions: @[Composable] @[ExtensionFunctionType] androidx.compose.runtime.internal.ComposableFunction1<androidx.compose.foundation.layout.RowScope, kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+private fun zed.rainxch.apps.presentation.components.LibraryRowContent(app: zed.rainxch.apps.presentation.components.LibraryRowApp, status: zed.rainxch.apps.presentation.components.LibraryStatus, tags: kotlinx.collections.immutable.ImmutableList<kotlin.String>, progress: zed.rainxch.apps.presentation.components.LibraryProgress?, showOwner: kotlin.Boolean, actions: @[Composable] @[ExtensionFunctionType] androidx.compose.runtime.internal.ComposableFunction1<androidx.compose.foundation.layout.RowScope, kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
   skippable: true
   restartable: true
   params:
     - app: STABLE (class with no mutable properties)
-    - status: STABLE (String is immutable)
-    - statusTone: STABLE (class with no mutable properties)
+    - status: STABLE (class with no mutable properties)
     - tags: STABLE (known stable type)
     - progress: UNKNOWN (interface or non-final class; concrete implementation unknown)
     - showOwner: STABLE (primitive type)
@@ -345,6 +343,14 @@ public fun zed.rainxch.apps.presentation.components.SourceChip(host: kotlin.Stri
     - modifier: STABLE (marked @Stable or @Immutable)
 
 @Composable
+private fun zed.rainxch.apps.presentation.components.StatusLine(status: zed.rainxch.apps.presentation.components.LibraryStatus, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - status: STABLE (class with no mutable properties)
+    - modifier: STABLE (marked @Stable or @Immutable)
+
+@Composable
 private fun zed.rainxch.apps.presentation.components.SuggestionRow(suggestion: zed.rainxch.core.domain.system.RepoMatchSuggestion, onClick: kotlin.Function0<kotlin.Unit>): kotlin.Unit
   skippable: true
   restartable: true
@@ -430,7 +436,7 @@ private fun zed.rainxch.apps.presentation.components.menuEntries(appItem: zed.ra
     - appItem: UNKNOWN (interface or non-final class; concrete implementation unknown)
 
 @Composable
-private fun zed.rainxch.apps.presentation.components.readyStatus(): kotlin.Pair<kotlin.String, zed.rainxch.apps.presentation.components.LibraryStatusTone>
+private fun zed.rainxch.apps.presentation.components.readyStatus(): zed.rainxch.apps.presentation.components.LibraryStatus
   skippable: false
   restartable: false
   params:
@@ -443,13 +449,13 @@ private fun zed.rainxch.apps.presentation.components.staleStatus(app: zed.rainxc
     - app: STABLE (class with no mutable properties)
 
 @Composable
-private fun zed.rainxch.apps.presentation.components.status(): kotlin.Pair<kotlin.String, zed.rainxch.apps.presentation.components.LibraryStatusTone>
+private fun zed.rainxch.apps.presentation.components.status(): zed.rainxch.apps.presentation.components.LibraryStatus
   skippable: false
   restartable: false
   params:
 
 @Composable
-private fun zed.rainxch.apps.presentation.components.status(installedVersion: kotlin.String?): kotlin.Pair<kotlin.String, zed.rainxch.apps.presentation.components.LibraryStatusTone>
+private fun zed.rainxch.apps.presentation.components.status(installedVersion: kotlin.String?): zed.rainxch.apps.presentation.components.LibraryStatus
   skippable: false
   restartable: false
   params:
@@ -460,13 +466,6 @@ private fun zed.rainxch.apps.presentation.components.tags(): kotlinx.collections
   skippable: false
   restartable: false
   params:
-
-@Composable
-private fun zed.rainxch.apps.presentation.components.versionText(installedVersion: kotlin.String?): kotlin.String
-  skippable: false
-  restartable: false
-  params:
-    - installedVersion: STABLE (class with no mutable properties)
 
 @Composable
 public fun zed.rainxch.apps.presentation.import.ExternalImportRoot(onNavigateBack: kotlin.Function0<kotlin.Unit>, onNavigateToDetails: kotlin.Function1<@[ParameterName(name = \, onAddManually: kotlin.Function0<kotlin.Unit>, viewModel: zed.rainxch.apps.presentation.import.ExternalImportViewModel): kotlin.Unit

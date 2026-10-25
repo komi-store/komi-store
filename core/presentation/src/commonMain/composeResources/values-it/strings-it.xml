@@ -225,7 +225,7 @@
     <string name="rate_limit_used_all">Hai usato tutte le %1$d richieste API.</string>
     <string name="rate_limit_used_all_free">Hai usato tutte le %1$d richieste API gratuite.</string>
     <string name="rate_limit_resets_in_minutes">Si resetta tra %1$d minuti</string>
-    <string name="rate_limit_tip_sign_in">💡 Effettua l'accesso per ottenere 5,000 richieste all'ora invece di 60!</string>
+    <string name="rate_limit_tip_sign_in">Effettua l'accesso per ottenere 5,000 richieste all'ora invece di 60!</string>
     <string name="rate_limit_sign_in">Accesso</string>
     <string name="rate_limit_ok">OK</string>
     <string name="rate_limit_close">Chiudi</string>
@@ -921,8 +921,7 @@
     <string name="apk_inspect_title">Ispezione APK</string>
     <string name="apk_inspect_version_code">Versione</string>
     <string name="apps_compact_more_actions">Altre azioni per %1$s</string>
-    <string name="apps_menu_item_active">%1$s  ✓</string>
-    <string name="apps_version_update">%1$s → %2$s</string>
+    <string name="apps_version_update_cd">%1$s a %2$s</string>
     <string name="apps_version_dated">%1$s (%2$s)</string>
     <string name="apps_variant_subtitle">%1$s  ·  %2$s</string>
     <string name="apps_section_header_cd">%1$s, %2$d, %3$s</string>
@@ -1013,7 +1012,7 @@
     <string name="starred_picker_resume">Riprendi</string>
     <string name="starred_picker_search_hint">Cerca proprietario / repo / descrizione</string>
     <string name="starred_picker_sign_in_required">Accedi a GitHub per vedere i tuoi repo preferiti.</string>
-    <string name="starred_picker_sort_alphabetical">A → Z</string>
+    <string name="starred_picker_sort_alphabetical">Dalla A alla Z</string>
     <string name="starred_picker_sort_recent">Recentemente preferiti</string>
     <string name="starred_picker_sort_stars">Più stelle</string>
     <string name="starred_picker_star_dedup_tooltip">Rimuovere la stella su GitHub non smetterà di tracciare l'app.</string>
@@ -1217,7 +1216,7 @@
     <string name="translation_card_title">Traduci</string>
     <string name="translation_card_translate_to">Traduci in %1$s</string>
     <string name="translation_deepl_auth_key">Auth key</string>
-    <string name="translation_deepl_get_free_key">Ottieni una key DeepL gratuita →</string>
+    <string name="translation_deepl_get_free_key">Ottieni una key DeepL gratuita</string>
     <string name="translation_deepl_help">Registrati su deepl.com/pro-api. Le key del piano gratuito finiscono con :fx e usano automaticamente l'endpoint free. Il piano Pro mantiene privato il tuo testo; il piano Free potrebbe usare il testo inviato per migliorare i modelli.</string>
     <string name="translation_deepl_save">Salva key</string>
     <string name="translation_deepl_saved">Key DeepL salvata</string>
@@ -1226,7 +1225,7 @@
     <string name="translation_libre_help">Funziona subito tramite il mirror pubblico Disroot — lascia i campi vuoti per usarlo. Per maggiore privacy, incolla l'URL della tua istanza self-hosted. La API key serve solo se l'istanza lo richiede.</string>
     <string name="translation_libre_save">Salva impostazioni</string>
     <string name="translation_libre_saved">Impostazioni LibreTranslate salvate</string>
-    <string name="translation_microsoft_get_free_key">Ottieni una key Azure gratuita →</string>
+    <string name="translation_microsoft_get_free_key">Ottieni una key Azure gratuita</string>
     <string name="translation_microsoft_help">Azure Translator rispetta la privacy (No-Trace per impostazione predefinita — il testo non viene mai memorizzato né usato per l'addestramento). Il piano gratuito copre 2M di caratteri al mese. La regione serve solo per risorse non globali.</string>
     <string name="translation_microsoft_key">Subscription key</string>
     <string name="translation_microsoft_region">Regione (es. westeurope, lascia vuoto per Global)</string>
@@ -1574,7 +1573,6 @@
     <string name="reviews_sort_newest">Più recenti</string>
     <string name="reviews_sort_highest">Valutazione più alta</string>
     <string name="reviews_sort_lowest">Valutazione più bassa</string>
-    <string name="reviews_filter_stars">%1$d★</string>
     <string name="reviews_hidden_notice">Un moderatore ha nascosto questa recensione. Solo tu puoi vederla e non conta nella valutazione.</string>
     <string name="reviews_composer_title_new">Valuta questa app</string>
     <string name="reviews_composer_title_edit">Modifica la tua recensione</string>

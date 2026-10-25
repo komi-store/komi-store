@@ -138,6 +138,7 @@ class FooViewModel(
 
 - All user-visible text comes from `Res.string`, content descriptions included. Bad: [KomiChip.kt:255](https://github.com/komi-store/komi-store/blob/cfa6bd30e6b35cbbc369d78a4599182a9a66beac/core/presentation/src/commonMain/kotlin/zed/rainxch/core/presentation/components/chips/KomiChip.kt#L255). **[review]**
 - Counts use `<plurals>`, not "(s)". **[review]**
+- No emoji or symbol glyphs (💡, ✓, ★, →) in user-visible text. Use an icon: a Material icon or a vector, as inline content when it sits inside text. Screen readers get words ("1.0 to 1.1", "3 stars"), and so do notifications, which can't hold icons. **[review]**
 - Toggles and selectable rows set `Role` and `stateDescription`; error states announce themselves with `liveRegion`. **[review]**
 - New keys go into the default `strings.xml` with a feature prefix (`tweaks_...`). **[review]**
 

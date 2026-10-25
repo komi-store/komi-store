@@ -19,7 +19,6 @@ import zed.rainxch.core.presentation.components.buttons.KomiIconButtonSize
 import zed.rainxch.core.presentation.utils.formatFileSize
 import zed.rainxch.core.presentation.utils.rememberTapCooldown
 import zed.rainxch.githubstore.core.presentation.res.Res
-import zed.rainxch.githubstore.core.presentation.res.apps_version_update
 import zed.rainxch.githubstore.core.presentation.res.delete_task
 import zed.rainxch.githubstore.core.presentation.res.dismiss
 import zed.rainxch.githubstore.core.presentation.res.download_failed
@@ -48,7 +47,7 @@ fun LibraryDownloadRow(
     onOpenRepo: (() -> Unit)?,
     modifier: Modifier = Modifier,
 ) {
-    val (status, tone) = download.status(installedVersion)
+    val status = download.status(installedVersion)
     LibraryRow(
         app =
             LibraryRowApp(
@@ -60,7 +59,6 @@ fun LibraryDownloadRow(
                 sourceHost = download.sourceHost,
             ),
         status = status,
-        statusTone = tone,
         onClick = onOpenRepo,
         modifier = modifier,
         progress = download.progress(),
@@ -78,42 +76,43 @@ fun LibraryDownloadRow(
 }
 
 @Composable
-private fun OrchestratedDownload.status(installedVersion: String?): Pair<String, LibraryStatusTone> =
+private fun OrchestratedDownload.status(installedVersion: String?): LibraryStatus =
     when (stage) {
         DownloadStage.Queued, DownloadStage.Downloading -> {
-            "${stringResource(Res.string.downloading)} · ${sizeLabel()}" to LibraryStatusTone.Plain
+            LibraryStatus("${stringResource(Res.string.downloading)} · ${sizeLabel()}", LibraryStatusTone.Plain)
         }
 
         DownloadStage.Paused -> {
-            "${stringResource(Res.string.paused)} · ${sizeLabel()}" to LibraryStatusTone.Plain
+            LibraryStatus("${stringResource(Res.string.paused)} · ${sizeLabel()}", LibraryStatusTone.Plain)
         }
 
         DownloadStage.Installing -> {
-            "${stringResource(Res.string.installing)} · $releaseTag" to LibraryStatusTone.Plain
+            LibraryStatus("${stringResource(Res.string.installing)} · $releaseTag", LibraryStatusTone.Plain)
         }
 
         DownloadStage.AwaitingInstall -> {
-            val version = versionText(installedVersion)
+            val ready = stringResource(Res.string.ready_to_install)
+            val size = formatFileSize(assetSize)
             val tone = if (isVersionDowngrade(installedVersion, releaseTag)) LibraryStatusTone.Downgrade else LibraryStatusTone.Accent
-            "${stringResource(Res.string.ready_to_install)} · $version · ${formatFileSize(assetSize)}" to tone
+            if (installedVersion.isNullOrBlank()) {
+                LibraryStatus("$ready · $releaseTag · $size", tone)
+            } else {
+                LibraryStatus("$ready · $installedVersion", tone, "$releaseTag · $size")
+            }
         }
 
         DownloadStage.Failed -> {
             val message = errorMessage ?: stringResource(Res.string.download_failed)
-            stringResource(Res.string.error_with_message, message) to LibraryStatusTone.Error
+            LibraryStatus(stringResource(Res.string.error_with_message, message), LibraryStatusTone.Error)
         }
 
         DownloadStage.Completed, DownloadStage.Cancelled -> {
-            versionText(installedVersion) to LibraryStatusTone.Plain
+            if (installedVersion.isNullOrBlank()) {
+                LibraryStatus(releaseTag, LibraryStatusTone.Plain)
+            } else {
+                LibraryStatus(installedVersion, LibraryStatusTone.Plain, releaseTag)
+            }
         }
-    }
-
-@Composable
-private fun OrchestratedDownload.versionText(installedVersion: String?): String =
-    if (installedVersion.isNullOrBlank()) {
-        releaseTag
-    } else {
-        stringResource(Res.string.apps_version_update, installedVersion, releaseTag)
     }
 
 private fun OrchestratedDownload.sizeLabel(): String {

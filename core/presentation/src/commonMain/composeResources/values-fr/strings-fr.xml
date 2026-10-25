@@ -175,7 +175,7 @@
     <string name="rate_limit_used_all">Vous avez utilisé les %1$d requêtes API.</string>
     <string name="rate_limit_used_all_free">Vous avez utilisé les %1$d requêtes API gratuites.</string>
     <string name="rate_limit_resets_in_minutes">Réinitialisation dans %1$d minutes</string>
-    <string name="rate_limit_tip_sign_in">💡 Connectez-vous pour obtenir 5 000 requêtes par heure au lieu de 60 !</string>
+    <string name="rate_limit_tip_sign_in">Connectez-vous pour obtenir 5 000 requêtes par heure au lieu de 60 !</string>
     <string name="rate_limit_sign_in">Se connecter</string>
     <string name="rate_limit_ok">OK</string>
     <string name="rate_limit_close">Fermer</string>
@@ -888,8 +888,7 @@
     <string name="apk_inspect_title">Inspection APK</string>
     <string name="apk_inspect_version_code">Version</string>
     <string name="apps_compact_more_actions">Plus d'actions pour %1$s</string>
-    <string name="apps_menu_item_active">%1$s  ✓</string>
-    <string name="apps_version_update">%1$s → %2$s</string>
+    <string name="apps_version_update_cd">%1$s vers %2$s</string>
     <string name="apps_version_dated">%1$s (%2$s)</string>
     <string name="apps_variant_subtitle">%1$s  ·  %2$s</string>
     <string name="apps_section_header_cd">%1$s, %2$d, %3$s</string>
@@ -980,7 +979,7 @@
     <string name="starred_picker_resume">Reprendre</string>
     <string name="starred_picker_search_hint">Rechercher propriétaire / dépôt / description</string>
     <string name="starred_picker_sign_in_required">Connectez-vous à GitHub pour voir vos dépôts étoilés.</string>
-    <string name="starred_picker_sort_alphabetical">A → Z</string>
+    <string name="starred_picker_sort_alphabetical">De A à Z</string>
     <string name="starred_picker_sort_recent">Étoilés récemment</string>
     <string name="starred_picker_sort_stars">Plus d'étoiles</string>
     <string name="starred_picker_star_dedup_tooltip">Retirer l'étoile sur GitHub n'arrêtera pas le suivi de l'app.</string>
@@ -1183,7 +1182,7 @@
     <string name="translation_card_title">Traduire</string>
     <string name="translation_card_translate_to">Traduire en %1$s</string>
     <string name="translation_deepl_auth_key">Clé d'authentification</string>
-    <string name="translation_deepl_get_free_key">Obtenir une clé DeepL gratuite →</string>
+    <string name="translation_deepl_get_free_key">Obtenir une clé DeepL gratuite</string>
     <string name="translation_deepl_help">Inscrivez-vous sur deepl.com/pro-api. Les clés du niveau gratuit se terminent par :fx et utilisent automatiquement l'endpoint gratuit. Le niveau Pro préserve la confidentialité de votre texte ; le niveau gratuit peut utiliser les textes soumis pour améliorer les modèles.</string>
     <string name="translation_deepl_save">Enregistrer la clé</string>
     <string name="translation_deepl_saved">Clé DeepL enregistrée</string>
@@ -1192,7 +1191,7 @@
     <string name="translation_libre_help">Fonctionne d'emblée via le miroir public Disroot — laissez les champs vides pour l'utiliser. Pour plus de confidentialité, collez l'URL de votre instance auto-hébergée. Une clé API n'est nécessaire que si l'instance l'exige.</string>
     <string name="translation_libre_save">Enregistrer</string>
     <string name="translation_libre_saved">Paramètres LibreTranslate enregistrés</string>
-    <string name="translation_microsoft_get_free_key">Obtenir une clé Azure gratuite →</string>
+    <string name="translation_microsoft_get_free_key">Obtenir une clé Azure gratuite</string>
     <string name="translation_microsoft_help">Azure Translator respecte la vie privée (No-Trace par défaut — votre texte n'est jamais stocké ni utilisé pour l'entraînement). Le niveau gratuit couvre 2 millions de caractères par mois. La région n'est nécessaire que pour les ressources non globales.</string>
     <string name="translation_microsoft_key">Clé d'abonnement</string>
     <string name="translation_microsoft_region">Région (ex. westeurope, laissez vide pour Global)</string>
@@ -1540,7 +1539,6 @@
     <string name="reviews_sort_newest">Les plus récents</string>
     <string name="reviews_sort_highest">Les mieux notés</string>
     <string name="reviews_sort_lowest">Les moins bien notés</string>
-    <string name="reviews_filter_stars">%1$d★</string>
     <string name="reviews_hidden_notice">Un modérateur a masqué cet avis. Vous seul pouvez le voir, et il n'est pas pris en compte dans la note.</string>
     <string name="reviews_composer_title_new">Noter cette application</string>
     <string name="reviews_composer_title_edit">Modifier votre avis</string>

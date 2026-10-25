@@ -196,7 +196,7 @@
     <string name="rate_limit_used_all">Ты использовал все %1$d API-запросов.</string>
     <string name="rate_limit_used_all_free">Ты использовал все %1$d бесплатных API-запросов.</string>
     <string name="rate_limit_resets_in_minutes">Сброс через %1$d мин</string>
-    <string name="rate_limit_tip_sign_in">💡 Войди, чтобы получить 5 000 запросов в час вместо 60!</string>
+    <string name="rate_limit_tip_sign_in">Войди, чтобы получить 5 000 запросов в час вместо 60!</string>
     <string name="rate_limit_sign_in">Войти</string>
     <string name="rate_limit_ok">ОК</string>
     <string name="rate_limit_close">Закрыть</string>
@@ -912,8 +912,7 @@
     <string name="apk_inspect_title">Проверка APK</string>
     <string name="apk_inspect_version_code">Версия</string>
     <string name="apps_compact_more_actions">Больше действий для %1$s</string>
-    <string name="apps_menu_item_active">%1$s  ✓</string>
-    <string name="apps_version_update">%1$s → %2$s</string>
+    <string name="apps_version_update_cd">%1$s до %2$s</string>
     <string name="apps_version_dated">%1$s (%2$s)</string>
     <string name="apps_variant_subtitle">%1$s  ·  %2$s</string>
     <string name="apps_section_header_cd">%1$s, %2$d, %3$s</string>
@@ -1004,7 +1003,7 @@
     <string name="starred_picker_resume">Возобновить</string>
     <string name="starred_picker_search_hint">Поиск по владельцу / репо / описанию</string>
     <string name="starred_picker_sign_in_required">Войди в GitHub, чтобы увидеть избранные репо.</string>
-    <string name="starred_picker_sort_alphabetical">А → Я</string>
+    <string name="starred_picker_sort_alphabetical">От А до Я</string>
     <string name="starred_picker_sort_recent">Недавно отмеченные</string>
     <string name="starred_picker_sort_stars">Больше звёзд</string>
     <string name="starred_picker_star_dedup_tooltip">Снятие звезды на GitHub не отменяет отслеживание приложения.</string>
@@ -1214,7 +1213,7 @@
     <string name="translation_card_title">Перевод</string>
     <string name="translation_card_translate_to">Перевести на %1$s</string>
     <string name="translation_deepl_auth_key">Ключ авторизации</string>
-    <string name="translation_deepl_get_free_key">Получить бесплатный ключ DeepL →</string>
+    <string name="translation_deepl_get_free_key">Получить бесплатный ключ DeepL</string>
     <string name="translation_deepl_help">Зарегистрируйся на deepl.com/pro-api. Ключи бесплатного тарифа оканчиваются на :fx и автоматически используют бесплатный эндпоинт. Pro-тариф сохраняет приватность текста; Free-тариф может использовать отправленный текст для улучшения моделей.</string>
     <string name="translation_deepl_save">Сохранить ключ</string>
     <string name="translation_deepl_saved">Ключ DeepL сохранён</string>
@@ -1223,7 +1222,7 @@
     <string name="translation_libre_help">Работает «из коробки» через публичное зеркало Disroot — оставь поля пустыми, чтобы использовать его. Для большей приватности укажи URL своего инстанса. API-ключ нужен, только если этого требует инстанс.</string>
     <string name="translation_libre_save">Сохранить настройки</string>
     <string name="translation_libre_saved">Настройки LibreTranslate сохранены</string>
-    <string name="translation_microsoft_get_free_key">Получить бесплатный ключ Azure →</string>
+    <string name="translation_microsoft_get_free_key">Получить бесплатный ключ Azure</string>
     <string name="translation_microsoft_help">Azure Translator уважает приватность (No-Trace по умолчанию — текст не сохраняется и не используется для обучения). Бесплатный тариф — до 2M символов в месяц. Регион нужен только для не-глобальных ресурсов.</string>
     <string name="translation_microsoft_key">Ключ подписки</string>
     <string name="translation_microsoft_region">Регион (например, westeurope, оставь пустым для Global)</string>
@@ -1579,7 +1578,6 @@
     <string name="reviews_sort_newest">Сначала новые</string>
     <string name="reviews_sort_highest">С высокой оценкой</string>
     <string name="reviews_sort_lowest">С низкой оценкой</string>
-    <string name="reviews_filter_stars">%1$d★</string>
     <string name="reviews_hidden_notice">Модератор скрыл этот отзыв. Его видишь только ты, и он не учитывается в оценке.</string>
     <string name="reviews_composer_title_new">Оцени приложение</string>
     <string name="reviews_composer_title_edit">Изменить отзыв</string>

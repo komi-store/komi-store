@@ -33,6 +33,7 @@ import zed.rainxch.core.presentation.components.text.KomiText
 import zed.rainxch.core.presentation.components.text.KomiTextRole
 import zed.rainxch.core.presentation.locals.LocalPersonality
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.OpenInNew
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -270,6 +271,7 @@ private fun DeeplCredentialsForm(
             label = stringResource(Res.string.translation_deepl_get_free_key),
             variant = KomiButtonVariant.Text,
             size = KomiButtonSize.Sm,
+            trailingIcon = Icons.AutoMirrored.Rounded.OpenInNew,
             modifier = Modifier.align(Alignment.Start),
         )
         KomiTextField(
@@ -312,6 +314,7 @@ private fun MicrosoftCredentialsForm(
             label = stringResource(Res.string.translation_microsoft_get_free_key),
             variant = KomiButtonVariant.Text,
             size = KomiButtonSize.Sm,
+            trailingIcon = Icons.AutoMirrored.Rounded.OpenInNew,
             modifier = Modifier.align(Alignment.Start),
         )
         KomiTextField(

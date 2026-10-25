@@ -43,6 +43,7 @@ The full rule set, with examples, is `docs/code-style.md`. These apply to almost
 - Errors are typed and become string resources in the UI. Never show `Throwable.message`, and never wrap suspend calls in `runCatching`.
 - Use `Komi*` components and `LocalPersonality` tokens, not `MaterialTheme` or color literals.
 - All user-visible text, content descriptions included, comes from `Res.string`.
+- No emoji or symbol glyphs (💡, ✓, ★, →) in the UI. Use an icon, and words for screen readers.
 - No KDoc and no comments that restate the code; comment only non-obvious invariants and workarounds. No em-dashes.
 - Don't guess APIs, versions or flags. Read the code or the docs first.
 

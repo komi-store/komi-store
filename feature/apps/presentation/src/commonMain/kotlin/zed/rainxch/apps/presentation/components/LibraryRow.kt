@@ -16,24 +16,40 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.InlineTextContent
+import androidx.compose.foundation.text.appendInlineContent
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.ArrowForward
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.Placeholder
+import androidx.compose.ui.text.PlaceholderVerticalAlign
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.em
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.persistentMapOf
+import org.jetbrains.compose.resources.stringResource
 import zed.rainxch.apps.presentation.model.InstalledAppUi
 import zed.rainxch.core.presentation.components.InstalledAppIcon
 import zed.rainxch.core.presentation.components.dividers.KomiHorizontalDivider
+import zed.rainxch.core.presentation.components.icon.KomiIcon
 import zed.rainxch.core.presentation.components.progress.KomiLinearProgress
 import zed.rainxch.core.presentation.components.reviews.CompactRating
 import zed.rainxch.core.presentation.components.surfaces.KomiSurface
 import zed.rainxch.core.presentation.components.text.KomiText
 import zed.rainxch.core.presentation.components.text.KomiTextRole
 import zed.rainxch.core.presentation.locals.LocalPersonality
+import zed.rainxch.githubstore.core.presentation.res.Res
+import zed.rainxch.githubstore.core.presentation.res.apps_version_update_cd
 
 // How a Library row's status line reads.
 enum class LibraryStatusTone {
@@ -42,6 +58,13 @@ enum class LibraryStatusTone {
     Error,
     Downgrade,
 }
+
+// A Library row's status line. With a target it names an update or install: the text, an arrow, the target.
+data class LibraryStatus(
+    val text: String,
+    val tone: LibraryStatusTone,
+    val target: String? = null,
+)
 
 // A Library row's progress bar, when it shows one.
 sealed interface LibraryProgress {
@@ -71,8 +94,7 @@ data class LibraryRowApp(
 @Composable
 fun LibraryRow(
     app: LibraryRowApp,
-    status: String,
-    statusTone: LibraryStatusTone,
+    status: LibraryStatus,
     onClick: (() -> Unit)?,
     modifier: Modifier = Modifier,
     tags: ImmutableList<String> = persistentListOf(),
@@ -84,7 +106,6 @@ fun LibraryRow(
         LibraryRowContent(
             app = app,
             status = status,
-            statusTone = statusTone,
             tags = tags,
             progress = progress,
             showOwner = framed,
@@ -105,8 +126,7 @@ fun LibraryRow(
 @Composable
 private fun LibraryRowContent(
     app: LibraryRowApp,
-    status: String,
-    statusTone: LibraryStatusTone,
+    status: LibraryStatus,
     tags: ImmutableList<String>,
     progress: LibraryProgress?,
     showOwner: Boolean,
@@ -137,14 +157,7 @@ private fun LibraryRowContent(
                     ratingAverage = app.ratingAverage.takeIf { showOwner && app.ratingCount > 0 },
                     ratingCount = app.ratingCount,
                 )
-                KomiText(
-                    text = status,
-                    role = KomiTextRole.Body,
-                    color = statusTone.color(),
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.padding(top = 2.dp),
-                )
+                StatusLine(status = status, modifier = Modifier.padding(top = 2.dp))
             }
 
             // Centred on the icon, which sits at the top when tags make the row taller.
@@ -213,6 +226,59 @@ private fun OwnerLine(
         ratingAverage?.let { CompactRating(average = it, count = ratingCount) }
     }
 }
+
+// The arrow is inline content, so a long line still wraps onto the second line.
+@Composable
+private fun StatusLine(
+    status: LibraryStatus,
+    modifier: Modifier = Modifier,
+) {
+    val color = status.tone.color()
+    val target = status.target
+    if (target == null) {
+        KomiText(
+            text = status.text,
+            role = KomiTextRole.Body,
+            color = color,
+            maxLines = 2,
+            overflow = TextOverflow.Ellipsis,
+            modifier = modifier,
+        )
+    } else {
+        val description = stringResource(Res.string.apps_version_update_cd, status.text, target)
+        val arrow =
+            remember(color) {
+                persistentMapOf(
+                    STATUS_ARROW to
+                        InlineTextContent(Placeholder(1.em, 1.em, PlaceholderVerticalAlign.TextCenter)) {
+                            KomiIcon(
+                                imageVector = Icons.AutoMirrored.Rounded.ArrowForward,
+                                contentDescription = null,
+                                tint = color,
+                            )
+                        },
+                )
+            }
+        KomiText(
+            text =
+                buildAnnotatedString {
+                    append(status.text)
+                    append(' ')
+                    appendInlineContent(STATUS_ARROW)
+                    append(' ')
+                    append(target)
+                },
+            role = KomiTextRole.Body,
+            color = color,
+            maxLines = 2,
+            overflow = TextOverflow.Ellipsis,
+            inlineContent = arrow,
+            modifier = modifier.semantics { contentDescription = description },
+        )
+    }
+}
+
+private const val STATUS_ARROW = "status_arrow"
 
 @Composable
 private fun LibraryTag(text: String) {

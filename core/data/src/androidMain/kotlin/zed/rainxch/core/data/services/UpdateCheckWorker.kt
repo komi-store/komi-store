@@ -163,7 +163,7 @@ class UpdateCheckWorker(
         val text =
             if (appsWithUpdates.size == 1) {
                 val app = appsWithUpdates.first()
-                "${app.installedVersion} → ${app.latestVersion}"
+                "${app.installedVersion} to ${app.latestVersion}"
             } else {
                 appsWithUpdates.joinToString(", ") { it.appName }
             }

@@ -2121,7 +2121,7 @@ public fun zed.rainxch.core.presentation.components.text.KomiText(text: kotlin.S
     - onTextLayout: STABLE (function type)
 
 @Composable
-public fun zed.rainxch.core.presentation.components.text.KomiText(text: androidx.compose.ui.text.AnnotatedString, modifier: androidx.compose.ui.Modifier, role: zed.rainxch.core.presentation.components.text.KomiTextRole, color: androidx.compose.ui.graphics.Color, maxLines: kotlin.Int, overflow: androidx.compose.ui.text.style.TextOverflow, textAlign: androidx.compose.ui.text.style.TextAlign?, onTextLayout: kotlin.Function1<androidx.compose.ui.text.TextLayoutResult, kotlin.Unit>?): kotlin.Unit
+public fun zed.rainxch.core.presentation.components.text.KomiText(text: androidx.compose.ui.text.AnnotatedString, modifier: androidx.compose.ui.Modifier, role: zed.rainxch.core.presentation.components.text.KomiTextRole, color: androidx.compose.ui.graphics.Color, maxLines: kotlin.Int, overflow: androidx.compose.ui.text.style.TextOverflow, textAlign: androidx.compose.ui.text.style.TextAlign?, inlineContent: kotlinx.collections.immutable.ImmutableMap<kotlin.String, androidx.compose.foundation.text.InlineTextContent>, onTextLayout: kotlin.Function1<androidx.compose.ui.text.TextLayoutResult, kotlin.Unit>?): kotlin.Unit
   skippable: true
   restartable: true
   params:
@@ -2132,6 +2132,7 @@ public fun zed.rainxch.core.presentation.components.text.KomiText(text: androidx
     - maxLines: STABLE (primitive type)
     - overflow: STABLE (known stable type)
     - textAlign: STABLE (known stable type)
+    - inlineContent: STABLE (known stable type)
     - onTextLayout: STABLE (function type)
 
 @Composable

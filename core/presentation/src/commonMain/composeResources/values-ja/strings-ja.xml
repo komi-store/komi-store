@@ -176,7 +176,7 @@
     <string name="rate_limit_used_all">%1$d 件のAPIリクエストをすべて使用しました。</string>
     <string name="rate_limit_used_all_free">%1$d 件の無料APIリクエストをすべて使用しました。</string>
     <string name="rate_limit_resets_in_minutes">%1$d分後にリセット</string>
-    <string name="rate_limit_tip_sign_in">💡 サインインすると、1時間あたり5,000件のリクエストが可能です。</string>
+    <string name="rate_limit_tip_sign_in">サインインすると、1時間あたり5,000件のリクエストが可能です。</string>
     <string name="rate_limit_sign_in">サインイン</string>
     <string name="rate_limit_ok">OK</string>
     <string name="rate_limit_close">閉じる</string>
@@ -880,8 +880,7 @@
     <string name="apk_inspect_title">APK検査</string>
     <string name="apk_inspect_version_code">バージョン</string>
     <string name="apps_compact_more_actions">%1$sのその他の操作</string>
-    <string name="apps_menu_item_active">%1$s  ✓</string>
-    <string name="apps_version_update">%1$s → %2$s</string>
+    <string name="apps_version_update_cd">%1$s から %2$s へ</string>
     <string name="apps_version_dated">%1$s (%2$s)</string>
     <string name="apps_variant_subtitle">%1$s  ·  %2$s</string>
     <string name="apps_section_header_cd">%1$s、%2$d、%3$s</string>
@@ -972,7 +971,7 @@
     <string name="starred_picker_resume">再開</string>
     <string name="starred_picker_search_hint">所有者 / リポジトリ / 説明を検索</string>
     <string name="starred_picker_sign_in_required">スター済みのリポジトリを表示するにはGitHubにサインインしてください。</string>
-    <string name="starred_picker_sort_alphabetical">A → Z</string>
+    <string name="starred_picker_sort_alphabetical">A から Z</string>
     <string name="starred_picker_sort_recent">最近スター付け</string>
     <string name="starred_picker_sort_stars">スター数順</string>
     <string name="starred_picker_star_dedup_tooltip">GitHubでスターを外してもアプリの追跡は解除されません。</string>
@@ -1172,7 +1171,7 @@
     <string name="translation_card_title">翻訳</string>
     <string name="translation_card_translate_to">%1$s に翻訳</string>
     <string name="translation_deepl_auth_key">認証キー</string>
-    <string name="translation_deepl_get_free_key">無料の DeepL キーを取得 →</string>
+    <string name="translation_deepl_get_free_key">無料の DeepL キーを取得</string>
     <string name="translation_deepl_help">deepl.com/pro-api からサインアップしてください。無料プランのキーは :fx で終わり、自動的に無料エンドポイントを使用します。Pro プランは入力テキストを非公開に保ちますが、Free プランでは送信されたテキストがモデル改善に使われる場合があります。</string>
     <string name="translation_deepl_save">キーを保存</string>
     <string name="translation_deepl_saved">DeepL キーを保存しました</string>
@@ -1181,7 +1180,7 @@
     <string name="translation_libre_help">公開されている Disroot ミラー経由で初期状態で動作します — 各欄を空のままにすれば使用されます。よりプライバシーを重視する場合は、ご自身のセルフホスト URL を貼り付けてください。API キーはインスタンスが要求する場合にのみ必要です。</string>
     <string name="translation_libre_save">設定を保存</string>
     <string name="translation_libre_saved">LibreTranslate の設定を保存しました</string>
-    <string name="translation_microsoft_get_free_key">無料の Azure キーを取得 →</string>
+    <string name="translation_microsoft_get_free_key">無料の Azure キーを取得</string>
     <string name="translation_microsoft_help">Azure Translator はプライバシーに配慮しています（デフォルトで No-Trace — 入力テキストは保存も学習にも使われません）。無料プランは月間 200 万文字までカバーします。Region は非グローバルリソースの場合のみ必要です。</string>
     <string name="translation_microsoft_key">サブスクリプションキー</string>
     <string name="translation_microsoft_region">Region（例: westeurope。グローバルの場合は空欄）</string>
@@ -1526,7 +1525,6 @@
     <string name="reviews_sort_newest">新しい順</string>
     <string name="reviews_sort_highest">評価の高い順</string>
     <string name="reviews_sort_lowest">評価の低い順</string>
-    <string name="reviews_filter_stars">%1$d★</string>
     <string name="reviews_hidden_notice">このレビューはモデレーターによって非表示になりました。あなただけが表示でき、評価には反映されません。</string>
     <string name="reviews_composer_title_new">このアプリを評価</string>
     <string name="reviews_composer_title_edit">レビューを編集</string>

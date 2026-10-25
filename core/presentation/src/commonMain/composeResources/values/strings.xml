@@ -353,7 +353,7 @@
     <string name="rate_limit_used_all">You've used all %1$d API requests.</string>
     <string name="rate_limit_used_all_free">You've used all %1$d free API requests.</string>
     <string name="rate_limit_resets_in_minutes">Resets in %1$d minutes</string>
-    <string name="rate_limit_tip_sign_in">💡 Sign in to get 5,000 requests per hour instead of 60!</string>
+    <string name="rate_limit_tip_sign_in">Sign in to get 5,000 requests per hour instead of 60!</string>
     <string name="releases_unavailable_temporarily">Releases are temporarily unavailable. Please try again in a bit.</string>
     <string name="rate_limit_sign_in">Sign In</string>
     <string name="rate_limit_ok">OK</string>
@@ -684,7 +684,7 @@
     <string name="starred_picker_progress">Checking %1$d / %2$d…</string>
     <string name="starred_picker_search_hint">Search owner / repo / description</string>
     <string name="starred_picker_sort_recent">Recently starred</string>
-    <string name="starred_picker_sort_alphabetical">A → Z</string>
+    <string name="starred_picker_sort_alphabetical">A to Z</string>
     <string name="starred_picker_sort_stars">Most stars</string>
     <string name="starred_picker_filter_show_all">Show repos without APK releases</string>
     <string name="starred_picker_apk_badge">APK</string>
@@ -878,14 +878,14 @@
     <string name="translation_deepl_auth_key">Auth key</string>
     <string name="translation_deepl_save">Save key</string>
     <string name="translation_deepl_saved">DeepL key saved</string>
-    <string name="translation_deepl_get_free_key">Get a free DeepL key →</string>
+    <string name="translation_deepl_get_free_key">Get a free DeepL key</string>
     <string name="translation_provider_microsoft">Microsoft</string>
     <string name="translation_microsoft_help">Azure Translator is privacy-respecting (No-Trace by default — your text is never stored or used for training). Free tier covers 2M characters/month. Region is only needed for non-global resources.</string>
     <string name="translation_microsoft_key">Subscription key</string>
     <string name="translation_microsoft_region">Region (e.g. westeurope, leave empty for Global)</string>
     <string name="translation_microsoft_save">Save credentials</string>
     <string name="translation_microsoft_saved">Microsoft Translator credentials saved</string>
-    <string name="translation_microsoft_get_free_key">Get a free Azure key →</string>
+    <string name="translation_microsoft_get_free_key">Get a free Azure key</string>
 
     <!-- E1: External import wizard -->
     <string name="external_import_top_bar_title">Import installed apps</string>
@@ -1097,8 +1097,7 @@
     <string name="apps_section_state_expanded">Expanded</string>
     <string name="apps_section_state_collapsed">Collapsed</string>
     <string name="apps_compact_more_actions">More actions for %1$s</string>
-    <string name="apps_menu_item_active">%1$s  ✓</string>
-    <string name="apps_version_update">%1$s → %2$s</string>
+    <string name="apps_version_update_cd">%1$s to %2$s</string>
     <string name="apps_version_dated">%1$s (%2$s)</string>
     <string name="apps_variant_subtitle">%1$s  ·  %2$s</string>
     <string name="apps_section_header_cd">%1$s, %2$d, %3$s</string>
@@ -1607,7 +1606,6 @@
     <string name="reviews_sort_newest">Newest</string>
     <string name="reviews_sort_highest">Highest rated</string>
     <string name="reviews_sort_lowest">Lowest rated</string>
-    <string name="reviews_filter_stars">%1$d★</string>
     <string name="reviews_hidden_notice">A moderator hid this review. Only you can see it, and it doesn't count toward the rating.</string>
     <string name="reviews_composer_title_new">Rate this app</string>
     <string name="reviews_composer_title_edit">Edit your review</string>

@@ -17,6 +17,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.material.icons.rounded.RateReview
 import androidx.compose.material.icons.rounded.Shield
+import androidx.compose.material.icons.rounded.Star
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -25,11 +26,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.collections.immutable.toImmutableList
 import org.jetbrains.compose.resources.StringResource
+import org.jetbrains.compose.resources.pluralStringResource
 import org.jetbrains.compose.resources.stringResource
 import zed.rainxch.core.domain.model.reviews.CannotReviewReason
 import zed.rainxch.core.domain.model.reviews.ReviewSort
@@ -68,7 +72,6 @@ import zed.rainxch.githubstore.core.presentation.res.reviews_delete_title
 import zed.rainxch.githubstore.core.presentation.res.reviews_edit_yours
 import zed.rainxch.githubstore.core.presentation.res.reviews_empty
 import zed.rainxch.githubstore.core.presentation.res.reviews_empty_filtered
-import zed.rainxch.githubstore.core.presentation.res.reviews_filter_stars
 import zed.rainxch.githubstore.core.presentation.res.reviews_moderation_open
 import zed.rainxch.githubstore.core.presentation.res.reviews_retry
 import zed.rainxch.githubstore.core.presentation.res.reviews_screen_title
@@ -77,6 +80,7 @@ import zed.rainxch.githubstore.core.presentation.res.reviews_sort_highest
 import zed.rainxch.githubstore.core.presentation.res.reviews_sort_lowest
 import zed.rainxch.githubstore.core.presentation.res.reviews_sort_newest
 import zed.rainxch.githubstore.core.presentation.res.reviews_sort_top
+import zed.rainxch.githubstore.core.presentation.res.reviews_stars
 import zed.rainxch.githubstore.core.presentation.res.reviews_unavailable
 import zed.rainxch.githubstore.core.presentation.res.reviews_write
 import zed.rainxch.reviews.presentation.components.ComposerSheet
@@ -320,11 +324,14 @@ private fun Filters(
             )
         }
         state.ratingFilter?.let { stars ->
+            val description = pluralStringResource(Res.plurals.reviews_stars, stars, stars)
             KomiChip(
-                label = stringResource(Res.string.reviews_filter_stars, stars),
+                label = stars.toString(),
+                modifier = Modifier.semantics { contentDescription = description },
                 kind = KomiChipKind.Input,
                 size = KomiChipSize.Sm,
                 selected = true,
+                leadingIcon = Icons.Rounded.Star,
                 onRemove = { onAction(ReviewsAction.OnRatingFilterChange(null)) },
             )
         }
