@@ -2,7 +2,6 @@ package zed.rainxch.apps.presentation.components
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.OpenInNew
-import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.DeleteOutline
 import androidx.compose.material.icons.rounded.MoreVert
@@ -254,8 +253,8 @@ private fun menuEntries(appItem: AppItem): ImmutableList<KomiMenuItem> {
     return buildList {
         add(KomiMenuItem(id = MENU_ADVANCED, label = advanced))
         add(KomiMenuItem(id = MENU_VARIANT, label = variant))
-        add(KomiMenuItem(id = MENU_PRE_RELEASE, label = preRelease, icon = Icons.Rounded.Check.takeIf { app.includePreReleases }))
-        add(KomiMenuItem(id = MENU_IGNORE, label = ignoreUpdates, icon = Icons.Rounded.Check.takeIf { !app.updateCheckEnabled }))
+        add(KomiMenuItem(id = MENU_PRE_RELEASE, label = preRelease, checked = app.includePreReleases))
+        add(KomiMenuItem(id = MENU_IGNORE, label = ignoreUpdates, checked = !app.updateCheckEnabled))
         when {
             app.skippedReleaseTag != null -> add(KomiMenuItem(id = MENU_UNSKIP, label = unskip))
             appItem.canSkipVersion -> add(KomiMenuItem(id = MENU_SKIP, label = skip))

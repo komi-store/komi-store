@@ -13,6 +13,8 @@ data class KomiMenuItem(
     val subtitle: String? = null,
     val tone: KomiMenuTone = KomiMenuTone.Default,
     val enabled: Boolean = true,
+    // An on/off option: a check shows while it's on, and screen readers hear the state.
+    val checked: Boolean? = null,
 ) : KomiMenuEntry
 
 data object KomiMenuDivider : KomiMenuEntry
