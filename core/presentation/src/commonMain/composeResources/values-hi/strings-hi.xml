@@ -1546,12 +1546,10 @@
         <item quantity="one">%1$d स्टार: %2$d समीक्षा</item>
         <item quantity="other">%1$d स्टार: %2$d समीक्षाएँ</item>
     </plurals>
-    <plurals name="reviews_helpful_count">
-        <item quantity="one">%1$d व्यक्ति को यह उपयोगी लगा</item>
-        <item quantity="other">%1$d लोगों को यह उपयोगी लगा</item>
-    </plurals>
     <string name="reviews_edited">संपादित</string>
-    <string name="reviews_helpful">उपयोगी</string>
+    <string name="reviews_upvote">अपवोट</string>
+    <string name="reviews_downvote">डाउनवोट</string>
+    <string name="reviews_score">स्कोर %1$d</string>
     <string name="reviews_more_actions">और क्रियाएँ</string>
     <string name="reviews_reply_from">%1$s का जवाब</string>
     <string name="reviews_show_more">और दिखाएँ</string>
@@ -1573,7 +1571,7 @@
     <string name="reviews_cannot_account_too_new">समीक्षा पोस्ट करने के लिए आपका GitHub खाता कम से कम 30 दिन पुराना होना चाहिए।</string>
     <string name="reviews_cannot_own_repo">आप इस रिपॉजिटरी के मेंटेनर हैं, इसलिए इसे रेटिंग नहीं दे सकते।</string>
     <string name="reviews_cannot_banned">आप समीक्षाएँ पोस्ट नहीं कर सकते।</string>
-    <string name="reviews_sort_helpful">सबसे उपयोगी</string>
+    <string name="reviews_sort_top">शीर्ष</string>
     <string name="reviews_sort_newest">सबसे नई</string>
     <string name="reviews_sort_highest">सबसे ज़्यादा रेटिंग</string>
     <string name="reviews_sort_lowest">सबसे कम रेटिंग</string>

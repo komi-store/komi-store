@@ -147,7 +147,7 @@ internal fun RawDetailsState.toView(): DetailsState {
         releaseLines = releaseLines,
         selectedAppLabel = selectedLine?.let { releaseLineLabel(it, repository?.name.orEmpty()) },
         reviewSummary = reviewSummary?.toUi(),
-        topReviews = topReviews.map { it.toUi(viewerId = null, votedIds = emptySet()) }.toImmutableList(),
+        topReviews = topReviews.map { it.toUi(viewerId = null, votes = emptyMap()) }.toImmutableList(),
     )
 }
 

@@ -1529,11 +1529,10 @@
     <plurals name="reviews_star_bar">
         <item quantity="other">별 %1$d개: 리뷰 %2$d개</item>
     </plurals>
-    <plurals name="reviews_helpful_count">
-        <item quantity="other">%1$d명에게 도움이 됨</item>
-    </plurals>
     <string name="reviews_edited">수정됨</string>
-    <string name="reviews_helpful">도움이 됨</string>
+    <string name="reviews_upvote">추천</string>
+    <string name="reviews_downvote">비추천</string>
+    <string name="reviews_score">점수 %1$d</string>
     <string name="reviews_more_actions">추가 작업</string>
     <string name="reviews_reply_from">%1$s님의 답글</string>
     <string name="reviews_show_more">더 보기</string>
@@ -1555,7 +1554,7 @@
     <string name="reviews_cannot_account_too_new">리뷰를 게시하려면 GitHub 계정이 생성된 지 30일 이상이어야 합니다.</string>
     <string name="reviews_cannot_own_repo">이 저장소의 관리자이므로 평가할 수 없습니다.</string>
     <string name="reviews_cannot_banned">리뷰를 게시할 수 없습니다.</string>
-    <string name="reviews_sort_helpful">도움이 된 순</string>
+    <string name="reviews_sort_top">인기순</string>
     <string name="reviews_sort_newest">최신순</string>
     <string name="reviews_sort_highest">평점 높은 순</string>
     <string name="reviews_sort_lowest">평점 낮은 순</string>

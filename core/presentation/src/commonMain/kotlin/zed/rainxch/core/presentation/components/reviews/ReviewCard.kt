@@ -13,8 +13,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.ArrowDownward
+import androidx.compose.material.icons.rounded.ArrowUpward
 import androidx.compose.material.icons.rounded.MoreVert
-import androidx.compose.material.icons.rounded.ThumbUp
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -24,13 +25,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.selected
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import kotlinx.collections.immutable.toImmutableList
-import org.jetbrains.compose.resources.pluralStringResource
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
 import zed.rainxch.core.domain.model.reviews.ReviewPlatform
+import zed.rainxch.core.domain.model.reviews.ReviewVote
 import zed.rainxch.core.presentation.components.GitHubStoreImage
 import zed.rainxch.core.presentation.components.buttons.KomiButton
 import zed.rainxch.core.presentation.components.buttons.KomiButtonSize
@@ -38,8 +42,8 @@ import zed.rainxch.core.presentation.components.buttons.KomiButtonVariant
 import zed.rainxch.core.presentation.components.buttons.KomiIconButton
 import zed.rainxch.core.presentation.components.buttons.KomiIconButtonSize
 import zed.rainxch.core.presentation.components.chips.KomiChip
-import zed.rainxch.core.presentation.components.chips.KomiChipKind
 import zed.rainxch.core.presentation.components.chips.KomiChipSize
+import zed.rainxch.core.presentation.components.icon.KomiIcon
 import zed.rainxch.core.presentation.components.overlays.KomiDropdown
 import zed.rainxch.core.presentation.components.overlays.KomiMenuEntry
 import zed.rainxch.core.presentation.components.overlays.KomiMenuItem
@@ -65,19 +69,20 @@ import zed.rainxch.githubstore.core.presentation.res.reviews_action_reply
 import zed.rainxch.githubstore.core.presentation.res.reviews_action_report
 import zed.rainxch.githubstore.core.presentation.res.reviews_edited
 import zed.rainxch.githubstore.core.presentation.res.reviews_hidden_notice
-import zed.rainxch.githubstore.core.presentation.res.reviews_helpful
-import zed.rainxch.githubstore.core.presentation.res.reviews_helpful_count
 import zed.rainxch.githubstore.core.presentation.res.reviews_more_actions
+import zed.rainxch.githubstore.core.presentation.res.reviews_downvote
 import zed.rainxch.githubstore.core.presentation.res.reviews_reply_from
+import zed.rainxch.githubstore.core.presentation.res.reviews_score
 import zed.rainxch.githubstore.core.presentation.res.reviews_show_less
 import zed.rainxch.githubstore.core.presentation.res.reviews_show_more
+import zed.rainxch.githubstore.core.presentation.res.reviews_upvote
 
 // A null callback hides its action: the menu only lists what this viewer may do with this review.
 @Composable
 fun ReviewCard(
     review: ReviewUi,
     modifier: Modifier = Modifier,
-    onHelpful: (() -> Unit)? = null,
+    onVote: ((ReviewVote) -> Unit)? = null,
     onReport: (() -> Unit)? = null,
     onEdit: (() -> Unit)? = null,
     onDelete: (() -> Unit)? = null,
@@ -140,8 +145,8 @@ fun ReviewCard(
             }
             ReviewTags(review)
             review.text?.let { ExpandableText(text = it) }
-            if (onHelpful != null || review.helpfulCount > 0) {
-                HelpfulRow(review = review, onHelpful = onHelpful)
+            if (onVote != null || review.score != 0) {
+                VoteRow(review = review, onVote = onVote)
             }
             review.reply?.let { ReplyBlock(it) }
         }
@@ -193,36 +198,55 @@ private fun ExpandableText(text: String) {
     }
 }
 
+// Up, the net score, down. The viewer's own vote is the filled button; without onVote (a preview, the
+// viewer's own review) only the score shows.
 @Composable
-private fun HelpfulRow(
+private fun VoteRow(
     review: ReviewUi,
-    onHelpful: (() -> Unit)?,
+    onVote: ((ReviewVote) -> Unit)?,
 ) {
     val colors = LocalPersonality.current.colors
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(10.dp),
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
     ) {
-        if (review.helpfulCount > 0) {
-            KomiText(
-                text = pluralStringResource(Res.plurals.reviews_helpful_count, review.helpfulCount, review.helpfulCount),
-                role = KomiTextRole.Caption,
-                color = colors.onSurfaceVariant,
-                modifier = Modifier.weight(1f, fill = false),
+        if (onVote != null) {
+            VoteButton(vote = ReviewVote.UP, selected = review.vote == ReviewVote.UP, onVote = onVote)
+        } else {
+            KomiIcon(
+                imageVector = Icons.Rounded.ArrowUpward,
+                contentDescription = null,
+                tint = colors.onSurfaceVariant,
+                modifier = Modifier.size(16.dp),
             )
         }
-        if (onHelpful != null) {
-            KomiChip(
-                label = stringResource(Res.string.reviews_helpful),
-                kind = KomiChipKind.Filter,
-                size = KomiChipSize.Sm,
-                selected = review.isVoted,
-                tilt = false,
-                leadingIcon = Icons.Rounded.ThumbUp,
-                onClick = onHelpful,
-            )
+        val scoreLabel = stringResource(Res.string.reviews_score, review.score)
+        KomiText(
+            text = review.score.toString(),
+            role = KomiTextRole.Label,
+            color = if (review.vote != null) colors.primary else colors.onSurface,
+            modifier = Modifier.semantics { contentDescription = scoreLabel },
+        )
+        if (onVote != null) {
+            VoteButton(vote = ReviewVote.DOWN, selected = review.vote == ReviewVote.DOWN, onVote = onVote)
         }
     }
+}
+
+@Composable
+private fun VoteButton(
+    vote: ReviewVote,
+    selected: Boolean,
+    onVote: (ReviewVote) -> Unit,
+) {
+    KomiIconButton(
+        icon = if (vote == ReviewVote.UP) Icons.Rounded.ArrowUpward else Icons.Rounded.ArrowDownward,
+        contentDescription = stringResource(if (vote == ReviewVote.UP) Res.string.reviews_upvote else Res.string.reviews_downvote),
+        onClick = { onVote(vote) },
+        variant = if (selected) KomiButtonVariant.Primary else KomiButtonVariant.Outline,
+        size = KomiIconButtonSize.Sm,
+        modifier = Modifier.semantics { this.selected = selected },
+    )
 }
 
 @Composable

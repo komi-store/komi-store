@@ -1550,14 +1550,10 @@
         <item quantity="many">%1$d из 5 звёзд: %2$d отзывов</item>
         <item quantity="other">%1$d из 5 звёзд: %2$d отзыва</item>
     </plurals>
-    <plurals name="reviews_helpful_count">
-        <item quantity="one">Отзыв полезен для %1$d пользователя</item>
-        <item quantity="few">Отзыв полезен для %1$d пользователей</item>
-        <item quantity="many">Отзыв полезен для %1$d пользователей</item>
-        <item quantity="other">Отзыв полезен для %1$d пользователя</item>
-    </plurals>
     <string name="reviews_edited">Изменено</string>
-    <string name="reviews_helpful">Полезно</string>
+    <string name="reviews_upvote">Голос за</string>
+    <string name="reviews_downvote">Голос против</string>
+    <string name="reviews_score">Счёт голосов %1$d</string>
     <string name="reviews_more_actions">Другие действия</string>
     <string name="reviews_reply_from">Ответ от %1$s</string>
     <string name="reviews_show_more">Развернуть</string>
@@ -1579,7 +1575,7 @@
     <string name="reviews_cannot_account_too_new">Чтобы оставить отзыв, твоей учётной записи GitHub должно быть не меньше 30 дней.</string>
     <string name="reviews_cannot_own_repo">Ты поддерживаешь этот репозиторий, поэтому не можешь его оценить.</string>
     <string name="reviews_cannot_banned">Ты не можешь оставлять отзывы.</string>
-    <string name="reviews_sort_helpful">Самые полезные</string>
+    <string name="reviews_sort_top">Лучшие</string>
     <string name="reviews_sort_newest">Сначала новые</string>
     <string name="reviews_sort_highest">С высокой оценкой</string>
     <string name="reviews_sort_lowest">С низкой оценкой</string>

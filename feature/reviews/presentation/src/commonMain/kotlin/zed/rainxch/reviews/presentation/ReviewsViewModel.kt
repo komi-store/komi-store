@@ -22,6 +22,7 @@ import zed.rainxch.core.domain.model.reviews.ReviewDraft
 import zed.rainxch.core.domain.model.reviews.ReviewPlatform
 import zed.rainxch.core.domain.model.reviews.ReviewSort
 import zed.rainxch.core.domain.model.reviews.ReviewTarget
+import zed.rainxch.core.domain.model.reviews.ReviewVote
 import zed.rainxch.core.domain.repository.ReviewsRepository
 import zed.rainxch.core.domain.repository.UserSessionRepository
 import zed.rainxch.core.presentation.components.reviews.toUi
@@ -60,7 +61,7 @@ class ReviewsViewModel(
     private var loaded: List<Review> = emptyList()
     private var summary: RatingSummary? = null
     private var mine: Review? = null
-    private var votedIds: Set<String> = emptySet()
+    private var votes: Map<String, ReviewVote> = emptyMap()
     private var viewerId: Long? = null
     private var requestGeneration = 0
     private var composerPending = openComposer
@@ -95,7 +96,7 @@ class ReviewsViewModel(
             ReviewsAction.OnDeleteReview -> _state.update { it.copy(isConfirmingDelete = true) }
             ReviewsAction.OnDismissDelete -> _state.update { it.copy(isConfirmingDelete = false) }
             ReviewsAction.OnConfirmDelete -> deleteMine()
-            is ReviewsAction.OnToggleHelpful -> toggleHelpful(action.reviewId)
+            is ReviewsAction.OnVote -> vote(action.reviewId, action.vote)
             is ReviewsAction.OnOpenReport -> requireSignIn { _state.update { it.copy(report = ReportState(action.reviewId)) } }
             is ReviewsAction.OnReportReasonChange -> _state.update { it.copy(report = it.report?.copy(reason = action.reason)) }
             is ReviewsAction.OnReportNoteChange ->
@@ -179,7 +180,7 @@ class ReviewsViewModel(
     private suspend fun loadMine() {
         if (viewerId == null) {
             mine = null
-            votedIds = emptySet()
+            votes = emptyMap()
             _state.update {
                 it.copy(mine = null, canReview = false, cannotReviewReason = null, canReply = false, isModerator = false)
             }
@@ -188,7 +189,7 @@ class ReviewsViewModel(
         }
         repository.getMine(target).onSuccess { state ->
             mine = state.review
-            votedIds = state.votedReviewIds
+            votes = state.votes
             _state.update {
                 it.copy(
                     canReview = state.canReview,
@@ -211,8 +212,8 @@ class ReviewsViewModel(
         val own = mine
         _state.update {
             it.copy(
-                mine = own?.toUi(viewerId, votedIds),
-                reviews = loaded.filterNot { r -> r.id == own?.id }.map { r -> r.toUi(viewerId, votedIds) }.toImmutableList(),
+                mine = own?.toUi(viewerId, votes),
+                reviews = loaded.filterNot { r -> r.id == own?.id }.map { r -> r.toUi(viewerId, votes) }.toImmutableList(),
             )
         }
     }
@@ -310,14 +311,19 @@ class ReviewsViewModel(
         _state.update { it.copy(summary = adjusted.toUi()) }
     }
 
-    // Optimistic: the count and the chip flip at once and roll back if the backend refuses.
-    private fun toggleHelpful(reviewId: String) {
+    // Tapping your current vote again takes it back. Optimistic: the score and the buttons change at
+    // once and roll back if the backend refuses.
+    private fun vote(
+        reviewId: String,
+        direction: ReviewVote,
+    ) {
         requireSignIn {
-            val voting = reviewId !in votedIds
-            applyVote(reviewId, voting)
+            val previous = votes[reviewId]
+            val next = direction.takeUnless { it == previous }
+            applyVote(reviewId, from = previous, to = next)
             viewModelScope.launch {
-                repository.setHelpful(reviewId, voting).onFailure { error ->
-                    applyVote(reviewId, !voting)
+                repository.setVote(reviewId, next).onFailure { error ->
+                    applyVote(reviewId, from = next, to = previous)
                     message(error.reviewMessage())
                 }
             }
@@ -326,14 +332,12 @@ class ReviewsViewModel(
 
     private fun applyVote(
         reviewId: String,
-        voted: Boolean,
+        from: ReviewVote?,
+        to: ReviewVote?,
     ) {
-        votedIds = if (voted) votedIds + reviewId else votedIds - reviewId
-        val delta = if (voted) 1 else -1
-        loaded =
-            loaded.map { r ->
-                if (r.id == reviewId) r.copy(helpfulCount = (r.helpfulCount + delta).coerceAtLeast(0)) else r
-            }
+        votes = if (to == null) votes - reviewId else votes + (reviewId to to)
+        val delta = (to?.value ?: 0) - (from?.value ?: 0)
+        loaded = loaded.map { r -> if (r.id == reviewId) r.copy(score = r.score + delta) else r }
         publishReviews()
     }
 

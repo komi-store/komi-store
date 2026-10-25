@@ -19,6 +19,7 @@ import zed.rainxch.core.domain.model.reviews.ReviewDraft
 import zed.rainxch.core.domain.model.reviews.ReviewReply
 import zed.rainxch.core.domain.model.reviews.ReviewSort
 import zed.rainxch.core.domain.model.reviews.ReviewTarget
+import zed.rainxch.core.domain.model.reviews.ReviewVote
 import zed.rainxch.core.domain.model.reviews.ReviewsPage
 import zed.rainxch.core.domain.repository.ReviewsRepository
 
@@ -58,10 +59,10 @@ class ReviewsRepositoryImpl(
 
     override suspend fun deleteMine(target: ReviewTarget): Result<Unit> = api.deleteReview(target).onSuccess { _changes.emit(target) }
 
-    override suspend fun setHelpful(
+    override suspend fun setVote(
         reviewId: String,
-        helpful: Boolean,
-    ): Result<Unit> = api.setHelpful(reviewId, helpful)
+        vote: ReviewVote?,
+    ): Result<Unit> = api.setVote(reviewId, vote?.value)
 
     override suspend fun report(
         reviewId: String,

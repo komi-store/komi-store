@@ -16,7 +16,7 @@ Ratings and written reviews for apps, stored by the backend (`komi-store-backend
   - a rating from 1 to 5;
   - optional text of up to 2000 characters (Unicode code points, so a client check of `String.length` never sends too much; blank text is stored as null);
   - the version reviewed (a release tag), the platform, and an optional app label.
-- **Helpful votes:** one per user per review, never on your own review. They feed the default sort.
+- **Votes:** an upvote or a downvote, one per user per review, never on your own review. A review shows its net score (ups minus downs, can be negative), which feeds the default `top` sort.
 - **Reports:** a report never hides a review by itself. It goes to a moderation queue, and a moderator hides, dismisses or deletes. Hidden reviews leave the public list and the rating.
 - **Developer replies:** one reply per review, from anyone with push access to the GitHub repo (`permissions.push` on `GET /repos/{owner}/{name}` with the replier's token). Any of them can replace or delete it; the author becomes whoever wrote last. Forgejo repos get no replies and no `own_repo` check, since a GitHub identity can't be matched to a forge account.
 - **Writes on GitHub repos** resolve the repo with the caller's token, which gives the numeric id and `permissions.push`. A private repo, or one GitHub 404s, is `repo_not_found`.
@@ -28,7 +28,7 @@ Ratings and written reviews for apps, stored by the backend (`komi-store-backend
 - The token is never logged or stored. On an authed call the backend keys an in-memory cache by `HmacSHA256(pepper, token)`, holding the GitHub user id, login, avatar URL and account creation date for 10 minutes. A miss calls GitHub `GET /user` with the token.
 - An upstream 401 returns our **401 `auth_invalid`**: these are the first routes where 401 means "your session with us", which is the convention the backend reserved it for. A token that isn't GitHub-token-shaped (only `[A-Za-z0-9_]`, at most 255 characters) gets the same 401 without a call to GitHub.
 - Text, version, platform and app label are trimmed before they're stored; text with a NUL character is `400 invalid_request`.
-- Helpful votes and reports need the same 30-day account age as reviews (`account_too_new`). Replies don't check it: push access is the gate there, resolved by the repo's numeric id (`GET /repositories/{id}`), so a renamed repo keeps working; a repo GitHub can't show that token is `403 not_maintainer`.
+- Votes and reports need the same 30-day account age as reviews (`account_too_new`). Replies don't check it: push access is the gate there, resolved by the repo's numeric id (`GET /repositories/{id}`), so a renamed repo keeps working; a repo GitHub can't show that token is `403 not_maintainer`.
 - In a moderation queue item, `reports` lists every report except dismissed ones, so the hidden queue still shows why a review was hidden.
 - Each review stores the author's GitHub id plus a snapshot of their login and avatar, refreshed whenever they write.
 
@@ -39,7 +39,7 @@ Repo routes live under `/reviews/repo/{owner}/{name}`, so an owner named `item` 
 ### Public reads: no token, CDN-cacheable
 
 **`GET /reviews/repo/{owner}/{name}?host=&sort=&rating=&page=&limit=`**
-- `sort`: `helpful` (default), `newest`, `highest` or `lowest`.
+- `sort`: `top` (default), `newest`, `highest` or `lowest`.
 - `rating`: a filter from 1 to 5.
 - `page`: from 1. `limit`: 1 to 50, default 20. Out-of-range values are clamped (page 1 to 500, limit 1 to 50), as on `/feed`; an unknown `sort` or a `rating` outside 1 to 5 is `400 invalid_request`.
 - Cache: `max-age=60, s-maxage=300`.
@@ -68,7 +68,7 @@ Repo routes live under `/reviews/repo/{owner}/{name}`, so an owner named `item` 
   "createdAt": "2026-10-25T10:00:00Z",
   "updatedAt": "2026-10-25T10:00:00Z",
   "edited": false,
-  "helpfulCount": 12,
+  "score": 9,
   "hidden": false,
   "reply": { "author": { … }, "text": "Thanks!", "createdAt": "…", "updatedAt": "…" }
 }
@@ -79,7 +79,8 @@ Repo routes live under `/reviews/repo/{owner}/{name}`, so an owner named `item` 
 - `hidden` is always false on the public list. It's true in `/mine` when a moderator hid the caller's review, and in the moderation queue. Editing a hidden review keeps it hidden.
 - `edited` is true once a PUT has replaced the review.
 - `summary.average` is rounded to one decimal, and `histogram` always has all five keys. A repo with no reviews returns `summary.count = 0`, a null `average` and an empty list (a 200, not a 404).
-- Sorts: `helpful` is helpfulCount, then updatedAt, both descending; `newest` is updatedAt descending (an edit bumps it); `highest` and `lowest` sort by rating, then helpfulCount and updatedAt descending. `page` is capped at 500.
+- `score` is upvotes minus downvotes and can be negative; the separate counts aren't published.
+- Sorts: `top` is score, then updatedAt, both descending; `newest` is updatedAt descending (an edit bumps it); `highest` and `lowest` sort by rating, then score and updatedAt descending. `page` is capped at 500.
 
 **`GET /reviews/summaries?r={owner}/{name}&r=…&host=`**
 - Up to 50 repos (more is `400 invalid_request`). Used for Library cards, whose rows don't come from catalog responses.
@@ -95,7 +96,7 @@ Repo routes live under `/reviews/repo/{owner}/{name}`, so an owner named `item` 
 ```json
 {
   "review": Review | null,
-  "votedReviewIds": ["rv_…"],
+  "votes": { "rv_…": 1, "rv_…": -1 },
   "canReview": true,
   "cannotReviewReason": null,
   "canReply": false,
@@ -111,8 +112,8 @@ Repo routes live under `/reviews/repo/{owner}/{name}`, so an owner named `item` 
 |---|---|---|
 | `PUT /reviews/repo/{owner}/{name}?host=` | `{ rating, text?, version?, platform?, appLabel? }` | `200` with the `Review` (creates or replaces yours) |
 | `DELETE /reviews/repo/{owner}/{name}?host=` | none | `204`, also when you have no review |
-| `PUT /reviews/item/{reviewId}/helpful` | none | `204` (idempotent) |
-| `DELETE /reviews/item/{reviewId}/helpful` | none | `204` |
+| `PUT /reviews/item/{reviewId}/vote` | `{ value: 1 \| -1 }` | `204`; sets or replaces your vote, the same value again is a no-op |
+| `DELETE /reviews/item/{reviewId}/vote` | none | `204` (idempotent) |
 | `POST /reviews/item/{reviewId}/report` | `{ reason: "spam"\|"offensive"\|"off_topic"\|"other", note? }` (note ≤ 500) | `202`; a second report from the same user is a no-op |
 | `PUT /reviews/item/{reviewId}/reply` | `{ text }` (≤ 2000, not blank) | `200` with the reply, the same object as `Review.reply` |
 | `DELETE /reviews/item/{reviewId}/reply` | none | `204` |
@@ -196,7 +197,7 @@ Behaviour:
 - **Errors:** error codes map to `ReviewError` and then to string resources. 400 and 413 are invalid input; a plain 404 or 5xx is unavailable.
 - **Token:** sent only on `/mine`, the writes and moderation. Never on the public reads, so they stay shared and anonymous.
 - **Details:** a Ratings & reviews section with the summary, the top 3 reviews, Write a review (opens the screen with the composer, prefilled with the installed version, else the selected release, and the monorepo app label) and See all. It's hidden while the backend can't be reached, and Write is hidden for the repo's owner.
-- **Full screen:** sort and star filter with paging; the viewer's own review is pinned on top (the public list is a CDN copy that can lag a write) and says when a moderator hid it; helpful votes are optimistic; report and reply sheets.
+- **Full screen:** sort and star filter with paging; the viewer's own review is pinned on top (the public list is a CDN copy that can lag a write) and says when a moderator hid it; votes are optimistic (tapping your current vote again takes it back); report and reply sheets.
 - **Moderation screen** (`GithubStoreGraph.ReviewModerationScreen`), opened from the Reviews top bar when `isModerator`: the Reported and Hidden queues, with hide, dismiss, unhide, delete and ban.
 - **Stars on cards:** `CompactRating` (stars plus "4.3 (128)") sits under the owner line of `KomiRepoCard`, apart from the stats row, whose star is GitHub stars. Catalog cards read `rating` through `GithubRepoSummary.rating` and the Home cache; Library rows and group headers read one `/reviews/summaries` call from `AppsViewModel`, made again only when the set of repos changes.
 

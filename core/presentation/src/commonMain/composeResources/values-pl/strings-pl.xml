@@ -1550,14 +1550,10 @@
         <item quantity="many">%1$d na 5 gwiazdek: %2$d opinii</item>
         <item quantity="other">%1$d na 5 gwiazdek: %2$d opinii</item>
     </plurals>
-    <plurals name="reviews_helpful_count">
-        <item quantity="one">%1$d osoba uznała tę opinię za pomocną</item>
-        <item quantity="few">%1$d osoby uznały tę opinię za pomocną</item>
-        <item quantity="many">%1$d osób uznało tę opinię za pomocną</item>
-        <item quantity="other">%1$d osób uznało tę opinię za pomocną</item>
-    </plurals>
     <string name="reviews_edited">Edytowano</string>
-    <string name="reviews_helpful">Pomocna</string>
+    <string name="reviews_upvote">Głos za</string>
+    <string name="reviews_downvote">Głos przeciw</string>
+    <string name="reviews_score">Wynik %1$d</string>
     <string name="reviews_more_actions">Więcej akcji</string>
     <string name="reviews_reply_from">Odpowiedź od %1$s</string>
     <string name="reviews_show_more">Pokaż więcej</string>
@@ -1579,7 +1575,7 @@
     <string name="reviews_cannot_account_too_new">Aby dodać opinię, Twoje konto GitHub musi mieć co najmniej 30 dni.</string>
     <string name="reviews_cannot_own_repo">Utrzymujesz to repozytorium, więc nie możesz go ocenić.</string>
     <string name="reviews_cannot_banned">Nie możesz dodawać opinii.</string>
-    <string name="reviews_sort_helpful">Najbardziej pomocne</string>
+    <string name="reviews_sort_top">Najlepsze</string>
     <string name="reviews_sort_newest">Najnowsze</string>
     <string name="reviews_sort_highest">Najwyżej oceniane</string>
     <string name="reviews_sort_lowest">Najniżej oceniane</string>

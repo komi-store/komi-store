@@ -1531,12 +1531,10 @@
         <item quantity="one">%1$d স্টার: %2$dটি রিভিউ</item>
         <item quantity="other">%1$d স্টার: %2$dটি রিভিউ</item>
     </plurals>
-    <plurals name="reviews_helpful_count">
-        <item quantity="one">%1$d জন এটি সহায়ক মনে করেছেন</item>
-        <item quantity="other">%1$d জন এটি সহায়ক মনে করেছেন</item>
-    </plurals>
     <string name="reviews_edited">সম্পাদিত</string>
-    <string name="reviews_helpful">সহায়ক</string>
+    <string name="reviews_upvote">আপভোট</string>
+    <string name="reviews_downvote">ডাউনভোট</string>
+    <string name="reviews_score">স্কোর %1$d</string>
     <string name="reviews_more_actions">আরও অ্যাকশন</string>
     <string name="reviews_reply_from">%1$s-এর উত্তর</string>
     <string name="reviews_show_more">আরও দেখান</string>
@@ -1558,7 +1556,7 @@
     <string name="reviews_cannot_account_too_new">রিভিউ পোস্ট করতে আপনার GitHub অ্যাকাউন্ট অন্তত ৩০ দিনের পুরনো হতে হবে।</string>
     <string name="reviews_cannot_own_repo">আপনি এই রিপোজিটরির রক্ষণাবেক্ষণকারী, তাই এটিকে রেটিং দিতে পারবেন না।</string>
     <string name="reviews_cannot_banned">আপনি রিভিউ পোস্ট করতে পারবেন না।</string>
-    <string name="reviews_sort_helpful">সবচেয়ে সহায়ক</string>
+    <string name="reviews_sort_top">সেরা</string>
     <string name="reviews_sort_newest">সবচেয়ে নতুন</string>
     <string name="reviews_sort_highest">সর্বোচ্চ রেটিং</string>
     <string name="reviews_sort_lowest">সর্বনিম্ন রেটিং</string>

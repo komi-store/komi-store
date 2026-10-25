@@ -27,6 +27,7 @@ import zed.rainxch.core.domain.model.reviews.ReviewPlatform
 import zed.rainxch.core.domain.model.reviews.ReviewReply
 import zed.rainxch.core.domain.model.reviews.ReviewSort
 import zed.rainxch.core.domain.model.reviews.ReviewTarget
+import zed.rainxch.core.domain.model.reviews.ReviewVote
 import zed.rainxch.core.domain.model.reviews.ReviewsPage
 import kotlin.time.Instant
 
@@ -62,7 +63,7 @@ fun BackendReviewDto.toDomain(): Review =
         createdAt = createdAt.toInstantOrNull(),
         updatedAt = updatedAt.toInstantOrNull(),
         edited = edited,
-        helpfulCount = helpfulCount,
+        score = score,
         hidden = hidden,
         reply = reply?.toDomain(),
     )
@@ -80,7 +81,7 @@ fun BackendReviewReplyDto.toDomain(): ReviewReply =
 fun BackendMyReviewDto.toDomain(): MyReviewState =
     MyReviewState(
         review = review?.toDomain(),
-        votedReviewIds = votedReviewIds.toSet(),
+        votes = votes.mapNotNull { (id, value) -> ReviewVote.entries.firstOrNull { it.value == value }?.let { id to it } }.toMap(),
         canReview = canReview,
         cannotReviewReason =
             when (cannotReviewReason) {

@@ -8,7 +8,7 @@ data class ReviewsPage(
 )
 
 enum class ReviewSort {
-    HELPFUL,
+    TOP,
     NEWEST,
     HIGHEST,
     LOWEST,

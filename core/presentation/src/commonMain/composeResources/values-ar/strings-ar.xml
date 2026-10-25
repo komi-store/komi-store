@@ -1588,16 +1588,10 @@
         <item quantity="many">تقييم %1$d من 5: %2$d مراجعة</item>
         <item quantity="other">تقييم %1$d من 5: %2$d مراجعة</item>
     </plurals>
-    <plurals name="reviews_helpful_count">
-        <item quantity="zero">وجد %1$d شخص هذا مفيدًا</item>
-        <item quantity="one">وجد %1$d شخص هذا مفيدًا</item>
-        <item quantity="two">وجد %1$d شخصان هذا مفيدًا</item>
-        <item quantity="few">وجد %1$d أشخاص هذا مفيدًا</item>
-        <item quantity="many">وجد %1$d شخصًا هذا مفيدًا</item>
-        <item quantity="other">وجد %1$d شخص هذا مفيدًا</item>
-    </plurals>
     <string name="reviews_edited">تم التعديل</string>
-    <string name="reviews_helpful">مفيدة</string>
+    <string name="reviews_upvote">تصويت مؤيد</string>
+    <string name="reviews_downvote">تصويت معارض</string>
+    <string name="reviews_score">النتيجة %1$d</string>
     <string name="reviews_more_actions">المزيد من الإجراءات</string>
     <string name="reviews_reply_from">رد من %1$s</string>
     <string name="reviews_show_more">عرض المزيد</string>
@@ -1619,7 +1613,7 @@
     <string name="reviews_cannot_account_too_new">يجب أن يكون قد مضى على إنشاء حسابك في GitHub 30 يومًا على الأقل لنشر مراجعة.</string>
     <string name="reviews_cannot_own_repo">أنت من القائمين على هذا المستودع، لذا لا يمكنك تقييمه.</string>
     <string name="reviews_cannot_banned">لا يمكنك نشر مراجعات.</string>
-    <string name="reviews_sort_helpful">الأكثر فائدة</string>
+    <string name="reviews_sort_top">الأفضل</string>
     <string name="reviews_sort_newest">الأحدث</string>
     <string name="reviews_sort_highest">الأعلى تقييمًا</string>
     <string name="reviews_sort_lowest">الأقل تقييمًا</string>

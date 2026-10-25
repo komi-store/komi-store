@@ -1498,11 +1498,10 @@
     <plurals name="reviews_star_bar">
         <item quantity="other">%1$d 星：%2$d 則評論</item>
     </plurals>
-    <plurals name="reviews_helpful_count">
-        <item quantity="other">%1$d 人覺得有幫助</item>
-    </plurals>
     <string name="reviews_edited">已編輯</string>
-    <string name="reviews_helpful">有幫助</string>
+    <string name="reviews_upvote">贊同</string>
+    <string name="reviews_downvote">反對</string>
+    <string name="reviews_score">得分 %1$d</string>
     <string name="reviews_more_actions">更多操作</string>
     <string name="reviews_reply_from">%1$s 的回覆</string>
     <string name="reviews_show_more">展開</string>
@@ -1524,7 +1523,7 @@
     <string name="reviews_cannot_account_too_new">你的 GitHub 賬戶必須建立滿 30 天才能發表評論。</string>
     <string name="reviews_cannot_own_repo">你是這個倉庫的維護者，因此無法評分。</string>
     <string name="reviews_cannot_banned">你無法發表評論。</string>
-    <string name="reviews_sort_helpful">最有幫助</string>
+    <string name="reviews_sort_top">熱門</string>
     <string name="reviews_sort_newest">最新</string>
     <string name="reviews_sort_highest">評分最高</string>
     <string name="reviews_sort_lowest">評分最低</string>

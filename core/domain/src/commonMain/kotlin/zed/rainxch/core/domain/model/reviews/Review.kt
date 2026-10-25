@@ -13,7 +13,8 @@ data class Review(
     val createdAt: Instant?,
     val updatedAt: Instant?,
     val edited: Boolean,
-    val helpfulCount: Int,
+    // Upvotes minus downvotes; can be negative.
+    val score: Int,
     // Only ever true on the viewer's own review (from /mine) and in the moderation queue.
     val hidden: Boolean,
     val reply: ReviewReply?,

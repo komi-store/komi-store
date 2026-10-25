@@ -13,7 +13,7 @@ import zed.rainxch.core.presentation.components.reviews.ReviewUi
 data class ReviewsUiState(
     val summary: RatingSummaryUi? = null,
     val reviews: ImmutableList<ReviewUi> = persistentListOf(),
-    val sort: ReviewSort = ReviewSort.HELPFUL,
+    val sort: ReviewSort = ReviewSort.TOP,
     val ratingFilter: Int? = null,
     val isLoading: Boolean = true,
     val isLoadingMore: Boolean = false,

@@ -1510,12 +1510,10 @@
         <item quantity="one">%1$d de 5 estrellas: %2$d reseña</item>
         <item quantity="other">%1$d de 5 estrellas: %2$d reseñas</item>
     </plurals>
-    <plurals name="reviews_helpful_count">
-        <item quantity="one">A %1$d persona le ha resultado útil</item>
-        <item quantity="other">A %1$d personas les ha resultado útil</item>
-    </plurals>
     <string name="reviews_edited">Editada</string>
-    <string name="reviews_helpful">Útil</string>
+    <string name="reviews_upvote">Votar a favor</string>
+    <string name="reviews_downvote">Votar en contra</string>
+    <string name="reviews_score">Puntuación %1$d</string>
     <string name="reviews_more_actions">Más acciones</string>
     <string name="reviews_reply_from">Respuesta de %1$s</string>
     <string name="reviews_show_more">Mostrar más</string>
@@ -1537,7 +1535,7 @@
     <string name="reviews_cannot_account_too_new">Tu cuenta de GitHub debe tener al menos 30 días para publicar una reseña.</string>
     <string name="reviews_cannot_own_repo">Mantienes este repositorio, así que no puedes valorarlo.</string>
     <string name="reviews_cannot_banned">No puedes publicar reseñas.</string>
-    <string name="reviews_sort_helpful">Más útiles</string>
+    <string name="reviews_sort_top">Destacadas</string>
     <string name="reviews_sort_newest">Más recientes</string>
     <string name="reviews_sort_highest">Mejor valoradas</string>
     <string name="reviews_sort_lowest">Peor valoradas</string>

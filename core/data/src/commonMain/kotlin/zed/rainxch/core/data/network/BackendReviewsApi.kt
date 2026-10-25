@@ -28,6 +28,7 @@ import zed.rainxch.core.data.dto.BackendReviewReplyDto
 import zed.rainxch.core.data.dto.BackendReviewReplyRequestDto
 import zed.rainxch.core.data.dto.BackendReviewReportDto
 import zed.rainxch.core.data.dto.BackendReviewSummariesDto
+import zed.rainxch.core.data.dto.BackendReviewVoteDto
 import zed.rainxch.core.data.dto.BackendReviewsPageDto
 import zed.rainxch.core.domain.model.reviews.ReviewError
 import zed.rainxch.core.domain.model.reviews.ReviewException
@@ -102,15 +103,20 @@ class BackendReviewsApi(
             }.emptyOrFailure()
         }
 
-    suspend fun setHelpful(
+    // value is 1 or -1; null takes the vote back.
+    suspend fun setVote(
         reviewId: String,
-        helpful: Boolean,
+        value: Int?,
     ): Result<Unit> =
         call(authed = true) { token ->
-            val path = "reviews/item/$reviewId/helpful"
+            val path = "reviews/item/$reviewId/vote"
             val response =
-                if (helpful) {
-                    put(path) { header(X_GITHUB_TOKEN_HEADER, token) }
+                if (value != null) {
+                    put(path) {
+                        header(X_GITHUB_TOKEN_HEADER, token)
+                        contentType(ContentType.Application.Json)
+                        setBody(BackendReviewVoteDto(value))
+                    }
                 } else {
                     delete(path) { header(X_GITHUB_TOKEN_HEADER, token) }
                 }

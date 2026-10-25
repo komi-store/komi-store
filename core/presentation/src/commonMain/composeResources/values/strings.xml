@@ -1578,12 +1578,10 @@
         <item quantity="one">%1$d-star: %2$d review</item>
         <item quantity="other">%1$d-star: %2$d reviews</item>
     </plurals>
-    <plurals name="reviews_helpful_count">
-        <item quantity="one">%1$d person found this helpful</item>
-        <item quantity="other">%1$d people found this helpful</item>
-    </plurals>
     <string name="reviews_edited">Edited</string>
-    <string name="reviews_helpful">Helpful</string>
+    <string name="reviews_upvote">Upvote</string>
+    <string name="reviews_downvote">Downvote</string>
+    <string name="reviews_score">Score %1$d</string>
     <string name="reviews_more_actions">More actions</string>
     <string name="reviews_reply_from">Reply from %1$s</string>
     <string name="reviews_show_more">Show more</string>
@@ -1605,7 +1603,7 @@
     <string name="reviews_cannot_account_too_new">Your GitHub account must be at least 30 days old to post a review.</string>
     <string name="reviews_cannot_own_repo">You maintain this repository, so you can't rate it.</string>
     <string name="reviews_cannot_banned">You can't post reviews.</string>
-    <string name="reviews_sort_helpful">Most helpful</string>
+    <string name="reviews_sort_top">Top</string>
     <string name="reviews_sort_newest">Newest</string>
     <string name="reviews_sort_highest">Highest rated</string>
     <string name="reviews_sort_lowest">Lowest rated</string>

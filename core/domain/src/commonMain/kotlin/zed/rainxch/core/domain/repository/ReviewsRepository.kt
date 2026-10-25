@@ -12,6 +12,7 @@ import zed.rainxch.core.domain.model.reviews.ReviewDraft
 import zed.rainxch.core.domain.model.reviews.ReviewReply
 import zed.rainxch.core.domain.model.reviews.ReviewSort
 import zed.rainxch.core.domain.model.reviews.ReviewTarget
+import zed.rainxch.core.domain.model.reviews.ReviewVote
 import zed.rainxch.core.domain.model.reviews.ReviewsPage
 
 // Every failure is a ReviewException; reads never send the GitHub token, writes always do.
@@ -21,7 +22,7 @@ interface ReviewsRepository {
 
     suspend fun getReviews(
         target: ReviewTarget,
-        sort: ReviewSort = ReviewSort.HELPFUL,
+        sort: ReviewSort = ReviewSort.TOP,
         rating: Int? = null,
         page: Int = 1,
     ): Result<ReviewsPage>
@@ -37,9 +38,10 @@ interface ReviewsRepository {
 
     suspend fun deleteMine(target: ReviewTarget): Result<Unit>
 
-    suspend fun setHelpful(
+    // null takes the viewer's vote back.
+    suspend fun setVote(
         reviewId: String,
-        helpful: Boolean,
+        vote: ReviewVote?,
     ): Result<Unit>
 
     suspend fun report(

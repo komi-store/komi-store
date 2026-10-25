@@ -6,6 +6,7 @@ import kotlinx.collections.immutable.toImmutableList
 import zed.rainxch.core.domain.model.reviews.RatingSummary
 import zed.rainxch.core.domain.model.reviews.Review
 import zed.rainxch.core.domain.model.reviews.ReviewPlatform
+import zed.rainxch.core.domain.model.reviews.ReviewVote
 
 @Immutable
 data class ReviewUi(
@@ -19,10 +20,10 @@ data class ReviewUi(
     val authorAvatarUrl: String?,
     val createdAt: String?,
     val edited: Boolean,
-    val helpfulCount: Int,
+    val score: Int,
     val reply: ReviewReplyUi?,
     val isOwn: Boolean,
-    val isVoted: Boolean,
+    val vote: ReviewVote?,
     val isHidden: Boolean,
 )
 
@@ -44,7 +45,7 @@ data class RatingSummaryUi(
 
 fun Review.toUi(
     viewerId: Long?,
-    votedIds: Set<String>,
+    votes: Map<String, ReviewVote>,
 ): ReviewUi =
     ReviewUi(
         id = id,
@@ -57,7 +58,7 @@ fun Review.toUi(
         authorAvatarUrl = author.avatarUrl,
         createdAt = (updatedAt ?: createdAt)?.toString(),
         edited = edited,
-        helpfulCount = helpfulCount,
+        score = score,
         reply =
             reply?.let {
                 ReviewReplyUi(
@@ -68,7 +69,7 @@ fun Review.toUi(
                 )
             },
         isOwn = viewerId != null && author.id == viewerId,
-        isVoted = id in votedIds,
+        vote = votes[id],
         isHidden = hidden,
     )
 

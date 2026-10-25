@@ -2,6 +2,7 @@ package zed.rainxch.reviews.presentation
 
 import zed.rainxch.core.domain.model.reviews.ReportReason
 import zed.rainxch.core.domain.model.reviews.ReviewSort
+import zed.rainxch.core.domain.model.reviews.ReviewVote
 
 sealed interface ReviewsAction {
     data object OnBackClick : ReviewsAction
@@ -42,8 +43,9 @@ sealed interface ReviewsAction {
 
     data object OnDismissDelete : ReviewsAction
 
-    data class OnToggleHelpful(
+    data class OnVote(
         val reviewId: String,
+        val vote: ReviewVote,
     ) : ReviewsAction
 
     data class OnOpenReport(

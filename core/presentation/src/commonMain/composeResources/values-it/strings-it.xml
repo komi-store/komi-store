@@ -1545,12 +1545,10 @@
         <item quantity="one">%1$d su 5 stelle: %2$d recensione</item>
         <item quantity="other">%1$d su 5 stelle: %2$d recensioni</item>
     </plurals>
-    <plurals name="reviews_helpful_count">
-        <item quantity="one">%1$d persona l'ha trovata utile</item>
-        <item quantity="other">%1$d persone l'hanno trovata utile</item>
-    </plurals>
     <string name="reviews_edited">Modificata</string>
-    <string name="reviews_helpful">Utile</string>
+    <string name="reviews_upvote">Voto positivo</string>
+    <string name="reviews_downvote">Voto negativo</string>
+    <string name="reviews_score">Punteggio %1$d</string>
     <string name="reviews_more_actions">Altre azioni</string>
     <string name="reviews_reply_from">Risposta di %1$s</string>
     <string name="reviews_show_more">Mostra altro</string>
@@ -1572,7 +1570,7 @@
     <string name="reviews_cannot_account_too_new">Il tuo account GitHub deve avere almeno 30 giorni per pubblicare una recensione.</string>
     <string name="reviews_cannot_own_repo">Gestisci questo repository, quindi non puoi valutarlo.</string>
     <string name="reviews_cannot_banned">Non puoi pubblicare recensioni.</string>
-    <string name="reviews_sort_helpful">Più utili</string>
+    <string name="reviews_sort_top">Migliori</string>
     <string name="reviews_sort_newest">Più recenti</string>
     <string name="reviews_sort_highest">Valutazione più alta</string>
     <string name="reviews_sort_lowest">Valutazione più bassa</string>

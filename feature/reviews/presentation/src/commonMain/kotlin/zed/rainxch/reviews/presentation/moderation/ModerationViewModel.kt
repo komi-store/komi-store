@@ -181,7 +181,7 @@ class ModerationViewModel(
     private fun ModerationItem.toUi(): ModerationItemUi =
         ModerationItemUi(
             // The card's own hidden notice speaks to the author; the queue says it in its own words.
-            review = review.toUi(viewerId = null, votedIds = emptySet()).copy(isHidden = false),
+            review = review.toUi(viewerId = null, votes = emptyMap()).copy(isHidden = false),
             repo = repo,
             repoLabel = listOfNotNull(repo.host, repo.owner, repo.name).joinToString("/"),
             authorId = review.author.id,

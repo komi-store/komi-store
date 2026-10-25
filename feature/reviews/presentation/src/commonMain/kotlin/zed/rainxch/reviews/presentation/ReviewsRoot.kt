@@ -29,6 +29,7 @@ import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 import zed.rainxch.core.domain.model.reviews.CannotReviewReason
 import zed.rainxch.core.domain.model.reviews.ReviewSort
+import zed.rainxch.core.domain.model.reviews.ReviewVote
 import zed.rainxch.core.presentation.components.bars.KomiTopBar
 import zed.rainxch.core.presentation.components.bars.KomiTopBarSize
 import zed.rainxch.core.presentation.components.buttons.KomiButton
@@ -66,10 +67,10 @@ import zed.rainxch.githubstore.core.presentation.res.reviews_moderation_open
 import zed.rainxch.githubstore.core.presentation.res.reviews_retry
 import zed.rainxch.githubstore.core.presentation.res.reviews_screen_title
 import zed.rainxch.githubstore.core.presentation.res.reviews_sign_in
-import zed.rainxch.githubstore.core.presentation.res.reviews_sort_helpful
 import zed.rainxch.githubstore.core.presentation.res.reviews_sort_highest
 import zed.rainxch.githubstore.core.presentation.res.reviews_sort_lowest
 import zed.rainxch.githubstore.core.presentation.res.reviews_sort_newest
+import zed.rainxch.githubstore.core.presentation.res.reviews_sort_top
 import zed.rainxch.githubstore.core.presentation.res.reviews_unavailable
 import zed.rainxch.githubstore.core.presentation.res.reviews_write
 import zed.rainxch.reviews.presentation.components.ComposerSheet
@@ -244,7 +245,7 @@ private fun ReviewsList(
         items(state.reviews, key = { it.id }) { review ->
             ReviewCard(
                 review = review,
-                onHelpful = { onAction(ReviewsAction.OnToggleHelpful(review.id)) }.takeUnless { review.isOwn },
+                onVote = { vote: ReviewVote -> onAction(ReviewsAction.OnVote(review.id, vote)) }.takeUnless { review.isOwn },
                 onReport = { onAction(ReviewsAction.OnOpenReport(review.id)) }.takeUnless { review.isOwn },
                 onReply = { onAction(ReviewsAction.OnOpenReply(review.id)) }.takeIf { state.canReply },
                 onDeleteReply = { onAction(ReviewsAction.OnDeleteReply(review.id)) }.takeIf { state.canReply && review.reply != null },
@@ -355,7 +356,7 @@ private fun ErrorBlock(
 
 private fun ReviewSort.label(): StringResource =
     when (this) {
-        ReviewSort.HELPFUL -> Res.string.reviews_sort_helpful
+        ReviewSort.TOP -> Res.string.reviews_sort_top
         ReviewSort.NEWEST -> Res.string.reviews_sort_newest
         ReviewSort.HIGHEST -> Res.string.reviews_sort_highest
         ReviewSort.LOWEST -> Res.string.reviews_sort_lowest

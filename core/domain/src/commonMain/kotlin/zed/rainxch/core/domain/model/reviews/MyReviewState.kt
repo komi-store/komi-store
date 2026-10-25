@@ -2,12 +2,19 @@ package zed.rainxch.core.domain.model.reviews
 
 data class MyReviewState(
     val review: Review?,
-    val votedReviewIds: Set<String>,
+    val votes: Map<String, ReviewVote>,
     val canReview: Boolean,
     val cannotReviewReason: CannotReviewReason?,
     val canReply: Boolean,
     val isModerator: Boolean,
 )
+
+enum class ReviewVote(
+    val value: Int,
+) {
+    UP(1),
+    DOWN(-1),
+}
 
 enum class CannotReviewReason {
     ACCOUNT_TOO_NEW,

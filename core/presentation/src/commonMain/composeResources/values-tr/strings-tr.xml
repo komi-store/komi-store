@@ -1542,12 +1542,10 @@
         <item quantity="one">%1$d yıldız: %2$d yorum</item>
         <item quantity="other">%1$d yıldız: %2$d yorum</item>
     </plurals>
-    <plurals name="reviews_helpful_count">
-        <item quantity="one">%1$d kişi bunu faydalı buldu</item>
-        <item quantity="other">%1$d kişi bunu faydalı buldu</item>
-    </plurals>
     <string name="reviews_edited">Düzenlendi</string>
-    <string name="reviews_helpful">Faydalı</string>
+    <string name="reviews_upvote">Olumlu oy</string>
+    <string name="reviews_downvote">Olumsuz oy</string>
+    <string name="reviews_score">Puan %1$d</string>
     <string name="reviews_more_actions">Diğer işlemler</string>
     <string name="reviews_reply_from">%1$s tarafından yanıt</string>
     <string name="reviews_show_more">Daha fazla göster</string>
@@ -1569,7 +1567,7 @@
     <string name="reviews_cannot_account_too_new">Yorum yapabilmek için GitHub hesabınız en az 30 günlük olmalıdır.</string>
     <string name="reviews_cannot_own_repo">Bu deponun bakımını siz yapıyorsunuz, bu yüzden puan veremezsiniz.</string>
     <string name="reviews_cannot_banned">Yorum yapamazsınız.</string>
-    <string name="reviews_sort_helpful">En faydalı</string>
+    <string name="reviews_sort_top">En iyiler</string>
     <string name="reviews_sort_newest">En yeni</string>
     <string name="reviews_sort_highest">En yüksek puan</string>
     <string name="reviews_sort_lowest">En düşük puan</string>

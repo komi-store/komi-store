@@ -1511,12 +1511,10 @@
         <item quantity="one">Note de %1$d sur 5 : %2$d avis</item>
         <item quantity="other">Note de %1$d sur 5 : %2$d avis</item>
     </plurals>
-    <plurals name="reviews_helpful_count">
-        <item quantity="one">%1$d personne a trouvé cet avis utile</item>
-        <item quantity="other">%1$d personnes ont trouvé cet avis utile</item>
-    </plurals>
     <string name="reviews_edited">Modifié</string>
-    <string name="reviews_helpful">Utile</string>
+    <string name="reviews_upvote">Vote positif</string>
+    <string name="reviews_downvote">Vote négatif</string>
+    <string name="reviews_score">Score %1$d</string>
     <string name="reviews_more_actions">Plus d'actions</string>
     <string name="reviews_reply_from">Réponse de %1$s</string>
     <string name="reviews_show_more">Afficher plus</string>
@@ -1538,7 +1536,7 @@
     <string name="reviews_cannot_account_too_new">Votre compte GitHub doit avoir au moins 30 jours pour publier un avis.</string>
     <string name="reviews_cannot_own_repo">Vous maintenez ce dépôt, vous ne pouvez donc pas le noter.</string>
     <string name="reviews_cannot_banned">Vous ne pouvez pas publier d'avis.</string>
-    <string name="reviews_sort_helpful">Les plus utiles</string>
+    <string name="reviews_sort_top">Les mieux notés</string>
     <string name="reviews_sort_newest">Les plus récents</string>
     <string name="reviews_sort_highest">Les mieux notés</string>
     <string name="reviews_sort_lowest">Les moins bien notés</string>

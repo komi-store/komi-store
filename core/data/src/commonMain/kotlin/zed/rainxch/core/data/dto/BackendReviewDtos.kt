@@ -29,7 +29,7 @@ data class BackendReviewDto(
     val createdAt: String? = null,
     val updatedAt: String? = null,
     val edited: Boolean = false,
-    val helpfulCount: Int = 0,
+    val score: Int = 0,
     val hidden: Boolean = false,
     val reply: BackendReviewReplyDto? = null,
 )
@@ -63,7 +63,7 @@ data class BackendReviewSummariesDto(
 @Serializable
 data class BackendMyReviewDto(
     val review: BackendReviewDto? = null,
-    val votedReviewIds: List<String> = emptyList(),
+    val votes: Map<String, Int> = emptyMap(),
     val canReview: Boolean = false,
     val cannotReviewReason: String? = null,
     val canReply: Boolean = false,
@@ -83,6 +83,11 @@ data class BackendReviewDraftDto(
 data class BackendReviewReportDto(
     val reason: String,
     val note: String? = null,
+)
+
+@Serializable
+data class BackendReviewVoteDto(
+    val value: Int,
 )
 
 @Serializable

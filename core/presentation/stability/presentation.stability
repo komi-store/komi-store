@@ -1822,14 +1822,6 @@ private fun zed.rainxch.core.presentation.components.reviews.ExpandableText(text
     - text: STABLE (String is immutable)
 
 @Composable
-private fun zed.rainxch.core.presentation.components.reviews.HelpfulRow(review: zed.rainxch.core.presentation.components.reviews.ReviewUi, onHelpful: kotlin.Function0<kotlin.Unit>?): kotlin.Unit
-  skippable: true
-  restartable: true
-  params:
-    - review: STABLE (marked @Stable or @Immutable)
-    - onHelpful: STABLE (function type)
-
-@Composable
 public fun zed.rainxch.core.presentation.components.reviews.RatingSummaryPanel(summary: zed.rainxch.core.presentation.components.reviews.RatingSummaryUi, modifier: androidx.compose.ui.Modifier): kotlin.Unit
   skippable: true
   restartable: true
@@ -1845,13 +1837,13 @@ private fun zed.rainxch.core.presentation.components.reviews.ReplyBlock(reply: z
     - reply: STABLE (marked @Stable or @Immutable)
 
 @Composable
-public fun zed.rainxch.core.presentation.components.reviews.ReviewCard(review: zed.rainxch.core.presentation.components.reviews.ReviewUi, modifier: androidx.compose.ui.Modifier, onHelpful: kotlin.Function0<kotlin.Unit>?, onReport: kotlin.Function0<kotlin.Unit>?, onEdit: kotlin.Function0<kotlin.Unit>?, onDelete: kotlin.Function0<kotlin.Unit>?, onReply: kotlin.Function0<kotlin.Unit>?, onDeleteReply: kotlin.Function0<kotlin.Unit>?): kotlin.Unit
+public fun zed.rainxch.core.presentation.components.reviews.ReviewCard(review: zed.rainxch.core.presentation.components.reviews.ReviewUi, modifier: androidx.compose.ui.Modifier, onVote: kotlin.Function1<zed.rainxch.core.domain.model.reviews.ReviewVote, kotlin.Unit>?, onReport: kotlin.Function0<kotlin.Unit>?, onEdit: kotlin.Function0<kotlin.Unit>?, onDelete: kotlin.Function0<kotlin.Unit>?, onReply: kotlin.Function0<kotlin.Unit>?, onDeleteReply: kotlin.Function0<kotlin.Unit>?): kotlin.Unit
   skippable: true
   restartable: true
   params:
     - review: STABLE (marked @Stable or @Immutable)
     - modifier: STABLE (marked @Stable or @Immutable)
-    - onHelpful: STABLE (function type)
+    - onVote: STABLE (function type)
     - onReport: STABLE (function type)
     - onEdit: STABLE (function type)
     - onDelete: STABLE (function type)
@@ -1902,6 +1894,23 @@ public fun zed.rainxch.core.presentation.components.reviews.StarRatingInput(rati
     - rating: STABLE (primitive type)
     - onRatingChange: STABLE (function type)
     - modifier: STABLE (marked @Stable or @Immutable)
+
+@Composable
+private fun zed.rainxch.core.presentation.components.reviews.VoteButton(vote: zed.rainxch.core.domain.model.reviews.ReviewVote, selected: kotlin.Boolean, onVote: kotlin.Function1<zed.rainxch.core.domain.model.reviews.ReviewVote, kotlin.Unit>): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - vote: STABLE (class with no mutable properties)
+    - selected: STABLE (primitive type)
+    - onVote: STABLE (function type)
+
+@Composable
+private fun zed.rainxch.core.presentation.components.reviews.VoteRow(review: zed.rainxch.core.presentation.components.reviews.ReviewUi, onVote: kotlin.Function1<zed.rainxch.core.domain.model.reviews.ReviewVote, kotlin.Unit>?): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - review: STABLE (marked @Stable or @Immutable)
+    - onVote: STABLE (function type)
 
 @Composable
 private fun zed.rainxch.core.presentation.components.reviews.icon(): androidx.compose.ui.graphics.vector.ImageVector

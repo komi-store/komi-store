@@ -1497,11 +1497,10 @@
     <plurals name="reviews_star_bar">
         <item quantity="other">%1$d つ星: %2$d 件のレビュー</item>
     </plurals>
-    <plurals name="reviews_helpful_count">
-        <item quantity="other">%1$d 人が役に立ったと評価しました</item>
-    </plurals>
     <string name="reviews_edited">編集済み</string>
-    <string name="reviews_helpful">役に立った</string>
+    <string name="reviews_upvote">高評価</string>
+    <string name="reviews_downvote">低評価</string>
+    <string name="reviews_score">スコア %1$d</string>
     <string name="reviews_more_actions">その他の操作</string>
     <string name="reviews_reply_from">%1$s からの返信</string>
     <string name="reviews_show_more">もっと見る</string>
@@ -1523,7 +1522,7 @@
     <string name="reviews_cannot_account_too_new">レビューを投稿するには、GitHub アカウントの作成から 30 日以上経過している必要があります。</string>
     <string name="reviews_cannot_own_repo">このリポジトリのメンテナーのため、評価できません。</string>
     <string name="reviews_cannot_banned">レビューを投稿できません。</string>
-    <string name="reviews_sort_helpful">役に立った順</string>
+    <string name="reviews_sort_top">トップ</string>
     <string name="reviews_sort_newest">新しい順</string>
     <string name="reviews_sort_highest">評価の高い順</string>
     <string name="reviews_sort_lowest">評価の低い順</string>
