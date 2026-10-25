@@ -10,10 +10,10 @@ import zed.rainxch.githubstore.core.presentation.res.reviews_cannot_own_repo
 import zed.rainxch.githubstore.core.presentation.res.reviews_error_generic
 import zed.rainxch.githubstore.core.presentation.res.reviews_error_network
 import zed.rainxch.githubstore.core.presentation.res.reviews_error_not_maintainer
+import zed.rainxch.githubstore.core.presentation.res.reviews_error_not_moderator
 import zed.rainxch.githubstore.core.presentation.res.reviews_error_own_review
 import zed.rainxch.githubstore.core.presentation.res.reviews_error_rate_limited
 import zed.rainxch.githubstore.core.presentation.res.reviews_error_sign_in
-import zed.rainxch.githubstore.core.presentation.res.reviews_error_not_moderator
 import zed.rainxch.githubstore.core.presentation.res.reviews_unavailable
 
 fun Throwable.reviewMessage(): StringResource =

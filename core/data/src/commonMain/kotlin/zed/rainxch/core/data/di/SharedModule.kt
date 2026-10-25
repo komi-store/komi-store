@@ -53,8 +53,8 @@ import zed.rainxch.core.data.repository.HiddenReposRepositoryImpl
 import zed.rainxch.core.data.repository.HostTokenRepositoryImpl
 import zed.rainxch.core.data.repository.InstalledAppsRepositoryImpl
 import zed.rainxch.core.data.repository.ProxyRepositoryImpl
-import zed.rainxch.core.data.repository.ReviewsRepositoryImpl
 import zed.rainxch.core.data.repository.RateLimitRepositoryImpl
+import zed.rainxch.core.data.repository.ReviewsRepositoryImpl
 import zed.rainxch.core.data.repository.SeenReposRepositoryImpl
 import zed.rainxch.core.data.repository.StarredRepositoryImpl
 import zed.rainxch.core.data.repository.TweaksRepositoryImpl
@@ -80,8 +80,8 @@ import zed.rainxch.core.domain.repository.HostTokenRepository
 import zed.rainxch.core.domain.repository.InstalledAppsRepository
 import zed.rainxch.core.domain.repository.MirrorRepository
 import zed.rainxch.core.domain.repository.ProxyRepository
-import zed.rainxch.core.domain.repository.ReviewsRepository
 import zed.rainxch.core.domain.repository.RateLimitRepository
+import zed.rainxch.core.domain.repository.ReviewsRepository
 import zed.rainxch.core.domain.repository.SeenReposRepository
 import zed.rainxch.core.domain.repository.StarredRepository
 import zed.rainxch.core.domain.repository.TweaksRepository

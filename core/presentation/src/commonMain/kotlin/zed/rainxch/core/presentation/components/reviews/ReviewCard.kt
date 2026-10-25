@@ -67,10 +67,10 @@ import zed.rainxch.githubstore.core.presentation.res.reviews_action_delete_reply
 import zed.rainxch.githubstore.core.presentation.res.reviews_action_edit
 import zed.rainxch.githubstore.core.presentation.res.reviews_action_reply
 import zed.rainxch.githubstore.core.presentation.res.reviews_action_report
+import zed.rainxch.githubstore.core.presentation.res.reviews_downvote
 import zed.rainxch.githubstore.core.presentation.res.reviews_edited
 import zed.rainxch.githubstore.core.presentation.res.reviews_hidden_notice
 import zed.rainxch.githubstore.core.presentation.res.reviews_more_actions
-import zed.rainxch.githubstore.core.presentation.res.reviews_downvote
 import zed.rainxch.githubstore.core.presentation.res.reviews_reply_from
 import zed.rainxch.githubstore.core.presentation.res.reviews_score
 import zed.rainxch.githubstore.core.presentation.res.reviews_show_less
@@ -297,13 +297,13 @@ private fun ReviewMenu(
 ) {
     val actions =
         listOfNotNull(
-            onEdit?.let { MenuAction(ID_EDIT, stringResource(Res.string.reviews_action_edit), it) },
-            onReply?.let { MenuAction(ID_REPLY, stringResource(Res.string.reviews_action_reply), it) },
+            onEdit?.let { ReviewMenuItem(ID_EDIT, stringResource(Res.string.reviews_action_edit), it) },
+            onReply?.let { ReviewMenuItem(ID_REPLY, stringResource(Res.string.reviews_action_reply), it) },
             onDeleteReply?.let {
-                MenuAction(ID_DELETE_REPLY, stringResource(Res.string.reviews_action_delete_reply), it, danger = true)
+                ReviewMenuItem(ID_DELETE_REPLY, stringResource(Res.string.reviews_action_delete_reply), it, danger = true)
             },
-            onReport?.let { MenuAction(ID_REPORT, stringResource(Res.string.reviews_action_report), it) },
-            onDelete?.let { MenuAction(ID_DELETE, stringResource(Res.string.reviews_action_delete), it, danger = true) },
+            onReport?.let { ReviewMenuItem(ID_REPORT, stringResource(Res.string.reviews_action_report), it) },
+            onDelete?.let { ReviewMenuItem(ID_DELETE, stringResource(Res.string.reviews_action_delete), it, danger = true) },
         )
     if (actions.isEmpty()) return
     val entries: List<KomiMenuEntry> =
@@ -325,7 +325,7 @@ private fun ReviewMenu(
     )
 }
 
-private class MenuAction(
+private class ReviewMenuItem(
     val id: String,
     val label: String,
     val onClick: () -> Unit,

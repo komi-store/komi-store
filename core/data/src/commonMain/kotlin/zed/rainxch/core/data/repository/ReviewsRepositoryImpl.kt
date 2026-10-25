@@ -39,13 +39,14 @@ class ReviewsRepositoryImpl(
     // The backend takes one host per call, so a mixed list (GitHub and Codeberg rows) is fetched per host.
     override suspend fun getSummaries(targets: List<ReviewTarget>): Result<Map<ReviewTarget, RepoRating>> {
         val ratings = mutableMapOf<ReviewTarget, RepoRating>()
-        for ((host, group) in targets.distinct().groupBy { it.host }) {
-            for (chunk in group.chunked(SUMMARIES_PER_CALL)) {
-                val byKey = chunk.associateBy { "${it.owner}/${it.name}".lowercase() }
-                val summaries =
-                    api.getSummaries(byKey.keys.toList(), host).getOrElse { return Result.failure(it) }.summaries
-                summaries.forEach { (key, rating) -> byKey[key.lowercase()]?.let { ratings[it] = rating.toDomain() } }
+        val calls =
+            targets.distinct().groupBy { it.host }.flatMap { (host, group) ->
+                group.chunked(SUMMARIES_PER_CALL).map { host to it }
             }
+        for ((host, chunk) in calls) {
+            val byKey = chunk.associateBy { "${it.owner}/${it.name}".lowercase() }
+            val summaries = api.getSummaries(byKey.keys.toList(), host).getOrElse { return Result.failure(it) }.summaries
+            summaries.forEach { (key, rating) -> byKey[key.lowercase()]?.let { ratings[it] = rating.toDomain() } }
         }
         return Result.success(ratings)
     }

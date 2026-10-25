@@ -2,6 +2,9 @@ package zed.rainxch.core.domain.model.reviews
 
 import kotlin.time.Instant
 
+// A rating runs from one to five stars.
+val REVIEW_RATING_RANGE = 1..5
+
 data class Review(
     val id: String,
     val rating: Int,

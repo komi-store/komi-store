@@ -71,7 +71,7 @@ private fun zed.rainxch.reviews.presentation.ReviewsScreen(state: zed.rainxch.re
     - onAction: STABLE (function type)
 
 @Composable
-public fun zed.rainxch.reviews.presentation.components.ComposerSheet(composer: zed.rainxch.reviews.presentation.ComposerState, maxLength: kotlin.Int, onRatingChange: kotlin.Function1<kotlin.Int, kotlin.Unit>, onTextChange: kotlin.Function1<kotlin.String, kotlin.Unit>, onSubmit: kotlin.Function0<kotlin.Unit>, onDelete: kotlin.Function0<kotlin.Unit>, onDismiss: kotlin.Function0<kotlin.Unit>): kotlin.Unit
+public fun zed.rainxch.reviews.presentation.components.ComposerSheet(composer: zed.rainxch.reviews.presentation.ComposerState, maxLength: kotlin.Int, onRatingChange: kotlin.Function1<kotlin.Int, kotlin.Unit>, onTextChange: kotlin.Function1<kotlin.String, kotlin.Unit>, onSubmit: kotlin.Function0<kotlin.Unit>, onDelete: kotlin.Function0<kotlin.Unit>, onDismiss: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
   skippable: true
   restartable: true
   params:
@@ -82,6 +82,7 @@ public fun zed.rainxch.reviews.presentation.components.ComposerSheet(composer: z
     - onSubmit: STABLE (function type)
     - onDelete: STABLE (function type)
     - onDismiss: STABLE (function type)
+    - modifier: STABLE (marked @Stable or @Immutable)
 
 @Composable
 private fun zed.rainxch.reviews.presentation.components.ReasonRow(label: kotlin.String, selected: kotlin.Boolean, onClick: kotlin.Function0<kotlin.Unit>): kotlin.Unit
@@ -93,7 +94,7 @@ private fun zed.rainxch.reviews.presentation.components.ReasonRow(label: kotlin.
     - onClick: STABLE (function type)
 
 @Composable
-public fun zed.rainxch.reviews.presentation.components.ReplySheet(reply: zed.rainxch.reviews.presentation.ReplyState, onTextChange: kotlin.Function1<kotlin.String, kotlin.Unit>, onSend: kotlin.Function0<kotlin.Unit>, onDismiss: kotlin.Function0<kotlin.Unit>): kotlin.Unit
+public fun zed.rainxch.reviews.presentation.components.ReplySheet(reply: zed.rainxch.reviews.presentation.ReplyState, onTextChange: kotlin.Function1<kotlin.String, kotlin.Unit>, onSend: kotlin.Function0<kotlin.Unit>, onDismiss: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
   skippable: true
   restartable: true
   params:
@@ -101,9 +102,10 @@ public fun zed.rainxch.reviews.presentation.components.ReplySheet(reply: zed.rai
     - onTextChange: STABLE (function type)
     - onSend: STABLE (function type)
     - onDismiss: STABLE (function type)
+    - modifier: STABLE (marked @Stable or @Immutable)
 
 @Composable
-public fun zed.rainxch.reviews.presentation.components.ReportSheet(report: zed.rainxch.reviews.presentation.ReportState, onReasonChange: kotlin.Function1<zed.rainxch.core.domain.model.reviews.ReportReason, kotlin.Unit>, onNoteChange: kotlin.Function1<kotlin.String, kotlin.Unit>, onSend: kotlin.Function0<kotlin.Unit>, onDismiss: kotlin.Function0<kotlin.Unit>): kotlin.Unit
+public fun zed.rainxch.reviews.presentation.components.ReportSheet(report: zed.rainxch.reviews.presentation.ReportState, onReasonChange: kotlin.Function1<zed.rainxch.core.domain.model.reviews.ReportReason, kotlin.Unit>, onNoteChange: kotlin.Function1<kotlin.String, kotlin.Unit>, onSend: kotlin.Function0<kotlin.Unit>, onDismiss: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
   skippable: true
   restartable: true
   params:
@@ -112,6 +114,7 @@ public fun zed.rainxch.reviews.presentation.components.ReportSheet(report: zed.r
     - onNoteChange: STABLE (function type)
     - onSend: STABLE (function type)
     - onDismiss: STABLE (function type)
+    - modifier: STABLE (marked @Stable or @Immutable)
 
 @Composable
 private fun zed.rainxch.reviews.presentation.moderation.Action(label: org.jetbrains.compose.resources.StringResource, variant: zed.rainxch.core.presentation.components.buttons.KomiButtonVariant, busy: kotlin.Boolean, onClick: kotlin.Function0<kotlin.Unit>): kotlin.Unit

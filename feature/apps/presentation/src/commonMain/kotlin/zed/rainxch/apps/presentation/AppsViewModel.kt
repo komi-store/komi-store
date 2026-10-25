@@ -49,10 +49,10 @@ import zed.rainxch.core.domain.model.account.github.GithubAsset
 import zed.rainxch.core.domain.model.error.RateLimitException
 import zed.rainxch.core.domain.model.installation.InstalledApp
 import zed.rainxch.core.domain.model.installation.InstallerType
-import zed.rainxch.core.domain.network.Downloader
-import zed.rainxch.core.domain.repository.ExternalImportRepository
 import zed.rainxch.core.domain.model.reviews.RepoRating
 import zed.rainxch.core.domain.model.reviews.ReviewTarget
+import zed.rainxch.core.domain.network.Downloader
+import zed.rainxch.core.domain.repository.ExternalImportRepository
 import zed.rainxch.core.domain.repository.InstalledAppsRepository
 import zed.rainxch.core.domain.repository.ReviewsRepository
 import zed.rainxch.core.domain.repository.TweaksRepository
@@ -245,12 +245,11 @@ class AppsViewModel(
                                         it.installedApp.packageName == app.packageName
                                     }
                                 add(
-                                    app
-                                        .toAppItem(
-                                            updateState = existing?.updateState ?: UpdateState.Idle,
-                                            downloadProgress = existing?.downloadProgress,
-                                            error = existing?.error,
-                                        ).withRating(ratingsByRepo[app.repoId]),
+                                    app.toAppItem(
+                                        updateState = existing?.updateState ?: UpdateState.Idle,
+                                        downloadProgress = existing?.downloadProgress,
+                                        error = existing?.error,
+                                    ),
                                 )
                             }
                         }.sortedWith(appComparator(sortRule))
@@ -258,7 +257,7 @@ class AppsViewModel(
 
                     _state.update {
                         it.copy(
-                            apps = appItems,
+                            apps = appItems.map { item -> item.withRating(ratingsByRepo[item.installedApp.repoId]) }.toImmutableList(),
                             sortRule = sortRule,
                             isLoading = false,
                             updateAllButtonEnabled =
@@ -310,8 +309,7 @@ class AppsViewModel(
             }
     }
 
-    private fun AppItem.withRating(rating: RepoRating?): AppItem =
-        copy(ratingAverage = rating?.average, ratingCount = rating?.count ?: 0)
+    private fun AppItem.withRating(rating: RepoRating?): AppItem = copy(ratingAverage = rating?.average, ratingCount = rating?.count ?: 0)
 
     private fun autoCheckForUpdatesIfNeeded() {
         val now = System.currentTimeMillis()

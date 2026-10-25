@@ -29,7 +29,7 @@
     <ID>LongMethod:ExternalImportViewModel.kt$ExternalImportViewModel$private fun startScanIfIdle(force: Boolean = false)</ID>
     <ID>LongMethod:ExternalImportViewModel.kt$ExternalImportViewModel$private fun submitSearchOverride(packageName: String)</ID>
     <ID>LongMethod:StatusDotCluster.kt$private fun DrawScope.drawShape( shape: DotShape, color: Color, )</ID>
-    <ID>LongParameterList:AppsViewModel.kt$AppsViewModel$( private val appsRepository: AppsRepository, private val installer: Installer, private val downloader: Downloader, private val installedAppsRepository: InstalledAppsRepository, private val syncInstalledAppsUseCase: SyncInstalledAppsUseCase, private val logger: KomiStoreLogger, private val shareManager: ShareManager, private val tweaksRepository: TweaksRepository, private val downloadOrchestrator: DownloadOrchestrator, private val externalImportRepository: ExternalImportRepository, private val systemInstallSerializer: SystemInstallSerializer, private val appScope: CoroutineScope, )</ID>
+    <ID>LongParameterList:AppsViewModel.kt$AppsViewModel$( private val appsRepository: AppsRepository, private val installer: Installer, private val downloader: Downloader, private val installedAppsRepository: InstalledAppsRepository, private val syncInstalledAppsUseCase: SyncInstalledAppsUseCase, private val logger: KomiStoreLogger, private val shareManager: ShareManager, private val tweaksRepository: TweaksRepository, private val downloadOrchestrator: DownloadOrchestrator, private val externalImportRepository: ExternalImportRepository, private val systemInstallSerializer: SystemInstallSerializer, private val reviewsRepository: ReviewsRepository, private val appScope: CoroutineScope, )</ID>
     <ID>MagicNumber:AppsViewModel.kt$AppsViewModel$100</ID>
     <ID>MagicNumber:AppsViewModel.kt$AppsViewModel$1000</ID>
     <ID>MagicNumber:AppsViewModel.kt$AppsViewModel$3</ID>
@@ -61,9 +61,6 @@
     <ID>TooManyFunctions:AppsViewModel.kt$AppsViewModel : ViewModel</ID>
     <ID>TooManyFunctions:ExternalImportViewModel.kt$ExternalImportViewModel : ViewModel</ID>
     <ID>UnusedPrivateMember:AppsViewModel.kt$AppsViewModel$private fun parseGithubUrl(input: String): Pair&lt;String, String&gt;?</ID>
-    <ID>UseCheckOrError:AppsViewModel.kt$AppsViewModel$throw IllegalStateException("Could not determine primary asset")</ID>
     <ID>UseCheckOrError:AppsViewModel.kt$AppsViewModel$throw IllegalStateException("Failed to fetch latest release: ${e.message}")</ID>
-    <ID>UseCheckOrError:AppsViewModel.kt$AppsViewModel$throw IllegalStateException("No installable assets found for this platform")</ID>
-    <ID>UseCheckOrError:AppsViewModel.kt$AppsViewModel$throw IllegalStateException("No release found for ${app.appName}")</ID>
   </CurrentIssues>
 </SmellBaseline>

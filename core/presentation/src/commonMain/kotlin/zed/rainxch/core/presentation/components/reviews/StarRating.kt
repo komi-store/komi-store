@@ -117,6 +117,8 @@ fun CompactRating(
 }
 
 fun formatAverage(average: Double): String {
-    val tenths = kotlin.math.round(average * 10).toInt()
-    return "${tenths / 10}.${tenths % 10}"
+    val tenths = kotlin.math.round(average * TENTHS).toInt()
+    return "${tenths / TENTHS}.${tenths % TENTHS}"
 }
+
+private const val TENTHS = 10

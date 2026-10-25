@@ -44,19 +44,39 @@ class ModerationViewModel(
 
     fun onAction(action: ModerationAction) {
         when (action) {
-            ModerationAction.OnBackClick, is ModerationAction.OnOpenRepo -> Unit
-            ModerationAction.OnRetry -> load(_state.value.status)
-            ModerationAction.OnLoadMore -> loadNextPage()
-            is ModerationAction.OnStatusChange -> if (action.status != _state.value.status) load(action.status)
-            is ModerationAction.OnDecision ->
+            ModerationAction.OnBackClick, is ModerationAction.OnOpenRepo -> {}
+
+            ModerationAction.OnRetry -> {
+                load(_state.value.status)
+            }
+
+            ModerationAction.OnLoadMore -> {
+                loadNextPage()
+            }
+
+            is ModerationAction.OnStatusChange -> {
+                if (action.status != _state.value.status) load(action.status)
+            }
+
+            is ModerationAction.OnDecision -> {
                 if (action.decision == ModerationDecision.DELETE) {
                     _state.update { it.copy(confirm = ModerationConfirm.Delete(action.reviewId)) }
                 } else {
                     decide(action.reviewId, action.decision)
                 }
-            is ModerationAction.OnBanClick -> askBan(action.reviewId)
-            ModerationAction.OnConfirm -> confirm()
-            ModerationAction.OnDismissConfirm -> _state.update { it.copy(confirm = null) }
+            }
+
+            is ModerationAction.OnBanClick -> {
+                askBan(action.reviewId)
+            }
+
+            ModerationAction.OnConfirm -> {
+                confirm()
+            }
+
+            ModerationAction.OnDismissConfirm -> {
+                _state.update { it.copy(confirm = null) }
+            }
         }
     }
 

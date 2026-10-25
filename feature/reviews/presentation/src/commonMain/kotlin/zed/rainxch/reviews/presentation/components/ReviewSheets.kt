@@ -14,6 +14,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
+import zed.rainxch.core.domain.model.reviews.REVIEW_RATING_RANGE
 import zed.rainxch.core.domain.model.reviews.ReportReason
 import zed.rainxch.core.presentation.components.buttons.KomiButton
 import zed.rainxch.core.presentation.components.buttons.KomiButtonVariant
@@ -58,10 +59,12 @@ fun ComposerSheet(
     onSubmit: () -> Unit,
     onDelete: () -> Unit,
     onDismiss: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val colors = LocalPersonality.current.colors
     KomiSheet(
         onDismiss = onDismiss,
+        modifier = modifier,
         title = stringResource(if (composer.isEditing) Res.string.reviews_composer_title_edit else Res.string.reviews_composer_title_new),
         footer = {
             Row(
@@ -79,7 +82,7 @@ fun ComposerSheet(
                 KomiButton(
                     onClick = onSubmit,
                     label = stringResource(if (composer.isEditing) Res.string.reviews_composer_save else Res.string.reviews_composer_post),
-                    enabled = composer.rating in 1..5 && !composer.isSubmitting,
+                    enabled = composer.rating in REVIEW_RATING_RANGE && !composer.isSubmitting,
                     loading = composer.isSubmitting,
                 )
             }
@@ -129,9 +132,11 @@ fun ReportSheet(
     onNoteChange: (String) -> Unit,
     onSend: () -> Unit,
     onDismiss: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     KomiSheet(
         onDismiss = onDismiss,
+        modifier = modifier,
         title = stringResource(Res.string.reviews_report_title),
         footer = {
             Row(
@@ -192,9 +197,11 @@ fun ReplySheet(
     onTextChange: (String) -> Unit,
     onSend: () -> Unit,
     onDismiss: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     KomiSheet(
         onDismiss = onDismiss,
+        modifier = modifier,
         title = stringResource(Res.string.reviews_reply_title),
         footer = {
             Row(

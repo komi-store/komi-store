@@ -18,6 +18,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.Role
@@ -132,12 +133,17 @@ private fun ModerationScreen(
             )
             Box(modifier = Modifier.fillMaxSize()) {
                 when {
-                    state.isLoading && state.items.isEmpty() -> Centered { KomiCircularProgress() }
-                    state.errorMessage != null ->
+                    state.isLoading && state.items.isEmpty() -> {
+                        Centered { KomiCircularProgress() }
+                    }
+
+                    state.errorMessage != null -> {
                         Centered {
                             ErrorBlock(state.errorMessage, onRetry = { onAction(ModerationAction.OnRetry) })
                         }
-                    state.items.isEmpty() ->
+                    }
+
+                    state.items.isEmpty() -> {
                         Centered {
                             Message(
                                 if (state.status == ModerationStatus.REPORTED) {
@@ -147,7 +153,11 @@ private fun ModerationScreen(
                                 },
                             )
                         }
-                    else -> Queue(state = state, onAction = onAction)
+                    }
+
+                    else -> {
+                        Queue(state = state, onAction = onAction)
+                    }
                 }
             }
         }
@@ -191,12 +201,16 @@ private fun Queue(
     val listState = rememberLazyListState()
     val nearEnd by remember {
         derivedStateOf {
-            val last = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
+            val last =
+                listState.layoutInfo.visibleItemsInfo
+                    .lastOrNull()
+                    ?.index ?: 0
             last >= listState.layoutInfo.totalItemsCount - LOAD_MORE_THRESHOLD
         }
     }
+    val currentOnAction by rememberUpdatedState(onAction)
     LaunchedEffect(nearEnd, state.items.size) {
-        if (nearEnd) onAction(ModerationAction.OnLoadMore)
+        if (nearEnd) currentOnAction(ModerationAction.OnLoadMore)
     }
     LazyColumn(
         state = listState,

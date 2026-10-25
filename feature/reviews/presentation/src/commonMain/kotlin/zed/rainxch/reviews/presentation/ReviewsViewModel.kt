@@ -16,6 +16,7 @@ import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.getString
 import zed.rainxch.core.domain.getPlatform
 import zed.rainxch.core.domain.model.reviews.CannotReviewReason
+import zed.rainxch.core.domain.model.reviews.REVIEW_RATING_RANGE
 import zed.rainxch.core.domain.model.reviews.RatingSummary
 import zed.rainxch.core.domain.model.reviews.Review
 import zed.rainxch.core.domain.model.reviews.ReviewDraft
@@ -83,32 +84,99 @@ class ReviewsViewModel(
 
     fun onAction(action: ReviewsAction) {
         when (action) {
-            ReviewsAction.OnBackClick, ReviewsAction.OnSignInClick, ReviewsAction.OnOpenModeration -> Unit
-            ReviewsAction.OnRetry -> load()
-            ReviewsAction.OnLoadMore -> loadNextPage()
-            is ReviewsAction.OnSortChange -> if (action.sort != _state.value.sort) load(sort = action.sort)
-            is ReviewsAction.OnRatingFilterChange -> if (action.rating != _state.value.ratingFilter) load(rating = action.rating)
-            ReviewsAction.OnOpenComposer -> openComposer()
-            ReviewsAction.OnDismissComposer -> _state.update { it.copy(composer = null) }
-            is ReviewsAction.OnComposerRatingChange -> updateComposer { it.copy(rating = action.rating) }
-            is ReviewsAction.OnComposerTextChange -> updateComposer { it.copy(text = action.text.take(MAX_TEXT)) }
-            ReviewsAction.OnSubmitReview -> submit()
-            ReviewsAction.OnDeleteReview -> _state.update { it.copy(isConfirmingDelete = true) }
-            ReviewsAction.OnDismissDelete -> _state.update { it.copy(isConfirmingDelete = false) }
-            ReviewsAction.OnConfirmDelete -> deleteMine()
-            is ReviewsAction.OnVote -> vote(action.reviewId, action.vote)
-            is ReviewsAction.OnOpenReport -> requireSignIn { _state.update { it.copy(report = ReportState(action.reviewId)) } }
-            is ReviewsAction.OnReportReasonChange -> _state.update { it.copy(report = it.report?.copy(reason = action.reason)) }
-            is ReviewsAction.OnReportNoteChange ->
+            ReviewsAction.OnBackClick, ReviewsAction.OnSignInClick, ReviewsAction.OnOpenModeration -> {}
+
+            ReviewsAction.OnRetry -> {
+                load()
+            }
+
+            ReviewsAction.OnLoadMore -> {
+                loadNextPage()
+            }
+
+            is ReviewsAction.OnSortChange -> {
+                if (action.sort != _state.value.sort) load(sort = action.sort)
+            }
+
+            is ReviewsAction.OnRatingFilterChange -> {
+                if (action.rating != _state.value.ratingFilter) load(rating = action.rating)
+            }
+
+            ReviewsAction.OnOpenComposer -> {
+                openComposer()
+            }
+
+            ReviewsAction.OnDismissComposer -> {
+                _state.update { it.copy(composer = null) }
+            }
+
+            is ReviewsAction.OnComposerRatingChange -> {
+                updateComposer { it.copy(rating = action.rating) }
+            }
+
+            is ReviewsAction.OnComposerTextChange -> {
+                updateComposer { it.copy(text = action.text.take(MAX_TEXT)) }
+            }
+
+            ReviewsAction.OnSubmitReview -> {
+                submit()
+            }
+
+            ReviewsAction.OnDeleteReview -> {
+                _state.update { it.copy(isConfirmingDelete = true) }
+            }
+
+            ReviewsAction.OnDismissDelete -> {
+                _state.update { it.copy(isConfirmingDelete = false) }
+            }
+
+            ReviewsAction.OnConfirmDelete -> {
+                deleteMine()
+            }
+
+            is ReviewsAction.OnVote -> {
+                vote(action.reviewId, action.vote)
+            }
+
+            is ReviewsAction.OnOpenReport -> {
+                requireSignIn { _state.update { it.copy(report = ReportState(action.reviewId)) } }
+            }
+
+            is ReviewsAction.OnReportReasonChange -> {
+                _state.update { it.copy(report = it.report?.copy(reason = action.reason)) }
+            }
+
+            is ReviewsAction.OnReportNoteChange -> {
                 _state.update { it.copy(report = it.report?.copy(note = action.note.take(MAX_NOTE))) }
-            ReviewsAction.OnSendReport -> sendReport()
-            ReviewsAction.OnDismissReport -> _state.update { it.copy(report = null) }
-            is ReviewsAction.OnOpenReply -> openReply(action.reviewId)
-            is ReviewsAction.OnReplyTextChange ->
+            }
+
+            ReviewsAction.OnSendReport -> {
+                sendReport()
+            }
+
+            ReviewsAction.OnDismissReport -> {
+                _state.update { it.copy(report = null) }
+            }
+
+            is ReviewsAction.OnOpenReply -> {
+                openReply(action.reviewId)
+            }
+
+            is ReviewsAction.OnReplyTextChange -> {
                 _state.update { it.copy(reply = it.reply?.copy(text = action.text.take(MAX_TEXT))) }
-            ReviewsAction.OnSendReply -> sendReply()
-            ReviewsAction.OnDismissReply -> _state.update { it.copy(reply = null) }
-            is ReviewsAction.OnDeleteReply -> deleteReply(action.reviewId)
+            }
+
+            ReviewsAction.OnSendReply -> {
+                sendReply()
+            }
+
+            ReviewsAction.OnDismissReply -> {
+                _state.update { it.copy(reply = null) }
+            }
+
+            is ReviewsAction.OnDeleteReply -> {
+                deleteReply(action.reviewId)
+            }
         }
     }
 
@@ -245,8 +313,7 @@ class ReviewsViewModel(
     }
 
     private fun submit() {
-        val composer = _state.value.composer ?: return
-        if (composer.rating !in 1..5 || composer.isSubmitting) return
+        val composer = _state.value.composer?.takeIf { it.rating in REVIEW_RATING_RANGE && !it.isSubmitting } ?: return
         if (composer.text.length > MAX_TEXT) {
             message(Res.string.reviews_error_too_long)
             return
@@ -342,9 +409,8 @@ class ReviewsViewModel(
     }
 
     private fun sendReport() {
-        val report = _state.value.report ?: return
+        val report = _state.value.report?.takeUnless { it.isSending } ?: return
         val reason = report.reason ?: return
-        if (report.isSending) return
         viewModelScope.launch {
             _state.update { it.copy(report = report.copy(isSending = true)) }
             repository
@@ -360,7 +426,12 @@ class ReviewsViewModel(
     }
 
     private fun openReply(reviewId: String) {
-        val existing = loaded.firstOrNull { it.id == reviewId }?.reply?.text.orEmpty()
+        val existing =
+            loaded
+                .firstOrNull { it.id == reviewId }
+                ?.reply
+                ?.text
+                .orEmpty()
         _state.update { it.copy(reply = ReplyState(reviewId = reviewId, text = existing)) }
     }
 

@@ -11,6 +11,7 @@
     <ID>CyclomaticComplexMethod:AndroidDownloader.kt$AndroidDownloader$private suspend fun downloadAttempt( client: OkHttpClient, url: String, partFile: File, metaFile: File, destination: File, downloadId: String, identity: AssetIdentity?, emit: suspend (DownloadProgress) -&gt; Unit, )</ID>
     <ID>CyclomaticComplexMethod:AutoUpdateWorker.kt$AutoUpdateWorker$@SuppressLint("MissingPermission") private fun showSummaryNotification( successfulApps: List&lt;String&gt;, failedApps: List&lt;String&gt;, )</ID>
     <ID>CyclomaticComplexMethod:AutoUpdateWorker.kt$AutoUpdateWorker$private suspend fun updateApp(app: InstalledApp)</ID>
+    <ID>CyclomaticComplexMethod:BackendReviewsApi.kt$BackendReviewsApi$private suspend fun HttpResponse.toReviewException(): ReviewException</ID>
     <ID>CyclomaticComplexMethod:DefaultDownloadOrchestrator.kt$DefaultDownloadOrchestrator$private suspend fun runDownload(spec: DownloadSpec)</ID>
     <ID>CyclomaticComplexMethod:DesktopAppLauncher.kt$DesktopAppLauncher$private fun launchLinuxApp(installedApp: InstalledApp)</ID>
     <ID>CyclomaticComplexMethod:DesktopAppLauncher.kt$DesktopAppLauncher$private fun launchWindowsApp(installedApp: InstalledApp)</ID>
@@ -313,6 +314,7 @@
     <ID>TooManyFunctions:AndroidDownloader.kt$AndroidDownloader : Downloader</ID>
     <ID>TooManyFunctions:AndroidInstaller.kt$AndroidInstaller : Installer</ID>
     <ID>TooManyFunctions:BackendApiClient.kt$BackendApiClient</ID>
+    <ID>TooManyFunctions:BackendReviewsApi.kt$BackendReviewsApi</ID>
     <ID>TooManyFunctions:DefaultDownloadOrchestrator.kt$DefaultDownloadOrchestrator : DownloadOrchestrator</ID>
     <ID>TooManyFunctions:DesktopAppLauncher.kt$DesktopAppLauncher : AppLauncher</ID>
     <ID>TooManyFunctions:DesktopDownloader.kt$DesktopDownloader : Downloader</ID>
@@ -322,6 +324,8 @@
     <ID>TooManyFunctions:InstalledAppsRepositoryImpl.kt$InstalledAppsRepositoryImpl : InstalledAppsRepository</ID>
     <ID>TooManyFunctions:PackageEventReceiver.kt$PackageEventReceiver : BroadcastReceiverKoinComponent</ID>
     <ID>TooManyFunctions:ProxyRepositoryImpl.kt$ProxyRepositoryImpl : ProxyRepository</ID>
+    <ID>TooManyFunctions:ReviewMappers.kt$zed.rainxch.core.data.mappers.ReviewMappers.kt</ID>
+    <ID>TooManyFunctions:ReviewsRepositoryImpl.kt$ReviewsRepositoryImpl : ReviewsRepository</ID>
     <ID>TooManyFunctions:RootServiceManager.kt$RootServiceManager</ID>
     <ID>TooManyFunctions:SilentInstallerDispatcher.kt$SilentInstallerDispatcher : Installer</ID>
     <ID>TooManyFunctions:StarredRepoDao.kt$StarredRepoDao</ID>

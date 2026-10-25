@@ -20,6 +20,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
@@ -208,12 +209,16 @@ private fun ReviewsList(
     val listState = rememberLazyListState()
     val nearEnd by remember {
         derivedStateOf {
-            val last = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
+            val last =
+                listState.layoutInfo.visibleItemsInfo
+                    .lastOrNull()
+                    ?.index ?: 0
             last >= listState.layoutInfo.totalItemsCount - LOAD_MORE_THRESHOLD
         }
     }
+    val currentOnAction by rememberUpdatedState(onAction)
     LaunchedEffect(nearEnd, state.reviews.size) {
-        if (nearEnd) onAction(ReviewsAction.OnLoadMore)
+        if (nearEnd) currentOnAction(ReviewsAction.OnLoadMore)
     }
     LazyColumn(
         state = listState,

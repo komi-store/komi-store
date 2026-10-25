@@ -97,6 +97,7 @@
     <ID>TooManyFunctions:InstalledAppUpdates.kt$zed.rainxch.core.domain.model.installation.InstalledAppUpdates.kt</ID>
     <ID>TooManyFunctions:InstalledAppsRepository.kt$InstalledAppsRepository</ID>
     <ID>TooManyFunctions:Installer.kt$Installer</ID>
+    <ID>TooManyFunctions:ReviewsRepository.kt$ReviewsRepository</ID>
     <ID>TooManyFunctions:TweaksRepository.kt$TweaksRepository</ID>
     <ID>TooManyFunctions:VersionMath.kt$VersionMath</ID>
   </CurrentIssues>

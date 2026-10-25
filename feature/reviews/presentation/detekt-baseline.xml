@@ -1,0 +1,14 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues/>
+  <CurrentIssues>
+    <ID>ComplexCondition:ModerationViewModel.kt$ModerationViewModel$current.isLoading || current.isLoadingMore || current.endReached || current.errorMessage != null</ID>
+    <ID>ComplexCondition:ReviewsViewModel.kt$ReviewsViewModel$current.isLoading || current.isLoadingMore || current.endReached || current.errorMessage != null</ID>
+    <ID>CyclomaticComplexMethod:ReviewsViewModel.kt$ReviewsViewModel$fun onAction(action: ReviewsAction)</ID>
+    <ID>LongMethod:ReviewsViewModel.kt$ReviewsViewModel$fun onAction(action: ReviewsAction)</ID>
+    <ID>LongParameterList:ReviewsViewModel.kt$ReviewsViewModel$( owner: String, repo: String, sourceHost: String?, openComposer: Boolean, private val version: String?, private val appLabel: String?, private val repository: ReviewsRepository, private val userSessionRepository: UserSessionRepository, )</ID>
+    <ID>TooManyFunctions:ModerationRoot.kt$zed.rainxch.reviews.presentation.moderation.ModerationRoot.kt</ID>
+    <ID>TooManyFunctions:ModerationViewModel.kt$ModerationViewModel : ViewModel</ID>
+    <ID>TooManyFunctions:ReviewsViewModel.kt$ReviewsViewModel : ViewModel</ID>
+  </CurrentIssues>
+</SmellBaseline>

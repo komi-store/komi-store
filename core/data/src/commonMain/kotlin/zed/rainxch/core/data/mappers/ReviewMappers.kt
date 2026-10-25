@@ -17,6 +17,7 @@ import zed.rainxch.core.domain.model.reviews.ModerationPage
 import zed.rainxch.core.domain.model.reviews.ModerationReport
 import zed.rainxch.core.domain.model.reviews.ModerationStatus
 import zed.rainxch.core.domain.model.reviews.MyReviewState
+import zed.rainxch.core.domain.model.reviews.REVIEW_RATING_RANGE
 import zed.rainxch.core.domain.model.reviews.RatingSummary
 import zed.rainxch.core.domain.model.reviews.RepoRating
 import zed.rainxch.core.domain.model.reviews.ReportReason
@@ -45,7 +46,7 @@ fun BackendRatingSummaryDto.toDomain(): RatingSummary =
         count = count,
         histogram =
             histogram
-                .mapNotNull { (stars, count) -> stars.toIntOrNull()?.takeIf { it in 1..5 }?.let { it to count } }
+                .mapNotNull { (stars, count) -> stars.toIntOrNull()?.takeIf { it in REVIEW_RATING_RANGE }?.let { it to count } }
                 .toMap(),
     )
 

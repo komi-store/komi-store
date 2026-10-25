@@ -234,16 +234,27 @@ class BackendReviewsApi(
         val kind =
             when (errorCode()) {
                 "auth_required" -> ReviewError.AUTH_REQUIRED
+
                 "auth_invalid" -> ReviewError.AUTH_INVALID
+
                 "account_too_new" -> ReviewError.ACCOUNT_TOO_NEW
+
                 "own_repo" -> ReviewError.OWN_REPO
+
                 "own_review" -> ReviewError.OWN_REVIEW
+
                 "banned" -> ReviewError.BANNED
+
                 "not_maintainer" -> ReviewError.NOT_MAINTAINER
+
                 "not_moderator" -> ReviewError.NOT_MODERATOR
+
                 "repo_not_found" -> ReviewError.REPO_NOT_FOUND
+
                 "review_not_found" -> ReviewError.REVIEW_NOT_FOUND
+
                 in INPUT_ERRORS -> ReviewError.INVALID_INPUT
+
                 // A plain 404 is the backend with REVIEWS_ENABLED off; 5xx and upstream_unavailable read the same way.
                 else -> if (status == HttpStatusCode.Unauthorized) ReviewError.AUTH_INVALID else ReviewError.UNAVAILABLE
             }
