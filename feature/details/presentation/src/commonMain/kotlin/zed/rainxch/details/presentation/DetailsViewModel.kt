@@ -37,6 +37,7 @@ import zed.rainxch.core.domain.helpers.ShareManager
 import zed.rainxch.core.domain.logging.KomiStoreLogger
 import zed.rainxch.core.domain.model.account.github.GithubAsset
 import zed.rainxch.core.domain.model.account.github.GithubRelease
+import zed.rainxch.core.domain.model.account.github.GithubRepoSummary
 import zed.rainxch.core.domain.model.account.github.isEffectivelyPreRelease
 import zed.rainxch.core.domain.model.apk.ApkPackageInfo
 import zed.rainxch.core.domain.model.error.RateLimitException
@@ -47,11 +48,13 @@ import zed.rainxch.core.domain.model.installation.InstallerType
 import zed.rainxch.core.domain.model.installation.isReallyInstalled
 import zed.rainxch.core.domain.model.repository.DiscoveryPlatform
 import zed.rainxch.core.domain.model.repository.FavoriteRepo
+import zed.rainxch.core.domain.model.reviews.ReviewTarget
 import zed.rainxch.core.domain.model.system.Platform
 import zed.rainxch.core.domain.network.Downloader
 import zed.rainxch.core.domain.repository.ExternalImportRepository
 import zed.rainxch.core.domain.repository.FavouritesRepository
 import zed.rainxch.core.domain.repository.InstalledAppsRepository
+import zed.rainxch.core.domain.repository.ReviewsRepository
 import zed.rainxch.core.domain.repository.SeenReposRepository
 import zed.rainxch.core.domain.repository.StarredRepository
 import zed.rainxch.core.domain.repository.TweaksRepository
@@ -160,6 +163,7 @@ class DetailsViewModel(
     private val apkInspector: ApkInspector,
     private val systemInstallSerializer: zed.rainxch.core.domain.system.SystemInstallSerializer,
     private val userSessionRepository: UserSessionRepository,
+    private val reviewsRepository: ReviewsRepository,
     private val appScope: CoroutineScope,
     private val packageNameParam: String? = null,
 ) : ViewModel() {
@@ -177,6 +181,7 @@ class DetailsViewModel(
     private var currentAssetName: String? = null
     private var aboutTranslationJob: Job? = null
     private var whatsNewTranslationJob: Job? = null
+    private var reviewsJob: Job? = null
 
     // Set once the user picks a release, asset, channel or installed app; an update check then
     // leaves the selection where they put it.
@@ -210,7 +215,32 @@ class DetailsViewModel(
     init {
         observeOrchestratorForDisplay()
         observeAutoTranslateSetting()
+        observeReviewChanges()
     }
+
+    private fun observeReviewChanges() {
+        viewModelScope.launch {
+            reviewsRepository.changes.collect { target ->
+                val repo = _state.value.repository ?: return@collect
+                if (target == repo.reviewTarget()) loadReviewsPreview(repo)
+            }
+        }
+    }
+
+    // The section stays hidden while the backend has reviews switched off or can't be reached.
+    private fun loadReviewsPreview(repo: GithubRepoSummary) {
+        reviewsJob?.cancel()
+        reviewsJob =
+            viewModelScope.launch {
+                reviewsRepository.getReviews(repo.reviewTarget()).onSuccess { page ->
+                    _state.update {
+                        it.copy(reviewSummary = page.summary, topReviews = page.reviews.take(PREVIEW_REVIEW_COUNT))
+                    }
+                }
+            }
+    }
+
+    private fun GithubRepoSummary.reviewTarget() = ReviewTarget(owner = owner.login, name = name, host = sourceHost)
 
     private fun observeAutoTranslateSetting() {
         viewModelScope.launch {
@@ -3051,6 +3081,7 @@ class DetailsViewModel(
                 }
 
                 observeInstalledApp(repo.id)
+                loadReviewsPreview(repo)
 
                 maybeAutoTranslate(
                     readmeBody = readme?.first,
@@ -3268,6 +3299,7 @@ class DetailsViewModel(
                         stats = freshStats ?: current.stats,
                     )
                 }
+                loadReviewsPreview(refreshed)
                 if (_state.value.selectedRelease?.id != previousSelectedId) {
                     whatsNewTranslationJob?.cancel()
                     maybeAutoTranslate(
@@ -3507,6 +3539,7 @@ class DetailsViewModel(
         const val OBTAINIUM_REPO_ID: Long = 523534328
         const val APP_MANAGER_REPO_ID: Long = 268006778
         const val STALLED_STABLE_THRESHOLD_DAYS = 180
+        const val PREVIEW_REVIEW_COUNT = 3
 
         const val NO_ORCHESTRATOR_KEY = ""
     }

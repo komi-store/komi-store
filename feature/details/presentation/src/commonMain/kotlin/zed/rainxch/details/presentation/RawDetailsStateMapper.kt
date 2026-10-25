@@ -5,6 +5,7 @@ import zed.rainxch.core.domain.model.account.github.GithubRelease
 import zed.rainxch.core.domain.model.account.github.isEffectivelyPreRelease
 import zed.rainxch.core.domain.utils.VersionMath
 import zed.rainxch.core.domain.utils.newestReleasePerPlatform
+import zed.rainxch.core.presentation.components.reviews.toUi
 import zed.rainxch.details.domain.model.ReleaseCategory
 import zed.rainxch.details.presentation.model.TranslationState
 import zed.rainxch.details.presentation.utils.releaseLineLabel
@@ -145,6 +146,8 @@ internal fun RawDetailsState.toView(): DetailsState {
         handoff = handoffPlatform?.let { platform -> platformReleases.firstOrNull { it.platform == platform } },
         releaseLines = releaseLines,
         selectedAppLabel = selectedLine?.let { releaseLineLabel(it, repository?.name.orEmpty()) },
+        reviewSummary = reviewSummary?.toUi(),
+        topReviews = topReviews.map { it.toUi(viewerId = null, votedIds = emptySet()) }.toImmutableList(),
     )
 }
 

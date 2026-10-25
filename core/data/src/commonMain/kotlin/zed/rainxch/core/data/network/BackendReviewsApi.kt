@@ -20,6 +20,8 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.contentOrNull
+import zed.rainxch.core.data.dto.BackendModerationQueueDto
+import zed.rainxch.core.data.dto.BackendModerationReasonDto
 import zed.rainxch.core.data.dto.BackendMyReviewDto
 import zed.rainxch.core.data.dto.BackendReviewDraftDto
 import zed.rainxch.core.data.dto.BackendReviewDto
@@ -149,6 +151,61 @@ class BackendReviewsApi(
             }.emptyOrFailure()
         }
 
+    suspend fun getModerationQueue(
+        status: String,
+        page: Int,
+    ): Result<BackendModerationQueueDto> =
+        call(authed = true) { token ->
+            val response =
+                get("reviews/moderation/queue") {
+                    header(X_GITHUB_TOKEN_HEADER, token)
+                    parameter("status", status)
+                    parameter("page", page)
+                }
+            response.bodyOrFailure()
+        }
+
+    // action is hide, unhide or dismiss.
+    suspend fun moderate(
+        reviewId: String,
+        action: String,
+        reason: String?,
+    ): Result<Unit> =
+        call(authed = true) { token ->
+            post("reviews/moderation/item/$reviewId/$action") {
+                header(X_GITHUB_TOKEN_HEADER, token)
+                contentType(ContentType.Application.Json)
+                setBody(BackendModerationReasonDto(reason))
+            }.emptyOrFailure()
+        }
+
+    suspend fun deleteAsModerator(reviewId: String): Result<Unit> =
+        call(authed = true) { token ->
+            delete("reviews/moderation/item/$reviewId") {
+                header(X_GITHUB_TOKEN_HEADER, token)
+            }.emptyOrFailure()
+        }
+
+    suspend fun setBanned(
+        githubId: Long,
+        banned: Boolean,
+        reason: String?,
+    ): Result<Unit> =
+        call(authed = true) { token ->
+            val path = "reviews/moderation/users/$githubId/ban"
+            val response =
+                if (banned) {
+                    post(path) {
+                        header(X_GITHUB_TOKEN_HEADER, token)
+                        contentType(ContentType.Application.Json)
+                        setBody(BackendModerationReasonDto(reason))
+                    }
+                } else {
+                    delete(path) { header(X_GITHUB_TOKEN_HEADER, token) }
+                }
+            response.emptyOrFailure()
+        }
+
     // A missing token never reaches the backend; any failure that isn't ours (no network, a timeout) is NETWORK.
     private suspend fun <T> call(
         authed: Boolean,
@@ -219,6 +276,9 @@ class BackendReviewsApi(
             setOf(
                 "invalid_owner",
                 "invalid_name",
+                "invalid_host",
+                "invalid_request",
+                "payload_too_large",
                 "invalid_rating",
                 "text_too_long",
                 "note_too_long",

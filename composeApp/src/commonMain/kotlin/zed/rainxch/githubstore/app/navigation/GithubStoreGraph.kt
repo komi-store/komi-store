@@ -110,6 +110,19 @@ sealed interface GithubStoreGraph {
     ) : GithubStoreGraph
 
     @Serializable
+    data class ReviewsScreen(
+        val owner: String,
+        val repo: String,
+        val sourceHost: String? = null,
+        val openComposer: Boolean = false,
+        val version: String? = null,
+        val appLabel: String? = null,
+    ) : GithubStoreGraph
+
+    @Serializable
+    data object ReviewModerationScreen : GithubStoreGraph
+
+    @Serializable
     data class RepoIssuesScreen(
         val owner: String,
         val repo: String,

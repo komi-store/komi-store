@@ -14,6 +14,8 @@ data class Review(
     val updatedAt: Instant?,
     val edited: Boolean,
     val helpfulCount: Int,
+    // Only ever true on the viewer's own review (from /mine) and in the moderation queue.
+    val hidden: Boolean,
     val reply: ReviewReply?,
 )
 

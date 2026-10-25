@@ -13,7 +13,7 @@ private fun zed.rainxch.details.presentation.DetailsActions(state: zed.rainxch.d
     - onAction: STABLE (function type)
 
 @Composable
-public fun zed.rainxch.details.presentation.DetailsRoot(onNavigateBack: kotlin.Function0<kotlin.Unit>, onNavigateToDeveloperProfile: kotlin.Function1<@[ParameterName(name = \, onOpenRepositoryInApp: kotlin.Function1<@[ParameterName(name = \, onNavigateToAbout: kotlin.Function5<@[ParameterName(name = \, onNavigateToWhatsNew: kotlin.Function4<@[ParameterName(name = \, onNavigateToIssues: kotlin.Function2<@[ParameterName(name = \, onNavigateToSecurity: kotlin.Function2<@[ParameterName(name = \, onNavigateToMarkdownViewer: kotlin.Function1<@[ParameterName(name = \, viewModel: zed.rainxch.details.presentation.DetailsViewModel): kotlin.Unit
+public fun zed.rainxch.details.presentation.DetailsRoot(onNavigateBack: kotlin.Function0<kotlin.Unit>, onNavigateToDeveloperProfile: kotlin.Function1<@[ParameterName(name = \, onOpenRepositoryInApp: kotlin.Function1<@[ParameterName(name = \, onNavigateToAbout: kotlin.Function5<@[ParameterName(name = \, onNavigateToWhatsNew: kotlin.Function4<@[ParameterName(name = \, onNavigateToIssues: kotlin.Function2<@[ParameterName(name = \, onNavigateToSecurity: kotlin.Function2<@[ParameterName(name = \, onNavigateToMarkdownViewer: kotlin.Function1<@[ParameterName(name = \, onNavigateToReviews: kotlin.Function6<@[ParameterName(name = \, viewModel: zed.rainxch.details.presentation.DetailsViewModel): kotlin.Unit
   skippable: true
   restartable: true
   params:
@@ -25,10 +25,11 @@ public fun zed.rainxch.details.presentation.DetailsRoot(onNavigateBack: kotlin.F
     - onNavigateToIssues: STABLE (function type)
     - onNavigateToSecurity: STABLE (function type)
     - onNavigateToMarkdownViewer: STABLE (function type)
+    - onNavigateToReviews: STABLE (function type)
     - viewModel: UNSTABLE (has mutable properties or unstable members)
 
 @Composable
-public fun zed.rainxch.details.presentation.DetailsScreen(state: zed.rainxch.details.presentation.DetailsState, onAction: kotlin.Function1<zed.rainxch.details.presentation.DetailsAction, kotlin.Unit>, toastState: zed.rainxch.core.presentation.components.overlays.KomiToastState, onTranslateLanguage: kotlin.Function1<kotlin.String, kotlin.Unit>?, onReadMoreWhatsNew: kotlin.Function0<kotlin.Unit>?, onOpenIssues: kotlin.Function0<kotlin.Unit>?, onOpenSecurity: kotlin.Function0<kotlin.Unit>?): kotlin.Unit
+public fun zed.rainxch.details.presentation.DetailsScreen(state: zed.rainxch.details.presentation.DetailsState, onAction: kotlin.Function1<zed.rainxch.details.presentation.DetailsAction, kotlin.Unit>, toastState: zed.rainxch.core.presentation.components.overlays.KomiToastState, onTranslateLanguage: kotlin.Function1<kotlin.String, kotlin.Unit>?, onReadMoreWhatsNew: kotlin.Function0<kotlin.Unit>?, onOpenIssues: kotlin.Function0<kotlin.Unit>?, onOpenSecurity: kotlin.Function0<kotlin.Unit>?, onOpenReviews: kotlin.Function1<@[ParameterName(name = \): kotlin.Unit
   skippable: true
   restartable: true
   params:
@@ -39,6 +40,7 @@ public fun zed.rainxch.details.presentation.DetailsScreen(state: zed.rainxch.det
     - onReadMoreWhatsNew: STABLE (function type)
     - onOpenIssues: STABLE (function type)
     - onOpenSecurity: STABLE (function type)
+    - onOpenReviews: STABLE (function type)
 
 @Composable
 private fun zed.rainxch.details.presentation.PullToRefreshHost(enabled: kotlin.Boolean, isRefreshing: kotlin.Boolean, onRefresh: kotlin.Function0<kotlin.Unit>, content: @[Composable] androidx.compose.runtime.internal.ComposableFunction0<kotlin.Unit>): kotlin.Unit

@@ -11,6 +11,8 @@ import zed.rainxch.core.domain.model.account.github.GithubUserProfile
 import zed.rainxch.core.domain.model.apk.ApkInspection
 import zed.rainxch.core.domain.model.installation.InstalledApp
 import zed.rainxch.core.domain.model.repository.DiscoveryPlatform
+import zed.rainxch.core.domain.model.reviews.RatingSummary
+import zed.rainxch.core.domain.model.reviews.Review
 import zed.rainxch.core.domain.model.system.SystemArchitecture
 import zed.rainxch.details.domain.model.ReleaseCategory
 import zed.rainxch.details.domain.model.RepoStats
@@ -93,4 +95,6 @@ internal data class RawDetailsState(
     val deviceBuildReleaseIds: ImmutableSet<Long> = persistentSetOf(),
     val releaseLines: ImmutableMap<Long, String> = persistentMapOf(),
     val handoffPlatform: DiscoveryPlatform? = null,
+    val reviewSummary: RatingSummary? = null,
+    val topReviews: List<Review> = emptyList(),
 )

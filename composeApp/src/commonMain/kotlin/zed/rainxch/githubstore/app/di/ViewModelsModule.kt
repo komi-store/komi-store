@@ -26,6 +26,8 @@ import zed.rainxch.repopages.presentation.issuedetail.IssueDetailViewModel
 import zed.rainxch.repopages.presentation.issues.IssuesViewModel
 import zed.rainxch.repopages.presentation.pulls.PullsViewModel
 import zed.rainxch.repopages.presentation.security.SecurityViewModel
+import zed.rainxch.reviews.presentation.ReviewsViewModel
+import zed.rainxch.reviews.presentation.moderation.ModerationViewModel
 import zed.rainxch.search.presentation.SearchViewModel
 import zed.rainxch.starred.presentation.StarredReposViewModel
 import zed.rainxch.tweaks.presentation.TweaksViewModel
@@ -71,6 +73,7 @@ val viewModelsModule =
                 externalImportRepository = get(),
                 apkInspector = get(),
                 userSessionRepository = get(),
+                reviewsRepository = get(),
                 systemInstallSerializer = get(),
                 appScope = get(),
             )
@@ -103,6 +106,19 @@ val viewModelsModule =
             )
         }
         viewModelOf(::DeveloperProfileViewModel)
+        viewModelOf(::ModerationViewModel)
+        viewModel { params ->
+            ReviewsViewModel(
+                owner = params[0],
+                repo = params[1],
+                sourceHost = params[2],
+                openComposer = params[3],
+                version = params[4],
+                appLabel = params[5],
+                repository = get(),
+                userSessionRepository = get(),
+            )
+        }
         viewModel { params ->
             IssuesViewModel(
                 owner = params[0],

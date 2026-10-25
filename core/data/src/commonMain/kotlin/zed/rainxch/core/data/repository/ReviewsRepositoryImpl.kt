@@ -1,10 +1,16 @@
 package zed.rainxch.core.data.repository
 
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import zed.rainxch.core.data.dto.BackendReviewReportDto
 import zed.rainxch.core.data.mappers.toDomain
 import zed.rainxch.core.data.mappers.toDto
 import zed.rainxch.core.data.mappers.toQuery
 import zed.rainxch.core.data.network.BackendReviewsApi
+import zed.rainxch.core.domain.model.reviews.ModerationDecision
+import zed.rainxch.core.domain.model.reviews.ModerationPage
+import zed.rainxch.core.domain.model.reviews.ModerationStatus
 import zed.rainxch.core.domain.model.reviews.MyReviewState
 import zed.rainxch.core.domain.model.reviews.RepoRating
 import zed.rainxch.core.domain.model.reviews.ReportReason
@@ -19,6 +25,9 @@ import zed.rainxch.core.domain.repository.ReviewsRepository
 class ReviewsRepositoryImpl(
     private val api: BackendReviewsApi,
 ) : ReviewsRepository {
+    private val _changes = MutableSharedFlow<ReviewTarget>(extraBufferCapacity = 8)
+    override val changes: Flow<ReviewTarget> = _changes.asSharedFlow()
+
     override suspend fun getReviews(
         target: ReviewTarget,
         sort: ReviewSort,
@@ -45,9 +54,9 @@ class ReviewsRepositoryImpl(
     override suspend fun submit(
         target: ReviewTarget,
         draft: ReviewDraft,
-    ): Result<Review> = api.putReview(target, draft.toDto()).map { it.toDomain() }
+    ): Result<Review> = api.putReview(target, draft.toDto()).map { it.toDomain() }.onSuccess { _changes.emit(target) }
 
-    override suspend fun deleteMine(target: ReviewTarget): Result<Unit> = api.deleteReview(target)
+    override suspend fun deleteMine(target: ReviewTarget): Result<Unit> = api.deleteReview(target).onSuccess { _changes.emit(target) }
 
     override suspend fun setHelpful(
         reviewId: String,
@@ -66,6 +75,25 @@ class ReviewsRepositoryImpl(
     ): Result<ReviewReply> = api.putReply(reviewId, text.trim()).map { it.toDomain() }
 
     override suspend fun deleteReply(reviewId: String): Result<Unit> = api.deleteReply(reviewId)
+
+    override suspend fun getModerationQueue(
+        status: ModerationStatus,
+        page: Int,
+    ): Result<ModerationPage> = api.getModerationQueue(status.toQuery(), page).map { it.toDomain() }
+
+    override suspend fun moderate(
+        reviewId: String,
+        decision: ModerationDecision,
+    ): Result<Unit> =
+        when (decision) {
+            ModerationDecision.DELETE -> api.deleteAsModerator(reviewId)
+            else -> api.moderate(reviewId, decision.name.lowercase(), reason = null)
+        }
+
+    override suspend fun setBanned(
+        githubId: Long,
+        banned: Boolean,
+    ): Result<Unit> = api.setBanned(githubId, banned, reason = null)
 
     private companion object {
         const val SUMMARIES_PER_CALL = 50

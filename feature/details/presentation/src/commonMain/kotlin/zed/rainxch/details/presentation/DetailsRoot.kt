@@ -94,6 +94,7 @@ import zed.rainxch.details.presentation.components.sections.about
 import zed.rainxch.details.presentation.components.sections.header
 import zed.rainxch.details.presentation.components.sections.logs
 import zed.rainxch.details.presentation.components.sections.releaseChannel
+import zed.rainxch.details.presentation.components.sections.reviews
 import zed.rainxch.details.presentation.components.sections.stats
 import zed.rainxch.details.presentation.components.sections.whatsNew
 import zed.rainxch.details.presentation.components.states.ErrorState
@@ -112,6 +113,14 @@ fun DetailsRoot(
     onNavigateToIssues: (owner: String, repo: String) -> Unit,
     onNavigateToSecurity: (owner: String, repo: String) -> Unit,
     onNavigateToMarkdownViewer: (url: String) -> Unit,
+    onNavigateToReviews: (
+        owner: String,
+        repo: String,
+        sourceHost: String?,
+        openComposer: Boolean,
+        version: String?,
+        appLabel: String?,
+    ) -> Unit,
     viewModel: DetailsViewModel = koinViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -216,6 +225,18 @@ fun DetailsRoot(
             },
             onOpenSecurity = state.repository?.takeIf { it.sourceHost == null }?.let { repo ->
                 { onNavigateToSecurity(repo.owner.login, repo.name) }
+            },
+            onOpenReviews = state.repository?.let { repo ->
+                { openComposer ->
+                    onNavigateToReviews(
+                        repo.owner.login,
+                        repo.name,
+                        repo.sourceHost,
+                        openComposer,
+                        state.installedApp?.installedVersion ?: state.selectedRelease?.tagName,
+                        state.selectedAppLabel,
+                    )
+                }
             },
         )
 
@@ -533,6 +554,7 @@ fun DetailsScreen(
     onReadMoreWhatsNew: (() -> Unit)? = null,
     onOpenIssues: (() -> Unit)? = null,
     onOpenSecurity: (() -> Unit)? = null,
+    onOpenReviews: ((openComposer: Boolean) -> Unit)? = null,
 ) {
     KomiScaffold(
         topBar = {
@@ -657,6 +679,18 @@ fun DetailsScreen(
                                 onMeasured = { onAction(DetailsAction.OnWhatsNewMeasured(it)) },
                                 onReadMore = onReadMoreWhatsNew,
                             )
+                        }
+
+                        if (onOpenReviews != null) {
+                            state.reviewSummary?.let { summary ->
+                                reviews(
+                                    summary = summary,
+                                    topReviews = state.topReviews,
+                                    canWrite = !state.isCurrentUserOwner,
+                                    onWrite = { onOpenReviews(true) },
+                                    onSeeAll = { onOpenReviews(false) },
+                                )
+                            }
                         }
 
                         state.readmeMarkdown?.let {

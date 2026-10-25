@@ -41,6 +41,8 @@ kotlin {
             implementation(projects.feature.repoPages.data)
             implementation(projects.feature.repoPages.presentation)
 
+            implementation(projects.feature.reviews.presentation)
+
             implementation(projects.feature.favourites.domain)
             implementation(projects.feature.favourites.data)
             implementation(projects.feature.favourites.presentation)

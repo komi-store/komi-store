@@ -16,6 +16,8 @@ import zed.rainxch.core.domain.model.installation.InstalledApp
 import zed.rainxch.core.domain.model.repository.DiscoveryPlatform
 import zed.rainxch.core.domain.model.system.SystemArchitecture
 import zed.rainxch.core.domain.utils.PlatformRelease
+import zed.rainxch.core.presentation.components.reviews.RatingSummaryUi
+import zed.rainxch.core.presentation.components.reviews.ReviewUi
 import zed.rainxch.details.domain.model.ReleaseCategory
 import zed.rainxch.details.domain.model.RepoStats
 import zed.rainxch.details.presentation.model.AttestationStatus
@@ -107,4 +109,6 @@ data class DetailsState(
     val handoff: PlatformRelease? = null,
     val releaseLines: ImmutableMap<Long, String> = persistentMapOf(),
     val selectedAppLabel: String? = null,
+    val reviewSummary: RatingSummaryUi? = null,
+    val topReviews: ImmutableList<ReviewUi> = persistentListOf(),
 )

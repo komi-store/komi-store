@@ -76,6 +76,8 @@ import zed.rainxch.repopages.presentation.issuedetail.IssueDetailRoot
 import zed.rainxch.repopages.presentation.issues.IssuesRoot
 import zed.rainxch.repopages.presentation.pulls.PullsRoot
 import zed.rainxch.repopages.presentation.security.SecurityRoot
+import zed.rainxch.reviews.presentation.ReviewsRoot
+import zed.rainxch.reviews.presentation.moderation.ModerationRoot
 import zed.rainxch.search.presentation.SearchRoot
 import zed.rainxch.search.presentation.SearchViewModel
 import zed.rainxch.starred.presentation.StarredReposRoot
@@ -485,6 +487,18 @@ fun AppNavigation(
                                                 ),
                                             )
                                         },
+                                        onNavigateToReviews = { owner, repo, sourceHost, openComposer, version, appLabel ->
+                                            navController.navigate(
+                                                GithubStoreGraph.ReviewsScreen(
+                                                    owner = owner,
+                                                    repo = repo,
+                                                    sourceHost = sourceHost,
+                                                    openComposer = openComposer,
+                                                    version = version,
+                                                    appLabel = appLabel,
+                                                ),
+                                            )
+                                        },
                                         onNavigateToMarkdownViewer = { url ->
                                             navController.navigate(
                                                 GithubStoreGraph.MarkdownViewerScreen(
@@ -586,6 +600,47 @@ fun AppNavigation(
                                     repo = args.repo,
                                     sourceHost = args.sourceHost,
                                     onNavigateBack = { navController.navigateUp() },
+                                )
+                            }
+
+                            composable<GithubStoreGraph.ReviewsScreen> { backStackEntry ->
+                                val args =
+                                    backStackEntry.toRoute<GithubStoreGraph.ReviewsScreen>()
+                                ReviewsRoot(
+                                    onNavigateBack = { navController.navigateUp() },
+                                    onNavigateToAuthentication = {
+                                        navController.navigate(GithubStoreGraph.AuthenticationScreen)
+                                    },
+                                    onNavigateToModeration = {
+                                        navController.navigate(GithubStoreGraph.ReviewModerationScreen)
+                                    },
+                                    viewModel =
+                                        koinViewModel {
+                                            parametersOf(
+                                                args.owner,
+                                                args.repo,
+                                                args.sourceHost,
+                                                args.openComposer,
+                                                args.version,
+                                                args.appLabel,
+                                            )
+                                        },
+                                )
+                            }
+
+                            composable<GithubStoreGraph.ReviewModerationScreen> {
+                                ModerationRoot(
+                                    onNavigateBack = { navController.navigateUp() },
+                                    onOpenRepo = { repo ->
+                                        navController.navigate(
+                                            GithubStoreGraph.ReviewsScreen(
+                                                owner = repo.owner,
+                                                repo = repo.name,
+                                                sourceHost = repo.host,
+                                            ),
+                                        )
+                                    },
+                                    viewModel = koinViewModel(),
                                 )
                             }
 

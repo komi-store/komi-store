@@ -1,0 +1,58 @@
+package zed.rainxch.reviews.presentation
+
+import androidx.compose.runtime.Immutable
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
+import zed.rainxch.core.domain.model.reviews.CannotReviewReason
+import zed.rainxch.core.domain.model.reviews.ReportReason
+import zed.rainxch.core.domain.model.reviews.ReviewSort
+import zed.rainxch.core.presentation.components.reviews.RatingSummaryUi
+import zed.rainxch.core.presentation.components.reviews.ReviewUi
+
+@Immutable
+data class ReviewsUiState(
+    val summary: RatingSummaryUi? = null,
+    val reviews: ImmutableList<ReviewUi> = persistentListOf(),
+    val sort: ReviewSort = ReviewSort.HELPFUL,
+    val ratingFilter: Int? = null,
+    val isLoading: Boolean = true,
+    val isLoadingMore: Boolean = false,
+    val endReached: Boolean = false,
+    val page: Int = 1,
+    val errorMessage: String? = null,
+    val isUnavailable: Boolean = false,
+    val isLoggedIn: Boolean = false,
+    val mine: ReviewUi? = null,
+    val canReview: Boolean = false,
+    val cannotReviewReason: CannotReviewReason? = null,
+    val canReply: Boolean = false,
+    val isModerator: Boolean = false,
+    val composer: ComposerState? = null,
+    val report: ReportState? = null,
+    val reply: ReplyState? = null,
+    val isConfirmingDelete: Boolean = false,
+)
+
+@Immutable
+data class ComposerState(
+    val rating: Int,
+    val text: String,
+    val version: String?,
+    val isEditing: Boolean,
+    val isSubmitting: Boolean = false,
+)
+
+@Immutable
+data class ReportState(
+    val reviewId: String,
+    val reason: ReportReason? = null,
+    val note: String = "",
+    val isSending: Boolean = false,
+)
+
+@Immutable
+data class ReplyState(
+    val reviewId: String,
+    val text: String,
+    val isSending: Boolean = false,
+)

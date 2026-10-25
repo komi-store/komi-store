@@ -30,6 +30,7 @@ data class BackendReviewDto(
     val updatedAt: String? = null,
     val edited: Boolean = false,
     val helpfulCount: Int = 0,
+    val hidden: Boolean = false,
     val reply: BackendReviewReplyDto? = null,
 )
 
@@ -87,4 +88,41 @@ data class BackendReviewReportDto(
 @Serializable
 data class BackendReviewReplyRequestDto(
     val text: String,
+)
+
+@Serializable
+data class BackendModerationQueueDto(
+    val items: List<BackendModerationItemDto> = emptyList(),
+    val page: Int = 1,
+    val hasMore: Boolean = false,
+)
+
+@Serializable
+data class BackendModerationItemDto(
+    val review: BackendReviewDto,
+    val repo: BackendModerationRepoDto,
+    val reportCount: Int = 0,
+    val reports: List<BackendModerationReportDto> = emptyList(),
+    val lastReportedAt: String? = null,
+    val hidden: Boolean = false,
+    val hiddenReason: String? = null,
+)
+
+@Serializable
+data class BackendModerationRepoDto(
+    val host: String? = null,
+    val owner: String,
+    val name: String,
+)
+
+@Serializable
+data class BackendModerationReportDto(
+    val reason: String? = null,
+    val note: String? = null,
+    val createdAt: String? = null,
+)
+
+@Serializable
+data class BackendModerationReasonDto(
+    val reason: String? = null,
 )
