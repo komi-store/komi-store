@@ -333,11 +333,7 @@ class StarredRepositoryImpl(
                         ?: return null
                 if (stable.assets.isEmpty()) return null
                 return if (stable.assets.any { asset -> matcher(asset.name) }) {
-                    StableReleaseInfo(
-                        version = stable.tagName,
-                        url = stable.htmlUrl,
-                        platforms = platformsOf(stable.assets.map { it.name }),
-                    )
+                    StableReleaseInfo(version = stable.tagName, url = stable.htmlUrl, assetNames = stable.assets.map { it.name })
                 } else {
                     null
                 }
@@ -380,7 +376,7 @@ class StarredRepositoryImpl(
                 StableReleaseInfo(
                     version = stableRelease.tagName,
                     url = stableRelease.htmlUrl,
-                    platforms = platformsOf(stableRelease.assets.map { it.name }),
+                    assetNames = stableRelease.assets.map { it.name },
                 )
             } else {
                 null
@@ -395,13 +391,13 @@ class StarredRepositoryImpl(
         }
     }
 
-    private fun platformsOf(assetNames: List<String>): List<DiscoveryPlatform> = assetNames.mapNotNull(::assetPlatformOf).distinct()
-
     private data class StableReleaseInfo(
         val version: String?,
         val url: String?,
-        val platforms: List<DiscoveryPlatform>,
-    )
+        val assetNames: List<String>,
+    ) {
+        val platforms: List<DiscoveryPlatform> = assetNames.mapNotNull(::assetPlatformOf).distinct()
+    }
 
     @Serializable
     private data class GithubReleaseNetworkModel(

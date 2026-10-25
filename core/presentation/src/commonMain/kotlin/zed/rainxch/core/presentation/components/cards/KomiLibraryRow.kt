@@ -53,11 +53,6 @@ import zed.rainxch.githubstore.core.presentation.res.installed
 import zed.rainxch.githubstore.core.presentation.res.self_owned_badge
 import zed.rainxch.githubstore.core.presentation.res.update_available
 
-enum class KomiLibraryStatus {
-    Installed,
-    Update,
-}
-
 // One saved repo in a library list (Recently viewed, Favourites, Stars). The app's icon (the
 // installed one when the app is on the device) sits on a cookie plate (an ink frame in Manga) beside
 // its name, owner and two lines of description; below them is what people weigh before opening it:

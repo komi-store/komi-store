@@ -67,7 +67,11 @@ class RecentlyViewedViewModel(
     // Newest first within each day, as the history table returns them.
     private fun List<RecentlyViewedRepo>.byDay(): ImmutableList<HistorySection> {
         val zone = TimeZone.currentSystemDefault()
-        val today = Clock.System.now().toLocalDateTime(zone).date
+        val today =
+            Clock.System
+                .now()
+                .toLocalDateTime(zone)
+                .date
         val byDay = groupBy { repo -> historyDayOf(repo.viewedAt, today, zone) }
         return HistoryDay.entries
             .mapNotNull { day -> byDay[day]?.let { HistorySection(day, it.toImmutableList()) } }
@@ -79,7 +83,12 @@ class RecentlyViewedViewModel(
         today: LocalDate,
         zone: TimeZone,
     ): HistoryDay {
-        val daysAgo = Instant.fromEpochMilliseconds(viewedAt).toLocalDateTime(zone).date.daysUntil(today)
+        val daysAgo =
+            Instant
+                .fromEpochMilliseconds(viewedAt)
+                .toLocalDateTime(zone)
+                .date
+                .daysUntil(today)
         return when {
             daysAgo <= 0 -> HistoryDay.Today
             daysAgo == 1 -> HistoryDay.Yesterday
