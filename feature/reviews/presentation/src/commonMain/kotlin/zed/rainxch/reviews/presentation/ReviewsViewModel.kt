@@ -97,7 +97,16 @@ class ReviewsViewModel(
                 .distinctUntilChanged()
                 .collectLatest { loggedIn ->
                     signedIn = loggedIn
-                    viewerId = if (loggedIn) userSessionRepository.getUser().firstOrNull()?.id?.toLong() else null
+                    viewerId =
+                        if (loggedIn) {
+                            userSessionRepository
+                                .getUser()
+                                .firstOrNull()
+                                ?.id
+                                ?.toLong()
+                        } else {
+                            null
+                        }
                     _state.update { it.copy(isLoggedIn = loggedIn) }
                     loadMine()
                 }
