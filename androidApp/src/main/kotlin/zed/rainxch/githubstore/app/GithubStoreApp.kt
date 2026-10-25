@@ -3,6 +3,7 @@ package zed.rainxch.githubstore.app
 import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.database.SQLException
 import androidx.core.content.ContextCompat
 import co.touchlab.kermit.Logger
 import kotlinx.coroutines.CancellationException
@@ -26,6 +27,7 @@ import zed.rainxch.core.domain.model.installation.InstallSource
 import zed.rainxch.core.domain.model.installation.InstalledApp
 import zed.rainxch.core.domain.model.installation.ParkedInstallDisposal
 import zed.rainxch.core.domain.model.installation.PendingInstallResolution
+import zed.rainxch.core.domain.model.installation.SystemPackageInfo
 import zed.rainxch.core.domain.model.installation.normalizeInstalledTag
 import zed.rainxch.core.domain.model.installation.pendingInstallResolution
 import zed.rainxch.core.domain.model.installation.resolvePendingFromSystem
@@ -195,7 +197,9 @@ class GithubStoreApp : Application() {
                     context = this@GithubStoreApp,
                     intervalHours = intervalHours,
                 )
-            } catch (e: Exception) {
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: IllegalStateException) {
                 Logger.e(e) { "Failed to schedule background update checks" }
             }
         }
@@ -203,72 +207,61 @@ class GithubStoreApp : Application() {
 
     private fun registerSelfAsInstalledApp() {
         appScope.launch {
-            try {
+            guardSelfRecord(onFailure = { Logger.e(it) { "Komi Store App: Failed to register self as installed app" } }) {
                 val repo = get<InstalledAppsRepository>()
-                val selfPackageName = packageName
-                val existing = repo.getAppByPackage(selfPackageName)
-
-                if (existing != null) {
-                    if (existing.isPendingInstall) {
-                        resolveSelfPendingInstall(existing, repo)
-                    } else {
-                        normalizeSelfInstalledVersion(existing, repo)
-                    }
-                    return@launch
+                val existing = repo.getAppByPackage(packageName)
+                when {
+                    existing == null -> addSelfAsInstalledApp(repo)
+                    existing.isPendingInstall -> resolveSelfPendingInstall(existing, repo)
+                    else -> normalizeSelfInstalledVersion(existing, repo)
                 }
-
-                val packageMonitor = get<PackageMonitor>()
-                val systemInfo = packageMonitor.getInstalledPackageInfo(selfPackageName)
-                if (systemInfo == null) {
-                    logger.warn("GithubStoreApp: Skip self-registration, package info missing for $selfPackageName")
-                    return@launch
-                }
-
-                val now = System.currentTimeMillis()
-                val versionName = systemInfo.versionName
-                val versionCode = systemInfo.versionCode
-
-                val selfApp =
-                    InstalledApp(
-                        packageName = selfPackageName,
-                        repoId = SELF_REPO_ID,
-                        repoName = SELF_REPO_NAME,
-                        repoOwner = SELF_REPO_OWNER,
-                        repoOwnerAvatarUrl = SELF_AVATAR_URL,
-                        repoDescription = "A cross-platform app store for GitHub releases",
-                        primaryLanguage = "Kotlin",
-                        repoUrl = "https://github.com/$SELF_REPO_OWNER/$SELF_REPO_NAME",
-                        installedVersion = versionName,
-                        installedAssetName = null,
-                        installedAssetUrl = null,
-                        latestVersion = null,
-                        latestAssetName = null,
-                        latestAssetUrl = null,
-                        latestAssetSize = null,
-                        appName = "Komi Store",
-                        installSource = InstallSource.THIS_APP,
-                        installedAt = now,
-                        lastCheckedAt = 0L,
-                        lastUpdatedAt = now,
-                        isUpdateAvailable = false,
-                        updateCheckEnabled = true,
-                        releaseNotes = null,
-                        systemArchitecture = "",
-                        fileExtension = "apk",
-                        isPendingInstall = false,
-                        installedVersionName = versionName,
-                        installedVersionCode = versionCode,
-                        signingFingerprint = SELF_SHA256_FINGERPRINT,
-                    )
-
-                repo.saveInstalledApp(selfApp)
-                Logger.i("Komi Store App: App added")
-            } catch (e: CancellationException) {
-                throw e
-            } catch (e: Exception) {
-                Logger.e(e) { "Komi Store App: Failed to register self as installed app" }
             }
         }
+    }
+
+    private suspend fun addSelfAsInstalledApp(repo: InstalledAppsRepository) {
+        val systemInfo = get<PackageMonitor>().getInstalledPackageInfo(packageName)
+        if (systemInfo == null) {
+            logger.warn("GithubStoreApp: Skip self-registration, package info missing for $packageName")
+            return
+        }
+        repo.saveInstalledApp(selfInstalledApp(systemInfo))
+        Logger.i("Komi Store App: App added")
+    }
+
+    private fun selfInstalledApp(systemInfo: SystemPackageInfo): InstalledApp {
+        val now = System.currentTimeMillis()
+        return InstalledApp(
+            packageName = packageName,
+            repoId = SELF_REPO_ID,
+            repoName = SELF_REPO_NAME,
+            repoOwner = SELF_REPO_OWNER,
+            repoOwnerAvatarUrl = SELF_AVATAR_URL,
+            repoDescription = "A cross-platform app store for GitHub releases",
+            primaryLanguage = "Kotlin",
+            repoUrl = "https://github.com/$SELF_REPO_OWNER/$SELF_REPO_NAME",
+            installedVersion = systemInfo.versionName,
+            installedAssetName = null,
+            installedAssetUrl = null,
+            latestVersion = null,
+            latestAssetName = null,
+            latestAssetUrl = null,
+            latestAssetSize = null,
+            appName = "Komi Store",
+            installSource = InstallSource.THIS_APP,
+            installedAt = now,
+            lastCheckedAt = 0L,
+            lastUpdatedAt = now,
+            isUpdateAvailable = false,
+            updateCheckEnabled = true,
+            releaseNotes = null,
+            systemArchitecture = "",
+            fileExtension = "apk",
+            isPendingInstall = false,
+            installedVersionName = systemInfo.versionName,
+            installedVersionCode = systemInfo.versionCode,
+            signingFingerprint = SELF_SHA256_FINGERPRINT,
+        )
     }
 
     private suspend fun normalizeSelfInstalledVersion(
@@ -277,7 +270,7 @@ class GithubStoreApp : Application() {
     ) {
         val latestTag = existing.latestVersion ?: return
         if (existing.installedVersion == latestTag) return
-        try {
+        guardSelfRecord(onFailure = { Logger.w(it) { "Failed to normalize self installedVersion tag" } }) {
             val packageMonitor = get<PackageMonitor>()
             val systemInfo = packageMonitor.getInstalledPackageInfo(packageName) ?: return
             if (systemInfo.versionCode != existing.installedVersionCode ||
@@ -292,8 +285,6 @@ class GithubStoreApp : Application() {
                 ),
             )
             Logger.i { "Normalized stale self installedVersion tag to $latestTag" }
-        } catch (e: Exception) {
-            Logger.w(e) { "Failed to normalize self installedVersion tag" }
         }
     }
 
@@ -301,7 +292,7 @@ class GithubStoreApp : Application() {
         existing: InstalledApp,
         repo: InstalledAppsRepository,
     ) {
-        try {
+        guardSelfRecord(onFailure = { Logger.e(it) { "Failed to resolve self-update pending install" } }) {
             val packageMonitor = get<PackageMonitor>()
             val systemInfo = packageMonitor.getInstalledPackageInfo(packageName)
             when (val resolution = existing.pendingInstallResolution(systemInfo)) {
@@ -311,39 +302,55 @@ class GithubStoreApp : Application() {
 
                 is PendingInstallResolution.Reached -> {
                     repo.updateApp(existing.resolvePendingFromSystem(resolution))
-                    try {
-                        val disposal =
-                            repo.discardParkedInstall(packageName, existing.pendingInstallFilePath)
-                        if (disposal == ParkedInstallDisposal.Discarded) {
-                            Logger.i {
-                                "Resolved self-update pending install: ${resolution.versionName} (code=${resolution.versionCode}, tag=${resolution.resolvedTag})"
-                            }
-                        } else {
-                            Logger.w { "Parked self-update is not gone yet; the next sync will retry" }
-                        }
-                    } catch (e: CancellationException) {
-                        throw e
-                    } catch (e: Exception) {
-                        Logger.e(e) { "Parked self-update not discarded; the next sync will retry" }
-                    }
+                    discardSelfParkedInstall(existing, resolution, repo)
                 }
             }
+        }
+    }
+
+    private suspend fun discardSelfParkedInstall(
+        existing: InstalledApp,
+        resolution: PendingInstallResolution.Reached,
+        repo: InstalledAppsRepository,
+    ) {
+        guardSelfRecord(onFailure = { Logger.e(it) { "Parked self-update not discarded; the next sync will retry" } }) {
+            val disposal = repo.discardParkedInstall(packageName, existing.pendingInstallFilePath)
+            if (disposal == ParkedInstallDisposal.Discarded) {
+                Logger.i {
+                    "Resolved self-update pending install: ${resolution.versionName} " +
+                        "(code=${resolution.versionCode}, tag=${resolution.resolvedTag})"
+                }
+            } else {
+                Logger.w { "Parked self-update is not gone yet; the next sync will retry" }
+            }
+        }
+    }
+
+    // Room throws SQLException or IllegalStateException and PackageManager SecurityException; none may crash the launch.
+    private inline fun guardSelfRecord(
+        onFailure: (Exception) -> Unit,
+        block: () -> Unit,
+    ) {
+        try {
+            block()
         } catch (e: CancellationException) {
             throw e
-        } catch (e: Exception) {
-            Logger.e(e) { "Failed to resolve self-update pending install" }
+        } catch (e: IllegalStateException) {
+            onFailure(e)
+        } catch (e: SQLException) {
+            onFailure(e)
+        } catch (e: SecurityException) {
+            onFailure(e)
         }
     }
 
     companion object {
         private const val SELF_REPO_ID = 1101281251L
         private const val SELF_SHA256_FINGERPRINT =
-            @Suppress("ktlint:standard:max-line-length")
             "B7:F2:8E:19:8E:48:C1:93:B0:38:C6:5D:92:DD:F7:BC:07:7B:0D:B5:9E:BC:9B:25:0A:6D:AC:48:C1:18:03:CA"
         private const val SELF_REPO_OWNER = "komi-store"
         private const val SELF_REPO_NAME = "komi-store"
         private const val SELF_AVATAR_URL =
-            @Suppress("ktlint:standard:max-line-length")
             "https://raw.githubusercontent.com/komi-store/komi-store/refs/heads/main/media-resources/app_icon.png"
         const val UPDATES_CHANNEL_ID = "app_updates"
         const val UPDATE_SERVICE_CHANNEL_ID = "update_service"
