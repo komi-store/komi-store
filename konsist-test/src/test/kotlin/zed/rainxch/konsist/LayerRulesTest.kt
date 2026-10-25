@@ -26,7 +26,7 @@ class LayerRulesTest {
     @Test
     fun packages_follow_owner_and_layer() {
         production.files
-            .filter { it.expectedPackagePrefix != null && it.relativePath !in PACKAGE_EXCEPTIONS }
+            .filter { it.expectedPackagePrefix != null }
             .assertTrue { file ->
                 val name = file.packagee?.name ?: return@assertTrue false
                 val prefix = file.expectedPackagePrefix!!
@@ -51,17 +51,5 @@ class LayerRulesTest {
             setOf(
                 "feature/tweaks/presentation/src/commonMain/kotlin/zed/rainxch/tweaks/presentation/mirror/MirrorPickerViewModel.kt",
             )
-
-        val PACKAGE_EXCEPTIONS =
-            listOf(
-                "model/ExploreResult.kt",
-                "model/ProgrammingLanguage.kt",
-                "model/SearchSource.kt",
-                "model/SortBy.kt",
-                "model/SortOrder.kt",
-                "repository/SearchHistoryRepository.kt",
-                "repository/SearchRepository.kt",
-            ).map { "feature/search/domain/src/commonMain/kotlin/zed/rainxch/domain/$it" }
-                .toSet()
     }
 }

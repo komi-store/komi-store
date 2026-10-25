@@ -32,11 +32,11 @@ import zed.rainxch.core.domain.model.account.github.GithubUser
 import zed.rainxch.core.domain.model.error.RateLimitException
 import zed.rainxch.core.domain.model.repository.DiscoveryPlatform
 import zed.rainxch.core.domain.model.repository.PaginatedDiscoveryRepositories
-import zed.rainxch.domain.model.ExploreResult
-import zed.rainxch.domain.model.ProgrammingLanguage
-import zed.rainxch.domain.model.SortBy
-import zed.rainxch.domain.model.SortOrder
-import zed.rainxch.domain.repository.SearchRepository
+import zed.rainxch.search.domain.model.ExploreResult
+import zed.rainxch.search.domain.model.ProgrammingLanguage
+import zed.rainxch.search.domain.model.SortBy
+import zed.rainxch.search.domain.model.SortOrder
+import zed.rainxch.search.domain.repository.SearchRepository
 import zed.rainxch.search.data.dto.GithubReleaseNetworkModel
 import zed.rainxch.search.data.utils.LruCache
 
@@ -84,10 +84,10 @@ class SearchRepositoryImpl(
         sortBy: SortBy,
         sortOrder: SortOrder,
         page: Int,
-        source: zed.rainxch.domain.model.SearchSource,
+        source: zed.rainxch.search.domain.model.SearchSource,
     ): Flow<PaginatedDiscoveryRepositories> =
         channelFlow {
-            if (source is zed.rainxch.domain.model.SearchSource.Forgejo) {
+            if (source is zed.rainxch.search.domain.model.SearchSource.Forgejo) {
                 forgejoSearch(source.host, query, page)
                 return@channelFlow
             }

@@ -1,4 +1,4 @@
-package zed.rainxch.domain.model
+package zed.rainxch.search.domain.model
 
 enum class SortOrder {
     Descending,

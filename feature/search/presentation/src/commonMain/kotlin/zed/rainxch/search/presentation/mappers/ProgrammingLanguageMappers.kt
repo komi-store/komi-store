@@ -1,7 +1,7 @@
 package zed.rainxch.search.presentation.mappers
 
-import zed.rainxch.domain.model.ProgrammingLanguage
-import zed.rainxch.domain.model.ProgrammingLanguage.*
+import zed.rainxch.search.domain.model.ProgrammingLanguage
+import zed.rainxch.search.domain.model.ProgrammingLanguage.*
 import zed.rainxch.search.presentation.model.ProgrammingLanguageUi
 
 fun ProgrammingLanguageUi.toDomain(): ProgrammingLanguage =

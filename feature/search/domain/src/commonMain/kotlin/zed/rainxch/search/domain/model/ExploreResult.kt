@@ -1,4 +1,4 @@
-package zed.rainxch.domain.model
+package zed.rainxch.search.domain.model
 
 import zed.rainxch.core.domain.model.account.github.GithubRepoSummary
 

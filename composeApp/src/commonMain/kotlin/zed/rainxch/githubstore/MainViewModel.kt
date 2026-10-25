@@ -22,7 +22,7 @@ import zed.rainxch.core.domain.repository.InstalledAppsRepository
 import zed.rainxch.core.domain.repository.RateLimitRepository
 import zed.rainxch.core.domain.repository.TweaksRepository
 import zed.rainxch.core.domain.repository.UserSessionRepository
-import zed.rainxch.core.domain.use_cases.SyncInstalledAppsUseCase
+import zed.rainxch.core.domain.usecases.SyncInstalledAppsUseCase
 import zed.rainxch.githubstore.utils.STARTUP_PREFERENCE_TIMEOUT_MS
 import kotlin.time.Duration.Companion.milliseconds
 

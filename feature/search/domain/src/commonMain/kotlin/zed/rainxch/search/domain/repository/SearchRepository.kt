@@ -1,13 +1,13 @@
-package zed.rainxch.domain.repository
+package zed.rainxch.search.domain.repository
 
 import kotlinx.coroutines.flow.Flow
 import zed.rainxch.core.domain.model.repository.DiscoveryPlatform
 import zed.rainxch.core.domain.model.repository.PaginatedDiscoveryRepositories
-import zed.rainxch.domain.model.ExploreResult
-import zed.rainxch.domain.model.ProgrammingLanguage
-import zed.rainxch.domain.model.SearchSource
-import zed.rainxch.domain.model.SortBy
-import zed.rainxch.domain.model.SortOrder
+import zed.rainxch.search.domain.model.ExploreResult
+import zed.rainxch.search.domain.model.ProgrammingLanguage
+import zed.rainxch.search.domain.model.SearchSource
+import zed.rainxch.search.domain.model.SortBy
+import zed.rainxch.search.domain.model.SortOrder
 
 interface SearchRepository {
     fun searchRepositories(

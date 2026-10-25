@@ -4,7 +4,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import zed.rainxch.core.data.local.db.dao.SearchHistoryDao
 import zed.rainxch.core.data.local.db.entities.SearchHistoryEntity
-import zed.rainxch.domain.repository.SearchHistoryRepository
+import zed.rainxch.search.domain.repository.SearchHistoryRepository
 import kotlin.time.Clock
 
 class SearchHistoryRepositoryImpl(

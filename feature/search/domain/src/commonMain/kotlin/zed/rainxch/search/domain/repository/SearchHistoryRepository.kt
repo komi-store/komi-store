@@ -1,4 +1,4 @@
-package zed.rainxch.domain.repository
+package zed.rainxch.search.domain.repository
 
 import kotlinx.coroutines.flow.Flow
 

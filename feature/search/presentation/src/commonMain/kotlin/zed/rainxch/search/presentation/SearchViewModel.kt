@@ -39,8 +39,8 @@ import zed.rainxch.core.domain.repository.UserSessionRepository
 import zed.rainxch.core.domain.usecases.SyncInstalledAppsUseCase
 import zed.rainxch.core.presentation.model.DiscoveryRepositoryUi
 import zed.rainxch.core.presentation.utils.toUi
-import zed.rainxch.domain.repository.SearchHistoryRepository
-import zed.rainxch.domain.repository.SearchRepository
+import zed.rainxch.search.domain.repository.SearchHistoryRepository
+import zed.rainxch.search.domain.repository.SearchRepository
 import zed.rainxch.githubstore.core.presentation.res.Res
 import zed.rainxch.githubstore.core.presentation.res.explore_error
 import zed.rainxch.githubstore.core.presentation.res.failed_to_share_link
