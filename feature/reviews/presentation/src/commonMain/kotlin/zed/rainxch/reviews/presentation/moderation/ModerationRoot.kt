@@ -133,7 +133,7 @@ private fun ModerationScreen(
             )
             Box(modifier = Modifier.fillMaxSize()) {
                 when {
-                    state.isLoading && state.items.isEmpty() -> {
+                    (state.isLoading || state.isLoadingMore) && state.items.isEmpty() -> {
                         Centered(Modifier.fillMaxSize()) { KomiCircularProgress() }
                     }
 
@@ -209,8 +209,10 @@ private fun Queue(
         }
     }
     val currentOnAction by rememberUpdatedState(onAction)
-    LaunchedEffect(nearEnd, state.items.size) {
-        if (nearEnd) currentOnAction(ModerationAction.OnLoadMore)
+    // isLoadingMore is a key so a page that added nothing new asks for the next one; after a failure the
+    // retry item asks instead, or this would retry forever.
+    LaunchedEffect(nearEnd, state.items.size, state.isLoadingMore, state.loadMoreFailed) {
+        if (nearEnd && !state.loadMoreFailed) currentOnAction(ModerationAction.OnLoadMore)
     }
     LazyColumn(
         state = listState,
@@ -228,6 +230,17 @@ private fun Queue(
         }
         if (state.isLoadingMore) {
             item(key = "more") { Centered(Modifier.fillMaxWidth()) { KomiCircularProgress() } }
+        }
+        if (state.loadMoreFailed) {
+            item(key = "more-failed") {
+                Centered(Modifier.fillMaxWidth()) {
+                    KomiButton(
+                        onClick = { onAction(ModerationAction.OnLoadMore) },
+                        label = stringResource(Res.string.reviews_retry),
+                        variant = KomiButtonVariant.Tonal,
+                    )
+                }
+            }
         }
     }
 }

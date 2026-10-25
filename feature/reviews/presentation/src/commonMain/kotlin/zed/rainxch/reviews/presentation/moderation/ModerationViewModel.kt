@@ -83,22 +83,33 @@ class ModerationViewModel(
     private fun load(status: ModerationStatus) {
         requestGeneration += 1
         _state.update {
-            it.copy(status = status, items = persistentListOf(), page = 1, endReached = false, errorMessage = null)
+            it.copy(
+                status = status,
+                items = persistentListOf(),
+                page = 1,
+                endReached = false,
+                loadMoreFailed = false,
+                errorMessage = null,
+            )
         }
-        loadPage(page = 1, generation = requestGeneration)
+        loadPage(page = 1, generation = requestGeneration, append = false)
     }
 
+    // A decision takes its review out of the server's queue as well, so the first unseen review sits at
+    // the position the list has reached, not after the last page fetched. Reviews already shown are
+    // dropped from the answer.
     private fun loadNextPage() {
         val current = _state.value
         if (current.isLoading || current.isLoadingMore || current.endReached || current.errorMessage != null) return
-        loadPage(page = current.page + 1, generation = requestGeneration)
+        _state.update { it.copy(loadMoreFailed = false) }
+        loadPage(page = current.items.size / QUEUE_PAGE_SIZE + 1, generation = requestGeneration, append = true)
     }
 
     private fun loadPage(
         page: Int,
         generation: Int,
+        append: Boolean,
     ) {
-        val append = page > 1
         viewModelScope.launch {
             _state.update { if (append) it.copy(isLoadingMore = true) else it.copy(isLoading = true) }
             repository
@@ -114,6 +125,7 @@ class ModerationViewModel(
                             endReached = !result.hasMore,
                             isLoading = false,
                             isLoadingMore = false,
+                            loadMoreFailed = false,
                         )
                     }
                 }.onFailure { error ->
@@ -122,6 +134,7 @@ class ModerationViewModel(
                         it.copy(
                             isLoading = false,
                             isLoadingMore = false,
+                            loadMoreFailed = append,
                             errorMessage = if (append) null else getString(Res.string.reviews_load_failed),
                         )
                     }
@@ -162,6 +175,8 @@ class ModerationViewModel(
                     message(decision.doneMessage())
                 }.onFailure { message(it.reviewMessage()) }
             setBusy(reviewId, false)
+            // Deciding the last loaded review empties the list while the queue may hold more.
+            if (_state.value.items.isEmpty()) loadNextPage()
         }
     }
 
@@ -209,4 +224,9 @@ class ModerationViewModel(
             reports = reports.map { ModerationReportUi(reason = it.reason, note = it.note) }.toImmutableList(),
             hiddenReason = hiddenReason,
         )
+
+    private companion object {
+        // The queue's page size, fixed by the backend.
+        const val QUEUE_PAGE_SIZE = 20
+    }
 }
