@@ -22,6 +22,7 @@ import org.jetbrains.compose.resources.getString
 import zed.rainxch.auth.domain.repository.AuthPath
 import zed.rainxch.auth.domain.repository.AuthenticationRepository
 import zed.rainxch.auth.domain.repository.DevicePollResult
+import zed.rainxch.auth.presentation.mapper.authErrorForWorkerReason
 import zed.rainxch.auth.presentation.mapper.toAuthError
 import zed.rainxch.auth.presentation.mapper.toPatError
 import zed.rainxch.auth.presentation.mapper.toUi
@@ -369,7 +370,7 @@ class AuthenticationViewModel(
         _state.update {
             it.copy(
                 isWebAuthInFlight = false,
-                loginState = AuthLoginState.Error(AuthError.Unknown),
+                loginState = AuthLoginState.Error(authErrorForWorkerReason(reason)),
             )
         }
     }

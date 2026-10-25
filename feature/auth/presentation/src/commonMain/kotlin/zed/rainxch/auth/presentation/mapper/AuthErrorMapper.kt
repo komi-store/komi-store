@@ -33,6 +33,27 @@ internal fun Throwable.toAuthError(): AuthError =
         else -> AuthError.Unknown
     }
 
+internal fun authErrorForWorkerReason(reason: String): AuthError =
+    when (reason) {
+        "exchange_failed_github_rate_limit" -> AuthError.RateLimited
+
+        "exchange_failed_github_bad_verification_code",
+        "exchange_failed_state_missing_or_expired",
+        "exchange_failed_invalid_state",
+        "invalid_state",
+        -> AuthError.CodeExpired
+
+        "exchange_failed_github_unreachable",
+        "exchange_unreachable",
+        -> AuthError.Unreachable
+
+        "access_denied" -> AuthError.Denied
+
+        "exchange_failed", "unknown" -> AuthError.Unknown
+
+        else -> AuthError.Unknown
+    }
+
 internal fun Throwable.toPatError(): PatError =
     when (this) {
         is IllegalArgumentException -> {
