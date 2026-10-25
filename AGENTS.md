@@ -55,6 +55,7 @@ The full rule set, with examples, is `docs/code-style.md`. These apply to almost
 - `docs/agents/releases-and-assets.md`: how releases, assets and installed apps are matched
 - `docs/agents/platform.md`: silent installs, local network access, Desktop logs, encrypted storage, Gradle memory
 - `docs/agents/translation.md`: translation providers
+- `docs/agents/reviews.md`: ratings and reviews, the API contract with the backend
 - `docs/agents/distribution.md`: installers, signing, Homebrew and WinGet (maintainers)
 - `feature/<name>/CLAUDE.md`: notes for one feature
 - `docs/quality/findings.md`: the research behind the rules
