@@ -2,6 +2,7 @@ package zed.rainxch.core.domain.model.account.github
 
 import kotlinx.serialization.Serializable
 import zed.rainxch.core.domain.model.repository.DiscoveryPlatform
+import zed.rainxch.core.domain.model.reviews.RepoRating
 
 @Serializable
 data class GithubRepoSummary(
@@ -27,4 +28,5 @@ data class GithubRepoSummary(
     val sourceHost: String? = null,
     val dailyStars: Int? = null,
     val topicCodes: List<String> = emptyList(),
+    val rating: RepoRating? = null,
 )

@@ -37,6 +37,7 @@ fun BackendRepoResponse.toSummary(platform: DiscoveryPlatform = DiscoveryPlatfor
         latestReleaseDate = releaseDateFor(platform),
         latestReleaseTag = platformReleaseFor(platform)?.tag ?: latestReleaseTag,
         dailyStars = dailyStars,
+        rating = rating?.toDomain(),
     )
 
 fun BackendRepoResponse.platformReleaseFor(platform: DiscoveryPlatform): BackendPlatformRelease? =

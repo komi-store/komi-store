@@ -24,4 +24,6 @@ data class CachedGithubRepoSummary(
     val dailyStars: Int? = null,
     val availablePlatforms: List<DiscoveryPlatform> = emptyList(),
     val downloadCount: Long = 0,
+    val ratingAverage: Double? = null,
+    val ratingCount: Int = 0,
 )

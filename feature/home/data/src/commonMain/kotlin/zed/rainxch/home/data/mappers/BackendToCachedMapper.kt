@@ -37,4 +37,6 @@ fun BackendRepoResponse.toCachedGithubRepoSummary(platform: DiscoveryPlatform = 
                 if (hasInstallersLinux) add(DiscoveryPlatform.Linux)
             },
         downloadCount = downloadCount,
+        ratingAverage = rating?.average,
+        ratingCount = rating?.count ?: 0,
     )

@@ -26,4 +26,6 @@ fun GithubRepoSummary.toUi(): GithubRepoSummaryUi =
         latestReleaseTag = latestReleaseTag,
         sourceHost = sourceHost,
         dailyStars = dailyStars,
+        ratingAverage = rating?.average,
+        ratingCount = rating?.count ?: 0,
     )

@@ -84,6 +84,8 @@ fun DiscoveryRepoCard(
         version = repo.latestReleaseTag,
         compact = compact,
         index = index,
+        ratingAverage = repo.ratingAverage,
+        ratingCount = repo.ratingCount,
     )
 
     if (showActions) {
