@@ -16,6 +16,7 @@ import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.getString
 import zed.rainxch.core.domain.getPlatform
 import zed.rainxch.core.domain.model.reviews.CannotReviewReason
+import zed.rainxch.core.domain.model.reviews.RatingSummary
 import zed.rainxch.core.domain.model.reviews.Review
 import zed.rainxch.core.domain.model.reviews.ReviewDraft
 import zed.rainxch.core.domain.model.reviews.ReviewPlatform
@@ -57,6 +58,7 @@ class ReviewsViewModel(
     val events = _events.receiveAsFlow()
 
     private var loaded: List<Review> = emptyList()
+    private var summary: RatingSummary? = null
     private var mine: Review? = null
     private var votedIds: Set<String> = emptySet()
     private var viewerId: Long? = null
@@ -148,6 +150,7 @@ class ReviewsViewModel(
                 .onSuccess { result ->
                     if (generation != requestGeneration) return@onSuccess
                     loaded = if (append) loaded + result.reviews.filterNot { r -> loaded.any { it.id == r.id } } else result.reviews
+                    summary = result.summary
                     _state.update {
                         it.copy(
                             summary = result.summary.toUi(),
@@ -247,6 +250,7 @@ class ReviewsViewModel(
             message(Res.string.reviews_error_too_long)
             return
         }
+        val previous = mine
         viewModelScope.launch {
             updateComposer { it.copy(isSubmitting = true) }
             val draft =
@@ -261,6 +265,7 @@ class ReviewsViewModel(
                 .submit(target, draft)
                 .onSuccess { review ->
                     mine = review
+                    if (!review.hidden) adjustSummary(removed = previous?.rating, added = review.rating)
                     _state.update { it.copy(composer = null) }
                     publishReviews()
                     message(if (composer.isEditing) Res.string.reviews_saved else Res.string.reviews_posted)
@@ -273,10 +278,12 @@ class ReviewsViewModel(
 
     private fun deleteMine() {
         _state.update { it.copy(isConfirmingDelete = false) }
+        val previous = mine
         viewModelScope.launch {
             repository
                 .deleteMine(target)
                 .onSuccess {
+                    if (previous != null && !previous.hidden) adjustSummary(removed = previous.rating, added = null)
                     mine = null
                     loaded = loaded.filterNot { r -> r.author.id == viewerId }
                     _state.update { it.copy(composer = null) }
@@ -284,6 +291,23 @@ class ReviewsViewModel(
                     message(Res.string.reviews_deleted)
                 }.onFailure { message(it.reviewMessage()) }
         }
+    }
+
+    // The public summary is a CDN copy that lags a write by minutes, so the viewer's own change is
+    // applied to it here.
+    private fun adjustSummary(
+        removed: Int?,
+        added: Int?,
+    ) {
+        val current = summary ?: return
+        val histogram = current.histogram.toMutableMap()
+        removed?.let { histogram[it] = ((histogram[it] ?: 0) - 1).coerceAtLeast(0) }
+        added?.let { histogram[it] = (histogram[it] ?: 0) + 1 }
+        val count = histogram.values.sum()
+        val average = if (count == 0) null else histogram.entries.sumOf { (stars, n) -> stars * n }.toDouble() / count
+        val adjusted = RatingSummary(average = average, count = count, histogram = histogram)
+        summary = adjusted
+        _state.update { it.copy(summary = adjusted.toUi()) }
     }
 
     // Optimistic: the count and the chip flip at once and roll back if the backend refuses.

@@ -1517,7 +1517,7 @@
     </plurals>
     <string name="reviews_edited">Modifié</string>
     <string name="reviews_helpful">Utile</string>
-    <string name="reviews_more_actions">Plus d\'actions</string>
+    <string name="reviews_more_actions">Plus d'actions</string>
     <string name="reviews_reply_from">Réponse de %1$s</string>
     <string name="reviews_show_more">Afficher plus</string>
     <string name="reviews_show_less">Afficher moins</string>
@@ -1526,8 +1526,8 @@
     <string name="reviews_action_delete_reply">Supprimer la réponse</string>
     <string name="reviews_action_report">Signaler</string>
     <string name="reviews_action_delete">Supprimer</string>
-    <string name="reviews_empty">Aucun avis pour l\'instant. Soyez le premier à noter cette application.</string>
-    <string name="reviews_empty_filtered">Aucun avis avec cette note pour l\'instant.</string>
+    <string name="reviews_empty">Aucun avis pour l'instant. Soyez le premier à noter cette application.</string>
+    <string name="reviews_empty_filtered">Aucun avis avec cette note pour l'instant.</string>
     <string name="reviews_unavailable">Les avis ne sont pas disponibles pour le moment.</string>
     <string name="reviews_load_failed">Impossible de charger les avis.</string>
     <string name="reviews_retry">Réessayer</string>
@@ -1537,17 +1537,17 @@
     <string name="reviews_sign_in">Connectez-vous avec GitHub pour donner votre avis</string>
     <string name="reviews_cannot_account_too_new">Votre compte GitHub doit avoir au moins 30 jours pour publier un avis.</string>
     <string name="reviews_cannot_own_repo">Vous maintenez ce dépôt, vous ne pouvez donc pas le noter.</string>
-    <string name="reviews_cannot_banned">Vous ne pouvez pas publier d\'avis.</string>
+    <string name="reviews_cannot_banned">Vous ne pouvez pas publier d'avis.</string>
     <string name="reviews_sort_helpful">Les plus utiles</string>
     <string name="reviews_sort_newest">Les plus récents</string>
     <string name="reviews_sort_highest">Les mieux notés</string>
     <string name="reviews_sort_lowest">Les moins bien notés</string>
     <string name="reviews_filter_all">Toutes les notes</string>
     <string name="reviews_filter_stars">%1$d★</string>
-    <string name="reviews_hidden_notice">Un modérateur a masqué cet avis. Vous seul pouvez le voir, et il n\'est pas pris en compte dans la note.</string>
+    <string name="reviews_hidden_notice">Un modérateur a masqué cet avis. Vous seul pouvez le voir, et il n'est pas pris en compte dans la note.</string>
     <string name="reviews_composer_title_new">Noter cette application</string>
     <string name="reviews_composer_title_edit">Modifier votre avis</string>
-    <string name="reviews_composer_hint">Qu\'est-ce qui vous plaît ou vous déplaît ? (facultatif)</string>
+    <string name="reviews_composer_hint">Qu'est-ce qui vous plaît ou vous déplaît ? (facultatif)</string>
     <string name="reviews_composer_version">Avis sur %1$s</string>
     <string name="reviews_composer_public">Les avis sont publics et affichent votre nom et votre avatar GitHub.</string>
     <string name="reviews_composer_pick_rating">Touchez une étoile pour noter</string>
@@ -1561,7 +1561,7 @@
     <string name="reviews_report_other">Autre chose</string>
     <string name="reviews_report_note">Détails (facultatif)</string>
     <string name="reviews_report_send">Envoyer le signalement</string>
-    <string name="reviews_report_sent">Merci. Un modérateur va l\'examiner.</string>
+    <string name="reviews_report_sent">Merci. Un modérateur va l'examiner.</string>
     <string name="reviews_reply_title">Répondre à cet avis</string>
     <string name="reviews_reply_hint">Votre réponse est publique</string>
     <string name="reviews_reply_send">Répondre</string>
@@ -1577,7 +1577,7 @@
     <string name="reviews_error_rate_limited">Trop de modifications à la fois. Réessayez dans une minute.</string>
     <string name="reviews_error_sign_in">Reconnectez-vous avec GitHub pour continuer.</string>
     <string name="reviews_error_network">Pas de connexion. Vérifiez votre réseau et réessayez.</string>
-    <string name="reviews_error_too_long">C\'est trop long.</string>
+    <string name="reviews_error_too_long">C'est trop long.</string>
     <string name="reviews_error_own_review">Vous ne pouvez pas voter pour votre propre avis ni le signaler.</string>
     <string name="reviews_error_not_maintainer">Seules les personnes qui maintiennent ce dépôt peuvent répondre.</string>
     <string name="reviews_error_not_moderator">Seuls les modérateurs peuvent faire cela.</string>
@@ -1588,7 +1588,7 @@
     <string name="reviews_moderation_hide">Masquer</string>
     <string name="reviews_moderation_unhide">Afficher</string>
     <string name="reviews_moderation_dismiss">Ignorer les signalements</string>
-    <string name="reviews_moderation_ban">Bannir l\'auteur</string>
+    <string name="reviews_moderation_ban">Bannir l'auteur</string>
     <plurals name="reviews_moderation_report_count">
         <item quantity="one">%1$d signalement</item>
         <item quantity="other">%1$d signalements</item>
@@ -1599,7 +1599,7 @@
     <string name="reviews_moderation_delete_title">Supprimer définitivement cet avis ?</string>
     <string name="reviews_moderation_delete_body">Il ne pourra pas être restauré. Ses votes, sa réponse et ses signalements seront supprimés avec lui.</string>
     <string name="reviews_moderation_ban_title">Bannir %1$s des avis ?</string>
-    <string name="reviews_moderation_ban_body">Cette personne ne pourra plus publier d\'avis, de réponses, de votes ni de signalements. Ses avis déjà publiés restent jusqu\'à ce que vous les masquiez.</string>
+    <string name="reviews_moderation_ban_body">Cette personne ne pourra plus publier d'avis, de réponses, de votes ni de signalements. Ses avis déjà publiés restent jusqu'à ce que vous les masquiez.</string>
     <string name="reviews_moderation_hidden_done">Avis masqué</string>
     <string name="reviews_moderation_unhidden_done">Avis restauré</string>
     <string name="reviews_moderation_dismissed_done">Signalements ignorés</string>

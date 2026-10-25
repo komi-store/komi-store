@@ -1546,8 +1546,8 @@
         <item quantity="other">%1$d su 5 stelle: %2$d recensioni</item>
     </plurals>
     <plurals name="reviews_helpful_count">
-        <item quantity="one">%1$d persona l\'ha trovata utile</item>
-        <item quantity="other">%1$d persone l\'hanno trovata utile</item>
+        <item quantity="one">%1$d persona l'ha trovata utile</item>
+        <item quantity="other">%1$d persone l'hanno trovata utile</item>
     </plurals>
     <string name="reviews_edited">Modificata</string>
     <string name="reviews_helpful">Utile</string>
@@ -1583,7 +1583,7 @@
     <string name="reviews_composer_title_edit">Modifica la tua recensione</string>
     <string name="reviews_composer_hint">Cosa ti piace o non ti piace? (facoltativo)</string>
     <string name="reviews_composer_version">Recensione per %1$s</string>
-    <string name="reviews_composer_public">Le recensioni sono pubbliche e mostrano il tuo nome e l\'avatar di GitHub.</string>
+    <string name="reviews_composer_public">Le recensioni sono pubbliche e mostrano il tuo nome e l'avatar di GitHub.</string>
     <string name="reviews_composer_pick_rating">Tocca una stella per valutare</string>
     <string name="reviews_composer_count">%1$d/%2$d</string>
     <string name="reviews_composer_post">Pubblica</string>
