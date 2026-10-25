@@ -42,6 +42,8 @@ fun SettingsRow(
         subtitle = subtitle,
         strong = strong,
         showDivider = !last,
+        titleMaxLines = 2,
+        subtitleMaxLines = 4,
         onClick = onClick,
         trailing = trailing,
     )

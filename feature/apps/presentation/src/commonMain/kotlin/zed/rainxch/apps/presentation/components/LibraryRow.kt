@@ -133,7 +133,9 @@ private fun LibraryRowContent(
                     text = status,
                     role = KomiTextRole.Body,
                     color = statusTone.color(),
-                    maxLines = 2,
+                    // The staggered grid gives each card its own height; a version pair plus a
+                    // date needs three lines on narrow cards instead of an ellipsis.
+                    maxLines = 4,
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.padding(top = 2.dp),
                 )

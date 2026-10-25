@@ -157,6 +157,7 @@ fun KomiListContainer(
     }
 }
 
+@Suppress("CyclomaticComplexMethod")
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun KomiListRow(
@@ -171,6 +172,8 @@ fun KomiListRow(
     selected: Boolean = false,
     enabled: Boolean = true,
     showDivider: Boolean = false,
+    titleMaxLines: Int = 1,
+    subtitleMaxLines: Int = 1,
     trailing: @Composable (() -> Unit)? = null,
 ) {
     val personality = LocalPersonality.current
@@ -241,7 +244,7 @@ fun KomiListRow(
                 text = title,
                 role = if (strong) KomiTextRole.CardTitle else KomiTextRole.ItemTitle,
                 color = titleColor,
-                maxLines = 1,
+                maxLines = titleMaxLines,
                 overflow = TextOverflow.Ellipsis,
             )
 
@@ -250,7 +253,7 @@ fun KomiListRow(
                     text = it,
                     role = KomiTextRole.Body,
                     color = subtitleColor,
-                    maxLines = 1,
+                    maxLines = subtitleMaxLines,
                     overflow = TextOverflow.Ellipsis,
                 )
             }
