@@ -192,10 +192,23 @@ private fun ReviewsScreen(
     ) { innerPadding ->
         Box(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
             when {
-                state.isLoading && state.reviews.isEmpty() && state.mine == null -> Centered { KomiCircularProgress() }
-                state.isUnavailable -> Centered { Message(Res.string.reviews_unavailable) }
-                state.errorMessage != null -> Centered { ErrorBlock(state.errorMessage, onRetry = { onAction(ReviewsAction.OnRetry) }) }
-                else -> ReviewsList(state = state, onAction = onAction)
+                state.isLoading && state.reviews.isEmpty() && state.mine == null -> {
+                    Centered(Modifier.fillMaxSize()) { KomiCircularProgress() }
+                }
+
+                state.isUnavailable -> {
+                    Centered(Modifier.fillMaxSize()) { Message(Res.string.reviews_unavailable) }
+                }
+
+                state.errorMessage != null -> {
+                    Centered(Modifier.fillMaxSize()) {
+                        ErrorBlock(state.errorMessage, onRetry = { onAction(ReviewsAction.OnRetry) })
+                    }
+                }
+
+                else -> {
+                    ReviewsList(state = state, onAction = onAction)
+                }
             }
         }
     }
@@ -326,7 +339,7 @@ private fun DeleteReviewDialog(
 
 @Composable
 private fun Centered(
-    modifier: Modifier = Modifier.fillMaxSize(),
+    modifier: Modifier = Modifier,
     content: @Composable () -> Unit,
 ) {
     Box(modifier = modifier.padding(24.dp), contentAlignment = Alignment.Center) { content() }

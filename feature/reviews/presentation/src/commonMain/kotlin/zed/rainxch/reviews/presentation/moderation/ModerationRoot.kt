@@ -134,17 +134,17 @@ private fun ModerationScreen(
             Box(modifier = Modifier.fillMaxSize()) {
                 when {
                     state.isLoading && state.items.isEmpty() -> {
-                        Centered { KomiCircularProgress() }
+                        Centered(Modifier.fillMaxSize()) { KomiCircularProgress() }
                     }
 
                     state.errorMessage != null -> {
-                        Centered {
+                        Centered(Modifier.fillMaxSize()) {
                             ErrorBlock(state.errorMessage, onRetry = { onAction(ModerationAction.OnRetry) })
                         }
                     }
 
                     state.items.isEmpty() -> {
-                        Centered {
+                        Centered(Modifier.fillMaxSize()) {
                             Message(
                                 if (state.status == ModerationStatus.REPORTED) {
                                     Res.string.reviews_moderation_empty_reported
@@ -350,7 +350,7 @@ private fun ConfirmDialog(
 
 @Composable
 private fun Centered(
-    modifier: Modifier = Modifier.fillMaxSize(),
+    modifier: Modifier = Modifier,
     content: @Composable () -> Unit,
 ) {
     Box(modifier = modifier.padding(24.dp), contentAlignment = Alignment.Center) { content() }
