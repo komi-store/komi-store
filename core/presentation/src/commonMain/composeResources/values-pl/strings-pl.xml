@@ -1579,7 +1579,6 @@
     <string name="reviews_sort_newest">Najnowsze</string>
     <string name="reviews_sort_highest">Najwyżej oceniane</string>
     <string name="reviews_sort_lowest">Najniżej oceniane</string>
-    <string name="reviews_filter_all">Wszystkie oceny</string>
     <string name="reviews_filter_stars">%1$d★</string>
     <string name="reviews_hidden_notice">Moderator ukrył tę opinię. Widzisz ją tylko Ty i nie wlicza się do oceny.</string>
     <string name="reviews_composer_title_new">Oceń tę aplikację</string>
@@ -1588,6 +1587,16 @@
     <string name="reviews_composer_version">Opinia o %1$s</string>
     <string name="reviews_composer_public">Opinie są publiczne i pokazują Twoją nazwę oraz awatar z GitHub.</string>
     <string name="reviews_composer_pick_rating">Dotknij gwiazdki, aby ocenić</string>
+    <string name="reviews_rate_this_app">Oceń tę aplikację</string>
+    <string name="reviews_your_review">Twoja opinia</string>
+    <string name="reviews_developer">Deweloper</string>
+    <string name="reviews_level_1">Okropna</string>
+    <string name="reviews_level_2">Słaba</string>
+    <string name="reviews_level_3">W porządku</string>
+    <string name="reviews_level_4">Dobra</string>
+    <string name="reviews_level_5">Świetna</string>
+    <string name="reviews_average">%1$d,%2$d</string>
+    <string name="reviews_compact_rating">%1$s (%2$s)</string>
     <string name="reviews_composer_count">%1$d/%2$d</string>
     <string name="reviews_composer_post">Opublikuj</string>
     <string name="reviews_composer_save">Zapisz</string>

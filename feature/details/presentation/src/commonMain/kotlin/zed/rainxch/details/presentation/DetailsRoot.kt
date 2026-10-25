@@ -118,6 +118,7 @@ fun DetailsRoot(
         repo: String,
         sourceHost: String?,
         openComposer: Boolean,
+        composerRating: Int,
         version: String?,
         appLabel: String?,
     ) -> Unit,
@@ -227,12 +228,13 @@ fun DetailsRoot(
                 { onNavigateToSecurity(repo.owner.login, repo.name) }
             },
             onOpenReviews = state.repository?.let { repo ->
-                { openComposer ->
+                { composerRating ->
                     onNavigateToReviews(
                         repo.owner.login,
                         repo.name,
                         repo.sourceHost,
-                        openComposer,
+                        composerRating != null,
+                        composerRating ?: 0,
                         state.installedApp?.installedVersion ?: state.selectedRelease?.tagName,
                         state.selectedAppLabel,
                     )
@@ -554,7 +556,7 @@ fun DetailsScreen(
     onReadMoreWhatsNew: (() -> Unit)? = null,
     onOpenIssues: (() -> Unit)? = null,
     onOpenSecurity: (() -> Unit)? = null,
-    onOpenReviews: ((openComposer: Boolean) -> Unit)? = null,
+    onOpenReviews: ((composerRating: Int?) -> Unit)? = null,
 ) {
     KomiScaffold(
         topBar = {
@@ -687,8 +689,8 @@ fun DetailsScreen(
                                     summary = summary,
                                     topReviews = state.topReviews,
                                     canWrite = !state.isCurrentUserOwner,
-                                    onWrite = { onOpenReviews(true) },
-                                    onSeeAll = { onOpenReviews(false) },
+                                    onRate = { rating -> onOpenReviews(rating) },
+                                    onSeeAll = { onOpenReviews(null) },
                                 )
                             }
                         }

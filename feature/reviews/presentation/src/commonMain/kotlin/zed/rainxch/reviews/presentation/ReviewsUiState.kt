@@ -17,6 +17,7 @@ data class ReviewsUiState(
     val ratingFilter: Int? = null,
     val isLoading: Boolean = true,
     val isLoadingMore: Boolean = false,
+    val loadMoreFailed: Boolean = false,
     val endReached: Boolean = false,
     val page: Int = 1,
     val errorMessage: String? = null,

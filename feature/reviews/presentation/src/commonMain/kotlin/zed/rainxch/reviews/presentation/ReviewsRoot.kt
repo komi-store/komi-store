@@ -1,16 +1,18 @@
 package zed.rainxch.reviews.presentation
 
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.material.icons.rounded.RateReview
@@ -26,6 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kotlinx.collections.immutable.toImmutableList
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 import zed.rainxch.core.domain.model.reviews.CannotReviewReason
@@ -37,6 +40,9 @@ import zed.rainxch.core.presentation.components.buttons.KomiButton
 import zed.rainxch.core.presentation.components.buttons.KomiButtonVariant
 import zed.rainxch.core.presentation.components.buttons.KomiFab
 import zed.rainxch.core.presentation.components.buttons.KomiIconButton
+import zed.rainxch.core.presentation.components.buttons.KomiIconButtonSize
+import zed.rainxch.core.presentation.components.buttons.KomiSegmented
+import zed.rainxch.core.presentation.components.buttons.KomiSegmentedItem
 import zed.rainxch.core.presentation.components.chips.KomiChip
 import zed.rainxch.core.presentation.components.chips.KomiChipKind
 import zed.rainxch.core.presentation.components.chips.KomiChipSize
@@ -62,7 +68,6 @@ import zed.rainxch.githubstore.core.presentation.res.reviews_delete_title
 import zed.rainxch.githubstore.core.presentation.res.reviews_edit_yours
 import zed.rainxch.githubstore.core.presentation.res.reviews_empty
 import zed.rainxch.githubstore.core.presentation.res.reviews_empty_filtered
-import zed.rainxch.githubstore.core.presentation.res.reviews_filter_all
 import zed.rainxch.githubstore.core.presentation.res.reviews_filter_stars
 import zed.rainxch.githubstore.core.presentation.res.reviews_moderation_open
 import zed.rainxch.githubstore.core.presentation.res.reviews_retry
@@ -77,6 +82,7 @@ import zed.rainxch.githubstore.core.presentation.res.reviews_write
 import zed.rainxch.reviews.presentation.components.ComposerSheet
 import zed.rainxch.reviews.presentation.components.ReplySheet
 import zed.rainxch.reviews.presentation.components.ReportSheet
+import zed.rainxch.reviews.presentation.components.ReviewsEmpty
 
 @Composable
 fun ReviewsRoot(
@@ -230,9 +236,13 @@ private fun ReviewsList(
         }
     }
     val currentOnAction by rememberUpdatedState(onAction)
-    LaunchedEffect(nearEnd, state.reviews.size) {
-        if (nearEnd) currentOnAction(ReviewsAction.OnLoadMore)
+    // isLoadingMore is a key so a page that added nothing new asks for the next one; after a failure the
+    // retry item asks instead, or this would retry forever.
+    LaunchedEffect(nearEnd, state.reviews.size, state.isLoadingMore, state.loadMoreFailed) {
+        if (nearEnd && !state.loadMoreFailed) currentOnAction(ReviewsAction.OnLoadMore)
     }
+    // The pinned own review follows the star filter like the rest of the list.
+    val pinned = state.mine?.takeIf { state.ratingFilter == null || it.rating == state.ratingFilter }
     LazyColumn(
         state = listState,
         modifier = Modifier.fillMaxSize(),
@@ -240,13 +250,21 @@ private fun ReviewsList(
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         state.summary?.takeIf { it.count > 0 }?.let { summary ->
-            item(key = "summary") { RatingSummaryPanel(summary = summary) }
+            item(key = "summary") {
+                RatingSummaryPanel(
+                    summary = summary,
+                    selectedStars = state.ratingFilter,
+                    onStarsClick = { stars ->
+                        onAction(ReviewsAction.OnRatingFilterChange(stars.takeUnless { it == state.ratingFilter }))
+                    },
+                )
+            }
         }
         state.cannotReviewReason?.let { reason ->
             item(key = "cannot") { Message(reason.message()) }
         }
         item(key = "filters") { Filters(state = state, onAction = onAction) }
-        state.mine?.let { own ->
+        pinned?.let { own ->
             item(key = "mine") {
                 ReviewCard(
                     review = own,
@@ -255,9 +273,9 @@ private fun ReviewsList(
                 )
             }
         }
-        if (state.reviews.isEmpty() && state.mine == null && !state.isLoading) {
+        if (state.reviews.isEmpty() && pinned == null && !state.isLoading) {
             item(key = "empty") {
-                Message(if (state.ratingFilter != null) Res.string.reviews_empty_filtered else Res.string.reviews_empty)
+                ReviewsEmpty(if (state.ratingFilter != null) Res.string.reviews_empty_filtered else Res.string.reviews_empty)
             }
         }
         items(state.reviews, key = { it.id }) { review ->
@@ -272,45 +290,45 @@ private fun ReviewsList(
         if (state.isLoadingMore) {
             item(key = "more") { Centered(Modifier.fillMaxWidth().padding(12.dp)) { KomiCircularProgress() } }
         }
+        if (state.loadMoreFailed) {
+            item(key = "more-failed") {
+                Centered(Modifier.fillMaxWidth()) {
+                    KomiButton(
+                        onClick = { onAction(ReviewsAction.OnLoadMore) },
+                        label = stringResource(Res.string.reviews_retry),
+                        variant = KomiButtonVariant.Tonal,
+                    )
+                }
+            }
+        }
     }
 }
 
+// Sort as one connected group, scrolling sideways where the labels run long. The star filter is picked on
+// the summary's bars; while one is on, a chip names it and clears it.
 @Composable
 private fun Filters(
     state: ReviewsUiState,
     onAction: (ReviewsAction) -> Unit,
 ) {
+    val sorts = ReviewSort.entries.map { KomiSegmentedItem(value = it, title = stringResource(it.label())) }.toImmutableList()
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            ReviewSort.entries.forEachIndexed { index, sort ->
-                KomiChip(
-                    label = stringResource(sort.label()),
-                    kind = KomiChipKind.Filter,
-                    size = KomiChipSize.Sm,
-                    selected = state.sort == sort,
-                    index = index,
-                    onClick = { onAction(ReviewsAction.OnSortChange(sort)) },
-                )
-            }
-        }
-        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            KomiChip(
-                label = stringResource(Res.string.reviews_filter_all),
-                kind = KomiChipKind.Filter,
-                size = KomiChipSize.Sm,
-                selected = state.ratingFilter == null,
-                onClick = { onAction(ReviewsAction.OnRatingFilterChange(null)) },
+        Row(modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState())) {
+            KomiSegmented(
+                selected = state.sort,
+                items = sorts,
+                onSelect = { onAction(ReviewsAction.OnSortChange(it)) },
+                size = KomiIconButtonSize.Sm,
             )
-            for (stars in 5 downTo 1) {
-                KomiChip(
-                    label = stringResource(Res.string.reviews_filter_stars, stars),
-                    kind = KomiChipKind.Filter,
-                    size = KomiChipSize.Sm,
-                    selected = state.ratingFilter == stars,
-                    index = stars,
-                    onClick = { onAction(ReviewsAction.OnRatingFilterChange(stars)) },
-                )
-            }
+        }
+        state.ratingFilter?.let { stars ->
+            KomiChip(
+                label = stringResource(Res.string.reviews_filter_stars, stars),
+                kind = KomiChipKind.Input,
+                size = KomiChipSize.Sm,
+                selected = true,
+                onRemove = { onAction(ReviewsAction.OnRatingFilterChange(null)) },
+            )
         }
     }
 }

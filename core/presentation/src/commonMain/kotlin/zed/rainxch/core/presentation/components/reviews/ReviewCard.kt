@@ -8,13 +8,9 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.ArrowDownward
-import androidx.compose.material.icons.rounded.ArrowUpward
 import androidx.compose.material.icons.rounded.MoreVert
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -26,9 +22,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.selected
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import kotlinx.collections.immutable.toImmutableList
 import org.jetbrains.compose.resources.stringResource
@@ -43,12 +38,12 @@ import zed.rainxch.core.presentation.components.buttons.KomiIconButton
 import zed.rainxch.core.presentation.components.buttons.KomiIconButtonSize
 import zed.rainxch.core.presentation.components.chips.KomiChip
 import zed.rainxch.core.presentation.components.chips.KomiChipSize
-import zed.rainxch.core.presentation.components.icon.KomiIcon
 import zed.rainxch.core.presentation.components.overlays.KomiDropdown
 import zed.rainxch.core.presentation.components.overlays.KomiMenuEntry
 import zed.rainxch.core.presentation.components.overlays.KomiMenuItem
 import zed.rainxch.core.presentation.components.overlays.KomiMenuTone
 import zed.rainxch.core.presentation.components.surfaces.KomiSurface
+import zed.rainxch.core.presentation.components.surfaces.KomiSurfacePaper
 import zed.rainxch.core.presentation.components.text.KomiText
 import zed.rainxch.core.presentation.components.text.KomiTextRole
 import zed.rainxch.core.presentation.locals.LocalPersonality
@@ -67,17 +62,15 @@ import zed.rainxch.githubstore.core.presentation.res.reviews_action_delete_reply
 import zed.rainxch.githubstore.core.presentation.res.reviews_action_edit
 import zed.rainxch.githubstore.core.presentation.res.reviews_action_reply
 import zed.rainxch.githubstore.core.presentation.res.reviews_action_report
-import zed.rainxch.githubstore.core.presentation.res.reviews_downvote
 import zed.rainxch.githubstore.core.presentation.res.reviews_edited
 import zed.rainxch.githubstore.core.presentation.res.reviews_hidden_notice
 import zed.rainxch.githubstore.core.presentation.res.reviews_more_actions
-import zed.rainxch.githubstore.core.presentation.res.reviews_reply_from
-import zed.rainxch.githubstore.core.presentation.res.reviews_score
 import zed.rainxch.githubstore.core.presentation.res.reviews_show_less
 import zed.rainxch.githubstore.core.presentation.res.reviews_show_more
-import zed.rainxch.githubstore.core.presentation.res.reviews_upvote
+import zed.rainxch.githubstore.core.presentation.res.reviews_your_review
 
-// A null callback hides its action: the menu only lists what this viewer may do with this review.
+// A null callback hides its action: the menu only lists what this viewer may do with this review. The
+// viewer's own review sits on a tinted card under a "Your review" label.
 @Composable
 fun ReviewCard(
     review: ReviewUi,
@@ -92,11 +85,19 @@ fun ReviewCard(
     val colors = LocalPersonality.current.colors
     KomiSurface(
         modifier = modifier.fillMaxWidth(),
+        paper = if (review.isOwn) KomiSurfacePaper.Tinted else KomiSurfacePaper.Surface,
         contentPadding = PaddingValues(14.dp),
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            if (review.isOwn) {
+                KomiText(
+                    text = stringResource(Res.string.reviews_your_review),
+                    role = KomiTextRole.Overline,
+                    color = colors.primary,
+                )
+            }
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Avatar(url = review.authorAvatarUrl, size = 32)
+                ReviewAvatar(url = review.authorAvatarUrl, size = 32.dp)
                 Spacer(Modifier.size(10.dp))
                 Column(modifier = Modifier.weight(1f)) {
                     KomiText(
@@ -146,9 +147,9 @@ fun ReviewCard(
             ReviewTags(review)
             review.text?.let { ExpandableText(text = it) }
             if (onVote != null || review.score != 0) {
-                VoteRow(review = review, onVote = onVote)
+                VotePill(score = review.score, vote = review.vote, onVote = onVote)
             }
-            review.reply?.let { ReplyBlock(it) }
+            review.reply?.let { ReplyBubble(it) }
         }
     }
 }
@@ -198,95 +199,6 @@ private fun ExpandableText(text: String) {
     }
 }
 
-// Up, the net score, down. The viewer's own vote is the filled button; without onVote (a preview, the
-// viewer's own review) only the score shows.
-@Composable
-private fun VoteRow(
-    review: ReviewUi,
-    onVote: ((ReviewVote) -> Unit)?,
-) {
-    val colors = LocalPersonality.current.colors
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(6.dp),
-    ) {
-        if (onVote != null) {
-            VoteButton(vote = ReviewVote.UP, selected = review.vote == ReviewVote.UP, onVote = onVote)
-        } else {
-            KomiIcon(
-                imageVector = Icons.Rounded.ArrowUpward,
-                contentDescription = null,
-                tint = colors.onSurfaceVariant,
-                modifier = Modifier.size(16.dp),
-            )
-        }
-        val scoreLabel = stringResource(Res.string.reviews_score, review.score)
-        KomiText(
-            text = review.score.toString(),
-            role = KomiTextRole.Label,
-            color = if (review.vote != null) colors.primary else colors.onSurface,
-            modifier = Modifier.semantics { contentDescription = scoreLabel },
-        )
-        if (onVote != null) {
-            VoteButton(vote = ReviewVote.DOWN, selected = review.vote == ReviewVote.DOWN, onVote = onVote)
-        }
-    }
-}
-
-@Composable
-private fun VoteButton(
-    vote: ReviewVote,
-    selected: Boolean,
-    onVote: (ReviewVote) -> Unit,
-) {
-    KomiIconButton(
-        icon = if (vote == ReviewVote.UP) Icons.Rounded.ArrowUpward else Icons.Rounded.ArrowDownward,
-        contentDescription = stringResource(if (vote == ReviewVote.UP) Res.string.reviews_upvote else Res.string.reviews_downvote),
-        onClick = { onVote(vote) },
-        variant = if (selected) KomiButtonVariant.Primary else KomiButtonVariant.Outline,
-        size = KomiIconButtonSize.Sm,
-        modifier = Modifier.semantics { this.selected = selected },
-    )
-}
-
-@Composable
-private fun ReplyBlock(reply: ReviewReplyUi) {
-    val colors = LocalPersonality.current.colors
-    Column(
-        modifier =
-            Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(LocalPersonality.current.shape.corner))
-                .background(colors.surfaceVariant)
-                .padding(12.dp),
-        verticalArrangement = Arrangement.spacedBy(6.dp),
-    ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            // The block is surfaceVariant already, so the empty-avatar circle needs another fill to show.
-            Avatar(url = reply.authorAvatarUrl, size = 20, placeholder = colors.surface)
-            Spacer(Modifier.size(8.dp))
-            KomiText(
-                text = stringResource(Res.string.reviews_reply_from, reply.authorLogin),
-                role = KomiTextRole.Label,
-                color = colors.onSurface,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.weight(1f, fill = false),
-            )
-            reply.createdAt?.let { iso ->
-                Spacer(Modifier.size(6.dp))
-                KomiText(
-                    text = formatRelativeLong(iso),
-                    role = KomiTextRole.Caption,
-                    color = colors.onSurfaceVariant,
-                    maxLines = 1,
-                )
-            }
-        }
-        KomiText(text = reply.text, role = KomiTextRole.Body, color = colors.onSurface)
-    }
-}
-
 @Composable
 private fun ReviewMenu(
     onReport: (() -> Unit)?,
@@ -333,16 +245,16 @@ private class ReviewMenuItem(
 )
 
 @Composable
-private fun Avatar(
+internal fun ReviewAvatar(
     url: String?,
-    size: Int,
+    size: Dp,
     placeholder: Color = LocalPersonality.current.colors.surfaceVariant,
 ) {
     GitHubStoreImage(
         imageModel = { url },
         modifier =
             Modifier
-                .size(size.dp)
+                .size(size)
                 .clip(CircleShape)
                 .background(placeholder),
         showLoadingIndicator = false,

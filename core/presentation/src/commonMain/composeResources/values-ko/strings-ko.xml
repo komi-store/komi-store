@@ -1558,7 +1558,6 @@
     <string name="reviews_sort_newest">최신순</string>
     <string name="reviews_sort_highest">평점 높은 순</string>
     <string name="reviews_sort_lowest">평점 낮은 순</string>
-    <string name="reviews_filter_all">모든 평점</string>
     <string name="reviews_filter_stars">%1$d★</string>
     <string name="reviews_hidden_notice">운영자가 이 리뷰를 숨겼습니다. 나만 볼 수 있으며 평점에 반영되지 않습니다.</string>
     <string name="reviews_composer_title_new">이 앱 평가하기</string>
@@ -1567,6 +1566,16 @@
     <string name="reviews_composer_version">%1$s 리뷰</string>
     <string name="reviews_composer_public">리뷰는 공개되며 GitHub 이름과 아바타가 표시됩니다.</string>
     <string name="reviews_composer_pick_rating">별을 탭하여 평가하세요</string>
+    <string name="reviews_rate_this_app">이 앱 평가하기</string>
+    <string name="reviews_your_review">내 리뷰</string>
+    <string name="reviews_developer">개발자</string>
+    <string name="reviews_level_1">최악이에요</string>
+    <string name="reviews_level_2">별로예요</string>
+    <string name="reviews_level_3">보통이에요</string>
+    <string name="reviews_level_4">좋아요</string>
+    <string name="reviews_level_5">최고예요</string>
+    <string name="reviews_average">%1$d.%2$d</string>
+    <string name="reviews_compact_rating">%1$s (%2$s)</string>
     <string name="reviews_composer_count">%1$d/%2$d</string>
     <string name="reviews_composer_post">게시</string>
     <string name="reviews_composer_save">저장</string>

@@ -1607,7 +1607,6 @@
     <string name="reviews_sort_newest">Newest</string>
     <string name="reviews_sort_highest">Highest rated</string>
     <string name="reviews_sort_lowest">Lowest rated</string>
-    <string name="reviews_filter_all">All ratings</string>
     <string name="reviews_filter_stars">%1$d★</string>
     <string name="reviews_hidden_notice">A moderator hid this review. Only you can see it, and it doesn't count toward the rating.</string>
     <string name="reviews_composer_title_new">Rate this app</string>
@@ -1616,6 +1615,16 @@
     <string name="reviews_composer_version">Reviewing %1$s</string>
     <string name="reviews_composer_public">Reviews are public and show your GitHub name and avatar.</string>
     <string name="reviews_composer_pick_rating">Tap a star to rate</string>
+    <string name="reviews_rate_this_app">Rate this app</string>
+    <string name="reviews_your_review">Your review</string>
+    <string name="reviews_developer">Developer</string>
+    <string name="reviews_level_1">Hate it</string>
+    <string name="reviews_level_2">Dislike it</string>
+    <string name="reviews_level_3">It's OK</string>
+    <string name="reviews_level_4">Like it</string>
+    <string name="reviews_level_5">Love it</string>
+    <string name="reviews_average">%1$d.%2$d</string>
+    <string name="reviews_compact_rating">%1$s (%2$s)</string>
     <string name="reviews_composer_count">%1$d/%2$d</string>
     <string name="reviews_composer_post">Post</string>
     <string name="reviews_composer_save">Save</string>

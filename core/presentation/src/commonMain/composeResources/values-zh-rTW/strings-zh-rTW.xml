@@ -1527,7 +1527,6 @@
     <string name="reviews_sort_newest">最新</string>
     <string name="reviews_sort_highest">評分最高</string>
     <string name="reviews_sort_lowest">評分最低</string>
-    <string name="reviews_filter_all">所有評分</string>
     <string name="reviews_filter_stars">%1$d★</string>
     <string name="reviews_hidden_notice">管理員已隱藏這則評論。只有你看得到，且不會計入評分。</string>
     <string name="reviews_composer_title_new">為這個應用評分</string>
@@ -1536,6 +1535,16 @@
     <string name="reviews_composer_version">正在評論 %1$s</string>
     <string name="reviews_composer_public">評論會公開，並顯示你的 GitHub 名稱和頭像。</string>
     <string name="reviews_composer_pick_rating">輕觸星星即可評分</string>
+    <string name="reviews_rate_this_app">為此應用程式評分</string>
+    <string name="reviews_your_review">你的評論</string>
+    <string name="reviews_developer">開發者</string>
+    <string name="reviews_level_1">很差</string>
+    <string name="reviews_level_2">較差</string>
+    <string name="reviews_level_3">普通</string>
+    <string name="reviews_level_4">喜歡</string>
+    <string name="reviews_level_5">非常喜歡</string>
+    <string name="reviews_average">%1$d.%2$d</string>
+    <string name="reviews_compact_rating">%1$s (%2$s)</string>
     <string name="reviews_composer_count">%1$d/%2$d</string>
     <string name="reviews_composer_post">發布</string>
     <string name="reviews_composer_save">儲存</string>

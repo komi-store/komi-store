@@ -1526,7 +1526,6 @@
     <string name="reviews_sort_newest">新しい順</string>
     <string name="reviews_sort_highest">評価の高い順</string>
     <string name="reviews_sort_lowest">評価の低い順</string>
-    <string name="reviews_filter_all">すべての評価</string>
     <string name="reviews_filter_stars">%1$d★</string>
     <string name="reviews_hidden_notice">このレビューはモデレーターによって非表示になりました。あなただけが表示でき、評価には反映されません。</string>
     <string name="reviews_composer_title_new">このアプリを評価</string>
@@ -1535,6 +1534,16 @@
     <string name="reviews_composer_version">%1$s のレビュー</string>
     <string name="reviews_composer_public">レビューは公開され、GitHub の名前とアバターが表示されます。</string>
     <string name="reviews_composer_pick_rating">星をタップして評価</string>
+    <string name="reviews_rate_this_app">このアプリを評価</string>
+    <string name="reviews_your_review">あなたのレビュー</string>
+    <string name="reviews_developer">開発者</string>
+    <string name="reviews_level_1">最悪</string>
+    <string name="reviews_level_2">いまいち</string>
+    <string name="reviews_level_3">まあまあ</string>
+    <string name="reviews_level_4">良い</string>
+    <string name="reviews_level_5">最高</string>
+    <string name="reviews_average">%1$d.%2$d</string>
+    <string name="reviews_compact_rating">%1$s (%2$s)</string>
     <string name="reviews_composer_count">%1$d/%2$d</string>
     <string name="reviews_composer_post">投稿</string>
     <string name="reviews_composer_save">保存</string>

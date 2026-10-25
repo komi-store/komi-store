@@ -8,7 +8,7 @@ The full Reviews screen for a repository: rating summary, sort and star filter, 
 feature/reviews/
   presentation/    # ReviewsRoot + ReviewsViewModel + ReviewsUiState + ReviewsAction + ReviewsEvent
     moderation/    # ModerationRoot + ModerationViewModel: the queue for moderators
-    components/    # ReviewSheets: ComposerSheet, ReportSheet, ReplySheet
+    components/    # ReviewSheets: ComposerSheet, ReportSheet, ReplySheet; ReviewsEmpty
     utils/         # ReviewErrorMessages: ReviewError -> string resource
 ```
 
@@ -16,12 +16,15 @@ There are no domain or data layers here: Details needs reviews too, and features
 
 ## Navigation
 
-`GithubStoreGraph.ReviewsScreen(owner, repo, sourceHost, openComposer, version, appLabel)`, opened from the Details section. `openComposer` opens the write sheet once `/mine` has loaded; `version` and `appLabel` prefill the review. Sign-in goes to `AuthenticationScreen`. When `/mine` says `isModerator`, a top bar action opens `GithubStoreGraph.ReviewModerationScreen`, whose repo labels open that repo's `ReviewsScreen`.
+`GithubStoreGraph.ReviewsScreen(owner, repo, sourceHost, openComposer, composerRating, version, appLabel)`, opened from the Details section. `openComposer` opens the write sheet once `/mine` has loaded; `composerRating` (the star tapped on Details, 0 for none) fills that first sheet only, and `version` and `appLabel` prefill the review. Sign-in goes to `AuthenticationScreen`. When `/mine` says `isModerator`, a top bar action opens `GithubStoreGraph.ReviewModerationScreen`, whose repo labels open that repo's `ReviewsScreen`.
 
 ## Notes
 
 - The public list is a CDN copy that can lag a write by minutes, so the viewer's own review comes from `/mine`, is pinned above the list and is dropped from it. `isHidden` on it shows the moderator notice.
 - Every fresh load (sort, filter, retry) bumps `requestGeneration`; responses from an older generation are dropped.
+- The composer never opens before `/mine` answers: a tap then waits for it (`composerPending`), since a blank composer would post a new review over the viewer's existing one. A failed `/mine` drops the wait with an error message.
+- Look: the summary's bars are the star filter (tap a bar, tap it again to clear; a chip names the active filter), sort is a `KomiSegmented` group, and the pinned own review follows the filter too. Load-more stops after a failed page and shows Retry, rather than retrying in a loop.
+- The shared pieces in `core/presentation/components/reviews` carry the expressive look: the average on a cookie (a tilted ink stamp in Manga) with bars that grow in once per visit, stars that pop in a wave as they fill, votes as one connected pill (`ReviewVotes.kt`) whose score rolls, the developer's reply as a speech bubble (`ReviewReply.kt`, `SpeechBubbleShape`) with a Developer badge, and the viewer's own review on a tinted card labelled Your review. The composer names each level (Hate it ... Love it).
 - Votes show as up, net score, down. They're optimistic and roll back on failure; tapping your current vote again takes it back (DELETE), and switching moves the score by 2. Reports and votes are hidden on your own review; Reply shows only when `/mine` says `canReply` (push access, GitHub repos only).
 - A plain 404, a 5xx or no network reads as "unavailable" (the backend has `REVIEWS_ENABLED` off or can't be reached), not as an error.
 - `ReviewsRepository.changes` emits after a post, edit or delete, so Details reloads its section.

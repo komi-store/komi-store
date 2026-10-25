@@ -1579,7 +1579,6 @@
     <string name="reviews_sort_newest">Сначала новые</string>
     <string name="reviews_sort_highest">С высокой оценкой</string>
     <string name="reviews_sort_lowest">С низкой оценкой</string>
-    <string name="reviews_filter_all">Все оценки</string>
     <string name="reviews_filter_stars">%1$d★</string>
     <string name="reviews_hidden_notice">Модератор скрыл этот отзыв. Его видишь только ты, и он не учитывается в оценке.</string>
     <string name="reviews_composer_title_new">Оцени приложение</string>
@@ -1588,6 +1587,16 @@
     <string name="reviews_composer_version">Отзыв о %1$s</string>
     <string name="reviews_composer_public">Отзывы публичные: в них видны твоё имя и аватар на GitHub.</string>
     <string name="reviews_composer_pick_rating">Нажми на звезду, чтобы оценить</string>
+    <string name="reviews_rate_this_app">Оцени приложение</string>
+    <string name="reviews_your_review">Твой отзыв</string>
+    <string name="reviews_developer">Разработчик</string>
+    <string name="reviews_level_1">Ужасно</string>
+    <string name="reviews_level_2">Не нравится</string>
+    <string name="reviews_level_3">Нормально</string>
+    <string name="reviews_level_4">Нравится</string>
+    <string name="reviews_level_5">В восторге</string>
+    <string name="reviews_average">%1$d,%2$d</string>
+    <string name="reviews_compact_rating">%1$s (%2$s)</string>
     <string name="reviews_composer_count">%1$d/%2$d</string>
     <string name="reviews_composer_post">Опубликовать</string>
     <string name="reviews_composer_save">Сохранить</string>

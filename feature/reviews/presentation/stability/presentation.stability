@@ -85,6 +85,13 @@ public fun zed.rainxch.reviews.presentation.components.ComposerSheet(composer: z
     - modifier: STABLE (marked @Stable or @Immutable)
 
 @Composable
+private fun zed.rainxch.reviews.presentation.components.RatingWord(rating: kotlin.Int): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - rating: STABLE (primitive type)
+
+@Composable
 private fun zed.rainxch.reviews.presentation.components.ReasonRow(label: kotlin.String, selected: kotlin.Boolean, onClick: kotlin.Function0<kotlin.Unit>): kotlin.Unit
   skippable: true
   restartable: true
@@ -114,6 +121,14 @@ public fun zed.rainxch.reviews.presentation.components.ReportSheet(report: zed.r
     - onNoteChange: STABLE (function type)
     - onSend: STABLE (function type)
     - onDismiss: STABLE (function type)
+    - modifier: STABLE (marked @Stable or @Immutable)
+
+@Composable
+public fun zed.rainxch.reviews.presentation.components.ReviewsEmpty(message: org.jetbrains.compose.resources.StringResource, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - message: STABLE (marked @Stable or @Immutable)
     - modifier: STABLE (marked @Stable or @Immutable)
 
 @Composable

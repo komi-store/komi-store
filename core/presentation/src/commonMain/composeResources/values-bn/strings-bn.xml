@@ -1560,7 +1560,6 @@
     <string name="reviews_sort_newest">সবচেয়ে নতুন</string>
     <string name="reviews_sort_highest">সর্বোচ্চ রেটিং</string>
     <string name="reviews_sort_lowest">সর্বনিম্ন রেটিং</string>
-    <string name="reviews_filter_all">সব রেটিং</string>
     <string name="reviews_filter_stars">%1$d★</string>
     <string name="reviews_hidden_notice">একজন মডারেটর এই রিভিউটি লুকিয়ে রেখেছেন। শুধু আপনি এটি দেখতে পান, এবং এটি রেটিংয়ে গণনা করা হয় না।</string>
     <string name="reviews_composer_title_new">এই অ্যাপটিকে রেটিং দিন</string>
@@ -1569,6 +1568,16 @@
     <string name="reviews_composer_version">%1$s-এর রিভিউ</string>
     <string name="reviews_composer_public">রিভিউ সর্বজনীন এবং এতে আপনার GitHub নাম ও অবতার দেখা যায়।</string>
     <string name="reviews_composer_pick_rating">রেটিং দিতে একটি স্টারে ট্যাপ করুন</string>
+    <string name="reviews_rate_this_app">এই অ্যাপটি রেট করুন</string>
+    <string name="reviews_your_review">আপনার রিভিউ</string>
+    <string name="reviews_developer">ডেভেলপার</string>
+    <string name="reviews_level_1">একদম পছন্দ নয়</string>
+    <string name="reviews_level_2">পছন্দ নয়</string>
+    <string name="reviews_level_3">চলনসই</string>
+    <string name="reviews_level_4">পছন্দ হয়েছে</string>
+    <string name="reviews_level_5">দারুণ পছন্দ</string>
+    <string name="reviews_average">%1$d.%2$d</string>
+    <string name="reviews_compact_rating">%1$s (%2$s)</string>
     <string name="reviews_composer_count">%1$d/%2$d</string>
     <string name="reviews_composer_post">পোস্ট করুন</string>
     <string name="reviews_composer_save">সংরক্ষণ</string>

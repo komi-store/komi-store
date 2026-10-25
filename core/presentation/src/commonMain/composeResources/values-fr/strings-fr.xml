@@ -1540,7 +1540,6 @@
     <string name="reviews_sort_newest">Les plus récents</string>
     <string name="reviews_sort_highest">Les mieux notés</string>
     <string name="reviews_sort_lowest">Les moins bien notés</string>
-    <string name="reviews_filter_all">Toutes les notes</string>
     <string name="reviews_filter_stars">%1$d★</string>
     <string name="reviews_hidden_notice">Un modérateur a masqué cet avis. Vous seul pouvez le voir, et il n'est pas pris en compte dans la note.</string>
     <string name="reviews_composer_title_new">Noter cette application</string>
@@ -1549,6 +1548,16 @@
     <string name="reviews_composer_version">Avis sur %1$s</string>
     <string name="reviews_composer_public">Les avis sont publics et affichent votre nom et votre avatar GitHub.</string>
     <string name="reviews_composer_pick_rating">Touchez une étoile pour noter</string>
+    <string name="reviews_rate_this_app">Notez cette app</string>
+    <string name="reviews_your_review">Votre avis</string>
+    <string name="reviews_developer">Développeur</string>
+    <string name="reviews_level_1">Je déteste</string>
+    <string name="reviews_level_2">Je n'aime pas</string>
+    <string name="reviews_level_3">Ça va</string>
+    <string name="reviews_level_4">J'aime bien</string>
+    <string name="reviews_level_5">J'adore</string>
+    <string name="reviews_average">%1$d,%2$d</string>
+    <string name="reviews_compact_rating">%1$s (%2$s)</string>
     <string name="reviews_composer_count">%1$d/%2$d</string>
     <string name="reviews_composer_post">Publier</string>
     <string name="reviews_composer_save">Enregistrer</string>

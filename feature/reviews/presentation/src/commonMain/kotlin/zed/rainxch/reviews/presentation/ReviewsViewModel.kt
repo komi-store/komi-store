@@ -46,6 +46,7 @@ class ReviewsViewModel(
     repo: String,
     sourceHost: String?,
     openComposer: Boolean,
+    composerRating: Int,
     private val version: String?,
     private val appLabel: String?,
     private val repository: ReviewsRepository,
@@ -66,6 +67,13 @@ class ReviewsViewModel(
     private var viewerId: Long? = null
     private var requestGeneration = 0
     private var composerPending = openComposer
+
+    // The rating tapped on Details; it fills the first composer only.
+    private var pendingRating = composerRating
+
+    // Until /mine answers, the viewer's own review is unknown, and a composer opened then would start a
+    // new review over it.
+    private var mineLoaded = false
 
     init {
         load()
@@ -192,6 +200,7 @@ class ReviewsViewModel(
                 ratingFilter = rating,
                 page = 1,
                 endReached = false,
+                loadMoreFailed = false,
                 errorMessage = null,
                 isUnavailable = false,
                 reviews = persistentListOf(),
@@ -203,6 +212,7 @@ class ReviewsViewModel(
     private fun loadNextPage() {
         val current = _state.value
         if (current.isLoading || current.isLoadingMore || current.endReached || current.errorMessage != null) return
+        _state.update { it.copy(loadMoreFailed = false) }
         loadPage(page = current.page + 1, generation = requestGeneration)
     }
 
@@ -227,6 +237,7 @@ class ReviewsViewModel(
                             endReached = !result.hasMore,
                             isLoading = false,
                             isLoadingMore = false,
+                            loadMoreFailed = false,
                         )
                     }
                     publishReviews()
@@ -236,6 +247,7 @@ class ReviewsViewModel(
                         it.copy(
                             isLoading = false,
                             isLoadingMore = false,
+                            loadMoreFailed = append,
                             isUnavailable = !append && error.isReviewsUnavailable(),
                             errorMessage = if (append) null else getString(Res.string.reviews_load_failed),
                         )
@@ -246,6 +258,7 @@ class ReviewsViewModel(
     }
 
     private suspend fun loadMine() {
+        mineLoaded = false
         if (viewerId == null) {
             mine = null
             votes = emptyMap()
@@ -256,6 +269,7 @@ class ReviewsViewModel(
             return
         }
         repository.getMine(target).onSuccess { state ->
+            mineLoaded = true
             mine = state.review
             votes = state.votes
             _state.update {
@@ -270,6 +284,11 @@ class ReviewsViewModel(
             if (composerPending) {
                 composerPending = false
                 openComposer()
+            }
+        }.onFailure { error ->
+            if (composerPending) {
+                composerPending = false
+                message(error.reviewMessage())
             }
         }
     }
@@ -288,17 +307,23 @@ class ReviewsViewModel(
 
     private fun openComposer() {
         requireSignIn {
+            if (!mineLoaded) {
+                composerPending = true
+                return@requireSignIn
+            }
             val reason = _state.value.cannotReviewReason
             if (reason != null) {
                 message(reason.message())
                 return@requireSignIn
             }
             val own = mine
+            val rating = pendingRating.takeIf { it in REVIEW_RATING_RANGE } ?: own?.rating ?: 0
+            pendingRating = 0
             _state.update {
                 it.copy(
                     composer =
                         ComposerState(
-                            rating = own?.rating ?: 0,
+                            rating = rating,
                             text = own?.text.orEmpty(),
                             version = version ?: own?.version,
                             isEditing = own != null,

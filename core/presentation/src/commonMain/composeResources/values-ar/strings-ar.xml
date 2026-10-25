@@ -1617,7 +1617,6 @@
     <string name="reviews_sort_newest">الأحدث</string>
     <string name="reviews_sort_highest">الأعلى تقييمًا</string>
     <string name="reviews_sort_lowest">الأقل تقييمًا</string>
-    <string name="reviews_filter_all">كل التقييمات</string>
     <string name="reviews_filter_stars">%1$d★</string>
     <string name="reviews_hidden_notice">أخفى أحد المشرفين هذه المراجعة. لا يراها أحد غيرك، ولا تُحتسب في التقييم.</string>
     <string name="reviews_composer_title_new">قيّم هذا التطبيق</string>
@@ -1626,6 +1625,16 @@
     <string name="reviews_composer_version">مراجعة %1$s</string>
     <string name="reviews_composer_public">المراجعات علنية وتعرض اسمك وصورتك الرمزية على GitHub.</string>
     <string name="reviews_composer_pick_rating">انقر على نجمة للتقييم</string>
+    <string name="reviews_rate_this_app">قيّم هذا التطبيق</string>
+    <string name="reviews_your_review">مراجعتك</string>
+    <string name="reviews_developer">المطوّر</string>
+    <string name="reviews_level_1">أكرهه</string>
+    <string name="reviews_level_2">لم يعجبني</string>
+    <string name="reviews_level_3">مقبول</string>
+    <string name="reviews_level_4">أعجبني</string>
+    <string name="reviews_level_5">أحببته</string>
+    <string name="reviews_average">%1$d.%2$d</string>
+    <string name="reviews_compact_rating">%1$s (%2$s)</string>
     <string name="reviews_composer_count">%1$d/%2$d</string>
     <string name="reviews_composer_post">نشر</string>
     <string name="reviews_composer_save">حفظ</string>

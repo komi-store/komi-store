@@ -1575,7 +1575,6 @@
     <string name="reviews_sort_newest">सबसे नई</string>
     <string name="reviews_sort_highest">सबसे ज़्यादा रेटिंग</string>
     <string name="reviews_sort_lowest">सबसे कम रेटिंग</string>
-    <string name="reviews_filter_all">सभी रेटिंग</string>
     <string name="reviews_filter_stars">%1$d★</string>
     <string name="reviews_hidden_notice">एक मॉडरेटर ने यह समीक्षा छिपा दी है। इसे सिर्फ़ आप देख सकते हैं, और यह रेटिंग में नहीं गिनी जाती।</string>
     <string name="reviews_composer_title_new">इस ऐप को रेटिंग दें</string>
@@ -1584,6 +1583,16 @@
     <string name="reviews_composer_version">%1$s की समीक्षा</string>
     <string name="reviews_composer_public">समीक्षाएँ सार्वजनिक होती हैं और उनमें आपका GitHub नाम और अवतार दिखता है।</string>
     <string name="reviews_composer_pick_rating">रेटिंग देने के लिए किसी स्टार पर टैप करें</string>
+    <string name="reviews_rate_this_app">इस ऐप को रेट करें</string>
+    <string name="reviews_your_review">आपकी समीक्षा</string>
+    <string name="reviews_developer">डेवलपर</string>
+    <string name="reviews_level_1">बिल्कुल पसंद नहीं</string>
+    <string name="reviews_level_2">पसंद नहीं</string>
+    <string name="reviews_level_3">ठीक है</string>
+    <string name="reviews_level_4">पसंद है</string>
+    <string name="reviews_level_5">बहुत पसंद है</string>
+    <string name="reviews_average">%1$d.%2$d</string>
+    <string name="reviews_compact_rating">%1$s (%2$s)</string>
     <string name="reviews_composer_count">%1$d/%2$d</string>
     <string name="reviews_composer_post">पोस्ट करें</string>
     <string name="reviews_composer_save">सहेजें</string>

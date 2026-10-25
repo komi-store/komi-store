@@ -1571,7 +1571,6 @@
     <string name="reviews_sort_newest">En yeni</string>
     <string name="reviews_sort_highest">En yüksek puan</string>
     <string name="reviews_sort_lowest">En düşük puan</string>
-    <string name="reviews_filter_all">Tüm puanlar</string>
     <string name="reviews_filter_stars">%1$d★</string>
     <string name="reviews_hidden_notice">Bir moderatör bu yorumu gizledi. Yalnızca siz görebilirsiniz ve puana dahil edilmez.</string>
     <string name="reviews_composer_title_new">Bu uygulamayı puanlayın</string>
@@ -1580,6 +1579,16 @@
     <string name="reviews_composer_version">%1$s için yorum</string>
     <string name="reviews_composer_public">Yorumlar herkese açıktır ve GitHub adınızı ve avatarınızı gösterir.</string>
     <string name="reviews_composer_pick_rating">Puan vermek için bir yıldıza dokunun</string>
+    <string name="reviews_rate_this_app">Bu uygulamayı puanlayın</string>
+    <string name="reviews_your_review">Yorumunuz</string>
+    <string name="reviews_developer">Geliştirici</string>
+    <string name="reviews_level_1">Hiç beğenmedim</string>
+    <string name="reviews_level_2">Beğenmedim</string>
+    <string name="reviews_level_3">İdare eder</string>
+    <string name="reviews_level_4">Beğendim</string>
+    <string name="reviews_level_5">Bayıldım</string>
+    <string name="reviews_average">%1$d,%2$d</string>
+    <string name="reviews_compact_rating">%1$s (%2$s)</string>
     <string name="reviews_composer_count">%1$d/%2$d</string>
     <string name="reviews_composer_post">Yayınla</string>
     <string name="reviews_composer_save">Kaydet</string>

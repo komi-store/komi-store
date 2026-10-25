@@ -115,6 +115,7 @@ sealed interface GithubStoreGraph {
         val repo: String,
         val sourceHost: String? = null,
         val openComposer: Boolean = false,
+        val composerRating: Int = 0,
         val version: String? = null,
         val appLabel: String? = null,
     ) : GithubStoreGraph

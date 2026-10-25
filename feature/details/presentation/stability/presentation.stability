@@ -13,7 +13,7 @@ private fun zed.rainxch.details.presentation.DetailsActions(state: zed.rainxch.d
     - onAction: STABLE (function type)
 
 @Composable
-public fun zed.rainxch.details.presentation.DetailsRoot(onNavigateBack: kotlin.Function0<kotlin.Unit>, onNavigateToDeveloperProfile: kotlin.Function1<@[ParameterName(name = \, onOpenRepositoryInApp: kotlin.Function1<@[ParameterName(name = \, onNavigateToAbout: kotlin.Function5<@[ParameterName(name = \, onNavigateToWhatsNew: kotlin.Function4<@[ParameterName(name = \, onNavigateToIssues: kotlin.Function2<@[ParameterName(name = \, onNavigateToSecurity: kotlin.Function2<@[ParameterName(name = \, onNavigateToMarkdownViewer: kotlin.Function1<@[ParameterName(name = \, onNavigateToReviews: kotlin.Function6<@[ParameterName(name = \, viewModel: zed.rainxch.details.presentation.DetailsViewModel): kotlin.Unit
+public fun zed.rainxch.details.presentation.DetailsRoot(onNavigateBack: kotlin.Function0<kotlin.Unit>, onNavigateToDeveloperProfile: kotlin.Function1<@[ParameterName(name = \, onOpenRepositoryInApp: kotlin.Function1<@[ParameterName(name = \, onNavigateToAbout: kotlin.Function5<@[ParameterName(name = \, onNavigateToWhatsNew: kotlin.Function4<@[ParameterName(name = \, onNavigateToIssues: kotlin.Function2<@[ParameterName(name = \, onNavigateToSecurity: kotlin.Function2<@[ParameterName(name = \, onNavigateToMarkdownViewer: kotlin.Function1<@[ParameterName(name = \, onNavigateToReviews: kotlin.Function7<@[ParameterName(name = \, viewModel: zed.rainxch.details.presentation.DetailsViewModel): kotlin.Unit
   skippable: true
   restartable: true
   params:
@@ -832,6 +832,13 @@ internal fun zed.rainxch.details.presentation.components.sections.ProgressiveMar
     - effectiveHeight: STABLE (primitive type)
     - collapsedHeightPx: STABLE (primitive type)
     - rawKey: STABLE (String is immutable)
+
+@Composable
+private fun zed.rainxch.details.presentation.components.sections.RateThisApp(onRate: kotlin.Function1<kotlin.Int, kotlin.Unit>): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - onRate: STABLE (function type)
 
 @Composable
 private fun zed.rainxch.details.presentation.components.sections.ReleaseHint(text: kotlin.String, onClick: kotlin.Function0<kotlin.Unit>, emphasized: kotlin.Boolean): kotlin.Unit

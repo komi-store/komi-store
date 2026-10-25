@@ -113,8 +113,9 @@ val viewModelsModule =
                 repo = params[1],
                 sourceHost = params[2],
                 openComposer = params[3],
-                version = params[4],
-                appLabel = params[5],
+                composerRating = params[4],
+                version = params[5],
+                appLabel = params[6],
                 repository = get(),
                 userSessionRepository = get(),
             )

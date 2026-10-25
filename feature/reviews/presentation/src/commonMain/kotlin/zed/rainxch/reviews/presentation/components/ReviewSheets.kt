@@ -1,5 +1,10 @@
 package zed.rainxch.reviews.presentation.components
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -36,6 +41,11 @@ import zed.rainxch.githubstore.core.presentation.res.reviews_composer_save
 import zed.rainxch.githubstore.core.presentation.res.reviews_composer_title_edit
 import zed.rainxch.githubstore.core.presentation.res.reviews_composer_title_new
 import zed.rainxch.githubstore.core.presentation.res.reviews_composer_version
+import zed.rainxch.githubstore.core.presentation.res.reviews_level_1
+import zed.rainxch.githubstore.core.presentation.res.reviews_level_2
+import zed.rainxch.githubstore.core.presentation.res.reviews_level_3
+import zed.rainxch.githubstore.core.presentation.res.reviews_level_4
+import zed.rainxch.githubstore.core.presentation.res.reviews_level_5
 import zed.rainxch.githubstore.core.presentation.res.reviews_reply_hint
 import zed.rainxch.githubstore.core.presentation.res.reviews_reply_send
 import zed.rainxch.githubstore.core.presentation.res.reviews_reply_title
@@ -99,13 +109,13 @@ fun ComposerSheet(
                     color = colors.onSurfaceVariant,
                 )
             }
-            StarRatingInput(rating = composer.rating, onRatingChange = onRatingChange)
-            if (composer.rating == 0) {
-                KomiText(
-                    text = stringResource(Res.string.reviews_composer_pick_rating),
-                    role = KomiTextRole.Caption,
-                    color = colors.onSurfaceVariant,
-                )
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(2.dp),
+            ) {
+                StarRatingInput(rating = composer.rating, onRatingChange = onRatingChange)
+                RatingWord(rating = composer.rating)
             }
             KomiTextField(
                 value = composer.text,
@@ -228,6 +238,37 @@ fun ReplySheet(
     }
 }
 
+// The word for the picked level, which springs in as the rating changes; before a pick, the hint to tap.
+@Composable
+private fun RatingWord(rating: Int) {
+    val personality = LocalPersonality.current
+    val motion = personality.motion
+    AnimatedContent(
+        targetState = rating,
+        transitionSpec = {
+            (fadeIn(motion.fastEffects()) + scaleIn(motion.bouncySpatial(), initialScale = WORD_START_SCALE))
+                .togetherWith(fadeOut(motion.fastEffects()))
+        },
+        label = "rating-word",
+    ) { level ->
+        KomiText(
+            text = stringResource(level.ratingWord()),
+            role = if (level == 0) KomiTextRole.Caption else KomiTextRole.ItemTitle,
+            color = if (level == 0) personality.colors.onSurfaceVariant else personality.colors.primary,
+        )
+    }
+}
+
+private fun Int.ratingWord(): StringResource =
+    when (this) {
+        1 -> Res.string.reviews_level_1
+        2 -> Res.string.reviews_level_2
+        3 -> Res.string.reviews_level_3
+        4 -> Res.string.reviews_level_4
+        5 -> Res.string.reviews_level_5
+        else -> Res.string.reviews_composer_pick_rating
+    }
+
 private fun ReportReason.label(): StringResource =
     when (this) {
         ReportReason.SPAM -> Res.string.reviews_report_spam
@@ -235,3 +276,5 @@ private fun ReportReason.label(): StringResource =
         ReportReason.OFF_TOPIC -> Res.string.reviews_report_off_topic
         ReportReason.OTHER -> Res.string.reviews_report_other
     }
+
+private const val WORD_START_SCALE = 0.7f

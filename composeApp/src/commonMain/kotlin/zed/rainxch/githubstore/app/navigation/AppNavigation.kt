@@ -487,13 +487,14 @@ fun AppNavigation(
                                                 ),
                                             )
                                         },
-                                        onNavigateToReviews = { owner, repo, sourceHost, openComposer, version, appLabel ->
+                                        onNavigateToReviews = { owner, repo, sourceHost, openComposer, composerRating, version, appLabel ->
                                             navController.navigate(
                                                 GithubStoreGraph.ReviewsScreen(
                                                     owner = owner,
                                                     repo = repo,
                                                     sourceHost = sourceHost,
                                                     openComposer = openComposer,
+                                                    composerRating = composerRating,
                                                     version = version,
                                                     appLabel = appLabel,
                                                 ),
@@ -621,6 +622,7 @@ fun AppNavigation(
                                                 args.repo,
                                                 args.sourceHost,
                                                 args.openComposer,
+                                                args.composerRating,
                                                 args.version,
                                                 args.appLabel,
                                             )
