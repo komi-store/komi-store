@@ -32,7 +32,12 @@ data class ReviewsUiState(
     val report: ReportState? = null,
     val reply: ReplyState? = null,
     val isConfirmingDelete: Boolean = false,
-)
+) {
+    // The viewer's own review is pinned above the list only while it matches the star filter.
+    val pinnedMine: ReviewUi? get() = mine?.takeIf { ratingFilter == null || it.rating == ratingFilter }
+
+    val isEmpty: Boolean get() = reviews.isEmpty() && pinnedMine == null && !isLoading
+}
 
 @Immutable
 data class ComposerState(

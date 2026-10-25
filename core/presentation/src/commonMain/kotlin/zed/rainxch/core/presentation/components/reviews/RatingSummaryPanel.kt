@@ -159,7 +159,12 @@ private fun AverageText(
     color: Color,
 ) {
     if (average != null) {
-        BasicText(text = formatAverage(average), style = LocalPersonality.current.type.displayEmphasized.copy(color = color))
+        BasicText(
+            text = formatAverage(average),
+            style =
+                LocalPersonality.current.type.displayEmphasized
+                    .copy(color = color),
+        )
     } else {
         KomiIcon(imageVector = Icons.Rounded.StarBorder, contentDescription = null, tint = color, modifier = Modifier.size(36.dp))
     }
@@ -199,12 +204,13 @@ private fun StarBar(
                 .then(
                     when {
                         !selected -> Modifier
+
                         // Manga's container is the bar's own red, so the row gets an ink frame instead.
                         manga -> Modifier.border(2.dp, colors.outline)
+
                         else -> Modifier.background(colors.primaryContainer, rowShape)
                     },
-                )
-                .semantics(mergeDescendants = true) { contentDescription = description }
+                ).semantics(mergeDescendants = true) { contentDescription = description }
                 .padding(horizontal = 6.dp, vertical = 4.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp),

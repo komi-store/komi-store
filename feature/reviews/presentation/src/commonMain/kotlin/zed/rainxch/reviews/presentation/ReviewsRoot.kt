@@ -241,8 +241,6 @@ private fun ReviewsList(
     LaunchedEffect(nearEnd, state.reviews.size, state.isLoadingMore, state.loadMoreFailed) {
         if (nearEnd && !state.loadMoreFailed) currentOnAction(ReviewsAction.OnLoadMore)
     }
-    // The pinned own review follows the star filter like the rest of the list.
-    val pinned = state.mine?.takeIf { state.ratingFilter == null || it.rating == state.ratingFilter }
     LazyColumn(
         state = listState,
         modifier = Modifier.fillMaxSize(),
@@ -264,7 +262,7 @@ private fun ReviewsList(
             item(key = "cannot") { Message(reason.message()) }
         }
         item(key = "filters") { Filters(state = state, onAction = onAction) }
-        pinned?.let { own ->
+        state.pinnedMine?.let { own ->
             item(key = "mine") {
                 ReviewCard(
                     review = own,
@@ -273,7 +271,7 @@ private fun ReviewsList(
                 )
             }
         }
-        if (state.reviews.isEmpty() && pinned == null && !state.isLoading) {
+        if (state.isEmpty) {
             item(key = "empty") {
                 ReviewsEmpty(if (state.ratingFilter != null) Res.string.reviews_empty_filtered else Res.string.reviews_empty)
             }
