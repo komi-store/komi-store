@@ -283,31 +283,33 @@ class ReviewsViewModel(
             publishReviews()
             return
         }
-        repository.getMine(target).onSuccess { state ->
-            mineLoaded = true
-            mine = state.review
-            votes = state.votes
-            confirmedVotes = state.votes
-            viewerId = viewerId ?: state.review?.author?.id
-            _state.update {
-                it.copy(
-                    canReview = state.canReview,
-                    cannotReviewReason = state.cannotReviewReason,
-                    canReply = state.canReply,
-                    isModerator = state.isModerator,
-                )
+        repository
+            .getMine(target)
+            .onSuccess { state ->
+                mineLoaded = true
+                mine = state.review
+                votes = state.votes
+                confirmedVotes = state.votes
+                viewerId = viewerId ?: state.review?.author?.id
+                _state.update {
+                    it.copy(
+                        canReview = state.canReview,
+                        cannotReviewReason = state.cannotReviewReason,
+                        canReply = state.canReply,
+                        isModerator = state.isModerator,
+                    )
+                }
+                publishReviews()
+                if (composerPending) {
+                    composerPending = false
+                    openComposer()
+                }
+            }.onFailure { error ->
+                if (composerPending) {
+                    composerPending = false
+                    message(error.reviewMessage())
+                }
             }
-            publishReviews()
-            if (composerPending) {
-                composerPending = false
-                openComposer()
-            }
-        }.onFailure { error ->
-            if (composerPending) {
-                composerPending = false
-                message(error.reviewMessage())
-            }
-        }
     }
 
     // The viewer's own review is pinned above the list, and dropped from it, because the public list is a

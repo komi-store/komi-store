@@ -259,15 +259,17 @@ private fun RatingWord(rating: Int) {
     }
 }
 
-private fun Int.ratingWord(): StringResource =
-    when (this) {
-        1 -> Res.string.reviews_level_1
-        2 -> Res.string.reviews_level_2
-        3 -> Res.string.reviews_level_3
-        4 -> Res.string.reviews_level_4
-        5 -> Res.string.reviews_level_5
-        else -> Res.string.reviews_composer_pick_rating
-    }
+// One word per level, one star first; no rating yet reads as the hint to tap.
+private val ratingWords =
+    listOf(
+        Res.string.reviews_level_1,
+        Res.string.reviews_level_2,
+        Res.string.reviews_level_3,
+        Res.string.reviews_level_4,
+        Res.string.reviews_level_5,
+    )
+
+private fun Int.ratingWord(): StringResource = ratingWords.getOrNull(this - 1) ?: Res.string.reviews_composer_pick_rating
 
 private fun ReportReason.label(): StringResource =
     when (this) {
