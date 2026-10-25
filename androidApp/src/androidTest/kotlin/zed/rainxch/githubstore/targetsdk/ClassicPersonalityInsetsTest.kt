@@ -1,6 +1,6 @@
 package zed.rainxch.githubstore.targetsdk
 
-import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -41,8 +41,7 @@ class ClassicPersonalityInsetsTest : TargetSdk37TestBase() {
         runBlocking {
             GlobalContext.get().get<TweaksRepository>().setPersonality(AppPersonality.CLASSIC)
         }
-        // A Classic tab screen has no top bar: Explore starts with its chip row, and the tab card holds the search
-        // field and the tabs at the bottom.
+        // A Classic tab screen has no top bar: Explore starts with its chip row, and the tab card sits at the bottom.
         rule.waitForTag(KomiTestTags.CLASSIC_TAB_CARD, 20_000)
         rule.waitForIdle()
 
