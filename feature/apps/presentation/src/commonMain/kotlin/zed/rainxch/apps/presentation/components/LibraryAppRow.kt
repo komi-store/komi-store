@@ -2,6 +2,7 @@ package zed.rainxch.apps.presentation.components
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.OpenInNew
+import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.DeleteOutline
 import androidx.compose.material.icons.rounded.MoreVert
@@ -27,7 +28,6 @@ import zed.rainxch.githubstore.core.presentation.res.Res
 import zed.rainxch.githubstore.core.presentation.res.advanced_settings_open
 import zed.rainxch.githubstore.core.presentation.res.apps_compact_more_actions
 import zed.rainxch.githubstore.core.presentation.res.apps_ignore_updates
-import zed.rainxch.githubstore.core.presentation.res.apps_menu_item_active
 import zed.rainxch.githubstore.core.presentation.res.apps_skip_version
 import zed.rainxch.githubstore.core.presentation.res.apps_skip_version_unskip
 import zed.rainxch.githubstore.core.presentation.res.apps_tag_asset_filter
@@ -60,7 +60,7 @@ fun LibraryAppRow(
     framed: Boolean = true,
 ) {
     val app = appItem.installedApp
-    val (status, tone) = appItem.status()
+    val status = appItem.status()
     LibraryRow(
         app =
             LibraryRowApp(
@@ -74,7 +74,6 @@ fun LibraryAppRow(
                 ratingCount = appItem.ratingCount,
             ),
         status = status,
-        statusTone = tone,
         onClick = onOpenRepo,
         modifier = modifier,
         tags = appItem.tags(),
@@ -94,23 +93,23 @@ private val AppItem.isWorking: Boolean
             updateState is UpdateState.Installing
 
 @Composable
-private fun AppItem.status(): Pair<String, LibraryStatusTone> {
+private fun AppItem.status(): LibraryStatus {
     val app = installedApp
     return when {
         updateState is UpdateState.Error -> {
-            stringResource(Res.string.error_with_message, updateState.message) to LibraryStatusTone.Error
+            LibraryStatus(stringResource(Res.string.error_with_message, updateState.message), LibraryStatusTone.Error)
         }
 
         updateState is UpdateState.CheckingUpdate -> {
-            stringResource(Res.string.checking) to LibraryStatusTone.Plain
+            LibraryStatus(stringResource(Res.string.checking), LibraryStatusTone.Plain)
         }
 
         updateState is UpdateState.Downloading -> {
-            stringResource(Res.string.downloading) to LibraryStatusTone.Plain
+            LibraryStatus(stringResource(Res.string.downloading), LibraryStatusTone.Plain)
         }
 
         updateState is UpdateState.Installing -> {
-            stringResource(Res.string.installing) to LibraryStatusTone.Plain
+            LibraryStatus(stringResource(Res.string.installing), LibraryStatusTone.Plain)
         }
 
         app.isParked -> {
@@ -118,15 +117,15 @@ private fun AppItem.status(): Pair<String, LibraryStatusTone> {
         }
 
         app.preferredVariantStale -> {
-            staleStatus(app) to LibraryStatusTone.Error
+            LibraryStatus(staleStatus(app), LibraryStatusTone.Error)
         }
 
         app.isUpdateAvailable && app.updateCheckEnabled -> {
-            versionLabel to LibraryStatusTone.Accent
+            LibraryStatus(versionLabel.text, LibraryStatusTone.Accent, versionLabel.target)
         }
 
         else -> {
-            idleVersionLabel to LibraryStatusTone.Plain
+            LibraryStatus(idleVersionLabel.text, LibraryStatusTone.Plain, idleVersionLabel.target)
         }
     }
 }
@@ -145,10 +144,11 @@ private val InstalledAppUi.isParked: Boolean
     get() = isPendingInstall && pendingInstallFilePath != null
 
 @Composable
-private fun AppItem.readyStatus(): Pair<String, LibraryStatusTone> {
+private fun AppItem.readyStatus(): LibraryStatus {
     val ready = stringResource(Res.string.ready_to_install)
-    if (versionTargetVersion == null) return ready to LibraryStatusTone.Accent
-    return "$ready · $versionLabel" to if (isVersionDowngrade) LibraryStatusTone.Downgrade else LibraryStatusTone.Accent
+    if (versionTargetVersion == null) return LibraryStatus(ready, LibraryStatusTone.Accent)
+    val tone = if (isVersionDowngrade) LibraryStatusTone.Downgrade else LibraryStatusTone.Accent
+    return LibraryStatus("$ready · ${versionLabel.text}", tone, versionLabel.target)
 }
 
 // The app's own settings, shown only when they differ from the default.
@@ -251,13 +251,11 @@ private fun menuEntries(appItem: AppItem): ImmutableList<KomiMenuItem> {
     val unskip = stringResource(Res.string.apps_skip_version_unskip)
     val deleteTask = stringResource(Res.string.delete_task)
     val uninstall = stringResource(Res.string.uninstall)
-    val preReleaseOn = stringResource(Res.string.apps_menu_item_active, preRelease)
-    val ignoreUpdatesOn = stringResource(Res.string.apps_menu_item_active, ignoreUpdates)
     return buildList {
         add(KomiMenuItem(id = MENU_ADVANCED, label = advanced))
         add(KomiMenuItem(id = MENU_VARIANT, label = variant))
-        add(KomiMenuItem(id = MENU_PRE_RELEASE, label = if (app.includePreReleases) preReleaseOn else preRelease))
-        add(KomiMenuItem(id = MENU_IGNORE, label = if (app.updateCheckEnabled) ignoreUpdates else ignoreUpdatesOn))
+        add(KomiMenuItem(id = MENU_PRE_RELEASE, label = preRelease, icon = Icons.Rounded.Check.takeIf { app.includePreReleases }))
+        add(KomiMenuItem(id = MENU_IGNORE, label = ignoreUpdates, icon = Icons.Rounded.Check.takeIf { !app.updateCheckEnabled }))
         when {
             app.skippedReleaseTag != null -> add(KomiMenuItem(id = MENU_UNSKIP, label = unskip))
             appItem.canSkipVersion -> add(KomiMenuItem(id = MENU_SKIP, label = skip))

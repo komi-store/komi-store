@@ -2,12 +2,16 @@ package zed.rainxch.githubstore.app.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material.icons.outlined.Lightbulb
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
@@ -97,11 +101,22 @@ fun RateLimitDialog(
                 if (!isAuthenticated) {
                     Spacer(modifier = Modifier.height(8.dp))
 
-                    KomiText(
-                        text = stringResource(Res.string.rate_limit_tip_sign_in),
-                        role = KomiTextRole.Body,
-                        color = colors.primary,
-                    )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        KomiIcon(
+                            imageVector = Icons.Outlined.Lightbulb,
+                            contentDescription = null,
+                            modifier = Modifier.size(18.dp),
+                            tint = colors.primary,
+                        )
+                        KomiText(
+                            text = stringResource(Res.string.rate_limit_tip_sign_in),
+                            role = KomiTextRole.Body,
+                            color = colors.primary,
+                        )
+                    }
                 }
             }
         },

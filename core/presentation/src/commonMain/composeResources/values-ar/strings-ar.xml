@@ -260,7 +260,7 @@
     <string name="rate_limit_used_all">لقد استخدمت جميع طلبات API البالغة %1$d.</string>
     <string name="rate_limit_used_all_free">لقد استخدمت جميع الطلبات المجانية البالغة %1$d.</string>
     <string name="rate_limit_resets_in_minutes">يتم إعادة التعيين خلال %1$d دقيقة</string>
-    <string name="rate_limit_tip_sign_in">💡 سجّل الدخول للحصول على 5,000 طلب في الساعة بدلاً من 60!</string>
+    <string name="rate_limit_tip_sign_in">سجّل الدخول للحصول على 5,000 طلب في الساعة بدلاً من 60!</string>
     <string name="rate_limit_sign_in">تسجيل الدخول</string>
     <string name="rate_limit_ok">حسناً</string>
     <string name="rate_limit_close">إغلاق</string>
@@ -936,8 +936,7 @@
     <string name="apk_inspect_title">فحص APK</string>
     <string name="apk_inspect_version_code">الإصدار</string>
     <string name="apps_compact_more_actions">المزيد من الإجراءات لـ %1$s</string>
-    <string name="apps_menu_item_active">%1$s  ✓</string>
-    <string name="apps_version_update">%1$s → %2$s</string>
+    <string name="apps_version_update_cd">%1$s إلى %2$s</string>
     <string name="apps_version_dated">%1$s (%2$s)</string>
     <string name="apps_variant_subtitle">%1$s  ·  %2$s</string>
     <string name="apps_section_header_cd">%1$s، %2$d، %3$s</string>
@@ -1028,7 +1027,7 @@
     <string name="starred_picker_resume">استئناف</string>
     <string name="starred_picker_search_hint">ابحث في المالك / المستودع / الوصف</string>
     <string name="starred_picker_sign_in_required">سجّل الدخول إلى GitHub لرؤية مستودعاتك المميّزة بنجمة.</string>
-    <string name="starred_picker_sort_alphabetical">أ → ي</string>
+    <string name="starred_picker_sort_alphabetical">من أ إلى ي</string>
     <string name="starred_picker_sort_recent">المميّزة مؤخراً</string>
     <string name="starred_picker_sort_stars">الأكثر نجوماً</string>
     <string name="starred_picker_star_dedup_tooltip">إزالة النجمة من GitHub لن تُلغي تتبّع التطبيق.</string>
@@ -1244,7 +1243,7 @@
     <string name="translation_card_title">ترجمة</string>
     <string name="translation_card_translate_to">الترجمة إلى %1$s</string>
     <string name="translation_deepl_auth_key">مفتاح المصادقة</string>
-    <string name="translation_deepl_get_free_key">احصل على مفتاح DeepL مجاني ←</string>
+    <string name="translation_deepl_get_free_key">احصل على مفتاح DeepL مجاني</string>
     <string name="translation_deepl_help">سجّل في deepl.com/pro-api. مفاتيح الطبقة المجانية تنتهي بـ :fx وتستخدم نقطة النهاية المجانية تلقائياً. الطبقة المدفوعة تحافظ على خصوصية نصك؛ الطبقة المجانية قد تستخدم النص المرسَل لتحسين النماذج.</string>
     <string name="translation_deepl_save">حفظ المفتاح</string>
     <string name="translation_deepl_saved">تم حفظ مفتاح DeepL</string>
@@ -1253,7 +1252,7 @@
     <string name="translation_libre_help">يعمل مباشرةً عبر مرآة Disroot العامة — اترك الحقول فارغة لاستخدامها. لخصوصية أكبر، الصق رابط استضافتك الذاتية. لا يلزم مفتاح API إلا إذا اشترطه المثيل.</string>
     <string name="translation_libre_save">حفظ الإعدادات</string>
     <string name="translation_libre_saved">تم حفظ إعدادات LibreTranslate</string>
-    <string name="translation_microsoft_get_free_key">احصل على مفتاح Azure مجاني ←</string>
+    <string name="translation_microsoft_get_free_key">احصل على مفتاح Azure مجاني</string>
     <string name="translation_microsoft_help">Azure Translator يحترم الخصوصية (وضع No-Trace افتراضياً — لا يُخزَّن نصك ولا يُستخدم للتدريب). الطبقة المجانية تغطي مليوني حرف شهرياً. المنطقة لازمة فقط للموارد غير العالمية.</string>
     <string name="translation_microsoft_key">مفتاح الاشتراك</string>
     <string name="translation_microsoft_region">المنطقة (مثل westeurope، اتركه فارغاً للعالمي)</string>
@@ -1617,7 +1616,6 @@
     <string name="reviews_sort_newest">الأحدث</string>
     <string name="reviews_sort_highest">الأعلى تقييمًا</string>
     <string name="reviews_sort_lowest">الأقل تقييمًا</string>
-    <string name="reviews_filter_stars">%1$d★</string>
     <string name="reviews_hidden_notice">أخفى أحد المشرفين هذه المراجعة. لا يراها أحد غيرك، ولا تُحتسب في التقييم.</string>
     <string name="reviews_composer_title_new">قيّم هذا التطبيق</string>
     <string name="reviews_composer_title_edit">تعديل مراجعتك</string>

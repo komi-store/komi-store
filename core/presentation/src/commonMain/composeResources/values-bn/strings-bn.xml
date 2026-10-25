@@ -225,7 +225,7 @@
     <string name="rate_limit_used_all">আপনি সব %1$d টি API অনুরোধ ব্যবহার করেছেন।</string>
     <string name="rate_limit_used_all_free">আপনি সব %1$d টি ফ্রি API অনুরোধ ব্যবহার করেছেন।</string>
     <string name="rate_limit_resets_in_minutes">%1$d মিনিটে রিসেট হবে</string>
-    <string name="rate_limit_tip_sign_in">💡 ৬০ এর বদলে প্রতি ঘণ্টায় ৫,০০০ অনুরোধ পেতে সাইন ইন করুন!</string>
+    <string name="rate_limit_tip_sign_in">৬০ এর বদলে প্রতি ঘণ্টায় ৫,০০০ অনুরোধ পেতে সাইন ইন করুন!</string>
     <string name="rate_limit_sign_in">সাইন ইন</string>
     <string name="rate_limit_ok">ঠিক আছে</string>
     <string name="rate_limit_close">বন্ধ করুন</string>
@@ -908,8 +908,7 @@
     <string name="apk_inspect_title">APK পরিদর্শন</string>
     <string name="apk_inspect_version_code">সংস্করণ</string>
     <string name="apps_compact_more_actions">%1$s এর জন্য আরও অ্যাকশন</string>
-    <string name="apps_menu_item_active">%1$s  ✓</string>
-    <string name="apps_version_update">%1$s → %2$s</string>
+    <string name="apps_version_update_cd">%1$s থেকে %2$s</string>
     <string name="apps_version_dated">%1$s (%2$s)</string>
     <string name="apps_variant_subtitle">%1$s  ·  %2$s</string>
     <string name="apps_section_header_cd">%1$s, %2$d, %3$s</string>
@@ -1000,7 +999,7 @@
     <string name="starred_picker_resume">পুনরায় শুরু</string>
     <string name="starred_picker_search_hint">মালিক / রিপো / বিবরণ অনুসন্ধান করুন</string>
     <string name="starred_picker_sign_in_required">আপনার স্টার করা রিপো দেখতে GitHub-এ সাইন ইন করুন।</string>
-    <string name="starred_picker_sort_alphabetical">A → Z</string>
+    <string name="starred_picker_sort_alphabetical">A থেকে Z</string>
     <string name="starred_picker_sort_recent">সম্প্রতি স্টার করা</string>
     <string name="starred_picker_sort_stars">সবচেয়ে বেশি স্টার</string>
     <string name="starred_picker_star_dedup_tooltip">GitHub-এ স্টার সরিয়ে নিলে অ্যাপটি আনট্র্যাক হবে না।</string>
@@ -1208,7 +1207,7 @@
     <string name="translation_card_title">অনুবাদ</string>
     <string name="translation_card_translate_to">%1$s ভাষায় অনুবাদ করুন</string>
     <string name="translation_deepl_auth_key">Auth key</string>
-    <string name="translation_deepl_get_free_key">একটি ফ্রি DeepL key নিন →</string>
+    <string name="translation_deepl_get_free_key">একটি ফ্রি DeepL key নিন</string>
     <string name="translation_deepl_help">deepl.com/pro-api তে সাইন আপ করুন। ফ্রি tier key :fx দিয়ে শেষ হয় এবং স্বয়ংক্রিয়ভাবে ফ্রি এন্ডপয়েন্ট ব্যবহার করে। Pro tier আপনার টেক্সট গোপন রাখে; Free tier মডেল উন্নয়নে জমা দেওয়া টেক্সট ব্যবহার করতে পারে।</string>
     <string name="translation_deepl_save">Key সংরক্ষণ</string>
     <string name="translation_deepl_saved">DeepL key সংরক্ষিত</string>
@@ -1217,7 +1216,7 @@
     <string name="translation_libre_help">পাবলিক Disroot মিরর দিয়ে সরাসরি কাজ করে — এটি ব্যবহার করতে ক্ষেত্রগুলি খালি রাখুন। আরও গোপনীয়তার জন্য, আপনার নিজস্ব সেলফ-হোস্টেড URL পেস্ট করুন। ইনস্ট্যান্সের প্রয়োজন হলেই API key লাগবে।</string>
     <string name="translation_libre_save">সেটিংস সংরক্ষণ</string>
     <string name="translation_libre_saved">LibreTranslate সেটিংস সংরক্ষিত</string>
-    <string name="translation_microsoft_get_free_key">একটি ফ্রি Azure key নিন →</string>
+    <string name="translation_microsoft_get_free_key">একটি ফ্রি Azure key নিন</string>
     <string name="translation_microsoft_help">Azure Translator গোপনীয়তা-সম্মানজনক (ডিফল্টভাবে No-Trace — আপনার টেক্সট কখনো সংরক্ষণ বা প্রশিক্ষণে ব্যবহৃত হয় না)। ফ্রি tier মাসে ২০ লক্ষ অক্ষর কভার করে। নন-গ্লোবাল রিসোর্সের জন্যই কেবল Region প্রয়োজন।</string>
     <string name="translation_microsoft_key">সাবস্ক্রিপশন key</string>
     <string name="translation_microsoft_region">Region (যেমন westeurope, Global-এর জন্য খালি রাখুন)</string>
@@ -1560,7 +1559,6 @@
     <string name="reviews_sort_newest">সবচেয়ে নতুন</string>
     <string name="reviews_sort_highest">সর্বোচ্চ রেটিং</string>
     <string name="reviews_sort_lowest">সর্বনিম্ন রেটিং</string>
-    <string name="reviews_filter_stars">%1$d★</string>
     <string name="reviews_hidden_notice">একজন মডারেটর এই রিভিউটি লুকিয়ে রেখেছেন। শুধু আপনি এটি দেখতে পান, এবং এটি রেটিংয়ে গণনা করা হয় না।</string>
     <string name="reviews_composer_title_new">এই অ্যাপটিকে রেটিং দিন</string>
     <string name="reviews_composer_title_edit">আপনার রিভিউ সম্পাদনা করুন</string>

@@ -177,7 +177,7 @@
     <string name="rate_limit_used_all">已用完 %1$d 次 API 請求。</string>
     <string name="rate_limit_used_all_free">已用完 %1$d 次免費 API 請求。</string>
     <string name="rate_limit_resets_in_minutes">%1$d 分鐘後重置</string>
-    <string name="rate_limit_tip_sign_in">💡 登入後每小時可使用 5,000 次請求，而不是 60 次！</string>
+    <string name="rate_limit_tip_sign_in">登入後每小時可使用 5,000 次請求，而不是 60 次！</string>
     <string name="rate_limit_sign_in">登入</string>
     <string name="rate_limit_ok">確定</string>
     <string name="rate_limit_close">關閉</string>
@@ -879,8 +879,7 @@
     <string name="apk_inspect_title">APK 檢查</string>
     <string name="apk_inspect_version_code">版本</string>
     <string name="apps_compact_more_actions">%1$s 的更多操作</string>
-    <string name="apps_menu_item_active">%1$s  ✓</string>
-    <string name="apps_version_update">%1$s → %2$s</string>
+    <string name="apps_version_update_cd">%1$s 至 %2$s</string>
     <string name="apps_version_dated">%1$s (%2$s)</string>
     <string name="apps_variant_subtitle">%1$s  ·  %2$s</string>
     <string name="apps_section_header_cd">%1$s，%2$d，%3$s</string>
@@ -974,7 +973,7 @@
     <string name="starred_picker_resume">繼續</string>
     <string name="starred_picker_search_hint">搜尋 所有者 / 倉庫 / 描述</string>
     <string name="starred_picker_sign_in_required">登入 GitHub 才能檢視你的星標倉庫。</string>
-    <string name="starred_picker_sort_alphabetical">A → Z</string>
+    <string name="starred_picker_sort_alphabetical">A 至 Z</string>
     <string name="starred_picker_sort_recent">最近加星</string>
     <string name="starred_picker_sort_stars">星數最多</string>
     <string name="starred_picker_star_dedup_tooltip">在 GitHub 上取消星標不會取消應用追蹤。</string>
@@ -1175,7 +1174,7 @@
     <string name="translation_card_title">翻譯</string>
     <string name="translation_card_translate_to">翻譯為 %1$s</string>
     <string name="translation_deepl_auth_key">Auth 金鑰</string>
-    <string name="translation_deepl_get_free_key">獲取免費 DeepL 金鑰 →</string>
+    <string name="translation_deepl_get_free_key">獲取免費 DeepL 金鑰</string>
     <string name="translation_deepl_help">在 deepl.com/pro-api 註冊。免費版金鑰以 :fx 結尾，會自動使用免費端點。專業版會保持你的文字私密；免費版可能使用提交的文字來改進模型。</string>
     <string name="translation_deepl_save">儲存金鑰</string>
     <string name="translation_deepl_saved">DeepL 金鑰已儲存</string>
@@ -1184,7 +1183,7 @@
     <string name="translation_libre_help">透過公共 Disroot 鏡像開箱即用 — 留空欄位即可使用。為獲得更高隱私性，可貼上自建 URL。僅當例項要求時才需要 API 金鑰。</string>
     <string name="translation_libre_save">儲存設定</string>
     <string name="translation_libre_saved">LibreTranslate 設定已儲存</string>
-    <string name="translation_microsoft_get_free_key">獲取免費 Azure 金鑰 →</string>
+    <string name="translation_microsoft_get_free_key">獲取免費 Azure 金鑰</string>
     <string name="translation_microsoft_help">Azure Translator 注重隱私（預設 No-Trace — 你的文字從不儲存，也不用於訓練）。免費版每月可翻譯 200 萬字元。僅非全球資源需要填寫區域。</string>
     <string name="translation_microsoft_key">訂閱金鑰</string>
     <string name="translation_microsoft_region">區域（例如 westeurope，全球留空）</string>
@@ -1527,7 +1526,6 @@
     <string name="reviews_sort_newest">最新</string>
     <string name="reviews_sort_highest">評分最高</string>
     <string name="reviews_sort_lowest">評分最低</string>
-    <string name="reviews_filter_stars">%1$d★</string>
     <string name="reviews_hidden_notice">管理員已隱藏這則評論。只有你看得到，且不會計入評分。</string>
     <string name="reviews_composer_title_new">為這個應用評分</string>
     <string name="reviews_composer_title_edit">編輯你的評論</string>
