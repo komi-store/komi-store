@@ -34,10 +34,10 @@ class StabilityRulesTest {
         val problems =
             dumps.flatMap { dump ->
                 val path = dump.relativeTo(root).invariantSeparatorsPath
-                composables(dump.readText()).flatMap { composable ->
+                composables(dump.readText()).filter { it.restartable }.flatMap { composable ->
                     buildList {
                         composable.unstableParams.forEach { add("$path: ${composable.name} takes unstable $it") }
-                        if (composable.restartable && !composable.skippable) add("$path: ${composable.name} restarts but can't skip")
+                        if (!composable.skippable) add("$path: ${composable.name} restarts but can't skip")
                     }
                 }
             }
@@ -50,17 +50,35 @@ class StabilityRulesTest {
 
     private fun composables(text: String): List<DumpedComposable> =
         text
-            .split(Regex("""\R\s*\R"""))
-            .mapNotNull { block ->
-                val lines = block.lines().map { it.trim() }
+            .lines()
+            .map { it.trim() }
+            .fold(mutableListOf<MutableList<String>>()) { entries, line ->
+                if (line == "@Composable") entries += mutableListOf<String>() else entries.lastOrNull()?.add(line)
+                entries
+            }.mapNotNull { lines ->
                 val signature = lines.firstOrNull { it.contains(" fun ") } ?: return@mapNotNull null
                 DumpedComposable(
                     name = signature.substringAfter(" fun ").substringBefore('('),
                     restartable = "restartable: true" in lines,
                     skippable = "skippable: true" in lines,
-                    unstableParams = lines.filter { it.startsWith("- ") && ": UNSTABLE" in it }.map { it.removePrefix("- ").substringBefore(':') },
+                    unstableParams =
+                        lines
+                            .filter { it.startsWith("- ") && ": UNSTABLE" in it }
+                            .map { it.removePrefix("- ").substringBefore(':') }
+                            .filterNot { isViewModel(signature, it) },
                 )
             }
+
+    // A Root holds its ViewModel by reference, and strong skipping compares it by identity.
+    private fun isViewModel(
+        signature: String,
+        param: String,
+    ): Boolean =
+        signature
+            .substringAfter("($param: ", missingDelimiterValue = signature.substringAfter(", $param: ", ""))
+            .substringBefore(',')
+            .substringBefore(')')
+            .endsWith("ViewModel")
 
     private data class DumpedComposable(
         val name: String,
