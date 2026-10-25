@@ -26,7 +26,10 @@ Ratings and written reviews for apps, stored by the backend (`komi-store-backend
 ## Identity (backend)
 
 - The token is never logged or stored. On an authed call the backend keys an in-memory cache by `HmacSHA256(pepper, token)`, holding the GitHub user id, login, avatar URL and account creation date for 10 minutes. A miss calls GitHub `GET /user` with the token.
-- An upstream 401 returns our **401 `auth_invalid`**: these are the first routes where 401 means "your session with us", which is the convention the backend reserved it for.
+- An upstream 401 returns our **401 `auth_invalid`**: these are the first routes where 401 means "your session with us", which is the convention the backend reserved it for. A token that isn't GitHub-token-shaped (only `[A-Za-z0-9_]`, at most 255 characters) gets the same 401 without a call to GitHub.
+- Text, version, platform and app label are trimmed before they're stored; text with a NUL character is `400 invalid_request`.
+- Helpful votes and reports need the same 30-day account age as reviews (`account_too_new`). Replies don't check it: push access is the gate there, resolved by the repo's numeric id (`GET /repositories/{id}`), so a renamed repo keeps working; a repo GitHub can't show that token is `403 not_maintainer`.
+- In a moderation queue item, `reports` lists every report except dismissed ones, so the hidden queue still shows why a review was hidden.
 - Each review stores the author's GitHub id plus a snapshot of their login and avatar, refreshed whenever they write.
 
 ## API (all under `/v1`, JSON, additive-only)
@@ -38,7 +41,7 @@ Repo routes live under `/reviews/repo/{owner}/{name}`, so an owner named `item` 
 **`GET /reviews/repo/{owner}/{name}?host=&sort=&rating=&page=&limit=`**
 - `sort`: `helpful` (default), `newest`, `highest` or `lowest`.
 - `rating`: a filter from 1 to 5.
-- `page`: from 1. `limit`: 1 to 50, default 20.
+- `page`: from 1. `limit`: 1 to 50, default 20. Out-of-range values are clamped (page 1 to 500, limit 1 to 50), as on `/feed`; an unknown `sort` or a `rating` outside 1 to 5 is `400 invalid_request`.
 - Cache: `max-age=60, s-maxage=300`.
 - The backend never reads `X-GitHub-Token` on this route, so the response is the same for everyone.
 
