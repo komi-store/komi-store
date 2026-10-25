@@ -20,8 +20,9 @@ When a rule and nearby code disagree, follow the rule. Fix the nearby code only 
 
 ## 2. Comments
 
-- No KDoc, no comments that restate the code. **[review]**
-- Comment only a non-obvious invariant, tricky concurrency or a workaround, in one or two lines. Good: [AppsRepositoryImpl.kt:300-301](https://github.com/komi-store/komi-store/blob/cfa6bd30e6b35cbbc369d78a4599182a9a66beac/feature/apps/data/src/commonMain/kotlin/zed/rainxch/apps/data/repository/AppsRepositoryImpl.kt#L300-L301), [BackgroundRequest.kt:13-14](https://github.com/komi-store/komi-store/blob/cfa6bd30e6b35cbbc369d78a4599182a9a66beac/core/data/src/commonMain/kotlin/zed/rainxch/core/data/network/BackgroundRequest.kt#L13-L14).
+- No KDoc, no comments that restate the code. **[Konsist]** for KDoc, **[review]** for the rest
+- A comment is one line, in one place: two comment-only lines never sit together, and no block comment spans lines. Trailing comments on separate code lines are separate comments. If it needs more, cut it to the one non-obvious fact, or move the explanation to the feature's `CLAUDE.md` or `docs/agents`. This covers code, tests and build scripts. **[Konsist]**
+- Comment only a non-obvious invariant, tricky concurrency or a workaround. **[review]**
 - No em-dashes anywhere: code, strings, logs, comments. **[review]**
 
 ## 3. Modules and packages
