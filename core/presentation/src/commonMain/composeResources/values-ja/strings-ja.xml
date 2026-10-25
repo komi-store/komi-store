@@ -194,11 +194,6 @@
     <string name="remove_from_favourites">お気に入りから削除</string>
     <string name="favourites">お気に入り</string>
 
-    <string name="added_just_now">たった今追加されました</string>
-    <string name="added_hours_ago">%1$d時間前に追加</string>
-    <string name="added_yesterday">昨日追加</string>
-    <string name="added_days_ago">%1$d日前に追加</string>
-    <string name="added_on_date">%1$s に追加</string>
 
     <string name="starred_repositories">スター付きリポジトリ</string>
     <string name="repository_starred">リポジトリはスター済みです</string>
@@ -507,6 +502,13 @@
 
     <string name="recently_viewed">最近閲覧した</string>
     <string name="recently_viewed_remove_cd">履歴から削除</string>
+    <string name="library_viewed">%1$sに閲覧</string>
+    <string name="library_added">%1$sに追加</string>
+    <string name="library_starred">%1$sにスター</string>
+    <string name="history_today">今日</string>
+    <string name="history_yesterday">昨日</string>
+    <string name="history_this_week">今週</string>
+    <string name="history_earlier">それ以前</string>
     <string name="profile_recently_viewed_description">訪問したリポジトリ</string>
     <string name="delete_all">すべて削除</string>
     <string name="delete_downloads_confirmation_title">すべてのダウンロードを削除しますか？</string>

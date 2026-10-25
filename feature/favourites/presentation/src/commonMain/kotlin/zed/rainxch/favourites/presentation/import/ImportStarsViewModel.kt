@@ -168,6 +168,8 @@ class ImportStarsViewModel(
                                     primaryLanguage = repo.primaryLanguage,
                                     repoUrl = repo.repoUrl,
                                     stargazersCount = repo.stargazersCount,
+                                    latestVersion = repo.latestVersion,
+                                    platforms = repo.platforms.toImmutableList(),
                                     isAlreadyFavourited = repo.repoId in favouritedIds,
                                 )
                             }
@@ -205,10 +207,12 @@ class ImportStarsViewModel(
                     repoDescription = candidate.description,
                     primaryLanguage = candidate.primaryLanguage,
                     repoUrl = candidate.repoUrl,
-                    latestVersion = null,
+                    latestVersion = candidate.latestVersion,
                     latestReleaseUrl = null,
                     addedAt = now,
                     lastSyncedAt = now,
+                    stargazersCount = candidate.stargazersCount,
+                    platforms = candidate.platforms,
                 )
 
             val toggled = runCatching { favouritesRepository.toggleFavorite(favourite) }.isSuccess
@@ -249,10 +253,12 @@ class ImportStarsViewModel(
                         repoDescription = candidate.description,
                         primaryLanguage = candidate.primaryLanguage,
                         repoUrl = candidate.repoUrl,
-                        latestVersion = null,
+                        latestVersion = candidate.latestVersion,
                         latestReleaseUrl = null,
                         addedAt = now,
                         lastSyncedAt = now,
+                        stargazersCount = candidate.stargazersCount,
+                        platforms = candidate.platforms,
                     )
 
                 runCatching { favouritesRepository.toggleFavorite(favourite) }

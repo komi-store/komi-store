@@ -28,7 +28,8 @@ feature/favourites/presentation/
 
 - The favourites list itself is local Room; only Import stars hits the network.
 - Favourites are added from Details, Dev Profile, Starred and Import stars. This screen lists and un-favourites (`OnToggleFavorite`).
-- `FavoriteRepo` stores no `sourceHost`; the Details link recovers it with `RepoIdCodec.sourceHostOf(repoId, repoUrl)`.
+- The Details link recovers the host with `RepoIdCodec.sourceHostOf(repoId, repoUrl)`. Since DB v22 `FavoriteRepo` also keeps stars, platforms and the host, filled by every place that favourites (Details, Dev Profile, Starred, Import stars); older rows stay sparse until favourited again.
+- Rows are `KomiLibraryRow` (core/presentation): the app's icon (the installed one when it's on the device) on a cookie plate, name, owner, description, then install status, stars, platforms and the newest version, with when the list got the repo underneath. Install status is live: the VM combines the list with `InstalledAppsRepository.getAllInstalledApps()` through `installsByRepo()`. The heart is `KomiFavouriteToggle`.
 - Inline search bar when the list is non-empty; filters name / owner / description / language client-side.
 - `FavouriteRepository.isCurrentUserOwner` set when the signed-in user owns the repo.
 - Import stars: `fetchStarredForUsername` pages through `/users/{name}/starred` and keeps only repos whose latest stable release has an installer asset for any platform (`.apk`, `.exe`, `.dmg`, `.deb`, ...). Candidates already favourited are marked; "Add all" favourites the rest.

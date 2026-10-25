@@ -22,6 +22,7 @@ fun StarredRepository.toEntity(): StarredRepositoryEntity =
         starredAt = starredAt,
         addedAt = addedAt,
         lastSyncedAt = lastSyncedAt,
+        platforms = platforms.toPlatformsColumn(),
     )
 
 fun StarredRepositoryEntity.toDomain(): StarredRepository =
@@ -43,4 +44,5 @@ fun StarredRepositoryEntity.toDomain(): StarredRepository =
         starredAt = starredAt,
         addedAt = addedAt,
         lastSyncedAt = lastSyncedAt,
+        platforms = platforms.toPlatforms(),
     )

@@ -373,13 +373,15 @@
     <string name="favourites">Favourites</string>
     <string name="recently_viewed">Recently Viewed</string>
     <string name="recently_viewed_remove_cd">Remove from history</string>
+    <string name="library_viewed">Viewed %1$s</string>
+    <string name="library_added">Added %1$s</string>
+    <string name="library_starred">Starred %1$s</string>
+    <string name="history_today">Today</string>
+    <string name="history_yesterday">Yesterday</string>
+    <string name="history_this_week">This week</string>
+    <string name="history_earlier">Earlier</string>
     <string name="profile_recently_viewed_description">Repositories you have visited</string>
 
-    <string name="added_just_now">added just now</string>
-    <string name="added_hours_ago">added %1$d hour(s) ago</string>
-    <string name="added_yesterday">added yesterday</string>
-    <string name="added_days_ago">added %1$d day(s) ago</string>
-    <string name="added_on_date">added on %1$s</string>
 
     <string name="starred_repositories">Starred Repositories</string>
     <string name="repository_starred">Repository is starred</string>

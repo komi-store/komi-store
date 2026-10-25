@@ -41,19 +41,11 @@ private fun zed.rainxch.favourites.presentation.FavouritesTopbar(sortRule: zed.r
     - onAction: STABLE (function type)
 
 @Composable
-private fun zed.rainxch.favourites.presentation.components.FavoriteToggle(favorited: kotlin.Boolean, onClick: kotlin.Function0<kotlin.Unit>): kotlin.Unit
-  skippable: true
-  restartable: true
-  params:
-    - favorited: STABLE (primitive type)
-    - onClick: STABLE (function type)
-
-@Composable
 public fun zed.rainxch.favourites.presentation.components.FavouriteRepositoryItem(favouriteRepository: zed.rainxch.favourites.presentation.model.FavouriteRepository, onToggleFavouriteClick: kotlin.Function0<kotlin.Unit>, onItemClick: kotlin.Function0<kotlin.Unit>, onDevProfileClick: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
   skippable: true
   restartable: true
   params:
-    - favouriteRepository: STABLE (class with no mutable properties)
+    - favouriteRepository: STABLE (marked @Stable or @Immutable)
     - onToggleFavouriteClick: STABLE (function type)
     - onItemClick: STABLE (function type)
     - onDevProfileClick: STABLE (function type)
@@ -82,7 +74,7 @@ private fun zed.rainxch.favourites.presentation.import.ImportStarsScreen(state: 
   skippable: true
   restartable: true
   params:
-    - state: STABLE (class with no mutable properties)
+    - state: UNKNOWN (interface or non-final class; concrete implementation unknown)
     - onAction: STABLE (function type)
 
 @Composable
@@ -90,7 +82,7 @@ private fun zed.rainxch.favourites.presentation.import.ResultsPanel(state: zed.r
   skippable: true
   restartable: true
   params:
-    - state: STABLE (class with no mutable properties)
+    - state: UNKNOWN (interface or non-final class; concrete implementation unknown)
     - onAction: STABLE (function type)
 
 @Composable
@@ -98,6 +90,6 @@ private fun zed.rainxch.favourites.presentation.import.UsernameInputPanel(state:
   skippable: true
   restartable: true
   params:
-    - state: STABLE (class with no mutable properties)
+    - state: UNKNOWN (interface or non-final class; concrete implementation unknown)
     - onAction: STABLE (function type)
 

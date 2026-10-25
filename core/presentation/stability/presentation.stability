@@ -526,6 +526,15 @@ public fun zed.rainxch.core.presentation.components.buttons.KomiFab(onClick: kot
     - label: STABLE (class with no mutable properties)
 
 @Composable
+public fun zed.rainxch.core.presentation.components.buttons.KomiFavouriteToggle(favourited: kotlin.Boolean, onClick: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - favourited: STABLE (primitive type)
+    - onClick: STABLE (function type)
+    - modifier: STABLE (marked @Stable or @Immutable)
+
+@Composable
 public fun zed.rainxch.core.presentation.components.buttons.KomiIconButton(icon: androidx.compose.ui.graphics.vector.ImageVector, contentDescription: kotlin.String, onClick: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier, variant: zed.rainxch.core.presentation.components.buttons.KomiButtonVariant, size: zed.rainxch.core.presentation.components.buttons.KomiIconButtonSize, enabled: kotlin.Boolean): kotlin.Unit
   skippable: true
   restartable: true
@@ -737,6 +746,30 @@ public fun zed.rainxch.core.presentation.components.cards.DiscoveryRepoCard(disc
     - index: STABLE (primitive type)
 
 @Composable
+public fun zed.rainxch.core.presentation.components.cards.KomiLibraryRow(name: kotlin.String, owner: kotlin.String, onClick: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier, description: kotlin.String?, avatarUrl: kotlin.String?, installedPackageName: kotlin.String?, platforms: kotlinx.collections.immutable.ImmutableList<zed.rainxch.core.domain.model.repository.DiscoveryPlatform>, version: kotlin.String?, stars: kotlin.Int?, ratingAverage: kotlin.Double?, ratingCount: kotlin.Int, status: zed.rainxch.core.presentation.components.cards.KomiLibraryStatus?, context: kotlin.String?, contextIcon: androidx.compose.ui.graphics.vector.ImageVector?, ownedByViewer: kotlin.Boolean, onOwnerClick: kotlin.Function0<kotlin.Unit>?, action: @[Composable] androidx.compose.runtime.internal.ComposableFunction0<kotlin.Unit>?): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - name: STABLE (String is immutable)
+    - owner: STABLE (String is immutable)
+    - onClick: STABLE (function type)
+    - modifier: STABLE (marked @Stable or @Immutable)
+    - description: STABLE (class with no mutable properties)
+    - avatarUrl: STABLE (class with no mutable properties)
+    - installedPackageName: STABLE (class with no mutable properties)
+    - platforms: STABLE (known stable type)
+    - version: STABLE (class with no mutable properties)
+    - stars: STABLE (class with no mutable properties)
+    - ratingAverage: STABLE (class with no mutable properties)
+    - ratingCount: STABLE (primitive type)
+    - status: STABLE (class with no mutable properties)
+    - context: STABLE (class with no mutable properties)
+    - contextIcon: STABLE (marked @Stable or @Immutable)
+    - ownedByViewer: STABLE (primitive type)
+    - onOwnerClick: STABLE (function type)
+    - action: STABLE (composable function type)
+
+@Composable
 public fun zed.rainxch.core.presentation.components.cards.KomiRepoCard(name: kotlin.String, owner: kotlin.String, language: kotlin.String, description: kotlin.String, platforms: kotlinx.collections.immutable.ImmutableList<zed.rainxch.core.domain.model.repository.DiscoveryPlatform>, stars: kotlin.Int, downloads: kotlin.Int, releasedAgoDays: kotlin.Int, onOpen: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier, onLongPress: kotlin.Function0<kotlin.Unit>?, monogram: kotlin.String?, imageUrl: kotlin.String?, feed: zed.rainxch.core.presentation.components.cards.KomiRepoCardFeed, rank: kotlin.Int, version: kotlin.String?, dailyStars: kotlin.Int, compact: kotlin.Boolean, index: kotlin.Int, tilt: kotlin.Boolean, releasedAt: kotlin.String?, ratingAverage: kotlin.Double?, ratingCount: kotlin.Int): kotlin.Unit
   skippable: true
   restartable: true
@@ -766,6 +799,35 @@ public fun zed.rainxch.core.presentation.components.cards.KomiRepoCard(name: kot
     - ratingCount: STABLE (primitive type)
 
 @Composable
+private fun zed.rainxch.core.presentation.components.cards.LibraryContext(text: kotlin.String, icon: androidx.compose.ui.graphics.vector.ImageVector?): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - text: STABLE (String is immutable)
+    - icon: STABLE (marked @Stable or @Immutable)
+
+@Composable
+private fun zed.rainxch.core.presentation.components.cards.LibraryFacts(status: zed.rainxch.core.presentation.components.cards.KomiLibraryStatus?, ratingAverage: kotlin.Double?, ratingCount: kotlin.Int, stars: kotlin.Int?, platforms: kotlinx.collections.immutable.ImmutableList<zed.rainxch.core.domain.model.repository.DiscoveryPlatform>, version: kotlin.String?): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - status: STABLE (class with no mutable properties)
+    - ratingAverage: STABLE (class with no mutable properties)
+    - ratingCount: STABLE (primitive type)
+    - stars: STABLE (class with no mutable properties)
+    - platforms: STABLE (known stable type)
+    - version: STABLE (class with no mutable properties)
+
+@Composable
+private fun zed.rainxch.core.presentation.components.cards.LibraryPicture(name: kotlin.String, avatarUrl: kotlin.String?, installedPackageName: kotlin.String?): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - name: STABLE (String is immutable)
+    - avatarUrl: STABLE (class with no mutable properties)
+    - installedPackageName: STABLE (class with no mutable properties)
+
+@Composable
 private fun zed.rainxch.core.presentation.components.cards.MonogramText(monogram: kotlin.String, color: androidx.compose.ui.graphics.Color, fontSize: androidx.compose.ui.unit.TextUnit): kotlin.Unit
   skippable: true
   restartable: true
@@ -782,6 +844,15 @@ private fun zed.rainxch.core.presentation.components.cards.NewReleaseStamp(versi
     - version: STABLE (class with no mutable properties)
     - showStamp: STABLE (primitive type)
     - colors: STABLE (marked @Stable or @Immutable)
+
+@Composable
+private fun zed.rainxch.core.presentation.components.cards.OwnerLine(owner: kotlin.String, ownedByViewer: kotlin.Boolean, onClick: kotlin.Function0<kotlin.Unit>?): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - owner: STABLE (String is immutable)
+    - ownedByViewer: STABLE (primitive type)
+    - onClick: STABLE (function type)
 
 @Composable
 private fun zed.rainxch.core.presentation.components.cards.PreviewCards(): kotlin.Unit
@@ -816,6 +887,20 @@ private fun zed.rainxch.core.presentation.components.cards.Stat(icon: androidx.c
     - value: STABLE (String is immutable)
     - colors: STABLE (marked @Stable or @Immutable)
     - hero: STABLE (primitive type)
+
+@Composable
+private fun zed.rainxch.core.presentation.components.cards.StatusBadge(status: zed.rainxch.core.presentation.components.cards.KomiLibraryStatus): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - status: STABLE (class with no mutable properties)
+
+@Composable
+private fun zed.rainxch.core.presentation.components.cards.VersionTag(version: kotlin.String): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - version: STABLE (String is immutable)
 
 @Composable
 private fun zed.rainxch.core.presentation.components.chips.ChipCountPill(count: kotlin.Int, selected: kotlin.Boolean, color: androidx.compose.ui.graphics.Color, colors: zed.rainxch.core.presentation.personality.model.PersonalityColors): kotlin.Unit
@@ -2500,6 +2585,13 @@ public fun zed.rainxch.core.presentation.utils.formatRelativeLong(isoInstant: ko
   restartable: false
   params:
     - isoInstant: STABLE (String is immutable)
+
+@Composable
+public fun zed.rainxch.core.presentation.utils.formatRelativeLong(epochMillis: kotlin.Long): kotlin.String
+  skippable: false
+  restartable: false
+  params:
+    - epochMillis: STABLE (primitive type)
 
 @Composable
 public fun zed.rainxch.core.presentation.utils.formatReleasedAgo(isoInstant: kotlin.String?): kotlin.String?

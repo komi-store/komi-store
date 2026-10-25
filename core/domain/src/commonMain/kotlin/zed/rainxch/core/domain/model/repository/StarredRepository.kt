@@ -18,4 +18,5 @@ data class StarredRepository(
     val starredAt: Long?,
     val addedAt: Long,
     val lastSyncedAt: Long,
+    val platforms: List<DiscoveryPlatform> = emptyList(),
 )

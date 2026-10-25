@@ -5,6 +5,14 @@
 //   ./gradlew :presentation:stabilityDump
 
 @Composable
+private fun zed.rainxch.recentlyviewed.presentation.DayHeader(day: zed.rainxch.recentlyviewed.presentation.model.HistoryDay, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - day: STABLE (class with no mutable properties)
+    - modifier: STABLE (marked @Stable or @Immutable)
+
+@Composable
 public fun zed.rainxch.recentlyviewed.presentation.RecentlyViewedRoot(onNavigateBack: kotlin.Function0<kotlin.Unit>, onNavigateToDetails: kotlin.Function4<@[ParameterName(name = \, onNavigateToDeveloperProfile: kotlin.Function1<@[ParameterName(name = \, viewModel: zed.rainxch.recentlyviewed.presentation.RecentlyViewedViewModel): kotlin.Unit
   skippable: true
   restartable: true
@@ -27,7 +35,7 @@ public fun zed.rainxch.recentlyviewed.presentation.components.RecentlyViewedItem
   skippable: true
   restartable: true
   params:
-    - repo: STABLE (class with no mutable properties)
+    - repo: STABLE (marked @Stable or @Immutable)
     - onItemClick: STABLE (function type)
     - onRemoveClick: STABLE (function type)
     - onDevProfileClick: STABLE (function type)

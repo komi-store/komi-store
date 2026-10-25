@@ -14,4 +14,7 @@ data class FavoriteRepo(
     val latestReleaseUrl: String?,
     val addedAt: Long,
     val lastSyncedAt: Long,
+    val stargazersCount: Int? = null,
+    val platforms: List<DiscoveryPlatform> = emptyList(),
+    val sourceHost: String? = null,
 )

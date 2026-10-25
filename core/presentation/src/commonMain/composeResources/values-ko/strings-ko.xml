@@ -241,11 +241,6 @@
     <string name="remove_from_favourites">즐겨찾기에서 제거</string>
     <string name="favourites">즐겨찾기</string>
 
-    <string name="added_just_now">방금 추가됨</string>
-    <string name="added_hours_ago">%1$d시간 전에 추가됨</string>
-    <string name="added_yesterday">어제 추가됨</string>
-    <string name="added_days_ago">%1$d일 전에 추가됨</string>
-    <string name="added_on_date">%1$s에 추가됨</string>
 
     <string name="starred_repositories">별표 표시된 저장소</string>
     <string name="repository_starred">저장소에 별표가 추가되었습니다</string>
@@ -536,6 +531,13 @@
 
     <string name="recently_viewed">최근 본 항목</string>
     <string name="recently_viewed_remove_cd">기록에서 삭제</string>
+    <string name="library_viewed">%1$s 조회</string>
+    <string name="library_added">%1$s 추가</string>
+    <string name="library_starred">%1$s 스타</string>
+    <string name="history_today">오늘</string>
+    <string name="history_yesterday">어제</string>
+    <string name="history_this_week">이번 주</string>
+    <string name="history_earlier">이전</string>
     <string name="profile_recently_viewed_description">방문한 저장소</string>
     <string name="delete_all">모두 삭제</string>
     <string name="delete_downloads_confirmation_title">모든 다운로드를 삭제하시겠습니까?</string>

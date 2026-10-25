@@ -237,6 +237,7 @@ class DeveloperProfileViewModel(
                             latestReleaseUrl = null,
                             addedAt = Clock.System.now().toEpochMilliseconds(),
                             lastSyncedAt = Clock.System.now().toEpochMilliseconds(),
+                            stargazersCount = repo.stargazersCount,
                         )
 
                     favouritesRepository.toggleFavorite(favoriteRepo)

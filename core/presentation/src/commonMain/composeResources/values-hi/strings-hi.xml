@@ -241,11 +241,6 @@
     <string name="remove_from_favourites">पसंदीदा से निकालें</string>
     <string name="favourites">पसंदीदा</string>
 
-    <string name="added_just_now">अभी जोड़ा गया</string>
-    <string name="added_hours_ago">%1$d घंटे पहले जोड़ा गया</string>
-    <string name="added_yesterday">कल जोड़ा गया</string>
-    <string name="added_days_ago">%1$d दिन पहले जोड़ा गया</string>
-    <string name="added_on_date">%1$s को जोड़ा गया</string>
 
     <string name="starred_repositories">तारांकित रिपॉजिटरी</string>
     <string name="repository_starred">रिपॉजिटरी स्टार की गई</string>
@@ -538,6 +533,13 @@
 
     <string name="recently_viewed">हाल ही में देखा गया</string>
     <string name="recently_viewed_remove_cd">इतिहास से हटाएँ</string>
+    <string name="library_viewed">देखा गया %1$s</string>
+    <string name="library_added">जोड़ा गया %1$s</string>
+    <string name="library_starred">स्टार किया गया %1$s</string>
+    <string name="history_today">आज</string>
+    <string name="history_yesterday">कल</string>
+    <string name="history_this_week">इस सप्ताह</string>
+    <string name="history_earlier">पहले</string>
     <string name="profile_recently_viewed_description">वे रिपॉजिटरी जिन्हें आपने देखा है</string>
     <string name="delete_all">सभी हटाएँ</string>
     <string name="delete_downloads_confirmation_title">सभी डाउनलोड हटाएँ?</string>

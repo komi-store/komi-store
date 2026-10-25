@@ -4,7 +4,10 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import zed.rainxch.core.data.local.db.dao.SeenRepoDao
 import zed.rainxch.core.data.local.db.entities.SeenRepoEntity
+import zed.rainxch.core.data.mappers.toPlatforms
+import zed.rainxch.core.data.mappers.toPlatformsColumn
 import zed.rainxch.core.domain.model.account.github.GithubRepoSummary
+import zed.rainxch.core.domain.model.repository.DiscoveryPlatform
 import zed.rainxch.core.domain.model.repository.SeenRepo
 import zed.rainxch.core.domain.repository.SeenReposRepository
 
@@ -27,6 +30,10 @@ class SeenReposRepositoryImpl(
             repoDescription = repo.description,
             primaryLanguage = repo.language,
             repoUrl = repo.htmlUrl,
+            stargazersCount = repo.stargazersCount,
+            platforms = repo.availablePlatforms,
+            latestVersion = repo.latestReleaseTag,
+            sourceHost = repo.sourceHost,
         )
     }
 
@@ -38,6 +45,10 @@ class SeenReposRepositoryImpl(
         repoDescription: String?,
         primaryLanguage: String?,
         repoUrl: String,
+        stargazersCount: Int?,
+        platforms: List<DiscoveryPlatform>,
+        latestVersion: String?,
+        sourceHost: String?,
     ) {
         seenRepoDao.insert(
             SeenRepoEntity(
@@ -49,6 +60,10 @@ class SeenReposRepositoryImpl(
                 primaryLanguage = primaryLanguage,
                 repoUrl = repoUrl,
                 seenAt = System.currentTimeMillis(),
+                stargazersCount = stargazersCount,
+                platforms = platforms.toPlatformsColumn(),
+                latestVersion = latestVersion,
+                sourceHost = sourceHost,
             ),
         )
     }
@@ -71,5 +86,9 @@ class SeenReposRepositoryImpl(
             primaryLanguage = primaryLanguage,
             repoUrl = repoUrl,
             seenAt = seenAt,
+            stargazersCount = stargazersCount,
+            platforms = platforms.toPlatforms(),
+            latestVersion = latestVersion,
+            sourceHost = sourceHost,
         )
 }

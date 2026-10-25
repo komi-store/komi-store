@@ -33,8 +33,10 @@ import zed.rainxch.core.data.mappers.toEntity
 import zed.rainxch.core.data.network.GitHubClientProvider
 import zed.rainxch.core.data.network.gitHubJson
 import zed.rainxch.core.domain.model.error.RateLimitException
+import zed.rainxch.core.domain.model.repository.DiscoveryPlatform
 import zed.rainxch.core.domain.model.system.Platform
 import zed.rainxch.core.domain.repository.StarredRepository
+import zed.rainxch.core.domain.utils.assetPlatformOf
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
@@ -166,6 +168,7 @@ class StarredRepositoryImpl(
                                             installedPackageName = firstInstalled?.packageName,
                                             latestVersion = release.version,
                                             latestReleaseUrl = release.url,
+                                            platforms = release.platforms,
                                             starredAt = repo.starredAt.toEpochMillisecondsOrNull(),
                                             addedAt = now,
                                             lastSyncedAt = now,
@@ -263,6 +266,7 @@ class StarredRepositoryImpl(
                                         installedPackageName = firstInstalled?.packageName,
                                         latestVersion = release?.version,
                                         latestReleaseUrl = release?.url,
+                                        platforms = release?.platforms.orEmpty(),
                                         starredAt = repo.starredAt.toEpochMillisecondsOrNull(),
                                         addedAt = now,
                                         lastSyncedAt = now,
@@ -329,7 +333,11 @@ class StarredRepositoryImpl(
                         ?: return null
                 if (stable.assets.isEmpty()) return null
                 return if (stable.assets.any { asset -> matcher(asset.name) }) {
-                    StableReleaseInfo(version = stable.tagName, url = stable.htmlUrl)
+                    StableReleaseInfo(
+                        version = stable.tagName,
+                        url = stable.htmlUrl,
+                        platforms = platformsOf(stable.assets.map { it.name }),
+                    )
                 } else {
                     null
                 }
@@ -369,7 +377,11 @@ class StarredRepositoryImpl(
                 stableRelease.assets.filter { asset -> matcher(asset.name) }
 
             if (relevantAssets.isNotEmpty()) {
-                StableReleaseInfo(version = stableRelease.tagName, url = stableRelease.htmlUrl)
+                StableReleaseInfo(
+                    version = stableRelease.tagName,
+                    url = stableRelease.htmlUrl,
+                    platforms = platformsOf(stableRelease.assets.map { it.name }),
+                )
             } else {
                 null
             }
@@ -383,9 +395,12 @@ class StarredRepositoryImpl(
         }
     }
 
+    private fun platformsOf(assetNames: List<String>): List<DiscoveryPlatform> = assetNames.mapNotNull(::assetPlatformOf).distinct()
+
     private data class StableReleaseInfo(
         val version: String?,
         val url: String?,
+        val platforms: List<DiscoveryPlatform>,
     )
 
     @Serializable
