@@ -1,0 +1,229 @@
+package zed.rainxch.core.data.network
+
+import io.ktor.client.HttpClient
+import io.ktor.client.call.body
+import io.ktor.client.request.HttpRequestBuilder
+import io.ktor.client.request.delete
+import io.ktor.client.request.get
+import io.ktor.client.request.header
+import io.ktor.client.request.parameter
+import io.ktor.client.request.post
+import io.ktor.client.request.put
+import io.ktor.client.request.setBody
+import io.ktor.client.statement.HttpResponse
+import io.ktor.client.statement.bodyAsText
+import io.ktor.http.ContentType
+import io.ktor.http.HttpStatusCode
+import io.ktor.http.contentType
+import io.ktor.http.isSuccess
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.contentOrNull
+import zed.rainxch.core.data.dto.BackendMyReviewDto
+import zed.rainxch.core.data.dto.BackendReviewDraftDto
+import zed.rainxch.core.data.dto.BackendReviewDto
+import zed.rainxch.core.data.dto.BackendReviewReplyDto
+import zed.rainxch.core.data.dto.BackendReviewReplyRequestDto
+import zed.rainxch.core.data.dto.BackendReviewReportDto
+import zed.rainxch.core.data.dto.BackendReviewSummariesDto
+import zed.rainxch.core.data.dto.BackendReviewsPageDto
+import zed.rainxch.core.domain.model.reviews.ReviewError
+import zed.rainxch.core.domain.model.reviews.ReviewException
+import zed.rainxch.core.domain.model.reviews.ReviewTarget
+import kotlin.coroutines.cancellation.CancellationException
+
+// The /v1/reviews routes (docs/agents/reviews.md). Every failure becomes a ReviewException.
+class BackendReviewsApi(
+    private val client: BackendApiClient,
+) {
+    suspend fun getReviews(
+        target: ReviewTarget,
+        sort: String,
+        rating: Int?,
+        page: Int,
+    ): Result<BackendReviewsPageDto> =
+        call(authed = false) {
+            val response =
+                get(repoPath(target)) {
+                    hostParameter(target)
+                    parameter("sort", sort)
+                    if (rating != null) parameter("rating", rating)
+                    parameter("page", page)
+                    parameter("limit", PAGE_SIZE)
+                }
+            response.bodyOrFailure()
+        }
+
+    suspend fun getSummaries(
+        repos: List<String>,
+        host: String?,
+    ): Result<BackendReviewSummariesDto> =
+        call(authed = false) {
+            val response =
+                get("reviews/summaries") {
+                    repos.forEach { parameter("r", it) }
+                    if (host != null) parameter("host", host)
+                }
+            response.bodyOrFailure()
+        }
+
+    suspend fun getMine(target: ReviewTarget): Result<BackendMyReviewDto> =
+        call(authed = true) { token ->
+            val response =
+                get("${repoPath(target)}/mine") {
+                    hostParameter(target)
+                    header(X_GITHUB_TOKEN_HEADER, token)
+                }
+            response.bodyOrFailure()
+        }
+
+    suspend fun putReview(
+        target: ReviewTarget,
+        draft: BackendReviewDraftDto,
+    ): Result<BackendReviewDto> =
+        call(authed = true) { token ->
+            val response =
+                put(repoPath(target)) {
+                    hostParameter(target)
+                    header(X_GITHUB_TOKEN_HEADER, token)
+                    contentType(ContentType.Application.Json)
+                    setBody(draft)
+                }
+            response.bodyOrFailure()
+        }
+
+    suspend fun deleteReview(target: ReviewTarget): Result<Unit> =
+        call(authed = true) { token ->
+            delete(repoPath(target)) {
+                hostParameter(target)
+                header(X_GITHUB_TOKEN_HEADER, token)
+            }.emptyOrFailure()
+        }
+
+    suspend fun setHelpful(
+        reviewId: String,
+        helpful: Boolean,
+    ): Result<Unit> =
+        call(authed = true) { token ->
+            val path = "reviews/item/$reviewId/helpful"
+            val response =
+                if (helpful) {
+                    put(path) { header(X_GITHUB_TOKEN_HEADER, token) }
+                } else {
+                    delete(path) { header(X_GITHUB_TOKEN_HEADER, token) }
+                }
+            response.emptyOrFailure()
+        }
+
+    suspend fun report(
+        reviewId: String,
+        body: BackendReviewReportDto,
+    ): Result<Unit> =
+        call(authed = true) { token ->
+            post("reviews/item/$reviewId/report") {
+                header(X_GITHUB_TOKEN_HEADER, token)
+                contentType(ContentType.Application.Json)
+                setBody(body)
+            }.emptyOrFailure()
+        }
+
+    suspend fun putReply(
+        reviewId: String,
+        text: String,
+    ): Result<BackendReviewReplyDto> =
+        call(authed = true) { token ->
+            val response =
+                put("reviews/item/$reviewId/reply") {
+                    header(X_GITHUB_TOKEN_HEADER, token)
+                    contentType(ContentType.Application.Json)
+                    setBody(BackendReviewReplyRequestDto(text))
+                }
+            response.bodyOrFailure()
+        }
+
+    suspend fun deleteReply(reviewId: String): Result<Unit> =
+        call(authed = true) { token ->
+            delete("reviews/item/$reviewId/reply") {
+                header(X_GITHUB_TOKEN_HEADER, token)
+            }.emptyOrFailure()
+        }
+
+    // A missing token never reaches the backend; any failure that isn't ours (no network, a timeout) is NETWORK.
+    private suspend fun <T> call(
+        authed: Boolean,
+        block: suspend HttpClient.(token: String) -> Result<T>,
+    ): Result<T> {
+        val result =
+            client.request(authed) { token ->
+                if (authed && token == null) {
+                    Result.failure(ReviewException(ReviewError.AUTH_REQUIRED))
+                } else {
+                    this.block(token.orEmpty())
+                }
+            }
+        return result.exceptionOrNull()?.let { error ->
+            if (error is ReviewException) result else Result.failure(ReviewException(ReviewError.NETWORK))
+        } ?: result
+    }
+
+    private suspend inline fun <reified T> HttpResponse.bodyOrFailure(): Result<T> =
+        if (status.isSuccess()) Result.success(body()) else Result.failure(toReviewException())
+
+    private suspend fun HttpResponse.emptyOrFailure(): Result<Unit> =
+        if (status.isSuccess()) Result.success(Unit) else Result.failure(toReviewException())
+
+    private suspend fun HttpResponse.toReviewException(): ReviewException {
+        if (status == HttpStatusCode.TooManyRequests) {
+            return ReviewException(ReviewError.RATE_LIMITED, headers["Retry-After"]?.toLongOrNull())
+        }
+        val kind =
+            when (errorCode()) {
+                "auth_required" -> ReviewError.AUTH_REQUIRED
+                "auth_invalid" -> ReviewError.AUTH_INVALID
+                "account_too_new" -> ReviewError.ACCOUNT_TOO_NEW
+                "own_repo" -> ReviewError.OWN_REPO
+                "own_review" -> ReviewError.OWN_REVIEW
+                "banned" -> ReviewError.BANNED
+                "not_maintainer" -> ReviewError.NOT_MAINTAINER
+                "not_moderator" -> ReviewError.NOT_MODERATOR
+                "repo_not_found" -> ReviewError.REPO_NOT_FOUND
+                "review_not_found" -> ReviewError.REVIEW_NOT_FOUND
+                in INPUT_ERRORS -> ReviewError.INVALID_INPUT
+                // A plain 404 is the backend with REVIEWS_ENABLED off; 5xx and upstream_unavailable read the same way.
+                else -> if (status == HttpStatusCode.Unauthorized) ReviewError.AUTH_INVALID else ReviewError.UNAVAILABLE
+            }
+        return ReviewException(kind)
+    }
+
+    private suspend fun HttpResponse.errorCode(): String? =
+        try {
+            val obj = Json.parseToJsonElement(bodyAsText()) as? JsonObject
+            (obj?.get("error") as? JsonPrimitive)?.contentOrNull
+        } catch (e: CancellationException) {
+            throw e
+        } catch (_: Exception) {
+            null
+        }
+
+    private fun repoPath(target: ReviewTarget) = "reviews/repo/${target.owner}/${target.name}"
+
+    private fun HttpRequestBuilder.hostParameter(target: ReviewTarget) {
+        if (target.host != null) parameter("host", target.host)
+    }
+
+    private companion object {
+        const val PAGE_SIZE = 20
+        const val X_GITHUB_TOKEN_HEADER = "X-GitHub-Token"
+        val INPUT_ERRORS =
+            setOf(
+                "invalid_owner",
+                "invalid_name",
+                "invalid_rating",
+                "text_too_long",
+                "note_too_long",
+                "invalid_platform",
+                "invalid_reason",
+            )
+    }
+}

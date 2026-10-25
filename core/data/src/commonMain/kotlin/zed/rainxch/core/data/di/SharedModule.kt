@@ -32,6 +32,7 @@ import zed.rainxch.core.data.mirror.MirrorLatencyProbeImpl
 import zed.rainxch.core.data.mirror.MirrorRepositoryImpl
 import zed.rainxch.core.data.network.BackendApiClient
 import zed.rainxch.core.data.network.BackendExternalMatchApi
+import zed.rainxch.core.data.network.BackendReviewsApi
 import zed.rainxch.core.data.network.ExternalMatchApi
 import zed.rainxch.core.data.network.ExternalMatchApiSelector
 import zed.rainxch.core.data.network.ForgejoClientRegistry
@@ -52,6 +53,7 @@ import zed.rainxch.core.data.repository.HiddenReposRepositoryImpl
 import zed.rainxch.core.data.repository.HostTokenRepositoryImpl
 import zed.rainxch.core.data.repository.InstalledAppsRepositoryImpl
 import zed.rainxch.core.data.repository.ProxyRepositoryImpl
+import zed.rainxch.core.data.repository.ReviewsRepositoryImpl
 import zed.rainxch.core.data.repository.RateLimitRepositoryImpl
 import zed.rainxch.core.data.repository.SeenReposRepositoryImpl
 import zed.rainxch.core.data.repository.StarredRepositoryImpl
@@ -78,6 +80,7 @@ import zed.rainxch.core.domain.repository.HostTokenRepository
 import zed.rainxch.core.domain.repository.InstalledAppsRepository
 import zed.rainxch.core.domain.repository.MirrorRepository
 import zed.rainxch.core.domain.repository.ProxyRepository
+import zed.rainxch.core.domain.repository.ReviewsRepository
 import zed.rainxch.core.domain.repository.RateLimitRepository
 import zed.rainxch.core.domain.repository.SeenReposRepository
 import zed.rainxch.core.domain.repository.StarredRepository
@@ -267,6 +270,10 @@ val coreModule =
         }
 
         single { BackendExternalMatchApi(get()) }
+
+        single { BackendReviewsApi(get()) }
+
+        single<ReviewsRepository> { ReviewsRepositoryImpl(get()) }
 
         single { MockExternalMatchApi() }
 

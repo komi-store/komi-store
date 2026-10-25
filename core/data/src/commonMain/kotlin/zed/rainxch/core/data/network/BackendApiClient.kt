@@ -495,6 +495,17 @@ class BackendApiClient(
             null to null
         }
 
+    // Lets BackendReviewsApi share this client (proxy, timeouts, rate-limit tracking) from its own file.
+    // The token is read only for calls that need the user, so public reads stay anonymous.
+    internal suspend fun <T> request(
+        authed: Boolean,
+        block: suspend HttpClient.(token: String?) -> Result<T>,
+    ): Result<T> =
+        safeCall {
+            val token = if (authed) currentUserGithubToken() else null
+            httpClient.block(token)
+        }
+
     private inline fun <T> safeCall(block: () -> Result<T>): Result<T> =
         try {
             block()
