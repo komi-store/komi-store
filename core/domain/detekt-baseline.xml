@@ -42,9 +42,6 @@
     <ID>MatchingDeclarationName:ExternalInstallVerdict.kt$VersionVerdict</ID>
     <ID>MatchingDeclarationName:ReleasePlatforms.kt$PlatformRelease</ID>
     <ID>NestedBlockDepth:SyncInstalledAppsUseCase.kt$SyncInstalledAppsUseCase$private suspend fun reconcileEnumerable(appsInDb: List&lt;InstalledApp&gt;)</ID>
-    <ID>PackageNaming:MatchingPreview.kt$package zed.rainxch.core.domain.model.smart_detect</ID>
-    <ID>PackageNaming:SyncInstalledAppsUseCase.kt$package zed.rainxch.core.domain.use_cases</ID>
-    <ID>PackageNaming:SyncInstalledAppsUseCaseParkTest.kt$package zed.rainxch.core.domain.use_cases</ID>
     <ID>RethrowCaughtException:executeInTransaction.kt$throw e</ID>
     <ID>ReturnCount:AppTheme.kt$AppTheme.Companion$fun fromName(name: String?): AppTheme</ID>
     <ID>ReturnCount:AssetFilter.kt$AssetFilter.Companion$fun suggestFromAssetName(assetName: String): String?</ID>

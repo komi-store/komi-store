@@ -1,4 +1,4 @@
-package zed.rainxch.core.data.local.data_store
+package zed.rainxch.core.data.local.datastore
 
 import android.content.Context
 import androidx.datastore.core.DataStore

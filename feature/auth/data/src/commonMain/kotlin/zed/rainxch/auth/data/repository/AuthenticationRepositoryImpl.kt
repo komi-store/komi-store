@@ -20,7 +20,7 @@ import zed.rainxch.auth.domain.repository.DevicePollResult
 import zed.rainxch.auth.domain.repository.PatRejectedException
 import zed.rainxch.auth.domain.repository.PollOutcome
 import zed.rainxch.auth.domain.repository.WebAuthRegistration
-import zed.rainxch.core.data.data_source.TokenStore
+import zed.rainxch.core.data.datasource.TokenStore
 import zed.rainxch.core.data.dto.GithubDeviceTokenSuccessDto
 import zed.rainxch.core.data.mappers.toData
 import zed.rainxch.core.data.mappers.toDomain

@@ -13,7 +13,7 @@ import zed.rainxch.core.data.cache.CacheManager.CacheTtl.RELEASES
 import zed.rainxch.core.data.cache.CacheManager.CacheTtl.REPO_DETAILS
 import zed.rainxch.core.data.cache.CacheManager.CacheTtl.REPO_STATS
 import zed.rainxch.core.data.cache.CacheManager.CacheTtl.USER_PROFILE
-import zed.rainxch.core.data.data_source.TokenStore
+import zed.rainxch.core.data.datasource.TokenStore
 import zed.rainxch.core.data.dto.BackendRepoResponse
 import zed.rainxch.core.data.dto.GithubReadmeResponseDto
 import zed.rainxch.core.data.dto.ReleaseNetwork

@@ -11,7 +11,7 @@ import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.util.network.UnresolvedAddressException
 import kotlinx.serialization.json.Json
-import zed.rainxch.core.data.data_source.TokenStore
+import zed.rainxch.core.data.datasource.TokenStore
 import zed.rainxch.core.data.network.interceptor.HostTokenInterceptor
 import zed.rainxch.core.data.network.interceptor.RateLimitInterceptor
 import zed.rainxch.core.data.network.interceptor.UnauthorizedInterceptor

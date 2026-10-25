@@ -1,4 +1,4 @@
-package zed.rainxch.core.data.data_source
+package zed.rainxch.core.data.datasource
 
 import kotlinx.coroutines.flow.Flow
 import zed.rainxch.core.data.dto.GithubDeviceTokenSuccessDto

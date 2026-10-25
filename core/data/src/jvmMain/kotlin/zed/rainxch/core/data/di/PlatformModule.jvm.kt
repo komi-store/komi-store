@@ -3,8 +3,8 @@ package zed.rainxch.core.data.di
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import org.koin.dsl.module
-import zed.rainxch.core.data.local.data_store.createAnnouncementsDataStore
-import zed.rainxch.core.data.local.data_store.createDataStore
+import zed.rainxch.core.data.local.datastore.createAnnouncementsDataStore
+import zed.rainxch.core.data.local.datastore.createDataStore
 import zed.rainxch.core.data.local.db.AppDatabase
 import zed.rainxch.core.data.local.db.initDatabase
 import zed.rainxch.core.data.network.DesktopDigestVerifier

@@ -15,7 +15,7 @@ import okhttp3.Credentials
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
-import zed.rainxch.core.data.data_source.TokenStore
+import zed.rainxch.core.data.datasource.TokenStore
 import zed.rainxch.core.data.download.AssetSourceGoneException
 import zed.rainxch.core.data.download.ContentRange
 import zed.rainxch.core.data.download.FinishedFileReuse

@@ -2,7 +2,7 @@ package zed.rainxch.core.data.services
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
-import zed.rainxch.core.data.data_source.TokenStore
+import zed.rainxch.core.data.datasource.TokenStore
 import zed.rainxch.core.data.dto.GithubDeviceTokenSuccessDto
 import java.io.File
 

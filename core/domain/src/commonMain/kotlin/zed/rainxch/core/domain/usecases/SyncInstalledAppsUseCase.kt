@@ -1,4 +1,4 @@
-package zed.rainxch.core.domain.use_cases
+package zed.rainxch.core.domain.usecases
 
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers

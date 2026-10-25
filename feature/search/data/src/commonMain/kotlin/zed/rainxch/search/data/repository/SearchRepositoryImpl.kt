@@ -45,7 +45,7 @@ class SearchRepositoryImpl(
     private val backendApiClient: BackendApiClient,
     private val cacheManager: CacheManager,
     private val forgejoClientRegistry: zed.rainxch.core.data.network.ForgejoClientRegistry,
-    private val tokenStore: zed.rainxch.core.data.data_source.TokenStore,
+    private val tokenStore: zed.rainxch.core.data.datasource.TokenStore,
 ) : SearchRepository {
     private val httpClient: HttpClient get() = clientProvider.client
     private val releaseCheckCache = LruCache<String, GithubRepoSummary>(maxSize = 500)

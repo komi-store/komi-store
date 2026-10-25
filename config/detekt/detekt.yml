@@ -4,6 +4,9 @@ complexity:
   LongParameterList:
     ignoreAnnotated: ['Composable']
     ignoreDefaultParameters: true
+  TooManyFunctions:
+    # Private helpers are how LongMethod gets fixed; counting them would set the two rules against each other.
+    ignorePrivate: true
 
 naming:
   FunctionNaming:
@@ -13,6 +16,8 @@ style:
   MagicNumber:
     ignorePropertyDeclaration: true
     ignoreAnnotated: ['Composable', 'Preview']
+  ReturnCount:
+    excludeGuardClauses: true
   MaxLineLength:
     # ktlint's default; Spotless joins lines up to this length
     maxLineLength: 140

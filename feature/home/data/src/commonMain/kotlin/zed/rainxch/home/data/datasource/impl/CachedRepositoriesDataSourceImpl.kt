@@ -1,4 +1,4 @@
-package zed.rainxch.home.data.data_source.impl
+package zed.rainxch.home.data.datasource.impl
 
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.HttpTimeout
@@ -19,7 +19,7 @@ import zed.rainxch.core.data.network.BackendApiClient
 import zed.rainxch.core.data.network.OFFLINE_MIRROR_BASE
 import zed.rainxch.core.domain.logging.KomiStoreLogger
 import zed.rainxch.core.domain.model.repository.DiscoveryPlatform
-import zed.rainxch.home.data.data_source.CachedRepositoriesDataSource
+import zed.rainxch.home.data.datasource.CachedRepositoriesDataSource
 import zed.rainxch.home.data.dto.CachedGithubRepoSummary
 import zed.rainxch.home.data.dto.CachedRepoResponse
 import zed.rainxch.home.data.mappers.toCachedGithubRepoSummary

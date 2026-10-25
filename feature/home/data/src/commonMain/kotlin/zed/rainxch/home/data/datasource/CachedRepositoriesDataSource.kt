@@ -1,4 +1,4 @@
-package zed.rainxch.home.data.data_source
+package zed.rainxch.home.data.datasource
 
 import zed.rainxch.core.domain.model.repository.DiscoveryPlatform
 import zed.rainxch.home.data.dto.CachedRepoResponse

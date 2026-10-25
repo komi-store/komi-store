@@ -11,8 +11,8 @@ import kotlinx.coroutines.SupervisorJob
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import zed.rainxch.core.data.cache.CacheManager
-import zed.rainxch.core.data.data_source.TokenStore
-import zed.rainxch.core.data.data_source.impl.DefaultTokenStore
+import zed.rainxch.core.data.datasource.TokenStore
+import zed.rainxch.core.data.datasource.impl.DefaultTokenStore
 import zed.rainxch.core.data.download.AssetSourceRefetcher
 import zed.rainxch.core.data.download.DefaultAssetSourceRefetcher
 import zed.rainxch.core.data.download.MultiSourceDownloaderImpl
@@ -91,7 +91,7 @@ import zed.rainxch.core.domain.system.DownloadOrchestrator
 import zed.rainxch.core.domain.system.ExternalAppScanner
 import zed.rainxch.core.domain.system.MultiSourceDownloader
 import zed.rainxch.core.domain.system.SystemInstallSerializer
-import zed.rainxch.core.domain.use_cases.SyncInstalledAppsUseCase
+import zed.rainxch.core.domain.usecases.SyncInstalledAppsUseCase
 
 val coreModule =
     module {

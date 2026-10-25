@@ -110,16 +110,3 @@ standard:if-else-wrapping core/data/src/commonMain/kotlin/zed/rainxch/core/data/
 standard:max-line-length core/domain/src/commonTest/kotlin/zed/rainxch/core/domain/utils/AssetOwnershipTest.kt
 standard:max-line-length feature/details/presentation/src/commonMain/kotlin/zed/rainxch/details/presentation/utils/LanguageLinkInterceptor.kt
 standard:mixed-condition-operators core/presentation/src/commonMain/kotlin/zed/rainxch/core/presentation/components/markdown/MarkdownImageTransformer.kt
-standard:package-name core/data/src/androidMain/kotlin/zed/rainxch/core/data/local/data_store/createAnnouncementsDataStore.kt
-standard:package-name core/data/src/androidMain/kotlin/zed/rainxch/core/data/local/data_store/createDataStore.kt
-standard:package-name core/data/src/commonMain/kotlin/zed/rainxch/core/data/data_source/TokenStore.kt
-standard:package-name core/data/src/commonMain/kotlin/zed/rainxch/core/data/data_source/impl/DefaultTokenStore.kt
-standard:package-name core/data/src/commonMain/kotlin/zed/rainxch/core/data/local/data_store/announcementsDataStoreFile.kt
-standard:package-name core/data/src/commonMain/kotlin/zed/rainxch/core/data/local/data_store/createDataStoreCore.kt
-standard:package-name core/data/src/jvmMain/kotlin/zed/rainxch/core/data/local/data_store/createAnnouncementsDataStore.kt
-standard:package-name core/data/src/jvmMain/kotlin/zed/rainxch/core/data/local/data_store/createDataStore.kt
-standard:package-name core/domain/src/commonMain/kotlin/zed/rainxch/core/domain/model/smart_detect/MatchingPreview.kt
-standard:package-name core/domain/src/commonMain/kotlin/zed/rainxch/core/domain/use_cases/SyncInstalledAppsUseCase.kt
-standard:package-name core/domain/src/jvmTest/kotlin/zed/rainxch/core/domain/use_cases/SyncInstalledAppsUseCaseParkTest.kt
-standard:package-name feature/home/data/src/commonMain/kotlin/zed/rainxch/home/data/data_source/CachedRepositoriesDataSource.kt
-standard:package-name feature/home/data/src/commonMain/kotlin/zed/rainxch/home/data/data_source/impl/CachedRepositoriesDataSourceImpl.kt

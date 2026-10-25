@@ -38,7 +38,7 @@ import zed.rainxch.core.domain.model.error.RateLimitException
 import zed.rainxch.core.domain.model.repository.DiscoveryPlatform
 import zed.rainxch.core.domain.model.repository.PaginatedDiscoveryRepositories
 import zed.rainxch.core.domain.model.system.Platform
-import zed.rainxch.home.data.data_source.CachedRepositoriesDataSource
+import zed.rainxch.home.data.datasource.CachedRepositoriesDataSource
 import zed.rainxch.home.data.dto.CachedRepoResponse
 import zed.rainxch.home.data.mappers.toGithubRepoSummary
 import zed.rainxch.home.domain.repository.HomeRepository

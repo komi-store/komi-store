@@ -65,7 +65,7 @@ import zed.rainxch.core.domain.system.Installer
 import zed.rainxch.core.domain.system.OrchestratedDownload
 import zed.rainxch.core.domain.system.SystemInstallSerializer
 import zed.rainxch.core.domain.system.phase
-import zed.rainxch.core.domain.use_cases.SyncInstalledAppsUseCase
+import zed.rainxch.core.domain.usecases.SyncInstalledAppsUseCase
 import zed.rainxch.core.domain.utils.AssetFilter
 import zed.rainxch.core.domain.utils.AssetVariant
 import zed.rainxch.core.presentation.utils.TimeZoneChangeSignal

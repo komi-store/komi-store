@@ -165,12 +165,6 @@
     <ID>NestedBlockDepth:DesktopFileLocationsProvider.kt$DesktopFileLocationsProvider$private fun getXdgDownloadsDir(): String?</ID>
     <ID>NestedBlockDepth:DhizukuServiceManager.kt$DhizukuServiceManager$private fun computeStatus(): DhizukuStatus</ID>
     <ID>NestedBlockDepth:PackageEventReceiver.kt$PackageEventReceiver$private suspend fun onPackageInstalled(packageName: String)</ID>
-    <ID>PackageNaming:DefaultTokenStore.kt$package zed.rainxch.core.data.data_source.impl</ID>
-    <ID>PackageNaming:TokenStore.kt$package zed.rainxch.core.data.data_source</ID>
-    <ID>PackageNaming:announcementsDataStoreFile.kt$package zed.rainxch.core.data.local.data_store</ID>
-    <ID>PackageNaming:createAnnouncementsDataStore.kt$package zed.rainxch.core.data.local.data_store</ID>
-    <ID>PackageNaming:createDataStore.kt$package zed.rainxch.core.data.local.data_store</ID>
-    <ID>PackageNaming:createDataStoreCore.kt$package zed.rainxch.core.data.local.data_store</ID>
     <ID>PrintStackTrace:DesktopInstaller.kt$DesktopInstaller$e</ID>
     <ID>ReturnCount:AndroidClipboardHelper.kt$AndroidClipboardHelper$override fun getText(): String?</ID>
     <ID>ReturnCount:AndroidDownloadProgressNotifier.kt$AndroidDownloadProgressNotifier$private fun formatBytes(bytes: Long): String</ID>

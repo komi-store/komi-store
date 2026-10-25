@@ -1,4 +1,4 @@
-package zed.rainxch.core.data.data_source.impl
+package zed.rainxch.core.data.datasource.impl
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
@@ -18,7 +18,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.serialization.json.Json
-import zed.rainxch.core.data.data_source.TokenStore
+import zed.rainxch.core.data.datasource.TokenStore
 import zed.rainxch.core.data.dto.GithubDeviceTokenSuccessDto
 import kotlin.time.Clock
 import zed.rainxch.core.data.secure.safeDelete

@@ -1,4 +1,4 @@
-package zed.rainxch.core.domain.model.smart_detect
+package zed.rainxch.core.domain.model.smartdetect
 import zed.rainxch.core.domain.model.account.github.GithubAsset
 import zed.rainxch.core.domain.model.account.github.GithubRelease
 

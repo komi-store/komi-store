@@ -69,7 +69,7 @@ import zed.rainxch.core.domain.system.Installer
 import zed.rainxch.core.domain.system.OrchestratedDownload
 import zed.rainxch.core.domain.system.PackageMonitor
 import zed.rainxch.core.domain.system.phase
-import zed.rainxch.core.domain.use_cases.SyncInstalledAppsUseCase
+import zed.rainxch.core.domain.usecases.SyncInstalledAppsUseCase
 import zed.rainxch.core.domain.utils.AssetFilter
 import zed.rainxch.core.domain.utils.AssetOwnership
 import zed.rainxch.core.domain.utils.AssetVariant
