@@ -25,8 +25,7 @@ tasks.flatpakGradleGenerator {
 
 spotless {
     ratchetFrom("origin/main")
-    // Excludes sit on the tree so the walk skips them; targetExclude would subtract them only after walking
-    // every worktree under .claude/.
+    // Excludes sit on the tree so the walk skips .claude/ worktrees; targetExclude would subtract them only after walking.
     kotlin {
         target(
             fileTree(rootDir) {

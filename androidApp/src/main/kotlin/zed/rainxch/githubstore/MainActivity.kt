@@ -62,8 +62,7 @@ class MainActivity : ComponentActivity() {
 
         super.onCreate(savedInstanceState)
 
-        // Cancels draw requests until the real UI past the gate has composed, so no placeholder
-        // frame is rendered.
+        // Cancels draw requests until the real UI past the gate has composed, so no placeholder frame is rendered.
         getViewModel<MainViewModel>()
         splash.setKeepOnScreenCondition { !contentPainted.get() }
 
@@ -117,9 +116,7 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    // Android 17 blocks LAN traffic without ACCESS_LOCAL_NETWORK. While the activity lives, asks again only when the
-    // set of LAN hosts in the proxy, forge or LibreTranslate settings changes; after two denials Android stops showing
-    // the prompt.
+    // Asks again only when the set of LAN hosts changes, since Android stops showing the prompt after two denials.
     @RequiresApi(Build.VERSION_CODES.CINNAMON_BUN)
     private fun requestLocalNetworkAccessWhenNeeded() {
         lifecycleScope.launch {

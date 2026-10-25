@@ -19,8 +19,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import zed.rainxch.githubstore.MainActivity
 
-// Starts through the real deep-link entry point and avoids Compose idling: Details shows an indeterminate
-// progress indicator while loading, which would keep a Compose test rule busy.
+// No Compose test rule: the indeterminate progress indicator Details shows while loading would keep it busy.
 @RunWith(AndroidJUnit4::class)
 class DetailsBackTest : TargetSdk37TestBase() {
     @get:Rule
