@@ -24,7 +24,7 @@ import zed.rainxch.core.presentation.personality.classic.withClassicFonts
 import zed.rainxch.core.presentation.personality.fonts.komiScriptForLanguageTag
 import zed.rainxch.core.presentation.personality.manga.withMangaFonts
 import zed.rainxch.core.presentation.personality.model.PersonalityColors
-import zed.rainxch.core.presentation.status.statusColors
+import zed.rainxch.core.presentation.personality.statusColors
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -103,8 +103,7 @@ private fun Personality.toMaterialTypography(): Typography {
     )
 }
 
-// Material never uppercases, and Anton is drawn for capitals, so Manga's Material
-// slots (markdown headings, dialog titles) take the body face instead.
+// Material never uppercases and Anton is drawn for capitals, so Manga's Material headings take the body face.
 private fun Personality.materialHeading(style: TextStyle): TextStyle =
     when (this) {
         is ClassicPersonality -> style
