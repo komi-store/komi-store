@@ -45,6 +45,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
 import zed.rainxch.core.domain.model.account.github.GithubAsset
+import zed.rainxch.core.domain.utils.ReleaseChange
 import zed.rainxch.core.domain.utils.VersionMath
 import zed.rainxch.core.presentation.components.buttons.KomiSoftIconButton
 import zed.rainxch.core.presentation.components.icon.KomiIcon
@@ -128,15 +129,17 @@ fun SmartInstallButton(
                 VersionMath.detectScheme(normSelected) == VersionMath.Scheme.Unknown)
     val latestBuildDiffers =
         installedApp != null &&
-            VersionMath.assetBuildChanged(
-                matchedReleaseId = null,
-                matchedAssetId = installedApp.latestAssetId,
-                matchedDigest = installedApp.latestAssetDigest,
-                matchedSize = null,
-                storedReleaseId = null,
-                storedAssetId = installedApp.installedAssetId,
-                storedDigest = installedApp.installedAssetDigest,
-                storedSize = null,
+            ReleaseChange.assetBuildChanged(
+                matched =
+                    ReleaseChange.BuildIdentity(
+                        assetId = installedApp.latestAssetId,
+                        digest = installedApp.latestAssetDigest,
+                    ),
+                stored =
+                    ReleaseChange.BuildIdentity(
+                        assetId = installedApp.installedAssetId,
+                        digest = installedApp.installedAssetDigest,
+                    ),
             )
     val selectedIsLatestRelease = VersionMath.isExactSameVersion(normSelected, installedApp?.latestVersion)
     val isSameVersionInstalled =

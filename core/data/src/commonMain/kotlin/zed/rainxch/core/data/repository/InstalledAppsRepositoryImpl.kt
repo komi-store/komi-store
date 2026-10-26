@@ -2,9 +2,11 @@ package zed.rainxch.core.data.repository
 
 import androidx.room.immediateTransaction
 import androidx.room.useWriterConnection
+import androidx.sqlite.SQLiteException
 import co.touchlab.kermit.Logger
 import io.ktor.client.HttpClient
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.sync.Mutex
@@ -22,8 +24,10 @@ import zed.rainxch.core.data.mappers.toReleaseWindow
 import zed.rainxch.core.data.mappers.toUpdateCheckWindow
 import zed.rainxch.core.data.network.GitHubClientProvider
 import zed.rainxch.core.domain.model.account.github.GithubRelease
+import zed.rainxch.core.domain.model.error.LocalStoreException
 import zed.rainxch.core.domain.model.installation.InstallSource
 import zed.rainxch.core.domain.model.installation.InstalledApp
+import zed.rainxch.core.domain.model.installation.InstalledBuild
 import zed.rainxch.core.domain.model.installation.ParkedInstallDisposal
 import zed.rainxch.core.domain.model.installation.clearPending
 import zed.rainxch.core.domain.model.installation.confirmInstall
@@ -35,9 +39,11 @@ import zed.rainxch.core.domain.system.Installer
 import zed.rainxch.core.domain.system.PackageMonitor
 import zed.rainxch.core.domain.utils.AssetFilter
 import zed.rainxch.core.domain.utils.AssetVariant
+import zed.rainxch.core.domain.utils.ReleaseTracking
 import zed.rainxch.core.domain.utils.ResolvedRelease
 import zed.rainxch.core.domain.utils.TrackedReleaseResolver
 import zed.rainxch.core.domain.utils.UpdateVerdict
+import zed.rainxch.core.domain.utils.VariantPin
 import zed.rainxch.core.domain.utils.VersionMath
 import kotlin.coroutines.cancellation.CancellationException
 
@@ -69,9 +75,11 @@ class InstalledAppsRepositoryImpl(
     }
 
     override suspend fun <R> executeInTransaction(block: suspend () -> R): R =
-        database.useWriterConnection { transactor ->
-            transactor.immediateTransaction {
-                block()
+        localStore {
+            database.useWriterConnection { transactor ->
+                transactor.immediateTransaction {
+                    block()
+                }
             }
         }
 
@@ -79,6 +87,7 @@ class InstalledAppsRepositoryImpl(
         installedAppsDao
             .getAllInstalledApps()
             .map { it.map { app -> app.toDomain() } }
+            .catch { e -> throw if (e is SQLiteException) LocalStoreException(e) else e }
 
     override fun getAppsWithUpdates(): Flow<List<InstalledApp>> =
         installedAppsDao
@@ -109,7 +118,7 @@ class InstalledAppsRepositoryImpl(
     }
 
     override suspend fun deleteInstalledApp(packageName: String) {
-        installedAppsDao.deleteByPackageName(packageName)
+        localStore { installedAppsDao.deleteByPackageName(packageName) }
     }
 
     private suspend fun fetchReleaseWindow(
@@ -157,15 +166,21 @@ class InstalledAppsRepositoryImpl(
 
         return TrackedReleaseResolver.resolve(
             releases = releases,
-            filter = compiledFilter,
-            fallbackToOlderReleases = app.fallbackToOlderReleases,
-            preferredVariant = app.preferredAssetVariant,
-            preferredTokens = AssetVariant.deserializeTokens(app.preferredAssetTokens),
-            preferredGlob = app.assetGlobPattern,
-            pickedIndex = app.pickedAssetIndex,
-            pickedSiblingCount = app.pickedAssetSiblingCount,
-            trackedPackageName = app.packageName,
-            installedAssetName = app.installedAssetName,
+            tracking =
+                ReleaseTracking(
+                    packageName = app.packageName,
+                    installedAssetName = app.installedAssetName,
+                    filter = compiledFilter,
+                    fallbackToOlderReleases = app.fallbackToOlderReleases,
+                    pin =
+                        VariantPin(
+                            variant = app.preferredAssetVariant,
+                            tokens = AssetVariant.deserializeTokens(app.preferredAssetTokens),
+                            glob = app.assetGlobPattern,
+                            pickedIndex = app.pickedAssetIndex,
+                            pickedSiblingCount = app.pickedAssetSiblingCount,
+                        ),
+                ),
             repoApps = installedAppsDao.getAppsByRepoId(app.repoId).map { it.toDomain() },
             installer = installer,
         )
@@ -412,22 +427,13 @@ class InstalledAppsRepositoryImpl(
 
     override suspend fun updateAppVersion(
         packageName: String,
-        newTag: String,
-        newReleaseId: Long?,
-        newAssetId: Long?,
-        newAssetDigest: String?,
-        newReleasePublishedAt: String?,
-        newAssetName: String?,
-        newAssetUrl: String?,
-        newVersionName: String,
-        newVersionCode: Long,
-        signingFingerprint: String?,
+        build: InstalledBuild,
         isPendingInstall: Boolean,
     ) {
         val app = installedAppsDao.getAppByPackage(packageName) ?: return
 
         Logger.d {
-            "Updating app version: $packageName from ${app.installedVersion} to $newTag"
+            "Updating app version: $packageName from ${app.installedVersion} to ${build.tag}"
         }
 
         historyDao.insertHistory(
@@ -437,7 +443,7 @@ class InstalledAppsRepositoryImpl(
                 repoOwner = app.repoOwner,
                 repoName = app.repoName,
                 fromVersion = app.installedVersion,
-                toVersion = newTag,
+                toVersion = build.tag,
                 updatedAt = System.currentTimeMillis(),
                 updateSource = InstallSource.THIS_APP,
                 success = true,
@@ -448,16 +454,7 @@ class InstalledAppsRepositoryImpl(
             app
                 .toDomain()
                 .confirmInstall(
-                    tag = newTag,
-                    releaseId = newReleaseId,
-                    assetId = newAssetId,
-                    assetDigest = newAssetDigest,
-                    releasePublishedAt = newReleasePublishedAt,
-                    assetName = newAssetName,
-                    assetUrl = newAssetUrl,
-                    versionName = newVersionName,
-                    versionCode = newVersionCode,
-                    signingFingerprint = signingFingerprint,
+                    build = build,
                     isPending = isPendingInstall,
                     at = System.currentTimeMillis(),
                 ).toEntity(),
@@ -469,7 +466,7 @@ class InstalledAppsRepositoryImpl(
     }
 
     override suspend fun updateApp(app: InstalledApp) {
-        installedAppsDao.updateApp(app.toEntity())
+        localStore { installedAppsDao.updateApp(app.toEntity()) }
     }
 
     override suspend fun updateInstalledVersion(
@@ -499,23 +496,25 @@ class InstalledAppsRepositoryImpl(
         packageName: String,
         isPending: Boolean,
     ) {
-        val app = installedAppsDao.getAppByPackage(packageName) ?: return
-        installedAppsDao.updateApp(
-            app
-                .toDomain()
-                .let {
-                    if (isPending) {
-                        it.markPending(
-                            releaseId = app.latestReleaseId,
-                            assetId = app.latestAssetId,
-                            assetDigest = app.latestAssetDigest,
-                            releasePublishedAt = app.latestReleasePublishedAt,
-                        )
-                    } else {
-                        it.clearPending()
-                    }
-                }.toEntity(),
-        )
+        localStore {
+            val app = installedAppsDao.getAppByPackage(packageName) ?: return
+            installedAppsDao.updateApp(
+                app
+                    .toDomain()
+                    .let {
+                        if (isPending) {
+                            it.markPending(
+                                releaseId = app.latestReleaseId,
+                                assetId = app.latestAssetId,
+                                assetDigest = app.latestAssetDigest,
+                                releasePublishedAt = app.latestReleasePublishedAt,
+                            )
+                        } else {
+                            it.clearPending()
+                        }
+                    }.toEntity(),
+            )
+        }
     }
 
     override suspend fun setIncludePreReleases(
@@ -670,11 +669,14 @@ class InstalledAppsRepositoryImpl(
                 return ParkedInstallDisposal.Retained
             }
         }
-        installedAppsDao.clearPendingInstallIfPathMatches(
-            packageName = packageName,
-            path = expectedPath,
-        )
-        val remainingPath = installedAppsDao.getAppByPackage(packageName)?.pendingInstallFilePath
+        val remainingPath =
+            localStore {
+                installedAppsDao.clearPendingInstallIfPathMatches(
+                    packageName = packageName,
+                    path = expectedPath,
+                )
+                installedAppsDao.getAppByPackage(packageName)?.pendingInstallFilePath
+            }
         return if (remainingPath != null) {
             Logger.d { "Parked install for $packageName still names $remainingPath; row kept" }
             ParkedInstallDisposal.Retained
@@ -759,6 +761,14 @@ internal enum class ParkedFileDisposal {
 
     Survived,
 }
+
+// Room surfaces SQLite failures on both drivers as androidx.sqlite.SQLiteException (android.database.SQLException on Android).
+private inline fun <T> localStore(block: () -> T): T =
+    try {
+        block()
+    } catch (e: SQLiteException) {
+        throw LocalStoreException(e)
+    }
 
 internal fun tryDeleteParkedFile(path: String): ParkedFileDisposal {
     val file = java.io.File(path)

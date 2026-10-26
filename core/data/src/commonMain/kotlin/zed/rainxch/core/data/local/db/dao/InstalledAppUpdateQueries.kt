@@ -2,7 +2,7 @@ package zed.rainxch.core.data.local.db.dao
 
 import zed.rainxch.core.data.local.db.entities.InstalledAppEntity
 import zed.rainxch.core.domain.model.account.github.GithubRelease
-import zed.rainxch.core.domain.utils.VersionMath
+import zed.rainxch.core.domain.utils.ReleaseChange
 
 // Small DAO write helpers used by the repository, kept here so the repository file stays
 // within the architecture line limit.
@@ -34,5 +34,5 @@ internal suspend fun InstalledAppDao.resolveInstalledReleasePublishedAt(
     if (fromWindow != null && fromWindow != app.installedReleasePublishedAt) {
         setInstalledReleasePublishedAt(app.packageName, fromWindow)
     }
-    return fromWindow ?: VersionMath.publishedAtOrNull(app.installedReleasePublishedAt)
+    return fromWindow ?: ReleaseChange.publishedAtOrNull(app.installedReleasePublishedAt)
 }

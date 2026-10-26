@@ -3,7 +3,7 @@ package zed.rainxch.core.domain.system
 import zed.rainxch.core.domain.model.account.github.GithubAsset
 import zed.rainxch.core.domain.model.system.SystemArchitecture
 
-interface Installer {
+interface Installer : InstallerHandoff {
     suspend fun isSupported(extOrMime: String): Boolean
 
     suspend fun ensurePermissionsOrThrow(extOrMime: String)
@@ -21,24 +21,7 @@ interface Installer {
 
     fun detectSystemArchitecture(): SystemArchitecture
 
-    fun isObtainiumInstalled(): Boolean
-
-    fun openInObtainium(
-        repoOwner: String,
-        repoName: String,
-        onOpenInstaller: () -> Unit,
-    )
-
-    fun isAppManagerInstalled(): Boolean
-
-    fun openInAppManager(
-        filePath: String,
-        onOpenInstaller: () -> Unit,
-    )
-
     fun getApkInfoExtractor(): InstallerInfoExtractor
 
     fun openApp(packageName: String): Boolean
-
-    fun openWithExternalInstaller(filePath: String)
 }

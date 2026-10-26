@@ -4,11 +4,6 @@ import zed.rainxch.core.domain.model.account.github.GithubRelease
 import zed.rainxch.core.domain.model.repository.DiscoveryPlatform
 import zed.rainxch.core.domain.model.system.Platform
 
-data class PlatformRelease(
-    val platform: DiscoveryPlatform,
-    val release: GithubRelease,
-)
-
 fun Platform.toDiscoveryPlatform(): DiscoveryPlatform =
     when (this) {
         Platform.ANDROID -> DiscoveryPlatform.Android

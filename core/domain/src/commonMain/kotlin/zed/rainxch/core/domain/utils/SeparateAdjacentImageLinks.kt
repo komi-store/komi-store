@@ -1,9 +1,11 @@
 package zed.rainxch.core.domain.utils
 
+private const val INSERTED_BREAKS_HEADROOM = 64
+
 fun separateAdjacentImageLinks(content: String): String {
     if (content.isEmpty()) return content
     val lines = content.split('\n')
-    val out = StringBuilder(content.length + 64)
+    val out = StringBuilder(content.length + INSERTED_BREAKS_HEADROOM)
     var lastWasLinkLine = false
     var lastEmittedWasBlank = true
     for (line in lines) {

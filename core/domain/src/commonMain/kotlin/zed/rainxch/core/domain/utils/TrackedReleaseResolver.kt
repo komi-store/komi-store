@@ -5,116 +5,130 @@ import zed.rainxch.core.domain.model.account.github.GithubRelease
 import zed.rainxch.core.domain.model.installation.InstalledApp
 import zed.rainxch.core.domain.system.Installer
 
-// One resolution for every entry point that needs "which release does this app track, and
-// which asset of it is its file". The update check and the download started from the library
-// both go through this, so a download always fetches the asset the check described.
+// One resolution for the update check and the library download, so a download fetches the asset the check described.
 data class ResolvedRelease(
     val release: GithubRelease,
     val primaryAsset: GithubAsset,
     val variantWasLost: Boolean,
 )
 
+data class VariantPin(
+    val variant: String? = null,
+    val tokens: Set<String> = emptySet(),
+    val glob: String? = null,
+    val pickedIndex: Int? = null,
+    val pickedSiblingCount: Int? = null,
+) {
+    val isSet: Boolean
+        get() = variant != null || tokens.isNotEmpty() || !glob.isNullOrBlank()
+}
+
+data class ReleaseTracking(
+    val packageName: String,
+    val installedAssetName: String?,
+    val filter: AssetFilter?,
+    val fallbackToOlderReleases: Boolean,
+    val pin: VariantPin,
+)
+
 object TrackedReleaseResolver {
     fun resolve(
         releases: List<GithubRelease>,
-        filter: AssetFilter?,
-        fallbackToOlderReleases: Boolean,
-        preferredVariant: String?,
-        preferredTokens: Set<String>,
-        preferredGlob: String?,
-        pickedIndex: Int?,
-        pickedSiblingCount: Int?,
-        trackedPackageName: String,
-        installedAssetName: String?,
+        tracking: ReleaseTracking,
         repoApps: List<InstalledApp>,
         installer: Installer,
     ): ResolvedRelease? {
         if (releases.isEmpty()) return null
 
-        val self = repoApps.firstOrNull { it.packageName == trackedPackageName }
-
-        // An APK no installed app owns is usually a sibling app the user never installed
-        // (monorepos). Only an app with no asset name or glob to compare can't tell.
-        fun belongsElsewhere(
-            asset: GithubAsset,
-            releaseTag: String,
-            releaseAssets: List<GithubAsset>,
-        ): Boolean {
-            if (self == null) return false
-            if (!AssetOwnership.canOwn(self, asset.name)) return true
-            val owner =
-                AssetOwnership.ownerOf(asset.name, repoApps, releaseAssets, releases, releaseTag)
-                    ?: return self.installedAssetName != null || !self.assetGlobPattern.isNullOrBlank()
-            return owner.packageName != trackedPackageName
-        }
-
         val candidates =
-            if (filter != null && !fallbackToOlderReleases) {
+            if (tracking.filter != null && !tracking.fallbackToOlderReleases) {
                 releases.take(1)
             } else {
                 releases
             }
+        val resolution = Resolution(releases, tracking, repoApps, installer)
+        return candidates.firstNotNullOfOrNull(resolution::resolveIn)
+    }
 
-        val hasAnyPin =
-            preferredVariant != null ||
-                preferredTokens.isNotEmpty() ||
-                !preferredGlob.isNullOrBlank()
+    private class Resolution(
+        private val releases: List<GithubRelease>,
+        private val tracking: ReleaseTracking,
+        private val repoApps: List<InstalledApp>,
+        private val installer: Installer,
+    ) {
+        private val self = repoApps.firstOrNull { it.packageName == tracking.packageName }
 
-        for (release in candidates) {
+        fun resolveIn(release: GithubRelease): ResolvedRelease? {
+            val filter = tracking.filter
             val installableForPlatform =
                 release.assets.filter { installer.isAssetInstallable(it.name) }
             val installableForApp =
-                (
-                    if (filter == null) {
-                        installableForPlatform
-                    } else {
-                        installableForPlatform.filter { filter.matches(it.name) }
-                    }
-                ).filterNot { belongsElsewhere(it, release.tagName, installableForPlatform) }
+                installableForPlatform
+                    .filter { filter == null || filter.matches(it.name) }
+                    .filterNot { belongsElsewhere(it, release.tagName, installableForPlatform) }
+            return installableForApp.takeIf { it.isNotEmpty() }?.let { pick(release, it) }
+        }
 
-            if (installableForApp.isEmpty()) continue
+        // An APK no installed app owns is usually a sibling app never installed (monorepos); an app with nothing to compare can't tell.
+        private fun belongsElsewhere(
+            asset: GithubAsset,
+            releaseTag: String,
+            releaseAssets: List<GithubAsset>,
+        ): Boolean {
+            val app = self ?: return false
+            if (!AssetOwnership.canOwn(app, asset.name)) return true
+            val owner =
+                AssetOwnership.ownerOf(asset.name, repoApps, releaseAssets, releases, releaseTag)
+                    ?: return app.installedAssetName != null || !app.assetGlobPattern.isNullOrBlank()
+            return owner.packageName != tracking.packageName
+        }
 
+        private fun pick(
+            release: GithubRelease,
+            installableForApp: List<GithubAsset>,
+        ): ResolvedRelease? {
+            val pin = tracking.pin
             val sameApp =
-                AssetOwnership.narrowToApp(installableForApp, installedAssetName, release.tagName, self?.installedVersion)
+                AssetOwnership.narrowToApp(installableForApp, tracking.installedAssetName, release.tagName, self?.installedVersion)
             val fingerprintMatch =
                 AssetVariant.resolvePreferredAsset(
                     assets = sameApp,
-                    pinnedVariant = preferredVariant,
-                    pinnedTokens = preferredTokens.takeIf { it.isNotEmpty() },
-                    pinnedGlob = preferredGlob,
+                    pinnedVariant = pin.variant,
+                    pinnedTokens = pin.tokens.takeIf { it.isNotEmpty() },
+                    pinnedGlob = pin.glob,
                     releaseTag = release.tagName,
                 )
 
             val positionMatch =
-                if (fingerprintMatch == null && hasAnyPin && sameApp.size == installableForApp.size) {
+                if (fingerprintMatch == null && pin.isSet && sameApp.size == installableForApp.size) {
                     AssetVariant.resolveBySamePosition(
                         assets = installableForApp,
-                        originalIndex = pickedIndex,
-                        siblingCountAtPickTime = pickedSiblingCount,
+                        originalIndex = pin.pickedIndex,
+                        siblingCountAtPickTime = pin.pickedSiblingCount,
                     )
                 } else {
                     null
                 }
 
-            val autoPickPool =
-                AssetOwnership.narrowToApp(
-                    AssetVariant.filterByPackageFlavor(installableForApp, trackedPackageName),
-                    installedAssetName,
-                    release.tagName,
-                    self?.installedVersion,
-                )
             val primary =
                 fingerprintMatch
                     ?: positionMatch
-                    ?: installer.choosePrimaryAsset(autoPickPool)
-                    ?: continue
+                    ?: installer.choosePrimaryAsset(autoPickPool(release, installableForApp))
+                    ?: return null
 
-            val variantWasLost =
-                hasAnyPin && fingerprintMatch == null && positionMatch == null
-
+            val variantWasLost = pin.isSet && fingerprintMatch == null && positionMatch == null
             return ResolvedRelease(release, primary, variantWasLost)
         }
 
-        return null
+        private fun autoPickPool(
+            release: GithubRelease,
+            installableForApp: List<GithubAsset>,
+        ): List<GithubAsset> =
+            AssetOwnership.narrowToApp(
+                AssetVariant.filterByPackageFlavor(installableForApp, tracking.packageName),
+                tracking.installedAssetName,
+                release.tagName,
+                self?.installedVersion,
+            )
     }
 }

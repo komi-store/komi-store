@@ -7,6 +7,7 @@ import zed.rainxch.core.domain.model.account.github.GithubAsset
 import zed.rainxch.core.domain.model.account.github.GithubRelease
 import zed.rainxch.core.domain.network.DigestVerifier
 import zed.rainxch.core.domain.system.PackageMonitor
+import zed.rainxch.core.domain.utils.ReleaseChange
 import zed.rainxch.core.domain.utils.UpdateVerdict
 import zed.rainxch.core.domain.utils.VersionMath
 
@@ -66,7 +67,7 @@ internal fun shouldConfirmDigest(input: DigestConfirmationInput): Boolean {
             input.matchedDigest != null
     return legacyWithoutDigest &&
         VersionMath.isExactSameVersion(input.matchedTag, input.installedVersion) &&
-        VersionMath.publishedAtAfter(input.matchedPublishedAt, input.installedPublishedAt)
+        ReleaseChange.publishedAtAfter(input.matchedPublishedAt, input.installedPublishedAt)
 }
 
 @Suppress("LongParameterList")

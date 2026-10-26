@@ -13,7 +13,7 @@ import zed.rainxch.core.data.mappers.toDomain
 import zed.rainxch.core.data.network.executeRequest
 import zed.rainxch.core.domain.model.account.github.GithubRelease
 import zed.rainxch.core.domain.model.account.github.isEffectivelyPreRelease
-import zed.rainxch.core.domain.utils.VersionMath
+import zed.rainxch.core.domain.utils.PreReleaseTags
 import kotlin.coroutines.cancellation.CancellationException
 
 internal suspend fun fetchGithubReleaseWindow(
@@ -40,7 +40,7 @@ internal suspend fun fetchGithubReleaseWindow(
             .map { it.toDomain() }
             .onEach { release ->
                 val flagSays = release.isPrerelease
-                val tagSays = VersionMath.isPreReleaseTag(release.tagName)
+                val tagSays = PreReleaseTags.isPreReleaseTag(release.tagName)
                 if (flagSays != tagSays) {
                     Logger.w {
                         "Pre-release flag/tag mismatch for $owner/$repo " +

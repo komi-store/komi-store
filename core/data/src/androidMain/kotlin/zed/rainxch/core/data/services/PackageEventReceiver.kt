@@ -13,6 +13,7 @@ import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import zed.rainxch.core.data.local.db.dao.ExternalLinkDao
+import zed.rainxch.core.domain.model.installation.InstalledBuild
 import zed.rainxch.core.domain.model.installation.ParkedInstallDisposal
 import zed.rainxch.core.domain.model.installation.PendingInstallResolution
 import zed.rainxch.core.domain.model.installation.externalInstallUpdateFlag
@@ -130,16 +131,19 @@ class PackageEventReceiver() :
                             val settled = app.withSettledInstallIdentity(resolution.versionCode)
                             repo.updateAppVersion(
                                 packageName = packageName,
-                                newTag = resolution.resolvedTag,
-                                newReleaseId = settled.installedReleaseId,
-                                newAssetId = settled.installedAssetId,
-                                newAssetDigest = settled.installedAssetDigest,
-                                newReleasePublishedAt = settled.installedReleasePublishedAt,
-                                newAssetName = app.latestAssetName ?: "",
-                                newAssetUrl = app.latestAssetUrl ?: "",
-                                newVersionName = resolution.versionName,
-                                newVersionCode = resolution.versionCode,
-                                signingFingerprint = app.signingFingerprint,
+                                build =
+                                    InstalledBuild(
+                                        tag = resolution.resolvedTag,
+                                        releaseId = settled.installedReleaseId,
+                                        assetId = settled.installedAssetId,
+                                        assetDigest = settled.installedAssetDigest,
+                                        releasePublishedAt = settled.installedReleasePublishedAt,
+                                        assetName = app.latestAssetName ?: "",
+                                        assetUrl = app.latestAssetUrl ?: "",
+                                        versionName = resolution.versionName,
+                                        versionCode = resolution.versionCode,
+                                        signingFingerprint = app.signingFingerprint,
+                                    ),
                                 isPendingInstall = true,
                             )
                             try {

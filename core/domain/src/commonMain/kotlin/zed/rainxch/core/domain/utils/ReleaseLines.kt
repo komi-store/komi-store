@@ -14,8 +14,7 @@ object ReleaseLines {
             .joinToString("-")
     }
 
-    // Lines are separate apps only when they interleave; a tag scheme that changed once
-    // (release-1.0 then v1.1) or a lone `nightly` tag is still one app.
+    // Lines are separate apps only when they interleave; a changed tag scheme (release-1.0, v1.1) or a lone nightly is one app.
     fun isMultiLine(releases: List<GithubRelease>): Boolean {
         val spans =
             releases

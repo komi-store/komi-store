@@ -9,38 +9,37 @@ fun applyThemeAwareImages(
 
     processed =
         processed.replace(
-            Regex("""!\[([^\]]*)\]\(([^)]*?)#gh-(dark|light)-mode-only([^)]*)\)"""),
+            Regex("""!\[(?<alt>[^\]]*)\]\((?<url>[^)]*?)#gh-(?<mode>dark|light)-mode-only(?<trailing>[^)]*)\)"""),
         ) { match ->
-            val mode = match.groupValues[3]
-            if ((isDark && mode == "light") || (!isDark && mode == "dark")) {
+            if (isHiddenInTheme(match.group("mode"), isDark)) {
                 ""
             } else {
-                val alt = match.groupValues[1]
-                val urlBase = match.groupValues[2]
-                val trailing = match.groupValues[4]
-                "![$alt]($urlBase$trailing)"
+                "![${match.group("alt")}](${match.group("url")}${match.group("trailing")})"
             }
         }
 
     processed =
         processed.replace(
             Regex(
-                """<img(\s[^>]*?)src\s*=\s*(["'])([^"']*?)#gh-(dark|light)-mode-only([^"']*?)\2([^>]*?)>""",
+                """<img(?<pre>\s[^>]*?)src\s*=\s*(?<quote>["'])(?<url>[^"']*?)""" +
+                    """#gh-(?<mode>dark|light)-mode-only(?<trailing>[^"']*?)\k<quote>(?<post>[^>]*?)>""",
                 RegexOption.IGNORE_CASE,
             ),
         ) { match ->
-            val mode = match.groupValues[4]
-            if ((isDark && mode == "light") || (!isDark && mode == "dark")) {
+            if (isHiddenInTheme(match.group("mode"), isDark)) {
                 ""
             } else {
-                val pre = match.groupValues[1]
-                val quote = match.groupValues[2]
-                val urlBase = match.groupValues[3]
-                val trailing = match.groupValues[5]
-                val post = match.groupValues[6]
-                "<img${pre}src=$quote$urlBase$trailing$quote$post>"
+                val quote = match.group("quote")
+                "<img${match.group("pre")}src=$quote${match.group("url")}${match.group("trailing")}$quote${match.group("post")}>"
             }
         }
 
     return processed
 }
+
+private fun MatchResult.group(name: String): String = groups[name]?.value.orEmpty()
+
+private fun isHiddenInTheme(
+    mode: String,
+    isDark: Boolean,
+): Boolean = mode == if (isDark) "light" else "dark"

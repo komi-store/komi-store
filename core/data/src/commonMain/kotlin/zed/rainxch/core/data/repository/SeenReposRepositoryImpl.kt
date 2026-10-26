@@ -6,6 +6,7 @@ import zed.rainxch.core.data.local.db.dao.SeenRepoDao
 import zed.rainxch.core.data.local.db.entities.SeenRepoEntity
 import zed.rainxch.core.domain.model.account.github.GithubRepoSummary
 import zed.rainxch.core.domain.model.repository.SeenRepo
+import zed.rainxch.core.domain.model.repository.SeenRepoEntry
 import zed.rainxch.core.domain.repository.SeenReposRepository
 
 class SeenReposRepositoryImpl(
@@ -20,34 +21,28 @@ class SeenReposRepositoryImpl(
 
     override suspend fun markAsSeen(repo: GithubRepoSummary) {
         markAsSeen(
-            repoId = repo.id,
-            repoName = repo.name,
-            repoOwner = repo.owner.login,
-            repoOwnerAvatarUrl = repo.owner.avatarUrl,
-            repoDescription = repo.description,
-            primaryLanguage = repo.language,
-            repoUrl = repo.htmlUrl,
+            SeenRepoEntry(
+                repoId = repo.id,
+                repoName = repo.name,
+                repoOwner = repo.owner.login,
+                repoOwnerAvatarUrl = repo.owner.avatarUrl,
+                repoDescription = repo.description,
+                primaryLanguage = repo.language,
+                repoUrl = repo.htmlUrl,
+            ),
         )
     }
 
-    override suspend fun markAsSeen(
-        repoId: Long,
-        repoName: String,
-        repoOwner: String,
-        repoOwnerAvatarUrl: String,
-        repoDescription: String?,
-        primaryLanguage: String?,
-        repoUrl: String,
-    ) {
+    override suspend fun markAsSeen(entry: SeenRepoEntry) {
         seenRepoDao.insert(
             SeenRepoEntity(
-                repoId = repoId,
-                repoName = repoName,
-                repoOwner = repoOwner,
-                repoOwnerAvatarUrl = repoOwnerAvatarUrl,
-                repoDescription = repoDescription,
-                primaryLanguage = primaryLanguage,
-                repoUrl = repoUrl,
+                repoId = entry.repoId,
+                repoName = entry.repoName,
+                repoOwner = entry.repoOwner,
+                repoOwnerAvatarUrl = entry.repoOwnerAvatarUrl,
+                repoDescription = entry.repoDescription,
+                primaryLanguage = entry.primaryLanguage,
+                repoUrl = entry.repoUrl,
                 seenAt = System.currentTimeMillis(),
             ),
         )
