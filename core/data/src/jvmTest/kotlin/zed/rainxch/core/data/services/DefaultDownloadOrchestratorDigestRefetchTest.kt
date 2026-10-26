@@ -64,18 +64,32 @@ class DefaultDownloadOrchestratorDigestRefetchTest {
         multi: MultiSourceDownloader,
         verifier: DigestVerifier,
         scope: CoroutineScope,
-    ) = DefaultDownloadOrchestrator(
-        downloader = downloader,
-        multiSourceDownloader = multi,
-        assetSourceRefetcher = StubAssetSourceRefetcher,
-        digestVerifier = verifier,
-        installer = StubInstaller,
-        installedAppsRepository = StubInstalledAppsRepository(),
-        pendingInstallNotifier = StubNotifier,
-        appScope = scope,
-        systemInstallSerializer = StubInstallSerializer,
-        tokenStore = StubTokenStore,
-    )
+    ): DefaultDownloadOrchestrator {
+        val repository = StubInstalledAppsRepository()
+        return DefaultDownloadOrchestrator(
+            downloader = downloader,
+            assetFetcher =
+                AssetFetcher(
+                    downloader = downloader,
+                    multiSourceDownloader = multi,
+                    assetSourceRefetcher = StubAssetSourceRefetcher,
+                    digestVerifier = verifier,
+                    tokenStore = StubTokenStore,
+                    installedAppsRepository = repository,
+                ),
+            installRunner =
+                DownloadInstallRunner(
+                    installer = StubInstaller,
+                    installedAppsRepository = repository,
+                    pendingInstallNotifier = StubNotifier,
+                    systemInstallSerializer = StubInstallSerializer,
+                    digestVerifier = verifier,
+                ),
+            installedAppsRepository = repository,
+            pendingInstallNotifier = StubNotifier,
+            appScope = scope,
+        )
+    }
 
     @Test
     fun bytes_that_fail_verification_are_refetched_from_the_source_and_the_download_proceeds() =

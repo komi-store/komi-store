@@ -18,8 +18,7 @@ class DefaultAssetSourceRefetcher(
     private val clientProvider: GitHubClientProvider,
     private val logger: KomiStoreLogger,
 ) : AssetSourceRefetcher {
-    // Reads the host directly, since the dead URL came from a stale cached resolution such as
-    // the backend's release copy. Forgejo specs are resolved from their host already.
+    // Reads GitHub directly, since the dead URL came from a stale copy such as the backend's; Forgejo specs already read their host.
     override suspend fun refetch(spec: DownloadSpec): DownloadSpec? {
         if (!GithubAssetAuth.isGithubHost(spec.asset.downloadUrl)) return null
 
@@ -32,20 +31,15 @@ class DefaultAssetSourceRefetcher(
                             parameter("per_page", RELEASE_WINDOW)
                         }
                     }
-                    // executeRequest returns ordinary failures in the Result. Log them: this read
-                    // decides whether the recovery runs at all.
+                    // executeRequest returns ordinary failures in the Result; log them, as this read decides whether recovery runs.
                     .onFailure { e ->
-                        logger.error(
-                            "Asset refetch failed for ${spec.repoOwner}/${spec.repoName}: ${e.message}",
-                        )
+                        logger.error("Asset refetch failed for ${spec.repoOwner}/${spec.repoName}", e)
                     }.getOrNull()
                     ?: return null
             } catch (e: CancellationException) {
                 throw e
             } catch (e: java.io.IOException) {
-                logger.error(
-                    "Asset refetch failed for ${spec.repoOwner}/${spec.repoName}: ${e.message}",
-                )
+                logger.error("Asset refetch failed for ${spec.repoOwner}/${spec.repoName}", e)
                 return null
             }
 
@@ -58,9 +52,7 @@ class DefaultAssetSourceRefetcher(
     }
 }
 
-// Same release first, then the newest release carrying an asset of the same name. A different
-// name would be a different download, not a retry. Pre-releases count, since a test build is one.
-// Null means nothing moved.
+// Same release first, then the newest one (pre-releases count) with an asset of the same name; null means nothing moved.
 internal fun assetReplacementFor(
     spec: DownloadSpec,
     window: List<GithubRelease>,
@@ -70,25 +62,27 @@ internal fun assetReplacementFor(
             .firstOrNull { it.tagName == spec.releaseTag }
             ?.assets
             ?.firstOrNull { it.name == spec.asset.name }
-    if (inSameRelease != null) {
-        return if (inSameRelease.downloadUrl == spec.asset.downloadUrl) {
-            null
-        } else {
+    val replacement =
+        if (inSameRelease != null) {
             spec.copy(asset = inSameRelease)
+        } else {
+            newestReleaseCarrying(spec, window)
         }
-    }
+    return replacement?.takeIf { it.asset.downloadUrl != spec.asset.downloadUrl }
+}
 
-    val replacementRelease =
+private fun newestReleaseCarrying(
+    spec: DownloadSpec,
+    window: List<GithubRelease>,
+): DownloadSpec? {
+    val release =
         window
             .sortedByDescending { it.publishedAt }
-            .firstOrNull { release -> release.assets.any { it.name == spec.asset.name } }
+            .firstOrNull { candidate -> candidate.assets.any { it.name == spec.asset.name } }
             ?: return null
-    val replacement = replacementRelease.assets.first { it.name == spec.asset.name }
-    if (replacement.downloadUrl == spec.asset.downloadUrl) return null
-
     return spec.copy(
-        asset = replacement,
-        releaseTag = replacementRelease.tagName,
-        releaseId = replacementRelease.id,
+        asset = release.assets.first { it.name == spec.asset.name },
+        releaseTag = release.tagName,
+        releaseId = release.id,
     )
 }

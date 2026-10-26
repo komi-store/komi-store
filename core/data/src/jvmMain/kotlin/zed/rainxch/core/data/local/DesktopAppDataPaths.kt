@@ -1,7 +1,9 @@
 package zed.rainxch.core.data.local
 
+import co.touchlab.kermit.Logger
 import zed.rainxch.core.domain.system.DesktopOs
 import java.io.File
+import java.io.IOException
 
 object DesktopAppDataPaths {
     private const val APP_DIR_NAME = "Komi-Store"
@@ -33,35 +35,33 @@ object DesktopAppDataPaths {
         return dir
     }
 
-    // KSafe's JVM default baseDir is ~/.eu_anifantakis_ksafe, which is not reliably
-    // persistent inside the Flatpak sandbox (writes land off the per-app tree and are
-    // silently swallowed). Pin it to the same persistent dir Room uses. One-time,
-    // best-effort copy of any legacy store so existing desktop users keep their settings.
+    // KSafe's default ~/.eu_anifantakis_ksafe is not persistent under Flatpak; pin it beside Room and copy any legacy store once.
     @Synchronized
     fun ksafeBaseDir(): File {
         val target = appDataDir()
-        runCatching {
-            val marker = File(target, ".ksafe_migrated")
-            if (!marker.exists()) {
-                val legacy = File(System.getProperty("user.home"), ".eu_anifantakis_ksafe")
-                if (legacy.isDirectory) {
-                    legacy.copyRecursively(target, overwrite = false)
-                }
-                marker.createNewFile()
+        val marker = File(target, ".ksafe_migrated")
+        if (marker.exists()) return target
+        try {
+            val legacy = File(System.getProperty("user.home"), ".eu_anifantakis_ksafe")
+            if (legacy.isDirectory) {
+                legacy.copyRecursively(target, overwrite = false)
             }
+            marker.createNewFile()
+        } catch (e: IOException) {
+            Logger.w(e) { "Could not copy the legacy KSafe store; retrying on the next launch" }
         }
         return target
     }
 
     fun migrateFromTmpIfNeeded(filename: String): Boolean {
         val newFile = File(appDataDir(), filename)
-        if (newFile.exists()) return false
         val legacyFile = File(System.getProperty("java.io.tmpdir"), filename)
-        if (!legacyFile.exists()) return false
+        if (newFile.exists() || !legacyFile.exists()) return false
         return try {
             legacyFile.copyTo(newFile, overwrite = false)
             true
-        } catch (_: Exception) {
+        } catch (e: IOException) {
+            Logger.w(e) { "Could not move $filename out of the temp folder" }
             false
         }
     }

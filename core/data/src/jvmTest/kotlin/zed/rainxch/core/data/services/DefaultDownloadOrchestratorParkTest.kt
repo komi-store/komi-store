@@ -64,18 +64,32 @@ class DefaultDownloadOrchestratorParkTest {
         notifier: PendingInstallNotifier = RecordingPendingInstallNotifier(),
         installer: Installer = FakeInstaller,
         serializer: SystemInstallSerializer = FakeSystemInstallSerializer,
-    ) = DefaultDownloadOrchestrator(
-        downloader = FakeDownloader(parkedPath),
-        multiSourceDownloader = FakeMultiSourceDownloader,
-        assetSourceRefetcher = StubAssetSourceRefetcher,
-        digestVerifier = FakeDigestVerifier,
-        installer = installer,
-        installedAppsRepository = repository,
-        pendingInstallNotifier = notifier,
-        appScope = scope,
-        systemInstallSerializer = serializer,
-        tokenStore = FakeTokenStore,
-    )
+    ): DefaultDownloadOrchestrator {
+        val downloader = FakeDownloader(parkedPath)
+        return DefaultDownloadOrchestrator(
+            downloader = downloader,
+            assetFetcher =
+                AssetFetcher(
+                    downloader = downloader,
+                    multiSourceDownloader = FakeMultiSourceDownloader,
+                    assetSourceRefetcher = StubAssetSourceRefetcher,
+                    digestVerifier = FakeDigestVerifier,
+                    tokenStore = FakeTokenStore,
+                    installedAppsRepository = repository,
+                ),
+            installRunner =
+                DownloadInstallRunner(
+                    installer = installer,
+                    installedAppsRepository = repository,
+                    pendingInstallNotifier = notifier,
+                    systemInstallSerializer = serializer,
+                    digestVerifier = FakeDigestVerifier,
+                ),
+            installedAppsRepository = repository,
+            pendingInstallNotifier = notifier,
+            appScope = scope,
+        )
+    }
 
     @Test
     fun parking_a_finished_download_goes_through_the_combined_write_only() =

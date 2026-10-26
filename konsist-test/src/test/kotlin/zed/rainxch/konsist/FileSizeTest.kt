@@ -33,7 +33,6 @@ class FileSizeTest {
                 "feature/details/presentation/src/commonMain/kotlin/zed/rainxch/details/presentation/DetailsViewModel.kt",
                 "feature/apps/presentation/src/commonMain/kotlin/zed/rainxch/apps/presentation/AppsViewModel.kt",
                 "feature/tweaks/presentation/src/commonMain/kotlin/zed/rainxch/tweaks/presentation/TweaksViewModel.kt",
-                "core/data/src/jvmMain/kotlin/zed/rainxch/core/data/services/DesktopInstaller.kt",
                 "feature/search/presentation/src/commonMain/kotlin/zed/rainxch/search/presentation/SearchRoot.kt",
                 "composeApp/src/commonMain/kotlin/zed/rainxch/githubstore/app/navigation/AppNavigation.kt",
                 "feature/search/presentation/src/commonMain/kotlin/zed/rainxch/search/presentation/SearchViewModel.kt",
@@ -43,7 +42,6 @@ class FileSizeTest {
                 "feature/auth/presentation/src/commonMain/kotlin/zed/rainxch/auth/presentation/AuthenticationViewModel.kt",
                 "feature/auth/presentation/src/commonMain/kotlin/zed/rainxch/auth/presentation/AuthenticationRoot.kt",
                 "feature/details/presentation/src/commonMain/kotlin/zed/rainxch/details/presentation/DetailsRoot.kt",
-                "core/data/src/commonMain/kotlin/zed/rainxch/core/data/services/DefaultDownloadOrchestrator.kt",
             )
     }
 }

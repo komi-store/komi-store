@@ -128,19 +128,32 @@ class DownloadLifecycleTest {
             assertEquals(2, source.calls)
         }
 
-    private fun kotlinx.coroutines.CoroutineScope.orchestrator(source: FileWritingSource) =
-        DefaultDownloadOrchestrator(
-            downloader = DirDownloader(dir),
-            multiSourceDownloader = source,
-            assetSourceRefetcher = StubAssetSourceRefetcher,
-            digestVerifier = UnusedVerifier,
-            installer = HandOffInstaller,
+    private fun kotlinx.coroutines.CoroutineScope.orchestrator(source: FileWritingSource): DefaultDownloadOrchestrator {
+        val downloader = DirDownloader(dir)
+        return DefaultDownloadOrchestrator(
+            downloader = downloader,
+            assetFetcher =
+                AssetFetcher(
+                    downloader = downloader,
+                    multiSourceDownloader = source,
+                    assetSourceRefetcher = StubAssetSourceRefetcher,
+                    digestVerifier = UnusedVerifier,
+                    tokenStore = FakeTokenStore(),
+                    installedAppsRepository = StubInstalledAppsRepository,
+                ),
+            installRunner =
+                DownloadInstallRunner(
+                    installer = HandOffInstaller,
+                    installedAppsRepository = StubInstalledAppsRepository,
+                    pendingInstallNotifier = StubNotifier,
+                    systemInstallSerializer = StubInstallSerializer,
+                    digestVerifier = UnusedVerifier,
+                ),
             installedAppsRepository = StubInstalledAppsRepository,
             pendingInstallNotifier = StubNotifier,
             appScope = this,
-            systemInstallSerializer = StubInstallSerializer,
-            tokenStore = FakeTokenStore(),
         )
+    }
 
     private suspend fun awaitStage(
         orchestrator: DefaultDownloadOrchestrator,
