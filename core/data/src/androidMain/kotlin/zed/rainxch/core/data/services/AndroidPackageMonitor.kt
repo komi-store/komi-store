@@ -8,6 +8,7 @@ import android.os.Build
 import co.touchlab.kermit.Logger
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import zed.rainxch.core.domain.model.error.SystemPackagesException
 import zed.rainxch.core.domain.model.installation.DeviceApp
 import zed.rainxch.core.domain.model.installation.SystemPackageInfo
 import zed.rainxch.core.domain.system.PackageMonitor
@@ -69,7 +70,7 @@ class AndroidPackageMonitor(
                     null
                 } else {
                     Logger.w(e) { "getInstalledPackageInfo($packageName) failed: ${e.message}" }
-                    throw e
+                    throw SystemPackagesException(e)
                 }
             }
         }
