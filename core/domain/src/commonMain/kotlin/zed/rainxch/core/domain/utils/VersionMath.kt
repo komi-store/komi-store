@@ -1,7 +1,5 @@
 package zed.rainxch.core.domain.utils
 
-import kotlin.time.Instant
-
 object VersionMath {
     fun normalizeVersion(version: String?): String {
         if (version.isNullOrBlank()) return ""
@@ -13,13 +11,11 @@ object VersionMath {
         val separated = insertHyphenBeforeKnownMarker(calverNormalized)
 
         val deflavoured = stripBuildVariantSuffix(separated)
-        if (parseSemanticVersion(deflavoured) != null) {
-            return deflavoured
-        }
-        if (isMarkerWithOpaqueSuffix(deflavoured)) return deflavoured
-        if (hasHexTailAfterNumericPrefix(deflavoured)) return deflavoured
-        val match = DOTTED_DIGIT_PATTERN.find(deflavoured)
-        return match?.value ?: deflavoured
+        val keepWhole =
+            parseSemanticVersion(deflavoured) != null ||
+                isMarkerWithOpaqueSuffix(deflavoured) ||
+                hasHexTailAfterNumericPrefix(deflavoured)
+        return if (keepWhole) deflavoured else DOTTED_DIGIT_PATTERN.find(deflavoured)?.value ?: deflavoured
     }
 
     private fun stripFullPrefix(version: String): String {
@@ -36,11 +32,8 @@ object VersionMath {
 
     private fun normalizeCalverHyphen(s: String): String {
         val m = CALVER_HYPHEN_PATTERN.matchEntire(s) ?: return s
-        val year = m.groupValues[1]
-        val month = m.groupValues[2].padStart(2, '0')
-        val day = m.groupValues[3].padStart(2, '0')
-        val tail = m.groupValues.getOrNull(4).orEmpty()
-        val core = "$year.$month.$day"
+        val (year, rawMonth, rawDay, tail) = m.destructured
+        val core = "$year.${rawMonth.padStart(2, '0')}.${rawDay.padStart(2, '0')}"
         return if (tail.isNotEmpty()) "$core-$tail" else core
     }
 
@@ -57,11 +50,9 @@ object VersionMath {
         if (preRelease.contains('.') || preRelease.contains('-')) return false
         val token = preRelease.lowercase()
 
-        if (KNOWN_PRE_RELEASE_PREFIXES.any { token.startsWith(it) }) {
-            return false
-        }
-        if (M_DIGIT_TAIL_PATTERN.containsMatchIn(token)) return false
-        return BUILD_VARIANT_LITERALS.contains(token)
+        return KNOWN_PRE_RELEASE_PREFIXES.none { token.startsWith(it) } &&
+            !M_DIGIT_TAIL_PATTERN.containsMatchIn(token) &&
+            BUILD_VARIANT_LITERALS.contains(token)
     }
 
     private val BUILD_VARIANT_LITERALS =
@@ -99,7 +90,7 @@ object VersionMath {
             "ios",
         )
 
-    private fun insertHyphenBeforeKnownMarker(s: String): String {
+    internal fun insertHyphenBeforeKnownMarker(s: String): String {
         val match = ADJACENT_ALPHA_PATTERN.find(s) ?: return s
         val letterStart = match.range.first + 1
         val tail = s.substring(letterStart).lowercase()
@@ -117,16 +108,13 @@ object VersionMath {
     ): Boolean {
         val normCandidate = normalizeVersion(candidate)
         val normCurrent = normalizeVersion(current)
-        if (normCandidate.isEmpty() || normCurrent.isEmpty()) return false
-        if (normCandidate == normCurrent) return false
-        return compareNormalized(normCandidate, normCurrent) > 0
+        return normCandidate.isNotEmpty() &&
+            normCurrent.isNotEmpty() &&
+            normCandidate != normCurrent &&
+            compareNormalized(normCandidate, normCurrent) > 0
     }
 
-    // Whether two versions can be compared meaningfully by number. False when one is
-    // unparseable, or when exactly one carries a commit-hash-style suffix (e.g. tag
-    // "2.0.9.1" vs APK versionName "2.0.9-1c19925b5") — the hash normalizes to a
-    // pre-release and makes the real build look older. Callers should then track by
-    // release tag instead of nagging on a bogus numeric diff (GH#729).
+    // False when one side is unparseable or only one carries a commit-hash suffix (2.0.9.1 vs 2.0.9-1c19925b5, GH#729).
     fun versionsReconcilable(
         installed: String?,
         latest: String?,
@@ -138,24 +126,19 @@ object VersionMath {
         ) {
             return false
         }
-        val a = parseSemanticVersion(normalizedInstalled) ?: return false
-        val b = parseSemanticVersion(normalizedLatest) ?: return false
-        val aHash = a.preRelease?.let { isCommitHashPreRelease(it) } == true
-        val bHash = b.preRelease?.let { isCommitHashPreRelease(it) } == true
-        return aHash == bHash
+        val a = parseSemanticVersion(normalizedInstalled)
+        val b = parseSemanticVersion(normalizedLatest)
+        return a != null && b != null && isCommitHashPreRelease(a.preRelease) == isCommitHashPreRelease(b.preRelease)
     }
 
-    private fun isCommitHashPreRelease(preRelease: String): Boolean = COMMIT_HASH_PATTERN.matches(preRelease)
+    private fun isCommitHashPreRelease(preRelease: String?): Boolean = preRelease != null && COMMIT_HASH_PATTERN.matches(preRelease)
 
     private fun isMarkerWithOpaqueSuffix(version: String): Boolean {
         val lower = version.lowercase()
         val marker = KNOWN_PRE_RELEASE_PREFIXES.firstOrNull { lower.startsWith(it) } ?: return false
         val rest = lower.substring(marker.length)
-        if (rest.isEmpty()) return true
-        if (rest.first() != '-' && rest.first() != '.') return false
-        val suffix = rest.substring(1)
-        if (suffix.all { it.isDigit() || it == '.' }) return false
-        return suffix.isNotEmpty() && !suffix.all { it.isDigit() }
+        val separated = rest.firstOrNull() == '-' || rest.firstOrNull() == '.'
+        return rest.isEmpty() || (separated && !rest.drop(1).all { it.isDigit() || it == '.' })
     }
 
     fun isOpaqueMarker(version: String?): Boolean = isMarkerWithOpaqueSuffix(normalizeVersion(version))
@@ -164,120 +147,6 @@ object VersionMath {
         if (version.isNullOrBlank()) return false
         if (isOpaqueMarker(version)) return true
         return hasHexTailAfterNumericPrefix(normalizeVersion(version))
-    }
-
-    internal fun parsePublishedAtToInstant(raw: String?): Instant? {
-        val trimmed = raw?.trim().orEmpty()
-        if (trimmed.isEmpty()) return null
-        return runCatching { Instant.parse(trimmed) }.getOrNull()
-    }
-
-    // Public comparison for callers outside this module (the update check needs it).
-    fun publishedAtAfter(
-        candidate: String?,
-        baseline: String?,
-    ): Boolean = isPublishedAtAfter(candidate, baseline)
-
-    // A stored release timestamp only counts while it parses; a corrupt value must not win
-    // over the freshly fetched window.
-    fun publishedAtOrNull(raw: String?): String? {
-        val trimmed = raw?.trim().orEmpty()
-        return trimmed.takeIf { it.isNotEmpty() && parsePublishedAtToInstant(it) != null }
-    }
-
-    internal fun isPublishedAtAfter(
-        candidate: String?,
-        baseline: String?,
-    ): Boolean {
-        val candidateInstant = parsePublishedAtToInstant(candidate) ?: return false
-        val baselineInstant = parsePublishedAtToInstant(baseline) ?: return false
-        return candidateInstant > baselineInstant
-    }
-
-    fun assetBuildChanged(
-        matchedReleaseId: Long?,
-        matchedAssetId: Long?,
-        matchedDigest: String?,
-        matchedSize: Long?,
-        storedReleaseId: Long?,
-        storedAssetId: Long?,
-        storedDigest: String?,
-        storedSize: Long?,
-    ): Boolean {
-        if (matchedDigest != null && storedDigest != null) return matchedDigest != storedDigest
-        return releaseObjectChanged(
-            matchedReleaseId = matchedReleaseId,
-            matchedAssetId = matchedAssetId,
-            storedReleaseId = storedReleaseId,
-            storedAssetId = storedAssetId,
-        ) ||
-            assetIdentityChanged(
-                matchedDigest = matchedDigest,
-                matchedSize = matchedSize,
-                storedDigest = storedDigest,
-                storedSize = storedSize,
-            )
-    }
-
-    fun releaseObjectChanged(
-        matchedReleaseId: Long?,
-        matchedAssetId: Long?,
-        storedReleaseId: Long?,
-        storedAssetId: Long?,
-    ): Boolean {
-        if (matchedReleaseId != null && storedReleaseId != null && matchedReleaseId != storedReleaseId) {
-            return true
-        }
-        if (matchedAssetId != null && storedAssetId != null && matchedAssetId != storedAssetId) {
-            return true
-        }
-        return false
-    }
-
-    fun assetIdentityChanged(
-        matchedDigest: String?,
-        matchedSize: Long?,
-        storedDigest: String?,
-        storedSize: Long?,
-    ): Boolean {
-        if (matchedDigest != null && storedDigest != null) return matchedDigest != storedDigest
-        if (matchedSize != null && storedSize != null) return matchedSize != storedSize
-        return false
-    }
-
-    fun shouldReportTimestampUpdate(
-        matchedTag: String?,
-        matchedPublishedAt: String?,
-        previousLatestPublishedAt: String?,
-        previousWasUpdateAvailable: Boolean,
-        previousLatestTag: String?,
-        matchedAssetDigest: String? = null,
-        matchedAssetSize: Long? = null,
-        previousAssetDigest: String? = null,
-        previousAssetSize: Long? = null,
-        matchedReleaseId: Long? = null,
-        matchedAssetId: Long? = null,
-        previousReleaseId: Long? = null,
-        previousAssetId: Long? = null,
-        installedTag: String? = null,
-    ): Boolean {
-        if (previousLatestPublishedAt.isNullOrBlank() && matchedPublishedAt != null) {
-            return !isExactSameVersion(matchedTag, installedTag)
-        }
-        val newerByTimestamp = isPublishedAtAfter(matchedPublishedAt, previousLatestPublishedAt)
-        val newerByBuild =
-            assetBuildChanged(
-                matchedReleaseId = matchedReleaseId,
-                matchedAssetId = matchedAssetId,
-                matchedDigest = matchedAssetDigest,
-                matchedSize = matchedAssetSize,
-                storedReleaseId = previousReleaseId,
-                storedAssetId = previousAssetId,
-                storedDigest = previousAssetDigest,
-                storedSize = previousAssetSize,
-            )
-        return newerByTimestamp || newerByBuild ||
-            (previousWasUpdateAvailable && isExactSameVersion(matchedTag, previousLatestTag))
     }
 
     fun compareVersions(
@@ -435,64 +304,22 @@ object VersionMath {
             "pre",
         )
 
-    fun isPreReleaseTag(tag: String?): Boolean {
-        if (tag.isNullOrBlank()) return false
-
-        val separated = insertHyphenBeforeKnownMarker(tag)
-        return PRE_RELEASE_MARKER_PATTERN.containsMatchIn(separated)
-    }
-
-    fun preReleaseMarkerLabel(tag: String?): String? {
-        if (tag.isNullOrBlank()) return null
-        val separated = insertHyphenBeforeKnownMarker(tag)
-        val match = PRE_RELEASE_MARKER_PATTERN.find(separated) ?: return null
-        val raw =
-            match.groupValues
-                .getOrNull(1)
-                ?.lowercase()
-                .orEmpty()
-        return when {
-            raw.startsWith("alpha") -> "Alpha"
-            raw.startsWith("beta") -> "Beta"
-            raw.startsWith("rc") -> "RC"
-            raw == "preview" -> "Preview"
-            raw == "prerelease" -> "Pre-release"
-            raw == "snapshot" -> "Snapshot"
-            raw == "canary" -> "Canary"
-            raw == "nightly" -> "Nightly"
-            raw == "rolling" -> "Rolling"
-            raw == "milestone" || raw.startsWith("m") -> "Milestone"
-            raw == "ea" -> "Early Access"
-            raw == "dev" -> "Dev"
-            raw == "pre" -> "Pre"
-            else -> null
-        }
-    }
-
-    private val PRE_RELEASE_MARKER_PATTERN =
-
-        Regex(
-            "\\b(alpha|beta|rc|preview|prerelease|snapshot|canary|nightly|rolling|milestone|ea|dev|pre|m\\d+)\\d*\\b",
-            RegexOption.IGNORE_CASE,
-        )
-
     fun detectScheme(version: String?): Scheme {
         if (version.isNullOrBlank()) return Scheme.Unknown
         val cleaned = stripFullPrefix(version).substringBefore('+')
-        if (cleaned.isEmpty()) return Scheme.Unknown
-
-        if (CALVER_HYPHEN_PATTERN.matchEntire(cleaned) != null) return Scheme.CalVer
-
-        DATE_INTEGER_PATTERN.matchEntire(cleaned)?.let { return Scheme.CalVer }
-
-        DOTTED_CALVER_PATTERN.matchEntire(cleaned)?.let { return Scheme.CalVer }
-
-        val separated = insertHyphenBeforeKnownMarker(cleaned)
-        if (parseSemanticVersion(separated) != null) return Scheme.SemVer
-
-        if (COMMIT_HASH_PATTERN.matchEntire(cleaned) != null) return Scheme.CommitHash
-        return Scheme.Unknown
+        return when {
+            cleaned.isEmpty() -> Scheme.Unknown
+            isCalVer(cleaned) -> Scheme.CalVer
+            parseSemanticVersion(insertHyphenBeforeKnownMarker(cleaned)) != null -> Scheme.SemVer
+            COMMIT_HASH_PATTERN.matches(cleaned) -> Scheme.CommitHash
+            else -> Scheme.Unknown
+        }
     }
+
+    private fun isCalVer(cleaned: String): Boolean =
+        CALVER_HYPHEN_PATTERN.matches(cleaned) ||
+            DATE_INTEGER_PATTERN.matches(cleaned) ||
+            DOTTED_CALVER_PATTERN.matches(cleaned)
 
     enum class Scheme {
         SemVer,

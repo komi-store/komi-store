@@ -1,5 +1,6 @@
 package zed.rainxch.core.data.services
 
+import zed.rainxch.core.domain.model.installation.DownloadProgress
 import zed.rainxch.core.domain.system.DownloadProgressNotifier
 
 class DesktopDownloadProgressNotifier : DownloadProgressNotifier {
@@ -7,9 +8,7 @@ class DesktopDownloadProgressNotifier : DownloadProgressNotifier {
         packageName: String,
         appName: String,
         versionTag: String,
-        percent: Int?,
-        bytesDownloaded: Long,
-        totalBytes: Long?,
+        progress: DownloadProgress,
         paused: Boolean,
     ) = Unit
 

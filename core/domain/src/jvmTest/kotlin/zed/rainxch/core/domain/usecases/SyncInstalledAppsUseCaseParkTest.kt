@@ -12,6 +12,7 @@ import kotlinx.coroutines.runBlocking
 import zed.rainxch.core.domain.logging.KomiStoreLogger
 import zed.rainxch.core.domain.model.installation.DeviceApp
 import zed.rainxch.core.domain.model.installation.InstalledApp
+import zed.rainxch.core.domain.model.installation.InstalledBuild
 import zed.rainxch.core.domain.model.installation.ParkedInstallDisposal
 import zed.rainxch.core.domain.model.installation.SystemPackageInfo
 import zed.rainxch.core.domain.model.installation.testInstalledApp
@@ -440,16 +441,7 @@ class SyncInstalledAppsUseCaseParkTest {
 
         override suspend fun updateAppVersion(
             packageName: String,
-            newTag: String,
-            newReleaseId: Long?,
-            newAssetId: Long?,
-            newAssetDigest: String?,
-            newReleasePublishedAt: String?,
-            newAssetName: String?,
-            newAssetUrl: String?,
-            newVersionName: String,
-            newVersionCode: Long,
-            signingFingerprint: String?,
+            build: InstalledBuild,
             isPendingInstall: Boolean,
         ) = Unit
 

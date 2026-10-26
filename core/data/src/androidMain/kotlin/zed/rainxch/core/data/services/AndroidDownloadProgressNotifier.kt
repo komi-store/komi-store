@@ -12,6 +12,7 @@ import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
+import zed.rainxch.core.domain.model.installation.DownloadProgress
 import zed.rainxch.core.domain.system.DownloadProgressNotifier
 
 class AndroidDownloadProgressNotifier(
@@ -25,12 +26,11 @@ class AndroidDownloadProgressNotifier(
         packageName: String,
         appName: String,
         versionTag: String,
-        percent: Int?,
-        bytesDownloaded: Long,
-        totalBytes: Long?,
+        progress: DownloadProgress,
         paused: Boolean,
     ) {
         if (!hasNotificationPermission()) return
+        val (bytesDownloaded, totalBytes, percent) = progress
 
         val primaryPendingIntent =
             if (paused) {

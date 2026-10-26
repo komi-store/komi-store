@@ -106,12 +106,12 @@ class AssetOwnershipTest {
 
     @Test
     fun versionMajorReadsTheFirstDottedVersion() {
-        assertEquals(4, AssetVariant.versionMajor("Godot_v4.7.2-stable_android_editor.apk"))
-        assertEquals(3, AssetVariant.versionMajor("3.6.3-stable"))
-        assertEquals(1, AssetVariant.versionMajor("MyApp_v1.2.apk"))
-        assertEquals(439, AssetVariant.versionMajor("instagram-arm64-v8a-piko-patches-v439.0.0.37.89.apk"))
-        assertNull(AssetVariant.versionMajor("app-arm64-v8a.apk"))
-        assertNull(AssetVariant.versionMajor("app-x86_64-release.apk"))
+        assertEquals(4, AssetGlob.versionMajor("Godot_v4.7.2-stable_android_editor.apk"))
+        assertEquals(3, AssetGlob.versionMajor("3.6.3-stable"))
+        assertEquals(1, AssetGlob.versionMajor("MyApp_v1.2.apk"))
+        assertEquals(439, AssetGlob.versionMajor("instagram-arm64-v8a-piko-patches-v439.0.0.37.89.apk"))
+        assertNull(AssetGlob.versionMajor("app-arm64-v8a.apk"))
+        assertNull(AssetGlob.versionMajor("app-x86_64-release.apk"))
     }
 
     @Test
@@ -297,13 +297,12 @@ class AssetOwnershipTest {
         )
     }
 
-    // wxxsfxyzm/InstallerX-Revived tags automatic builds with a commit hash after the version
-    // (26.09.8ede272) and names the APK the same way, next to a released 26.09.
+    // wxxsfxyzm/InstallerX-Revived tags automatic builds 26.09.8ede272, names the APK alike, and ships a released 26.09.
     @Test
     fun aBuildIdInTheReleaseVersionIsTheSameApp() {
         val released = "InstallerX-Revived-online-26.09.apk"
         val autoBuild = "InstallerX-Revived-online-26.09.8ede272.apk"
-        assertEquals(AssetVariant.tagGlob(released, "26.09"), AssetVariant.tagGlob(autoBuild, "26.09.8ede272"))
+        assertEquals(AssetGlob.tagGlob(released, "26.09"), AssetGlob.tagGlob(autoBuild, "26.09.8ede272"))
         assertTrue(AssetOwnership.isSameApp(released, autoBuild, "26.09", "26.09.8ede272"))
     }
 
@@ -313,12 +312,19 @@ class AssetOwnershipTest {
         val autoBuild = "InstallerX-Revived-online-26.09.8ede272.apk"
         val installed = app("com.rosan.installer.x.revived", autoBuild, installedVersion = "26.09.8ede272")
         val newest = listOf(asset(released))
-        val history = listOf(
-            release("26.09", newest),
-            release("26.09.8ede272", listOf(asset(autoBuild))),
-            release("26.05.01", listOf(asset("InstallerX-Revived-offline-26.05.01.apk"), asset("InstallerX-Revived-online-26.05.01.apk"))),
-            release("26.05", listOf(asset("InstallerX-Revived-offline-26.05.apk"), asset("InstallerX-Revived-online-26.05.apk"))),
-        )
+        val history =
+            listOf(
+                release("26.09", newest),
+                release("26.09.8ede272", listOf(asset(autoBuild))),
+                release(
+                    "26.05.01",
+                    listOf(asset("InstallerX-Revived-offline-26.05.01.apk"), asset("InstallerX-Revived-online-26.05.01.apk")),
+                ),
+                release(
+                    "26.05",
+                    listOf(asset("InstallerX-Revived-offline-26.05.apk"), asset("InstallerX-Revived-online-26.05.apk")),
+                ),
+            )
         assertEquals(installed, AssetOwnership.ownerOf(released, listOf(installed), newest, history, "26.09"))
     }
 

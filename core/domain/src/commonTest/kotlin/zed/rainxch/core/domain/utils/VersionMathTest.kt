@@ -8,10 +8,10 @@ import kotlin.test.assertTrue
 class VersionMathTest {
     @Test
     fun a_stored_timestamp_only_counts_while_it_parses() {
-        assertEquals("2026-10-01T00:00:00Z", VersionMath.publishedAtOrNull("2026-10-01T00:00:00Z"))
-        assertEquals(null, VersionMath.publishedAtOrNull("not-a-date"))
-        assertEquals(null, VersionMath.publishedAtOrNull("   "))
-        assertEquals(null, VersionMath.publishedAtOrNull(null))
+        assertEquals("2026-10-01T00:00:00Z", ReleaseChange.publishedAtOrNull("2026-10-01T00:00:00Z"))
+        assertEquals(null, ReleaseChange.publishedAtOrNull("not-a-date"))
+        assertEquals(null, ReleaseChange.publishedAtOrNull("   "))
+        assertEquals(null, ReleaseChange.publishedAtOrNull(null))
     }
 
     @Test
@@ -128,22 +128,22 @@ class VersionMathTest {
 
     @Test
     fun nightly_is_prerelease_tag() {
-        assertTrue(VersionMath.isPreReleaseTag("nightly"))
-        assertTrue(VersionMath.isPreReleaseTag("nightly-abc"))
-        assertTrue(VersionMath.isPreReleaseTag("nightly-20260731"))
-        assertTrue(VersionMath.isPreReleaseTag("rolling"))
-        assertTrue(VersionMath.isPreReleaseTag("rolling-abc"))
-        assertFalse(VersionMath.isPreReleaseTag("v1.2.3"))
-        assertFalse(VersionMath.isPreReleaseTag("1.2.3"))
+        assertTrue(PreReleaseTags.isPreReleaseTag("nightly"))
+        assertTrue(PreReleaseTags.isPreReleaseTag("nightly-abc"))
+        assertTrue(PreReleaseTags.isPreReleaseTag("nightly-20260731"))
+        assertTrue(PreReleaseTags.isPreReleaseTag("rolling"))
+        assertTrue(PreReleaseTags.isPreReleaseTag("rolling-abc"))
+        assertFalse(PreReleaseTags.isPreReleaseTag("v1.2.3"))
+        assertFalse(PreReleaseTags.isPreReleaseTag("1.2.3"))
     }
 
     @Test
     fun nightly_marker_label() {
-        assertEquals("Nightly", VersionMath.preReleaseMarkerLabel("nightly"))
-        assertEquals("Nightly", VersionMath.preReleaseMarkerLabel("nightly-abc"))
-        assertEquals("Nightly", VersionMath.preReleaseMarkerLabel("v1.2.3-nightly"))
-        assertEquals("Rolling", VersionMath.preReleaseMarkerLabel("rolling"))
-        assertEquals("Rolling", VersionMath.preReleaseMarkerLabel("rolling-abc"))
+        assertEquals("Nightly", PreReleaseTags.preReleaseMarkerLabel("nightly"))
+        assertEquals("Nightly", PreReleaseTags.preReleaseMarkerLabel("nightly-abc"))
+        assertEquals("Nightly", PreReleaseTags.preReleaseMarkerLabel("v1.2.3-nightly"))
+        assertEquals("Rolling", PreReleaseTags.preReleaseMarkerLabel("rolling"))
+        assertEquals("Rolling", PreReleaseTags.preReleaseMarkerLabel("rolling-abc"))
     }
 
     @Test
@@ -157,7 +157,7 @@ class VersionMathTest {
     @Test
     fun timestamp_update_retained_across_scans_without_install() {
         val stillAvailable =
-            VersionMath.shouldReportTimestampUpdate(
+            ReleaseChange.shouldReportTimestampUpdate(
                 matchedTag = "nightly-def",
                 matchedPublishedAt = "2026-08-01T00:00:00Z",
                 previousLatestPublishedAt = "2026-08-01T00:00:00Z",
@@ -170,7 +170,7 @@ class VersionMathTest {
     @Test
     fun timestamp_update_reports_newer_release() {
         assertTrue(
-            VersionMath.shouldReportTimestampUpdate(
+            ReleaseChange.shouldReportTimestampUpdate(
                 matchedTag = "nightly-def",
                 matchedPublishedAt = "2026-08-02T00:00:00Z",
                 previousLatestPublishedAt = "2026-08-01T00:00:00Z",
@@ -183,7 +183,7 @@ class VersionMathTest {
     @Test
     fun timestamp_update_not_reported_after_install() {
         assertFalse(
-            VersionMath.shouldReportTimestampUpdate(
+            ReleaseChange.shouldReportTimestampUpdate(
                 matchedTag = "nightly-def",
                 matchedPublishedAt = "2026-08-01T00:00:00Z",
                 previousLatestPublishedAt = "2026-08-01T00:00:00Z",
@@ -196,7 +196,7 @@ class VersionMathTest {
     @Test
     fun timestamp_update_first_scan_with_no_baseline() {
         assertTrue(
-            VersionMath.shouldReportTimestampUpdate(
+            ReleaseChange.shouldReportTimestampUpdate(
                 matchedTag = "nightly",
                 matchedPublishedAt = "2026-08-02T00:00:00Z",
                 previousLatestPublishedAt = null,
@@ -208,9 +208,9 @@ class VersionMathTest {
 
     @Test
     fun published_at_parses_z_and_numeric_offsets_to_the_same_instant() {
-        val utc = VersionMath.parsePublishedAtToInstant("2026-09-17T15:27:32Z")
-        val plusTwo = VersionMath.parsePublishedAtToInstant("2026-09-17T17:27:32+02:00")
-        val minusSeven = VersionMath.parsePublishedAtToInstant("2026-09-17T08:27:32-07:00")
+        val utc = ReleaseChange.parsePublishedAtToInstant("2026-09-17T15:27:32Z")
+        val plusTwo = ReleaseChange.parsePublishedAtToInstant("2026-09-17T17:27:32+02:00")
+        val minusSeven = ReleaseChange.parsePublishedAtToInstant("2026-09-17T08:27:32-07:00")
 
         assertEquals(1789658852000L, utc?.toEpochMilliseconds())
         assertEquals(utc, plusTwo)
@@ -219,42 +219,42 @@ class VersionMathTest {
 
     @Test
     fun published_at_parse_failure_degrades_to_null() {
-        assertEquals(null, VersionMath.parsePublishedAtToInstant(null))
-        assertEquals(null, VersionMath.parsePublishedAtToInstant(""))
-        assertEquals(null, VersionMath.parsePublishedAtToInstant("   "))
-        assertEquals(null, VersionMath.parsePublishedAtToInstant("2026-09-17T15:27:32"))
-        assertEquals(null, VersionMath.parsePublishedAtToInstant("refs/tags/nightly"))
-        assertEquals(null, VersionMath.parsePublishedAtToInstant("not-a-time"))
+        assertEquals(null, ReleaseChange.parsePublishedAtToInstant(null))
+        assertEquals(null, ReleaseChange.parsePublishedAtToInstant(""))
+        assertEquals(null, ReleaseChange.parsePublishedAtToInstant("   "))
+        assertEquals(null, ReleaseChange.parsePublishedAtToInstant("2026-09-17T15:27:32"))
+        assertEquals(null, ReleaseChange.parsePublishedAtToInstant("refs/tags/nightly"))
+        assertEquals(null, ReleaseChange.parsePublishedAtToInstant("not-a-time"))
     }
 
     @Test
     fun is_published_at_after_orders_absolute_time_not_lexicographic() {
         assertFalse(
-            VersionMath.isPublishedAtAfter(
+            ReleaseChange.isPublishedAtAfter(
                 "2026-09-17T17:27:32+02:00",
                 "2026-09-17T15:27:32Z",
             ),
         )
         assertFalse(
-            VersionMath.isPublishedAtAfter(
+            ReleaseChange.isPublishedAtAfter(
                 "2026-09-17T17:27:32+02:00",
                 "2026-09-17T16:00:00Z",
             ),
         )
         assertTrue(
-            VersionMath.isPublishedAtAfter(
+            ReleaseChange.isPublishedAtAfter(
                 "2026-09-17T18:27:32+02:00",
                 "2026-09-17T15:27:32Z",
             ),
         )
-        assertFalse(VersionMath.isPublishedAtAfter("not-a-time", "2026-09-17T15:27:32Z"))
-        assertFalse(VersionMath.isPublishedAtAfter("2026-09-17T15:27:32Z", "not-a-time"))
+        assertFalse(ReleaseChange.isPublishedAtAfter("not-a-time", "2026-09-17T15:27:32Z"))
+        assertFalse(ReleaseChange.isPublishedAtAfter("2026-09-17T15:27:32Z", "not-a-time"))
     }
 
     @Test
     fun timestamp_update_treats_equal_instants_across_offset_forms_as_not_newer() {
         assertFalse(
-            VersionMath.shouldReportTimestampUpdate(
+            ReleaseChange.shouldReportTimestampUpdate(
                 matchedTag = "nightly",
                 matchedPublishedAt = "2026-09-17T17:27:32+02:00",
                 previousLatestPublishedAt = "2026-09-17T15:27:32Z",
@@ -267,7 +267,7 @@ class VersionMathTest {
     @Test
     fun timestamp_update_reports_offset_form_that_is_truly_newer() {
         assertTrue(
-            VersionMath.shouldReportTimestampUpdate(
+            ReleaseChange.shouldReportTimestampUpdate(
                 matchedTag = "nightly",
                 matchedPublishedAt = "2026-09-17T18:27:32+02:00",
                 previousLatestPublishedAt = "2026-09-17T15:27:32Z",
@@ -280,7 +280,7 @@ class VersionMathTest {
     @Test
     fun timestamp_update_degrades_to_silent_when_either_side_is_unparseable() {
         assertFalse(
-            VersionMath.shouldReportTimestampUpdate(
+            ReleaseChange.shouldReportTimestampUpdate(
                 matchedTag = "nightly",
                 matchedPublishedAt = "not-a-time",
                 previousLatestPublishedAt = "2026-08-01T00:00:00Z",
@@ -289,7 +289,7 @@ class VersionMathTest {
             ),
         )
         assertFalse(
-            VersionMath.shouldReportTimestampUpdate(
+            ReleaseChange.shouldReportTimestampUpdate(
                 matchedTag = "nightly",
                 matchedPublishedAt = "2026-08-02T00:00:00Z",
                 previousLatestPublishedAt = "not-a-time",
@@ -302,7 +302,7 @@ class VersionMathTest {
     @Test
     fun release_identity_sees_a_rebuild_that_the_timestamp_cannot() {
         assertTrue(
-            VersionMath.shouldReportTimestampUpdate(
+            ReleaseChange.shouldReportTimestampUpdate(
                 matchedTag = "nightly",
                 matchedPublishedAt = "2026-09-24T11:46:11Z",
                 previousLatestPublishedAt = "2026-09-24T11:46:11Z",
@@ -319,7 +319,7 @@ class VersionMathTest {
     @Test
     fun release_identity_catches_an_asset_replaced_without_any_digest() {
         assertTrue(
-            VersionMath.shouldReportTimestampUpdate(
+            ReleaseChange.shouldReportTimestampUpdate(
                 matchedTag = "nightly",
                 matchedPublishedAt = null,
                 previousLatestPublishedAt = null,
@@ -336,7 +336,7 @@ class VersionMathTest {
     @Test
     fun release_identity_stays_quiet_when_nothing_was_replaced() {
         assertFalse(
-            VersionMath.shouldReportTimestampUpdate(
+            ReleaseChange.shouldReportTimestampUpdate(
                 matchedTag = "nightly",
                 matchedPublishedAt = "2026-09-24T11:46:11Z",
                 previousLatestPublishedAt = "2026-09-24T11:46:11Z",
@@ -357,7 +357,7 @@ class VersionMathTest {
     @Test
     fun release_identity_says_nothing_without_both_sides() {
         assertTrue(
-            VersionMath.releaseObjectChanged(
+            ReleaseChange.releaseObjectChanged(
                 matchedReleaseId = 900L,
                 matchedAssetId = null,
                 storedReleaseId = 800L,
@@ -365,7 +365,7 @@ class VersionMathTest {
             ),
         )
         assertTrue(
-            VersionMath.releaseObjectChanged(
+            ReleaseChange.releaseObjectChanged(
                 matchedReleaseId = null,
                 matchedAssetId = 999L,
                 storedReleaseId = null,
@@ -373,7 +373,7 @@ class VersionMathTest {
             ),
         )
         assertFalse(
-            VersionMath.releaseObjectChanged(
+            ReleaseChange.releaseObjectChanged(
                 matchedReleaseId = 900L,
                 matchedAssetId = 901L,
                 storedReleaseId = null,
@@ -381,7 +381,7 @@ class VersionMathTest {
             ),
         )
         assertFalse(
-            VersionMath.releaseObjectChanged(
+            ReleaseChange.releaseObjectChanged(
                 matchedReleaseId = null,
                 matchedAssetId = null,
                 storedReleaseId = 800L,
@@ -393,7 +393,7 @@ class VersionMathTest {
     @Test
     fun asset_identity_reports_a_swapped_asset_at_the_same_publish_time() {
         assertTrue(
-            VersionMath.shouldReportTimestampUpdate(
+            ReleaseChange.shouldReportTimestampUpdate(
                 matchedTag = "nightly",
                 matchedPublishedAt = "2026-09-24T11:46:11Z",
                 previousLatestPublishedAt = "2026-09-24T11:46:11Z",
@@ -410,7 +410,7 @@ class VersionMathTest {
     @Test
     fun asset_identity_stays_quiet_when_the_asset_is_the_same_one() {
         assertFalse(
-            VersionMath.shouldReportTimestampUpdate(
+            ReleaseChange.shouldReportTimestampUpdate(
                 matchedTag = "nightly",
                 matchedPublishedAt = "2026-09-24T11:46:11Z",
                 previousLatestPublishedAt = "2026-09-24T11:46:11Z",
@@ -427,7 +427,7 @@ class VersionMathTest {
     @Test
     fun asset_identity_falls_back_to_size_and_says_nothing_without_evidence() {
         assertTrue(
-            VersionMath.assetIdentityChanged(
+            ReleaseChange.assetIdentityChanged(
                 matchedDigest = null,
                 matchedSize = 2_000L,
                 storedDigest = null,
@@ -435,7 +435,7 @@ class VersionMathTest {
             ),
         )
         assertTrue(
-            VersionMath.assetIdentityChanged(
+            ReleaseChange.assetIdentityChanged(
                 matchedDigest = "sha256:bbbb",
                 matchedSize = 1_000L,
                 storedDigest = "sha256:aaaa",
@@ -443,7 +443,7 @@ class VersionMathTest {
             ),
         )
         assertFalse(
-            VersionMath.assetIdentityChanged(
+            ReleaseChange.assetIdentityChanged(
                 matchedDigest = null,
                 matchedSize = null,
                 storedDigest = null,
@@ -451,7 +451,7 @@ class VersionMathTest {
             ),
         )
         assertFalse(
-            VersionMath.assetIdentityChanged(
+            ReleaseChange.assetIdentityChanged(
                 matchedDigest = "sha256:aaaa",
                 matchedSize = null,
                 storedDigest = null,
@@ -463,7 +463,7 @@ class VersionMathTest {
     @Test
     fun a_blank_stored_baseline_reads_as_no_baseline() {
         assertTrue(
-            VersionMath.shouldReportTimestampUpdate(
+            ReleaseChange.shouldReportTimestampUpdate(
                 matchedTag = "nightly",
                 matchedPublishedAt = "2026-09-20T00:00:00Z",
                 previousLatestPublishedAt = "",
@@ -472,7 +472,7 @@ class VersionMathTest {
             ),
         )
         assertTrue(
-            VersionMath.shouldReportTimestampUpdate(
+            ReleaseChange.shouldReportTimestampUpdate(
                 matchedTag = "nightly",
                 matchedPublishedAt = "",
                 previousLatestPublishedAt = null,

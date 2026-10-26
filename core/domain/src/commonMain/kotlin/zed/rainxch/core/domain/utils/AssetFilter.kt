@@ -21,9 +21,10 @@ class AssetFilter private constructor(
             }
         }
 
+        private val VERSION_ANCHOR = Regex("[-_ .]\\d")
+
         fun suggestFromAssetName(assetName: String): String? {
-            val versionAnchor = Regex("[-_ .]\\d")
-            val match = versionAnchor.find(assetName) ?: return null
+            val match = VERSION_ANCHOR.find(assetName) ?: return null
             val prefix = assetName.substring(0, match.range.first + 1)
 
             if (prefix.length < 2) return null

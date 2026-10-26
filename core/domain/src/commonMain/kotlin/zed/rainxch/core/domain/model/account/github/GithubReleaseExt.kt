@@ -1,16 +1,12 @@
 package zed.rainxch.core.domain.model.account.github
 
-import zed.rainxch.core.domain.utils.VersionMath
+import zed.rainxch.core.domain.utils.PreReleaseTags
 
-// Only the API flag and the version TAG decide pre-release status. The release `name` is free
-// prose ("Stability and beta fixes") and was producing false positives that filtered legitimate
-// stable releases out of the update window — i.e. real updates silently never appeared. The tag
-// is the canonical version identifier, so it is the reliable secondary signal when a maintainer
-// forgets to set the pre-release flag.
+// Only the API flag and the tag decide: the release name is free prose ("beta fixes") that hid real stable updates.
 fun GithubRelease.isEffectivelyPreRelease(): Boolean =
     isPrerelease ||
-        VersionMath.isPreReleaseTag(tagName)
+        PreReleaseTags.isPreReleaseTag(tagName)
 
 fun GithubRelease.preReleaseLabel(): String? =
-    VersionMath.preReleaseMarkerLabel(tagName)
-        ?: VersionMath.preReleaseMarkerLabel(name)
+    PreReleaseTags.preReleaseMarkerLabel(tagName)
+        ?: PreReleaseTags.preReleaseMarkerLabel(name)

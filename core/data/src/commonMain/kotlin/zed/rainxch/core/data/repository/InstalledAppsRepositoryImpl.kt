@@ -24,6 +24,7 @@ import zed.rainxch.core.data.network.GitHubClientProvider
 import zed.rainxch.core.domain.model.account.github.GithubRelease
 import zed.rainxch.core.domain.model.installation.InstallSource
 import zed.rainxch.core.domain.model.installation.InstalledApp
+import zed.rainxch.core.domain.model.installation.InstalledBuild
 import zed.rainxch.core.domain.model.installation.ParkedInstallDisposal
 import zed.rainxch.core.domain.model.installation.clearPending
 import zed.rainxch.core.domain.model.installation.confirmInstall
@@ -35,9 +36,11 @@ import zed.rainxch.core.domain.system.Installer
 import zed.rainxch.core.domain.system.PackageMonitor
 import zed.rainxch.core.domain.utils.AssetFilter
 import zed.rainxch.core.domain.utils.AssetVariant
+import zed.rainxch.core.domain.utils.ReleaseTracking
 import zed.rainxch.core.domain.utils.ResolvedRelease
 import zed.rainxch.core.domain.utils.TrackedReleaseResolver
 import zed.rainxch.core.domain.utils.UpdateVerdict
+import zed.rainxch.core.domain.utils.VariantPin
 import zed.rainxch.core.domain.utils.VersionMath
 import kotlin.coroutines.cancellation.CancellationException
 
@@ -157,15 +160,21 @@ class InstalledAppsRepositoryImpl(
 
         return TrackedReleaseResolver.resolve(
             releases = releases,
-            filter = compiledFilter,
-            fallbackToOlderReleases = app.fallbackToOlderReleases,
-            preferredVariant = app.preferredAssetVariant,
-            preferredTokens = AssetVariant.deserializeTokens(app.preferredAssetTokens),
-            preferredGlob = app.assetGlobPattern,
-            pickedIndex = app.pickedAssetIndex,
-            pickedSiblingCount = app.pickedAssetSiblingCount,
-            trackedPackageName = app.packageName,
-            installedAssetName = app.installedAssetName,
+            tracking =
+                ReleaseTracking(
+                    packageName = app.packageName,
+                    installedAssetName = app.installedAssetName,
+                    filter = compiledFilter,
+                    fallbackToOlderReleases = app.fallbackToOlderReleases,
+                    pin =
+                        VariantPin(
+                            variant = app.preferredAssetVariant,
+                            tokens = AssetVariant.deserializeTokens(app.preferredAssetTokens),
+                            glob = app.assetGlobPattern,
+                            pickedIndex = app.pickedAssetIndex,
+                            pickedSiblingCount = app.pickedAssetSiblingCount,
+                        ),
+                ),
             repoApps = installedAppsDao.getAppsByRepoId(app.repoId).map { it.toDomain() },
             installer = installer,
         )
@@ -412,22 +421,13 @@ class InstalledAppsRepositoryImpl(
 
     override suspend fun updateAppVersion(
         packageName: String,
-        newTag: String,
-        newReleaseId: Long?,
-        newAssetId: Long?,
-        newAssetDigest: String?,
-        newReleasePublishedAt: String?,
-        newAssetName: String?,
-        newAssetUrl: String?,
-        newVersionName: String,
-        newVersionCode: Long,
-        signingFingerprint: String?,
+        build: InstalledBuild,
         isPendingInstall: Boolean,
     ) {
         val app = installedAppsDao.getAppByPackage(packageName) ?: return
 
         Logger.d {
-            "Updating app version: $packageName from ${app.installedVersion} to $newTag"
+            "Updating app version: $packageName from ${app.installedVersion} to ${build.tag}"
         }
 
         historyDao.insertHistory(
@@ -437,7 +437,7 @@ class InstalledAppsRepositoryImpl(
                 repoOwner = app.repoOwner,
                 repoName = app.repoName,
                 fromVersion = app.installedVersion,
-                toVersion = newTag,
+                toVersion = build.tag,
                 updatedAt = System.currentTimeMillis(),
                 updateSource = InstallSource.THIS_APP,
                 success = true,
@@ -448,16 +448,7 @@ class InstalledAppsRepositoryImpl(
             app
                 .toDomain()
                 .confirmInstall(
-                    tag = newTag,
-                    releaseId = newReleaseId,
-                    assetId = newAssetId,
-                    assetDigest = newAssetDigest,
-                    releasePublishedAt = newReleasePublishedAt,
-                    assetName = newAssetName,
-                    assetUrl = newAssetUrl,
-                    versionName = newVersionName,
-                    versionCode = newVersionCode,
-                    signingFingerprint = signingFingerprint,
+                    build = build,
                     isPending = isPendingInstall,
                     at = System.currentTimeMillis(),
                 ).toEntity(),

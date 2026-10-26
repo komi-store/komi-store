@@ -1,13 +1,13 @@
 package zed.rainxch.core.domain.system
 
+import zed.rainxch.core.domain.model.installation.DownloadProgress
+
 interface DownloadProgressNotifier {
     fun notifyProgress(
         packageName: String,
         appName: String,
         versionTag: String,
-        percent: Int?,
-        bytesDownloaded: Long,
-        totalBytes: Long?,
+        progress: DownloadProgress,
         paused: Boolean = false,
     )
 

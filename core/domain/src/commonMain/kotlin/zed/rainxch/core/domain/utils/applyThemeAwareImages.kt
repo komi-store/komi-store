@@ -11,13 +11,10 @@ fun applyThemeAwareImages(
         processed.replace(
             Regex("""!\[([^\]]*)\]\(([^)]*?)#gh-(dark|light)-mode-only([^)]*)\)"""),
         ) { match ->
-            val mode = match.groupValues[3]
-            if ((isDark && mode == "light") || (!isDark && mode == "dark")) {
+            val (alt, urlBase, mode, trailing) = match.destructured
+            if (isHiddenInTheme(mode, isDark)) {
                 ""
             } else {
-                val alt = match.groupValues[1]
-                val urlBase = match.groupValues[2]
-                val trailing = match.groupValues[4]
                 "![$alt]($urlBase$trailing)"
             }
         }
@@ -29,18 +26,18 @@ fun applyThemeAwareImages(
                 RegexOption.IGNORE_CASE,
             ),
         ) { match ->
-            val mode = match.groupValues[4]
-            if ((isDark && mode == "light") || (!isDark && mode == "dark")) {
+            val (pre, quote, urlBase, mode, trailing, post) = match.destructured
+            if (isHiddenInTheme(mode, isDark)) {
                 ""
             } else {
-                val pre = match.groupValues[1]
-                val quote = match.groupValues[2]
-                val urlBase = match.groupValues[3]
-                val trailing = match.groupValues[5]
-                val post = match.groupValues[6]
                 "<img${pre}src=$quote$urlBase$trailing$quote$post>"
             }
         }
 
     return processed
 }
+
+private fun isHiddenInTheme(
+    mode: String,
+    isDark: Boolean,
+): Boolean = mode == if (isDark) "light" else "dark"

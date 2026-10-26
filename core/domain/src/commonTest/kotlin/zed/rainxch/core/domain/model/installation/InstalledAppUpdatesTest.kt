@@ -28,16 +28,19 @@ class InstalledAppUpdatesTest {
     fun a_confirmed_install_records_the_release_timestamp() {
         val result =
             app().confirmInstall(
-                tag = "2.0.0",
-                releaseId = 7L,
-                assetId = 8L,
-                assetDigest = "sha256:abc",
-                releasePublishedAt = "2026-10-01T00:00:00Z",
-                assetName = "app-2.0.0.apk",
-                assetUrl = "https://dl/app-2.0.0.apk",
-                versionName = "2.0.0",
-                versionCode = 200L,
-                signingFingerprint = "SHA",
+                build =
+                    InstalledBuild(
+                        tag = "2.0.0",
+                        releaseId = 7L,
+                        assetId = 8L,
+                        assetDigest = "sha256:abc",
+                        releasePublishedAt = "2026-10-01T00:00:00Z",
+                        assetName = "app-2.0.0.apk",
+                        assetUrl = "https://dl/app-2.0.0.apk",
+                        versionName = "2.0.0",
+                        versionCode = 200L,
+                        signingFingerprint = "SHA",
+                    ),
                 at = 3_000L,
             )
 
@@ -90,12 +93,15 @@ class InstalledAppUpdatesTest {
     fun confirmInstallWritesInstallZone() {
         val result =
             app().confirmInstall(
-                tag = "2.0.0",
-                assetName = "app-2.0.0.apk",
-                assetUrl = "https://dl/app-2.0.0.apk",
-                versionName = "2.0.0",
-                versionCode = 200L,
-                signingFingerprint = "SHA-NEW",
+                build =
+                    InstalledBuild(
+                        tag = "2.0.0",
+                        assetName = "app-2.0.0.apk",
+                        assetUrl = "https://dl/app-2.0.0.apk",
+                        versionName = "2.0.0",
+                        versionCode = 200L,
+                        signingFingerprint = "SHA-NEW",
+                    ),
                 at = 9999L,
             )
 
@@ -114,12 +120,15 @@ class InstalledAppUpdatesTest {
     fun confirmInstallKeepsTheStoredSignerWhenNoneIsReported() {
         val result =
             app().confirmInstall(
-                tag = "2.0.0",
-                assetName = "a",
-                assetUrl = "u",
-                versionName = "2.0.0",
-                versionCode = 200L,
-                signingFingerprint = null,
+                build =
+                    InstalledBuild(
+                        tag = "2.0.0",
+                        assetName = "a",
+                        assetUrl = "u",
+                        versionName = "2.0.0",
+                        versionCode = 200L,
+                        signingFingerprint = null,
+                    ),
                 at = 1L,
             )
 
@@ -130,12 +139,15 @@ class InstalledAppUpdatesTest {
     fun confirmInstallClearsUpdateFlagWhenLatestMatchesInstalled() {
         val result =
             app().confirmInstall(
-                tag = "2.0.0",
-                assetName = "a",
-                assetUrl = "u",
-                versionName = "2.0.0",
-                versionCode = 200L,
-                signingFingerprint = null,
+                build =
+                    InstalledBuild(
+                        tag = "2.0.0",
+                        assetName = "a",
+                        assetUrl = "u",
+                        versionName = "2.0.0",
+                        versionCode = 200L,
+                        signingFingerprint = null,
+                    ),
                 at = 1L,
             )
         assertFalse(result.isUpdateAvailable)
@@ -146,12 +158,15 @@ class InstalledAppUpdatesTest {
     fun confirmInstallKeepsUpdateFlagWhenSnapshotStillNewer() {
         val result =
             app(latestVersion = "3.0.0", latestVersionCode = 300L).confirmInstall(
-                tag = "2.0.0",
-                assetName = "a",
-                assetUrl = "u",
-                versionName = "2.0.0",
-                versionCode = 200L,
-                signingFingerprint = null,
+                build =
+                    InstalledBuild(
+                        tag = "2.0.0",
+                        assetName = "a",
+                        assetUrl = "u",
+                        versionName = "2.0.0",
+                        versionCode = 200L,
+                        signingFingerprint = null,
+                    ),
                 at = 1L,
             )
         assertTrue(result.isUpdateAvailable)
@@ -168,12 +183,15 @@ class InstalledAppUpdatesTest {
                 latestVersionCode = 200L,
                 skippedReleaseTag = "2.0.0",
             ).confirmInstall(
-                tag = "1.9.0",
-                assetName = "a",
-                assetUrl = "u",
-                versionName = "1.9.0",
-                versionCode = 190L,
-                signingFingerprint = null,
+                build =
+                    InstalledBuild(
+                        tag = "1.9.0",
+                        assetName = "a",
+                        assetUrl = "u",
+                        versionName = "1.9.0",
+                        versionCode = 190L,
+                        signingFingerprint = null,
+                    ),
                 at = 1L,
             )
         assertFalse(result.isUpdateAvailable)
@@ -185,12 +203,15 @@ class InstalledAppUpdatesTest {
     fun confirmInstallKeepsFlagWhenLandedBuildIsOlderThanTarget() {
         val result =
             app(latestVersion = "2.0.0", latestVersionCode = 200L).confirmInstall(
-                tag = "2.0.0",
-                assetName = "a",
-                assetUrl = "u",
-                versionName = "1.5.0",
-                versionCode = 150L,
-                signingFingerprint = null,
+                build =
+                    InstalledBuild(
+                        tag = "2.0.0",
+                        assetName = "a",
+                        assetUrl = "u",
+                        versionName = "1.5.0",
+                        versionCode = 150L,
+                        signingFingerprint = null,
+                    ),
                 at = 1L,
             )
         assertTrue(result.isUpdateAvailable)
@@ -201,12 +222,15 @@ class InstalledAppUpdatesTest {
     fun confirmInstallKeepsFlagWhenLandedCodeIsBelowTargetCode() {
         val result =
             app(latestVersion = "2.0.0", latestVersionCode = 200L).confirmInstall(
-                tag = "2.0.0",
-                assetName = "a",
-                assetUrl = "u",
-                versionName = "2.0.0",
-                versionCode = 199L,
-                signingFingerprint = null,
+                build =
+                    InstalledBuild(
+                        tag = "2.0.0",
+                        assetName = "a",
+                        assetUrl = "u",
+                        versionName = "2.0.0",
+                        versionCode = 199L,
+                        signingFingerprint = null,
+                    ),
                 at = 1L,
             )
         assertTrue(result.isUpdateAvailable)
@@ -221,12 +245,15 @@ class InstalledAppUpdatesTest {
                 latestVersionCode = 500L,
                 isUpdateAvailable = true,
             ).confirmInstall(
-                tag = "nightly",
-                assetName = "a",
-                assetUrl = "u",
-                versionName = "26.09.01",
-                versionCode = 500L,
-                signingFingerprint = null,
+                build =
+                    InstalledBuild(
+                        tag = "nightly",
+                        assetName = "a",
+                        assetUrl = "u",
+                        versionName = "26.09.01",
+                        versionCode = 500L,
+                        signingFingerprint = null,
+                    ),
                 at = 1L,
             )
         assertFalse(result.isUpdateAvailable)
@@ -242,12 +269,15 @@ class InstalledAppUpdatesTest {
                 latestVersionCode = 500L,
                 isUpdateAvailable = true,
             ).confirmInstall(
-                tag = "nightly",
-                assetName = "a",
-                assetUrl = "u",
-                versionName = "26.09.01",
-                versionCode = 400L,
-                signingFingerprint = null,
+                build =
+                    InstalledBuild(
+                        tag = "nightly",
+                        assetName = "a",
+                        assetUrl = "u",
+                        versionName = "26.09.01",
+                        versionCode = 400L,
+                        signingFingerprint = null,
+                    ),
                 at = 1L,
             )
         assertTrue(result.isUpdateAvailable)
@@ -267,12 +297,15 @@ class InstalledAppUpdatesTest {
 
         val afterInstall =
             offeredWithNightlyAvailable.confirmInstall(
-                tag = "nightly",
-                assetName = "a",
-                assetUrl = "u",
-                versionName = "26.09.01",
-                versionCode = 500L,
-                signingFingerprint = null,
+                build =
+                    InstalledBuild(
+                        tag = "nightly",
+                        assetName = "a",
+                        assetUrl = "u",
+                        versionName = "26.09.01",
+                        versionCode = 500L,
+                        signingFingerprint = null,
+                    ),
                 at = 5_000L,
             )
 
@@ -331,12 +364,15 @@ class InstalledAppUpdatesTest {
     fun confirmInstallClearsUpdateFlagWhenSnapshotMissing() {
         val result =
             app(latestVersion = null, latestVersionCode = null).confirmInstall(
-                tag = "1.0.0",
-                assetName = "a",
-                assetUrl = "u",
-                versionName = "1.0.0",
-                versionCode = 100L,
-                signingFingerprint = null,
+                build =
+                    InstalledBuild(
+                        tag = "1.0.0",
+                        assetName = "a",
+                        assetUrl = "u",
+                        versionName = "1.0.0",
+                        versionCode = 100L,
+                        signingFingerprint = null,
+                    ),
                 at = 1L,
             )
         assertFalse(result.isUpdateAvailable)
@@ -347,12 +383,15 @@ class InstalledAppUpdatesTest {
     fun confirmInstallClearsFlagWhenSameTagCarriesNewerCode() {
         val result =
             app(latestVersion = "2.0.0", latestVersionCode = 200L).confirmInstall(
-                tag = "2.0.0",
-                assetName = "a",
-                assetUrl = "u",
-                versionName = "2.0.0",
-                versionCode = 201L,
-                signingFingerprint = null,
+                build =
+                    InstalledBuild(
+                        tag = "2.0.0",
+                        assetName = "a",
+                        assetUrl = "u",
+                        versionName = "2.0.0",
+                        versionCode = 201L,
+                        signingFingerprint = null,
+                    ),
                 at = 1L,
             )
         assertFalse(result.isUpdateAvailable)
@@ -363,12 +402,15 @@ class InstalledAppUpdatesTest {
     fun confirmInstallPendingHandoffKeepsParkedMetadata() {
         val result =
             app().confirmInstall(
-                tag = "2.0.0",
-                assetName = "a",
-                assetUrl = "u",
-                versionName = "2.0.0",
-                versionCode = 200L,
-                signingFingerprint = null,
+                build =
+                    InstalledBuild(
+                        tag = "2.0.0",
+                        assetName = "a",
+                        assetUrl = "u",
+                        versionName = "2.0.0",
+                        versionCode = 200L,
+                        signingFingerprint = null,
+                    ),
                 isPending = true,
                 at = 1L,
             )
@@ -381,12 +423,15 @@ class InstalledAppUpdatesTest {
     fun confirmInstallDoesNotTouchCheckZoneSnapshot() {
         val result =
             app().confirmInstall(
-                tag = "2.0.0",
-                assetName = "a",
-                assetUrl = "u",
-                versionName = "2.0.0",
-                versionCode = 200L,
-                signingFingerprint = null,
+                build =
+                    InstalledBuild(
+                        tag = "2.0.0",
+                        assetName = "a",
+                        assetUrl = "u",
+                        versionName = "2.0.0",
+                        versionCode = 200L,
+                        signingFingerprint = null,
+                    ),
                 at = 1L,
             )
         assertEquals("2.0.0", result.latestVersion)

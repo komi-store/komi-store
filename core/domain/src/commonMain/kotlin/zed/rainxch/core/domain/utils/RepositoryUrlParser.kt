@@ -17,33 +17,36 @@ object RepositoryUrlParser {
             "gitea.com",
         )
 
+    private const val GIT_SUFFIX = ".git"
+
     fun parse(
         rawUrl: String,
         additionalForgejoHosts: Set<String> = emptySet(),
     ): RepositoryReference? {
-        val trimmed = rawUrl.trim().trimEnd('/')
-        val match = urlRegex.matchEntire(trimmed) ?: return null
-        val host = match.groupValues[1].lowercase()
-        val owner = match.groupValues[2]
-        val repo = stripGitSuffix(match.groupValues[3])
+        val match = urlRegex.matchEntire(rawUrl.trim().trimEnd('/')) ?: return null
+        val (rawHost, owner, rawRepo) = match.destructured
+        val repo = stripGitSuffix(rawRepo)
         if (owner.isEmpty() || repo.isEmpty()) return null
+        return sourceOf(rawHost.lowercase(), additionalForgejoHosts)?.let { RepositoryReference(it, owner, repo) }
+    }
 
+    private fun sourceOf(
+        host: String,
+        additionalForgejoHosts: Set<String>,
+    ): RepositorySource? {
         val userHosts = additionalForgejoHosts.map { it.lowercase().trim() }.toSet()
-
-        val source =
-            when {
-                host == "github.com" || host == "www.github.com" -> RepositorySource.GitHub
-                host in knownForgejoHosts -> RepositorySource.Forgejo(host)
-                host in userHosts -> RepositorySource.Forgejo(host)
-                looksLikeForgejoHost(host) -> RepositorySource.Forgejo(host)
-                else -> return null
-            }
-        return RepositoryReference(source, owner, repo)
+        return when {
+            host == "github.com" || host == "www.github.com" -> RepositorySource.GitHub
+            host in knownForgejoHosts -> RepositorySource.Forgejo(host)
+            host in userHosts -> RepositorySource.Forgejo(host)
+            looksLikeForgejoHost(host) -> RepositorySource.Forgejo(host)
+            else -> null
+        }
     }
 
     private fun stripGitSuffix(name: String): String =
-        if (name.length > 4 && name.regionMatches(name.length - 4, ".git", 0, 4, ignoreCase = true)) {
-            name.substring(0, name.length - 4)
+        if (name.length > GIT_SUFFIX.length && name.endsWith(GIT_SUFFIX, ignoreCase = true)) {
+            name.dropLast(GIT_SUFFIX.length)
         } else {
             name
         }

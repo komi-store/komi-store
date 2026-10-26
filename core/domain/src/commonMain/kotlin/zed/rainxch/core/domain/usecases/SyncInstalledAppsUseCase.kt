@@ -78,128 +78,141 @@ class SyncInstalledAppsUseCase(
 
     private suspend fun reconcileEnumerable(appsInDb: List<InstalledApp>) {
         val installedPackageNames = packageMonitor.getAllInstalledPackageNames()
-        val now = System.currentTimeMillis()
-
-        val deleteCandidates = mutableListOf<InstalledApp>()
-        val staleCandidates = mutableListOf<InstalledApp>()
-        val toResolvePending = mutableListOf<InstalledApp>()
-        val toMigrate = mutableListOf<Pair<String, MigrationResult>>()
-        val toSyncVersions = mutableListOf<InstalledApp>()
-        val toClearStaleParkedFile = mutableListOf<InstalledApp>()
-
-        appsInDb.forEach { app ->
-            val isOnSystem = installedPackageNames.contains(app.packageName)
-            when {
-                app.isPendingInstall -> {
-                    if (isOnSystem) {
-                        toResolvePending.add(app)
-                    } else if (now - app.installedAt > PENDING_TIMEOUT_MS) {
-                        staleCandidates.add(app)
-                    }
-                }
-
-                !isOnSystem -> deleteCandidates.add(app)
-
-                app.installedVersionName == null ->
-                    toMigrate.add(app.packageName to determineMigrationData(app))
-
-                platform == Platform.ANDROID -> toSyncVersions.add(app)
-            }
-            if (isOnSystem && !app.isPendingInstall && app.pendingInstallFilePath != null) {
-                toClearStaleParkedFile.add(app)
-            }
-        }
+        val plan = planSync(appsInDb, installedPackageNames, System.currentTimeMillis())
 
         guardUntrustworthyScan(
             appsInDb = appsInDb,
             installedPackageNames = installedPackageNames,
-            deleteCandidates = deleteCandidates,
-            staleCandidates = staleCandidates
+            deleteCandidates = plan.deleteCandidates,
+            staleCandidates = plan.staleCandidates,
         )
 
-        val confirmedDeletes =
-            deleteCandidates.filter { app ->
-                val absent = presenceOf(app.packageName) is Presence.Absent
-                if (!absent) {
-                    logger.info("Kept ${app.packageName}: not positively absent (installed, hidden, or lookup failed)")
-                }
-                absent
+        val confirmedDeletes = confirmUninstalled(plan.deleteCandidates)
+        val confirmedStaleDeletes = confirmStalePending(plan)
+        val systemInfoByPackage = systemInfoFor(plan)
+
+        val parkedCleanups =
+            (
+                rowCleanups(confirmedDeletes, reason = "uninstalled app") +
+                    rowCleanups(confirmedStaleDeletes, reason = "stale pending install (>24h)") +
+                    staleParkedFileCleanups(plan.toClearStaleParkedFile, systemInfoByPackage)
+            ).toMutableList()
+
+        installedAppsRepository.executeInTransaction {
+            plan.toResolvePending.forEach {
+                resolvePending(it, systemInfoByPackage[it.packageName], parkedCleanups)
             }
+            plan.toMigrate.forEach { (packageName, result) -> migrate(appsInDb, packageName, result) }
+            plan.toSyncVersions.forEach { syncVersion(it, systemInfoByPackage[it.packageName]) }
+        }
+
+        val droppedRows = discardParkedInstalls(parkedCleanups)
+
+        logger.info(
+            "Sync completed: $droppedRows rows dropped " +
+                "(${confirmedDeletes.size} uninstalled + ${confirmedStaleDeletes.size} stale pending " +
+                "candidates), ${plan.toResolvePending.size} pending resolved, ${plan.toMigrate.size} migrated, " +
+                "${plan.toSyncVersions.size} version-checked, " +
+                "${plan.toClearStaleParkedFile.size} stale parked files checked",
+        )
+    }
+
+    private suspend fun planSync(
+        appsInDb: List<InstalledApp>,
+        installedPackageNames: Set<String>,
+        now: Long,
+    ): SyncPlan {
+        val plan = SyncPlan()
+        appsInDb.forEach { app ->
+            val isOnSystem = installedPackageNames.contains(app.packageName)
+            when {
+                app.isPendingInstall -> plan.addPending(app, isOnSystem, now)
+
+                !isOnSystem -> plan.deleteCandidates.add(app)
+
+                app.installedVersionName == null ->
+                    plan.toMigrate.add(app.packageName to determineMigrationData(app))
+
+                platform == Platform.ANDROID -> plan.toSyncVersions.add(app)
+            }
+            if (isOnSystem && !app.isPendingInstall && app.pendingInstallFilePath != null) {
+                plan.toClearStaleParkedFile.add(app)
+            }
+        }
+        return plan
+    }
+
+    private suspend fun confirmUninstalled(deleteCandidates: List<InstalledApp>): List<InstalledApp> =
+        deleteCandidates.filter { app ->
+            val absent = presenceOf(app.packageName) is Presence.Absent
+            if (!absent) {
+                logger.info("Kept ${app.packageName}: not positively absent (installed, hidden, or lookup failed)")
+            }
+            absent
+        }
+
+    private suspend fun confirmStalePending(plan: SyncPlan): List<InstalledApp> {
         val confirmedStaleDeletes = mutableListOf<InstalledApp>()
-        staleCandidates.forEach { app ->
+        plan.staleCandidates.forEach { app ->
             when (presenceOf(app.packageName)) {
                 is Presence.Absent -> confirmedStaleDeletes.add(app)
-                is Presence.Present -> toResolvePending.add(app)
+                is Presence.Present -> plan.toResolvePending.add(app)
                 is Presence.Unknown -> Unit
             }
         }
+        return confirmedStaleDeletes
+    }
 
-        val systemInfoByPackage =
-            (toResolvePending.map { it.packageName } + toSyncVersions.map { it.packageName } +
-                toClearStaleParkedFile.map { it.packageName })
-                .toSet()
-                .associateWith { (presenceOf(it) as? Presence.Present)?.info }
+    private suspend fun systemInfoFor(plan: SyncPlan): Map<String, SystemPackageInfo?> =
+        (
+            plan.toResolvePending.map { it.packageName } + plan.toSyncVersions.map { it.packageName } +
+                plan.toClearStaleParkedFile.map { it.packageName }
+        ).toSet()
+            .associateWith { (presenceOf(it) as? Presence.Present)?.info }
 
-        val parkedCleanups = mutableListOf<ParkedCleanup>()
-        confirmedDeletes.forEach {
-            parkedCleanups += ParkedCleanup(
+    private fun rowCleanups(
+        apps: List<InstalledApp>,
+        reason: String,
+    ): List<ParkedCleanup> =
+        apps.map {
+            ParkedCleanup(
                 packageName = it.packageName,
                 expectedPath = it.pendingInstallFilePath,
                 deleteRow = true,
-                reason = "uninstalled app",
+                reason = reason,
             )
         }
-        confirmedStaleDeletes.forEach {
-            parkedCleanups += ParkedCleanup(
-                packageName = it.packageName,
-                expectedPath = it.pendingInstallFilePath,
-                deleteRow = true,
-                reason = "stale pending install (>24h)",
-            )
-        }
-        toClearStaleParkedFile.forEach { app ->
+
+    private fun staleParkedFileCleanups(
+        apps: List<InstalledApp>,
+        systemInfoByPackage: Map<String, SystemPackageInfo?>,
+    ): List<ParkedCleanup> =
+        apps.mapNotNull { app ->
             val resolution = app.pendingInstallResolution(systemInfoByPackage[app.packageName])
             if (resolution !is PendingInstallResolution.Reached) {
                 logger.info(
                     "Kept parked file for ${app.packageName}: the target is not proven on the system",
                 )
-                return@forEach
+                null
+            } else {
+                logger.info("Queued stale parked install for discard: ${app.packageName}")
+                ParkedCleanup(
+                    packageName = app.packageName,
+                    expectedPath = app.pendingInstallFilePath,
+                    deleteRow = false,
+                    reason = "stale parked file",
+                )
             }
-            parkedCleanups += ParkedCleanup(
-                packageName = app.packageName,
-                expectedPath = app.pendingInstallFilePath,
-                deleteRow = false,
-                reason = "stale parked file",
-            )
-            logger.info("Queued stale parked install for discard: ${app.packageName}")
         }
 
-        installedAppsRepository.executeInTransaction {
-            toResolvePending.forEach {
-                resolvePending(it, systemInfoByPackage[it.packageName], parkedCleanups)
-            }
-            toMigrate.forEach { (packageName, result) -> migrate(appsInDb, packageName, result) }
-            toSyncVersions.forEach { syncVersion(it, systemInfoByPackage[it.packageName]) }
-        }
-
+    private suspend fun discardParkedInstalls(parkedCleanups: List<ParkedCleanup>): Int {
         var droppedRows = 0
         parkedCleanups.forEach { cleanup ->
             try {
                 val disposal =
                     installedAppsRepository.discardParkedInstall(cleanup.packageName, cleanup.expectedPath)
-                if (cleanup.deleteRow) {
-                    when (disposal) {
-                        ParkedInstallDisposal.Discarded -> {
-                            installedAppsRepository.deleteInstalledApp(cleanup.packageName)
-                            droppedRows += 1
-                            logger.info("Removed ${cleanup.reason}: ${cleanup.packageName}")
-                        }
-                        ParkedInstallDisposal.Retained ->
-                            logger.info(
-                                "Kept ${cleanup.packageName}: something is still parked for it, " +
-                                    "so its row stays for the next sync",
-                            )
-                    }
+                if (cleanup.deleteRow && dropRowIfDiscarded(cleanup, disposal)) {
+                    droppedRows += 1
                 }
             } catch (e: CancellationException) {
                 throw e
@@ -207,15 +220,28 @@ class SyncInstalledAppsUseCase(
                 logger.error("Failed to clean up the parked install for ${cleanup.packageName}: ${e.message}")
             }
         }
-
-        logger.info(
-            "Sync completed: $droppedRows rows dropped " +
-                "(${confirmedDeletes.size} uninstalled + ${confirmedStaleDeletes.size} stale pending " +
-                "candidates), ${toResolvePending.size} pending resolved, ${toMigrate.size} migrated, " +
-                "${toSyncVersions.size} version-checked, " +
-                "${toClearStaleParkedFile.size} stale parked files checked",
-        )
+        return droppedRows
     }
+
+    private suspend fun dropRowIfDiscarded(
+        cleanup: ParkedCleanup,
+        disposal: ParkedInstallDisposal,
+    ): Boolean =
+        when (disposal) {
+            ParkedInstallDisposal.Discarded -> {
+                installedAppsRepository.deleteInstalledApp(cleanup.packageName)
+                logger.info("Removed ${cleanup.reason}: ${cleanup.packageName}")
+                true
+            }
+
+            ParkedInstallDisposal.Retained -> {
+                logger.info(
+                    "Kept ${cleanup.packageName}: something is still parked for it, " +
+                        "so its row stays for the next sync",
+                )
+                false
+            }
+        }
 
     private fun guardUntrustworthyScan(
         appsInDb: List<InstalledApp>,
@@ -394,6 +420,27 @@ class SyncInstalledAppsUseCase(
                 source = "desktop fallback to release tag",
             )
         }
+
+    private class SyncPlan {
+        val deleteCandidates = mutableListOf<InstalledApp>()
+        val staleCandidates = mutableListOf<InstalledApp>()
+        val toResolvePending = mutableListOf<InstalledApp>()
+        val toMigrate = mutableListOf<Pair<String, MigrationResult>>()
+        val toSyncVersions = mutableListOf<InstalledApp>()
+        val toClearStaleParkedFile = mutableListOf<InstalledApp>()
+
+        fun addPending(
+            app: InstalledApp,
+            isOnSystem: Boolean,
+            now: Long,
+        ) {
+            if (isOnSystem) {
+                toResolvePending.add(app)
+            } else if (now - app.installedAt > PENDING_TIMEOUT_MS) {
+                staleCandidates.add(app)
+            }
+        }
+    }
 
     private data class MigrationResult(
         val versionName: String,

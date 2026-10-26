@@ -3,6 +3,7 @@ package zed.rainxch.core.domain.repository
 import kotlinx.coroutines.flow.Flow
 import zed.rainxch.core.domain.model.account.github.GithubRepoSummary
 import zed.rainxch.core.domain.model.repository.SeenRepo
+import zed.rainxch.core.domain.model.repository.SeenRepoEntry
 
 interface SeenReposRepository {
     fun getAllSeenRepoIds(): Flow<Set<Long>>
@@ -11,15 +12,7 @@ interface SeenReposRepository {
 
     suspend fun markAsSeen(repo: GithubRepoSummary)
 
-    suspend fun markAsSeen(
-        repoId: Long,
-        repoName: String,
-        repoOwner: String,
-        repoOwnerAvatarUrl: String,
-        repoDescription: String?,
-        primaryLanguage: String?,
-        repoUrl: String,
-    )
+    suspend fun markAsSeen(entry: SeenRepoEntry)
 
     suspend fun removeFromHistory(repoId: Long)
 

@@ -7,6 +7,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import zed.rainxch.core.data.download.DownloadNotificationAction
 import zed.rainxch.core.data.download.notificationActionsFor
+import zed.rainxch.core.domain.model.installation.DownloadProgress
 import zed.rainxch.core.domain.system.DownloadOrchestrator
 import zed.rainxch.core.domain.system.DownloadProgressNotifier
 import zed.rainxch.core.domain.system.DownloadStage
@@ -109,9 +110,12 @@ class DownloadNotificationObserver(
                 packageName = pkg,
                 appName = entry.displayAppName,
                 versionTag = entry.releaseTag.ifBlank { entry.assetName },
-                percent = entry.progressPercent,
-                bytesDownloaded = entry.bytesDownloaded,
-                totalBytes = entry.totalBytes,
+                progress =
+                    DownloadProgress(
+                        bytesDownloaded = entry.bytesDownloaded,
+                        totalBytes = entry.totalBytes,
+                        percent = entry.progressPercent,
+                    ),
                 paused = paused,
             )
         } catch (t: Throwable) {

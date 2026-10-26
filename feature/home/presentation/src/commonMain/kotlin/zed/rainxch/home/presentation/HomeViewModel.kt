@@ -27,6 +27,7 @@ import zed.rainxch.core.domain.model.installation.hasActualUpdate
 import zed.rainxch.core.domain.model.installation.isReallyInstalled
 import zed.rainxch.core.domain.model.repository.DiscoveryPlatform
 import zed.rainxch.core.domain.model.repository.PaginatedDiscoveryRepositories
+import zed.rainxch.core.domain.model.repository.SeenRepoEntry
 import zed.rainxch.core.domain.model.system.Platform
 import zed.rainxch.core.domain.repository.BrowseFilterStore
 import zed.rainxch.core.domain.repository.FavouritesRepository
@@ -192,13 +193,15 @@ class HomeViewModel(
                     val repo = action.repo
                     try {
                         seenReposRepository.markAsSeen(
-                            repoId = repo.id,
-                            repoName = repo.name,
-                            repoOwner = repo.owner.login,
-                            repoOwnerAvatarUrl = repo.owner.avatarUrl,
-                            repoDescription = repo.description,
-                            primaryLanguage = repo.language,
-                            repoUrl = repo.htmlUrl,
+                            SeenRepoEntry(
+                                repoId = repo.id,
+                                repoName = repo.name,
+                                repoOwner = repo.owner.login,
+                                repoOwnerAvatarUrl = repo.owner.avatarUrl,
+                                repoDescription = repo.description,
+                                primaryLanguage = repo.language,
+                                repoUrl = repo.htmlUrl,
+                            ),
                         )
                     } catch (e: CancellationException) {
                         throw e

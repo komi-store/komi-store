@@ -7,6 +7,7 @@ import zed.rainxch.core.domain.logging.KomiStoreLogger
 import zed.rainxch.core.domain.model.apk.ApkPackageInfo
 import zed.rainxch.core.domain.model.installation.InstallSource
 import zed.rainxch.core.domain.model.installation.InstalledApp
+import zed.rainxch.core.domain.model.installation.InstalledBuild
 import zed.rainxch.core.domain.repository.FavouritesRepository
 import zed.rainxch.core.domain.repository.InstalledAppsRepository
 import zed.rainxch.core.domain.repository.TweaksRepository
@@ -170,16 +171,19 @@ class InstallationManagerImpl(
     override suspend fun updateInstalledAppVersion(params: UpdateInstalledAppParams) {
         installedAppsRepository.updateAppVersion(
             packageName = params.apkInfo.packageName,
-            newTag = params.releaseTag,
-            newReleaseId = params.releaseId,
-            newAssetId = params.assetId,
-            newAssetDigest = params.assetDigest,
-            newReleasePublishedAt = params.releasePublishedAt,
-            newAssetName = params.assetName,
-            newAssetUrl = params.assetUrl,
-            newVersionName = params.apkInfo.versionName,
-            newVersionCode = params.apkInfo.versionCode,
-            signingFingerprint = params.apkInfo.signingFingerprint,
+            build =
+                InstalledBuild(
+                    tag = params.releaseTag,
+                    releaseId = params.releaseId,
+                    assetId = params.assetId,
+                    assetDigest = params.assetDigest,
+                    releasePublishedAt = params.releasePublishedAt,
+                    assetName = params.assetName,
+                    assetUrl = params.assetUrl,
+                    versionName = params.apkInfo.versionName,
+                    versionCode = params.apkInfo.versionCode,
+                    signingFingerprint = params.apkInfo.signingFingerprint,
+                ),
             isPendingInstall = params.isPendingInstall,
         )
     }
