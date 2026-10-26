@@ -2,6 +2,7 @@ package zed.rainxch.core.data.services
 
 import co.touchlab.kermit.Logger
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.Flow
@@ -42,7 +43,11 @@ import zed.rainxch.core.domain.network.Downloader
 import java.io.BufferedOutputStream
 import java.io.File
 import java.io.FileOutputStream
+import java.io.IOException
+import java.io.InputStream
+import java.io.OutputStream
 import java.net.Authenticator
+import java.net.HttpURLConnection
 import java.net.InetSocketAddress
 import java.net.PasswordAuthentication
 import java.net.Proxy
@@ -52,6 +57,7 @@ import java.nio.file.StandardCopyOption
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.TimeUnit
+import kotlin.coroutines.cancellation.CancellationException
 import kotlin.coroutines.coroutineContext
 
 class AndroidDownloader(
@@ -73,12 +79,13 @@ class AndroidDownloader(
     private fun downloadClient(): OkHttpClient {
         val config = ProxyManager.currentConfig(ProxyScope.DOWNLOAD)
         if (!config.isCacheable()) return buildClient(config)
-        synchronized(clientLock) {
-            cachedClient?.takeIf { cachedConfig == config }?.let { return it }
-            cachedClient?.connectionPool?.evictAll()
-            return buildClient(config).also {
-                cachedConfig = config
-                cachedClient = it
+        return synchronized(clientLock) {
+            cachedClient?.takeIf { cachedConfig == config } ?: run {
+                cachedClient?.connectionPool?.evictAll()
+                buildClient(config).also {
+                    cachedConfig = config
+                    cachedClient = it
+                }
             }
         }
     }
@@ -95,9 +102,9 @@ class AndroidDownloader(
 
         return OkHttpClient
             .Builder()
-            .connectTimeout(30, TimeUnit.SECONDS)
-            .readTimeout(60, TimeUnit.SECONDS)
-            .writeTimeout(60, TimeUnit.SECONDS)
+            .connectTimeout(CONNECT_TIMEOUT_SECONDS, TimeUnit.SECONDS)
+            .readTimeout(READ_TIMEOUT_SECONDS, TimeUnit.SECONDS)
+            .writeTimeout(WRITE_TIMEOUT_SECONDS, TimeUnit.SECONDS)
             .apply {
                 when (config) {
                     is ProxyConfig.None -> {
@@ -146,254 +153,268 @@ class AndroidDownloader(
         bypassMirror: Boolean,
         identity: AssetIdentity?,
     ): Flow<DownloadProgress> =
-
         flow {
             val client = downloadClient()
 
-            val dirPath = files.appDownloadsDir()
-            val dir = File(dirPath)
+            val dir = File(files.appDownloadsDir())
             if (!dir.exists()) dir.mkdirs()
 
-            val rawName =
-                suggestedFileName?.takeIf { it.isNotBlank() }
-                    ?: url
-                        .substringAfterLast('/')
-                        .substringBefore('?')
-                        .substringBefore('#')
-                        .ifBlank { "asset-${UUID.randomUUID()}.apk" }
-            val safeName = rawName.substringAfterLast('/').substringAfterLast('\\')
-            require(safeName.isNotBlank() && safeName != "." && safeName != "..") {
-                "Invalid file name: $rawName"
-            }
+            val safeName = safeFileName(url, suggestedFileName)
+            val request =
+                DownloadRequest(
+                    client = client,
+                    url = url,
+                    id = UUID.randomUUID().toString(),
+                    identity = identity,
+                    dir = dir,
+                    name = safeName,
+                )
 
-            val downloadId = UUID.randomUUID().toString()
-
-            val destination = File(dir, safeName)
-            val partFile = File(dir, PartialNaming.part(safeName))
-            val metaFile = File(dir, PartialNaming.meta(safeName))
-
-            Logger.d { "Starting download: $url (id=$downloadId, partial=${partFile.name})" }
+            Logger.d { "Starting download: $url (id=${request.id}, partial=${request.partFile.name})" }
 
             val lock = nameLocks.computeIfAbsent(safeName) { Mutex() }
             lock.withLock {
-                idsByName.computeIfAbsent(safeName) { ConcurrentHashMap.newKeySet() }.add(downloadId)
+                idsByName.computeIfAbsent(safeName) { ConcurrentHashMap.newKeySet() }.add(request.id)
                 try {
-                    var attemptsMade = 0
-                    var restartsMade = 0
-                    while (true) {
-                        try {
-                            downloadAttempt(
-                                client = client,
-                                url = url,
-                                partFile = partFile,
-                                metaFile = metaFile,
-                                destination = destination,
-                                downloadId = downloadId,
-                                identity = identity,
-                                emit = { emit(it) },
-                            )
-                            break
-                        } catch (e: kotlin.coroutines.cancellation.CancellationException) {
-                            throw e
-                        } catch (e: PartialRestart) {
-                            if (restartsMade >= MAX_RESTARTS) {
-                                throw kotlinx.io.IOException(
-                                    "The bytes on disk could not be resumed for $safeName",
-                                )
-                            }
-                            restartsMade++
-                            Logger.d {
-                                "The partial cannot be resumed (server refused the range, or served a span we did not ask for); restarting from zero"
-                            }
-                        } catch (e: PartialAborted) {
-                            throw e.cause ?: e
-                        } catch (e: AssetSourceGoneException) {
-                            throw e
-                        } catch (e: Exception) {
-                            coroutineContext.ensureActive()
-                            if (!PartialRetry.hasAttemptsLeft(attemptsMade + 1)) {
-                                Logger.e(e) {
-                                    "Download failed after ${PartialRetry.MAX_ATTEMPTS} attempts"
-                                }
-                                throw e
-                            }
-                            val backoff = PartialRetry.backoffMillis(attemptsMade)
-                            Logger.w(e) {
-                                "Download attempt ${attemptsMade + 1} failed; retrying in ${backoff}ms"
-                            }
-                            delay(backoff)
-                            attemptsMade++
-                        }
-                    }
+                    downloadWithRetries(request) { emit(it) }
                 } finally {
-                    activeDownloads.remove(downloadId)
-                    cancelRequested.remove(downloadId)
+                    activeDownloads.remove(request.id)
+                    cancelRequested.remove(request.id)
                     idsByName.computeIfPresent(safeName) { _, set ->
-                        set.remove(downloadId)
+                        set.remove(request.id)
                         if (set.isEmpty()) null else set
                     }
                 }
             }
         }.flowOn(Dispatchers.IO)
 
-    private suspend fun downloadAttempt(
-        client: OkHttpClient,
-        url: String,
-        partFile: File,
-        metaFile: File,
-        destination: File,
-        downloadId: String,
-        identity: AssetIdentity?,
+    private suspend fun downloadWithRetries(
+        request: DownloadRequest,
         emit: suspend (DownloadProgress) -> Unit,
     ) {
-        val stored = readIdentity(metaFile)
+        val budget = RetryBudget(request.destination.name)
+        while (true) {
+            when (val attempt = attemptOrFailure(request, emit)) {
+                Attempt.Complete -> return
+                Attempt.Restart -> budget.spendRestart()
+                is Attempt.Aborted -> throw attempt.cause
+                is Attempt.Failed -> budget.backOff(attempt.cause)
+            }
+        }
+    }
+
+    // A gone source and cancellation propagate; the other step failures come back as Attempt.Failed.
+    private suspend fun attemptOrFailure(
+        request: DownloadRequest,
+        emit: suspend (DownloadProgress) -> Unit,
+    ): Attempt =
+        try {
+            downloadAttempt(request, emit)
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: IOException) {
+            Attempt.Failed(e)
+        } catch (e: IllegalStateException) {
+            Attempt.Failed(e)
+        } catch (e: IllegalArgumentException) {
+            Attempt.Failed(e)
+        } catch (e: SecurityException) {
+            Attempt.Failed(e)
+        }
+
+    private suspend fun downloadAttempt(
+        request: DownloadRequest,
+        emit: suspend (DownloadProgress) -> Unit,
+    ): Attempt {
+        val stored = readIdentity(request.metaFile)
+        prepareOwnedPartial(request, stored)
+        val resumeFrom = if (request.partFile.exists()) request.partFile.length() else 0L
+        if (reuseFinishedFile(request, emit)) return Attempt.Complete
+
+        val call = request.client.newCall(buildRequest(request.url, RangeRequest.headerValue(resumeFrom)))
+        activeDownloads[request.id] = call
+        if (cancelRequested.remove(request.id)) call.cancel()
+        val cancellationHandle =
+            coroutineContext[Job]?.invokeOnCompletion { cause ->
+                if (cause is CancellationException) call.cancel()
+            }
+        return try {
+            call.execute().use { response -> receive(response, Transfer(request, resumeFrom, stored), emit) }
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: IOException) {
+            abortedOrRethrow(call, e)
+        } catch (e: AssetSourceGoneException) {
+            abortedOrRethrow(call, e)
+        } catch (e: IllegalStateException) {
+            abortedOrRethrow(call, e)
+        } catch (e: IllegalArgumentException) {
+            abortedOrRethrow(call, e)
+        } catch (e: SecurityException) {
+            abortedOrRethrow(call, e)
+        } finally {
+            cancellationHandle?.dispose()
+        }
+    }
+
+    // A failure after the call was cancelled is the pause or discard itself, so it is not retried.
+    private suspend fun abortedOrRethrow(
+        call: Call,
+        failure: Exception,
+    ): Attempt {
+        if (!call.isCanceled()) throw failure
+        coroutineContext.ensureActive()
+        return Attempt.Aborted(failure)
+    }
+
+    private fun prepareOwnedPartial(
+        request: DownloadRequest,
+        stored: PartialIdentity?,
+    ) {
+        val partFile = request.partFile
         val reusable =
             PartialOwnership.decideReuse(
                 partExists = partFile.exists(),
                 partLength = if (partFile.exists()) partFile.length() else 0L,
                 meta = stored,
-                incoming = identity,
+                incoming = request.identity,
             ) == PartialReuse.REUSE
+        if (reusable) return
 
-        if (!reusable) {
-            partFile.delete()
-            metaFile.delete()
-            if (partFile.exists()) {
-                val truncated =
-                    runCatching { FileOutputStream(partFile, false).close() }
-                        .isSuccess && partFile.length() == 0L
-                if (!truncated) {
-                    throw kotlinx.io.IOException(
-                        "Cannot discard a partial that failed its ownership check: ${partFile.absolutePath}",
-                    )
-                }
-            }
+        request.discardPartial()
+        if (!partFile.exists()) return
+        val truncated =
+            runCatching { FileOutputStream(partFile, false).close() }
+                .isSuccess && partFile.length() == 0L
+        if (!truncated) {
+            throw IOException(
+                "Cannot discard a partial that failed its ownership check: ${partFile.absolutePath}",
+            )
         }
-        val resumeFrom = if (partFile.exists()) partFile.length() else 0L
+    }
 
+    private suspend fun reuseFinishedFile(
+        request: DownloadRequest,
+        emit: suspend (DownloadProgress) -> Unit,
+    ): Boolean {
+        val destination = request.destination
         val expectedDigest =
             FinishedFileReuse.digestToVerify(
                 destinationExists = destination.exists(),
                 destinationLength = destination.length(),
-                expectedDigest = identity?.digest,
-                expectedSize = identity?.size ?: -1L,
+                expectedDigest = request.identity?.digest,
+                expectedSize = request.identity?.size ?: -1L,
             )
-        if (expectedDigest != null &&
-            digestVerifier.verify(destination.absolutePath, expectedDigest) == null
-        ) {
-            partFile.delete()
-            metaFile.delete()
-            val length = destination.length()
-            Logger.d { "Reusing completed file: ${destination.absolutePath} ($length bytes)" }
-            emit(DownloadProgress(length, length, 100))
-            return
+        if (expectedDigest == null || digestVerifier.verify(destination.absolutePath, expectedDigest) != null) {
+            return false
         }
+        request.discardPartial()
+        val length = destination.length()
+        Logger.d { "Reusing completed file: ${destination.absolutePath} ($length bytes)" }
+        emit(DownloadProgress(length, length, PERCENT_COMPLETE))
+        return true
+    }
 
-        val request = buildRequest(url, RangeRequest.headerValue(resumeFrom))
-        val call = client.newCall(request)
-        activeDownloads[downloadId] = call
-        if (cancelRequested.remove(downloadId)) call.cancel()
-        val cancellationHandle =
-            coroutineContext[kotlinx.coroutines.Job]?.invokeOnCompletion { cause ->
-                if (cause is kotlin.coroutines.cancellation.CancellationException) call.cancel()
-            }
-        try {
-            call.execute().use { response ->
-                val contentRange = ContentRange.parse(response.header("Content-Range"))
-                val decision = RangeRequest.decide(response.code, resumeFrom, contentRange)
-                if (decision == RangeDecision.RESTART) {
-                    partFile.delete()
-                    metaFile.delete()
-                    throw PartialRestart()
-                }
-                if (decision == RangeDecision.UNEXPECTED) {
-                    if (PartialDisposal.shouldDiscardPartial(response.code, explicitDiscard = false)) {
-                        partFile.delete()
-                        metaFile.delete()
-                        throw AssetSourceGoneException(response.code)
-                    }
-                    throw kotlinx.io.IOException("Unexpected code ${response.code}")
-                }
+    private suspend fun receive(
+        response: Response,
+        transfer: Transfer,
+        emit: suspend (DownloadProgress) -> Unit,
+    ): Attempt {
+        val contentRange = ContentRange.parse(response.header("Content-Range"))
+        val decision = RangeRequest.decide(response.code, transfer.resumeFrom, contentRange)
+        if (decision == RangeDecision.UNEXPECTED) throw unexpectedResponse(response.code, transfer.request)
 
-                val total = totalBytes(response, resumeFrom, contentRange)
-                if (decision == RangeDecision.APPEND &&
-                    resumeFrom > 0L &&
-                    stored != null &&
-                    stored.size > 0L &&
-                    total != null &&
-                    stored.size != total
-                ) {
-                    partFile.delete()
-                    metaFile.delete()
-                    throw PartialRestart()
-                }
+        val total = totalBytes(response, transfer.resumeFrom, contentRange)
+        if (transfer.mustRestart(decision, total)) {
+            transfer.request.discardPartial()
+            return Attempt.Restart
+        }
+        write(response, transfer, decision == RangeDecision.APPEND, total, emit)
+        return Attempt.Complete
+    }
 
-                writeIdentity(
-                    metaFile,
-                    identity?.let {
-                        PartialIdentity(
-                            assetId = it.assetId,
-                            digest = it.digest,
-                            size = if (it.size > 0L) it.size else (total ?: resumeFrom),
-                        )
-                    } ?: PartialIdentity(assetId = 0L, digest = null, size = total ?: resumeFrom),
+    private fun unexpectedResponse(
+        code: Int,
+        request: DownloadRequest,
+    ): Exception {
+        if (!PartialDisposal.shouldDiscardPartial(code, explicitDiscard = false)) {
+            return IOException("Unexpected code $code")
+        }
+        request.discardPartial()
+        return AssetSourceGoneException(code)
+    }
+
+    private suspend fun write(
+        response: Response,
+        transfer: Transfer,
+        append: Boolean,
+        total: Long?,
+        emit: suspend (DownloadProgress) -> Unit,
+    ) {
+        val request = transfer.request
+        writeIdentity(
+            request.metaFile,
+            request.identity?.let {
+                PartialIdentity(
+                    assetId = it.assetId,
+                    digest = it.digest,
+                    size = if (it.size > 0L) it.size else (total ?: transfer.resumeFrom),
                 )
+            } ?: PartialIdentity(assetId = 0L, digest = null, size = total ?: transfer.resumeFrom),
+        )
 
-                val append = decision == RangeDecision.APPEND
-                if (!append) partFile.delete()
-                val base = if (append) resumeFrom else 0L
+        if (!append) request.partFile.delete()
+        val base = if (append) transfer.resumeFrom else 0L
 
-                response.body.byteStream().use { input ->
-                    BufferedOutputStream(FileOutputStream(partFile, append), BUFFER_SIZE).use { output ->
-                        val buffer = ByteArray(BUFFER_SIZE)
-                        val throttle = ProgressThrottle()
-                        var downloaded = base
-                        var bytesRead: Int
-                        while (input.read(buffer).also { bytesRead = it } != -1) {
-                            output.write(buffer, 0, bytesRead)
-                            downloaded += bytesRead
-                            val percent =
-                                total?.takeIf { it > 0L }?.let {
-                                    ((downloaded * 100L) / it).toInt()
-                                }
-                            val progress = DownloadProgress(downloaded, total, percent)
-                            if (throttle.shouldEmit(progress)) emit(progress)
-                        }
-                    }
-                }
-
-                val finalLength = partFile.length()
-                if (finalLength <= 0L) {
-                    throw IllegalStateException(
-                        "Download produced empty file: ${partFile.absolutePath}",
-                    )
-                }
-                if (total != null && total > 0L && finalLength != total) {
-                    throw kotlinx.io.IOException(
-                        "Incomplete download: got $finalLength of $total bytes",
-                    )
-                }
-
-                moveAtomic(partFile, destination)
-                metaFile.delete()
-
-                Logger.d { "Download complete: ${destination.absolutePath}" }
-                val finalPercent =
-                    total?.takeIf { it > 0L }?.let { ((finalLength * 100L) / it).toInt() } ?: 100
-                emit(DownloadProgress(finalLength, total, finalPercent))
+        response.body.byteStream().use { input ->
+            BufferedOutputStream(FileOutputStream(request.partFile, append), BUFFER_SIZE).use { output ->
+                copyWithProgress(input, output, base, total, emit)
             }
-        } catch (e: kotlin.coroutines.cancellation.CancellationException) {
-            throw e
-        } catch (e: Exception) {
-            if (call.isCanceled()) {
-                coroutineContext.ensureActive()
-                throw PartialAborted(e)
-            }
-            throw e
-        } finally {
-            cancellationHandle?.dispose()
+        }
+        finish(request, total, emit)
+    }
+
+    private suspend fun copyWithProgress(
+        input: InputStream,
+        output: OutputStream,
+        base: Long,
+        total: Long?,
+        emit: suspend (DownloadProgress) -> Unit,
+    ) {
+        val buffer = ByteArray(BUFFER_SIZE)
+        val throttle = ProgressThrottle()
+        var downloaded = base
+        var bytesRead: Int
+        while (input.read(buffer).also { bytesRead = it } != -1) {
+            output.write(buffer, 0, bytesRead)
+            downloaded += bytesRead
+            val progress = DownloadProgress(downloaded, total, percentOf(downloaded, total))
+            if (throttle.shouldEmit(progress)) emit(progress)
         }
     }
+
+    private suspend fun finish(
+        request: DownloadRequest,
+        total: Long?,
+        emit: suspend (DownloadProgress) -> Unit,
+    ) {
+        val finalLength = request.partFile.length()
+        check(finalLength > 0L) { "Download produced empty file: ${request.partFile.absolutePath}" }
+        if (total != null && total > 0L && finalLength != total) {
+            throw IOException("Incomplete download: got $finalLength of $total bytes")
+        }
+
+        moveAtomic(request.partFile, request.destination)
+        request.metaFile.delete()
+
+        Logger.d { "Download complete: ${request.destination.absolutePath}" }
+        emit(DownloadProgress(finalLength, total, percentOf(finalLength, total) ?: PERCENT_COMPLETE))
+    }
+
+    private fun percentOf(
+        downloaded: Long,
+        total: Long?,
+    ): Int? = total?.takeIf { it > 0L }?.let { ((downloaded * PERCENT_COMPLETE) / it).toInt() }
 
     private suspend fun buildRequest(
         url: String,
@@ -416,7 +437,7 @@ class AndroidDownloader(
     private fun readIdentity(metaFile: File): PartialIdentity? =
         try {
             if (metaFile.exists()) PartialIdentity.parse(metaFile.readText()) else null
-        } catch (e: Exception) {
+        } catch (e: IOException) {
             Logger.w(e) { "Unreadable sidecar ${metaFile.name}; treating the partial as unattributable" }
             null
         }
@@ -427,7 +448,7 @@ class AndroidDownloader(
     ) {
         try {
             metaFile.writeText(identity.serialize())
-        } catch (e: Exception) {
+        } catch (e: IOException) {
             Logger.w(e) { "Failed to persist sidecar ${metaFile.name}" }
         }
     }
@@ -437,11 +458,14 @@ class AndroidDownloader(
         resumeFrom: Long,
         contentRange: ContentRange?,
     ): Long? {
-        val declared = contentRange?.total
-        if (declared != null && declared > 0L) return declared
+        val declared = contentRange?.total?.takeIf { it > 0L }
         val contentLength = response.body.contentLength()
-        if (contentLength > 0L) return if (response.code == 206) resumeFrom + contentLength else contentLength
-        return null
+        return when {
+            declared != null -> declared
+            contentLength <= 0L -> null
+            response.code == HttpURLConnection.HTTP_PARTIAL -> resumeFrom + contentLength
+            else -> contentLength
+        }
     }
 
     private suspend fun githubToken(): String? =
@@ -451,7 +475,7 @@ class AndroidDownloader(
                 ?.accessToken
                 ?.trim()
                 ?.takeIf { it.isNotEmpty() }
-        } catch (e: kotlin.coroutines.cancellation.CancellationException) {
+        } catch (e: CancellationException) {
             throw e
         } catch (_: Exception) {
             null
@@ -530,25 +554,31 @@ class AndroidDownloader(
         suggestedFileName: String?,
     ): String =
         withContext(Dispatchers.IO) {
-            val rawName =
-                suggestedFileName?.takeIf { it.isNotBlank() }
-                    ?: url
-                        .substringAfterLast('/')
-                        .substringBefore('?')
-                        .substringBefore('#')
-                        .ifBlank { "asset-${UUID.randomUUID()}.apk" }
-            val safeName = rawName.substringAfterLast('/').substringAfterLast('\\')
-            require(safeName.isNotBlank() && safeName != "." && safeName != "..") {
-                "Invalid file name: $rawName"
-            }
-
-            val file = File(files.appDownloadsDir(), safeName)
+            val file = File(files.appDownloadsDir(), safeFileName(url, suggestedFileName))
 
             Logger.d { "saveToFile downloading file..." }
             download(url, suggestedFileName).collect { }
 
             file.absolutePath
         }
+
+    private fun safeFileName(
+        url: String,
+        suggestedFileName: String?,
+    ): String {
+        val rawName =
+            suggestedFileName?.takeIf { it.isNotBlank() }
+                ?: url
+                    .substringAfterLast('/')
+                    .substringBefore('?')
+                    .substringBefore('#')
+                    .ifBlank { "asset-${UUID.randomUUID()}.apk" }
+        val safeName = rawName.substringAfterLast('/').substringAfterLast('\\')
+        require(safeName.isNotBlank() && safeName != "." && safeName != "..") {
+            "Invalid file name: $rawName"
+        }
+        return safeName
+    }
 
     override suspend fun getDownloadedFilePath(fileName: String): String? =
         withContext(Dispatchers.IO) {
@@ -596,14 +626,96 @@ class AndroidDownloader(
         return partRemoved || metaRemoved
     }
 
-    private class PartialRestart : Exception()
+    private class DownloadRequest(
+        val client: OkHttpClient,
+        val url: String,
+        val id: String,
+        val identity: AssetIdentity?,
+        dir: File,
+        name: String,
+    ) {
+        val destination = File(dir, name)
+        val partFile = File(dir, PartialNaming.part(name))
+        val metaFile = File(dir, PartialNaming.meta(name))
 
-    private class PartialAborted(
-        cause: Throwable,
-    ) : Exception(cause)
+        fun discardPartial() {
+            partFile.delete()
+            metaFile.delete()
+        }
+    }
+
+    private class Transfer(
+        val request: DownloadRequest,
+        val resumeFrom: Long,
+        val stored: PartialIdentity?,
+    ) {
+        // A refused range restarts, and so does an append whose server total no longer matches the partial's.
+        fun mustRestart(
+            decision: RangeDecision,
+            total: Long?,
+        ): Boolean =
+            when (decision) {
+                RangeDecision.RESTART -> true
+                RangeDecision.APPEND -> resumeFrom > 0L && storedSizeDiffers(total)
+                RangeDecision.TRUNCATE_REWRITE, RangeDecision.UNEXPECTED -> false
+            }
+
+        private fun storedSizeDiffers(total: Long?): Boolean {
+            if (stored == null || total == null) return false
+            return stored.size > 0L && stored.size != total
+        }
+    }
+
+    private sealed interface Attempt {
+        data object Complete : Attempt
+
+        data object Restart : Attempt
+
+        class Aborted(
+            val cause: Exception,
+        ) : Attempt
+
+        class Failed(
+            val cause: Exception,
+        ) : Attempt
+    }
+
+    private class RetryBudget(
+        private val name: String,
+    ) {
+        private var attemptsMade = 0
+        private var restartsMade = 0
+
+        fun spendRestart() {
+            if (restartsMade >= MAX_RESTARTS) {
+                throw IOException("The bytes on disk could not be resumed for $name")
+            }
+            restartsMade++
+            Logger.d {
+                "The partial cannot be resumed (server refused the range, or served a span we did not ask for); " +
+                    "restarting from zero"
+            }
+        }
+
+        suspend fun backOff(failure: Exception) {
+            coroutineContext.ensureActive()
+            if (!PartialRetry.hasAttemptsLeft(attemptsMade + 1)) {
+                Logger.e(failure) { "Download failed after ${PartialRetry.MAX_ATTEMPTS} attempts" }
+                throw failure
+            }
+            val backoff = PartialRetry.backoffMillis(attemptsMade)
+            Logger.w(failure) { "Download attempt ${attemptsMade + 1} failed; retrying in ${backoff}ms" }
+            delay(backoff)
+            attemptsMade++
+        }
+    }
 
     private companion object {
-        private const val BUFFER_SIZE = 64 * 1024
-        private const val MAX_RESTARTS = 2
+        const val BUFFER_SIZE = 64 * 1024
+        const val MAX_RESTARTS = 2
+        const val PERCENT_COMPLETE = 100
+        const val CONNECT_TIMEOUT_SECONDS = 30L
+        const val READ_TIMEOUT_SECONDS = 60L
+        const val WRITE_TIMEOUT_SECONDS = 60L
     }
 }
