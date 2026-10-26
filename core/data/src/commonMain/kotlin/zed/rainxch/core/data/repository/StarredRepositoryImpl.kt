@@ -2,6 +2,7 @@
 
 package zed.rainxch.core.data.repository
 
+import androidx.sqlite.SQLiteException
 import co.touchlab.kermit.Logger
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -11,6 +12,7 @@ import io.ktor.client.request.header
 import io.ktor.client.request.parameter
 import io.ktor.client.request.put
 import io.ktor.http.HttpHeaders
+import io.ktor.http.HttpStatusCode
 import io.ktor.http.isSuccess
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -24,37 +26,44 @@ import kotlinx.coroutines.withContext
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import zed.rainxch.core.data.dto.GitHubStarredResponse
-import zed.rainxch.core.data.dto.GitHubStarredResponseWithTimestamp
 import zed.rainxch.core.data.dto.parseStarredPage
 import zed.rainxch.core.data.local.db.dao.InstalledAppDao
 import zed.rainxch.core.data.local.db.dao.StarredRepoDao
 import zed.rainxch.core.data.mappers.toDomain
 import zed.rainxch.core.data.mappers.toEntity
+import zed.rainxch.core.data.network.BackendApiClient
 import zed.rainxch.core.data.network.GitHubClientProvider
+import zed.rainxch.core.data.network.getReleases
 import zed.rainxch.core.data.network.gitHubJson
+import zed.rainxch.core.data.network.recoverHttpFailure
+import zed.rainxch.core.data.network.shouldFallbackToGithubOrRethrow
 import zed.rainxch.core.domain.model.error.RateLimitException
 import zed.rainxch.core.domain.model.system.Platform
 import zed.rainxch.core.domain.repository.StarredRepository
-import kotlin.coroutines.cancellation.CancellationException
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
+import zed.rainxch.core.domain.model.repository.StarredRepository as StarredRepo
 
 class StarredRepositoryImpl(
     private val starredRepoDao: StarredRepoDao,
     private val installedAppsDao: InstalledAppDao,
     private val platform: Platform,
     private val clientProvider: GitHubClientProvider,
-    private val backendApiClient: zed.rainxch.core.data.network.BackendApiClient,
+    private val backendApiClient: BackendApiClient,
 ) : StarredRepository {
     private val httpClient: HttpClient get() = clientProvider.client
 
     companion object {
         private const val SYNC_THRESHOLD_MS = 24 * 60 * 60 * 1000L
         private const val STARRED_MEDIA_TYPE = "application/vnd.github.star+json"
+        private const val STARRED_PAGE_SIZE = 100
+        private const val RELEASE_CHECK_PAGE_SIZE = 10
+        private const val RELEASE_CHECK_CONCURRENCY = 25
+        private const val SIGN_IN_REQUIRED = "Authentication required. Please sign in with GitHub."
     }
 
-    override fun getAllStarred(): Flow<List<zed.rainxch.core.domain.model.repository.StarredRepository>> =
+    override fun getAllStarred(): Flow<List<StarredRepo>> =
         starredRepoDao
             .getAllStarred()
             .map { it.map { entity -> entity.toDomain() } }
@@ -68,122 +77,50 @@ class StarredRepositoryImpl(
     ): Result<Unit> =
         withContext(Dispatchers.IO) {
             try {
-                val response =
-                    if (starred) {
-                        httpClient.put("/user/starred/$owner/$repo") {
-                            header("Content-Length", "0")
+                recoverHttpFailure({ Result.failure(it) }) {
+                    val response =
+                        if (starred) {
+                            httpClient.put("/user/starred/$owner/$repo") {
+                                header("Content-Length", "0")
+                            }
+                        } else {
+                            httpClient.delete("/user/starred/$owner/$repo")
                         }
-                    } else {
-                        httpClient.delete("/user/starred/$owner/$repo")
-                    }
-                when {
-                    response.status.isSuccess() -> {
-                        Result.success(Unit)
-                    }
-
-                    response.status.value == 401 -> {
-                        Result.failure(Exception("Authentication required. Please sign in with GitHub."))
-                    }
-
-                    else -> {
-                        Result.failure(Exception("Failed to update star: ${response.status.description}"))
+                    when {
+                        response.status.isSuccess() -> Result.success(Unit)
+                        response.status == HttpStatusCode.Unauthorized -> Result.failure(Exception(SIGN_IN_REQUIRED))
+                        else -> Result.failure(Exception("Failed to update star: ${response.status.description}"))
                     }
                 }
             } catch (e: RateLimitException) {
-                Result.failure(e)
-            } catch (e: CancellationException) {
-                throw e
-            } catch (e: Exception) {
                 Result.failure(e)
             }
         }
 
-    override suspend fun fetchStarredForUsername(
-        username: String,
-    ): Result<List<zed.rainxch.core.domain.model.repository.StarredRepository>> =
+    override suspend fun fetchStarredForUsername(username: String): Result<List<StarredRepo>> =
         withContext(Dispatchers.IO) {
-            try {
-                val sanitized = username.trim().trimStart('@')
-                if (sanitized.isEmpty()) {
-                    return@withContext Result.failure(IllegalArgumentException("Username is empty"))
-                }
-
-                val allRepos = mutableListOf<GitHubStarredResponse>()
-                var page = 1
-                val perPage = 100
-
-                while (true) {
-                    val response =
-                        httpClient.get("/users/$sanitized/starred") {
-                            header(HttpHeaders.Accept, STARRED_MEDIA_TYPE)
-                            parameter("per_page", perPage)
-                            parameter("page", page)
-                        }
-
-                    if (!response.status.isSuccess()) {
-                        val reason =
-                            when (response.status.value) {
-                                404 -> "User '$sanitized' not found."
-                                403 -> "GitHub rate limit reached. Try again later or sign in."
-                                else -> "Failed to fetch stars: ${response.status.description}"
+            val sanitized = username.trim().trimStart('@')
+            if (sanitized.isEmpty()) {
+                return@withContext Result.failure(IllegalArgumentException("Username is empty"))
+            }
+            starredCall("Failed to fetch starred for username") {
+                fetchAllStarred("/users/$sanitized/starred") { status ->
+                    Exception(
+                        when (status) {
+                            HttpStatusCode.NotFound -> "User '$sanitized' not found."
+                            HttpStatusCode.Forbidden -> "GitHub rate limit reached. Try again later or sign in."
+                            else -> "Failed to fetch stars: ${status.description}"
+                        },
+                    )
+                }.map { repos ->
+                    val now = Clock.System.now().toEpochMilliseconds()
+                    repos
+                        .mapWithReleaseChecks { repo ->
+                            checkForValidAssets(repo.owner.login, repo.name, ::matchesAnyPlatform)?.let { release ->
+                                repo.toStarred(release, now)
                             }
-                        return@withContext Result.failure(Exception(reason))
-                    }
-
-                    val repos = parseStarredPage(gitHubJson, response.body())
-                    if (repos.isEmpty()) break
-                    allRepos.addAll(repos.map { it.repo.copy(starredAt = it.starredAt) })
-                    if (repos.size < perPage) break
-                    page++
+                        }.filterNotNull()
                 }
-
-                val now = Clock.System.now().toEpochMilliseconds()
-                val results =
-                    coroutineScope {
-                        val semaphore = Semaphore(25)
-                        allRepos
-                            .map { repo ->
-                                async {
-                                    semaphore.withPermit {
-                                        val release =
-                                            checkForValidAssets(repo.owner.login, repo.name, ::matchesAnyPlatform)
-                                                ?: return@withPermit null
-                                        val installedApps = installedAppsDao.getAppsByRepoId(repo.id)
-                                        val firstInstalled =
-                                            installedApps.firstOrNull { !it.isPendingInstall }
-                                        zed.rainxch.core.domain.model.repository.StarredRepository(
-                                            repoId = repo.id,
-                                            repoName = repo.name,
-                                            repoOwner = repo.owner.login,
-                                            repoOwnerAvatarUrl = repo.owner.avatarUrl,
-                                            repoDescription = repo.description,
-                                            primaryLanguage = repo.language,
-                                            repoUrl = repo.htmlUrl,
-                                            stargazersCount = repo.stargazersCount,
-                                            forksCount = repo.forksCount,
-                                            openIssuesCount = repo.openIssuesCount,
-                                            isInstalled = firstInstalled != null,
-                                            installedPackageName = firstInstalled?.packageName,
-                                            latestVersion = release.version,
-                                            latestReleaseUrl = release.url,
-                                            starredAt = repo.starredAt.toEpochMillisecondsOrNull(),
-                                            addedAt = now,
-                                            lastSyncedAt = now,
-                                        )
-                                    }
-                                }
-                            }.awaitAll()
-                            .filterNotNull()
-                    }
-
-                Result.success(results)
-            } catch (e: RateLimitException) {
-                Result.failure(e)
-            } catch (e: CancellationException) {
-                throw e
-            } catch (e: Exception) {
-                Logger.e(e) { "Failed to fetch starred for username" }
-                Result.failure(e)
             }
         }
 
@@ -197,95 +134,103 @@ class StarredRepositoryImpl(
 
     override suspend fun syncStarredRepos(forceRefresh: Boolean): Result<Unit> =
         withContext(Dispatchers.IO) {
-            try {
+            starredCall("Failed to sync starred repos") {
                 if (!forceRefresh && !needsSync()) {
-                    return@withContext Result.success(Unit)
-                }
-
-                val allRepos = mutableListOf<GitHubStarredResponse>()
-                var page = 1
-                val perPage = 100
-
-                while (true) {
-                    val response =
-                        httpClient.get("/user/starred") {
-                            header(HttpHeaders.Accept, STARRED_MEDIA_TYPE)
-                            parameter("per_page", perPage)
-                            parameter("page", page)
-                        }
-
-                    if (!response.status.isSuccess()) {
-                        if (response.status.value == 401) {
-                            return@withContext Result.failure(
-                                Exception("Authentication required. Please sign in with GitHub."),
-                            )
-                        }
-                        return@withContext Result.failure(
-                            Exception("Failed to fetch starred repos: ${response.status.description}"),
+                    Result.success(Unit)
+                } else {
+                    fetchAllStarred("/user/starred") { status ->
+                        Exception(
+                            if (status == HttpStatusCode.Unauthorized) {
+                                SIGN_IN_REQUIRED
+                            } else {
+                                "Failed to fetch starred repos: ${status.description}"
+                            },
                         )
-                    }
-
-                    val repos = parseStarredPage(gitHubJson, response.body())
-
-                    if (repos.isEmpty()) break
-
-                    allRepos.addAll(repos.map { it.repo.copy(starredAt = it.starredAt) })
-
-                    if (repos.size < perPage) break
-                    page++
-                }
-
-                val now = Clock.System.now().toEpochMilliseconds()
-                val starredRepos = mutableListOf<zed.rainxch.core.domain.model.repository.StarredRepository>()
-
-                coroutineScope {
-                    val semaphore = Semaphore(25)
-                    val deferredResults =
-                        allRepos.map { repo ->
-                            async {
-                                semaphore.withPermit {
-                                    val release = checkForValidAssets(repo.owner.login, repo.name)
-                                    val installedApps = installedAppsDao.getAppsByRepoId(repo.id)
-                                    val firstInstalled = installedApps.firstOrNull { !it.isPendingInstall }
-
-                                    zed.rainxch.core.domain.model.repository.StarredRepository(
-                                        repoId = repo.id,
-                                        repoName = repo.name,
-                                        repoOwner = repo.owner.login,
-                                        repoOwnerAvatarUrl = repo.owner.avatarUrl,
-                                        repoDescription = repo.description,
-                                        primaryLanguage = repo.language,
-                                        repoUrl = repo.htmlUrl,
-                                        stargazersCount = repo.stargazersCount,
-                                        forksCount = repo.forksCount,
-                                        openIssuesCount = repo.openIssuesCount,
-                                        isInstalled = firstInstalled != null,
-                                        installedPackageName = firstInstalled?.packageName,
-                                        latestVersion = release?.version,
-                                        latestReleaseUrl = release?.url,
-                                        starredAt = repo.starredAt.toEpochMillisecondsOrNull(),
-                                        addedAt = now,
-                                        lastSyncedAt = now,
-                                    )
-                                }
+                    }.map { repos ->
+                        val now = Clock.System.now().toEpochMilliseconds()
+                        val starred =
+                            repos.mapWithReleaseChecks { repo ->
+                                repo.toStarred(checkForValidAssets(repo.owner.login, repo.name), now)
                             }
-                        }
-
-                    starredRepos.addAll(deferredResults.awaitAll())
+                        starredRepoDao.replaceAllStarred(starred.map { it.toEntity() })
+                    }
                 }
-
-                starredRepoDao.replaceAllStarred(starredRepos.map { it.toEntity() })
-
-                Result.success(Unit)
-            } catch (e: RateLimitException) {
-                Result.failure(e)
-            } catch (e: CancellationException) {
-                throw e
-            } catch (e: Exception) {
-                Logger.e(e) { "Failed to sync starred repos" }
-                Result.failure(e)
             }
         }
+
+    // A rate limit reaches the caller untouched; the network, a page that won't parse or Room fail the call and are logged.
+    private inline fun <T> starredCall(
+        failureLog: String,
+        block: () -> Result<T>,
+    ): Result<T> =
+        try {
+            recoverHttpFailure(
+                { e ->
+                    Logger.e(e) { failureLog }
+                    Result.failure(e)
+                },
+                block,
+            )
+        } catch (e: RateLimitException) {
+            Result.failure(e)
+        } catch (e: SQLiteException) {
+            Logger.e(e) { failureLog }
+            Result.failure(e)
+        }
+
+    // Every page of a starred list, or the refusal for the first page GitHub turned down.
+    private suspend fun fetchAllStarred(
+        path: String,
+        refusal: (HttpStatusCode) -> Exception,
+    ): Result<List<GitHubStarredResponse>> {
+        val all = mutableListOf<GitHubStarredResponse>()
+        var page = 1
+        while (true) {
+            val response =
+                httpClient.get(path) {
+                    header(HttpHeaders.Accept, STARRED_MEDIA_TYPE)
+                    parameter("per_page", STARRED_PAGE_SIZE)
+                    parameter("page", page)
+                }
+            if (!response.status.isSuccess()) return Result.failure(refusal(response.status))
+            val repos = parseStarredPage(gitHubJson, response.body())
+            all += repos.map { it.repo.copy(starredAt = it.starredAt) }
+            if (repos.size < STARRED_PAGE_SIZE) return Result.success(all)
+            page++
+        }
+    }
+
+    private suspend fun <T> List<GitHubStarredResponse>.mapWithReleaseChecks(transform: suspend (GitHubStarredResponse) -> T): List<T> =
+        coroutineScope {
+            val semaphore = Semaphore(RELEASE_CHECK_CONCURRENCY)
+            map { repo -> async { semaphore.withPermit { transform(repo) } } }.awaitAll()
+        }
+
+    private suspend fun GitHubStarredResponse.toStarred(
+        release: StableReleaseInfo?,
+        now: Long,
+    ): StarredRepo {
+        val firstInstalled = installedAppsDao.getAppsByRepoId(id).firstOrNull { !it.isPendingInstall }
+        return StarredRepo(
+            repoId = id,
+            repoName = name,
+            repoOwner = owner.login,
+            repoOwnerAvatarUrl = owner.avatarUrl,
+            repoDescription = description,
+            primaryLanguage = language,
+            repoUrl = htmlUrl,
+            stargazersCount = stargazersCount,
+            forksCount = forksCount,
+            openIssuesCount = openIssuesCount,
+            isInstalled = firstInstalled != null,
+            installedPackageName = firstInstalled?.packageName,
+            latestVersion = release?.version,
+            latestReleaseUrl = release?.url,
+            starredAt = starredAt.toEpochMillisecondsOrNull(),
+            addedAt = now,
+            lastSyncedAt = now,
+        )
+    }
 
     private fun matchesPlatform(assetName: String): Boolean {
         val name = assetName.lowercase()
@@ -320,68 +265,45 @@ class StarredRepositoryImpl(
         owner: String,
         repo: String,
         matcher: (String) -> Boolean = ::matchesPlatform,
-    ): StableReleaseInfo? {
-        val backendResult = backendApiClient.getReleases(owner, repo, perPage = 10)
-        backendResult.fold(
+    ): StableReleaseInfo? =
+        backendApiClient.getReleases(owner, repo, perPage = RELEASE_CHECK_PAGE_SIZE).fold(
             onSuccess = { releases ->
-                val stable =
-                    releases.firstOrNull { it.draft != true && it.prerelease != true }
-                        ?: return null
-                if (stable.assets.isEmpty()) return null
-                return if (stable.assets.any { asset -> matcher(asset.name) }) {
-                    StableReleaseInfo(version = stable.tagName, url = stable.htmlUrl)
-                } else {
-                    null
-                }
+                releases
+                    .firstOrNull { it.draft != true && it.prerelease != true }
+                    ?.takeIf { stable -> stable.assets.any { matcher(it.name) } }
+                    ?.let { StableReleaseInfo(version = it.tagName, url = it.htmlUrl) }
             },
             onFailure = { error ->
-                if (!zed.rainxch.core.data.network
-                        .shouldFallbackToGithubOrRethrow(error)
-                ) {
-                    return null
-                }
+                if (shouldFallbackToGithubOrRethrow(error)) githubStableRelease(owner, repo, matcher) else null
             },
         )
 
-        return try {
-            val releasesResponse =
+    private suspend fun githubStableRelease(
+        owner: String,
+        repo: String,
+        matcher: (String) -> Boolean,
+    ): StableReleaseInfo? =
+        recoverHttpFailure(
+            { e ->
+                Logger.w(e) { "Failed to check valid assets for $owner/$repo" }
+                null
+            },
+        ) {
+            val response =
                 httpClient.get("/repos/$owner/$repo/releases") {
                     header("Accept", "application/vnd.github.v3+json")
-                    parameter("per_page", 10)
+                    parameter("per_page", RELEASE_CHECK_PAGE_SIZE)
                 }
-
-            if (!releasesResponse.status.isSuccess()) {
-                return null
-            }
-
-            val allReleases: List<GithubReleaseNetworkModel> = releasesResponse.body()
-
-            val stableRelease =
-                allReleases.firstOrNull {
-                    it.draft != true && it.prerelease != true
-                } ?: return null
-
-            if (stableRelease.assets.isEmpty()) {
-                return null
-            }
-
-            val relevantAssets =
-                stableRelease.assets.filter { asset -> matcher(asset.name) }
-
-            if (relevantAssets.isNotEmpty()) {
-                StableReleaseInfo(version = stableRelease.tagName, url = stableRelease.htmlUrl)
+            if (response.status.isSuccess()) {
+                response
+                    .body<List<GithubReleaseNetworkModel>>()
+                    .firstOrNull { it.draft != true && it.prerelease != true }
+                    ?.takeIf { stable -> stable.assets.any { matcher(it.name) } }
+                    ?.let { StableReleaseInfo(version = it.tagName, url = it.htmlUrl) }
             } else {
                 null
             }
-        } catch (e: RateLimitException) {
-            throw e
-        } catch (e: CancellationException) {
-            throw e
-        } catch (e: Exception) {
-            Logger.w(e) { "Failed to check valid assets for $owner/$repo" }
-            null
         }
-    }
 
     private data class StableReleaseInfo(
         val version: String?,
@@ -404,8 +326,7 @@ class StarredRepositoryImpl(
     )
 }
 
-// A malformed starred_at would otherwise cancel the sync's coroutineScope; it costs only the
-// entry's ordering hint.
+// A malformed starred_at would cancel the sync's coroutineScope; dropping it costs only the entry's ordering hint.
 internal fun String?.toEpochMillisecondsOrNull(): Long? {
     val raw = this ?: return null
     return try {

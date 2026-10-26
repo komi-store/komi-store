@@ -5,7 +5,6 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import eu.anifantakis.lib.ksafe.KSafe
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.BufferOverflow
@@ -20,25 +19,25 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
-import kotlin.time.Clock
-import kotlin.time.Instant
 import zed.rainxch.core.data.dto.MirrorEntry
 import zed.rainxch.core.data.dto.MirrorListResponse
 import zed.rainxch.core.data.network.MirrorApiClient
 import zed.rainxch.core.data.secure.MigrationEntry
 import zed.rainxch.core.data.secure.migrateDataStoreToKSafe
+import zed.rainxch.core.data.secure.safeDelete
+import zed.rainxch.core.data.secure.safeGet
+import zed.rainxch.core.data.secure.safeGetFlow
+import zed.rainxch.core.data.secure.safePut
 import zed.rainxch.core.domain.model.mirror.MirrorConfig
 import zed.rainxch.core.domain.model.mirror.MirrorPreference
+import zed.rainxch.core.domain.model.mirror.MirrorRemoved
 import zed.rainxch.core.domain.model.mirror.MirrorStatus
 import zed.rainxch.core.domain.model.mirror.MirrorType
 import zed.rainxch.core.domain.model.mirror.TrafficKind
 import zed.rainxch.core.domain.network.MirrorLatencyProbe
 import zed.rainxch.core.domain.repository.MirrorRepository
-import zed.rainxch.core.data.secure.safeDelete
-import zed.rainxch.core.data.secure.safeGet
-import zed.rainxch.core.data.secure.safeGetFlow
-import zed.rainxch.core.data.secure.safePut
-import zed.rainxch.core.domain.model.mirror.MirrorRemoved
+import kotlin.time.Clock
+import kotlin.time.Instant
 
 class MirrorRepositoryImpl(
     private val ksafe: KSafe,
@@ -50,89 +49,103 @@ class MirrorRepositoryImpl(
     private val json = Json { ignoreUnknownKeys = true }
     private val cacheTtlMs = 60L * 60 * 1000
 
-    private val _catalog = MutableStateFlow<List<MirrorConfig>>(emptyList())
-    private val _measuredLatencies = MutableStateFlow<Map<String, Int>>(emptyMap())
-    private val _removedNotices = MutableSharedFlow<MirrorRemoved>(
-        replay = 0,
-        extraBufferCapacity = 4,
-        onBufferOverflow = BufferOverflow.DROP_OLDEST,
-    )
+    private val catalog = MutableStateFlow<List<MirrorConfig>>(emptyList())
+    private val measuredLatencies = MutableStateFlow<Map<String, Int>>(emptyMap())
+    private val removedNotices =
+        MutableSharedFlow<MirrorRemoved>(
+            replay = 0,
+            extraBufferCapacity = 4,
+            onBufferOverflow = BufferOverflow.DROP_OLDEST,
+        )
     private val migrationDeferred = CompletableDeferred<Unit>()
     private val catalogLoaded = CompletableDeferred<Unit>()
 
     init {
         appScope.launch {
-            runCatching {
+            try {
                 migrateDataStoreToKSafe(
                     legacy = legacyDataStore,
                     ksafe = ksafe,
                     markerKey = MIGRATION_MARKER,
-                    entries = listOf(
-                        MigrationEntry(
-                            legacyKey = stringPreferencesKey("mirror_preferred_id"),
-                            ksafeKey = K_PREFERRED
+                    entries =
+                        listOf(
+                            MigrationEntry(
+                                legacyKey = stringPreferencesKey("mirror_preferred_id"),
+                                ksafeKey = K_PREFERRED,
+                            ),
+                            MigrationEntry(
+                                legacyKey = stringPreferencesKey("mirror_custom_template"),
+                                ksafeKey = K_CUSTOM_TEMPLATE,
+                            ),
+                            MigrationEntry(
+                                legacyKey = stringPreferencesKey("mirror_cached_list_json"),
+                                ksafeKey = K_CACHED_JSON,
+                            ),
+                            MigrationEntry(
+                                legacyKey = longPreferencesKey("mirror_cached_list_at"),
+                                ksafeKey = K_CACHED_AT,
+                            ),
                         ),
-                        MigrationEntry(
-                            legacyKey = stringPreferencesKey("mirror_custom_template"),
-                            ksafeKey = K_CUSTOM_TEMPLATE
-                        ),
-                        MigrationEntry(
-                            legacyKey = stringPreferencesKey("mirror_cached_list_json"),
-                            ksafeKey = K_CACHED_JSON
-                        ),
-                        MigrationEntry(
-                            legacyKey = longPreferencesKey("mirror_cached_list_at"),
-                            ksafeKey = K_CACHED_AT
-                        ),
-                    ),
                 )
+            } finally {
+                migrationDeferred.complete(Unit)
             }
-            migrationDeferred.complete(Unit)
-            _catalog.value = readCachedCatalogOrBundled()
+            catalog.value = readCachedCatalogOrBundled()
             catalogLoaded.complete(Unit)
-            val cachedAt = runCatching { ksafe.safeGet(K_CACHED_AT, 0L) }.getOrDefault(0L)
+            val cachedAt = ksafe.safeGet(K_CACHED_AT, 0L)
             if (Clock.System.now().toEpochMilliseconds() - cachedAt > cacheTtlMs) {
                 refreshCatalog()
             }
         }
     }
 
-    override fun observeCatalog(): Flow<List<MirrorConfig>> = _catalog.asStateFlow()
+    override fun observeCatalog(): Flow<List<MirrorConfig>> = catalog.asStateFlow()
 
     override suspend fun refreshCatalog(): Result<Unit> =
         apiClient
             .fetchList()
             .onSuccess { response ->
                 val configs = response.mirrors.map { it.toDomain() }.withBundledDirect()
-                val previousCatalog = _catalog.value
-                _catalog.value = configs
+                val previousCatalog = catalog.value
+                catalog.value = configs
                 ksafe.safePut(
                     K_CACHED_JSON,
-                    json.encodeToString(MirrorListResponse.serializer(), response)
+                    json.encodeToString(MirrorListResponse.serializer(), response),
                 )
                 ksafe.safePut(K_CACHED_AT, Clock.System.now().toEpochMilliseconds())
                 checkSelectedMirrorStillExists(fresh = configs, previous = previousCatalog)
             }.map { }
 
-    override fun observePreference(): Flow<MirrorPreference> = flow {
-        migrationDeferred.await()
-        emitAll(
-            combine(
-                ksafe.safeGetFlow(K_PREFERRED, DIRECT_MIRROR_ID),
-                ksafe.safeGetFlow(K_CUSTOM_TEMPLATE, ""),
-            ) { id, template ->
-                when (id) {
-                    DIRECT_MIRROR_ID -> MirrorPreference.Direct
-                    CUSTOM_MIRROR_ID_SENTINEL ->
-                        if (template.isBlank()) MirrorPreference.Direct else MirrorPreference.Custom(
-                            template
-                        )
+    override fun observePreference(): Flow<MirrorPreference> =
+        flow {
+            migrationDeferred.await()
+            emitAll(
+                combine(
+                    ksafe.safeGetFlow(K_PREFERRED, DIRECT_MIRROR_ID),
+                    ksafe.safeGetFlow(K_CUSTOM_TEMPLATE, ""),
+                ) { id, template ->
+                    when (id) {
+                        DIRECT_MIRROR_ID -> {
+                            MirrorPreference.Direct
+                        }
 
-                    else -> MirrorPreference.Selected(id)
-                }
-            },
-        )
-    }
+                        CUSTOM_MIRROR_ID_SENTINEL -> {
+                            if (template.isBlank()) {
+                                MirrorPreference.Direct
+                            } else {
+                                MirrorPreference.Custom(
+                                    template,
+                                )
+                            }
+                        }
+
+                        else -> {
+                            MirrorPreference.Selected(id)
+                        }
+                    }
+                },
+            )
+        }
 
     override suspend fun setPreference(pref: MirrorPreference) {
         migrationDeferred.await()
@@ -154,35 +167,30 @@ class MirrorRepositoryImpl(
         }
     }
 
-    override fun observeMeasuredLatencies(): Flow<Map<String, Int>> = _measuredLatencies.asStateFlow()
+    override fun observeMeasuredLatencies(): Flow<Map<String, Int>> = measuredLatencies.asStateFlow()
 
-    override suspend fun measureLatencies(): Result<Map<String, Int>> =
-        try {
-            catalogLoaded.await()
-            val measured = latencyProbe.probe(_catalog.value)
-            _measuredLatencies.value = measured
-            Result.success(measured)
-        } catch (e: CancellationException) {
-            throw e
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
+    // The probe turns every failed request into a missing entry, so measuring itself cannot fail.
+    override suspend fun measureLatencies(): Result<Map<String, Int>> {
+        catalogLoaded.await()
+        val measured = latencyProbe.probe(catalog.value)
+        measuredLatencies.value = measured
+        return Result.success(measured)
+    }
 
-    override fun observeRemovedNotices(): Flow<MirrorRemoved> = _removedNotices.asSharedFlow()
+    override fun observeRemovedNotices(): Flow<MirrorRemoved> = removedNotices.asSharedFlow()
 
     private suspend fun readCachedCatalogOrBundled(): List<MirrorConfig> {
-        val cachedJson = runCatching {
-            ksafe.safeGet(key = K_CACHED_JSON, defaultValue = "")
-        }.getOrDefault("")
+        val cachedJson = ksafe.safeGet(key = K_CACHED_JSON, defaultValue = "")
 
         return if (cachedJson.isBlank()) {
             BundledMirrors.ALL.sortedBy { it.status.ordinal }
         } else {
             runCatching {
-                json.decodeFromString(
-                    deserializer = MirrorListResponse.serializer(),
-                    string = cachedJson
-                ).mirrors
+                json
+                    .decodeFromString(
+                        deserializer = MirrorListResponse.serializer(),
+                        string = cachedJson,
+                    ).mirrors
                     .map { it.toDomain() }
                     .sortedBy { it.status.ordinal }
                     .withBundledDirect()
@@ -200,7 +208,7 @@ class MirrorRepositoryImpl(
         if (match == null) {
             val previousName = previous.firstOrNull { it.id == pref.id }?.name ?: pref.id
             setPreference(MirrorPreference.Direct)
-            _removedNotices.tryEmit(MirrorRemoved(displayName = previousName))
+            removedNotices.tryEmit(MirrorRemoved(displayName = previousName))
         }
     }
 
@@ -209,23 +217,26 @@ class MirrorRepositoryImpl(
             id = id,
             name = name,
             urlTemplate = urlTemplate,
-            type = when (type) {
-                "official" -> MirrorType.OFFICIAL
-                else -> MirrorType.COMMUNITY
-            },
-            status = when (status) {
-                "ok" -> MirrorStatus.OK
-                "degraded" -> MirrorStatus.DEGRADED
-                "down" -> MirrorStatus.DOWN
-                else -> MirrorStatus.UNKNOWN
-            },
+            type =
+                when (type) {
+                    "official" -> MirrorType.OFFICIAL
+                    else -> MirrorType.COMMUNITY
+                },
+            status =
+                when (status) {
+                    "ok" -> MirrorStatus.OK
+                    "degraded" -> MirrorStatus.DEGRADED
+                    "down" -> MirrorStatus.DOWN
+                    else -> MirrorStatus.UNKNOWN
+                },
             latencyMs = latencyMs,
             lastCheckedAt = lastCheckedAt?.let { runCatching { Instant.parse(it) }.getOrNull() },
-            trafficKinds = trafficKinds
-                ?.mapNotNull { TrafficKind.fromWire(it) }
-                ?.toSet()
-                ?.ifEmpty { null }
-                ?: setOf(TrafficKind.RELEASE_ASSET, TrafficKind.RAW_FILE),
+            trafficKinds =
+                trafficKinds
+                    ?.mapNotNull { TrafficKind.fromWire(it) }
+                    ?.toSet()
+                    ?.ifEmpty { null }
+                    ?: setOf(TrafficKind.RELEASE_ASSET, TrafficKind.RAW_FILE),
         )
 
     private companion object {

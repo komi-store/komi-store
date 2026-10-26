@@ -2,9 +2,9 @@ package zed.rainxch.core.data.secure
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.edit
 import eu.anifantakis.lib.ksafe.KSafe
-import kotlinx.coroutines.flow.first
+import zed.rainxch.core.data.local.datastore.removeKeys
+import zed.rainxch.core.data.local.datastore.snapshotOrNull
 
 suspend fun migrateDataStoreToKSafe(
     legacy: DataStore<Preferences>,
@@ -12,37 +12,30 @@ suspend fun migrateDataStoreToKSafe(
     markerKey: String,
     entries: List<MigrationEntry>,
 ) {
-    val alreadyMigrated =
-        runCatching {
-            ksafe.get(markerKey, false)
-        }.getOrDefault(false)
-    if (alreadyMigrated) return
-
-    val snapshotResult = runCatching { legacy.data.first() }
-    val snapshot = snapshotResult.getOrNull() ?: return
+    if (ksafe.safeGet(markerKey, false)) return
+    val snapshot = legacy.snapshotOrNull() ?: return
 
     val movedKeys = mutableListOf<Preferences.Key<*>>()
     var anyFailure = false
     entries.forEach { entry ->
-        val copyResult = runCatching { entry.copy(snapshot, ksafe) }
-        when {
-            copyResult.isFailure -> anyFailure = true
-            copyResult.getOrNull() == true -> movedKeys += entry.legacyKeys
+        when (copyOrNull(entry, snapshot, ksafe)) {
+            null -> anyFailure = true
+            true -> movedKeys += entry.legacyKeys
+            false -> Unit
         }
     }
 
-    if (movedKeys.isNotEmpty()) {
-        val deleteResult =
-            runCatching {
-                legacy.edit { prefs -> movedKeys.forEach { prefs.remove(it) } }
-            }
-        if (deleteResult.isFailure) anyFailure = true
-    }
+    if (movedKeys.isNotEmpty() && !legacy.removeKeys(movedKeys)) anyFailure = true
 
-    if (!anyFailure) {
-        runCatching { ksafe.put(markerKey, true) }
-    }
+    if (!anyFailure) ksafe.safePut(markerKey, true)
 }
+
+// Null when the copy failed, so the marker stays unset and the next start retries.
+private suspend fun copyOrNull(
+    entry: MigrationEntry,
+    snapshot: Preferences,
+    ksafe: KSafe,
+): Boolean? = guardStorage({ "migrating ${entry.legacyKeys} failed" }, { null }) { entry.copy(snapshot, ksafe) }
 
 class MigrationEntry(
     val legacyKeys: List<Preferences.Key<*>>,
@@ -88,8 +81,7 @@ class MigrationEntry(
                         }
 
                         is Set<*> -> {
-                            @Suppress("UNCHECKED_CAST")
-                            val asStrings = (value as Set<String>).toList()
+                            val asStrings = value.filterIsInstance<String>()
                             ksafe.put<List<String>>(ksafeKey, asStrings)
                         }
 

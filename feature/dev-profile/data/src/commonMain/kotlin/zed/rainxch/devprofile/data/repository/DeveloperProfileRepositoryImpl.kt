@@ -21,6 +21,9 @@ import kotlinx.serialization.Serializable
 import zed.rainxch.core.data.local.db.dao.InstalledAppDao
 import zed.rainxch.core.data.network.BackendApiClient
 import zed.rainxch.core.data.network.GitHubClientProvider
+import zed.rainxch.core.data.network.getReleases
+import zed.rainxch.core.data.network.getUser
+import zed.rainxch.core.data.network.getUserRepos
 import zed.rainxch.core.data.network.shouldFallbackToGithubOrRethrow
 import zed.rainxch.core.domain.logging.KomiStoreLogger
 import zed.rainxch.core.domain.model.error.RateLimitException

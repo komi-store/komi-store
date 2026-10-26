@@ -188,7 +188,7 @@ Errors use the backend's existing `ApiError` body, `{ "error": "<code>", "messag
 Details and the cards both need reviews, and features don't depend on each other, so the shared parts live in core:
 
 - `core/domain`: the `model/reviews` models and `ReviewsRepository`. Every failure is a `ReviewException(kind: ReviewError)`.
-- `core/data`: `BackendReviewsApi` (on `BackendApiClient.request`) and `ReviewsRepositoryImpl`. `ReviewsRepository.changes` emits a repo after the viewer posts, edits or deletes, so Details refreshes its section.
+- `core/data`: `BackendReviewsApi` and `BackendReviewModerationApi` (both on `BackendApiClient.request`) and `ReviewsRepositoryImpl`. `ReviewsRepository.changes` emits a repo after the viewer posts, edits or deletes, so Details refreshes its section.
 - `core/presentation/components/reviews`: `ReviewCard`, `RatingSummaryPanel`, `StarRating`, `StarRatingInput` and the `ReviewUi` models.
 - `feature/reviews/presentation`: the full screen, `GithubStoreGraph.ReviewsScreen(owner, repo, sourceHost, openComposer, composerRating, version, appLabel)`.
 

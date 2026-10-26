@@ -43,10 +43,7 @@ object ProxyManager {
                 seedJob =
                     launch {
                         ProxyScope.entries.forEach { scope ->
-                            runCatching {
-                                val cfg = repository.getProxyConfig(scope).first()
-                                flows.getValue(scope).value = cfg
-                            }
+                            flows.getValue(scope).value = repository.getProxyConfig(scope).first()
                         }
                     }
             }

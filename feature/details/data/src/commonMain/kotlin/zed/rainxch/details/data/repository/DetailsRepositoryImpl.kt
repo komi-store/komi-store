@@ -31,6 +31,11 @@ import zed.rainxch.core.data.network.RefreshCooldownException
 import zed.rainxch.core.data.network.RepoArchivedException
 import zed.rainxch.core.data.network.RepoNotFoundException
 import zed.rainxch.core.data.network.executeRequest
+import zed.rainxch.core.data.network.getReadme
+import zed.rainxch.core.data.network.getReleases
+import zed.rainxch.core.data.network.getRepo
+import zed.rainxch.core.data.network.getUser
+import zed.rainxch.core.data.network.refreshRepo
 import zed.rainxch.core.data.services.LocalizationManager
 import zed.rainxch.core.domain.logging.KomiStoreLogger
 import zed.rainxch.core.domain.model.account.github.GithubRelease

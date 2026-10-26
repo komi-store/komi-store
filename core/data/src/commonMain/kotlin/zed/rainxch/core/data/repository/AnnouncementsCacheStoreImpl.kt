@@ -2,7 +2,6 @@ package zed.rainxch.core.data.repository
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import co.touchlab.kermit.Logger
 import eu.anifantakis.lib.ksafe.KSafe
@@ -12,10 +11,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import zed.rainxch.core.data.local.datastore.removeKeys
+import zed.rainxch.core.data.local.datastore.snapshotOrNull
 import zed.rainxch.core.data.secure.safeDelete
 import zed.rainxch.core.data.secure.safeGet
 import zed.rainxch.core.data.secure.safeGetFlow
@@ -34,8 +34,11 @@ class AnnouncementsCacheStoreImpl(
 
     init {
         migrationScope.launch {
-            runCatching { migrateIfNeeded() }
-            migrationDeferred.complete(Unit)
+            try {
+                migrateIfNeeded()
+            } finally {
+                migrationDeferred.complete(Unit)
+            }
         }
     }
 
@@ -58,30 +61,18 @@ class AnnouncementsCacheStoreImpl(
 
     private suspend fun migrateIfNeeded() {
         if (migrated) return
-        val existing = runCatching { ksafe.safeGet<String?>(K_CACHED_PAYLOAD, null) }.getOrNull()
-        if (existing != null) {
-            migrated = true
-            return
-        }
-        val legacy =
-            runCatching {
-                legacyDataStore.data.first()[stringPreferencesKey("announcements_cached_payload")]
-            }.getOrNull()
-        if (!legacy.isNullOrEmpty()) {
-            val putOk = ksafe.safePut(K_CACHED_PAYLOAD, legacy)
-            if (!putOk) {
-                return
+        if (ksafe.safeGet<String?>(K_CACHED_PAYLOAD, null) == null) {
+            val legacy = legacyDataStore.snapshotOrNull()?.get(LEGACY_PAYLOAD_KEY)
+            if (!legacy.isNullOrEmpty()) {
+                if (!ksafe.safePut(K_CACHED_PAYLOAD, legacy)) return
+                if (!legacyDataStore.removeKeys(listOf(LEGACY_PAYLOAD_KEY))) logger.w("legacy clear failed")
             }
-            runCatching {
-                legacyDataStore.edit {
-                    it.remove(stringPreferencesKey("announcements_cached_payload"))
-                }
-            }.onFailure { logger.w("legacy clear failed: ${it.message}") }
         }
         migrated = true
     }
 
     private companion object {
         const val K_CACHED_PAYLOAD = "announcements_cached_payload"
+        val LEGACY_PAYLOAD_KEY = stringPreferencesKey("announcements_cached_payload")
     }
 }

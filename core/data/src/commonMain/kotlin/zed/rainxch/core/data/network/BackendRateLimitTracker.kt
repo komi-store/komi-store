@@ -32,11 +32,13 @@ object BackendRateLimitTracker {
 
     fun shouldPreempt(): Boolean {
         val snapshot = state.value
-        val r = snapshot.remaining ?: return false
-        if (r > PREEMPT_THRESHOLD) return false
-        val resetSec = snapshot.resetEpochSec ?: return r <= 0
-        val now = Clock.System.now().epochSeconds
-        return resetSec > now
+        val remaining = snapshot.remaining
+        val resetSec = snapshot.resetEpochSec
+        return when {
+            remaining == null || remaining > PREEMPT_THRESHOLD -> false
+            resetSec == null -> remaining <= 0
+            else -> resetSec > Clock.System.now().epochSeconds
+        }
     }
 
     fun snapshot(): Snapshot = state.value

@@ -1,5 +1,6 @@
 package zed.rainxch.core.data.network
 
+import io.ktor.http.HttpStatusCode
 import zed.rainxch.core.domain.model.error.RateLimitException
 import zed.rainxch.core.domain.model.error.RateLimitInfo
 import kotlin.coroutines.cancellation.CancellationException
@@ -9,7 +10,7 @@ fun shouldFallbackToGithubOrRethrow(cause: Throwable): Boolean =
     when (cause) {
         is CancellationException -> throw cause
         is RateLimitedException -> throw cause.toDomainRateLimitException()
-        is BackendException -> cause.statusCode in 500..599
+        is BackendException -> cause.statusCode in SERVER_ERROR_CODES
         else -> true
     }
 
@@ -27,14 +28,19 @@ fun shouldFallbackToGithubOrRethrow(
         }
 
         is BackendException -> {
-            cause.statusCode in 500..599 ||
-                (isSignedIn && cause.statusCode in setOf(401, 403, 404))
+            cause.statusCode in SERVER_ERROR_CODES ||
+                (isSignedIn && cause.statusCode in SIGNED_IN_FALLBACK_CODES)
         }
 
         else -> {
             true
         }
     }
+
+private val SERVER_ERROR_CODES = 500..599
+
+private val SIGNED_IN_FALLBACK_CODES =
+    setOf(HttpStatusCode.Unauthorized.value, HttpStatusCode.Forbidden.value, HttpStatusCode.NotFound.value)
 
 private fun RateLimitedException.toDomainRateLimitException(): RateLimitException {
     val nowSec = Clock.System.now().epochSeconds

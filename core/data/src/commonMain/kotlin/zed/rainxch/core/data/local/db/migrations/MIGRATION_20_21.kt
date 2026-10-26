@@ -4,8 +4,7 @@ import androidx.room.migration.Migration
 import androidx.sqlite.SQLiteConnection
 import androidx.sqlite.execSQL
 
-// DEFAULT NULL has to be spelled out. Room compares each column's default against the
-// exported schema on open, so omitting it fails validation on both platforms.
+// DEFAULT NULL is spelled out because Room checks each column's default against the exported schema on open.
 val MIGRATION_20_21 =
     object : Migration(20, 21) {
         override fun migrate(connection: SQLiteConnection) {

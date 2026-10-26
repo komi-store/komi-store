@@ -1,6 +1,6 @@
 package zed.rainxch.core.data.repository
 
-import kotlinx.coroutines.CancellationException
+import androidx.sqlite.SQLiteException
 import co.touchlab.kermit.Logger
 import io.ktor.client.HttpClient
 import io.ktor.client.request.get
@@ -26,6 +26,7 @@ import zed.rainxch.core.data.network.executeRequest
 import zed.rainxch.core.domain.logging.KomiStoreLogger
 import zed.rainxch.core.domain.model.account.SessionSnapshot
 import zed.rainxch.core.domain.model.account.UserProfile
+import zed.rainxch.core.domain.model.error.RateLimitException
 import zed.rainxch.core.domain.repository.UserSessionRepository
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
@@ -35,7 +36,7 @@ class UserSessionRepositoryImpl(
     private val tokenStore: TokenStore,
     private val cacheManager: CacheManager,
     private val httpClientProvider: () -> HttpClient,
-    private val logger: KomiStoreLogger
+    private val logger: KomiStoreLogger,
 ) : UserSessionRepository {
     private val httpClient: HttpClient get() = httpClientProvider()
 
@@ -44,9 +45,9 @@ class UserSessionRepositoryImpl(
 
     private val sessionExpiredMutex = Mutex()
 
-    private var _failingTokenSnapshot: String? = null
-    private var _firstFailureAtMillis: Long = 0L
-    private var _consecutiveFailures: Int = 0
+    private var failingTokenSnapshot: String? = null
+    private var firstFailureAtMillis: Long = 0L
+    private var consecutiveFailures: Int = 0
 
     override fun isUserLoggedIn(): Flow<Boolean> =
         tokenStore
@@ -60,7 +61,10 @@ class UserSessionRepositoryImpl(
 
     override val lastKnownSession: SessionSnapshot? get() = _lastKnownSession
 
-    private fun recordSession(isLoggedIn: Boolean, profile: UserProfile?) {
+    private fun recordSession(
+        isLoggedIn: Boolean,
+        profile: UserProfile?,
+    ) {
         _lastKnownSession = SessionSnapshot(isLoggedIn, profile)
     }
 
@@ -81,8 +85,7 @@ class UserSessionRepositoryImpl(
             ?: if (allowStale) cacheManager.getStale<UserProfile>(CACHE_KEY) else null
     }
 
-    private fun ownershipStamp(token: GithubDeviceTokenSuccessDto): String? =
-        token.savedAtEpochMillis?.toString()
+    private fun ownershipStamp(token: GithubDeviceTokenSuccessDto): String? = token.savedAtEpochMillis?.toString()
 
     private suspend fun isCurrentToken(token: GithubDeviceTokenSuccessDto): Boolean =
         tokenStore.currentToken()?.accessToken == token.accessToken
@@ -93,89 +96,101 @@ class UserSessionRepositoryImpl(
         recordSession(token != null, profile)
     }
 
-    override fun getUser(): Flow<UserProfile?> = flow {
-        val token = tokenStore.currentToken()
-        if (token == null) {
-            cacheManager.invalidate(CACHE_KEY)
-            recordSession(isLoggedIn = false, profile = null)
-            emit(null)
-            return@flow
-        }
-
-        val cached = ownedCachedProfile(token, allowStale = false)
-        if (cached != null) {
-            logger.debug("Profile cache hit")
-            if (isCurrentToken(token)) {
-                recordSession(isLoggedIn = true, profile = cached)
-                emit(cached)
-            } else {
+    override fun getUser(): Flow<UserProfile?> =
+        flow {
+            val token = tokenStore.currentToken()
+            if (token == null) {
+                cacheManager.invalidate(CACHE_KEY)
+                recordSession(isLoggedIn = false, profile = null)
                 emit(null)
+                return@flow
             }
-            return@flow
-        }
 
-        try {
-            val networkProfile =
-                httpClient
-                    .executeRequest<UserProfileNetwork> {
-                        get("/user") {
-                            header(HttpHeaders.Accept, "application/vnd.github+json")
-                        }
-                    }.getOrThrow()
-
-            val userProfile = networkProfile.toUserProfile()
-            cacheManager.put(CACHE_KEY, userProfile, USER_PROFILE)
-            ownershipStamp(token)?.let { cacheManager.put(CACHE_OWNER_KEY, it, USER_PROFILE) }
-            logger.debug("Fetched and cached user profile: ${userProfile.username}")
-            if (isCurrentToken(token)) {
-                recordSession(isLoggedIn = true, profile = userProfile)
-                emit(userProfile)
-            } else {
-                emit(null)
+            val cached = ownedCachedProfile(token, allowStale = false)
+            if (cached != null) {
+                logger.debug("Profile cache hit")
+                emit(publishIfCurrent(token, cached))
+                return@flow
             }
-        } catch (e: CancellationException) {
-            throw e
-        } catch (e: Exception) {
-            logger.error("Failed to fetch user profile: ${e.message}")
+
+            val fetched = fetchAndCacheProfile(token)
+            if (fetched != null) {
+                emit(publishIfCurrent(token, fetched))
+                return@flow
+            }
 
             val fallback = ownedCachedProfile(token, allowStale = true)
             if (fallback != null) {
                 logger.debug("Using cached profile as fallback")
-                if (isCurrentToken(token)) {
-                    recordSession(isLoggedIn = true, profile = fallback)
-                    emit(fallback)
-                } else {
-                    emit(null)
-                }
+                emit(publishIfCurrent(token, fallback))
             } else {
-                if (isCurrentToken(token)) {
-                    val previous = _lastKnownSession?.takeIf { it.isLoggedIn }?.profile
-                    if (previous != null) {
-                        recordSession(isLoggedIn = true, profile = previous)
-                    }
-                }
+                keepLastKnownProfile(token)
                 emit(null)
             }
+        }.flowOn(Dispatchers.IO)
+
+    // Null when the fetch or the cache write failed; the caller then falls back to a cached copy.
+    private suspend fun fetchAndCacheProfile(token: GithubDeviceTokenSuccessDto): UserProfile? {
+        val fetched =
+            try {
+                httpClient.executeRequest<UserProfileNetwork> {
+                    get("/user") {
+                        header(HttpHeaders.Accept, "application/vnd.github+json")
+                    }
+                }
+            } catch (e: RateLimitException) {
+                Result.failure(e)
+            }
+        val userProfile =
+            fetched.map { it.toUserProfile() }.getOrElse { error ->
+                logger.error("Failed to fetch user profile: ${error.message}")
+                return null
+            }
+        return try {
+            cacheManager.put(CACHE_KEY, userProfile, USER_PROFILE)
+            ownershipStamp(token)?.let { cacheManager.put(CACHE_OWNER_KEY, it, USER_PROFILE) }
+            logger.debug("Fetched and cached user profile: ${userProfile.username}")
+            userProfile
+        } catch (e: SQLiteException) {
+            logger.error("Failed to fetch user profile: ${e.message}")
+            null
         }
-    }.flowOn(Dispatchers.IO)
+    }
+
+    private suspend fun publishIfCurrent(
+        token: GithubDeviceTokenSuccessDto,
+        profile: UserProfile,
+    ): UserProfile? {
+        if (!isCurrentToken(token)) return null
+        recordSession(isLoggedIn = true, profile = profile)
+        return profile
+    }
+
+    private suspend fun keepLastKnownProfile(token: GithubDeviceTokenSuccessDto) {
+        if (!isCurrentToken(token)) return
+        val previous = _lastKnownSession?.takeIf { it.isLoggedIn }?.profile
+        if (previous != null) {
+            recordSession(isLoggedIn = true, profile = previous)
+        }
+    }
 
     override suspend fun notifySessionExpired(tokenKey: String?) {
         if (tokenKey.isNullOrEmpty()) return
         sessionExpiredMutex.withLock {
             val now = Clock.System.now().toEpochMilliseconds()
-            if (tokenKey != _failingTokenSnapshot ||
-                now - _firstFailureAtMillis > FAILURE_WINDOW_MS
+            if (tokenKey != failingTokenSnapshot ||
+                now - firstFailureAtMillis > FAILURE_WINDOW_MS
             ) {
-                _failingTokenSnapshot = tokenKey
-                _firstFailureAtMillis = now
-                _consecutiveFailures = 1
+                failingTokenSnapshot = tokenKey
+                firstFailureAtMillis = now
+                consecutiveFailures = 1
             } else {
-                _consecutiveFailures += 1
+                consecutiveFailures += 1
             }
 
-            if (_consecutiveFailures < REQUIRED_CONSECUTIVE_FAILURES) {
+            if (consecutiveFailures < REQUIRED_CONSECUTIVE_FAILURES) {
                 Logger.w(TAG) {
-                    "notifySessionExpired: 401 count=$_consecutiveFailures (need " +
+                    "notifySessionExpired: 401 count=$consecutiveFailures (need " +
                         "$REQUIRED_CONSECUTIVE_FAILURES); deferring sign-out"
                 }
                 return@withLock
@@ -192,7 +207,7 @@ class UserSessionRepositoryImpl(
             }
 
             Logger.w(TAG) {
-                "notifySessionExpired: $_consecutiveFailures consecutive 401s within " +
+                "notifySessionExpired: $consecutiveFailures consecutive 401s within " +
                     "window; clearing token"
             }
             tokenStore.clear()
@@ -206,16 +221,16 @@ class UserSessionRepositoryImpl(
     override suspend fun notifyRequestSucceeded(tokenKey: String?) {
         if (tokenKey.isNullOrEmpty()) return
         sessionExpiredMutex.withLock {
-            if (tokenKey == _failingTokenSnapshot) {
+            if (tokenKey == failingTokenSnapshot) {
                 resetCounter()
             }
         }
     }
 
     private fun resetCounter() {
-        _failingTokenSnapshot = null
-        _firstFailureAtMillis = 0L
-        _consecutiveFailures = 0
+        failingTokenSnapshot = null
+        firstFailureAtMillis = 0L
+        consecutiveFailures = 0
     }
 
     override suspend fun logout() {

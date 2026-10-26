@@ -193,27 +193,34 @@ class InstalledAppsUpdateCheckWindowTest {
             database = db,
             installedAppsDao = db.installedAppDao,
             historyDao = db.updateHistoryDao,
-            installer = FakeInstaller(),
-            clientProvider =
-                GitHubClientProvider(
-                    tokenStore = FakeTokenStore(),
-                    rateLimitRepository = FakeRateLimitRepository(),
-                    userSessionRepository = FakeUserSessionRepository(),
-                    hostTokenRepository = FakeHostTokenRepository(),
-                    proxyConfigFlow = MutableStateFlow(offlineProxy),
+            updateChecker =
+                InstalledAppUpdateChecker(
+                    dao = db.installedAppDao,
+                    installer = FakeInstaller(),
+                    releaseSource =
+                        InstalledReleaseSource(
+                            clientProvider =
+                                GitHubClientProvider(
+                                    tokenStore = FakeTokenStore(),
+                                    rateLimitRepository = FakeRateLimitRepository(),
+                                    userSessionRepository = FakeUserSessionRepository(),
+                                    hostTokenRepository = FakeHostTokenRepository(),
+                                    proxyConfigFlow = MutableStateFlow(offlineProxy),
+                                ),
+                            backendApiClient =
+                                BackendApiClient(
+                                    proxyConfigFlow = MutableStateFlow(offlineProxy),
+                                    tokenStore = FakeTokenStore(),
+                                ),
+                            forgejoClientRegistry =
+                                ForgejoClientRegistry(
+                                    proxyConfigFlow = MutableStateFlow(offlineProxy),
+                                    hostTokenRepository = FakeHostTokenRepository(),
+                                ),
+                        ),
+                    packageMonitor = NoPackageMonitor,
+                    digestVerifier = DesktopDigestVerifier(),
                 ),
-            backendApiClient =
-                BackendApiClient(
-                    proxyConfigFlow = MutableStateFlow(offlineProxy),
-                    tokenStore = FakeTokenStore(),
-                ),
-            forgejoClientRegistry =
-                ForgejoClientRegistry(
-                    proxyConfigFlow = MutableStateFlow(offlineProxy),
-                    hostTokenRepository = FakeHostTokenRepository(),
-                ),
-            packageMonitor = NoPackageMonitor,
-            digestVerifier = DesktopDigestVerifier(),
         )
 
     private object NoPackageMonitor : PackageMonitor {

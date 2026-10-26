@@ -33,9 +33,7 @@ data class GitHubStarredResponse(
     )
 }
 
-// A host that ignores the star media type sends bare repositories: keep them, without star
-// times, instead of failing the sync. Parsed by hand because a JsonTransformingSerializer on
-// the wrapper makes its generated serializer() ask for itself (ExceptionInInitializerError).
+// Hand-parsed so bare repos (no star media type) still sync; a JsonTransformingSerializer here hits ExceptionInInitializerError.
 internal fun parseStarredPage(
     json: Json,
     element: JsonElement,
