@@ -250,7 +250,7 @@ class DefaultDownloadOrchestrator(
 
         entries[packageName]?.let { stopTransfer(it) }
 
-        // The network call is only cut by cancelDownload above, so wait for the job after it, not before.
+        // The network call is only cut by stopTransfer's cancelDownload, so wait for the job after it, not before.
         job?.join()
 
         entries.lock.withLock {
