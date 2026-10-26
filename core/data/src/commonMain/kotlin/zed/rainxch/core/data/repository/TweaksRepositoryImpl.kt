@@ -49,15 +49,16 @@ class TweaksRepositoryImpl(
 
     init {
         migrationScope.launch {
-            runCatching {
+            try {
                 migrateDataStoreToKSafe(
                     legacy = legacyDataStore,
                     ksafe = ksafe,
                     markerKey = MIGRATION_MARKER,
                     entries = legacyEntries(),
                 )
+            } finally {
+                migrationDeferred.complete(Unit)
             }
-            migrationDeferred.complete(Unit)
         }
     }
 

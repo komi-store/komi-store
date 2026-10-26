@@ -1,5 +1,7 @@
 package zed.rainxch.core.data.cache
 
+import androidx.sqlite.SQLiteException
+import co.touchlab.kermit.Logger
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
@@ -35,7 +37,11 @@ class CacheManager(
         appScope?.launch {
             while (true) {
                 delay(CLEANUP_INTERVAL_MS)
-                runCatching { cleanupExpired() }
+                try {
+                    cleanupExpired()
+                } catch (e: SQLiteException) {
+                    Logger.w(e) { "Cache cleanup failed; the next pass retries" }
+                }
             }
         }
     }
@@ -46,42 +52,33 @@ class CacheManager(
         val currentTime = now()
 
         val cached = memoryCacheMutex.withLock { memoryCache[key] }
-        if (cached != null) {
-            val (expiresAt, jsonData) = cached
-            if (expiresAt > currentTime) {
-                return try {
-                    json.decodeFromString(serializer<T>(), jsonData)
-                } catch (e: CancellationException) {
-                    throw e
-                } catch (_: Exception) {
-                    memoryCacheMutex.withLock {
-                        if (memoryCache[key] == cached) memoryCache.remove(key)
-                    }
-                    null
-                }
-            } else {
-                memoryCacheMutex.withLock {
-                    if (memoryCache[key] == cached) memoryCache.remove(key)
-                }
-            }
-        }
+        val memoryHit = cached?.takeIf { (expiresAt, _) -> expiresAt > currentTime }
+        if (cached != null && memoryHit == null) evictFromMemory(key, cached)
 
-        val entry = readRow(key) { cacheDao.getValid(key, currentTime) } ?: return null
-        val snapshot = entry.expiresAt to entry.jsonData
-        memoryCacheMutex.withLock {
-            memoryCache[key] = snapshot
+        val diskRow = if (memoryHit == null) readRow(key) { cacheDao.getValid(key, currentTime) } else null
+        val snapshot = memoryHit ?: diskRow?.let { it.expiresAt to it.jsonData } ?: return null
+        if (diskRow != null) {
+            memoryCacheMutex.withLock {
+                memoryCache[key] = snapshot
+            }
         }
 
         return try {
-            json.decodeFromString(serializer<T>(), entry.jsonData)
-        } catch (e: CancellationException) {
-            throw e
-        } catch (_: Exception) {
-            cacheDao.deleteIfMatches(key, entry.cachedAt)
-            memoryCacheMutex.withLock {
-                if (memoryCache[key] == snapshot) memoryCache.remove(key)
-            }
+            json.decodeFromString(serializer<T>(), snapshot.second)
+        } catch (_: IllegalArgumentException) {
+            if (diskRow != null) cacheDao.deleteIfMatches(key, diskRow.cachedAt)
+            evictFromMemory(key, snapshot)
             null
+        }
+    }
+
+    @PublishedApi
+    internal suspend fun evictFromMemory(
+        key: String,
+        expected: Pair<Long, String>,
+    ) {
+        memoryCacheMutex.withLock {
+            if (memoryCache[key] == expected) memoryCache.remove(key)
         }
     }
 
@@ -89,9 +86,7 @@ class CacheManager(
         val entry = readRow(key) { cacheDao.getAny(key) } ?: return null
         return try {
             json.decodeFromString(serializer<T>(), entry.jsonData)
-        } catch (e: CancellationException) {
-            throw e
-        } catch (_: Exception) {
+        } catch (_: IllegalArgumentException) {
             null
         }
     }
@@ -126,8 +121,7 @@ class CacheManager(
 
     suspend fun getCachedAt(key: String): Long? = readRow(key) { cacheDao.getValid(key, now()) }?.cachedAt
 
-    // Android reads a row through a 2 MB CursorWindow and throws SQLiteBlobTooBigException
-    // for a bigger one (sing-box's release list), so a row that can't be read is a miss.
+    // A row over the 2 MB CursorWindow throws SQLiteBlobTooBigException on Android 9+ and IllegalStateException before.
     @PublishedApi
     internal suspend fun readRow(
         key: String,
@@ -137,7 +131,10 @@ class CacheManager(
             read()
         } catch (e: CancellationException) {
             throw e
-        } catch (_: Exception) {
+        } catch (_: SQLiteException) {
+            cacheDao.delete(key)
+            null
+        } catch (_: IllegalStateException) {
             cacheDao.delete(key)
             null
         }

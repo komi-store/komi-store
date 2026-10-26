@@ -1,10 +1,10 @@
 package zed.rainxch.core.data.repository
 
 import co.touchlab.kermit.Logger
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
 import zed.rainxch.core.data.dto.AnnouncementsResponseDto
 import zed.rainxch.core.data.mappers.toDomain
@@ -87,11 +87,10 @@ class AnnouncementsRepositoryImpl(
                     tweaksRepository.setAnnouncementsLastFetchedAt(nowMillis())
                     lastRefreshFailed.value = false
                     Result.success(Unit)
-                } catch (t: Throwable) {
-                    if (t is CancellationException) throw t
-                    logger.w("Announcements cache write failed: ${t.message}")
+                } catch (e: SerializationException) {
+                    logger.w("Announcements cache write failed: ${e.message}")
                     lastRefreshFailed.value = true
-                    Result.failure(t)
+                    Result.failure(e)
                 }
             },
             onFailure = { error ->
@@ -102,22 +101,13 @@ class AnnouncementsRepositoryImpl(
         )
     }
 
+    // The tweaks writes log and drop their own storage failures, so these three cannot throw.
     override suspend fun dismiss(id: String) {
-        try {
-            tweaksRepository.addAnnouncementDismissedId(id)
-        } catch (t: Throwable) {
-            if (t is CancellationException) throw t
-            logger.e(t) { "Failed to persist dismissed announcement $id" }
-        }
+        tweaksRepository.addAnnouncementDismissedId(id)
     }
 
     override suspend fun acknowledge(id: String) {
-        try {
-            tweaksRepository.addAnnouncementAcknowledgedId(id)
-        } catch (t: Throwable) {
-            if (t is CancellationException) throw t
-            logger.e(t) { "Failed to persist acknowledged announcement $id" }
-        }
+        tweaksRepository.addAnnouncementAcknowledgedId(id)
     }
 
     override suspend fun setMuted(
@@ -125,12 +115,7 @@ class AnnouncementsRepositoryImpl(
         muted: Boolean,
     ) {
         if (!category.isMutable) return
-        try {
-            tweaksRepository.setAnnouncementCategoryMuted(category, muted)
-        } catch (t: Throwable) {
-            if (t is CancellationException) throw t
-            logger.e(t) { "Failed to persist mute toggle for $category" }
-        }
+        tweaksRepository.setAnnouncementCategoryMuted(category, muted)
     }
 
     private fun parseAndFilter(
