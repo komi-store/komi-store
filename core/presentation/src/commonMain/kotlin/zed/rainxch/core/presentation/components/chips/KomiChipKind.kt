@@ -5,7 +5,6 @@ enum class KomiChipKind {
     Filter,
     Input,
 
-    // A filled chip for a tinted card, where a selected filter chip would vanish: a neutral fill (the primary
-    // container when selected) in Classic, ink in Manga.
+    // A filled chip for a tinted card, where a selected filter chip would vanish.
     Tonal,
 }

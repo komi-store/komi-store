@@ -71,8 +71,7 @@ fun StarRating(
     }
 }
 
-// Five tappable stars, each its own 44dp target. Stars that fill pop one after another from the left, so
-// a tap on the fourth runs a wave along the row.
+// Five tappable stars, each its own 44dp target; filling stars pop one after another from the left.
 @Composable
 fun StarRatingInput(
     rating: Int,

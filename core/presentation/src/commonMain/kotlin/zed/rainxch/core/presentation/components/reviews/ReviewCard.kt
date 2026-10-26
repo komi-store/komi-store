@@ -69,8 +69,7 @@ import zed.rainxch.githubstore.core.presentation.res.reviews_show_less
 import zed.rainxch.githubstore.core.presentation.res.reviews_show_more
 import zed.rainxch.githubstore.core.presentation.res.reviews_your_review
 
-// A null callback hides its action: the menu only lists what this viewer may do with this review. The
-// viewer's own review sits on a tinted card under a "Your review" label.
+// A null callback hides its action, so the menu lists only what this viewer may do with this review.
 @Composable
 fun ReviewCard(
     review: ReviewUi,

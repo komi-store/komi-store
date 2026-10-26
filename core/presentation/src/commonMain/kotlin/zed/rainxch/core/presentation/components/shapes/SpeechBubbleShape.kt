@@ -11,9 +11,7 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 
-// A rounded box with a tail on its top edge that points up at what it answers. The tail sits [tailStart]
-// in from the start edge, so it flips in right-to-left layouts. Content needs [tailHeight] of extra top
-// padding to clear it.
+// A rounded box with a tail on its top edge, tailStart in from the start; content needs tailHeight of extra top padding.
 class SpeechBubbleShape(
     private val corner: Dp,
     private val tailStart: Dp,
