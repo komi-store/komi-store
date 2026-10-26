@@ -14,6 +14,8 @@ import java.util.concurrent.TimeUnit
 
 object UpdateScheduler {
     private const val DEFAULT_INTERVAL_HOURS = 12L
+    private const val CHECK_BACKOFF_MINUTES = 30L
+    private const val AUTO_UPDATE_BACKOFF_MINUTES = 15L
     private const val IMMEDIATE_CHECK_WORK_NAME = "github_store_immediate_update_check"
 
     fun schedule(
@@ -33,7 +35,7 @@ object UpdateScheduler {
             ).setConstraints(constraints)
                 .setBackoffCriteria(
                     BackoffPolicy.EXPONENTIAL,
-                    30,
+                    CHECK_BACKOFF_MINUTES,
                     TimeUnit.MINUTES,
                 ).build()
 
@@ -65,7 +67,7 @@ object UpdateScheduler {
             ).setConstraints(constraints)
                 .setBackoffCriteria(
                     BackoffPolicy.EXPONENTIAL,
-                    30,
+                    CHECK_BACKOFF_MINUTES,
                     TimeUnit.MINUTES,
                 ).build()
 
@@ -92,7 +94,7 @@ object UpdateScheduler {
                 .setConstraints(constraints)
                 .setBackoffCriteria(
                     BackoffPolicy.EXPONENTIAL,
-                    15,
+                    AUTO_UPDATE_BACKOFF_MINUTES,
                     TimeUnit.MINUTES,
                 ).build()
 

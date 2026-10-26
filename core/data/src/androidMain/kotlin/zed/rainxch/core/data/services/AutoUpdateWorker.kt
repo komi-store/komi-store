@@ -1,7 +1,6 @@
 package zed.rainxch.core.data.services
 
 import android.Manifest
-import android.annotation.SuppressLint
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
@@ -19,6 +18,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import zed.rainxch.core.data.download.AssetSourceGoneException
 import zed.rainxch.core.data.network.BackgroundRequest
 import zed.rainxch.core.data.services.dhizuku.DhizukuServiceManager
 import zed.rainxch.core.data.services.dhizuku.model.DhizukuStatus
@@ -26,6 +26,8 @@ import zed.rainxch.core.data.services.root.RootServiceManager
 import zed.rainxch.core.data.services.root.model.RootStatus
 import zed.rainxch.core.data.services.shizuku.ShizukuServiceManager
 import zed.rainxch.core.data.services.shizuku.model.ShizukuStatus
+import zed.rainxch.core.domain.model.apk.ApkPackageInfo
+import zed.rainxch.core.domain.model.error.LocalStoreException
 import zed.rainxch.core.domain.model.installation.InstalledApp
 import zed.rainxch.core.domain.model.installation.InstallerType
 import zed.rainxch.core.domain.model.installation.markPending
@@ -35,6 +37,8 @@ import zed.rainxch.core.domain.repository.InstalledAppsRepository
 import zed.rainxch.core.domain.repository.TweaksRepository
 import zed.rainxch.core.domain.system.Installer
 import zed.rainxch.core.domain.system.SystemInstallSerializer
+import java.io.IOException
+import kotlin.coroutines.cancellation.CancellationException
 
 class AutoUpdateWorker(
     context: Context,
@@ -52,163 +56,164 @@ class AutoUpdateWorker(
 
     override suspend fun doWork(): Result = withContext(BackgroundRequest()) { runAutoUpdate() }
 
-    private suspend fun runAutoUpdate(): Result {
-        return try {
+    private suspend fun runAutoUpdate(): Result =
+        try {
             Logger.i { "AutoUpdateWorker: Starting auto-update" }
-
-            val autoUpdateEnabled = tweaksRepository.getAutoUpdateEnabled().first()
-            val installerType = tweaksRepository.getInstallerType().first()
-
-            val silentReady =
-                when (installerType) {
-                    InstallerType.THIRD_PARTY -> {
-                        false
-                    }
-
-                    InstallerType.SHIZUKU -> {
-                        shizukuServiceManager.refreshStatus()
-                        shizukuServiceManager.status.value == ShizukuStatus.READY
-                    }
-
-                    InstallerType.DHIZUKU -> {
-                        dhizukuServiceManager.refreshStatus()
-                        dhizukuServiceManager.status.value == DhizukuStatus.READY
-                    }
-
-                    InstallerType.ROOT -> {
-                        rootServiceManager.refreshStatus()
-                        rootServiceManager.status.value == RootStatus.READY
-                    }
-
-                    InstallerType.DEFAULT -> {
-                        false
-                    }
-                }
-
-            if (!autoUpdateEnabled || !silentReady) {
-                Logger.i {
-                    "AutoUpdateWorker: Conditions not met (autoUpdate=$autoUpdateEnabled, installer=$installerType, silentReady=$silentReady), skipping"
-                }
-                return Result.success()
-            }
-
-            val appsWithUpdates = installedAppsRepository.getAppsWithUpdates().first()
-            if (appsWithUpdates.isEmpty()) {
-                Logger.d { "AutoUpdateWorker: No apps need updating" }
-                return Result.success()
-            }
-
-            setForegroundIfAllowed(createForegroundInfo("Updating apps...", 0, appsWithUpdates.size))
-
-            val successfulApps = mutableListOf<String>()
-            val failedApps = mutableListOf<String>()
-
-            appsWithUpdates.forEachIndexed { index, app ->
-                setForegroundIfAllowed(
-                    createForegroundInfo(
-                        "Updating ${app.appName}...",
-                        index + 1,
-                        appsWithUpdates.size,
-                    ),
-                )
-
-                try {
-                    updateApp(app)
-                    successfulApps.add(app.appName)
-                    Logger.i { "AutoUpdateWorker: Successfully updated ${app.appName}" }
-                } catch (e: Exception) {
-                    failedApps.add(app.appName)
-                    Logger.e { "AutoUpdateWorker: Failed to update ${app.appName}: ${e.message}" }
-                    try {
-                        installedAppsRepository.updatePendingStatus(app.packageName, false)
-                    } catch (clearEx: Exception) {
-                        Logger.e { "AutoUpdateWorker: Failed to clear pending status: ${clearEx.message}" }
-                    }
-                }
-            }
-
-            showSummaryNotification(successfulApps, failedApps)
-
-            Logger.i { "AutoUpdateWorker: Completed. Success: ${successfulApps.size}, Failed: ${failedApps.size}" }
+            val appsWithUpdates = appsToUpdate()
+            if (appsWithUpdates.isNotEmpty()) updateAll(appsWithUpdates)
             Result.success()
-        } catch (e: Exception) {
-            Logger.e { "AutoUpdateWorker: Fatal error: ${e.message}" }
-            if (runAttemptCount < 2) {
-                Result.retry()
-            } else {
-                Result.failure()
-            }
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: IOException) {
+            retryOrFail(e)
+        } catch (e: LocalStoreException) {
+            retryOrFail(e)
+        } catch (e: IllegalStateException) {
+            retryOrFail(e)
+        } catch (e: SecurityException) {
+            retryOrFail(e)
+        }
+
+    private fun retryOrFail(e: Exception): Result {
+        Logger.e { "AutoUpdateWorker: Fatal error: ${e.message}" }
+        return if (runAttemptCount < 2) {
+            Result.retry()
+        } else {
+            Result.failure()
         }
     }
 
+    private suspend fun appsToUpdate(): List<InstalledApp> {
+        val autoUpdateEnabled = tweaksRepository.getAutoUpdateEnabled().first()
+        val installerType = tweaksRepository.getInstallerType().first()
+        val silentReady = isSilentInstallerReady(installerType)
+
+        if (!autoUpdateEnabled || !silentReady) {
+            Logger.i {
+                "AutoUpdateWorker: Conditions not met (autoUpdate=$autoUpdateEnabled, installer=$installerType, " +
+                    "silentReady=$silentReady), skipping"
+            }
+            return emptyList()
+        }
+
+        val appsWithUpdates = installedAppsRepository.getAppsWithUpdates().first()
+        if (appsWithUpdates.isEmpty()) {
+            Logger.d { "AutoUpdateWorker: No apps need updating" }
+        }
+        return appsWithUpdates
+    }
+
+    private fun isSilentInstallerReady(installerType: InstallerType): Boolean =
+        when (installerType) {
+            InstallerType.THIRD_PARTY -> {
+                false
+            }
+
+            InstallerType.SHIZUKU -> {
+                shizukuServiceManager.refreshStatus()
+                shizukuServiceManager.status.value == ShizukuStatus.READY
+            }
+
+            InstallerType.DHIZUKU -> {
+                dhizukuServiceManager.refreshStatus()
+                dhizukuServiceManager.status.value == DhizukuStatus.READY
+            }
+
+            InstallerType.ROOT -> {
+                rootServiceManager.refreshStatus()
+                rootServiceManager.status.value == RootStatus.READY
+            }
+
+            InstallerType.DEFAULT -> {
+                false
+            }
+        }
+
+    private suspend fun updateAll(appsWithUpdates: List<InstalledApp>) {
+        setForegroundIfAllowed(createForegroundInfo("Updating apps...", 0, appsWithUpdates.size))
+
+        val successfulApps = mutableListOf<String>()
+        val failedApps = mutableListOf<String>()
+
+        appsWithUpdates.forEachIndexed { index, app ->
+            setForegroundIfAllowed(
+                createForegroundInfo(
+                    "Updating ${app.appName}...",
+                    index + 1,
+                    appsWithUpdates.size,
+                ),
+            )
+
+            if (tryUpdate(app)) {
+                successfulApps.add(app.appName)
+            } else {
+                failedApps.add(app.appName)
+            }
+        }
+
+        showSummaryNotification(successfulApps, failedApps)
+
+        Logger.i { "AutoUpdateWorker: Completed. Success: ${successfulApps.size}, Failed: ${failedApps.size}" }
+    }
+
+    private suspend fun tryUpdate(app: InstalledApp): Boolean =
+        try {
+            updateApp(app)
+            Logger.i { "AutoUpdateWorker: Successfully updated ${app.appName}" }
+            true
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: IOException) {
+            onUpdateFailed(app, e)
+        } catch (e: IllegalStateException) {
+            onUpdateFailed(app, e)
+        } catch (e: IllegalArgumentException) {
+            onUpdateFailed(app, e)
+        } catch (e: AssetSourceGoneException) {
+            onUpdateFailed(app, e)
+        } catch (e: LocalStoreException) {
+            onUpdateFailed(app, e)
+        } catch (e: SecurityException) {
+            onUpdateFailed(app, e)
+        }
+
+    private suspend fun onUpdateFailed(
+        app: InstalledApp,
+        e: Exception,
+    ): Boolean {
+        Logger.e { "AutoUpdateWorker: Failed to update ${app.appName}: ${e.message}" }
+        try {
+            installedAppsRepository.updatePendingStatus(app.packageName, false)
+        } catch (clearEx: LocalStoreException) {
+            Logger.e { "AutoUpdateWorker: Failed to clear pending status: ${clearEx.message}" }
+        }
+        return false
+    }
+
     private suspend fun updateApp(app: InstalledApp) {
-        val assetUrl =
-            app.latestAssetUrl
-                ?: throw IllegalStateException("No asset URL for ${app.appName}")
-        val assetName =
-            app.latestAssetName
-                ?: throw IllegalStateException("No asset name for ${app.appName}")
-        val latestVersion =
-            app.latestVersion
-                ?: throw IllegalStateException("No latest version for ${app.appName}")
+        val assetUrl = app.latestAssetUrl ?: error("No asset URL for ${app.appName}")
+        val assetName = app.latestAssetName ?: error("No asset name for ${app.appName}")
+        val latestVersion = app.latestVersion ?: error("No latest version for ${app.appName}")
 
         val ext = assetName.substringAfterLast('.', "").lowercase()
 
-        val existingPath = downloader.getDownloadedFilePath(assetName)
-        if (existingPath != null) {
-            val file = java.io.File(existingPath)
-            try {
-                val apkInfo = installer.getApkInfoExtractor().extractPackageInfo(existingPath)
-                val normalizedExisting =
-                    apkInfo?.versionName?.removePrefix("v")?.removePrefix("V") ?: ""
-                val normalizedLatest = latestVersion.removePrefix("v").removePrefix("V")
-                if (normalizedExisting != normalizedLatest) {
-                    file.delete()
-                    Logger.d { "AutoUpdateWorker: Deleted mismatched existing file for ${app.appName}" }
-                }
-            } catch (_: Exception) {
-                file.delete()
-                Logger.d { "AutoUpdateWorker: Deleted unextractable existing file for ${app.appName}" }
-            }
-        }
+        discardStaleDownload(app, assetName, latestVersion)
 
         Logger.d { "AutoUpdateWorker: Downloading $assetName for ${app.appName}" }
         downloader.download(assetUrl, assetName).collect { }
 
         val filePath =
             downloader.getDownloadedFilePath(assetName)
-                ?: throw IllegalStateException("Downloaded file not found for ${app.appName}")
+                ?: error("Downloaded file not found for ${app.appName}")
 
         val apkInfo =
             installer.getApkInfoExtractor().extractPackageInfo(filePath)
 
-        if (apkInfo != null && apkInfo.packageName != app.packageName) {
-            Logger.e {
-                "AutoUpdateWorker: Package name mismatch for ${app.appName}! " +
-                    "Expected: ${app.packageName}, got: ${apkInfo.packageName}. " +
-                    "Skipping auto-update."
-            }
-            throw IllegalStateException(
-                "Package name mismatch for ${app.appName}: expected ${app.packageName}, got ${apkInfo.packageName}",
-            )
-        }
+        checkPackageName(app, apkInfo)
 
         val currentApp = installedAppsRepository.getAppByPackage(app.packageName)
 
-        if (apkInfo != null && currentApp?.signingFingerprint != null) {
-            val expected = currentApp.signingFingerprint!!.trim().uppercase()
-            val actual = apkInfo.signingFingerprint?.trim()?.uppercase()
-            if (actual == null || expected != actual) {
-                Logger.e {
-                    "AutoUpdateWorker: Signing key mismatch for ${app.appName}! " +
-                        "Expected: ${currentApp.signingFingerprint}, got: ${apkInfo.signingFingerprint}. " +
-                        "Skipping auto-update."
-                }
-                throw IllegalStateException(
-                    "Signing fingerprint verification failed for ${app.appName}, blocking auto-update",
-                )
-            }
-        }
+        checkSigner(app, apkInfo, currentApp)
 
         if (apkInfo == null) {
             Logger.w { "AutoUpdateWorker: APK info extraction failed for ${app.appName}, installing without validation" }
@@ -232,18 +237,77 @@ class AutoUpdateWorker(
             )
         }
 
+        installDownloaded(app, filePath, ext)
+    }
+
+    private suspend fun discardStaleDownload(
+        app: InstalledApp,
+        assetName: String,
+        latestVersion: String,
+    ) {
+        val existingPath = downloader.getDownloadedFilePath(assetName) ?: return
+        val apkInfo = installer.getApkInfoExtractor().extractPackageInfo(existingPath)
+        val normalizedExisting =
+            apkInfo?.versionName?.removePrefix("v")?.removePrefix("V") ?: ""
+        val normalizedLatest = latestVersion.removePrefix("v").removePrefix("V")
+        if (normalizedExisting != normalizedLatest) {
+            java.io.File(existingPath).delete()
+            Logger.d { "AutoUpdateWorker: Deleted mismatched existing file for ${app.appName}" }
+        }
+    }
+
+    private fun checkPackageName(
+        app: InstalledApp,
+        apkInfo: ApkPackageInfo?,
+    ) {
+        if (apkInfo == null || apkInfo.packageName == app.packageName) return
+        Logger.e {
+            "AutoUpdateWorker: Package name mismatch for ${app.appName}! " +
+                "Expected: ${app.packageName}, got: ${apkInfo.packageName}. " +
+                "Skipping auto-update."
+        }
+        error("Package name mismatch for ${app.appName}: expected ${app.packageName}, got ${apkInfo.packageName}")
+    }
+
+    private fun checkSigner(
+        app: InstalledApp,
+        apkInfo: ApkPackageInfo?,
+        currentApp: InstalledApp?,
+    ) {
+        val storedSigner = currentApp?.signingFingerprint
+        val expected = storedSigner?.trim()?.uppercase()
+        val actual = apkInfo?.signingFingerprint?.trim()?.uppercase()
+        if (apkInfo == null || expected == null || actual == expected) return
+        Logger.e {
+            "AutoUpdateWorker: Signing key mismatch for ${app.appName}! " +
+                "Expected: $storedSigner, got: ${apkInfo.signingFingerprint}. " +
+                "Skipping auto-update."
+        }
+        error("Signing fingerprint verification failed for ${app.appName}, blocking auto-update")
+    }
+
+    private suspend fun installDownloaded(
+        app: InstalledApp,
+        filePath: String,
+        ext: String,
+    ) {
         val installerLabel = tweaksRepository.getInstallerType().first().name
         Logger.d { "AutoUpdateWorker: Installing ${app.appName} via $installerLabel" }
+        var handedOver = false
         try {
             systemInstallSerializer.awaitFreeAndMarkPending(app.packageName)
             installer.install(filePath, ext)
-        } catch (e: Exception) {
-            systemInstallSerializer.markCompleted(app.packageName)
-            installedAppsRepository.updatePendingStatus(app.packageName, false)
-            throw e
+            handedOver = true
+        } finally {
+            if (!handedOver) {
+                systemInstallSerializer.markCompleted(app.packageName)
+                installedAppsRepository.updatePendingStatus(app.packageName, false)
+            }
         }
 
-        Logger.d { "AutoUpdateWorker: Install command completed for ${app.appName}, waiting for system confirmation via broadcast" }
+        Logger.d {
+            "AutoUpdateWorker: Install command completed for ${app.appName}, waiting for system confirmation via broadcast"
+        }
     }
 
     private fun createForegroundInfo(
@@ -278,7 +342,6 @@ class AutoUpdateWorker(
         }
     }
 
-    @SuppressLint("MissingPermission")
     private fun showSummaryNotification(
         successfulApps: List<String>,
         failedApps: List<String>,
@@ -294,43 +357,6 @@ class AutoUpdateWorker(
 
         if (successfulApps.isEmpty() && failedApps.isEmpty()) return
 
-        val title =
-            when {
-                failedApps.isEmpty() -> "${successfulApps.size} app${if (successfulApps.size > 1) "s" else ""} updated"
-                successfulApps.isEmpty() -> "Failed to update ${failedApps.size} app${if (failedApps.size > 1) "s" else ""}"
-                else -> "${successfulApps.size} updated, ${failedApps.size} failed"
-            }
-
-        val text =
-            when {
-                failedApps.isEmpty() -> successfulApps.joinToString(", ")
-
-                successfulApps.isEmpty() -> failedApps.joinToString(", ")
-
-                else -> "Updated: ${successfulApps.joinToString(", ")}. Failed: ${
-                    failedApps.joinToString(
-                        ", ",
-                    )
-                }"
-            }
-
-        val launchIntent =
-            applicationContext.packageManager
-                .getLaunchIntentForPackage(applicationContext.packageName)
-                ?.apply {
-                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
-                }
-
-        val pendingIntent =
-            launchIntent?.let {
-                PendingIntent.getActivity(
-                    applicationContext,
-                    0,
-                    it,
-                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
-                )
-            }
-
         val notification =
             NotificationCompat
                 .Builder(applicationContext, UPDATES_CHANNEL_ID)
@@ -340,10 +366,10 @@ class AutoUpdateWorker(
                     } else {
                         android.R.drawable.stat_notify_error
                     },
-                ).setContentTitle(title)
-                .setContentText(text)
+                ).setContentTitle(summaryTitle(successfulApps, failedApps))
+                .setContentText(summaryText(successfulApps, failedApps))
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                .setContentIntent(pendingIntent)
+                .setContentIntent(launchAppPendingIntent())
                 .setAutoCancel(true)
                 .build()
 
@@ -351,6 +377,46 @@ class AutoUpdateWorker(
             .from(applicationContext)
             .notify(SUMMARY_NOTIFICATION_ID, notification)
     }
+
+    private fun summaryTitle(
+        successfulApps: List<String>,
+        failedApps: List<String>,
+    ): String =
+        when {
+            failedApps.isEmpty() -> "${successfulApps.size} app${if (successfulApps.size > 1) "s" else ""} updated"
+            successfulApps.isEmpty() -> "Failed to update ${failedApps.size} app${if (failedApps.size > 1) "s" else ""}"
+            else -> "${successfulApps.size} updated, ${failedApps.size} failed"
+        }
+
+    private fun summaryText(
+        successfulApps: List<String>,
+        failedApps: List<String>,
+    ): String =
+        when {
+            failedApps.isEmpty() -> successfulApps.joinToString(", ")
+
+            successfulApps.isEmpty() -> failedApps.joinToString(", ")
+
+            else -> "Updated: ${successfulApps.joinToString(", ")}. Failed: ${
+                failedApps.joinToString(
+                    ", ",
+                )
+            }"
+        }
+
+    private fun launchAppPendingIntent(): PendingIntent? =
+        applicationContext.packageManager
+            .getLaunchIntentForPackage(applicationContext.packageName)
+            ?.apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+            }?.let {
+                PendingIntent.getActivity(
+                    applicationContext,
+                    0,
+                    it,
+                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+                )
+            }
 
     companion object {
         const val WORK_NAME = "github_store_auto_update"

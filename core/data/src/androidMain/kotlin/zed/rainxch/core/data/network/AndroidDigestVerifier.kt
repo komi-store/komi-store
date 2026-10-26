@@ -19,7 +19,7 @@ class AndroidDigestVerifier : DigestVerifier {
                 runCatching {
                     val digest = MessageDigest.getInstance("SHA-256")
                     file.inputStream().use { stream ->
-                        val buf = ByteArray(8 * 1024)
+                        val buf = ByteArray(BUFFER_SIZE)
                         while (true) {
                             val read = stream.read(buf)
                             if (read <= 0) break
@@ -36,7 +36,7 @@ class AndroidDigestVerifier : DigestVerifier {
             runCatching {
                 val digest = MessageDigest.getInstance("SHA-256")
                 File(filePath).inputStream().use { stream ->
-                    val buf = ByteArray(8 * 1024)
+                    val buf = ByteArray(BUFFER_SIZE)
                     while (true) {
                         val read = stream.read(buf)
                         if (read <= 0) break
@@ -46,4 +46,8 @@ class AndroidDigestVerifier : DigestVerifier {
                 "sha256:" + digest.digest().joinToString("") { "%02x".format(it) }
             }.getOrNull()
         }
+
+    private companion object {
+        const val BUFFER_SIZE = 8 * 1024
+    }
 }

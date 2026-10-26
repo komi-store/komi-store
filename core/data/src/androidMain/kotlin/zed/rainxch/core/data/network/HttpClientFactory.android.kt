@@ -76,18 +76,16 @@ actual fun createPlatformHttpClient(proxyConfig: ProxyConfig): HttpClient {
     }
 }
 
-internal fun resolveAndroidSystemProxy(): Proxy {
-    val httpsHost = System.getProperty("https.proxyHost")?.takeIf { it.isNotBlank() }
-    val httpsPort = System.getProperty("https.proxyPort")?.toIntOrNull()?.takeIf { it in 1..65535 }
-    if (httpsHost != null && httpsPort != null) {
-        return Proxy(Proxy.Type.HTTP, InetSocketAddress(httpsHost, httpsPort))
-    }
+internal fun resolveAndroidSystemProxy(): Proxy = systemProxyFor("https") ?: systemProxyFor("http") ?: Proxy.NO_PROXY
 
-    val httpHost = System.getProperty("http.proxyHost")?.takeIf { it.isNotBlank() }
-    val httpPort = System.getProperty("http.proxyPort")?.toIntOrNull()?.takeIf { it in 1..65535 }
-    if (httpHost != null && httpPort != null) {
-        return Proxy(Proxy.Type.HTTP, InetSocketAddress(httpHost, httpPort))
+private fun systemProxyFor(scheme: String): Proxy? {
+    val host = System.getProperty("$scheme.proxyHost")?.takeIf { it.isNotBlank() }
+    val port = System.getProperty("$scheme.proxyPort")?.toIntOrNull()?.takeIf { it in 1..MAX_PORT }
+    return if (host != null && port != null) {
+        Proxy(Proxy.Type.HTTP, InetSocketAddress(host, port))
+    } else {
+        null
     }
-
-    return Proxy.NO_PROXY
 }
+
+private const val MAX_PORT = 65535

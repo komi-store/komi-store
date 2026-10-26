@@ -3,9 +3,9 @@ package zed.rainxch.core.data.services
 import android.content.Context
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
-import android.content.pm.PackageManager.GET_SIGNING_CERTIFICATES
 import android.os.BadParcelableException
 import android.os.Build
+import androidx.core.content.pm.PackageInfoCompat
 import co.touchlab.kermit.Logger
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -25,14 +25,9 @@ class AndroidPackageMonitor(
 
     override suspend fun getInstalledPackageInfo(packageName: String): SystemPackageInfo? =
         withContext(Dispatchers.IO) {
-            runCatching {
-                val flags =
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                        GET_SIGNING_CERTIFICATES.toLong()
-                    } else {
-                        @Suppress("DEPRECATION")
-                        PackageManager.GET_SIGNATURES.toLong()
-                    }
+            // Only NameNotFoundException means not installed; any other failure is rethrown so no caller deletes data on it.
+            try {
+                val flags = SigningFingerprint.SIGNER_FLAG.toLong()
 
                 val packageInfo =
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -41,17 +36,10 @@ class AndroidPackageMonitor(
                             PackageManager.PackageInfoFlags.of(flags),
                         )
                     } else {
-                        @Suppress("DEPRECATION")
                         packageManager.getPackageInfo(packageName, flags.toInt())
                     }
 
-                val versionCode =
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                        packageInfo.longVersionCode
-                    } else {
-                        @Suppress("DEPRECATION")
-                        packageInfo.versionCode.toLong()
-                    }
+                val versionCode = PackageInfoCompat.getLongVersionCode(packageInfo)
 
                 val signingFingerprint = SigningFingerprint.fromPackageInfo(packageInfo)
 
@@ -63,16 +51,11 @@ class AndroidPackageMonitor(
                     signingFingerprint = signingFingerprint,
                     apkPath = packageInfo.applicationInfo?.sourceDir,
                 )
-            }.getOrElse { e ->
-                // null means ONLY "positively not installed" (NameNotFoundException). Any other
-                // failure (SecurityException, transient PackageManager error) is rethrown so the
-                // caller never mistakes an ambiguous lookup for proof of uninstall and deletes data.
-                if (e is PackageManager.NameNotFoundException) {
-                    null
-                } else {
-                    Logger.w(e) { "getInstalledPackageInfo($packageName) failed: ${e.message}" }
-                    throw SystemPackagesException(e)
-                }
+            } catch (_: PackageManager.NameNotFoundException) {
+                null
+            } catch (e: SecurityException) {
+                Logger.w(e) { "getInstalledPackageInfo($packageName) failed: ${e.message}" }
+                throw SystemPackagesException(e)
             }
         }
 
@@ -84,7 +67,6 @@ class AndroidPackageMonitor(
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                         packageManager.getInstalledPackages(PackageManager.PackageInfoFlags.of(0L))
                     } else {
-                        @Suppress("DEPRECATION")
                         packageManager.getInstalledPackages(0)
                     }
                 } catch (e: BadParcelableException) {
@@ -100,7 +82,6 @@ class AndroidPackageMonitor(
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                     packageManager.getInstalledPackages(PackageManager.PackageInfoFlags.of(0L))
                 } else {
-                    @Suppress("DEPRECATION")
                     packageManager.getInstalledPackages(0)
                 }
 
@@ -110,13 +91,7 @@ class AndroidPackageMonitor(
                     val isUpdatedSystem = (pkg.applicationInfo?.flags ?: 0) and ApplicationInfo.FLAG_UPDATED_SYSTEM_APP != 0
                     !isSystemApp || isUpdatedSystem
                 }.map { pkg ->
-                    val versionCode =
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                            pkg.longVersionCode
-                        } else {
-                            @Suppress("DEPRECATION")
-                            pkg.versionCode.toLong()
-                        }
+                    val versionCode = PackageInfoCompat.getLongVersionCode(pkg)
 
                     val installer = resolveInstallerPackageName(pkg.packageName)
                     val isUpdatedSystem =
@@ -133,13 +108,5 @@ class AndroidPackageMonitor(
                 }.sortedBy { it.appName.lowercase() }
         }
 
-    private fun resolveInstallerPackageName(pkg: String): String? =
-        runCatching {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                packageManager.getInstallSourceInfo(pkg).installingPackageName
-            } else {
-                @Suppress("DEPRECATION")
-                packageManager.getInstallerPackageName(pkg)
-            }
-        }.getOrNull()
+    private fun resolveInstallerPackageName(pkg: String): String? = runCatching { packageManager.installingPackageNameOf(pkg) }.getOrNull()
 }

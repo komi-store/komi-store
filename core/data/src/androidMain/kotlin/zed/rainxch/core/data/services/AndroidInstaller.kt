@@ -12,6 +12,8 @@ import android.provider.Settings
 import androidx.core.content.FileProvider
 import androidx.core.net.toUri
 import co.touchlab.kermit.Logger
+import zed.rainxch.core.data.services.installer.AndroidInstallerAppHandoff
+import zed.rainxch.core.data.services.installer.InstallerAppHandoff
 import zed.rainxch.core.domain.model.account.github.GithubAsset
 import zed.rainxch.core.domain.model.system.SystemArchitecture
 import zed.rainxch.core.domain.system.InstallOutcome
@@ -25,7 +27,8 @@ import java.io.File
 class AndroidInstaller(
     private val context: Context,
     private val installerInfoExtractor: InstallerInfoExtractor,
-) : Installer {
+) : Installer,
+    InstallerAppHandoff by AndroidInstallerAppHandoff(context) {
     override fun getApkInfoExtractor(): InstallerInfoExtractor = installerInfoExtractor
 
     override fun detectSystemArchitecture(): SystemArchitecture {
@@ -81,7 +84,7 @@ class AndroidInstaller(
                     addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 }
             context.startActivity(intent)
-            throw IllegalStateException("Please enable 'Install unknown apps' for this app in Settings and try again.")
+            error("Please enable 'Install unknown apps' for this app in Settings and try again.")
         }
     }
 
@@ -90,9 +93,7 @@ class AndroidInstaller(
         extOrMime: String,
     ): InstallOutcome {
         val file = File(filePath)
-        if (!file.exists()) {
-            throw IllegalStateException("APK file not found: $filePath")
-        }
+        check(file.exists()) { "APK file not found: $filePath" }
 
         Logger.d { "Installing APK: $filePath" }
 
@@ -106,19 +107,15 @@ class AndroidInstaller(
                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             }
 
-        if (intent.resolveActivity(context.packageManager) != null) {
-            intent.preferSystemInstaller()
-            context.startActivity(intent)
-            Logger.d { "APK installation intent launched" }
-        } else {
-            throw IllegalStateException("No installer available on this device")
-        }
+        check(intent.resolveActivity(context.packageManager) != null) { "No installer available on this device" }
+        intent.preferSystemInstaller()
+        context.startActivity(intent)
+        Logger.d { "APK installation intent launched" }
 
         return InstallOutcome.DELEGATED_TO_SYSTEM
     }
 
-    // With several APK installers and no default set in Android, the intent opens a chooser on every
-    // install. Default means the system installer; another one is picked in the installer setting.
+    // Several installers and no Android default would open a chooser per install, so Default means the system installer.
     private fun Intent.preferSystemInstaller() {
         val packageManager = context.packageManager
         val resolved = resolveActivity(packageManager) ?: return
@@ -136,7 +133,6 @@ class AndroidInstaller(
                 PackageManager.ResolveInfoFlags.of(PackageManager.MATCH_DEFAULT_ONLY.toLong()),
             )
         } else {
-            @Suppress("DEPRECATION")
             queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY)
         }
 
@@ -149,49 +145,12 @@ class AndroidInstaller(
             }
         try {
             context.startActivity(intent)
-        } catch (e: Exception) {
+        } catch (e: ActivityNotFoundException) {
+            Logger.w { "Failed to start uninstall for $packageName: ${e.message}" }
+        } catch (e: SecurityException) {
             Logger.w { "Failed to start uninstall for $packageName: ${e.message}" }
         }
     }
-
-    override fun isObtainiumInstalled(): Boolean =
-        try {
-            context.packageManager.getPackageInfo("dev.imranr.obtainium.fdroid", 0)
-            true
-        } catch (e: Exception) {
-            try {
-                context.packageManager.getPackageInfo("dev.imranr.obtainium", 0)
-                true
-            } catch (e: Exception) {
-                false
-            }
-        }
-
-    override fun openInObtainium(
-        repoOwner: String,
-        repoName: String,
-        onOpenInstaller: () -> Unit,
-    ) {
-        val obtainiumUrl = "obtainium://add/https://github.com/$repoOwner/$repoName"
-        val intent =
-            Intent(Intent.ACTION_VIEW).apply {
-                data = obtainiumUrl.toUri()
-                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            }
-        try {
-            context.startActivity(intent)
-        } catch (_: ActivityNotFoundException) {
-            onOpenInstaller()
-        }
-    }
-
-    override fun isAppManagerInstalled(): Boolean =
-        try {
-            context.packageManager.getPackageInfo("io.github.muntashirakon.AppManager", 0)
-            true
-        } catch (e: Exception) {
-            false
-        }
 
     override fun openApp(packageName: String): Boolean {
         val launchIntent = context.packageManager.getLaunchIntentForPackage(packageName)
@@ -207,61 +166,6 @@ class AndroidInstaller(
         } else {
             Logger.w { "No launch intent found for $packageName" }
             false
-        }
-    }
-
-    override fun openWithExternalInstaller(filePath: String) {
-        val file = File(filePath)
-        if (!file.exists()) {
-            throw IllegalStateException("APK file not found: $filePath")
-        }
-
-        Logger.d { "Opening APK with external installer: $filePath" }
-
-        val authority = "${context.packageName}.fileprovider"
-        val fileUri: Uri = FileProvider.getUriForFile(context, authority, file)
-
-        val intent =
-            Intent(Intent.ACTION_VIEW).apply {
-                setDataAndType(fileUri, "application/vnd.android.package-archive")
-                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            }
-
-        val chooser =
-            Intent.createChooser(intent, null).apply {
-                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            }
-        context.startActivity(chooser)
-    }
-
-    override fun openInAppManager(
-        filePath: String,
-        onOpenInstaller: () -> Unit,
-    ) {
-        val file = File(filePath)
-        if (!file.exists()) {
-            throw IllegalStateException("APK file not found: $filePath")
-        }
-
-        Logger.d { "Opening APK in AppManager: $filePath" }
-
-        val authority = "${context.packageName}.fileprovider"
-        val fileUri: Uri = FileProvider.getUriForFile(context, authority, file)
-
-        val intent =
-            Intent(Intent.ACTION_VIEW).apply {
-                setDataAndType(fileUri, "application/vnd.android.package-archive")
-                setPackage("io.github.muntashirakon.AppManager")
-                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            }
-
-        try {
-            context.startActivity(intent)
-            Logger.d { "APK opened in AppManager" }
-        } catch (_: ActivityNotFoundException) {
-            onOpenInstaller()
         }
     }
 }

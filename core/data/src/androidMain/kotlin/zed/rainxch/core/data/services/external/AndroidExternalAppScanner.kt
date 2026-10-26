@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.os.Build
+import androidx.core.content.pm.PackageInfoCompat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import zed.rainxch.core.domain.system.ExternalAppCandidate
@@ -74,7 +75,6 @@ class AndroidExternalAppScanner(
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 packageManager.getInstalledPackages(PackageManager.PackageInfoFlags.of(baseFlags))
             } else {
-                @Suppress("DEPRECATION")
                 packageManager.getInstalledPackages(baseFlags.toInt())
             }
         }.getOrDefault(emptyList())
@@ -86,7 +86,6 @@ class AndroidExternalAppScanner(
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 packageManager.getPackageInfo(packageName, PackageManager.PackageInfoFlags.of(flags))
             } else {
-                @Suppress("DEPRECATION")
                 packageManager.getPackageInfo(packageName, flags.toInt())
             }
         }.getOrNull()
@@ -105,7 +104,7 @@ class AndroidExternalAppScanner(
 
         val installerKind = installerSourceClassifier.classify(packageName, appInfo)
         val manifestHint = manifestHintExtractor.extract(appInfo.metaData)
-        val versionCode = longVersionCode(pkgInfo)
+        val versionCode = PackageInfoCompat.getLongVersionCode(pkgInfo)
         val fingerprint = SigningFingerprintComputer.compute(packageManager, packageName)
 
         return ExternalAppCandidate(
@@ -119,14 +118,6 @@ class AndroidExternalAppScanner(
             firstSeenAt = firstSeenAt,
         )
     }
-
-    private fun longVersionCode(pkgInfo: PackageInfo): Long =
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            pkgInfo.longVersionCode
-        } else {
-            @Suppress("DEPRECATION")
-            pkgInfo.versionCode.toLong()
-        }
 
     private fun nowMillis(): Long = System.currentTimeMillis()
 

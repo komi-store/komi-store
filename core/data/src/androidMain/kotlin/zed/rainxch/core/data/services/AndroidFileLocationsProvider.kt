@@ -9,17 +9,12 @@ class AndroidFileLocationsProvider(
     private val context: Context,
 ) : zed.rainxch.core.data.services.FileLocationsProvider {
     @Volatile
-    private var _cachedDownloadsDir: String? = null
+    private var cachedDownloadsDir: String? = null
 
-    override fun appDownloadsDir(): String {
-        _cachedDownloadsDir?.let { return it }
-        synchronized(this) {
-            _cachedDownloadsDir?.let { return it }
-            val resolved = resolveDownloadsDir()
-            _cachedDownloadsDir = resolved
-            return resolved
+    override fun appDownloadsDir(): String =
+        cachedDownloadsDir ?: synchronized(this) {
+            cachedDownloadsDir ?: resolveDownloadsDir().also { cachedDownloadsDir = it }
         }
-    }
 
     private fun resolveDownloadsDir(): String {
         val candidates =
@@ -45,26 +40,18 @@ class AndroidFileLocationsProvider(
         return fallback.absolutePath
     }
 
-    private fun ensureUsable(dir: File): File? {
-        return try {
-            if (!dir.exists() && !dir.mkdirs() && !dir.exists()) {
-                return null
-            }
-            if (!dir.canWrite()) return null
-            dir
-        } catch (t: Throwable) {
-            Log.w(TAG, "Failed probing ${dir.absolutePath}: ${t.message}")
+    private fun ensureUsable(dir: File): File? =
+        try {
+            val exists = dir.exists() || dir.mkdirs() || dir.exists()
+            dir.takeIf { exists && it.canWrite() }
+        } catch (e: SecurityException) {
+            Log.w(TAG, "Failed probing ${dir.absolutePath}: ${e.message}")
             null
         }
-    }
 
-    override fun userDownloadsDir(): String {
-        return appDownloadsDir()
-    }
+    override fun userDownloadsDir(): String = appDownloadsDir()
 
-    override fun setExecutableIfNeeded(path: String) {
-
-    }
+    override fun setExecutableIfNeeded(path: String) = Unit
 
     override fun getCacheSizeBytes(): Long {
         val dir = File(appDownloadsDir())

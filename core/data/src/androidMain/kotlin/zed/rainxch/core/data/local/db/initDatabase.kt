@@ -5,7 +5,6 @@ import androidx.room.Room
 import kotlinx.coroutines.Dispatchers
 import zed.rainxch.core.data.local.db.migrations.MIGRATIONS
 
-@Suppress("SpreadOperator")
 fun initDatabase(context: Context): AppDatabase {
     val appContext = context.applicationContext
     val dbFile = appContext.getDatabasePath("github_store.db")
@@ -14,7 +13,7 @@ fun initDatabase(context: Context): AppDatabase {
             context = appContext,
             name = dbFile.absolutePath,
         ).setQueryCoroutineContext(Dispatchers.IO)
-        .addMigrations(*MIGRATIONS)
+        .apply { MIGRATIONS.forEach { addMigrations(it) } }
         .fallbackToDestructiveMigrationOnDowngrade(dropAllTables = true)
         .build()
 }

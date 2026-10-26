@@ -1,6 +1,7 @@
 package zed.rainxch.core.data.utils
 
 import android.app.Activity
+import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -10,6 +11,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.FileProvider
 import zed.rainxch.core.domain.helpers.ShareManager
 import java.io.File
+import java.io.IOException
 
 class AndroidShareManager(
     private val context: Context,
@@ -35,7 +37,9 @@ class AndroidShareManager(
                                     ?.bufferedReader()
                                     ?.use { it.readText() }
                             callback?.invoke(content)
-                        } catch (e: Exception) {
+                        } catch (_: IOException) {
+                            callback?.invoke(null)
+                        } catch (_: SecurityException) {
                             callback?.invoke(null)
                         }
                     } else {
@@ -125,7 +129,9 @@ class AndroidShareManager(
                 )
 
                 onResult(null)
-            } catch (e: Exception) {
+            } catch (_: ActivityNotFoundException) {
+                onResult(null)
+            } catch (_: SecurityException) {
                 onResult(null)
             }
         }

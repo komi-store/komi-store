@@ -7,30 +7,40 @@ import zed.rainxch.core.domain.model.installation.ManifestHintSource
 class ManifestHintExtractor {
     fun extract(metaData: Bundle?): ManifestHint? {
         if (metaData == null) return null
+        return literalHint(metaData) ?: URL_KEYS.firstNotNullOfOrNull { entry -> urlHint(metaData, entry) }
+    }
 
-        metaData.getString(KEY_GITHUB_REPO)?.trim()?.takeIf { it.isNotEmpty() }?.let { raw ->
-            parseOwnerRepoLiteral(raw)?.let { (owner, repo) ->
-                return ManifestHint(
+    private fun literalHint(metaData: Bundle): ManifestHint? =
+        metaData
+            .getString(KEY_GITHUB_REPO)
+            ?.trim()
+            ?.takeIf { it.isNotEmpty() }
+            ?.let { parseOwnerRepoLiteral(it) }
+            ?.let { (owner, repo) ->
+                ManifestHint(
                     owner = owner,
                     repo = repo,
                     source = ManifestHintSource.META_GITHUB_REPO,
                     confidence = 0.95,
                 )
             }
-        }
 
-        for (entry in URL_KEYS) {
-            val raw = metaData.getString(entry.name)?.trim() ?: continue
-            val parsed = parseGithubUrl(raw) ?: continue
-            return ManifestHint(
-                owner = parsed.first,
-                repo = parsed.second,
-                source = entry.source,
-                confidence = entry.confidence,
-            )
-        }
-        return null
-    }
+    private fun urlHint(
+        metaData: Bundle,
+        entry: UrlKey,
+    ): ManifestHint? =
+        metaData
+            .getString(entry.name)
+            ?.trim()
+            ?.let { parseGithubUrl(it) }
+            ?.let { (owner, repo) ->
+                ManifestHint(
+                    owner = owner,
+                    repo = repo,
+                    source = entry.source,
+                    confidence = entry.confidence,
+                )
+            }
 
     fun parseOwnerRepoLiteral(raw: String): Pair<String, String>? {
         if (!OWNER_REPO_REGEX.matches(raw)) return null
@@ -44,11 +54,10 @@ class ManifestHintExtractor {
         val match = URL_REGEX.find(cleaned) ?: return null
         val owner = match.groupValues[1]
         val repoSegment = match.groupValues[2]
-        if (owner.isEmpty() || repoSegment.isEmpty()) return null
-        if (!OWNER_REGEX.matches(owner)) return null
         val repo = stripRepoSuffix(repoSegment)
-        if (!REPO_NAME_REGEX.matches(repo)) return null
-        return owner to repo
+        val ownerValid = owner.isNotEmpty() && OWNER_REGEX.matches(owner)
+        val repoValid = repoSegment.isNotEmpty() && REPO_NAME_REGEX.matches(repo)
+        return if (ownerValid && repoValid) owner to repo else null
     }
 
     private fun stripRepoSuffix(repo: String): String {
