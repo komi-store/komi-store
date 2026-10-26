@@ -31,6 +31,7 @@ import zed.rainxch.core.data.local.db.dao.StarredRepoDao
 import zed.rainxch.core.data.mappers.toDomain
 import zed.rainxch.core.data.mappers.toEntity
 import zed.rainxch.core.data.network.GitHubClientProvider
+import zed.rainxch.core.data.network.getReleases
 import zed.rainxch.core.data.network.gitHubJson
 import zed.rainxch.core.domain.model.error.RateLimitException
 import zed.rainxch.core.domain.model.system.Platform

@@ -17,6 +17,8 @@ import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
 import zed.rainxch.core.data.network.BackendApiClient
 import zed.rainxch.core.data.network.OFFLINE_MIRROR_BASE
+import zed.rainxch.core.data.network.getCategory
+import zed.rainxch.core.data.network.getTopic
 import zed.rainxch.core.domain.logging.KomiStoreLogger
 import zed.rainxch.core.domain.model.repository.DiscoveryPlatform
 import zed.rainxch.home.data.datasource.CachedRepositoriesDataSource

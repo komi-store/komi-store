@@ -32,6 +32,7 @@ import zed.rainxch.core.data.mirror.MirrorLatencyProbeImpl
 import zed.rainxch.core.data.mirror.MirrorRepositoryImpl
 import zed.rainxch.core.data.network.BackendApiClient
 import zed.rainxch.core.data.network.BackendExternalMatchApi
+import zed.rainxch.core.data.network.BackendReviewModerationApi
 import zed.rainxch.core.data.network.BackendReviewsApi
 import zed.rainxch.core.data.network.ExternalMatchApi
 import zed.rainxch.core.data.network.ExternalMatchApiSelector
@@ -273,7 +274,9 @@ val coreModule =
 
         single { BackendReviewsApi(get()) }
 
-        single<ReviewsRepository> { ReviewsRepositoryImpl(get()) }
+        single { BackendReviewModerationApi(get()) }
+
+        single<ReviewsRepository> { ReviewsRepositoryImpl(get(), get()) }
 
         single { MockExternalMatchApi() }
 

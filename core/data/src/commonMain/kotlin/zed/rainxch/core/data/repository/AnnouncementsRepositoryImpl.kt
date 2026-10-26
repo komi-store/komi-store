@@ -9,6 +9,7 @@ import kotlinx.serialization.json.Json
 import zed.rainxch.core.data.dto.AnnouncementsResponseDto
 import zed.rainxch.core.data.mappers.toDomain
 import zed.rainxch.core.data.network.BackendApiClient
+import zed.rainxch.core.data.network.getAnnouncements
 import zed.rainxch.core.data.services.LocalizationManager
 import zed.rainxch.core.domain.getPlatform
 import zed.rainxch.core.domain.model.announcement.Announcement

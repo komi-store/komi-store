@@ -1,33 +1,21 @@
 package zed.rainxch.core.data.mappers
 
-import zed.rainxch.core.data.dto.BackendModerationItemDto
-import zed.rainxch.core.data.dto.BackendModerationQueueDto
-import zed.rainxch.core.data.dto.BackendModerationReportDto
 import zed.rainxch.core.data.dto.BackendMyReviewDto
 import zed.rainxch.core.data.dto.BackendRatingSummaryDto
 import zed.rainxch.core.data.dto.BackendRepoRatingDto
 import zed.rainxch.core.data.dto.BackendReviewAuthorDto
-import zed.rainxch.core.data.dto.BackendReviewDraftDto
 import zed.rainxch.core.data.dto.BackendReviewDto
 import zed.rainxch.core.data.dto.BackendReviewReplyDto
 import zed.rainxch.core.data.dto.BackendReviewsPageDto
 import zed.rainxch.core.domain.model.reviews.CannotReviewReason
-import zed.rainxch.core.domain.model.reviews.ModerationItem
-import zed.rainxch.core.domain.model.reviews.ModerationPage
-import zed.rainxch.core.domain.model.reviews.ModerationReport
-import zed.rainxch.core.domain.model.reviews.ModerationStatus
 import zed.rainxch.core.domain.model.reviews.MyReviewState
 import zed.rainxch.core.domain.model.reviews.REVIEW_RATING_RANGE
 import zed.rainxch.core.domain.model.reviews.RatingSummary
 import zed.rainxch.core.domain.model.reviews.RepoRating
-import zed.rainxch.core.domain.model.reviews.ReportReason
 import zed.rainxch.core.domain.model.reviews.Review
 import zed.rainxch.core.domain.model.reviews.ReviewAuthor
-import zed.rainxch.core.domain.model.reviews.ReviewDraft
 import zed.rainxch.core.domain.model.reviews.ReviewPlatform
 import zed.rainxch.core.domain.model.reviews.ReviewReply
-import zed.rainxch.core.domain.model.reviews.ReviewSort
-import zed.rainxch.core.domain.model.reviews.ReviewTarget
 import zed.rainxch.core.domain.model.reviews.ReviewVote
 import zed.rainxch.core.domain.model.reviews.ReviewsPage
 import kotlin.time.Instant
@@ -95,51 +83,9 @@ fun BackendMyReviewDto.toDomain(): MyReviewState =
         isModerator = isModerator,
     )
 
-fun ReviewDraft.toDto(): BackendReviewDraftDto =
-    BackendReviewDraftDto(
-        rating = rating,
-        text = text?.trim()?.takeIf { it.isNotEmpty() },
-        version = version,
-        platform = platform?.name?.lowercase(),
-        appLabel = appLabel,
-    )
-
-fun BackendModerationQueueDto.toDomain(): ModerationPage =
-    ModerationPage(items = items.map { it.toDomain() }, page = page, hasMore = hasMore)
-
-// The queue names GitHub as "github.com"; a ReviewTarget leaves the host null for GitHub.
-fun BackendModerationItemDto.toDomain(): ModerationItem =
-    ModerationItem(
-        review = review.toDomain(),
-        repo =
-            ReviewTarget(
-                owner = repo.owner,
-                name = repo.name,
-                host = repo.host?.takeUnless { it.equals(GITHUB_HOST, ignoreCase = true) },
-            ),
-        reportCount = reportCount,
-        reports = reports.map { it.toDomain() },
-        lastReportedAt = lastReportedAt.toInstantOrNull(),
-        hidden = hidden,
-        hiddenReason = hiddenReason?.takeIf { it.isNotBlank() },
-    )
-
-fun BackendModerationReportDto.toDomain(): ModerationReport =
-    ModerationReport(
-        reason = ReportReason.entries.firstOrNull { it.name.equals(reason, ignoreCase = true) },
-        note = note?.takeIf { it.isNotBlank() },
-        createdAt = createdAt.toInstantOrNull(),
-    )
-
-fun ModerationStatus.toQuery(): String = name.lowercase()
-
-fun ReviewSort.toQuery(): String = name.lowercase()
-
-fun ReportReason.toQuery(): String = name.lowercase()
-
 private fun String?.toReviewPlatform(): ReviewPlatform? = ReviewPlatform.entries.firstOrNull { it.name.equals(this, ignoreCase = true) }
 
-private fun String?.toInstantOrNull(): Instant? =
+internal fun String?.toInstantOrNull(): Instant? =
     this?.let {
         try {
             Instant.parse(it)
@@ -147,5 +93,3 @@ private fun String?.toInstantOrNull(): Instant? =
             null
         }
     }
-
-private const val GITHUB_HOST = "github.com"

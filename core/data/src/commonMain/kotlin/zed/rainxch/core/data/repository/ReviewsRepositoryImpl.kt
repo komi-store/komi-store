@@ -7,6 +7,7 @@ import zed.rainxch.core.data.dto.BackendReviewReportDto
 import zed.rainxch.core.data.mappers.toDomain
 import zed.rainxch.core.data.mappers.toDto
 import zed.rainxch.core.data.mappers.toQuery
+import zed.rainxch.core.data.network.BackendReviewModerationApi
 import zed.rainxch.core.data.network.BackendReviewsApi
 import zed.rainxch.core.domain.model.reviews.ModerationDecision
 import zed.rainxch.core.domain.model.reviews.ModerationPage
@@ -26,12 +27,12 @@ import kotlin.time.Clock
 
 class ReviewsRepositoryImpl(
     private val api: BackendReviewsApi,
+    private val moderationApi: BackendReviewModerationApi,
 ) : ReviewsRepository {
     private val _changes = MutableSharedFlow<ReviewTarget>(extraBufferCapacity = 8)
     override val changes: Flow<ReviewTarget> = _changes.asSharedFlow()
 
-    // The public list is a CDN copy kept up to five minutes, so for that long after the viewer's own write
-    // the repo's reads skip it; otherwise the write would seem undone on the next load.
+    // The public list is a CDN copy up to five minutes old, so reads skip it that long after the viewer's own write.
     private var freshUntil: Map<ReviewTarget, Long> = emptyMap()
 
     override suspend fun getReviews(
@@ -45,9 +46,7 @@ class ReviewsRepositoryImpl(
         return api.getReviews(target, sort.toQuery(), rating, page, fresh).map { it.toDomain() }
     }
 
-    // The backend takes one host per call, so a mixed list (GitHub and Codeberg rows) is fetched per host.
-    // A host that fails (one the backend doesn't serve, say) only loses its own rows; the call fails only
-    // when every host does. Keys go out as written, since the answer is keyed by them exactly.
+    // One host per call; a failing host loses only its own rows, and the call fails only when every host does.
     override suspend fun getSummaries(targets: List<ReviewTarget>): Result<Map<ReviewTarget, RepoRating>> {
         val ratings = mutableMapOf<ReviewTarget, RepoRating>()
         val calls =
@@ -99,21 +98,21 @@ class ReviewsRepositoryImpl(
     override suspend fun getModerationQueue(
         status: ModerationStatus,
         page: Int,
-    ): Result<ModerationPage> = api.getModerationQueue(status.toQuery(), page).map { it.toDomain() }
+    ): Result<ModerationPage> = moderationApi.getModerationQueue(status.toQuery(), page).map { it.toDomain() }
 
     override suspend fun moderate(
         reviewId: String,
         decision: ModerationDecision,
     ): Result<Unit> =
         when (decision) {
-            ModerationDecision.DELETE -> api.deleteAsModerator(reviewId)
-            else -> api.moderate(reviewId, decision.name.lowercase())
+            ModerationDecision.DELETE -> moderationApi.deleteAsModerator(reviewId)
+            else -> moderationApi.moderate(reviewId, decision.name.lowercase())
         }
 
     override suspend fun setBanned(
         githubId: Long,
         banned: Boolean,
-    ): Result<Unit> = api.setBanned(githubId, banned)
+    ): Result<Unit> = moderationApi.setBanned(githubId, banned)
 
     private suspend fun wrote(target: ReviewTarget) {
         freshUntil = freshUntil + (target to Clock.System.now().toEpochMilliseconds() + CDN_LAG_MILLIS)

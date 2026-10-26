@@ -9,6 +9,7 @@ import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
+import io.ktor.http.isSuccess
 import io.ktor.util.network.UnresolvedAddressException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -22,6 +23,8 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.json.Json
+import zed.rainxch.core.data.network.recoverHttpFailure
+import zed.rainxch.core.data.secure.safeGet
 import zed.rainxch.core.domain.model.account.HostNames
 import zed.rainxch.core.domain.model.account.HostToken
 import zed.rainxch.core.domain.model.account.TokenValidation
@@ -45,8 +48,7 @@ class HostTokenRepositoryImpl(
     private val json = Json { ignoreUnknownKeys = true }
 
     init {
-
-        initScope.launch { runCatching { ensureLoaded() } }
+        initScope.launch { ensureLoaded() }
     }
 
     override fun observeAll(): Flow<List<HostToken>> = cache.asStateFlow().onStart { ensureLoaded() }
@@ -106,12 +108,18 @@ class HostTokenRepositoryImpl(
             Result.success(mapValidation(response))
         } catch (ce: CancellationException) {
             throw ce
+        } catch (e: TokenValidationException) {
+            Result.failure(e)
         } catch (e: IOException) {
             Result.failure(TokenValidationException.Unreachable(e))
         } catch (e: UnresolvedAddressException) {
             Result.failure(TokenValidationException.Unreachable(e))
-        } catch (t: Throwable) {
-            Result.failure(t)
+        } catch (e: IllegalStateException) {
+            // A host that doesn't make a valid URL, or the client closing under the request.
+            Result.failure(e)
+        } catch (e: IllegalArgumentException) {
+            // OkHttp rejects a pasted token with a character a header can't carry.
+            Result.failure(e)
         }
     }
 
@@ -123,13 +131,12 @@ class HostTokenRepositoryImpl(
 
     private suspend fun mapValidation(response: HttpResponse): TokenValidation {
         val status = response.status
-        if (status.value !in 200..299) throw TokenValidationException.HttpStatus(status.value)
+        if (!status.isSuccess()) throw TokenValidationException.HttpStatus(status.value)
         val login =
-            runCatching {
-                val text = response.bodyAsText()
+            recoverHttpFailure({ null }) { response.bodyAsText() }?.let { text ->
                 val pattern = Regex("\"login\"\\s*:\\s*\"([^\"]+)\"")
                 pattern.find(text)?.groupValues?.getOrNull(1)
-            }.getOrNull()
+            }
         val scopesHeader = response.headers["X-OAuth-Scopes"].orEmpty()
         val scopes =
             if (scopesHeader.isBlank()) {
@@ -151,7 +158,7 @@ class HostTokenRepositoryImpl(
 
     private suspend fun ensureLoadedLocked() {
         if (loaded) return
-        val raw = runCatching { ksafe.get(KEY_TOKENS_JSON, "") }.getOrDefault("")
+        val raw = ksafe.safeGet(KEY_TOKENS_JSON, "")
         val list =
             if (raw.isBlank()) {
                 emptyList()
@@ -164,16 +171,8 @@ class HostTokenRepositoryImpl(
     }
 
     private suspend fun persistOrThrow(list: List<HostToken>) {
-        val previous = cache.value
         val encoded = json.encodeToString(ListSerializer(HostToken.serializer()), list)
-        try {
-            ksafe.put(KEY_TOKENS_JSON, encoded)
-        } catch (ce: CancellationException) {
-            throw ce
-        } catch (t: Throwable) {
-            cache.value = previous
-            throw t
-        }
+        ksafe.put(KEY_TOKENS_JSON, encoded)
         cache.value = list
     }
 

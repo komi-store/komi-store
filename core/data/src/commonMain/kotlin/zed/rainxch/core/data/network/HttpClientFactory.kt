@@ -15,13 +15,11 @@ import zed.rainxch.core.data.datasource.TokenStore
 import zed.rainxch.core.data.network.interceptor.HostTokenInterceptor
 import zed.rainxch.core.data.network.interceptor.RateLimitInterceptor
 import zed.rainxch.core.data.network.interceptor.UnauthorizedInterceptor
-import zed.rainxch.core.domain.model.error.RateLimitException
 import zed.rainxch.core.domain.model.settings.ProxyConfig
 import zed.rainxch.core.domain.repository.HostTokenRepository
 import zed.rainxch.core.domain.repository.RateLimitRepository
 import zed.rainxch.core.domain.repository.UserSessionRepository
 import java.io.IOException
-import kotlin.coroutines.cancellation.CancellationException
 
 expect fun createPlatformHttpClient(proxyConfig: ProxyConfig): HttpClient
 
@@ -57,7 +55,7 @@ fun createGitHubHttpClient(
 
             install(HttpTimeout) {
                 requestTimeoutMillis = HttpTimeoutConfig.INFINITE_TIMEOUT_MS
-                connectTimeoutMillis = 30_000
+                connectTimeoutMillis = CONNECT_TIMEOUT_MS
                 socketTimeoutMillis = HttpTimeoutConfig.INFINITE_TIMEOUT_MS
             }
 
@@ -93,16 +91,19 @@ fun createGitHubHttpClient(
             }
         }.also { it.installMirrorRewrite() }
 
+private const val CONNECT_TIMEOUT_MS = 30_000L
+private const val MAX_RETRIES = 3
+private val SERVER_ERROR_CODES = 500..<600
+
 private fun HttpClientConfig<*>.installGitHubRetry() {
     install(HttpRequestRetry) {
-        maxRetries = 3
+        maxRetries = MAX_RETRIES
         retryIf { _, response ->
-            val code = response.status.value
-            if (code == 403) {
+            if (response.status == HttpStatusCode.Forbidden) {
                 val remaining = response.headers["X-RateLimit-Remaining"]?.toIntOrNull()
                 if (remaining == 0) return@retryIf false
             }
-            code in 500..<600
+            response.status.value in SERVER_ERROR_CODES
         }
         retryOnExceptionIf { _, cause ->
             cause is HttpRequestTimeoutException ||
@@ -114,7 +115,7 @@ private fun HttpClientConfig<*>.installGitHubRetry() {
 }
 
 suspend inline fun <reified T> HttpClient.executeRequest(crossinline block: suspend HttpClient.() -> HttpResponse): Result<T> =
-    try {
+    recoverHttpFailure({ Result.failure(it) }) {
         val response = block()
 
         if (response.status.isSuccess()) {
@@ -124,10 +125,4 @@ suspend inline fun <reified T> HttpClient.executeRequest(crossinline block: susp
                 Exception("HTTP ${response.status.value}: ${response.status.description}"),
             )
         }
-    } catch (e: RateLimitException) {
-        throw e
-    } catch (e: CancellationException) {
-        throw e
-    } catch (e: Exception) {
-        Result.failure(e)
     }

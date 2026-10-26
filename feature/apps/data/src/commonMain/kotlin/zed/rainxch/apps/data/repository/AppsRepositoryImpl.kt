@@ -26,6 +26,8 @@ import zed.rainxch.core.data.mappers.toObtainiumApp
 import zed.rainxch.core.data.network.BackendApiClient
 import zed.rainxch.core.data.network.GitHubClientProvider
 import zed.rainxch.core.data.network.executeRequest
+import zed.rainxch.core.data.network.getReleases
+import zed.rainxch.core.data.network.getRepo
 import zed.rainxch.core.data.network.shouldFallbackToGithubOrRethrow
 import zed.rainxch.core.domain.helpers.AppLauncher
 import zed.rainxch.core.domain.logging.KomiStoreLogger

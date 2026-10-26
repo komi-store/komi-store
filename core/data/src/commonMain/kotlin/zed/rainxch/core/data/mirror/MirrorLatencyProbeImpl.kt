@@ -5,13 +5,13 @@ import io.ktor.client.plugins.timeout
 import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.isSuccess
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
 import zed.rainxch.core.data.network.MirrorRewriter
+import zed.rainxch.core.data.network.recoverHttpFailure
 import zed.rainxch.core.domain.model.mirror.MirrorConfig
 import zed.rainxch.core.domain.network.MirrorLatencyProbe
 import kotlin.time.TimeSource
@@ -46,7 +46,7 @@ class MirrorLatencyProbeImpl(
         url: String,
         timeoutMs: Long,
     ): Int? =
-        try {
+        recoverHttpFailure({ null }) {
             val mark = TimeSource.Monotonic.markNow()
             val response =
                 client.get(url) {
@@ -59,10 +59,6 @@ class MirrorLatencyProbeImpl(
             response.bodyAsText()
             val elapsedMs = mark.elapsedNow().inWholeMilliseconds
             if (response.status.isSuccess()) elapsedMs.toInt() else null
-        } catch (e: CancellationException) {
-            throw e
-        } catch (_: Throwable) {
-            null
         }
 
     private companion object {

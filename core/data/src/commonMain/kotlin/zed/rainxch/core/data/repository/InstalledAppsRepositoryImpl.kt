@@ -21,6 +21,7 @@ import zed.rainxch.core.data.mappers.toEntity
 import zed.rainxch.core.data.mappers.toReleaseWindow
 import zed.rainxch.core.data.mappers.toUpdateCheckWindow
 import zed.rainxch.core.data.network.GitHubClientProvider
+import zed.rainxch.core.data.network.getReleases
 import zed.rainxch.core.domain.model.account.github.GithubRelease
 import zed.rainxch.core.domain.model.installation.InstallSource
 import zed.rainxch.core.domain.model.installation.InstalledApp
