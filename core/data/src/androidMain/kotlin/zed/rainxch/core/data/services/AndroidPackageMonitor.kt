@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.content.pm.PackageManager.GET_SIGNING_CERTIFICATES
+import android.os.BadParcelableException
 import android.os.Build
 import co.touchlab.kermit.Logger
 import kotlinx.coroutines.Dispatchers
@@ -77,12 +78,17 @@ class AndroidPackageMonitor(
 
     override suspend fun getAllInstalledPackageNames(): Set<String> =
         withContext(Dispatchers.IO) {
+            // A long list arrives in chunks, and a chunk that fails to arrive throws BadParcelableException.
             val packages =
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    packageManager.getInstalledPackages(PackageManager.PackageInfoFlags.of(0L))
-                } else {
-                    @Suppress("DEPRECATION")
-                    packageManager.getInstalledPackages(0)
+                try {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        packageManager.getInstalledPackages(PackageManager.PackageInfoFlags.of(0L))
+                    } else {
+                        @Suppress("DEPRECATION")
+                        packageManager.getInstalledPackages(0)
+                    }
+                } catch (e: BadParcelableException) {
+                    throw SystemPackagesException(e)
                 }
 
             packages.map { it.packageName }.toSet()
