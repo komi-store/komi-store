@@ -1,9 +1,11 @@
 package zed.rainxch.core.data.utils
 
+import co.touchlab.kermit.Logger
 import zed.rainxch.core.domain.helpers.ShareManager
 import java.awt.Toolkit
 import java.awt.datatransfer.StringSelection
 import java.io.File
+import java.io.IOException
 import javax.swing.JFileChooser
 import javax.swing.SwingUtilities
 import javax.swing.filechooser.FileNameExtensionFilter
@@ -55,7 +57,8 @@ class DesktopShareManager : ShareManager {
                 try {
                     val content = chooser.selectedFile.readText()
                     onResult(content)
-                } catch (e: Exception) {
+                } catch (e: IOException) {
+                    Logger.w(e) { "Could not read the picked file" }
                     onResult(null)
                 }
             } else {
