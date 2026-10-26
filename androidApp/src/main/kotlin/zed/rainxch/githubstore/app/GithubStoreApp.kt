@@ -3,10 +3,10 @@ package zed.rainxch.githubstore.app
 import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
-import android.database.SQLException
 import androidx.core.content.ContextCompat
 import co.touchlab.kermit.Logger
-import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -43,7 +43,15 @@ import zed.rainxch.githubstore.app.diagnostics.diagnosticSessionModule
 
 class GithubStoreApp : Application() {
     private var packageEventReceiver: PackageEventReceiver? = null
-    private val appScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+
+    // Startup tasks are best effort: a failed one is logged and never takes the launch down.
+    private val appScope =
+        CoroutineScope(
+            SupervisorJob() + Dispatchers.IO +
+                CoroutineExceptionHandler { context, e ->
+                    Logger.e(e) { "Startup task failed: ${context[CoroutineName]?.name}" }
+                },
+        )
     private val proxyRepository: ProxyRepository by inject()
     private val logger: KomiStoreLogger by inject()
 
@@ -58,29 +66,9 @@ class GithubStoreApp : Application() {
             modules(diagnosticSessionModule)
         }
 
-        appScope.launch {
-            runCatching {
-                createNotificationChannels()
-            }.onFailure {
-                logger.warn("$it - Notification-channel creation failed")
-            }
-        }
-
-        appScope.launch {
-            runCatching {
-                registerPackageEventReceiver()
-            }.onFailure {
-                logger.warn("$it - Dynamic PackageEventReceiver registration failed")
-            }
-        }
-
-        appScope.launch {
-            runCatching {
-                startDownloadNotificationObserver()
-            }.onFailure {
-                logger.warn("$it - Download notification observer start failed")
-            }
-        }
+        appScope.launch(CoroutineName("notification channels")) { createNotificationChannels() }
+        appScope.launch(CoroutineName("package event receiver")) { registerPackageEventReceiver() }
+        appScope.launch(CoroutineName("download notification observer")) { startDownloadNotificationObserver() }
 
         scheduleBackgroundUpdateChecks()
         registerSelfAsInstalledApp()
@@ -101,22 +89,14 @@ class GithubStoreApp : Application() {
     }
 
     private fun scheduleInitialExternalScan() {
-        appScope.launch {
-            runCatching {
-                get<ExternalImportRepository>().scheduleInitialScanIfNeeded()
-            }.onFailure {
-                logger.warn("$it - Initial external scan scheduling failed")
-            }
+        appScope.launch(CoroutineName("initial external scan")) {
+            get<ExternalImportRepository>().scheduleInitialScanIfNeeded()
         }
     }
 
     private fun scheduleSigningSeedSync() {
-        appScope.launch(BackgroundRequest()) {
-            runCatching {
-                get<ExternalImportRepository>().syncSigningFingerprintSeed()
-            }.onFailure {
-                logger.warn("$it - Signing seed sync failed")
-            }
+        appScope.launch(BackgroundRequest() + CoroutineName("signing seed sync")) {
+            get<ExternalImportRepository>().syncSigningFingerprintSeed()
         }
     }
 
@@ -183,38 +163,30 @@ class GithubStoreApp : Application() {
     }
 
     private fun scheduleBackgroundUpdateChecks() {
-        appScope.launch {
-            try {
-                val tweaks = get<TweaksRepository>()
-                val enabled = tweaks.getUpdateCheckEnabled().first()
-                if (!enabled) {
-                    UpdateScheduler.cancel(this@GithubStoreApp)
-                    Logger.i { "Background update check disabled — skipping schedule" }
-                    return@launch
-                }
-                val intervalHours = tweaks.getUpdateCheckInterval().first()
-                UpdateScheduler.schedule(
-                    context = this@GithubStoreApp,
-                    intervalHours = intervalHours,
-                )
-            } catch (e: CancellationException) {
-                throw e
-            } catch (e: IllegalStateException) {
-                Logger.e(e) { "Failed to schedule background update checks" }
+        appScope.launch(CoroutineName("update check scheduling")) {
+            val tweaks = get<TweaksRepository>()
+            val enabled = tweaks.getUpdateCheckEnabled().first()
+            if (!enabled) {
+                UpdateScheduler.cancel(this@GithubStoreApp)
+                Logger.i { "Background update check disabled, skipping schedule" }
+                return@launch
             }
+            val intervalHours = tweaks.getUpdateCheckInterval().first()
+            UpdateScheduler.schedule(
+                context = this@GithubStoreApp,
+                intervalHours = intervalHours,
+            )
         }
     }
 
     private fun registerSelfAsInstalledApp() {
-        appScope.launch {
-            guardSelfRecord(onFailure = { Logger.e(it) { "Komi Store App: Failed to register self as installed app" } }) {
-                val repo = get<InstalledAppsRepository>()
-                val existing = repo.getAppByPackage(packageName)
-                when {
-                    existing == null -> addSelfAsInstalledApp(repo)
-                    existing.isPendingInstall -> resolveSelfPendingInstall(existing, repo)
-                    else -> normalizeSelfInstalledVersion(existing, repo)
-                }
+        appScope.launch(CoroutineName("self registration")) {
+            val repo = get<InstalledAppsRepository>()
+            val existing = repo.getAppByPackage(packageName)
+            when {
+                existing == null -> addSelfAsInstalledApp(repo)
+                existing.isPendingInstall -> resolveSelfPendingInstall(existing, repo)
+                else -> normalizeSelfInstalledVersion(existing, repo)
             }
         }
     }
@@ -270,40 +242,35 @@ class GithubStoreApp : Application() {
     ) {
         val latestTag = existing.latestVersion ?: return
         if (existing.installedVersion == latestTag) return
-        guardSelfRecord(onFailure = { Logger.w(it) { "Failed to normalize self installedVersion tag" } }) {
-            val packageMonitor = get<PackageMonitor>()
-            val systemInfo = packageMonitor.getInstalledPackageInfo(packageName) ?: return
-            if (systemInfo.versionCode != existing.installedVersionCode ||
-                existing.latestVersionCode != systemInfo.versionCode
-            ) {
-                return
-            }
-            repo.updateApp(
-                existing.normalizeInstalledTag(
-                    tag = latestTag,
-                    isUpdateAvailable = existing.isUpdateAvailable,
-                ),
-            )
-            Logger.i { "Normalized stale self installedVersion tag to $latestTag" }
+        val systemInfo = get<PackageMonitor>().getInstalledPackageInfo(packageName) ?: return
+        if (systemInfo.versionCode != existing.installedVersionCode ||
+            existing.latestVersionCode != systemInfo.versionCode
+        ) {
+            return
         }
+        repo.updateApp(
+            existing.normalizeInstalledTag(
+                tag = latestTag,
+                isUpdateAvailable = existing.isUpdateAvailable,
+            ),
+        )
+        Logger.i { "Normalized stale self installedVersion tag to $latestTag" }
     }
 
     private suspend fun resolveSelfPendingInstall(
         existing: InstalledApp,
         repo: InstalledAppsRepository,
     ) {
-        guardSelfRecord(onFailure = { Logger.e(it) { "Failed to resolve self-update pending install" } }) {
-            val packageMonitor = get<PackageMonitor>()
-            val systemInfo = packageMonitor.getInstalledPackageInfo(packageName)
-            when (val resolution = existing.pendingInstallResolution(systemInfo)) {
-                PendingInstallResolution.Keep -> {
-                    Logger.i { "Kept parked self-update (target not proven)" }
-                }
+        val packageMonitor = get<PackageMonitor>()
+        val systemInfo = packageMonitor.getInstalledPackageInfo(packageName)
+        when (val resolution = existing.pendingInstallResolution(systemInfo)) {
+            PendingInstallResolution.Keep -> {
+                Logger.i { "Kept parked self-update (target not proven)" }
+            }
 
-                is PendingInstallResolution.Reached -> {
-                    repo.updateApp(existing.resolvePendingFromSystem(resolution))
-                    discardSelfParkedInstall(existing, resolution, repo)
-                }
+            is PendingInstallResolution.Reached -> {
+                repo.updateApp(existing.resolvePendingFromSystem(resolution))
+                discardSelfParkedInstall(existing, resolution, repo)
             }
         }
     }
@@ -313,34 +280,14 @@ class GithubStoreApp : Application() {
         resolution: PendingInstallResolution.Reached,
         repo: InstalledAppsRepository,
     ) {
-        guardSelfRecord(onFailure = { Logger.e(it) { "Parked self-update not discarded; the next sync will retry" } }) {
-            val disposal = repo.discardParkedInstall(packageName, existing.pendingInstallFilePath)
-            if (disposal == ParkedInstallDisposal.Discarded) {
-                Logger.i {
-                    "Resolved self-update pending install: ${resolution.versionName} " +
-                        "(code=${resolution.versionCode}, tag=${resolution.resolvedTag})"
-                }
-            } else {
-                Logger.w { "Parked self-update is not gone yet; the next sync will retry" }
+        val disposal = repo.discardParkedInstall(packageName, existing.pendingInstallFilePath)
+        if (disposal == ParkedInstallDisposal.Discarded) {
+            Logger.i {
+                "Resolved self-update pending install: ${resolution.versionName} " +
+                    "(code=${resolution.versionCode}, tag=${resolution.resolvedTag})"
             }
-        }
-    }
-
-    // Room throws SQLException or IllegalStateException and PackageManager SecurityException; none may crash the launch.
-    private inline fun guardSelfRecord(
-        onFailure: (Exception) -> Unit,
-        block: () -> Unit,
-    ) {
-        try {
-            block()
-        } catch (e: CancellationException) {
-            throw e
-        } catch (e: IllegalStateException) {
-            onFailure(e)
-        } catch (e: SQLException) {
-            onFailure(e)
-        } catch (e: SecurityException) {
-            onFailure(e)
+        } else {
+            Logger.w { "Parked self-update is not gone yet; the next sync will retry" }
         }
     }
 

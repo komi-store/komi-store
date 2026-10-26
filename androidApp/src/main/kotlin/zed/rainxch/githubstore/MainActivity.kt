@@ -141,10 +141,9 @@ class MainActivity : ComponentActivity() {
     override fun onRestart() {
         super.onRestart()
         appScope.launch {
-            runCatching { syncInstalledAppsUseCase() }
-                .onFailure {
-                    Logger.w(it) { "onRestart sync failed" }
-                }
+            syncInstalledAppsUseCase().onFailure {
+                Logger.w(it) { "onRestart sync failed" }
+            }
         }
     }
 

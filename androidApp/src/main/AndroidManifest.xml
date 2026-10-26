@@ -20,25 +20,14 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-    <!--
-        Whitelisted use: aggressive-OEM ROMs (Oppo / OnePlus / Realme /
-        Xiaomi / vivo / Honor) routinely kill background WorkManager
-        tasks even when the user has scheduled a periodic update check
-        through Komi Store's own settings. Surfaced via a one-time
-        prompt — never required, never re-nagged after dismissal.
-    -->
+    <!-- Aggressive OEM ROMs kill scheduled update checks; asked once, never required -->
     <uses-permission
         android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS"
         tools:ignore="BatteryLife" />
 
     <uses-permission android:name="com.rosan.dhizuku.permission.API" />
 
-    <!--
-        Fallback visibility for installer-source classification when
-        QUERY_ALL_PACKAGES is denied on Android 11+. We need to recognise
-        these specific packages as install sources even without blanket
-        package visibility.
-    -->
+    <!-- Install sources stay visible when QUERY_ALL_PACKAGES is denied on Android 11+ -->
     <queries>
         <package android:name="dev.imranr.obtainium.app" />
         <package android:name="dev.imranr.obtainium" />
