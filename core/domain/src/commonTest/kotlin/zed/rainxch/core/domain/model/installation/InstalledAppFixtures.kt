@@ -59,3 +59,28 @@ fun testInstalledApp(
         installedReleaseId = installedReleaseId,
         pendingInstallReleaseId = pendingInstallReleaseId,
     )
+
+fun testUpdatableApp(
+    installedVersion: String = "1.0.0",
+    installedVersionCode: Long = 100L,
+    latestVersion: String? = "2.0.0",
+    latestVersionCode: Long? = 200L,
+    latestVersionName: String? = "2.0.0",
+    isUpdateAvailable: Boolean = true,
+    isPendingInstall: Boolean = false,
+    pendingFilePath: String? = "/data/parked.apk",
+    skippedReleaseTag: String? = null,
+): InstalledApp =
+    testInstalledApp(
+        installedVersion = installedVersion,
+        installedVersionName = "1.0.0",
+        installedVersionCode = installedVersionCode,
+        latestVersion = latestVersion,
+        latestVersionName = latestVersionName,
+        latestVersionCode = latestVersionCode,
+        isUpdateAvailable = isUpdateAvailable,
+        isPendingInstall = isPendingInstall,
+        pendingInstallFilePath = pendingFilePath,
+        latestReleasePublishedAt = "2026-08-01T00:00:00Z",
+        skippedReleaseTag = skippedReleaseTag,
+    )
