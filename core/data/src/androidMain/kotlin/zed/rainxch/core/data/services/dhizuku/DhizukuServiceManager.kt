@@ -57,7 +57,7 @@ class DhizukuServiceManager(
                 DhizukuStatus.NOT_RUNNING
             }
 
-            isPermissionGranted() -> {
+            permissionGrantedOrNull() == true -> {
                 Logger.d(TAG) { "computeStatus(): READY" }
                 DhizukuStatus.READY
             }
@@ -81,8 +81,6 @@ class DhizukuServiceManager(
             false
         }
     }
-
-    private fun isPermissionGranted(): Boolean = permissionGrantedOrNull() ?: false
 
     // Dhizuku rethrows a dead binder's RemoteException as a bare RuntimeException, so no narrower catch exists.
     private fun permissionGrantedOrNull(): Boolean? =

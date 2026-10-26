@@ -7,11 +7,11 @@ import java.security.MessageDigest
 
 internal object SigningFingerprint {
     // API 26-27 have no signer flag or field but the deprecated GET_SIGNATURES and PackageInfo.signatures.
-    @Suppress("DEPRECATION")
     val SIGNER_FLAG: Int =
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             PackageManager.GET_SIGNING_CERTIFICATES
         } else {
+            @Suppress("DEPRECATION")
             PackageManager.GET_SIGNATURES
         }
 
