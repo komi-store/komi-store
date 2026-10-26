@@ -48,27 +48,19 @@ data class PartialIdentity(
 
     companion object {
         fun parse(text: String): PartialIdentity? {
-            var assetId: Long? = null
-            var size: Long? = null
-            var digest: String? = null
-
-            for (rawLine in text.lineSequence()) {
-                val line = rawLine.trim()
-                if (line.isEmpty()) continue
-                val separator = line.indexOf('=')
-                if (separator <= 0) continue
-                val key = line.substring(0, separator).trim()
-                val value = line.substring(separator + 1).trim()
-                when (key) {
-                    "assetId" -> assetId = value.toLongOrNull()
-                    "size" -> size = value.toLongOrNull()
-                    "digest" -> digest = value.takeIf { it.isNotEmpty() }
-                }
+            val fields =
+                text
+                    .lineSequence()
+                    .map { it.trim() }
+                    .filter { it.indexOf('=') > 0 }
+                    .associate { it.substringBefore('=').trim() to it.substringAfter('=').trim() }
+            val assetId = fields["assetId"]?.toLongOrNull()
+            val size = fields["size"]?.toLongOrNull()
+            return if (assetId == null || size == null) {
+                null
+            } else {
+                PartialIdentity(assetId = assetId, digest = fields["digest"]?.takeIf { it.isNotEmpty() }, size = size)
             }
-
-            val parsedId = assetId ?: return null
-            val parsedSize = size ?: return null
-            return PartialIdentity(assetId = parsedId, digest = digest, size = parsedSize)
         }
     }
 }
@@ -89,17 +81,13 @@ object PartialOwnership {
         if (!partExists || partLength <= 0L) return PartialReuse.DISCARD
         if (meta == null) return PartialReuse.DISCARD
 
-        val onDiskDigest = meta.digest
-        val wantedDigest = incoming.digest
-        if (onDiskDigest != null && wantedDigest != null) {
-            return if (onDiskDigest == wantedDigest) PartialReuse.REUSE else PartialReuse.DISCARD
-        }
-
-        if (meta.assetId > 0L && incoming.assetId > 0L) {
-            return if (meta.assetId == incoming.assetId) PartialReuse.REUSE else PartialReuse.DISCARD
-        }
-
-        return if (meta.size == incoming.size) PartialReuse.REUSE else PartialReuse.DISCARD
+        val sameAsset =
+            when {
+                meta.digest != null && incoming.digest != null -> meta.digest == incoming.digest
+                meta.assetId > 0L && incoming.assetId > 0L -> meta.assetId == incoming.assetId
+                else -> meta.size == incoming.size
+            }
+        return if (sameAsset) PartialReuse.REUSE else PartialReuse.DISCARD
     }
 
     fun decideReuse(
@@ -141,8 +129,7 @@ data class ContentRange(
         fun parse(value: String?): ContentRange? {
             val body = value?.trim()?.takeIf { it.isNotEmpty() } ?: return null
             if (!body.substringBefore(' ', "").trim().equals("bytes", ignoreCase = true)) return null
-            val spec = body.substringAfter(' ', "").trim()
-            if (spec.isEmpty()) return null
+            val spec = body.substringAfter(' ', "").trim().takeIf { it.isNotEmpty() } ?: return null
             val total = spec.substringAfterLast('/', "").trim().toLongOrNull()
             val range = spec.substringBefore('/').trim()
             val start =
@@ -151,13 +138,16 @@ data class ContentRange(
                 } else {
                     range.substringBefore('-').trim().toLongOrNull()
                 }
-            if (start == null && total == null) return null
-            return ContentRange(start = start, total = total)
+            return if (start == null && total == null) null else ContentRange(start = start, total = total)
         }
     }
 }
 
 object RangeRequest {
+    private const val HTTP_OK = 200
+    private const val HTTP_PARTIAL_CONTENT = 206
+    private const val HTTP_RANGE_NOT_SATISFIABLE = 416
+
     fun headerValue(partLength: Long): String? = if (partLength > 0L) "bytes=$partLength-" else null
 
     fun decide(
@@ -166,9 +156,9 @@ object RangeRequest {
         contentRange: ContentRange?,
     ): RangeDecision =
         when (statusCode) {
-            206 -> if (contentRange?.start == partLength) RangeDecision.APPEND else RangeDecision.RESTART
-            416 -> RangeDecision.RESTART
-            200 -> if (partLength > 0L) RangeDecision.TRUNCATE_REWRITE else RangeDecision.APPEND
+            HTTP_PARTIAL_CONTENT -> if (contentRange?.start == partLength) RangeDecision.APPEND else RangeDecision.RESTART
+            HTTP_RANGE_NOT_SATISFIABLE -> RangeDecision.RESTART
+            HTTP_OK -> if (partLength > 0L) RangeDecision.TRUNCATE_REWRITE else RangeDecision.APPEND
             else -> RangeDecision.UNEXPECTED
         }
 }

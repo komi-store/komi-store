@@ -49,8 +49,7 @@ class DefaultSystemInstallSerializer : SystemInstallSerializer {
         pending.value = null
     }
 
-    // The app only resumes once an installer screen it opened has closed. A cancelled one sends no
-    // package broadcast, so its hold would otherwise make the next install wait out the timeout.
+    // Resuming means the installer screen closed; a cancelled one sends no broadcast, so its hold would stall the next install.
     override fun onAppResumed() {
         val heldBy = pending.value ?: return
         if (pending.compareAndSet(heldBy, null)) {
