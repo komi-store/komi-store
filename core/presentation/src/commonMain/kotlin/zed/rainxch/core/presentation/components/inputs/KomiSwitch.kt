@@ -20,6 +20,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import zed.rainxch.core.presentation.locals.LocalPersonality
 import zed.rainxch.core.presentation.personality.ClassicPersonality
@@ -35,7 +36,13 @@ fun KomiSwitch(
 ) {
     when (val personality = LocalPersonality.current) {
         is MangaPersonality -> {
-            MangaSwitch(personality, checked, onCheckedChange, modifier, enabled)
+            MangaSwitch(
+                personality = personality,
+                checked = checked,
+                onCheckedChange = onCheckedChange,
+                enabled = enabled,
+                modifier = modifier,
+            )
         }
 
         is ClassicPersonality -> {
@@ -63,8 +70,8 @@ private fun MangaSwitch(
     personality: MangaPersonality,
     checked: Boolean,
     onCheckedChange: ((Boolean) -> Unit)?,
-    modifier: Modifier = Modifier,
     enabled: Boolean,
+    modifier: Modifier = Modifier,
 ) {
     val colors = personality.colors
     val alpha = if (enabled) 1f else 0.45f
@@ -109,7 +116,7 @@ private fun MangaSwitch(
         Box(
             modifier =
                 Modifier
-                    .offset(x = thumbOffset)
+                    .offset { IntOffset(thumbOffset.roundToPx(), 0) }
                     .size(thumb)
                     .background(
                         color = (if (checked) colors.onPrimary else colors.surface).copy(alpha = alpha),

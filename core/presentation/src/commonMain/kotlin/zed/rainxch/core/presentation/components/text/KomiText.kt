@@ -138,7 +138,7 @@ private fun KomiTextEllipsisPreview() {
 @Preview
 @Composable
 private fun KomiTextClassicPreview() {
-    PersonalityPreview(classicPersonality()) {
+    PersonalityPreview(personality = classicPersonality()) {
         KomiTextScale()
     }
 }
@@ -146,7 +146,7 @@ private fun KomiTextClassicPreview() {
 @Preview
 @Composable
 private fun KomiTextClassicDarkPreview() {
-    PersonalityPreview(classicPersonality(dark = true)) {
+    PersonalityPreview(personality = classicPersonality(dark = true)) {
         KomiTextScale()
     }
 }

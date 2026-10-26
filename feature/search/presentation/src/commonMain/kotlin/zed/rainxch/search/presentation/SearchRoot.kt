@@ -599,7 +599,7 @@ fun SearchScreen(
                                                 )
                                             )
                                         },
-                                        onToggleSeen = {
+                                        onToggleSeenClick = {
                                             if (discoveryRepository.isSeen) {
                                                 onAction(
                                                     SearchAction.OnMarkAsUnseen(

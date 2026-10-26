@@ -77,9 +77,7 @@ fun KomiTopBar(
     val personality = LocalPersonality.current
     // A Classic tab screen has no top bar: its search field and actions go to the tab card.
     val tabCard = LocalTabCardSlot.current?.takeIf { personality is ClassicPersonality }
-    // Elsewhere Classic hands the back action and the actions to its KomiScaffold, which draws
-    // them in a KomiActionBar at the bottom, so the top bar keeps only the title. A search field
-    // keeps its actions beside it.
+    // Elsewhere Classic's KomiScaffold draws the back action and actions in a KomiActionBar; a search keeps its actions.
     val scaffoldChrome = LocalScaffoldChrome.current?.takeIf { personality is ClassicPersonality && search == null }
     if (scaffoldChrome != null) HandToScaffold(chrome = scaffoldChrome, onBack = onBack, actions = actions)
     val topBarBack: (@Composable () -> Unit)? =
@@ -246,9 +244,7 @@ private fun mangaTitle(
     }
 }
 
-// One row on the page itself: the title right under the status bar, with no container and no
-// tint when content scrolls under it. Inside a KomiScaffold it slides away as the content scrolls
-// down and returns on the way up.
+// One row on the page itself, with no container or scroll tint; in a KomiScaffold it slides away as content scrolls down.
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ClassicTopBar(
@@ -416,34 +412,35 @@ private fun PreviewCompact() {
 @Preview
 @Composable
 private fun KomiTopBarMangaPreview() {
-    PersonalityPreview(mangaPersonality()) { PreviewMasthead() }
+    PersonalityPreview(personality = mangaPersonality()) { PreviewMasthead() }
 }
 
 @Preview
 @Composable
 private fun KomiTopBarMangaCompactPreview() {
-    PersonalityPreview(mangaPersonality()) { PreviewCompact() }
+    PersonalityPreview(personality = mangaPersonality()) { PreviewCompact() }
 }
 
 @Preview
 @Composable
 private fun KomiTopBarMangaNightPreview() {
     PersonalityPreview(
-        mangaPersonality(
-            paper = MangaPaper.NIGHT,
-            accent = MangaAccent.SUN,
-        ),
+        personality =
+            mangaPersonality(
+                paper = MangaPaper.NIGHT,
+                accent = MangaAccent.SUN,
+            ),
     ) { PreviewMasthead() }
 }
 
 @Preview
 @Composable
 private fun KomiTopBarClassicPreview() {
-    PersonalityPreview(classicPersonality()) { PreviewMasthead() }
+    PersonalityPreview(personality = classicPersonality()) { PreviewMasthead() }
 }
 
 @Preview
 @Composable
 private fun KomiTopBarClassicDarkPreview() {
-    PersonalityPreview(classicPersonality(dark = true)) { PreviewCompact() }
+    PersonalityPreview(personality = classicPersonality(dark = true)) { PreviewCompact() }
 }

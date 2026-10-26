@@ -235,28 +235,29 @@ private fun PreviewBottomBar() {
 @Preview
 @Composable
 private fun KomiBottomBarMangaPreview() {
-    PersonalityPreview(mangaPersonality()) { PreviewBottomBar() }
+    PersonalityPreview(personality = mangaPersonality()) { PreviewBottomBar() }
 }
 
 @Preview
 @Composable
 private fun KomiBottomBarMangaNightPreview() {
     PersonalityPreview(
-        mangaPersonality(
-            paper = MangaPaper.NIGHT,
-            accent = MangaAccent.SUN,
-        ),
+        personality =
+            mangaPersonality(
+                paper = MangaPaper.NIGHT,
+                accent = MangaAccent.SUN,
+            ),
     ) { PreviewBottomBar() }
 }
 
 @Preview
 @Composable
 private fun KomiBottomBarClassicPreview() {
-    PersonalityPreview(classicPersonality()) { PreviewBottomBar() }
+    PersonalityPreview(personality = classicPersonality()) { PreviewBottomBar() }
 }
 
 @Preview
 @Composable
 private fun KomiBottomBarClassicDarkPreview() {
-    PersonalityPreview(classicPersonality(dark = true)) { PreviewBottomBar() }
+    PersonalityPreview(personality = classicPersonality(dark = true)) { PreviewBottomBar() }
 }

@@ -39,8 +39,7 @@ import zed.rainxch.core.presentation.spacing.Spacing
 import zed.rainxch.githubstore.core.presentation.res.Res
 import zed.rainxch.githubstore.core.presentation.res.navigate_back
 
-// A screen's actions within thumb reach: back at the start, the actions and a floating action
-// button at the end. A Classic KomiScaffold draws one from what its KomiTopBar hands it.
+// A screen's back action, actions and FAB within thumb reach, drawn by a Classic KomiScaffold from its KomiTopBar.
 @Composable
 fun KomiActionBar(
     modifier: Modifier = Modifier,
@@ -139,17 +138,17 @@ private fun PreviewActionBar() {
 @Preview
 @Composable
 private fun KomiActionBarClassicPreview() {
-    PersonalityPreview(classicPersonality()) { PreviewActionBar() }
+    PersonalityPreview(personality = classicPersonality()) { PreviewActionBar() }
 }
 
 @Preview
 @Composable
 private fun KomiActionBarClassicDarkPreview() {
-    PersonalityPreview(classicPersonality(dark = true)) { PreviewActionBar() }
+    PersonalityPreview(personality = classicPersonality(dark = true)) { PreviewActionBar() }
 }
 
 @Preview
 @Composable
 private fun KomiActionBarMangaPreview() {
-    PersonalityPreview(mangaPersonality()) { PreviewActionBar() }
+    PersonalityPreview(personality = mangaPersonality()) { PreviewActionBar() }
 }

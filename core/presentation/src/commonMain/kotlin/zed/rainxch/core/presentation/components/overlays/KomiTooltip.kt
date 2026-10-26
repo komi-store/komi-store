@@ -202,7 +202,7 @@ private fun KomiTooltipAnchorsPreview() {
 @Preview
 @Composable
 private fun KomiCoachmarkClassicPreview() {
-    PersonalityPreview(classicPersonality()) {
+    PersonalityPreview(personality = classicPersonality()) {
         Box(modifier = Modifier.padding(top = 160.dp)) {
             KomiCoachmark(
                 visible = true,

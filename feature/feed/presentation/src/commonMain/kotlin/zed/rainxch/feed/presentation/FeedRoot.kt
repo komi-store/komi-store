@@ -169,7 +169,7 @@ private fun FeedScreen(
                     onClick = { onAction(FeedAction.OnRepoClick(card.repository)) },
                     onShareClick = { onAction(FeedAction.OnShareClick(card.repository)) },
                     onHideClick = { onAction(FeedAction.OnHideRepository(card.repository)) },
-                    onToggleSeen = {
+                    onToggleSeenClick = {
                         if (card.isSeen) {
                             onAction(FeedAction.OnMarkAsUnseen(card.repository.id))
                         } else {
