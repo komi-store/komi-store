@@ -1,5 +1,3 @@
-@file:Suppress("LongParameterList")
-
 package zed.rainxch.core.data.services
 
 import android.app.Service
@@ -42,9 +40,7 @@ class DownloadForegroundService : Service() {
         val percent = intent.getIntExtra(EXTRA_PERCENT, NO_PERCENT).takeIf { it != NO_PERCENT }
         val cancelPackageName = intent.getStringExtra(EXTRA_CANCEL_PACKAGE)
 
-        // A throw here kills the app: the platform launched us with startForegroundService and
-        // treats an unanswered dataSync timeout as fatal. The notification build is guarded too,
-        // since creating PendingIntents is what is likeliest to throw.
+        // A throw here kills the app: after startForegroundService, an unanswered dataSync start is fatal.
         val started =
             runCatching {
                 val notification =
@@ -79,6 +75,14 @@ class DownloadForegroundService : Service() {
             .orEmpty()
             .ifBlank { packageName }
 
+    data class Card(
+        val notificationId: Int,
+        val title: String,
+        val text: String,
+        val percent: Int?,
+        val cancelPackageName: String?,
+    )
+
     companion object {
         private const val NO_PERCENT = -1
         private const val EXTRA_NOTIFICATION_ID = "zed.rainxch.githubstore.extra.FGS_NOTIFICATION_ID"
@@ -96,18 +100,14 @@ class DownloadForegroundService : Service() {
 
         fun startIntent(
             context: Context,
-            notificationId: Int,
-            title: String,
-            text: String,
-            percent: Int?,
-            cancelPackageName: String?,
+            card: Card,
         ): Intent =
             Intent(context, DownloadForegroundService::class.java).apply {
-                putExtra(EXTRA_NOTIFICATION_ID, notificationId)
-                putExtra(EXTRA_TITLE, title)
-                putExtra(EXTRA_TEXT, text)
-                putExtra(EXTRA_PERCENT, percent ?: NO_PERCENT)
-                putExtra(EXTRA_CANCEL_PACKAGE, cancelPackageName)
+                putExtra(EXTRA_NOTIFICATION_ID, card.notificationId)
+                putExtra(EXTRA_TITLE, card.title)
+                putExtra(EXTRA_TEXT, card.text)
+                putExtra(EXTRA_PERCENT, card.percent ?: NO_PERCENT)
+                putExtra(EXTRA_CANCEL_PACKAGE, card.cancelPackageName)
             }
     }
 }

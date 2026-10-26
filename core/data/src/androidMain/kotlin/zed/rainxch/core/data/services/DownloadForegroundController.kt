@@ -1,5 +1,3 @@
-@file:Suppress("ReturnCount")
-
 package zed.rainxch.core.data.services
 
 import android.content.Context
@@ -23,15 +21,13 @@ class DownloadForegroundController(
 
     fun ensureRunning(active: List<OrchestratedDownload>) {
         if (degraded) return
-        if (!DownloadNotificationFactory.hasNotificationPermission(context)) return
-        // Moving the service to another download's id makes the platform cancel the card it
-        // held, so it stays on the current download until that one ends.
+        if (!DownloadNotificationFactory.checkNotificationPermission(context)) return
+        // Moving the service to another id makes the platform cancel its card, so it stays on the current download until that ends.
         if (running && active.any { it.packageName == foregroundPackage }) return
 
         val primary = active.first()
-        val intent =
-            DownloadForegroundService.startIntent(
-                context = context,
+        val card =
+            DownloadForegroundService.Card(
                 notificationId = DownloadNotificationFactory.notificationIdFor(primary.packageName),
                 title = primary.displayAppName.ifBlank { primary.packageName },
                 text =
@@ -43,21 +39,20 @@ class DownloadForegroundController(
                 percent = primary.progressPercent,
                 cancelPackageName = primary.packageName,
             )
+        val intent = DownloadForegroundService.startIntent(context, card)
         val result = runCatching { ContextCompat.startForegroundService(context, intent) }
-        if (result.isFailure) {
+        if (result.isSuccess) {
+            running = true
+            foregroundPackage = primary.packageName
+        } else {
             Logger.w(result.exceptionOrNull()) {
                 "DownloadForegroundController: FGS start refused for ${primary.packageName}, " +
                     "degrading to plain notification"
             }
-            // An already-running service holds the previous primary's notification, which the
-            // observer cancels when that download ends, leaving a foreground service with no
-            // notification. Tear it down and keep the plain notification path.
+            // A running service is left without a card once the observer cancels the previous one, so tear it down.
             if (running) stop()
             degraded = true
-            return
         }
-        running = true
-        foregroundPackage = primary.packageName
     }
 
     fun stop() {

@@ -4,17 +4,23 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.database.SQLException
 import co.touchlab.kermit.Logger
-import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import zed.rainxch.core.data.local.db.dao.ExternalLinkDao
+import zed.rainxch.core.domain.model.error.LocalStoreException
+import zed.rainxch.core.domain.model.error.SystemPackagesException
+import zed.rainxch.core.domain.model.installation.InstalledApp
 import zed.rainxch.core.domain.model.installation.ParkedInstallDisposal
 import zed.rainxch.core.domain.model.installation.PendingInstallResolution
+import zed.rainxch.core.domain.model.installation.SystemPackageInfo
 import zed.rainxch.core.domain.model.installation.externalInstallUpdateFlag
 import zed.rainxch.core.domain.model.installation.pendingInstallResolution
 import zed.rainxch.core.domain.model.installation.tagForObservedBuild
@@ -26,6 +32,7 @@ import zed.rainxch.core.domain.system.PackageMonitor
 import zed.rainxch.core.domain.system.SystemInstallSerializer
 import zed.rainxch.core.domain.utils.VersionVerdict
 import zed.rainxch.core.domain.utils.resolveExternalInstallVerdict
+import kotlin.coroutines.cancellation.CancellationException
 
 class PackageEventReceiver() :
     BroadcastReceiver(),
@@ -89,117 +96,165 @@ class PackageEventReceiver() :
 
         Logger.d { "PackageEventReceiver: ${intent?.action} for $packageName" }
 
-        try {
-            when (intent?.action) {
-                Intent.ACTION_PACKAGE_ADDED,
-                Intent.ACTION_PACKAGE_REPLACED,
-                Intent.ACTION_MY_PACKAGE_REPLACED,
-                -> {
-                    scope.launch { onPackageInstalled(packageName) }
-                }
-
-                Intent.ACTION_PACKAGE_FULLY_REMOVED -> {
-                    scope.launch { onPackageRemoved(packageName) }
+        when (intent?.action) {
+            Intent.ACTION_PACKAGE_ADDED,
+            Intent.ACTION_PACKAGE_REPLACED,
+            Intent.ACTION_MY_PACKAGE_REPLACED,
+            -> {
+                scope.launch(logsFailure { "PackageEventReceiver error for $packageName" }) {
+                    onPackageInstalled(packageName)
                 }
             }
-        } catch (e: Exception) {
-            Logger.e { "PackageEventReceiver: Failed to handle ${intent?.action}: ${e.message}" }
+
+            Intent.ACTION_PACKAGE_FULLY_REMOVED -> {
+                scope.launch(logsFailure { "PackageEventReceiver remove error for $packageName" }) {
+                    onPackageRemoved(packageName)
+                }
+            }
         }
     }
+
+    // These coroutines run unattended on a scope without a handler, so a failure is logged here instead of crashing the app.
+    private fun logsFailure(message: () -> String): CoroutineExceptionHandler =
+        CoroutineExceptionHandler { _, e -> Logger.w(e, message = message) }
 
     private suspend fun onPackageInstalled(packageName: String) {
         getSystemInstallSerializer().markCompleted(packageName)
 
         try {
-            val repo = getRepository()
-            val monitor = getMonitor()
-            val app = repo.getAppByPackage(packageName)
-
-            if (app != null) {
-                if (app.isPendingInstall) {
-                    val resolution =
-                        app.pendingInstallResolution(monitor.getInstalledPackageInfo(packageName))
-                    when (resolution) {
-                        PendingInstallResolution.Keep -> {
-                            Logger.i {
-                                "Kept parked install via broadcast (target not proven): $packageName"
-                            }
-                        }
-
-                        is PendingInstallResolution.Reached -> {
-                            val settled = app.withSettledInstallIdentity(resolution.versionCode)
-                            repo.updateAppVersion(
-                                packageName = packageName,
-                                newTag = resolution.resolvedTag,
-                                newReleaseId = settled.installedReleaseId,
-                                newAssetId = settled.installedAssetId,
-                                newAssetDigest = settled.installedAssetDigest,
-                                newReleasePublishedAt = settled.installedReleasePublishedAt,
-                                newAssetName = app.latestAssetName ?: "",
-                                newAssetUrl = app.latestAssetUrl ?: "",
-                                newVersionName = resolution.versionName,
-                                newVersionCode = resolution.versionCode,
-                                signingFingerprint = app.signingFingerprint,
-                                isPendingInstall = true,
-                            )
-                            try {
-                                val disposal =
-                                    repo.discardParkedInstall(packageName, app.pendingInstallFilePath)
-                                if (disposal == ParkedInstallDisposal.Retained) {
-                                    Logger.w {
-                                        "Parked install not fully discarded for $packageName; " +
-                                            "the next sync will retry"
-                                    }
-                                }
-                            } catch (e: CancellationException) {
-                                throw e
-                            } catch (e: Exception) {
-                                Logger.e(e) {
-                                    "Parked install not discarded for $packageName; the next sync will retry"
-                                }
-                            }
-                            Logger.i {
-                                "Update confirmed via broadcast: $packageName " +
-                                    "(v${resolution.versionName}, tag=${resolution.resolvedTag})"
-                            }
-                        }
-                    }
-                } else {
-                    handleExternalInstall(packageName, app, repo, monitor)
-                }
-            }
+            reconcileInstalled(packageName)
         } catch (e: CancellationException) {
             throw e
-        } catch (e: Exception) {
-            Logger.e { "PackageEventReceiver error for $packageName: ${e.message}" }
+        } catch (e: LocalStoreException) {
+            logInstallFailure(packageName, e)
+        } catch (e: SystemPackagesException) {
+            logInstallFailure(packageName, e)
+        } catch (e: SecurityException) {
+            logInstallFailure(packageName, e)
+        } catch (e: IllegalStateException) {
+            logInstallFailure(packageName, e)
         }
 
-        getBackstopScope().launch {
-            runCatching {
-                val rescan = shouldRescan(packageName)
-                if (rescan) {
-                    getExternalImport().runDeltaScan(setOf(packageName))
-                }
-            }.onFailure {
-                Logger.w(it) { "Delta scan failed for $packageName" }
+        rescanInBackground(packageName) { "Delta scan failed for $packageName" }
+    }
+
+    private fun rescanInBackground(
+        packageName: String,
+        failure: () -> String,
+    ) {
+        getBackstopScope().launch(logsFailure(failure)) {
+            if (shouldRescan(packageName)) {
+                getExternalImport().runDeltaScan(setOf(packageName))
             }
         }
     }
 
+    private fun logInstallFailure(
+        packageName: String,
+        e: Exception,
+    ) {
+        Logger.e { "PackageEventReceiver error for $packageName: ${e.message}" }
+    }
+
+    private suspend fun reconcileInstalled(packageName: String) {
+        val repo = getRepository()
+        val monitor = getMonitor()
+        val app = repo.getAppByPackage(packageName) ?: return
+
+        if (!app.isPendingInstall) {
+            handleExternalInstall(packageName, app, repo, monitor)
+            return
+        }
+        when (val resolution = app.pendingInstallResolution(monitor.getInstalledPackageInfo(packageName))) {
+            PendingInstallResolution.Keep -> {
+                Logger.i {
+                    "Kept parked install via broadcast (target not proven): $packageName"
+                }
+            }
+
+            is PendingInstallResolution.Reached -> {
+                settleReachedInstall(packageName, app, repo, resolution)
+            }
+        }
+    }
+
+    private suspend fun settleReachedInstall(
+        packageName: String,
+        app: InstalledApp,
+        repo: InstalledAppsRepository,
+        resolution: PendingInstallResolution.Reached,
+    ) {
+        val settled = app.withSettledInstallIdentity(resolution.versionCode)
+        repo.updateAppVersion(
+            packageName = packageName,
+            newTag = resolution.resolvedTag,
+            newReleaseId = settled.installedReleaseId,
+            newAssetId = settled.installedAssetId,
+            newAssetDigest = settled.installedAssetDigest,
+            newReleasePublishedAt = settled.installedReleasePublishedAt,
+            newAssetName = app.latestAssetName ?: "",
+            newAssetUrl = app.latestAssetUrl ?: "",
+            newVersionName = resolution.versionName,
+            newVersionCode = resolution.versionCode,
+            signingFingerprint = app.signingFingerprint,
+            isPendingInstall = true,
+        )
+        try {
+            val disposal = repo.discardParkedInstall(packageName, app.pendingInstallFilePath)
+            if (disposal == ParkedInstallDisposal.Retained) {
+                Logger.w {
+                    "Parked install not fully discarded for $packageName; " +
+                        "the next sync will retry"
+                }
+            }
+        } catch (e: LocalStoreException) {
+            Logger.e(e) { "Parked install not discarded for $packageName; the next sync will retry" }
+        } catch (e: SecurityException) {
+            Logger.e(e) { "Parked install not discarded for $packageName; the next sync will retry" }
+        }
+        Logger.i {
+            "Update confirmed via broadcast: $packageName " +
+                "(v${resolution.versionName}, tag=${resolution.resolvedTag})"
+        }
+    }
+
+    // An unreadable row counts as untracked and unlinked, so the scan still runs.
     private suspend fun shouldRescan(packageName: String): Boolean {
         val tracked =
-            runCatching { getRepository().getAppByPackage(packageName) }
-                .getOrNull()
+            try {
+                getRepository().getAppByPackage(packageName)
+            } catch (e: LocalStoreException) {
+                Logger.w(e) { "Tracked lookup failed for $packageName; rescanning" }
+                null
+            }
         if (tracked != null) return false
-        val link = runCatching { getExternalLinkDao().get(packageName) }.getOrNull()
-        val state = link?.state ?: return true
-        return state != ExternalLinkState.MATCHED.name &&
-            state != ExternalLinkState.NEVER_ASK.name
+        val state = externalLinkStateOrNull(packageName)
+        return state == null ||
+            (state != ExternalLinkState.MATCHED.name && state != ExternalLinkState.NEVER_ASK.name)
+    }
+
+    private suspend fun externalLinkStateOrNull(packageName: String): String? =
+        try {
+            getExternalLinkDao().get(packageName)?.state
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: SQLException) {
+            logLinkLookupFailure(packageName, e)
+        } catch (e: IllegalStateException) {
+            logLinkLookupFailure(packageName, e)
+        }
+
+    private fun logLinkLookupFailure(
+        packageName: String,
+        e: RuntimeException,
+    ): String? {
+        Logger.w(e) { "External link lookup failed for $packageName; rescanning" }
+        return null
     }
 
     private suspend fun handleExternalInstall(
         packageName: String,
-        app: zed.rainxch.core.domain.model.installation.InstalledApp,
+        app: InstalledApp,
         repo: InstalledAppsRepository,
         monitor: PackageMonitor,
     ) {
@@ -238,8 +293,7 @@ class PackageEventReceiver() :
                 installedVersionCode = systemInfo.versionCode,
                 isUpdateAvailable = newIsUpdateAvailable,
             )
-            // AutoUpdateWorker checks the signer only when one is stored, so an unreadable
-            // signer (null) must never erase it.
+            // AutoUpdateWorker checks the signer only when one is stored, so an unreadable (null) signer never erases it.
             if (installedSigner != null && !installedSigner.equals(app.signingFingerprint, ignoreCase = true)) {
                 repo.updateSigningFingerprint(packageName, installedSigner)
             }
@@ -253,30 +307,32 @@ class PackageEventReceiver() :
                 "verdict=$verdict, updateAvailable=$newIsUpdateAvailable"
         }
 
-        getBackstopScope().launch {
-            try {
-                repo.checkForUpdates(packageName)
-                val refreshed = repo.getAppByPackage(packageName)
-                if (refreshed != null) {
-                    repo.updateInstalledVersion(
-                        packageName = packageName,
-                        installedVersion = refreshed.tagForObservedBuild(systemInfo.versionName, systemInfo.versionCode),
-                        installedVersionName = systemInfo.versionName,
-                        installedVersionCode = systemInfo.versionCode,
-                        isUpdateAvailable =
-                            refreshed.externalInstallUpdateFlag(
-                                newVersionName = systemInfo.versionName,
-                                newVersionCode = systemInfo.versionCode,
-                            ),
-                    )
-                }
-                Logger.d {
-                    "External-install re-validation completed for $packageName"
-                }
-            } catch (e: Exception) {
-                Logger.w {
-                    "External-install re-validation failed for $packageName: ${e.message}"
-                }
+        revalidateExternalInstall(packageName, systemInfo, repo)
+    }
+
+    private fun revalidateExternalInstall(
+        packageName: String,
+        systemInfo: SystemPackageInfo,
+        repo: InstalledAppsRepository,
+    ) {
+        getBackstopScope().launch(logsFailure { "External-install re-validation failed for $packageName" }) {
+            repo.checkForUpdates(packageName)
+            val refreshed = repo.getAppByPackage(packageName)
+            if (refreshed != null) {
+                repo.updateInstalledVersion(
+                    packageName = packageName,
+                    installedVersion = refreshed.tagForObservedBuild(systemInfo.versionName, systemInfo.versionCode),
+                    installedVersionName = systemInfo.versionName,
+                    installedVersionCode = systemInfo.versionCode,
+                    isUpdateAvailable =
+                        refreshed.externalInstallUpdateFlag(
+                            newVersionName = systemInfo.versionName,
+                            newVersionCode = systemInfo.versionCode,
+                        ),
+                )
+            }
+            Logger.d {
+                "External-install re-validation completed for $packageName"
             }
         }
     }
@@ -287,59 +343,70 @@ class PackageEventReceiver() :
         try {
             val repo = getRepository()
             val parkedPath = repo.getAppByPackage(packageName)?.pendingInstallFilePath
-            var mayDropRow = parkedPath == null
-            if (parkedPath != null) {
-                val disposal =
-                    try {
-                        repo.discardParkedInstall(packageName, parkedPath)
-                    } catch (e: CancellationException) {
-                        throw e
-                    } catch (e: Exception) {
-                        Logger.e(e) { "Parked file not discarded for $packageName; the row stays for the next sync" }
-                        null
-                    }
-                mayDropRow = disposal == ParkedInstallDisposal.Discarded
-                if (disposal == ParkedInstallDisposal.Retained) {
-                    Logger.w {
-                        "Parked file for $packageName survived the uninstall; the row stays for the next sync"
-                    }
-                }
-            }
+            val mayDropRow = parkedPath == null || discardParkedFile(repo, packageName, parkedPath)
             if (mayDropRow) {
                 repo.deleteInstalledApp(packageName)
             }
-            runCatching { getExternalImport().unlink(packageName) }
-                .onFailure { initialError ->
-                    Logger.w(initialError) { "External link cleanup failed for $packageName; scheduling retry" }
-
-                    getBackstopScope().launch {
-                        kotlinx.coroutines.delay(UNLINK_RETRY_DELAY_MS)
-                        runCatching { getExternalImport().unlink(packageName) }
-                            .onSuccess {
-                                Logger.i { "External link cleanup retry succeeded for $packageName" }
-
-                                runCatching {
-                                    if (shouldRescan(packageName)) {
-                                        getExternalImport().runDeltaScan(setOf(packageName))
-                                    }
-                                }.onFailure { e ->
-                                    Logger.w(e) { "Post-retry delta scan failed for $packageName" }
-                                }
-                            }.onFailure { retryError ->
-                                Logger.w(retryError) {
-                                    "External link cleanup final failure for $packageName; " +
-                                        "row may persist until next periodic scan"
-                                }
-                            }
-                    }
-                }
+            try {
+                getExternalImport().unlink(packageName)
+            } catch (e: LocalStoreException) {
+                Logger.w(e) { "External link cleanup failed for $packageName; scheduling retry" }
+                retryUnlink(packageName)
+            }
             if (mayDropRow) {
                 Logger.i { "Removed uninstalled app via broadcast: $packageName" }
             }
         } catch (e: CancellationException) {
             throw e
-        } catch (e: Exception) {
-            Logger.e { "PackageEventReceiver remove error for $packageName: ${e.message}" }
+        } catch (e: LocalStoreException) {
+            logRemoveFailure(packageName, e)
+        } catch (e: SecurityException) {
+            logRemoveFailure(packageName, e)
+        } catch (e: IllegalStateException) {
+            logRemoveFailure(packageName, e)
+        }
+    }
+
+    private fun logRemoveFailure(
+        packageName: String,
+        e: Exception,
+    ) {
+        Logger.e { "PackageEventReceiver remove error for $packageName: ${e.message}" }
+    }
+
+    private suspend fun discardParkedFile(
+        repo: InstalledAppsRepository,
+        packageName: String,
+        parkedPath: String,
+    ): Boolean {
+        val disposal =
+            try {
+                repo.discardParkedInstall(packageName, parkedPath)
+            } catch (e: LocalStoreException) {
+                Logger.e(e) { "Parked file not discarded for $packageName; the row stays for the next sync" }
+                null
+            } catch (e: SecurityException) {
+                Logger.e(e) { "Parked file not discarded for $packageName; the row stays for the next sync" }
+                null
+            }
+        if (disposal == ParkedInstallDisposal.Retained) {
+            Logger.w {
+                "Parked file for $packageName survived the uninstall; the row stays for the next sync"
+            }
+        }
+        return disposal == ParkedInstallDisposal.Discarded
+    }
+
+    private fun retryUnlink(packageName: String) {
+        val finalFailure = {
+            "External link cleanup final failure for $packageName; " +
+                "row may persist until next periodic scan"
+        }
+        getBackstopScope().launch(logsFailure(finalFailure)) {
+            delay(UNLINK_RETRY_DELAY_MS)
+            getExternalImport().unlink(packageName)
+            Logger.i { "External link cleanup retry succeeded for $packageName" }
+            rescanInBackground(packageName) { "Post-retry delta scan failed for $packageName" }
         }
     }
 
