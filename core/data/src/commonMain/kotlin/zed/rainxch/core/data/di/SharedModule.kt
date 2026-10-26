@@ -52,7 +52,9 @@ import zed.rainxch.core.data.repository.ExternalImportRepositoryImpl
 import zed.rainxch.core.data.repository.FavouritesRepositoryImpl
 import zed.rainxch.core.data.repository.HiddenReposRepositoryImpl
 import zed.rainxch.core.data.repository.HostTokenRepositoryImpl
+import zed.rainxch.core.data.repository.InstalledAppUpdateChecker
 import zed.rainxch.core.data.repository.InstalledAppsRepositoryImpl
+import zed.rainxch.core.data.repository.InstalledReleaseSource
 import zed.rainxch.core.data.repository.ProxyRepositoryImpl
 import zed.rainxch.core.data.repository.RateLimitRepositoryImpl
 import zed.rainxch.core.data.repository.ReviewsRepositoryImpl
@@ -144,12 +146,19 @@ val coreModule =
                 database = get(),
                 installedAppsDao = get(),
                 historyDao = get(),
-                installer = get(),
-                clientProvider = get(),
-                backendApiClient = get(),
-                forgejoClientRegistry = get(),
-                packageMonitor = get(),
-                digestVerifier = get(),
+                updateChecker =
+                    InstalledAppUpdateChecker(
+                        dao = get(),
+                        installer = get(),
+                        releaseSource =
+                            InstalledReleaseSource(
+                                clientProvider = get(),
+                                backendApiClient = get(),
+                                forgejoClientRegistry = get(),
+                            ),
+                        packageMonitor = get(),
+                        digestVerifier = get(),
+                    ),
             )
         }
 
