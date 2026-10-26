@@ -47,7 +47,7 @@ class DhizukuInstallerServiceImpl : IDhizukuInstallerService.Stub() {
         installerPackageName: String?,
     ): Int {
         log(
-            "installPackage() called — fileSize=$fileSize, expected=$expectedPackageName@$expectedVersionCode, " +
+            "installPackage() called: fileSize=$fileSize, expected=$expectedPackageName@$expectedVersionCode, " +
                 "installer=$installerPackageName",
         )
         log("Process UID: ${android.os.Process.myUid()}, PID: ${android.os.Process.myPid()}")
@@ -68,7 +68,7 @@ class DhizukuInstallerServiceImpl : IDhizukuInstallerService.Stub() {
         return try {
             failureAsStatus("installPackage() exception") {
                 sessionId = installer.createSession(params)
-                log("createSession() — sessionId=$sessionId")
+                log("createSession(): sessionId=$sessionId")
                 val openSession = installer.openSession(sessionId)
                 session = openSession
                 writeApk(openSession, pfd, fileSize)
@@ -88,7 +88,7 @@ class DhizukuInstallerServiceImpl : IDhizukuInstallerService.Stub() {
                 if (latch.await(INSTALL_TIMEOUT_SECONDS, TimeUnit.SECONDS)) {
                     resultRef.get()
                 } else {
-                    logE("install timed out after ${INSTALL_TIMEOUT_SECONDS}s — verifying package state")
+                    logE("install timed out after ${INSTALL_TIMEOUT_SECONDS}s; verifying package state")
                     statusAfterInstallTimeout(ctx, installer, sessionId, expectedPackageName, expectedVersionCode)
                 }
             }
@@ -157,7 +157,7 @@ class DhizukuInstallerServiceImpl : IDhizukuInstallerService.Stub() {
                         PackageInstaller.STATUS_FAILURE,
                     )
                 val message = intent.getStringExtra(PackageInstaller.EXTRA_STATUS_MESSAGE)
-                log("install result — status=$status, message='$message'")
+                log("install result: status=$status, message='$message'")
                 when (status) {
                     PackageInstaller.STATUS_SUCCESS -> {
                         resultRef.set(STATUS_SUCCESS)
@@ -165,7 +165,7 @@ class DhizukuInstallerServiceImpl : IDhizukuInstallerService.Stub() {
 
                     PackageInstaller.STATUS_PENDING_USER_ACTION -> {
                         logW(
-                            "install requires user action (Android 14+ update-ownership gate) — " +
+                            "install requires user action (Android 14+ update-ownership gate), " +
                                 "installerAttribution=$installerPackageName",
                         )
                         resultRef.set(STATUS_PENDING_USER_ACTION_REQUIRED)
@@ -225,7 +225,7 @@ class DhizukuInstallerServiceImpl : IDhizukuInstallerService.Stub() {
                                     PackageInstaller.STATUS_FAILURE,
                                 )
                             val message = intent.getStringExtra(PackageInstaller.EXTRA_STATUS_MESSAGE)
-                            log("uninstall result — status=$status, message='$message'")
+                            log("uninstall result: status=$status, message='$message'")
                             resultRef.set(if (status == PackageInstaller.STATUS_SUCCESS) STATUS_SUCCESS else STATUS_FAILURE)
                             latch.countDown()
                         }
@@ -238,7 +238,7 @@ class DhizukuInstallerServiceImpl : IDhizukuInstallerService.Stub() {
                 if (latch.await(UNINSTALL_TIMEOUT_SECONDS, TimeUnit.SECONDS)) {
                     resultRef.get()
                 } else {
-                    logE("uninstall timed out after ${UNINSTALL_TIMEOUT_SECONDS}s — verifying package state")
+                    logE("uninstall timed out after ${UNINSTALL_TIMEOUT_SECONDS}s; verifying package state")
                     statusAfterUninstallTimeout(ctx, packageName)
                 }
             }

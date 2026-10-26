@@ -66,7 +66,7 @@ class ShizukuServiceManager(
 
     private fun computeStatus(): ShizukuStatus {
         val binderAlive = Shizuku.pingBinder()
-        Logger.d(TAG) { "computeStatus() — pingBinder=$binderAlive" }
+        Logger.d(TAG) { "computeStatus(): pingBinder=$binderAlive" }
         return if (binderAlive) statusWithBinder() else statusWithoutBinder()
     }
 
@@ -75,12 +75,12 @@ class ShizukuServiceManager(
         try {
             val permResult = Shizuku.checkSelfPermission()
             Logger.d(TAG) {
-                "computeStatus() — checkSelfPermission=$permResult (GRANTED=${PackageManager.PERMISSION_GRANTED})"
+                "computeStatus(): checkSelfPermission=$permResult (GRANTED=${PackageManager.PERMISSION_GRANTED})"
             }
             if (permResult != PackageManager.PERMISSION_GRANTED) {
                 ShizukuStatus.PERMISSION_NEEDED
             } else {
-                Logger.d(TAG) { "computeStatus() — READY" }
+                Logger.d(TAG) { "computeStatus(): READY" }
                 ShizukuStatus.READY
             }
         } catch (e: Exception) {
@@ -90,7 +90,7 @@ class ShizukuServiceManager(
 
     private fun statusWithoutBinder(): ShizukuStatus {
         val installed = isShizukuOrSuiInstalled()
-        Logger.d(TAG) { "computeStatus() — binder dead, shizukuOrSuiInstalled=$installed" }
+        Logger.d(TAG) { "computeStatus(): binder dead, shizukuOrSuiInstalled=$installed" }
         return if (installed) ShizukuStatus.NOT_RUNNING else ShizukuStatus.NOT_INSTALLED
     }
 
@@ -129,9 +129,9 @@ class ShizukuServiceManager(
                 Logger.d(TAG) { "getService() — no cached service, binding..." }
             } else {
                 val alive = cached.asBinder().pingBinder()
-                Logger.d(TAG) { "getService() — cached service ping=$alive" }
+                Logger.d(TAG) { "getService(): cached service ping=$alive" }
                 if (alive) return@withLock cached
-                Logger.w(TAG) { "getService() — cached service binder dead, rebinding..." }
+                Logger.w(TAG) { "getService(): cached service binder dead, rebinding..." }
                 installerService = null
             }
 
@@ -148,7 +148,7 @@ class ShizukuServiceManager(
                         context.packageName,
                         ShizukuInstallerServiceImpl::class.java.name,
                     )
-                Logger.d(TAG) { "bindService() — component: $componentName" }
+                Logger.d(TAG) { "bindService(): component: $componentName" }
 
                 val args =
                     Shizuku
@@ -164,7 +164,7 @@ class ShizukuServiceManager(
                             binder: IBinder?,
                         ) {
                             Logger.d(TAG) {
-                                "onServiceConnected() — name=$name, binder=${binder?.javaClass?.name}, " +
+                                "onServiceConnected(): name=$name, binder=${binder?.javaClass?.name}, " +
                                     "binderAlive=${binder?.pingBinder()}"
                             }
                             val service = IShizukuInstallerService.Stub.asInterface(binder)

@@ -52,13 +52,13 @@ class ShizukuInstallerServiceImpl : IShizukuInstallerService.Stub() {
                 STATUS_FAILURE
             } else {
                 val exitCode = process.exitValue()
-                log("pm install — exitCode=$exitCode, stdout='$stdout', stderr='$stderr'")
+                log("pm install: exitCode=$exitCode, stdout='$stdout', stderr='$stderr'")
 
                 if (exitCode == 0 && stdout.contains("Success")) {
                     log("Install SUCCESS")
                     STATUS_SUCCESS
                 } else {
-                    logE("Install FAILED — exitCode=$exitCode, stdout='$stdout', stderr='$stderr'")
+                    logE("Install FAILED: exitCode=$exitCode, stdout='$stdout', stderr='$stderr'")
                     STATUS_FAILURE
                 }
             }

@@ -47,18 +47,18 @@ class DhizukuServiceManager(
 
     private fun computeStatus(): DhizukuStatus {
         if (!isPackageInstalled(DHIZUKU_PACKAGE)) {
-            Logger.d(TAG) { "computeStatus() — Dhizuku package not installed" }
+            Logger.d(TAG) { "computeStatus(): Dhizuku package not installed" }
             return DhizukuStatus.NOT_INSTALLED
         }
         val initialized = initDhizuku()
-        Logger.d(TAG) { "computeStatus() — Dhizuku.init=$initialized" }
+        Logger.d(TAG) { "computeStatus(): Dhizuku.init=$initialized" }
         return when {
             !initialized -> {
                 DhizukuStatus.NOT_RUNNING
             }
 
             isPermissionGranted() -> {
-                Logger.d(TAG) { "computeStatus() — READY" }
+                Logger.d(TAG) { "computeStatus(): READY" }
                 DhizukuStatus.READY
             }
 
@@ -105,7 +105,7 @@ class DhizukuServiceManager(
 
     fun requestPermission() {
         if (!initDhizuku()) {
-            Logger.w(TAG) { "requestPermission() — Dhizuku.init() failed, cannot request" }
+            Logger.w(TAG) { "requestPermission(): Dhizuku.init() failed, cannot request" }
             refreshStatus()
             return
         }
@@ -149,9 +149,9 @@ class DhizukuServiceManager(
                 Logger.d(TAG) { "getService() — no cached service, binding..." }
             } else {
                 val alive = cached.asBinder().pingBinder()
-                Logger.d(TAG) { "getService() — cached service ping=$alive" }
+                Logger.d(TAG) { "getService(): cached service ping=$alive" }
                 if (alive) return@withLock cached
-                Logger.w(TAG) { "getService() — cached service binder dead, rebinding..." }
+                Logger.w(TAG) { "getService(): cached service binder dead, rebinding..." }
                 installerService = null
             }
 
