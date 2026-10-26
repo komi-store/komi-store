@@ -155,7 +155,7 @@ private fun MangaButton(
     val borderColor = look.border
 
     val flat = variant == KomiButtonVariant.Text
-    val sweep = emphasized && active && variant.hasSolidFill()
+    val sweep = emphasized && active && variant.hasStrongFill()
     val clipNeeded = personality.shape.cornerSmall > 0.dp || sweep
 
     val interaction = remember { MutableInteractionSource() }
@@ -420,7 +420,7 @@ private fun PersonalityColors.mangaButtonLook(
     )
 }
 
-private fun KomiButtonVariant.hasSolidFill(): Boolean = this == KomiButtonVariant.Primary || this == KomiButtonVariant.Destructive
+private fun KomiButtonVariant.hasStrongFill(): Boolean = this == KomiButtonVariant.Primary || this == KomiButtonVariant.Destructive
 
 @Composable
 private fun RowScope.KomiButtonContent(
