@@ -4,6 +4,7 @@ import io.ktor.client.HttpClient
 import io.ktor.client.plugins.HttpClientPlugin
 import io.ktor.client.statement.HttpReceivePipeline
 import io.ktor.http.HttpHeaders
+import io.ktor.http.HttpStatusCode
 import io.ktor.util.AttributeKey
 import zed.rainxch.core.domain.repository.UserSessionRepository
 
@@ -34,7 +35,7 @@ class UnauthorizedInterceptor(
         ) {
             scope.receivePipeline.intercept(HttpReceivePipeline.After) {
                 val tokenKey = extractBearerToken(subject.call.request.headers[HttpHeaders.Authorization])
-                if (subject.status.value == 401) {
+                if (subject.status == HttpStatusCode.Unauthorized) {
                     plugin.userSessionRepository.notifySessionExpired(tokenKey)
                 } else {
                     plugin.userSessionRepository.notifyRequestSucceeded(tokenKey)

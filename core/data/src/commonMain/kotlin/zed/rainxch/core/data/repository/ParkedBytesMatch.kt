@@ -1,7 +1,6 @@
 package zed.rainxch.core.data.repository
 
-// The decision behind ParkedInstallSettler: pure so the five matching rules can be tested without
-// an InstalledAppDao. A missing installed hash is always "not proven".
+// Kept pure so the matching rules test without a DAO; a missing installed hash is always "not proven".
 internal fun parkedBytesMatch(
     installedHash: String?,
     parkedDigest: String?,

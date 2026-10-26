@@ -12,8 +12,7 @@ fun List<ReleaseNetwork>.toReleaseWindow(includePreReleases: Boolean): List<Gith
         .filter { includePreReleases || !it.isEffectivelyPreRelease() }
         .toList()
 
-// Capped before the pre-release filter, like the fetch path's per_page, so a longer fed list
-// cannot reach releases the fetched check would never see.
+// Capped before the pre-release filter, like per_page on the fetch path, so a fed list sees no release a fetch wouldn't.
 fun List<GithubRelease>.toUpdateCheckWindow(
     includePreReleases: Boolean,
     limit: Int,

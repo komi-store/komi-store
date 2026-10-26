@@ -7,6 +7,6 @@ import androidx.datastore.preferences.core.Preferences
 fun createAnnouncementsDataStore(context: Context): DataStore<Preferences> =
     createDataStore(
         producePath = {
-            context.filesDir.resolve(announcementsDataStoreFileName).absolutePath
+            context.filesDir.resolve(ANNOUNCEMENTS_DATA_STORE_FILE_NAME).absolutePath
         },
     )

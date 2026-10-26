@@ -8,7 +8,7 @@ import java.io.File
 fun createAnnouncementsDataStore(): DataStore<Preferences> =
     createDataStore(
         producePath = {
-            DesktopAppDataPaths.migrateFromTmpIfNeeded(announcementsDataStoreFileName)
-            File(DesktopAppDataPaths.appDataDir(), announcementsDataStoreFileName).absolutePath
+            DesktopAppDataPaths.migrateFromTmpIfNeeded(ANNOUNCEMENTS_DATA_STORE_FILE_NAME)
+            File(DesktopAppDataPaths.appDataDir(), ANNOUNCEMENTS_DATA_STORE_FILE_NAME).absolutePath
         },
     )

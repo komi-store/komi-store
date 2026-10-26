@@ -8,7 +8,7 @@ import java.io.File
 fun createDataStore(): DataStore<Preferences> =
     createDataStore(
         producePath = {
-            DesktopAppDataPaths.migrateFromTmpIfNeeded(dataStoreFileName)
-            File(DesktopAppDataPaths.appDataDir(), dataStoreFileName).absolutePath
+            DesktopAppDataPaths.migrateFromTmpIfNeeded(DATA_STORE_FILE_NAME)
+            File(DesktopAppDataPaths.appDataDir(), DATA_STORE_FILE_NAME).absolutePath
         },
     )

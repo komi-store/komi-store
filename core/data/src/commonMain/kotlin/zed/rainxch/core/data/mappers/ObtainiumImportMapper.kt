@@ -9,17 +9,15 @@ import kotlinx.serialization.json.jsonPrimitive
 import zed.rainxch.core.domain.model.transfer.ExportedApp
 import zed.rainxch.core.domain.model.transfer.ObtainiumApp
 
-data class ObtainiumMapResult(
-    val exported: ExportedApp?,
-    val nonGitHubLabel: String?,
-    val unsupportedFailureLabel: String?,
-)
-
 private data class AdditionalSettingsParse(
     val filter: String?,
     val fallbackToOlderReleases: Boolean,
     val invertFilter: Boolean,
 )
+
+// GitHub's own limits on owner and repository names.
+private const val MAX_OWNER_LENGTH = 39
+private const val MAX_REPO_LENGTH = 100
 
 fun ObtainiumApp.toExportedAppOrSkip(json: Json): ObtainiumMapResult {
     val rawUrl = url.trim()
@@ -32,66 +30,74 @@ fun ObtainiumApp.toExportedAppOrSkip(json: Json): ObtainiumMapResult {
                         if (rawUrl.isNotEmpty()) " ($rawUrl)" else "",
                 unsupportedFailureLabel = null,
             )
+    val packageName = id.trim().takeIf { it.isNotBlank() }
+    // The settings are parsed only for an entry with an id: a malformed value there throws.
+    return if (packageName == null) {
+        unsupported("$owner/$repo (missing package id)")
+    } else {
+        exportOrUnsupported(packageName, owner, repo, parseAdditionalSettings(additionalSettingsRaw, json))
+    }
+}
 
-    val packageName =
-        id.trim().takeIf { it.isNotBlank() } ?: return ObtainiumMapResult(
-            exported = null,
-            nonGitHubLabel = null,
-            unsupportedFailureLabel = "$owner/$repo (missing package id)",
-        )
-
-    val canonicalUrl = "https://github.com/$owner/$repo"
-    val parsed = parseAdditionalSettings(additionalSettingsRaw, json)
+private fun ObtainiumApp.exportOrUnsupported(
+    packageName: String,
+    owner: String,
+    repo: String,
+    parsed: AdditionalSettingsParse,
+): ObtainiumMapResult =
     if (parsed.invertFilter) {
-        return ObtainiumMapResult(
-            exported = null,
+        unsupported("$owner/$repo (inverted APK filter — not supported)")
+    } else {
+        ObtainiumMapResult(
+            exported =
+                ExportedApp(
+                    packageName = packageName,
+                    repoOwner = owner,
+                    repoName = repo,
+                    repoUrl = "https://github.com/$owner/$repo",
+                    assetFilterRegex = parsed.filter,
+                    fallbackToOlderReleases = parsed.fallbackToOlderReleases,
+                    preferredAssetVariant = null,
+                    preferredAssetTokens = null,
+                    assetGlobPattern = null,
+                    pickedAssetIndex = preferredApkIndex,
+                    pickedAssetSiblingCount = null,
+                ),
             nonGitHubLabel = null,
-            unsupportedFailureLabel = "$owner/$repo (inverted APK filter — not supported)",
+            unsupportedFailureLabel = null,
         )
     }
 
-    return ObtainiumMapResult(
-        exported =
-            ExportedApp(
-                packageName = packageName,
-                repoOwner = owner,
-                repoName = repo,
-                repoUrl = canonicalUrl,
-                assetFilterRegex = parsed.filter,
-                fallbackToOlderReleases = parsed.fallbackToOlderReleases,
-                preferredAssetVariant = null,
-                preferredAssetTokens = null,
-                assetGlobPattern = null,
-                pickedAssetIndex = preferredApkIndex,
-                pickedAssetSiblingCount = null,
-            ),
+private fun unsupported(label: String) =
+    ObtainiumMapResult(
+        exported = null,
         nonGitHubLabel = null,
-        unsupportedFailureLabel = null,
+        unsupportedFailureLabel = label,
     )
-}
 
 private fun parseGithubOwnerRepo(rawUrl: String): Pair<String, String>? {
     if (rawUrl.isBlank()) return null
+    val parts = githubRepoPath(rawUrl)?.split('/') ?: return null
+    val owner = parts[0]
+    val repo = parts.getOrNull(1).orEmpty()
+    val named = owner.isNotBlank() && repo.isNotBlank()
+    val withinLimits = owner.length <= MAX_OWNER_LENGTH && repo.length <= MAX_REPO_LENGTH
+    return if (named && withinLimits) owner to repo else null
+}
+
+// The part after github.com, or null for a URL on another host.
+private fun githubRepoPath(rawUrl: String): String? {
     val trimmed = rawUrl.substringBefore('?').substringBefore('#').trimEnd('/')
     val withoutScheme = trimmed.removePrefix("https://").removePrefix("http://")
     val withoutHost =
         withoutScheme
             .removePrefix("www.")
             .removePrefix("github.com/")
-    if (withoutScheme == withoutHost && !withoutScheme.startsWith("github.com")) return null
-    val cleaned =
-        if (withoutScheme.startsWith("github.com")) {
-            withoutScheme.removePrefix("github.com").trimStart('/')
-        } else {
-            withoutHost
-        }
-    val parts = cleaned.split('/')
-    if (parts.size < 2) return null
-    val owner = parts[0]
-    val repo = parts[1]
-    if (owner.isBlank() || repo.isBlank()) return null
-    if (owner.length > 39 || repo.length > 100) return null
-    return owner to repo
+    return when {
+        withoutScheme.startsWith("github.com") -> withoutScheme.removePrefix("github.com").trimStart('/')
+        withoutScheme == withoutHost -> null
+        else -> withoutHost
+    }
 }
 
 private fun parseAdditionalSettings(
