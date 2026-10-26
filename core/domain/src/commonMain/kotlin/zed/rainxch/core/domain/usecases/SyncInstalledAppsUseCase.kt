@@ -1,10 +1,11 @@
 package zed.rainxch.core.domain.usecases
 
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import zed.rainxch.core.domain.logging.KomiStoreLogger
+import zed.rainxch.core.domain.model.error.LocalStoreException
+import zed.rainxch.core.domain.model.error.SystemPackagesException
 import zed.rainxch.core.domain.model.installation.BindingStatus
 import zed.rainxch.core.domain.model.installation.DeviceChange
 import zed.rainxch.core.domain.model.installation.InstalledApp
@@ -46,13 +47,17 @@ class SyncInstalledAppsUseCase(
                 }
 
                 Result.success(Unit)
-            } catch (e: CancellationException) {
-                throw e
-            } catch (e: Exception) {
-                logger.error("Sync failed: ${e.message}")
-                Result.failure(e)
+            } catch (e: LocalStoreException) {
+                syncFailed(e)
+            } catch (e: SystemPackagesException) {
+                syncFailed(e)
             }
         }
+
+    private fun syncFailed(e: Exception): Result<Unit> {
+        logger.error("Sync failed: ${e.message}")
+        return Result.failure(e)
+    }
 
     private suspend fun resolveUntrackablePending(appsInDb: List<InstalledApp>) {
         val orphanPending =
@@ -66,9 +71,7 @@ class SyncInstalledAppsUseCase(
                 try {
                     installedAppsRepository.updatePendingStatus(app.packageName, false)
                     logger.info("Resolved un-confirmable pending install: ${app.packageName}")
-                } catch (e: CancellationException) {
-                    throw e
-                } catch (e: Exception) {
+                } catch (e: LocalStoreException) {
                     logger.error("Failed to resolve pending ${app.packageName}: ${e.message}")
                 }
             }
@@ -126,14 +129,21 @@ class SyncInstalledAppsUseCase(
         appsInDb.forEach { app ->
             val isOnSystem = installedPackageNames.contains(app.packageName)
             when {
-                app.isPendingInstall -> plan.addPending(app, isOnSystem, now)
+                app.isPendingInstall -> {
+                    plan.addPending(app, isOnSystem, now)
+                }
 
-                !isOnSystem -> plan.deleteCandidates.add(app)
+                !isOnSystem -> {
+                    plan.deleteCandidates.add(app)
+                }
 
-                app.installedVersionName == null ->
+                app.installedVersionName == null -> {
                     plan.toMigrate.add(app.packageName to determineMigrationData(app))
+                }
 
-                platform == Platform.ANDROID -> plan.toSyncVersions.add(app)
+                platform == Platform.ANDROID -> {
+                    plan.toSyncVersions.add(app)
+                }
             }
             if (isOnSystem && !app.isPendingInstall && app.pendingInstallFilePath != null) {
                 plan.toClearStaleParkedFile.add(app)
@@ -214,9 +224,7 @@ class SyncInstalledAppsUseCase(
                 if (cleanup.deleteRow && dropRowIfDiscarded(cleanup, disposal)) {
                     droppedRows += 1
                 }
-            } catch (e: CancellationException) {
-                throw e
-            } catch (e: Exception) {
+            } catch (e: LocalStoreException) {
                 logger.error("Failed to clean up the parked install for ${cleanup.packageName}: ${e.message}")
             }
         }
@@ -289,15 +297,14 @@ class SyncInstalledAppsUseCase(
                 "Resolved pending install: ${app.packageName} " +
                     "(v${resolution.versionName}, code=${resolution.versionCode}, tag=${resolution.resolvedTag})",
             )
-            parkedCleanups += ParkedCleanup(
-                packageName = app.packageName,
-                expectedPath = app.pendingInstallFilePath,
-                deleteRow = false,
-                reason = "resolved pending install",
-            )
-        } catch (e: CancellationException) {
-            throw e
-        } catch (e: Exception) {
+            parkedCleanups +=
+                ParkedCleanup(
+                    packageName = app.packageName,
+                    expectedPath = app.pendingInstallFilePath,
+                    deleteRow = false,
+                    reason = "resolved pending install",
+                )
+        } catch (e: LocalStoreException) {
             logger.error("Failed to resolve pending ${app.packageName}: ${e.message}")
         }
     }
@@ -319,14 +326,15 @@ class SyncInstalledAppsUseCase(
                 "Migrated $packageName: ${migrationResult.source} " +
                     "(versionName=${migrationResult.versionName}, code=${migrationResult.versionCode})",
             )
-        } catch (e: CancellationException) {
-            throw e
-        } catch (e: Exception) {
+        } catch (e: LocalStoreException) {
             logger.error("Failed to migrate $packageName: ${e.message}")
         }
     }
 
-    private suspend fun syncVersion(app: InstalledApp, systemInfo: SystemPackageInfo?) {
+    private suspend fun syncVersion(
+        app: InstalledApp,
+        systemInfo: SystemPackageInfo?,
+    ) {
         try {
             val local = systemInfo ?: return
 
@@ -347,22 +355,30 @@ class SyncInstalledAppsUseCase(
             }
 
             if (change != DeviceChange.NONE) {
-                val observed = app.observeExternalInstall(
-                    versionName = local.versionName,
-                    versionCode = local.versionCode,
-                    signingFingerprint = local.signingFingerprint,
-                )
+                val observed =
+                    app.observeExternalInstall(
+                        versionName = local.versionName,
+                        versionCode = local.versionCode,
+                        signingFingerprint = local.signingFingerprint,
+                    )
                 installedAppsRepository.updateApp(observed)
 
                 val action =
                     when (change) {
-                        DeviceChange.DOWNGRADE -> "downgrade"
-                        DeviceChange.SIGNER_CHANGE ->
+                        DeviceChange.DOWNGRADE -> {
+                            "downgrade"
+                        }
+
+                        DeviceChange.SIGNER_CHANGE -> {
                             "signer change " +
                                 "(stored=${app.signingFingerprint} now=${local.signingFingerprint})"
+                        }
+
                         DeviceChange.NONE,
                         DeviceChange.VERSION_CHANGE,
-                        -> "external update"
+                        -> {
+                            "external update"
+                        }
                     }
                 logger.info(
                     "Detected $action for ${app.packageName}: " +
@@ -371,28 +387,26 @@ class SyncInstalledAppsUseCase(
                         "binding=${binding::class.simpleName}, updateAvailable=${observed.isUpdateAvailable}",
                 )
             }
-        } catch (e: CancellationException) {
-            throw e
-        } catch (e: Exception) {
+        } catch (e: LocalStoreException) {
             logger.error("Failed to sync version for ${app.packageName}: ${e.message}")
         }
     }
 
     private suspend fun presenceOf(packageName: String): Presence =
-        runCatching { packageMonitor.getInstalledPackageInfo(packageName) }
-            .fold(
-                onSuccess = { info -> if (info == null) Presence.Absent else Presence.Present(info) },
-                onFailure = { e ->
-                    if (e is CancellationException) throw e
-                    logger.warn("Package lookup failed for $packageName; treated as unknown: ${e.message}")
-                    Presence.Unknown
-                },
-            )
+        try {
+            val info = packageMonitor.getInstalledPackageInfo(packageName)
+            if (info == null) Presence.Absent else Presence.Present(info)
+        } catch (e: SystemPackagesException) {
+            logger.warn("Package lookup failed for $packageName; treated as unknown: ${e.message}")
+            Presence.Unknown
+        }
 
     private sealed interface Presence {
         data object Absent : Presence
 
-        data class Present(val info: SystemPackageInfo) : Presence
+        data class Present(
+            val info: SystemPackageInfo,
+        ) : Presence
 
         data object Unknown : Presence
     }
