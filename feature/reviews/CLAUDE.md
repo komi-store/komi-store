@@ -12,7 +12,7 @@ feature/reviews/
     utils/         # ReviewErrorMessages: ReviewError -> string resource
 ```
 
-There are no domain or data layers here: Details needs reviews too, and features don't depend on each other, so the models and `ReviewsRepository` live in `core/domain`, the backend calls (`BackendReviewsApi`, `ReviewsRepositoryImpl`) in `core/data`, and `ReviewCard`, `RatingSummaryPanel` and `StarRating` in `core/presentation/components/reviews`.
+There are no domain or data layers here: Details needs reviews too, and features don't depend on each other, so the models and `ReviewsRepository` live in `core/domain`, the backend calls (`BackendReviewsApi`, `BackendReviewModerationApi`, `ReviewsRepositoryImpl`) in `core/data`, and `ReviewCard`, `RatingSummaryPanel` and `StarRating` in `core/presentation/components/reviews`.
 
 ## Navigation
 
