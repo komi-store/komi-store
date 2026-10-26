@@ -21,21 +21,18 @@ internal suspend fun fetchGithubReleaseWindow(
     includePreReleases: Boolean,
     perPage: Int,
 ): List<GithubRelease> {
-    val fetched =
-        try {
-            client.executeRequest<List<ReleaseNetwork>> {
-                get("/repos/$owner/$repo/releases") {
-                    header(HttpHeaders.Accept, "application/vnd.github+json")
-                    parameter("per_page", perPage)
-                }
-            }
-        } catch (e: RateLimitException) {
-            Result.failure(e)
-        }
     val releases =
-        fetched.getOrElse { error ->
-            Logger.e { "Failed to fetch releases for $owner/$repo: ${error.message}" }
-            return emptyList()
+        try {
+            client
+                .executeRequest<List<ReleaseNetwork>> {
+                    get("/repos/$owner/$repo/releases") {
+                        header(HttpHeaders.Accept, "application/vnd.github+json")
+                        parameter("per_page", perPage)
+                    }
+                }.getOrDefault(emptyList())
+        } catch (e: RateLimitException) {
+            Logger.e { "Failed to fetch releases for $owner/$repo: ${e.message}" }
+            emptyList()
         }
     return releases
         .asSequence()
