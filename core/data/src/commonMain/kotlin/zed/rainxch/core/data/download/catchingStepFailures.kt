@@ -1,6 +1,5 @@
 package zed.rainxch.core.data.download
 
-import androidx.sqlite.SQLiteException
 import zed.rainxch.core.domain.model.error.LocalStoreException
 import zed.rainxch.core.domain.model.error.SystemPackagesException
 import java.io.IOException
@@ -19,8 +18,6 @@ internal inline fun <T> catchingStepFailures(block: () -> T): Result<T> =
     } catch (e: LocalStoreException) {
         Result.failure(e)
     } catch (e: SystemPackagesException) {
-        Result.failure(e)
-    } catch (e: SQLiteException) {
         Result.failure(e)
     } catch (e: IllegalStateException) {
         Result.failure(e)

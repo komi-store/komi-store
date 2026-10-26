@@ -16,18 +16,18 @@ internal class AppTrackingPreferencesImpl(
         packageName: String,
         enabled: Boolean,
     ) {
-        installedAppsDao.updateIncludePreReleases(packageName, enabled)
+        localStore { installedAppsDao.updateIncludePreReleases(packageName, enabled) }
     }
 
     override suspend fun setUpdateCheckEnabled(
         packageName: String,
         enabled: Boolean,
     ) {
-        installedAppsDao.updateUpdateCheckEnabled(packageName, enabled)
+        localStore { installedAppsDao.updateUpdateCheckEnabled(packageName, enabled) }
         if (enabled) {
             recheckAfterChange(packageName, "enabled update checks")
         } else {
-            installedAppsDao.clearUpdateMetadata(packageName, System.currentTimeMillis())
+            localStore { installedAppsDao.clearUpdateMetadata(packageName, System.currentTimeMillis()) }
         }
     }
 
@@ -37,11 +37,13 @@ internal class AppTrackingPreferencesImpl(
         fallbackToOlderReleases: Boolean,
     ) {
         val normalized = regex?.trim()?.takeIf { it.isNotEmpty() }
-        installedAppsDao.updateAssetFilter(
-            packageName = packageName,
-            regex = normalized,
-            fallback = fallbackToOlderReleases,
-        )
+        localStore {
+            installedAppsDao.updateAssetFilter(
+                packageName = packageName,
+                regex = normalized,
+                fallback = fallbackToOlderReleases,
+            )
+        }
         recheckAfterChange(packageName, "a new asset filter")
     }
 
@@ -53,16 +55,18 @@ internal class AppTrackingPreferencesImpl(
         pickedIndex: Int?,
         siblingCount: Int?,
     ) {
-        installedAppsDao.updatePreferredVariant(
-            InstalledAppVariantPin(
-                packageName = packageName,
-                preferredAssetVariant = variant?.trim()?.takeIf { it.isNotEmpty() },
-                preferredAssetTokens = tokens?.trim()?.takeIf { it.isNotEmpty() },
-                assetGlobPattern = glob?.trim()?.takeIf { it.isNotEmpty() },
-                pickedAssetIndex = pickedIndex,
-                pickedAssetSiblingCount = siblingCount?.takeIf { it > 0 },
-            ),
-        )
+        localStore {
+            installedAppsDao.updatePreferredVariant(
+                InstalledAppVariantPin(
+                    packageName = packageName,
+                    preferredAssetVariant = variant?.trim()?.takeIf { it.isNotEmpty() },
+                    preferredAssetTokens = tokens?.trim()?.takeIf { it.isNotEmpty() },
+                    assetGlobPattern = glob?.trim()?.takeIf { it.isNotEmpty() },
+                    pickedAssetIndex = pickedIndex,
+                    pickedAssetSiblingCount = siblingCount?.takeIf { it > 0 },
+                ),
+            )
+        }
         recheckAfterChange(packageName, "a new variant")
     }
 
@@ -81,7 +85,7 @@ internal class AppTrackingPreferencesImpl(
         packageName: String,
         tag: String?,
     ) {
-        installedAppsDao.setSkippedReleaseTag(packageName, tag?.takeIf { it.isNotBlank() })
+        localStore { installedAppsDao.setSkippedReleaseTag(packageName, tag?.takeIf { it.isNotBlank() }) }
     }
 
     // The preference is saved either way; a failed re-check leaves the next scheduled check to pick it up.

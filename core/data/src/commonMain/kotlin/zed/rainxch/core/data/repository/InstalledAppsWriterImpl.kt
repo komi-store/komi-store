@@ -30,7 +30,7 @@ internal class InstalledAppsWriterImpl(
         }
 
     override suspend fun saveInstalledApp(app: InstalledApp) {
-        installedAppsDao.insertApp(app.toEntity())
+        localStore { installedAppsDao.insertApp(app.toEntity()) }
     }
 
     override suspend fun deleteInstalledApp(packageName: String) {
@@ -42,39 +42,41 @@ internal class InstalledAppsWriterImpl(
         build: InstalledBuild,
         isPendingInstall: Boolean,
     ) {
-        val app = installedAppsDao.getAppByPackage(packageName) ?: return
+        localStore {
+            val app = installedAppsDao.getAppByPackage(packageName) ?: return
 
-        Logger.d {
-            "Updating app version: $packageName from ${app.installedVersion} to ${build.tag}"
+            Logger.d {
+                "Updating app version: $packageName from ${app.installedVersion} to ${build.tag}"
+            }
+
+            historyDao.insertHistory(
+                UpdateHistoryEntity(
+                    packageName = packageName,
+                    appName = app.appName,
+                    repoOwner = app.repoOwner,
+                    repoName = app.repoName,
+                    fromVersion = app.installedVersion,
+                    toVersion = build.tag,
+                    updatedAt = System.currentTimeMillis(),
+                    updateSource = InstallSource.THIS_APP,
+                    success = true,
+                ),
+            )
+
+            installedAppsDao.updateApp(
+                app
+                    .toDomain()
+                    .confirmInstall(
+                        build = build,
+                        isPending = isPendingInstall,
+                        at = System.currentTimeMillis(),
+                    ).toEntity(),
+            )
         }
-
-        historyDao.insertHistory(
-            UpdateHistoryEntity(
-                packageName = packageName,
-                appName = app.appName,
-                repoOwner = app.repoOwner,
-                repoName = app.repoName,
-                fromVersion = app.installedVersion,
-                toVersion = build.tag,
-                updatedAt = System.currentTimeMillis(),
-                updateSource = InstallSource.THIS_APP,
-                success = true,
-            ),
-        )
-
-        installedAppsDao.updateApp(
-            app
-                .toDomain()
-                .confirmInstall(
-                    build = build,
-                    isPending = isPendingInstall,
-                    at = System.currentTimeMillis(),
-                ).toEntity(),
-        )
     }
 
     override suspend fun clearInstallBinding(packageName: String) {
-        installedAppsDao.clearInstallBinding(packageName)
+        localStore { installedAppsDao.clearInstallBinding(packageName) }
     }
 
     override suspend fun updateApp(app: InstalledApp) {
@@ -88,19 +90,21 @@ internal class InstalledAppsWriterImpl(
         installedVersionCode: Long,
         isUpdateAvailable: Boolean,
     ) {
-        installedAppsDao.updateInstalledVersion(
-            packageName = packageName,
-            installedVersion = installedVersion,
-            installedVersionName = installedVersionName,
-            installedVersionCode = installedVersionCode,
-            isUpdateAvailable = isUpdateAvailable,
-        )
+        localStore {
+            installedAppsDao.updateInstalledVersion(
+                packageName = packageName,
+                installedVersion = installedVersion,
+                installedVersionName = installedVersionName,
+                installedVersionCode = installedVersionCode,
+                isUpdateAvailable = isUpdateAvailable,
+            )
+        }
     }
 
     override suspend fun updateSigningFingerprint(
         packageName: String,
         signingFingerprint: String,
     ) {
-        installedAppsDao.updateSigningFingerprint(packageName, signingFingerprint)
+        localStore { installedAppsDao.updateSigningFingerprint(packageName, signingFingerprint) }
     }
 }

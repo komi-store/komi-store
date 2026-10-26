@@ -43,12 +43,14 @@ internal class PendingInstallStoreImpl(
         version: String?,
         assetName: String?,
     ) {
-        installedAppsDao.updatePendingInstallFilePath(
-            packageName = packageName,
-            path = path,
-            version = version,
-            assetName = assetName,
-        )
+        localStore {
+            installedAppsDao.updatePendingInstallFilePath(
+                packageName = packageName,
+                path = path,
+                version = version,
+                assetName = assetName,
+            )
+        }
     }
 
     override suspend fun markAwaitingInstall(
@@ -61,18 +63,20 @@ internal class PendingInstallStoreImpl(
         releasePublishedAt: String?,
         assetDigest: String?,
     ) {
-        installedAppsDao.markAwaitingInstall(
-            InstalledAppAwaitingInstall(
-                packageName = packageName,
-                pendingInstallFilePath = path,
-                pendingInstallVersion = version,
-                pendingInstallAssetName = assetName,
-                pendingInstallReleaseId = releaseId,
-                pendingInstallAssetId = assetId,
-                pendingInstallAssetDigest = assetDigest,
-                pendingInstallReleasePublishedAt = releasePublishedAt,
-            ),
-        )
+        localStore {
+            installedAppsDao.markAwaitingInstall(
+                InstalledAppAwaitingInstall(
+                    packageName = packageName,
+                    pendingInstallFilePath = path,
+                    pendingInstallVersion = version,
+                    pendingInstallAssetName = assetName,
+                    pendingInstallReleaseId = releaseId,
+                    pendingInstallAssetId = assetId,
+                    pendingInstallAssetDigest = assetDigest,
+                    pendingInstallReleasePublishedAt = releasePublishedAt,
+                ),
+            )
+        }
     }
 
     override suspend fun discardParkedInstall(
