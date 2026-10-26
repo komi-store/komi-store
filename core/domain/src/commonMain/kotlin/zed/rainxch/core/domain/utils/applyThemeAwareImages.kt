@@ -9,33 +9,35 @@ fun applyThemeAwareImages(
 
     processed =
         processed.replace(
-            Regex("""!\[([^\]]*)\]\(([^)]*?)#gh-(dark|light)-mode-only([^)]*)\)"""),
+            Regex("""!\[(?<alt>[^\]]*)\]\((?<url>[^)]*?)#gh-(?<mode>dark|light)-mode-only(?<trailing>[^)]*)\)"""),
         ) { match ->
-            val (alt, urlBase, mode, trailing) = match.destructured
-            if (isHiddenInTheme(mode, isDark)) {
+            if (isHiddenInTheme(match.group("mode"), isDark)) {
                 ""
             } else {
-                "![$alt]($urlBase$trailing)"
+                "![${match.group("alt")}](${match.group("url")}${match.group("trailing")})"
             }
         }
 
     processed =
         processed.replace(
             Regex(
-                """<img(\s[^>]*?)src\s*=\s*(["'])([^"']*?)#gh-(dark|light)-mode-only([^"']*?)\2([^>]*?)>""",
+                """<img(?<pre>\s[^>]*?)src\s*=\s*(?<quote>["'])(?<url>[^"']*?)""" +
+                    """#gh-(?<mode>dark|light)-mode-only(?<trailing>[^"']*?)\k<quote>(?<post>[^>]*?)>""",
                 RegexOption.IGNORE_CASE,
             ),
         ) { match ->
-            val (pre, quote, urlBase, mode, trailing, post) = match.destructured
-            if (isHiddenInTheme(mode, isDark)) {
+            if (isHiddenInTheme(match.group("mode"), isDark)) {
                 ""
             } else {
-                "<img${pre}src=$quote$urlBase$trailing$quote$post>"
+                val quote = match.group("quote")
+                "<img${match.group("pre")}src=$quote${match.group("url")}${match.group("trailing")}$quote${match.group("post")}>"
             }
         }
 
     return processed
 }
+
+private fun MatchResult.group(name: String): String = groups[name]?.value.orEmpty()
 
 private fun isHiddenInTheme(
     mode: String,

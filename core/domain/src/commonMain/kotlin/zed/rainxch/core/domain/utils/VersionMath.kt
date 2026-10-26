@@ -32,7 +32,8 @@ object VersionMath {
 
     private fun normalizeCalverHyphen(s: String): String {
         val m = CALVER_HYPHEN_PATTERN.matchEntire(s) ?: return s
-        val (year, rawMonth, rawDay, tail) = m.destructured
+        val (year, rawMonth, rawDay) = m.destructured
+        val tail = m.groups["tail"]?.value.orEmpty()
         val core = "$year.${rawMonth.padStart(2, '0')}.${rawDay.padStart(2, '0')}"
         return if (tail.isNotEmpty()) "$core-$tail" else core
     }
@@ -274,7 +275,7 @@ object VersionMath {
         )
 
     private val CALVER_HYPHEN_PATTERN =
-        Regex("""^((?:19|20|21)\d{2})-(\d{1,2})-(\d{1,2})(?:[-.](.+))?$""")
+        Regex("""^((?:19|20|21)\d{2})-(\d{1,2})-(\d{1,2})(?:[-.](?<tail>.+))?$""")
 
     private val ADJACENT_ALPHA_PATTERN = Regex("""\d[A-Za-z]""")
 
