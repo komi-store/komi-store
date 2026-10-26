@@ -8,11 +8,12 @@ import android.net.Uri
 import androidx.core.content.FileProvider
 import androidx.core.net.toUri
 import co.touchlab.kermit.Logger
+import zed.rainxch.core.domain.system.InstallerHandoff
 import java.io.File
 
 class AndroidInstallerAppHandoff(
     private val context: Context,
-) : InstallerAppHandoff {
+) : InstallerHandoff {
     override fun isObtainiumInstalled(): Boolean = isInstalled("dev.imranr.obtainium.fdroid") || isInstalled("dev.imranr.obtainium")
 
     override fun openInObtainium(

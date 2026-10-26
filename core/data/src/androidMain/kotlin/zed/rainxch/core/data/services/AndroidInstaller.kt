@@ -13,11 +13,11 @@ import androidx.core.content.FileProvider
 import androidx.core.net.toUri
 import co.touchlab.kermit.Logger
 import zed.rainxch.core.data.services.installer.AndroidInstallerAppHandoff
-import zed.rainxch.core.data.services.installer.InstallerAppHandoff
 import zed.rainxch.core.domain.model.account.github.GithubAsset
 import zed.rainxch.core.domain.model.system.SystemArchitecture
 import zed.rainxch.core.domain.system.InstallOutcome
 import zed.rainxch.core.domain.system.Installer
+import zed.rainxch.core.domain.system.InstallerHandoff
 import zed.rainxch.core.domain.system.InstallerInfoExtractor
 import zed.rainxch.core.domain.utils.AssetArchitectureMatcher
 import zed.rainxch.core.domain.utils.AssetSelector
@@ -28,7 +28,7 @@ class AndroidInstaller(
     private val context: Context,
     private val installerInfoExtractor: InstallerInfoExtractor,
 ) : Installer,
-    InstallerAppHandoff by AndroidInstallerAppHandoff(context) {
+    InstallerHandoff by AndroidInstallerAppHandoff(context) {
     override fun getApkInfoExtractor(): InstallerInfoExtractor = installerInfoExtractor
 
     override fun detectSystemArchitecture(): SystemArchitecture {
