@@ -59,9 +59,11 @@ import zed.rainxch.core.data.repository.SeenReposRepositoryImpl
 import zed.rainxch.core.data.repository.StarredRepositoryImpl
 import zed.rainxch.core.data.repository.TweaksRepositoryImpl
 import zed.rainxch.core.data.repository.UserSessionRepositoryImpl
+import zed.rainxch.core.data.services.AssetFetcher
 import zed.rainxch.core.data.services.BuildKonfigAppVersionInfo
 import zed.rainxch.core.data.services.DefaultDownloadOrchestrator
 import zed.rainxch.core.data.services.DefaultSystemInstallSerializer
+import zed.rainxch.core.data.services.DownloadInstallRunner
 import zed.rainxch.core.domain.getPlatform
 import zed.rainxch.core.domain.logging.KomiStoreLogger
 import zed.rainxch.core.domain.model.settings.ProxyConfig
@@ -315,18 +317,35 @@ val coreModule =
             )
         }
 
-        single<DownloadOrchestrator> {
-            DefaultDownloadOrchestrator(
+        single {
+            AssetFetcher(
                 downloader = get(),
                 multiSourceDownloader = get(),
                 assetSourceRefetcher = get(),
                 digestVerifier = get(),
+                tokenStore = get(),
+                installedAppsRepository = get(),
+            )
+        }
+
+        single {
+            DownloadInstallRunner(
                 installer = get(),
                 installedAppsRepository = get(),
                 pendingInstallNotifier = get(),
-                appScope = get(),
                 systemInstallSerializer = get(),
-                tokenStore = get(),
+                digestVerifier = get(),
+            )
+        }
+
+        single<DownloadOrchestrator> {
+            DefaultDownloadOrchestrator(
+                downloader = get(),
+                assetFetcher = get(),
+                installRunner = get(),
+                installedAppsRepository = get(),
+                pendingInstallNotifier = get(),
+                appScope = get(),
             )
         }
 
