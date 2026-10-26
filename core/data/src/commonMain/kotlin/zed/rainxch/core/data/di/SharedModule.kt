@@ -49,9 +49,11 @@ import zed.rainxch.core.data.repository.AnnouncementsRepositoryImpl
 import zed.rainxch.core.data.repository.BrowseFilterStoreImpl
 import zed.rainxch.core.data.repository.CacheRepositoryImpl
 import zed.rainxch.core.data.repository.ExternalImportRepositoryImpl
+import zed.rainxch.core.data.repository.ExternalMatchResolver
 import zed.rainxch.core.data.repository.FavouritesRepositoryImpl
 import zed.rainxch.core.data.repository.HiddenReposRepositoryImpl
 import zed.rainxch.core.data.repository.HostTokenRepositoryImpl
+import zed.rainxch.core.data.repository.InitialScanMarker
 import zed.rainxch.core.data.repository.InstalledAppUpdateChecker
 import zed.rainxch.core.data.repository.InstalledAppsRepositoryImpl
 import zed.rainxch.core.data.repository.InstalledReleaseSource
@@ -59,6 +61,7 @@ import zed.rainxch.core.data.repository.ProxyRepositoryImpl
 import zed.rainxch.core.data.repository.RateLimitRepositoryImpl
 import zed.rainxch.core.data.repository.ReviewsRepositoryImpl
 import zed.rainxch.core.data.repository.SeenReposRepositoryImpl
+import zed.rainxch.core.data.repository.SigningFingerprintIndex
 import zed.rainxch.core.data.repository.StarredRepositoryImpl
 import zed.rainxch.core.data.repository.TweaksRepositoryImpl
 import zed.rainxch.core.data.repository.UserSessionRepositoryImpl
@@ -299,18 +302,31 @@ val coreModule =
         }
 
         single<ExternalImportRepository> {
+            val fingerprints =
+                SigningFingerprintIndex(
+                    dao = get(),
+                    backendClient = get(),
+                    ksafe = get(qualifier = named("prefs")),
+                )
             ExternalImportRepositoryImpl(
                 scanner = get<ExternalAppScanner>(),
                 externalLinkDao = get(),
                 installedAppDao = get(),
-                signingFingerprintDao = get(),
-                ksafe = get(qualifier = named("prefs")),
-                legacyDataStore = get(),
-                externalMatchApi = get(),
-                backendClient = get(),
-                forgejoClientRegistry = get(),
-                tweaksRepository = get(),
-                starredRepository = get(),
+                fingerprints = fingerprints,
+                matchResolver =
+                    ExternalMatchResolver(
+                        fingerprints = fingerprints,
+                        externalMatchApi = get(),
+                        backendClient = get(),
+                        forgejoClientRegistry = get(),
+                        tweaksRepository = get(),
+                        starredRepository = get(),
+                    ),
+                initialScan =
+                    InitialScanMarker(
+                        ksafe = get(qualifier = named("prefs")),
+                        legacyDataStore = get(),
+                    ),
             )
         }
 
