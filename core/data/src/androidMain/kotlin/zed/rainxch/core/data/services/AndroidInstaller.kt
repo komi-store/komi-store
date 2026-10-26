@@ -14,6 +14,7 @@ import androidx.core.net.toUri
 import co.touchlab.kermit.Logger
 import zed.rainxch.core.data.services.installer.AndroidInstallerAppHandoff
 import zed.rainxch.core.domain.model.account.github.GithubAsset
+import zed.rainxch.core.domain.model.error.SystemPackagesException
 import zed.rainxch.core.domain.model.system.SystemArchitecture
 import zed.rainxch.core.domain.system.InstallOutcome
 import zed.rainxch.core.domain.system.Installer
@@ -83,7 +84,7 @@ class AndroidInstaller(
                     data = "package:${context.packageName}".toUri()
                     addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 }
-            context.startActivity(intent)
+            startActivityOrThrow(intent)
             error("Please enable 'Install unknown apps' for this app in Settings and try again.")
         }
     }
@@ -109,10 +110,19 @@ class AndroidInstaller(
 
         check(intent.resolveActivity(context.packageManager) != null) { "No installer available on this device" }
         intent.preferSystemInstaller()
-        context.startActivity(intent)
+        startActivityOrThrow(intent)
         Logger.d { "APK installation intent launched" }
 
         return InstallOutcome.DELEGATED_TO_SYSTEM
+    }
+
+    // A device without the screen (some TV builds) throws ActivityNotFoundException, which common code can't name.
+    private fun startActivityOrThrow(intent: Intent) {
+        try {
+            context.startActivity(intent)
+        } catch (e: ActivityNotFoundException) {
+            throw SystemPackagesException(e)
+        }
     }
 
     // Several installers and no Android default would open a chooser per install, so Default means the system installer.
