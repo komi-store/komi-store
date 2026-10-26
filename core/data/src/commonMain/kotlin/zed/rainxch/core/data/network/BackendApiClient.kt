@@ -54,7 +54,7 @@ class BackendApiClient(
             install(HttpTimeout) {
                 requestTimeoutMillis = REQUEST_TIMEOUT_MS
                 connectTimeoutMillis = CONNECT_TIMEOUT_MS
-                socketTimeoutMillis = REQUEST_TIMEOUT_MS
+                socketTimeoutMillis = SOCKET_TIMEOUT_MS
             }
             install(BackgroundRequestMarker)
             install(ResponseObserver) {
@@ -93,5 +93,6 @@ class BackendApiClient(
     private companion object {
         const val REQUEST_TIMEOUT_MS = 5_000L
         const val CONNECT_TIMEOUT_MS = 3_000L
+        const val SOCKET_TIMEOUT_MS = 5_000L
     }
 }
