@@ -9,9 +9,6 @@ import zed.rainxch.core.data.mappers.toDto
 import zed.rainxch.core.data.mappers.toQuery
 import zed.rainxch.core.data.network.BackendReviewModerationApi
 import zed.rainxch.core.data.network.BackendReviewsApi
-import zed.rainxch.core.domain.model.reviews.ModerationDecision
-import zed.rainxch.core.domain.model.reviews.ModerationPage
-import zed.rainxch.core.domain.model.reviews.ModerationStatus
 import zed.rainxch.core.domain.model.reviews.MyReviewState
 import zed.rainxch.core.domain.model.reviews.RepoRating
 import zed.rainxch.core.domain.model.reviews.ReportReason
@@ -22,13 +19,15 @@ import zed.rainxch.core.domain.model.reviews.ReviewSort
 import zed.rainxch.core.domain.model.reviews.ReviewTarget
 import zed.rainxch.core.domain.model.reviews.ReviewVote
 import zed.rainxch.core.domain.model.reviews.ReviewsPage
+import zed.rainxch.core.domain.repository.ReviewModeration
 import zed.rainxch.core.domain.repository.ReviewsRepository
 import kotlin.time.Clock
 
 class ReviewsRepositoryImpl(
     private val api: BackendReviewsApi,
-    private val moderationApi: BackendReviewModerationApi,
-) : ReviewsRepository {
+    moderationApi: BackendReviewModerationApi,
+) : ReviewsRepository,
+    ReviewModeration by ReviewModerationImpl(moderationApi) {
     private val _changes = MutableSharedFlow<ReviewTarget>(extraBufferCapacity = 8)
     override val changes: Flow<ReviewTarget> = _changes.asSharedFlow()
 
@@ -94,25 +93,6 @@ class ReviewsRepositoryImpl(
     ): Result<ReviewReply> = api.putReply(reviewId, text.trim()).map { it.toDomain() }
 
     override suspend fun deleteReply(reviewId: String): Result<Unit> = api.deleteReply(reviewId)
-
-    override suspend fun getModerationQueue(
-        status: ModerationStatus,
-        page: Int,
-    ): Result<ModerationPage> = moderationApi.getModerationQueue(status.toQuery(), page).map { it.toDomain() }
-
-    override suspend fun moderate(
-        reviewId: String,
-        decision: ModerationDecision,
-    ): Result<Unit> =
-        when (decision) {
-            ModerationDecision.DELETE -> moderationApi.deleteAsModerator(reviewId)
-            else -> moderationApi.moderate(reviewId, decision.name.lowercase())
-        }
-
-    override suspend fun setBanned(
-        githubId: Long,
-        banned: Boolean,
-    ): Result<Unit> = moderationApi.setBanned(githubId, banned)
 
     private suspend fun wrote(target: ReviewTarget) {
         freshUntil = freshUntil + (target to Clock.System.now().toEpochMilliseconds() + CDN_LAG_MILLIS)

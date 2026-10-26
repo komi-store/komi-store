@@ -19,6 +19,7 @@ import zed.rainxch.core.domain.model.error.RateLimitException
 import zed.rainxch.core.domain.model.error.SystemPackagesException
 import zed.rainxch.core.domain.model.smartdetect.MatchingPreview
 import zed.rainxch.core.domain.network.DigestVerifier
+import zed.rainxch.core.domain.repository.installedapps.InstalledAppUpdateChecks
 import zed.rainxch.core.domain.system.Installer
 import zed.rainxch.core.domain.system.PackageMonitor
 import zed.rainxch.core.domain.utils.AssetFilter
@@ -36,19 +37,19 @@ internal class InstalledAppUpdateChecker(
     private val releaseSource: InstalledReleaseSource,
     packageMonitor: PackageMonitor,
     digestVerifier: DigestVerifier,
-) {
+) : InstalledAppUpdateChecks {
     private val parkedInstallSettler = ParkedInstallSettler(dao, packageMonitor, digestVerifier)
     private val binder = InstalledReleaseBinder(dao, packageMonitor, digestVerifier)
     private val checkAllMutex = Mutex()
 
-    suspend fun checkForUpdates(packageName: String): Boolean =
+    override suspend fun checkForUpdates(packageName: String): Boolean =
         localStore {
             checkEnabledApp(packageName, recordUnmatched = true) { app ->
                 releaseSource.window(app.repoOwner, app.repoName, app.includePreReleases, app.sourceHost)
             }
         }
 
-    suspend fun checkForUpdatesWithReleases(
+    override suspend fun checkForUpdatesWithReleases(
         packageName: String,
         releases: List<GithubRelease>,
     ): Boolean =
@@ -59,7 +60,7 @@ internal class InstalledAppUpdateChecker(
         }
 
     // The dead URL came from the backend's stale release copy, so this reads the host itself.
-    suspend fun resolveTrackedRelease(packageName: String): ResolvedRelease? =
+    override suspend fun resolveTrackedRelease(packageName: String): ResolvedRelease? =
         localStore {
             dao.getAppByPackage(packageName)?.let { app ->
                 val releases = releaseSource.hostWindow(app.repoOwner, app.repoName, app.includePreReleases, app.sourceHost)
@@ -67,7 +68,7 @@ internal class InstalledAppUpdateChecker(
             }
         }
 
-    suspend fun checkAllForUpdates() {
+    override suspend fun checkAllForUpdates() {
         // App start, Library and the background worker can ask at once; a run already in flight answers all of them.
         if (checkAllMutex.isLocked) {
             checkAllMutex.withLock { }
@@ -80,7 +81,7 @@ internal class InstalledAppUpdateChecker(
         }
     }
 
-    suspend fun previewMatchingAssets(
+    override suspend fun previewMatchingAssets(
         owner: String,
         repo: String,
         regex: String?,
