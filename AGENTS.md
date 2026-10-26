@@ -27,7 +27,7 @@ CI runs these on every pull request. Existing findings live in committed baselin
 
 ```bash
 ./gradlew spotlessApply                  # formats the files you changed
-./gradlew compileKotlinJvm compileAndroidMain :androidApp:compileDebugKotlin jvmTest detekt :konsist-test:test
+./gradlew compileKotlinJvm compileAndroidMain :androidApp:compileDebugKotlin jvmTest testAndroidHostTest detekt :konsist-test:test
 ./gradlew lintDebug lintAndroidMain
 ./gradlew stabilityCheck                 # its own invocation, after compileKotlinJvm compileAndroidMain
 ```

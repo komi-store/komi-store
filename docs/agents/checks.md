@@ -6,7 +6,7 @@ CI (`.github/workflows/pr-checks.yml`) runs on every pull request and every push
 ./gradlew spotlessApply                                   # format files changed vs origin/main (ktlint 1.8.0 + Compose rules + .editorconfig)
 ./gradlew detekt                                          # static analysis; baseline: <module>/detekt-baseline.xml
 ./gradlew lintDebug lintAndroidMain                       # Android Lint; baseline: <module>/lint-baseline.xml
-./gradlew jvmTest koverXmlReport                          # tests and merged coverage (build/reports/kover)
+./gradlew jvmTest testAndroidHostTest koverXmlReport      # tests on the JVM and the Android host, merged coverage (build/reports/kover)
 ./gradlew compileKotlinJvm compileAndroidMain; ./gradlew stabilityCheck   # Compose stability vs <module>/stability/<project>.stability
 ./gradlew :konsist-test:test                              # architecture rules
 ./gradlew spotlessInstallGitPrePushHook                   # opt-in pre-push format check

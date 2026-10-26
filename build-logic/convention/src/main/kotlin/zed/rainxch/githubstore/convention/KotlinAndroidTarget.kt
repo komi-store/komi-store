@@ -33,6 +33,10 @@ internal fun Project.configureAndroidTarget() {
 
             configureLint(lint)
 
+            if (file("src/commonTest").exists()) {
+                withHostTest {}
+            }
+
             compilerOptions {
                 jvmTarget.set(JvmTarget.JVM_17)
             }

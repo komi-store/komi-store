@@ -36,7 +36,7 @@ jobs:
         run: ./gradlew compileKotlinJvm compileAndroidMain :androidApp:compileDebugKotlin --continue
 
       - name: Unit tests and coverage
-        run: ./gradlew jvmTest koverXmlReport koverHtmlReport --continue
+        run: ./gradlew jvmTest testAndroidHostTest koverXmlReport koverHtmlReport --continue
 
       - name: Architecture rules
         if: always()
