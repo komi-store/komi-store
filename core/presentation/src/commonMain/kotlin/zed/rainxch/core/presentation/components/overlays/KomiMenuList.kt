@@ -65,8 +65,7 @@ fun KomiMenuList(
     }
 }
 
-// Material's expressive menu: the options between dividers form a group on a rounded surface, and
-// each option is a shape of its own that morphs when pressed or selected, with its ripple inside.
+// Material's expressive menu: options between dividers group on a rounded surface, each a shape that morphs when pressed.
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 internal fun ClassicMenuList(
@@ -132,8 +131,7 @@ private fun ClassicMenuItem(
                 )
             }
         }
-    // A pick-one option without an icon keeps an empty slot where its check appears: Material's
-    // item otherwise under-reports its width and a long label is cut off in a popup.
+    // An icon-less pick-one option keeps an empty check slot, or Material under-reports its width and cuts a long label.
     val leadingIcon: (@Composable () -> Unit)? =
         when {
             item.icon != null -> {

@@ -115,7 +115,6 @@ fun KomiChip(
 private fun MangaChip(
     personality: MangaPersonality,
     label: String,
-    modifier: Modifier,
     kind: KomiChipKind,
     size: KomiChipSize,
     selected: Boolean,
@@ -126,27 +125,17 @@ private fun MangaChip(
     count: Int?,
     onClick: (() -> Unit)?,
     onRemove: (() -> Unit)?,
+    modifier: Modifier = Modifier,
 ) {
     val colors = personality.colors
     val metrics = chipMetrics(kind, size)
-    val isFilter = kind == KomiChipKind.Filter || kind == KomiChipKind.Input
+    val isFilter = kind.isFilterLike()
     val tappable = onClick != null || isFilter
     val compound = count != null || kind == KomiChipKind.Input
     val doSkew = kind == KomiChipKind.Filter && tilt && !compound
-    val rot =
-        if (doSkew) {
-            if (index % 2 != 0) 0.4f else -0.4f
-        } else {
-            0f
-        }
-    val fg = if (selected) colors.onPrimary else colors.onSurface
-    val bg =
-        when {
-            selected -> colors.primary
-            isFilter -> colors.surface
-            else -> colors.background
-        }
-    val hasShadow = selected && isFilter
+    val rot = chipRotation(doSkew, index)
+    val tone = mangaChipTone(selected = selected, isFilter = isFilter, colors = colors)
+    val fg = tone.content
     val shape = remember(doSkew) { if (doSkew) chipStampShape(CHIP_SKEW_DEGREES) else RectangleShape }
 
     val interaction = remember { MutableInteractionSource() }
@@ -161,12 +150,12 @@ private fun MangaChip(
                 .then(if (tappable) Modifier.inkFocusRing(focused = { focused }, color = colors.primary) else Modifier)
                 .offset { IntOffset(0, (1.dp.toPx() * pressProgress.value).roundToInt()) }
                 .then(
-                    if (hasShadow) {
+                    if (tone.shadowed) {
                         Modifier.hardShadow(offset = DpOffset(2.5.dp, 2.5.dp), color = colors.shadow, shape = shape)
                     } else {
                         Modifier
                     },
-                ).background(color = bg, shape = shape)
+                ).background(color = tone.container, shape = shape)
                 .border(width = metrics.border, color = colors.outline, shape = shape)
                 .then(
                     if (tappable) {
@@ -179,14 +168,10 @@ private fun MangaChip(
         horizontalArrangement = Arrangement.spacedBy(6.dp, Alignment.CenterHorizontally),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        if (leadingContent != null) {
-            leadingContent()
-        } else if (leadingIcon != null) {
-            Icon(imageVector = leadingIcon, contentDescription = null, modifier = Modifier.size(metrics.icon), tint = fg)
-        }
+        ChipLeading(leadingContent = leadingContent, leadingIcon = leadingIcon, iconSize = metrics.icon, tint = fg)
         KomiText(
             text = label,
-            role = if (isFilter) KomiTextRole.Stamp else KomiTextRole.LabelSmall,
+            role = tone.labelRole,
             color = fg,
             maxLines = 1,
             overflow = TextOverflow.Clip,
@@ -197,6 +182,20 @@ private fun MangaChip(
         if (kind == KomiChipKind.Input) {
             ChipRemove(onRemove = onRemove, color = fg, iconSize = metrics.icon)
         }
+    }
+}
+
+@Composable
+private fun ChipLeading(
+    leadingContent: (@Composable () -> Unit)?,
+    leadingIcon: ImageVector?,
+    iconSize: Dp,
+    tint: Color,
+) {
+    if (leadingContent != null) {
+        leadingContent()
+    } else if (leadingIcon != null) {
+        Icon(imageVector = leadingIcon, contentDescription = null, modifier = Modifier.size(iconSize), tint = tint)
     }
 }
 
@@ -238,7 +237,6 @@ private fun ChipRemove(
 @Composable
 private fun ClassicChip(
     label: String,
-    modifier: Modifier,
     kind: KomiChipKind,
     selected: Boolean,
     leadingIcon: ImageVector?,
@@ -246,6 +244,7 @@ private fun ClassicChip(
     count: Int?,
     onClick: (() -> Unit)?,
     onRemove: (() -> Unit)?,
+    modifier: Modifier = Modifier,
 ) {
     val text = if (count != null) "$label  $count" else label
     val leading: @Composable (() -> Unit)? =
@@ -324,16 +323,55 @@ private fun ClassicTonalChip(
 }
 
 private const val CHIP_SKEW_DEGREES = 8f
+private const val CHIP_TILT_DEGREES = 0.4f
+private const val DEGREES_PER_HALF_TURN = 180.0
 
 private fun chipStampShape(skewDegrees: Float): Shape =
     GenericShape { size, _ ->
-        val sk = size.height * tan(skewDegrees * (PI / 180.0)).toFloat()
+        val sk = size.height * tan(skewDegrees * (PI / DEGREES_PER_HALF_TURN)).toFloat()
         moveTo(sk, 0f)
         lineTo(size.width, 0f)
         lineTo(size.width - sk, size.height)
         lineTo(0f, size.height)
         close()
     }
+
+private data class MangaChipTone(
+    val content: Color,
+    val container: Color,
+    val shadowed: Boolean,
+    val labelRole: KomiTextRole,
+)
+
+private fun mangaChipTone(
+    selected: Boolean,
+    isFilter: Boolean,
+    colors: PersonalityColors,
+): MangaChipTone =
+    MangaChipTone(
+        content = if (selected) colors.onPrimary else colors.onSurface,
+        container =
+            when {
+                selected -> colors.primary
+                isFilter -> colors.surface
+                else -> colors.background
+            },
+        shadowed = selected && isFilter,
+        labelRole = if (isFilter) KomiTextRole.Stamp else KomiTextRole.LabelSmall,
+    )
+
+// Neighbouring tilted chips lean opposite ways.
+private fun chipRotation(
+    skewed: Boolean,
+    index: Int,
+): Float =
+    when {
+        !skewed -> 0f
+        index % 2 != 0 -> CHIP_TILT_DEGREES
+        else -> -CHIP_TILT_DEGREES
+    }
+
+private fun KomiChipKind.isFilterLike(): Boolean = this == KomiChipKind.Filter || this == KomiChipKind.Input
 
 private data class ChipMetrics(
     val height: Dp,
@@ -346,7 +384,7 @@ private fun chipMetrics(
     kind: KomiChipKind,
     size: KomiChipSize,
 ): ChipMetrics {
-    val filterLike = kind == KomiChipKind.Filter || kind == KomiChipKind.Input
+    val filterLike = kind.isFilterLike()
     return when {
         filterLike && size == KomiChipSize.Sm -> ChipMetrics(26.dp, 11.dp, 14.dp, 2.5.dp)
         filterLike && size == KomiChipSize.Md -> ChipMetrics(34.dp, 14.dp, 16.dp, 2.5.dp)
@@ -386,7 +424,7 @@ private fun PreviewCountInputRow() {
 @Preview
 @Composable
 private fun KomiChipMangaPreview() {
-    PersonalityPreview(mangaPersonality()) {
+    PersonalityPreview(personality = mangaPersonality()) {
         Column(verticalArrangement = Arrangement.spacedBy(Spacing.md)) {
             PreviewInfoRow()
             PreviewFilterRow()
@@ -398,7 +436,7 @@ private fun KomiChipMangaPreview() {
 @Preview
 @Composable
 private fun KomiChipMangaNightPreview() {
-    PersonalityPreview(mangaPersonality(paper = MangaPaper.NIGHT, accent = MangaAccent.SUN)) {
+    PersonalityPreview(personality = mangaPersonality(paper = MangaPaper.NIGHT, accent = MangaAccent.SUN)) {
         Column(verticalArrangement = Arrangement.spacedBy(Spacing.md)) {
             PreviewFilterRow()
             PreviewInfoRow()
@@ -409,7 +447,7 @@ private fun KomiChipMangaNightPreview() {
 @Preview
 @Composable
 private fun KomiChipClassicPreview() {
-    PersonalityPreview(classicPersonality()) {
+    PersonalityPreview(personality = classicPersonality()) {
         Column(verticalArrangement = Arrangement.spacedBy(Spacing.md)) {
             PreviewInfoRow()
             PreviewFilterRow()

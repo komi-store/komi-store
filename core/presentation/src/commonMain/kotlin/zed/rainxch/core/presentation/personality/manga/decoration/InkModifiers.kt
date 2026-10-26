@@ -25,9 +25,9 @@ import kotlin.math.hypot
 import kotlin.math.roundToInt
 import kotlin.math.sin
 
-// A repeating dot tile baked into a tiny ImageBitmap once, exposed as a tiling shader brush.
-// Lets the dot lattices fill any area with a SINGLE drawRect instead of a per-frame loop of
-// hundreds of drawCircle calls (the old approach janked scrolling on weaker GPUs).
+private const val CORNER_MASK_REACH = 0.7f
+
+// One baked dot tile as a tiling brush: a per-frame loop of drawCircle calls janked scrolling on weak GPUs.
 private fun dotTileBrush(
     color: Color,
     opacity: Float,
@@ -113,8 +113,7 @@ fun Modifier.speedLines(
         }
     }
 
-// Top-right corner wash: a dot lattice radial-masked from the top-right corner (opaque at
-// the corner, fading to nothing by 70% of the region diagonal). Draws behind content.
+// A dot lattice that fades out from the top-right corner, drawn behind content.
 fun Modifier.screentoneCorner(
     color: Color,
     opacity: Float,
@@ -127,7 +126,7 @@ fun Modifier.screentoneCorner(
     drawWithCache {
         val wPx = regionWidth.toPx()
         val hPx = regionHeight.toPx()
-        val maskRadius = hypot(wPx, hPx) * 0.7f
+        val maskRadius = hypot(wPx, hPx) * CORNER_MASK_REACH
         val bw = wPx.coerceAtMost(size.width).roundToInt().coerceAtLeast(1)
         val bh = hPx.coerceAtMost(size.height).roundToInt().coerceAtLeast(1)
         val region = ImageBitmap(bw, bh)
@@ -152,8 +151,7 @@ fun Modifier.screentoneCorner(
         }
     }
 
-// Halftone dot lattice drawn OVER content with multiply blend, so the dots sit IN the image
-// (inked-avatar Layer B). spacing/radius in dp; opacity already resolved by caller.
+// Multiplies a dot lattice over the content, so the dots sit in the image.
 fun Modifier.halftoneOverlay(
     color: Color,
     opacity: Float,

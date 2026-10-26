@@ -50,8 +50,7 @@ fun KomiDropdown(
     trigger: @Composable (onClick: () -> Unit) -> Unit,
 ) {
     var expanded by remember { mutableStateOf(false) }
-    // In a bar the menu opens as a popup above its button, as on desktop, so the button can show
-    // that its menu is open; elsewhere a phone gets a sheet.
+    // In a bar the menu pops up above its button so the button can show it is open; elsewhere a phone gets a sheet.
     val sheet = currentFormFactor().isCompact && !LocalInBar.current
     val onPick: (KomiMenuItem) -> Unit = { item ->
         expanded = false
@@ -168,17 +167,17 @@ private fun PreviewMenuPanel() {
 @Preview
 @Composable
 private fun KomiDropdownMangaPreview() {
-    PersonalityPreview(mangaPersonality()) { PreviewMenuPanel() }
+    PersonalityPreview(personality = mangaPersonality()) { PreviewMenuPanel() }
 }
 
 @Preview
 @Composable
 private fun KomiDropdownMangaNightPreview() {
-    PersonalityPreview(mangaPersonality(paper = MangaPaper.NIGHT, accent = MangaAccent.SUN)) { PreviewMenuPanel() }
+    PersonalityPreview(personality = mangaPersonality(paper = MangaPaper.NIGHT, accent = MangaAccent.SUN)) { PreviewMenuPanel() }
 }
 
 @Preview
 @Composable
 private fun KomiDropdownClassicPreview() {
-    PersonalityPreview(classicPersonality()) { PreviewMenuPanel() }
+    PersonalityPreview(personality = classicPersonality()) { PreviewMenuPanel() }
 }

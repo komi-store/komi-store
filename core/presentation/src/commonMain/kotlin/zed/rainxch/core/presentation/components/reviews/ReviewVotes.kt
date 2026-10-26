@@ -56,10 +56,7 @@ import zed.rainxch.githubstore.core.presentation.res.reviews_downvote
 import zed.rainxch.githubstore.core.presentation.res.reviews_score
 import zed.rainxch.githubstore.core.presentation.res.reviews_upvote
 
-// Up, the net score and down as one connected group: three tonal segments with round ends in Classic, one
-// inked strip in Manga, where the gaps between segments show the ink. The viewer's vote fills with the
-// accent and pops, and the score rolls up or down as it changes. Without onVote (a preview, the viewer's
-// own review) only the score shows.
+// Up, the net score and down as one group; without onVote (a preview, the viewer's own review) only the score shows.
 @Composable
 internal fun VotePill(
     score: Int,

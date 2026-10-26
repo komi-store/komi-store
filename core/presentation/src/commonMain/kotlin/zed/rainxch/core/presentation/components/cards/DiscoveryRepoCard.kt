@@ -48,7 +48,7 @@ fun DiscoveryRepoCard(
     onShareClick: () -> Unit,
     modifier: Modifier = Modifier,
     onHideClick: (() -> Unit)? = null,
-    onToggleSeen: (() -> Unit)? = null,
+    onToggleSeenClick: (() -> Unit)? = null,
     onLongPress: (() -> Unit)? = null,
     compact: Boolean = false,
     feed: KomiRepoCardFeed = KomiRepoCardFeed.Plain,
@@ -111,7 +111,7 @@ fun DiscoveryRepoCard(
                     uriHandler.openUri(repo.htmlUrl)
                 },
             )
-            onToggleSeen?.let { toggle ->
+            onToggleSeenClick?.let { toggle ->
                 RepoActionRow(
                     label =
                         if (discoveryRepositoryUi.isSeen) {

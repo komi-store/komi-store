@@ -26,8 +26,7 @@ import zed.rainxch.githubstore.core.presentation.res.feed_platform_all
 import zed.rainxch.githubstore.core.presentation.res.feed_platform_picker_title
 import zed.rainxch.githubstore.core.presentation.res.feed_platform_picker_title_jp
 
-// The backend's feed and charts have no iOS data, and /v1/feed rejects platform=ios; iOS
-// discovery is in Search.
+// The feed and charts have no iOS data and /v1/feed rejects platform=ios; iOS discovery is in Search.
 private val FeedPlatforms = DiscoveryPlatform.entries - DiscoveryPlatform.Ios
 
 // Explore's and Top Charts' action: the platform filter, labelled with the current platform.

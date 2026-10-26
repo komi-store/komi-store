@@ -15,6 +15,8 @@ import org.intellij.markdown.MarkdownElementTypes
 import org.intellij.markdown.MarkdownTokenTypes
 import org.intellij.markdown.ast.ASTNode
 
+private const val MAX_LINK_ANCESTOR_DEPTH = 4
+
 fun githubStoreMarkdownComponents(
     imageTransformer: ImageTransformer,
     isDark: Boolean,
@@ -24,7 +26,7 @@ fun githubStoreMarkdownComponents(
             AlertBlockQuote(
                 model = model,
                 imageTransformer = imageTransformer,
-                fallback = { defaultBlockQuoteFallback(model) },
+                fallback = { DefaultBlockQuoteFallback(model) },
             )
         },
         codeFence = { model ->
@@ -92,32 +94,21 @@ private fun LinkAwareMarkdownImage(
 private fun findChildRecursive(
     node: ASTNode,
     type: IElementType,
-): ASTNode? {
-    for (child in node.children) {
-        if (child.type == type) return child
-        val nested = findChildRecursive(child, type)
-        if (nested != null) return nested
+): ASTNode? =
+    node.children.firstNotNullOfOrNull { child ->
+        if (child.type == type) child else findChildRecursive(child, type)
     }
-    return null
-}
 
 private fun findEnclosingLinkDestination(
     imageNode: ASTNode,
     content: String,
 ): String? {
-    var cursor: ASTNode? = imageNode.parent
-
-    var depth = 0
-    while (cursor != null && depth < 4) {
-        if (cursor.type == MarkdownElementTypes.INLINE_LINK) {
-            val destNode =
-                cursor.children.firstOrNull {
-                    it.type == MarkdownElementTypes.LINK_DESTINATION
-                } ?: return null
-            return destNode.getUnescapedTextInNode(content)
-        }
-        cursor = cursor.parent
-        depth++
-    }
-    return null
+    val link =
+        generateSequence(imageNode.parent) { it.parent }
+            .take(MAX_LINK_ANCESTOR_DEPTH)
+            .firstOrNull { it.type == MarkdownElementTypes.INLINE_LINK }
+            ?: return null
+    return link.children
+        .firstOrNull { it.type == MarkdownElementTypes.LINK_DESTINATION }
+        ?.getUnescapedTextInNode(content)
 }

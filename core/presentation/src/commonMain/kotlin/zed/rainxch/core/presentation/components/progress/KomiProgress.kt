@@ -102,9 +102,7 @@ fun KomiLinearProgress(
     )
 }
 
-// A screen or panel waiting a few seconds for its content. Classic shows Material 3 Expressive's
-// shape-morphing indicator, Manga its ink spinner. Waits inside buttons and rows, and long ones
-// (sign-in, scans), stay on KomiCircularProgress.
+// A screen or panel waiting a few seconds for content; waits in buttons and rows, and long ones, use KomiCircularProgress.
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun KomiLoadingIndicator(modifier: Modifier = Modifier) {

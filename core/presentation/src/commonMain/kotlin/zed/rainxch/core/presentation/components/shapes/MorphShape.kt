@@ -10,8 +10,7 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.graphics.shapes.Morph
 
-// A Morph at one point of its progress. A spring can overshoot, so the outline itself stays
-// between the two shapes.
+// A Morph at one point of its progress, clamped so a spring's overshoot keeps the outline between the two shapes.
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 class MorphShape(
     private val morph: Morph,

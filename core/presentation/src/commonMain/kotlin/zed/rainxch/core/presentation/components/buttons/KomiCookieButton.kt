@@ -31,9 +31,7 @@ import zed.rainxch.core.presentation.components.overlays.KomiTooltip
 import zed.rainxch.core.presentation.components.shapes.MorphShape
 import zed.rainxch.core.presentation.locals.LocalPersonality
 
-// The bar's floating buttons (back, the screen's FAB): a tonal cookie that answers a press with
-// its whole body instead of a ripple. It dips, rounds into a circle and turns its icon half a
-// turn on the personality's bouncy spring, and confirms the tap with a haptic tick.
+// A tonal cookie that answers a press with its whole body on the bouncy spring, and confirms the tap with a haptic tick.
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 internal fun KomiCookieButton(

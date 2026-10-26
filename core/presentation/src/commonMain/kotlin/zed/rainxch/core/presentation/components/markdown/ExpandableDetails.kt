@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import zed.rainxch.core.presentation.locals.LocalPersonality
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
@@ -33,8 +32,11 @@ import com.mikepenz.markdown.compose.components.MarkdownComponentModel
 import com.mikepenz.markdown.model.ImageTransformer
 import org.intellij.markdown.MarkdownTokenTypes
 import org.intellij.markdown.flavours.gfm.GFMFlavourDescriptor
+import zed.rainxch.core.presentation.locals.LocalPersonality
 
 private const val DETAILS_INFO_PREFIX = "ghs-details"
+private const val PERCENT_ESCAPE_LENGTH = 3
+private const val HEX_RADIX = 16
 
 fun infoStringForDetails(infoString: String): String? {
     val trimmed = infoString.trim()
@@ -50,6 +52,7 @@ fun ExpandableDetails(
     model: MarkdownComponentModel,
     encodedSummary: String,
     imageTransformer: ImageTransformer,
+    modifier: Modifier = Modifier,
 ) {
     val summary = remember(encodedSummary) { decodeDetailsSummary(encodedSummary) }
     val body = remember(model.node, model.content) { extractFenceBody(model) }
@@ -58,7 +61,7 @@ fun ExpandableDetails(
     Surface(
         color = MaterialTheme.colorScheme.surfaceContainerHigh,
         shape = RoundedCornerShape(LocalPersonality.current.shape.cornerSmall),
-        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+        modifier = modifier.fillMaxWidth().padding(vertical = 4.dp),
     ) {
         Column(modifier = Modifier.fillMaxWidth()) {
             Row(
@@ -112,12 +115,12 @@ private fun decodeDetailsSummary(encoded: String): String {
     var i = 0
     while (i < encoded.length) {
         val c = encoded[i]
-        if (c == '%' && i + 2 < encoded.length) {
-            val hex = encoded.substring(i + 1, i + 3)
-            val code = hex.toIntOrNull(16)
+        if (c == '%' && i + PERCENT_ESCAPE_LENGTH <= encoded.length) {
+            val hex = encoded.substring(i + 1, i + PERCENT_ESCAPE_LENGTH)
+            val code = hex.toIntOrNull(HEX_RADIX)
             if (code != null) {
                 out.append(code.toChar())
-                i += 3
+                i += PERCENT_ESCAPE_LENGTH
                 continue
             }
         }

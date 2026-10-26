@@ -11,11 +11,7 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import kotlin.math.roundToInt
 
-// Stamp-down + lift interaction (Manga Design Spec v1.0). Press: face translates to
-// (shadow - pressInset) on each axis while the hard shadow collapses to 0, so the face
-// lands on its shadow. Hover (desktop; no-op on touch): face lifts by hoverLift and the
-// shadow grows by hoverGrow. Both progress reads happen in the layout/draw phase to avoid
-// per-frame recomposition. Buttons use pressInset 1 / hoverLift 2; surfaces 2 / 3.
+// The face lands on its collapsing shadow on press and lifts on hover, read in layout and draw so frames never recompose.
 fun Modifier.inkPress(
     pressProgress: () -> Float,
     hoverProgress: () -> Float,

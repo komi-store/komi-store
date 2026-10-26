@@ -22,11 +22,7 @@ internal val LocalInBar = staticCompositionLocalOf { false }
 
 internal val LocalScaffoldChrome = staticCompositionLocalOf<ScaffoldChrome?> { null }
 
-// What a Classic KomiScaffold draws around its content: the top bar, which slides away as the
-// content scrolls down and returns on the way up, and a KomiActionBar floating over the content
-// with the back action and the actions the top bar hands it, which does the same at the bottom.
-// The top bar scrolls only once a bar has attached: until one measures it, the behavior would
-// swallow every scroll.
+// What a Classic KomiScaffold draws around its content; the top bar scrolls only once attached, or it swallows every scroll.
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Stable
 internal class ScaffoldChrome(

@@ -8,8 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.platform.LocalContext
 
-// Two tab cards are on screen while the tabs slide, so the mode changes with the first card and
-// goes back with the last.
+// Two tab cards show while the tabs slide: the first to appear sets the mode, the last to leave restores it.
 private var cardsShown = 0
 private var previousMode = 0
 
@@ -19,8 +18,7 @@ internal actual fun ResizeWindowForKeyboard() {
     DisposableEffect(window) {
         if (cardsShown++ == 0) {
             previousMode = window.attributes.softInputMode
-            // Deprecated for windows that fit system windows; this one draws edge to edge, where
-            // it only stops the pan and leaves the keyboard to the insets.
+            // Deprecated for windows that fit system windows; edge to edge it only stops the pan.
             @Suppress("DEPRECATION")
             window.setSoftInputMode(
                 previousMode and WindowManager.LayoutParams.SOFT_INPUT_MASK_ADJUST.inv() or

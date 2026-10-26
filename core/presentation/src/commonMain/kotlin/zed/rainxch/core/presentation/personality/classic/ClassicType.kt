@@ -8,9 +8,7 @@ import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import zed.rainxch.core.presentation.personality.model.PersonalityType
 
-// Family (Nunito / Geist Mono) injected at theme time by withClassicFonts(). Nunito's rounded
-// shapes carry the look: ExtraBold headings, Bold titles and controls, Medium running text, and
-// Black, set a little tighter, for the emphasized display.
+// Nunito and Geist Mono come from withClassicFonts() at theme time; Nunito's rounded shapes carry the look.
 internal val ClassicType =
     PersonalityType(
         display =

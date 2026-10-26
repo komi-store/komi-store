@@ -3,7 +3,7 @@ package zed.rainxch.core.presentation.spacing
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
-// Shared neutral spacing scale — personality-agnostic (manga + classic share one rhythm).
+// One spacing scale for every personality: Manga and Classic share one rhythm.
 object Spacing {
     val xs: Dp = 4.dp
     val sm: Dp = 8.dp

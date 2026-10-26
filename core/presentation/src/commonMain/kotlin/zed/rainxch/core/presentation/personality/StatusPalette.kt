@@ -1,6 +1,7 @@
-package zed.rainxch.core.presentation.status
+package zed.rainxch.core.presentation.personality
 
 import androidx.compose.ui.graphics.Color
+import zed.rainxch.core.presentation.status.StatusColors
 
 fun statusColors(dark: Boolean): StatusColors = if (dark) StatusColorsDark else StatusColorsLight
 

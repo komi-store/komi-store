@@ -73,13 +73,7 @@ import zed.rainxch.githubstore.core.presentation.res.Res
 import zed.rainxch.githubstore.core.presentation.res.search_repositories_hint
 import zed.rainxch.githubstore.core.presentation.res.show_tabs
 
-// Classic's tab card, after Chocola: one card at the bottom of the tab screens with the screen's
-// search field and actions, and the tab row under them. The row folds behind a toggle while the
-// content scrolls down and unfolds on the way up. The app shell owns the tabs and the fold, shared
-// by every tab, and gives each tab destination a LocalTabCardSlot. KomiScaffold draws the card in
-// the screen's own composition, after its top bar hands over the search field and actions, so the
-// field never recomposes with a value its screen has already replaced (that loses typing). A
-// shared element keeps the card in place while the tabs slide.
+// Classic's tab card. KomiScaffold draws it after its top bar hands over the search field, or the field loses typing.
 @Stable
 class KomiTabCardState {
     internal var folded by mutableStateOf(false)
@@ -120,8 +114,7 @@ class KomiTabCardState {
     internal fun parts(tabId: String): TabCardParts = parts.getOrPut(tabId) { TabCardParts() }
 }
 
-// A tab destination's slot: the shared state and the tab the screen belongs to, which its card
-// shows as selected.
+// A tab destination's slot: the shared state and the tab its card shows as selected.
 @Immutable
 data class KomiTabCardSlot(
     val state: KomiTabCardState,
@@ -130,8 +123,7 @@ data class KomiTabCardSlot(
 
 val LocalTabCardSlot = staticCompositionLocalOf<KomiTabCardSlot?> { null }
 
-// What a tab screen's top bar hands its card, written while composing, ahead of the card that
-// reads it further down the same composition.
+// Written while the top bar composes, ahead of the card that reads it later in the same composition.
 @Stable
 internal class TabCardParts {
     var search by mutableStateOf<(@Composable () -> Unit)?>(null)
@@ -149,8 +141,7 @@ internal fun HandToTabCard(
     parts.actions = actions
 }
 
-// A tab screen's scaffold runs its top bar here, ahead of the card, instead of in Material's top
-// bar slot, which is composed during layout, after the card.
+// Runs the top bar ahead of the card: Material's top bar slot is composed during layout, after the card.
 @Composable
 internal fun HandTopBarToTabCard(
     slot: KomiTabCardSlot?,
@@ -161,8 +152,7 @@ internal fun HandTopBarToTabCard(
 
 internal fun Modifier.foldsTabCard(slot: KomiTabCardSlot?): Modifier = if (slot == null) this else nestedScroll(slot.state.foldConnection)
 
-// The room a tab screen's list leaves at its end for the folded card. The list scrolls under the
-// card (see withoutBottom); the unfolded tab row covers a little more of it.
+// Room at a tab list's end for the folded card it scrolls under; the unfolded tab row covers a little more.
 @Composable
 internal fun tabCardContentInsets(slot: KomiTabCardSlot?): WindowInsets =
     if (slot == null) {
@@ -211,7 +201,7 @@ internal fun KomiTabCard(
                 }
             }
         }
-        CardSurface(modifier = tabSwitchModifier().widthIn(max = 560.dp).testTag(KomiTestTags.CLASSIC_TAB_CARD)) {
+        CardSurface(modifier = Modifier.sharedAcrossTabSwitch().widthIn(max = 560.dp).testTag(KomiTestTags.CLASSIC_TAB_CARD)) {
             Column(modifier = Modifier.animateContentSize(motion.bouncySpatial())) {
                 Row(
                     modifier = Modifier.fillMaxWidth().heightIn(min = SearchRowHeight).padding(horizontal = Spacing.sm),
@@ -275,12 +265,12 @@ private fun CardSurface(
 
 // Each tab screen draws its own card; matched across a tab switch, it stays where it is.
 @Composable
-private fun tabSwitchModifier(): Modifier {
+private fun Modifier.sharedAcrossTabSwitch(): Modifier {
     val sharedScope = LocalSharedTransitionScope.current
     val visibilityScope = LocalAnimatedVisibilityScope.current
-    if (sharedScope == null || visibilityScope == null) return Modifier
+    if (sharedScope == null || visibilityScope == null) return this
     return with(sharedScope) {
-        Modifier.sharedElement(rememberSharedContentState(key = SHARED_KEY), visibilityScope)
+        this@sharedAcrossTabSwitch.sharedElement(rememberSharedContentState(key = SHARED_KEY), visibilityScope)
     }
 }
 

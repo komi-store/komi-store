@@ -9,10 +9,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
-// Keyboard-focus ring (Manga Design Spec v1.0): a 3px accent outline drawn 3px outside the
-// box on focus, unclipped. Pairs with clickable(indication = null) — the stamp is the press
-// feedback, this restores the focus affordance that null indication drops. Read in the draw
-// phase so a focus change never recomposes.
+// Restores the focus ring that clickable(indication = null) drops, read in the draw phase so focus never recomposes.
 fun Modifier.inkFocusRing(
     focused: () -> Boolean,
     color: Color,

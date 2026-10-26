@@ -15,8 +15,7 @@ data class KomiSpring(
     val stiffness: Float,
 )
 
-// Spatial springs move and resize things and may overshoot; effects springs fade and
-// recolor and never do. Fast suits small parts (buttons, chips), default suits panels.
+// Spatial springs move and resize and may overshoot; effects springs fade and recolor and never do.
 @Immutable
 data class PersonalityMotion(
     val level: MotionLevel,

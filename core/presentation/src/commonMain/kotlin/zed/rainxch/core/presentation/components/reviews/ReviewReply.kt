@@ -27,8 +27,7 @@ import zed.rainxch.githubstore.core.presentation.res.Res
 import zed.rainxch.githubstore.core.presentation.res.reviews_developer
 import zed.rainxch.githubstore.core.presentation.res.reviews_reply_from
 
-// The developer's reply as a speech bubble whose tail points up at the review: the accent's container in
-// Classic, an inked balloon on paper in Manga. A Developer badge says who is talking.
+// The developer's reply as a speech bubble whose tail points up at the review.
 @Composable
 internal fun ReplyBubble(
     reply: ReviewReplyUi,

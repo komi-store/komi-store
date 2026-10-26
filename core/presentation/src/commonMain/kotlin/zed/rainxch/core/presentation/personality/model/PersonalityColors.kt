@@ -38,4 +38,7 @@ data class PersonalityColors(
     val disabledContent: Color get() = onSurface.copy(alpha = 0.38f)
     val disabledContainer: Color get() = onSurface.copy(alpha = 0.12f)
     val scrimOverlay: Color get() = scrim.copy(alpha = 0.5f)
+
+    // Secondary marks on an accent fill, such as the inner ring of an ink stamp.
+    val onPrimaryMuted: Color get() = onPrimary.copy(alpha = 0.55f)
 }

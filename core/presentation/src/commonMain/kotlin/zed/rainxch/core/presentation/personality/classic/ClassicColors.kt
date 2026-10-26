@@ -8,8 +8,7 @@ import com.materialkolor.dynamiccolor.ColorSpec
 import zed.rainxch.core.domain.model.appearance.AccentId
 import zed.rainxch.core.presentation.personality.model.PersonalityColors
 
-// Material's 2025 color spec, TonalSpot: the seed's hue drives primary, secondary and
-// tertiary stay near it, and the neutrals carry a trace of it, as wallpaper colors do.
+// Material's 2025 spec, TonalSpot: the seed's hue drives primary and the neutrals carry a trace of it, as wallpaper does.
 fun classicColorScheme(
     accent: AccentId,
     dark: Boolean,
