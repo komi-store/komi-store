@@ -18,8 +18,7 @@ class AndroidClipboardHelper(
 
     override fun getText(): String? {
         val cm = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-        val clip = cm.primaryClip ?: return null
-        if (clip.itemCount == 0) return null
+        val clip = cm.primaryClip?.takeIf { it.itemCount > 0 } ?: return null
         return clip.getItemAt(0).text?.toString()
     }
 }

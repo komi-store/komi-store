@@ -1,26 +1,35 @@
 package zed.rainxch.core.data.services
 
 import android.content.pm.PackageInfo
+import android.content.pm.PackageManager
 import android.os.Build
 import java.security.MessageDigest
 
 internal object SigningFingerprint {
-    fun fromPackageInfo(info: PackageInfo): String? {
+    // API 26-27 have no signer flag or field but the deprecated GET_SIGNATURES and PackageInfo.signatures.
+    @Suppress("DEPRECATION")
+    val SIGNER_FLAG: Int =
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            val sigInfo = info.signingInfo ?: return null
-            val cert =
-                if (sigInfo.hasMultipleSigners()) {
-                    sigInfo.apkContentsSigners?.firstOrNull()
-                } else {
-                    sigInfo.signingCertificateHistory?.lastOrNull()
-                }
-            return cert?.toByteArray()?.let(::sha256)
+            PackageManager.GET_SIGNING_CERTIFICATES
+        } else {
+            PackageManager.GET_SIGNATURES
         }
-        @Suppress("DEPRECATION")
-        return info.signatures
-            ?.firstOrNull()
-            ?.toByteArray()
-            ?.let(::sha256)
+
+    fun fromPackageInfo(info: PackageInfo): String? {
+        val cert =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                info.signingInfo?.let { sigInfo ->
+                    if (sigInfo.hasMultipleSigners()) {
+                        sigInfo.apkContentsSigners?.firstOrNull()
+                    } else {
+                        sigInfo.signingCertificateHistory?.lastOrNull()
+                    }
+                }
+            } else {
+                @Suppress("DEPRECATION")
+                info.signatures?.firstOrNull()
+            }
+        return cert?.toByteArray()?.let(::sha256)
     }
 
     private fun sha256(bytes: ByteArray): String =

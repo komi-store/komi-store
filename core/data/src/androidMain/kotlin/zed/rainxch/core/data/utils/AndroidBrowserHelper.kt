@@ -1,5 +1,6 @@
 package zed.rainxch.core.data.utils
 
+import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import androidx.core.net.toUri
@@ -18,8 +19,14 @@ class AndroidBrowserHelper(
             }
         try {
             context.startActivity(intent)
-        } catch (e: Exception) {
-            onFailure(e.message ?: "Unable to open the requested URL.")
+        } catch (e: ActivityNotFoundException) {
+            onFailure(e.message ?: FALLBACK_ERROR)
+        } catch (e: SecurityException) {
+            onFailure(e.message ?: FALLBACK_ERROR)
         }
+    }
+
+    private companion object {
+        const val FALLBACK_ERROR = "Unable to open the requested URL."
     }
 }

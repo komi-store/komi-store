@@ -17,15 +17,13 @@ class AndroidAppLauncher(
             runCatching {
                 val packageManager = context.packageManager
 
-                val launchIntent = packageManager.getLaunchIntentForPackage(installedApp.packageName)
-
-                if (launchIntent != null) {
-                    launchIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                    context.startActivity(launchIntent)
-                    logger.debug("Launched app: ${installedApp.packageName}")
-                } else {
-                    throw Exception("No launch intent found for ${installedApp.packageName}")
-                }
+                val launchIntent =
+                    checkNotNull(packageManager.getLaunchIntentForPackage(installedApp.packageName)) {
+                        "No launch intent found for ${installedApp.packageName}"
+                    }
+                launchIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                context.startActivity(launchIntent)
+                logger.debug("Launched app: ${installedApp.packageName}")
             }.onFailure { error ->
                 logger.error("Failed to launch app ${installedApp.packageName}: ${error.message}")
             }
@@ -36,7 +34,7 @@ class AndroidAppLauncher(
             try {
                 val packageManager = context.packageManager
                 packageManager.getLaunchIntentForPackage(installedApp.packageName) != null
-            } catch (e: Exception) {
+            } catch (_: SecurityException) {
                 false
             }
         }

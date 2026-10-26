@@ -2,7 +2,7 @@ package zed.rainxch.core.data.services.external
 
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
-import android.os.Build
+import zed.rainxch.core.data.services.installingPackageNameOf
 import zed.rainxch.core.domain.system.InstallerKind
 
 class InstallerSourceClassifier(
@@ -13,29 +13,20 @@ class InstallerSourceClassifier(
         packageName: String,
         applicationInfo: ApplicationInfo?,
     ): InstallerKind {
-        if (packageName == selfPackageName) return InstallerKind.GITHUB_STORE_SELF
-
         val flags = applicationInfo?.flags ?: 0
         val isSystem = flags and ApplicationInfo.FLAG_SYSTEM != 0
-
-        if (isSystem) return InstallerKind.SYSTEM
-        if (OEM_PACKAGE_PREFIXES.any { packageName.startsWith(it) }) return InstallerKind.STORE_OEM_OTHER
-
-        val installer = installerPackageNameFor(packageName)
-        return mapInstaller(installer, isSystem = false)
+        return when {
+            packageName == selfPackageName -> InstallerKind.GITHUB_STORE_SELF
+            isSystem -> InstallerKind.SYSTEM
+            OEM_PACKAGE_PREFIXES.any { packageName.startsWith(it) } -> InstallerKind.STORE_OEM_OTHER
+            else -> mapInstaller(installerPackageNameFor(packageName), isSystem = false)
+        }
     }
 
     fun classifyByInstaller(installerPackageName: String?): InstallerKind = mapInstaller(installerPackageName, isSystem = false)
 
     private fun installerPackageNameFor(packageName: String): String? =
-        runCatching {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                packageManager.getInstallSourceInfo(packageName).installingPackageName
-            } else {
-                @Suppress("DEPRECATION")
-                packageManager.getInstallerPackageName(packageName)
-            }
-        }.getOrNull()
+        runCatching { packageManager.installingPackageNameOf(packageName) }.getOrNull()
 
     private fun mapInstaller(
         installer: String?,
