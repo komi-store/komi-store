@@ -1,9 +1,6 @@
-@file:Suppress("DEPRECATION")
-
 package zed.rainxch.core.presentation.components
 
 import androidx.compose.foundation.LocalScrollbarStyle
-import androidx.compose.foundation.ScrollbarAdapter
 import androidx.compose.foundation.VerticalScrollbar
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
@@ -16,6 +13,7 @@ import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridLayoutInf
 import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridState
 import androidx.compose.foundation.rememberScrollbarAdapter
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.v2.ScrollbarAdapter
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -32,15 +30,16 @@ actual fun ScrollbarContainer(
 ) {
     ScrollbarContainerShell(
         enabled = enabled,
+        scrollbar = {
+            VerticalScrollbar(
+                adapter = rememberScrollbarAdapter(listState),
+                modifier = Modifier.fillMaxHeight().align(Alignment.CenterEnd),
+                style = scrollbarStyle(),
+            )
+        },
         modifier = modifier,
         content = content,
-    ) {
-        VerticalScrollbar(
-            adapter = rememberScrollbarAdapter(listState),
-            modifier = Modifier.fillMaxHeight().align(Alignment.CenterEnd),
-            style = scrollbarStyle(),
-        )
-    }
+    )
 }
 
 @Composable
@@ -52,15 +51,16 @@ actual fun ScrollbarContainer(
 ) {
     ScrollbarContainerShell(
         enabled = enabled,
+        scrollbar = {
+            VerticalScrollbar(
+                adapter = remember(gridState) { StaggeredGridScrollbarAdapter(gridState) },
+                modifier = Modifier.fillMaxHeight().align(Alignment.CenterEnd),
+                style = scrollbarStyle(),
+            )
+        },
         modifier = modifier,
         content = content,
-    ) {
-        VerticalScrollbar(
-            adapter = remember(gridState) { StaggeredGridScrollbarAdapter(gridState) },
-            modifier = Modifier.fillMaxHeight().align(Alignment.CenterEnd),
-            style = scrollbarStyle(),
-        )
-    }
+    )
 }
 
 @Composable
@@ -72,33 +72,28 @@ actual fun ScrollbarContainer(
 ) {
     ScrollbarContainerShell(
         enabled = enabled,
+        scrollbar = {
+            VerticalScrollbar(
+                adapter = remember(gridState) { GridScrollbarAdapter(gridState) },
+                modifier = Modifier.fillMaxHeight().align(Alignment.CenterEnd),
+                style = scrollbarStyle(),
+            )
+        },
         modifier = modifier,
         content = content,
-    ) {
-        VerticalScrollbar(
-            adapter = remember(gridState) { GridScrollbarAdapter(gridState) },
-            modifier = Modifier.fillMaxHeight().align(Alignment.CenterEnd),
-            style = scrollbarStyle(),
-        )
-    }
+    )
 }
 
 @Composable
 private fun ScrollbarContainerShell(
     enabled: Boolean,
-    modifier: Modifier,
-    content: @Composable () -> Unit,
     scrollbar: @Composable BoxScope.() -> Unit,
+    modifier: Modifier = Modifier,
+    content: @Composable () -> Unit,
 ) {
-    if (!enabled) {
-        Box(modifier = modifier) {
-            content()
-        }
-        return
-    }
-    Box(modifier = modifier.padding(start = 8.dp)) {
+    Box(modifier = if (enabled) modifier.padding(start = 8.dp) else modifier) {
         content()
-        scrollbar()
+        if (enabled) scrollbar()
     }
 }
 
@@ -110,82 +105,123 @@ private fun scrollbarStyle(): androidx.compose.foundation.ScrollbarStyle =
         hoverColor = MaterialTheme.colorScheme.onSurfaceVariant,
     )
 
-private class GridScrollbarAdapterBase(
-    private val totalItemsCount: () -> Int,
-    private val firstVisibleIndex: () -> Int?,
-    private val firstVisibleOffsetY: () -> Int,
-    private val estimateContentSize: () -> Float,
-    private val scrollToItem: suspend (Int) -> Unit,
-    private val scrollByPixels: (Float) -> Unit,
-    private val measureResult: () -> Any,
-) : ScrollbarAdapter {
-    private var cachedMeasureResult: Any? = null
+// The content height is an estimate from the visible items, so it is cached per layout pass.
+private abstract class EstimatedGridScrollbarAdapter : ScrollbarAdapter {
+    private var cachedLayout: Any? = null
     private var cachedContentSize = 0f
 
+    protected abstract val currentLayout: Any
+    protected abstract val totalItemsCount: Int
+    protected abstract val firstVisibleIndex: Int?
+    protected abstract val firstVisibleOffsetY: Int
+    protected abstract val viewportHeight: Int
+
+    protected abstract fun estimateContentSize(): Float
+
+    protected abstract suspend fun scrollToItem(index: Int)
+
+    protected abstract fun scrollByPixels(delta: Float)
+
     private fun estimatedContentSize(): Float {
-        val key = measureResult()
-        if (key === cachedMeasureResult) return cachedContentSize
+        val layout = currentLayout
+        if (layout === cachedLayout) return cachedContentSize
         val size = estimateContentSize()
-        cachedMeasureResult = key
+        cachedLayout = layout
         cachedContentSize = size
         return size
     }
 
     private val averageItemSize: Float
         get() {
-            val count = totalItemsCount()
+            val count = totalItemsCount
             return if (count > 0) estimatedContentSize() / count else 0f
         }
 
-    override val scrollOffset: Float
+    override val scrollOffset: Double
         get() {
-            val index = firstVisibleIndex() ?: return 0f
-            return index * averageItemSize - firstVisibleOffsetY()
+            val index = firstVisibleIndex ?: return 0.0
+            return (index * averageItemSize - firstVisibleOffsetY).toDouble()
         }
 
-    override fun maxScrollOffset(containerSize: Int): Float = (estimatedContentSize() - containerSize).coerceAtLeast(0f)
+    override val viewportSize: Double
+        get() = viewportHeight.toDouble()
 
-    override suspend fun scrollTo(
-        containerSize: Int,
-        scrollOffset: Float,
-    ) {
+    override val contentSize: Double
+        get() = ((estimatedContentSize() - viewportHeight).coerceAtLeast(0f) + viewportHeight).toDouble()
+
+    override suspend fun scrollTo(scrollOffset: Double) {
+        val offset = scrollOffset.toFloat()
         val itemSize = averageItemSize
         if (itemSize <= 0f) return
-        val exactIndex = scrollOffset / itemSize
-        val targetIndex = exactIndex.toInt().coerceIn(0, totalItemsCount() - 1)
+        val exactIndex = offset / itemSize
+        val targetIndex = exactIndex.toInt().coerceIn(0, totalItemsCount - 1)
         scrollToItem(targetIndex)
-        val remainder = scrollOffset - targetIndex * itemSize
+        val remainder = offset - targetIndex * itemSize
         if (remainder != 0f) {
             scrollByPixels(remainder)
         }
     }
 }
 
-private fun StaggeredGridScrollbarAdapter(
-    gridState: LazyStaggeredGridState,
-): GridScrollbarAdapterBase =
-    GridScrollbarAdapterBase(
-        totalItemsCount = { gridState.layoutInfo.totalItemsCount },
-        firstVisibleIndex = { gridState.layoutInfo.visibleItemsInfo.firstOrNull()?.index },
-        firstVisibleOffsetY = { gridState.layoutInfo.visibleItemsInfo.firstOrNull()?.offset?.y ?: 0 },
-        estimateContentSize = { estimateStaggeredGridContentSize(gridState.layoutInfo) },
-        scrollToItem = { gridState.scrollToItem(it) },
-        scrollByPixels = { delta -> gridState.dispatchRawDelta(delta) },
-        measureResult = { gridState.layoutInfo },
-    )
+private class StaggeredGridScrollbarAdapter(
+    private val gridState: LazyStaggeredGridState,
+) : EstimatedGridScrollbarAdapter() {
+    override val currentLayout: Any
+        get() = gridState.layoutInfo
+    override val totalItemsCount: Int
+        get() = gridState.layoutInfo.totalItemsCount
+    override val firstVisibleIndex: Int?
+        get() =
+            gridState.layoutInfo.visibleItemsInfo
+                .firstOrNull()
+                ?.index
+    override val firstVisibleOffsetY: Int
+        get() =
+            gridState.layoutInfo.visibleItemsInfo
+                .firstOrNull()
+                ?.offset
+                ?.y ?: 0
+    override val viewportHeight: Int
+        get() = gridState.layoutInfo.viewportSize.height
 
-private fun GridScrollbarAdapter(
-    gridState: LazyGridState,
-): GridScrollbarAdapterBase =
-    GridScrollbarAdapterBase(
-        totalItemsCount = { gridState.layoutInfo.totalItemsCount },
-        firstVisibleIndex = { gridState.layoutInfo.visibleItemsInfo.firstOrNull()?.index },
-        firstVisibleOffsetY = { gridState.layoutInfo.visibleItemsInfo.firstOrNull()?.offset?.y ?: 0 },
-        estimateContentSize = { estimateLazyGridContentSize(gridState.layoutInfo) },
-        scrollToItem = { gridState.scrollToItem(it) },
-        scrollByPixels = { delta -> gridState.dispatchRawDelta(delta) },
-        measureResult = { gridState.layoutInfo },
-    )
+    override fun estimateContentSize(): Float = estimateStaggeredGridContentSize(gridState.layoutInfo)
+
+    override suspend fun scrollToItem(index: Int) = gridState.scrollToItem(index)
+
+    override fun scrollByPixels(delta: Float) {
+        gridState.dispatchRawDelta(delta)
+    }
+}
+
+private class GridScrollbarAdapter(
+    private val gridState: LazyGridState,
+) : EstimatedGridScrollbarAdapter() {
+    override val currentLayout: Any
+        get() = gridState.layoutInfo
+    override val totalItemsCount: Int
+        get() = gridState.layoutInfo.totalItemsCount
+    override val firstVisibleIndex: Int?
+        get() =
+            gridState.layoutInfo.visibleItemsInfo
+                .firstOrNull()
+                ?.index
+    override val firstVisibleOffsetY: Int
+        get() =
+            gridState.layoutInfo.visibleItemsInfo
+                .firstOrNull()
+                ?.offset
+                ?.y ?: 0
+    override val viewportHeight: Int
+        get() = gridState.layoutInfo.viewportSize.height
+
+    override fun estimateContentSize(): Float = estimateLazyGridContentSize(gridState.layoutInfo)
+
+    override suspend fun scrollToItem(index: Int) = gridState.scrollToItem(index)
+
+    override fun scrollByPixels(delta: Float) {
+        gridState.dispatchRawDelta(delta)
+    }
+}
 
 private fun estimateStaggeredGridContentSize(layoutInfo: LazyStaggeredGridLayoutInfo): Float {
     if (layoutInfo.totalItemsCount == 0) return 0f

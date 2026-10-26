@@ -29,6 +29,7 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpOffset
@@ -47,6 +48,7 @@ import zed.rainxch.core.presentation.personality.manga.decoration.inkPress
 import zed.rainxch.core.presentation.personality.manga.decoration.screentoneCorner
 import zed.rainxch.core.presentation.personality.manga.decoration.screentoneFill
 import zed.rainxch.core.presentation.personality.mangaPersonality
+import zed.rainxch.core.presentation.personality.model.PersonalityColors
 import zed.rainxch.core.presentation.personality.utils.PersonalityPreview
 import zed.rainxch.core.presentation.spacing.Spacing
 
@@ -116,7 +118,6 @@ private fun mangaElevation(elevation: KomiSurfaceElevation): MangaElevation =
 @Composable
 private fun MangaSurface(
     personality: MangaPersonality,
-    modifier: Modifier = Modifier,
     elevation: KomiSurfaceElevation,
     paper: KomiSurfacePaper,
     screentone: KomiScreentone,
@@ -127,6 +128,7 @@ private fun MangaSurface(
     tilt: Float,
     topEdgeOnly: Boolean,
     contentPadding: PaddingValues,
+    modifier: Modifier = Modifier,
     content: @Composable () -> Unit,
 ) {
     val colors = personality.colors
@@ -134,16 +136,7 @@ private fun MangaSurface(
     val borderWidth = if (topEdgeOnly) maxOf(elev.border, 4.dp) else elev.border
     val shape = remember(personality.shape.corner) { RoundedCornerShape(personality.shape.corner) }
     val needsClip = personality.shape.corner > 0.dp
-    val fill =
-        when (paper) {
-            KomiSurfacePaper.Surface, KomiSurfacePaper.Tinted -> colors.surface
-            KomiSurfacePaper.Background -> colors.background
-        }
-    val contentInk =
-        when (paper) {
-            KomiSurfacePaper.Surface, KomiSurfacePaper.Tinted -> colors.onSurface
-            KomiSurfacePaper.Background -> colors.onBackground
-        }
+    val (fill, contentInk) = mangaPaperColors(paper, colors)
 
     val pressable = onClick != null || onLongClick != null
     val tiltModifier = if (tilt != 0f) Modifier.rotate(tilt) else Modifier
@@ -185,41 +178,6 @@ private fun MangaSurface(
             Modifier
         }
 
-    val toneModifier =
-        when (screentone) {
-            KomiScreentone.None -> {
-                Modifier
-            }
-
-            KomiScreentone.Corner -> {
-                Modifier.screentoneCorner(
-                    colors.onSurface,
-                    colors.screentoneOpacity,
-                    boost = screentoneBoost,
-                )
-            }
-
-            KomiScreentone.Fill -> {
-                Modifier.screentoneFill(
-                    colors.onSurface,
-                    colors.screentoneOpacity,
-                )
-            }
-        }
-
-    val borderModifier =
-        if (topEdgeOnly) {
-            Modifier.drawBehind {
-                drawRect(
-                    color = colors.outline,
-                    topLeft = Offset.Zero,
-                    size = Size(size.width, borderWidth.toPx()),
-                )
-            }
-        } else {
-            Modifier.border(width = borderWidth, color = colors.outline, shape = shape)
-        }
-
     Box(
         modifier =
             modifier
@@ -227,8 +185,8 @@ private fun MangaSurface(
                 .then(depthModifier)
                 .then(if (needsClip) Modifier.clip(shape) else Modifier)
                 .background(color = fill, shape = shape)
-                .then(toneModifier)
-                .then(borderModifier)
+                .screentone(screentone, colors, screentoneBoost)
+                .mangaSurfaceBorder(topEdgeOnly, borderWidth, colors.outline, shape)
                 .padding(contentPadding),
     ) {
         CompositionLocalProvider(LocalContentColor provides contentInk) {
@@ -241,12 +199,12 @@ private fun MangaSurface(
 @Composable
 private fun ClassicSurface(
     personality: ClassicPersonality,
-    modifier: Modifier = Modifier,
     elevation: KomiSurfaceElevation,
     paper: KomiSurfacePaper,
     onClick: (() -> Unit)?,
     onLongClick: (() -> Unit)?,
     contentPadding: PaddingValues,
+    modifier: Modifier = Modifier,
     content: @Composable () -> Unit,
 ) {
     val colors = personality.colors
@@ -279,8 +237,45 @@ private fun ClassicSurface(
     }
 }
 
-// Tonal surfaces: the container color steps up with elevation instead of drawing an outline.
-// A background-colored surface keeps the outline, since it would vanish into the page.
+private fun mangaPaperColors(
+    paper: KomiSurfacePaper,
+    colors: PersonalityColors,
+): Pair<Color, Color> =
+    when (paper) {
+        KomiSurfacePaper.Surface, KomiSurfacePaper.Tinted -> colors.surface to colors.onSurface
+        KomiSurfacePaper.Background -> colors.background to colors.onBackground
+    }
+
+private fun Modifier.screentone(
+    screentone: KomiScreentone,
+    colors: PersonalityColors,
+    boost: Float,
+): Modifier =
+    when (screentone) {
+        KomiScreentone.None -> this
+        KomiScreentone.Corner -> screentoneCorner(colors.onSurface, colors.screentoneOpacity, boost = boost)
+        KomiScreentone.Fill -> screentoneFill(colors.onSurface, colors.screentoneOpacity)
+    }
+
+private fun Modifier.mangaSurfaceBorder(
+    topEdgeOnly: Boolean,
+    width: Dp,
+    color: Color,
+    shape: Shape,
+): Modifier =
+    if (topEdgeOnly) {
+        drawBehind {
+            drawRect(
+                color = color,
+                topLeft = Offset.Zero,
+                size = Size(size.width, width.toPx()),
+            )
+        }
+    } else {
+        border(width = width, color = color, shape = shape)
+    }
+
+// Tonal fills step up with elevation; a background-colored surface keeps its outline, or it would vanish into the page.
 private fun classicFill(
     personality: ClassicPersonality,
     paper: KomiSurfacePaper,
@@ -318,7 +313,7 @@ private fun PreviewPanelBody() {
 @Preview
 @Composable
 private fun KomiSurfaceMangaCardPreview() {
-    PersonalityPreview(mangaPersonality()) {
+    PersonalityPreview(personality = mangaPersonality()) {
         KomiSurface(
             elevation = KomiSurfaceElevation.Card,
             screentone = KomiScreentone.Corner,
@@ -333,7 +328,7 @@ private fun KomiSurfaceMangaCardPreview() {
 @Preview
 @Composable
 private fun KomiSurfaceMangaModalPreview() {
-    PersonalityPreview(mangaPersonality()) {
+    PersonalityPreview(personality = mangaPersonality()) {
         KomiSurface(
             elevation = KomiSurfaceElevation.Modal,
             paper = KomiSurfacePaper.Background,
@@ -347,7 +342,7 @@ private fun KomiSurfaceMangaModalPreview() {
 @Preview
 @Composable
 private fun KomiSurfaceMangaFillTiltPreview() {
-    PersonalityPreview(mangaPersonality()) {
+    PersonalityPreview(personality = mangaPersonality()) {
         KomiSurface(
             elevation = KomiSurfaceElevation.Raised,
             screentone = KomiScreentone.Fill,
@@ -362,7 +357,7 @@ private fun KomiSurfaceMangaFillTiltPreview() {
 @Preview
 @Composable
 private fun KomiSurfaceMangaNightPreview() {
-    PersonalityPreview(mangaPersonality(paper = MangaPaper.NIGHT, accent = MangaAccent.FROST)) {
+    PersonalityPreview(personality = mangaPersonality(paper = MangaPaper.NIGHT, accent = MangaAccent.FROST)) {
         KomiSurface(
             screentone = KomiScreentone.Corner,
             onClick = {},
@@ -376,7 +371,7 @@ private fun KomiSurfaceMangaNightPreview() {
 @Preview
 @Composable
 private fun KomiSurfaceClassicPreview() {
-    PersonalityPreview(classicPersonality()) {
+    PersonalityPreview(personality = classicPersonality()) {
         KomiSurface(onClick = {}, contentPadding = PaddingValues(Spacing.lg)) { PreviewPanelBody() }
     }
 }
@@ -384,7 +379,7 @@ private fun KomiSurfaceClassicPreview() {
 @Preview
 @Composable
 private fun KomiSurfaceClassicDarkPreview() {
-    PersonalityPreview(classicPersonality(dark = true)) {
+    PersonalityPreview(personality = classicPersonality(dark = true)) {
         KomiSurface(
             elevation = KomiSurfaceElevation.Modal,
             contentPadding = PaddingValues(Spacing.lg),

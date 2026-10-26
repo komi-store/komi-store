@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import zed.rainxch.core.presentation.locals.LocalPersonality
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Campaign
 import androidx.compose.material.icons.outlined.Info
@@ -31,47 +30,15 @@ import com.mikepenz.markdown.model.ImageTransformer
 import org.intellij.markdown.ast.ASTNode
 import org.intellij.markdown.flavours.gfm.GFMFlavourDescriptor
 import org.jetbrains.compose.resources.stringResource
+import zed.rainxch.core.presentation.locals.LocalPersonality
 import zed.rainxch.githubstore.core.presentation.res.*
-
-enum class GithubAlertKind(
-    val token: String,
-) {
-    NOTE("NOTE"),
-    TIP("TIP"),
-    IMPORTANT("IMPORTANT"),
-    WARNING("WARNING"),
-    CAUTION("CAUTION"),
-    ;
-
-    companion object {
-        private val PATTERN = Regex("""^\s*\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)]\s*$""")
-
-        fun parse(blockquoteText: String): Match? {
-            val stripped =
-                blockquoteText
-                    .lineSequence()
-                    .map { line -> line.trimStart().removePrefix(">").trimStart() }
-                    .toList()
-            if (stripped.isEmpty()) return null
-            val first = stripped.first()
-            val match = PATTERN.matchEntire(first) ?: return null
-            val kind = entries.firstOrNull { it.token == match.groupValues[1] } ?: return null
-            val body = stripped.drop(1).joinToString("\n").trim()
-            return Match(kind, body)
-        }
-    }
-
-    data class Match(
-        val kind: GithubAlertKind,
-        val body: String,
-    )
-}
 
 @Composable
 fun AlertBlockQuote(
     model: MarkdownComponentModel,
     imageTransformer: ImageTransformer,
     fallback: @Composable () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val raw = model.node.text(model.content)
     val match = GithubAlertKind.parse(raw)
@@ -89,7 +56,7 @@ fun AlertBlockQuote(
         color = palette.container,
         contentColor = palette.content,
         shape = RoundedCornerShape(LocalPersonality.current.shape.corner),
-        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+        modifier = modifier.fillMaxWidth().padding(vertical = 4.dp),
     ) {
         Column(modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp)) {
             Row(
@@ -197,7 +164,7 @@ private fun labelFor(kind: GithubAlertKind): String =
     }
 
 @Composable
-fun defaultBlockQuoteFallback(model: MarkdownComponentModel) {
+fun DefaultBlockQuoteFallback(model: MarkdownComponentModel) {
     MarkdownBlockQuote(
         content = model.content,
         node = model.node,

@@ -22,9 +22,13 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.movableContentOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -63,65 +67,23 @@ fun KomiBadge(
     val colors = personality.colors
     val fill = if (tone == KomiBadgeTone.Neutral) colors.primary else colors.error
     val fg = if (tone == KomiBadgeTone.Neutral) colors.onPrimary else colors.onError
-    val text =
-        if (dot) {
-            null
-        } else if (count!! > max) {
-            "$max+"
-        } else {
-            count.toString()
-        }
+    val text = badgeText(dot = dot, count = count, max = max)
     val a11y = contentDescription ?: text
 
     when (personality) {
         is MangaPersonality -> {
-        val metrics = badgeMetrics(size)
-        val motionOff = personality.motion.level == MotionLevel.OFF
-        val popScale = remember { Animatable(if (animate && !motionOff) 0f else 1f) }
-        LaunchedEffect(animate) {
-            if (animate && !motionOff) {
-                popScale.animateTo(1f, personality.motion.fastSpatial())
-            }
-        }
-        val transformed = animate || tilt
-        val transformMod =
-            if (transformed) {
-                Modifier.graphicsLayer {
-                    val s = popScale.value
-                    scaleX = s
-                    scaleY = s
-                    rotationZ = if (tilt) -4f else 0f
-                }
-            } else {
-                Modifier
-            }
-        val sizeMod =
-            if (dot) {
-                Modifier.size(metrics.dot)
-            } else {
-                Modifier.height(metrics.height).widthIn(min = metrics.height)
-            }
-
-        Box(
-            modifier =
-                modifier
-                    .then(transformMod)
-                    .then(sizeMod)
-                    .hardShadow(DpOffset(metrics.shadow, metrics.shadow), colors.shadow)
-                    .background(fill)
-                    .border(metrics.border, colors.outline)
-                    .then(if (dot) Modifier else Modifier.padding(horizontal = metrics.padX))
-                    .semanticsLabel(a11y),
-            contentAlignment = Alignment.Center,
-        ) {
-            if (text != null) {
-                Text(
-                    text = text,
-                    color = fg,
-                    style = personality.type.labelSmall.copy(fontFeatureSettings = "tnum"),
-                )
-            }
-        }
+            MangaBadge(
+                personality = personality,
+                text = text,
+                a11y = a11y,
+                dot = dot,
+                fill = fill,
+                fg = fg,
+                size = size,
+                tilt = tilt,
+                animate = animate,
+                modifier = modifier,
+            )
         }
 
         is ClassicPersonality -> {
@@ -136,6 +98,80 @@ fun KomiBadge(
     }
 }
 
+@Composable
+private fun MangaBadge(
+    personality: MangaPersonality,
+    text: String?,
+    a11y: String?,
+    dot: Boolean,
+    fill: Color,
+    fg: Color,
+    size: KomiBadgeSize,
+    tilt: Boolean,
+    animate: Boolean,
+    modifier: Modifier = Modifier,
+) {
+    val colors = personality.colors
+    val metrics = badgeMetrics(size)
+    val motionOff = personality.motion.level == MotionLevel.OFF
+    val popScale = remember { Animatable(if (animate && !motionOff) 0f else 1f) }
+    LaunchedEffect(animate) {
+        if (animate && !motionOff) {
+            popScale.animateTo(1f, personality.motion.fastSpatial())
+        }
+    }
+    val transformed = animate || tilt
+    val transformMod =
+        if (transformed) {
+            Modifier.graphicsLayer {
+                val s = popScale.value
+                scaleX = s
+                scaleY = s
+                rotationZ = if (tilt) -4f else 0f
+            }
+        } else {
+            Modifier
+        }
+    val sizeMod =
+        if (dot) {
+            Modifier.size(metrics.dot)
+        } else {
+            Modifier.height(metrics.height).widthIn(min = metrics.height)
+        }
+
+    Box(
+        modifier =
+            modifier
+                .then(transformMod)
+                .then(sizeMod)
+                .hardShadow(DpOffset(metrics.shadow, metrics.shadow), colors.shadow)
+                .background(fill)
+                .border(metrics.border, colors.outline)
+                .then(if (dot) Modifier else Modifier.padding(horizontal = metrics.padX))
+                .semanticsLabel(a11y),
+        contentAlignment = Alignment.Center,
+    ) {
+        if (text != null) {
+            Text(
+                text = text,
+                color = fg,
+                style = personality.type.labelSmall.copy(fontFeatureSettings = "tnum"),
+            )
+        }
+    }
+}
+
+private fun badgeText(
+    dot: Boolean,
+    count: Int?,
+    max: Int,
+): String? =
+    when {
+        dot || count == null -> null
+        count > max -> "$max+"
+        else -> count.toString()
+    }
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun KomiBadgedBox(
@@ -144,10 +180,14 @@ fun KomiBadgedBox(
     offset: Dp = 5.dp,
     content: @Composable () -> Unit,
 ) {
+    val currentBadge by rememberUpdatedState(badge)
+    val currentContent by rememberUpdatedState(content)
+    val movableBadge = remember { movableContentOf { currentBadge() } }
+    val movableContent = remember { movableContentOf { currentContent() } }
     when (LocalPersonality.current) {
         is MangaPersonality -> {
             Box(modifier = modifier) {
-                content()
+                movableContent()
                 Box(
                     modifier =
                         Modifier
@@ -157,19 +197,18 @@ fun KomiBadgedBox(
                                 translationY = -offset.toPx()
                             },
                 ) {
-                    badge()
+                    movableBadge()
                 }
             }
         }
 
         is ClassicPersonality -> {
-            BadgedBox(badge = { badge() }, modifier = modifier) { content() }
+            BadgedBox(badge = { movableBadge() }, modifier = modifier) { movableContent() }
         }
     }
 }
 
-private fun Modifier.semanticsLabel(label: String?): Modifier =
-    if (label == null) this else this.semantics { contentDescription = label }
+private fun Modifier.semanticsLabel(label: String?): Modifier = if (label == null) this else this.semantics { contentDescription = label }
 
 private data class BadgeMetrics(
     val height: Dp,
@@ -181,34 +220,38 @@ private data class BadgeMetrics(
 
 private fun badgeMetrics(size: KomiBadgeSize): BadgeMetrics =
     when (size) {
-        KomiBadgeSize.Sm -> BadgeMetrics(
-            height = 16.dp,
-            border = 2.dp,
-            shadow = 1.5.dp,
-            padX = 4.dp,
-            dot = 9.dp
-        )
+        KomiBadgeSize.Sm -> {
+            BadgeMetrics(
+                height = 16.dp,
+                border = 2.dp,
+                shadow = 1.5.dp,
+                padX = 4.dp,
+                dot = 9.dp,
+            )
+        }
 
-        KomiBadgeSize.Md -> BadgeMetrics(
-            height = 20.dp,
-            border = 2.dp,
-            shadow = 2.dp,
-            padX = 5.dp,
-            dot = 11.dp
-        )
+        KomiBadgeSize.Md -> {
+            BadgeMetrics(
+                height = 20.dp,
+                border = 2.dp,
+                shadow = 2.dp,
+                padX = 5.dp,
+                dot = 11.dp,
+            )
+        }
     }
 
 @Composable
 private fun PreviewBadges() {
     Row(
         horizontalArrangement = Arrangement.spacedBy(22.dp),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         KomiBadgedBox(badge = {
             KomiBadge(
                 count = 3,
                 size = KomiBadgeSize.Sm,
-                contentDescription = "3 updates available"
+                contentDescription = "3 updates available",
             )
         }) {
             Icon(Icons.Default.Apps, contentDescription = "Apps", modifier = Modifier.size(26.dp))
@@ -217,14 +260,14 @@ private fun PreviewBadges() {
             Icon(
                 Icons.Default.Notifications,
                 contentDescription = "Alerts",
-                modifier = Modifier.size(26.dp)
+                modifier = Modifier.size(26.dp),
             )
         }
         KomiBadgedBox(badge = { KomiBadge(count = 128, size = KomiBadgeSize.Sm) }) {
             Icon(
                 Icons.Default.Notifications,
                 contentDescription = "Inbox",
-                modifier = Modifier.size(26.dp)
+                modifier = Modifier.size(26.dp),
             )
         }
         KomiBadgedBox(badge = { KomiBadge(dot = true, size = KomiBadgeSize.Sm) }) {
@@ -237,7 +280,7 @@ private fun PreviewBadges() {
 private fun PreviewRules() {
     Row(
         horizontalArrangement = Arrangement.spacedBy(12.dp),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         KomiBadge(count = 1, size = KomiBadgeSize.Md)
         KomiBadge(count = 9, size = KomiBadgeSize.Md)
@@ -260,7 +303,7 @@ private fun PreviewRow() {
             text = "Announcements",
             modifier = Modifier.weight(1f),
             role = KomiTextRole.Body,
-            color = colors.onSurface
+            color = colors.onSurface,
         )
         KomiBadge(count = 3, size = KomiBadgeSize.Md)
     }
@@ -278,22 +321,23 @@ private fun PreviewAll() {
 @Preview
 @Composable
 private fun KomiBadgeMangaPreview() {
-    PersonalityPreview(mangaPersonality()) { PreviewAll() }
+    PersonalityPreview(personality = mangaPersonality()) { PreviewAll() }
 }
 
 @Preview
 @Composable
 private fun KomiBadgeMangaNightPreview() {
     PersonalityPreview(
-        mangaPersonality(
-            paper = MangaPaper.NIGHT,
-            accent = MangaAccent.SUN
-        )
+        personality =
+            mangaPersonality(
+                paper = MangaPaper.NIGHT,
+                accent = MangaAccent.SUN,
+            ),
     ) { PreviewAll() }
 }
 
 @Preview
 @Composable
 private fun KomiBadgeClassicPreview() {
-    PersonalityPreview(classicPersonality()) { PreviewAll() }
+    PersonalityPreview(personality = classicPersonality()) { PreviewAll() }
 }

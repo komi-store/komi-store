@@ -28,6 +28,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
@@ -38,6 +39,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -63,6 +65,7 @@ import zed.rainxch.core.presentation.personality.manga.decoration.inkFocusRing
 import zed.rainxch.core.presentation.personality.manga.decoration.inkPress
 import zed.rainxch.core.presentation.personality.manga.decoration.speedLines
 import zed.rainxch.core.presentation.personality.mangaPersonality
+import zed.rainxch.core.presentation.personality.model.PersonalityColors
 import zed.rainxch.core.presentation.personality.utils.PersonalityPreview
 import zed.rainxch.core.presentation.spacing.Spacing
 import kotlin.math.roundToInt
@@ -128,7 +131,6 @@ private fun MangaButton(
     personality: MangaPersonality,
     onClick: () -> Unit,
     label: String,
-    modifier: Modifier = Modifier,
     variant: KomiButtonVariant,
     size: KomiButtonSize,
     enabled: Boolean,
@@ -139,41 +141,29 @@ private fun MangaButton(
     trailingIcon: ImageVector?,
     containerColor: Color,
     contentColor: Color,
+    modifier: Modifier = Modifier,
 ) {
     val colors = personality.colors
     val metrics = buttonMetrics(size)
     val shape =
         remember(personality.shape.cornerSmall) { RoundedCornerShape(personality.shape.cornerSmall) }
     val active = enabled && !loading
-    val alpha = if (active) 1f else 0.45f
+    val look = colors.mangaButtonLook(variant, LocalContentColor.current, containerColor, contentColor, active)
+    val alpha = look.alpha
+    val container = look.container
+    val resolvedContentColor = look.content
+    val borderColor = look.border
 
     val flat = variant == KomiButtonVariant.Text
-    val ambientInk = LocalContentColor.current
-    val overrideColorsGiven =
-        containerColor != Color.Unspecified && contentColor != Color.Unspecified
-    val container =
-        if (overrideColorsGiven) containerColor else mangaButtonContainer(variant, colors)
-    val resolvedContentColor =
-        if (overrideColorsGiven) contentColor else mangaButtonContent(variant, colors, ambientInk)
-    val borderColor =
-        if (overrideColorsGiven || container == Color.Transparent) resolvedContentColor else colors.outline
-    val stamped = !flat && container != Color.Transparent
-    val sweep =
-        emphasized && active &&
-            (variant == KomiButtonVariant.Primary || variant == KomiButtonVariant.Destructive)
+    val sweep = emphasized && active && variant.hasSolidFill()
     val clipNeeded = personality.shape.cornerSmall > 0.dp || sweep
 
     val interaction = remember { MutableInteractionSource() }
-    val pressed by interaction.collectIsPressedAsState()
-    val hovered by interaction.collectIsHoveredAsState()
     val focused by interaction.collectIsFocusedAsState()
-    val pressProgress =
-        animateFloatAsState(if (pressed && active) 1f else 0f, label = "komiButtonPress")
-    val hoverProgress =
-        animateFloatAsState(if (hovered && active) 1f else 0f, label = "komiButtonHover")
+    val (pressProgress, hoverProgress) = animateInkProgress(interaction, active)
 
     val pressModifier =
-        if (!stamped) {
+        if (!look.stamped) {
             Modifier.offset { IntOffset(0, (1.dp.toPx() * pressProgress.value).roundToInt()) }
         } else {
             Modifier.inkPress(
@@ -191,7 +181,7 @@ private fun MangaButton(
                 .then(if (fullWidth) Modifier.fillMaxWidth() else Modifier)
                 .inkFocusRing(
                     focused = { focused },
-                    color = if (overrideColorsGiven) resolvedContentColor else colors.primary,
+                    color = look.focus,
                 ).then(pressModifier)
                 .then(if (clipNeeded) Modifier.clip(shape) else Modifier)
                 .background(color = container.copy(alpha = container.alpha * alpha), shape = shape)
@@ -242,7 +232,6 @@ private fun ClassicButton(
     personality: ClassicPersonality,
     onClick: () -> Unit,
     label: String,
-    modifier: Modifier = Modifier,
     variant: KomiButtonVariant,
     size: KomiButtonSize,
     enabled: Boolean,
@@ -252,6 +241,7 @@ private fun ClassicButton(
     trailingIcon: ImageVector?,
     containerColor: Color,
     contentColor: Color,
+    modifier: Modifier = Modifier,
 ) {
     val colors = personality.colors
     val metrics = buttonMetrics(size)
@@ -263,42 +253,7 @@ private fun ClassicButton(
             .heightIn(min = metrics.height)
             .then(if (fullWidth) Modifier.fillMaxWidth() else Modifier)
 
-    val overrideColors =
-        if (containerColor != Color.Unspecified && contentColor != Color.Unspecified) {
-            when (variant) {
-                KomiButtonVariant.Primary,
-                KomiButtonVariant.Destructive,
-                -> {
-                    ButtonDefaults.buttonColors(
-                        containerColor = containerColor,
-                        contentColor = contentColor,
-                    )
-                }
-
-                KomiButtonVariant.Tonal -> {
-                    ButtonDefaults.filledTonalButtonColors(
-                        containerColor = containerColor,
-                        contentColor = contentColor,
-                    )
-                }
-
-                KomiButtonVariant.Outline -> {
-                    ButtonDefaults.outlinedButtonColors(
-                        containerColor = containerColor,
-                        contentColor = contentColor,
-                    )
-                }
-
-                KomiButtonVariant.Text -> {
-                    ButtonDefaults.textButtonColors(
-                        containerColor = containerColor,
-                        contentColor = contentColor,
-                    )
-                }
-            }
-        } else {
-            null
-        }
+    val overrideColors = classicOverrideColors(variant, containerColor, contentColor)
 
     val content: @Composable RowScope.() -> Unit = {
         KomiButtonContent(
@@ -380,6 +335,92 @@ private fun ClassicButton(
         }
     }
 }
+
+@Composable
+private fun classicOverrideColors(
+    variant: KomiButtonVariant,
+    containerColor: Color,
+    contentColor: Color,
+): ButtonColors? {
+    if (containerColor == Color.Unspecified || contentColor == Color.Unspecified) return null
+    return when (variant) {
+        KomiButtonVariant.Primary,
+        KomiButtonVariant.Destructive,
+        -> {
+            ButtonDefaults.buttonColors(
+                containerColor = containerColor,
+                contentColor = contentColor,
+            )
+        }
+
+        KomiButtonVariant.Tonal -> {
+            ButtonDefaults.filledTonalButtonColors(
+                containerColor = containerColor,
+                contentColor = contentColor,
+            )
+        }
+
+        KomiButtonVariant.Outline -> {
+            ButtonDefaults.outlinedButtonColors(
+                containerColor = containerColor,
+                contentColor = contentColor,
+            )
+        }
+
+        KomiButtonVariant.Text -> {
+            ButtonDefaults.textButtonColors(
+                containerColor = containerColor,
+                contentColor = contentColor,
+            )
+        }
+    }
+}
+
+@Composable
+private fun animateInkProgress(
+    interaction: MutableInteractionSource,
+    active: Boolean,
+): Pair<State<Float>, State<Float>> {
+    val pressed by interaction.collectIsPressedAsState()
+    val hovered by interaction.collectIsHoveredAsState()
+    val pressProgress = animateFloatAsState(if (pressed && active) 1f else 0f, label = "komiButtonPress")
+    val hoverProgress = animateFloatAsState(if (hovered && active) 1f else 0f, label = "komiButtonHover")
+    return pressProgress to hoverProgress
+}
+
+private const val INACTIVE_ALPHA = 0.45f
+
+private data class MangaButtonLook(
+    val container: Color,
+    val content: Color,
+    val border: Color,
+    val focus: Color,
+    val stamped: Boolean,
+    val alpha: Float,
+)
+
+// Explicit colors replace the variant's, but only when both are given.
+private fun PersonalityColors.mangaButtonLook(
+    variant: KomiButtonVariant,
+    ambientInk: Color,
+    containerOverride: Color,
+    contentOverride: Color,
+    active: Boolean,
+): MangaButtonLook {
+    val overridden = containerOverride != Color.Unspecified && contentOverride != Color.Unspecified
+    val container = if (overridden) containerOverride else mangaButtonContainer(variant, this)
+    val content = if (overridden) contentOverride else mangaButtonContent(variant, this, ambientInk)
+    return MangaButtonLook(
+        container = container,
+        content = content,
+        border = if (overridden || container == Color.Transparent) content else outline,
+        focus = if (overridden) content else primary,
+        stamped = variant != KomiButtonVariant.Text && container != Color.Transparent,
+        alpha = if (active) 1f else INACTIVE_ALPHA,
+    )
+}
+
+private fun KomiButtonVariant.hasSolidFill(): Boolean = this == KomiButtonVariant.Primary || this == KomiButtonVariant.Destructive
 
 @Composable
 private fun RowScope.KomiButtonContent(
@@ -477,24 +518,25 @@ private fun PreviewButtonStack() {
 @Preview
 @Composable
 private fun KomiButtonMangaPreview() {
-    PersonalityPreview(mangaPersonality()) { PreviewButtonStack() }
+    PersonalityPreview(personality = mangaPersonality()) { PreviewButtonStack() }
 }
 
 @Preview
 @Composable
 private fun KomiButtonMangaNightPreview() {
     PersonalityPreview(
-        mangaPersonality(
-            paper = MangaPaper.NIGHT,
-            accent = MangaAccent.SUN,
-        ),
+        personality =
+            mangaPersonality(
+                paper = MangaPaper.NIGHT,
+                accent = MangaAccent.SUN,
+            ),
     ) { PreviewButtonStack() }
 }
 
 @Preview
 @Composable
 private fun KomiButtonMangaStatesPreview() {
-    PersonalityPreview(mangaPersonality()) {
+    PersonalityPreview(personality = mangaPersonality()) {
         Column(verticalArrangement = Arrangement.spacedBy(Spacing.md)) {
             KomiButton(onClick = {}, label = "Loading", loading = true)
             KomiButton(onClick = {}, label = "Disabled", enabled = false)
@@ -507,11 +549,11 @@ private fun KomiButtonMangaStatesPreview() {
 @Preview
 @Composable
 private fun KomiButtonClassicPreview() {
-    PersonalityPreview(classicPersonality()) { PreviewButtonStack() }
+    PersonalityPreview(personality = classicPersonality()) { PreviewButtonStack() }
 }
 
 @Preview
 @Composable
 private fun KomiButtonClassicDarkPreview() {
-    PersonalityPreview(classicPersonality(dark = true)) { PreviewButtonStack() }
+    PersonalityPreview(personality = classicPersonality(dark = true)) { PreviewButtonStack() }
 }
