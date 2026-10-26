@@ -135,7 +135,7 @@ class DefaultDownloadOrchestratorDigestRefetchTest {
 
             assertEquals(1, downloader.calls.size, "the source is tried exactly once")
             assertEquals(2, verifier.calls.size)
-            assertEquals("Checksum mismatch — file may have been tampered with", entry.errorMessage)
+            assertEquals("Checksum mismatch: file may have been tampered with", entry.errorMessage)
         }
 
     private object StubAssetSourceRefetcher : AssetSourceRefetcher {

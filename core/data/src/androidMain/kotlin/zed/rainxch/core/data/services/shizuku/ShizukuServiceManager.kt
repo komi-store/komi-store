@@ -117,16 +117,16 @@ class ShizukuServiceManager(
     }
 
     suspend fun getService(): IShizukuInstallerService? {
-        Logger.d(TAG) { "getService() — current status=${_status.value}" }
+        Logger.d(TAG) { "getService(): current status=${_status.value}" }
         if (_status.value != ShizukuStatus.READY) {
-            Logger.w(TAG) { "getService() — Shizuku not READY (status=${_status.value}), returning null" }
+            Logger.w(TAG) { "getService(): Shizuku not READY (status=${_status.value}), returning null" }
             return null
         }
 
         return bindMutex.withLock {
             val cached = installerService
             if (cached == null) {
-                Logger.d(TAG) { "getService() — no cached service, binding..." }
+                Logger.d(TAG) { "getService(): no cached service, binding..." }
             } else {
                 val alive = cached.asBinder().pingBinder()
                 Logger.d(TAG) { "getService(): cached service ping=$alive" }
@@ -140,7 +140,7 @@ class ShizukuServiceManager(
     }
 
     private suspend fun bindService(): IShizukuInstallerService? {
-        Logger.d(TAG) { "bindService() — attempting to bind Shizuku UserService..." }
+        Logger.d(TAG) { "bindService(): attempting to bind Shizuku UserService..." }
         return withTimeoutOrNull(BIND_TIMEOUT_MS) {
             suspendCancellableCoroutine { continuation ->
                 val componentName =

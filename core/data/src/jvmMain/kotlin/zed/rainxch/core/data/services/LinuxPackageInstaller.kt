@@ -144,7 +144,7 @@ internal class LinuxPackageInstaller(
         if (availableTerminals.isEmpty()) {
             notifier.show(
                 "Wrong Package Type",
-                "This is an Arch Linux package (.pkg.tar.zst) — not supported on your distribution. " +
+                "This is an Arch Linux package (.pkg.tar.zst), not supported on your distribution. " +
                     "Look for a .deb, .rpm, or .AppImage in the release.",
             )
         } else {

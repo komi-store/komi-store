@@ -135,16 +135,16 @@ class DhizukuServiceManager(
     }
 
     suspend fun getService(): IDhizukuInstallerService? {
-        Logger.d(TAG) { "getService() — current status=${_status.value}" }
+        Logger.d(TAG) { "getService(): current status=${_status.value}" }
         if (_status.value != DhizukuStatus.READY) {
-            Logger.w(TAG) { "getService() — Dhizuku not READY (status=${_status.value}), returning null" }
+            Logger.w(TAG) { "getService(): Dhizuku not READY (status=${_status.value}), returning null" }
             return null
         }
 
         return bindMutex.withLock {
             val cached = installerService
             if (cached == null) {
-                Logger.d(TAG) { "getService() — no cached service, binding..." }
+                Logger.d(TAG) { "getService(): no cached service, binding..." }
             } else {
                 val alive = cached.asBinder().pingBinder()
                 Logger.d(TAG) { "getService(): cached service ping=$alive" }
@@ -158,7 +158,7 @@ class DhizukuServiceManager(
     }
 
     private suspend fun bindService(): IDhizukuInstallerService? {
-        Logger.d(TAG) { "bindService() — attempting to bind Dhizuku UserService..." }
+        Logger.d(TAG) { "bindService(): attempting to bind Dhizuku UserService..." }
         return try {
             withTimeoutOrNull(BIND_TIMEOUT_MS) {
                 suspendCancellableCoroutine { continuation ->
@@ -167,7 +167,7 @@ class DhizukuServiceManager(
                             context.packageName,
                             DhizukuInstallerServiceImpl::class.java.name,
                         )
-                    Logger.d(TAG) { "bindService() — component: $componentName" }
+                    Logger.d(TAG) { "bindService(): component: $componentName" }
 
                     val args = DhizukuUserServiceArgs(componentName)
 
@@ -178,7 +178,7 @@ class DhizukuServiceManager(
                                 binder: IBinder?,
                             ) {
                                 Logger.d(TAG) {
-                                    "onServiceConnected() — name=$name, binderAlive=${binder?.pingBinder()}"
+                                    "onServiceConnected(): name=$name, binderAlive=${binder?.pingBinder()}"
                                 }
                                 val service = IDhizukuInstallerService.Stub.asInterface(binder)
                                 installerService = service

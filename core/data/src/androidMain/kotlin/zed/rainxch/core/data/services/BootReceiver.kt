@@ -30,7 +30,7 @@ class BootReceiver : BroadcastReceiver() {
                     UpdateScheduler.schedule(context)
                 }
             } else {
-                Logger.i { "BootReceiver: Device booted, update check disabled — skipping" }
+                Logger.i { "BootReceiver: Device booted, update check disabled, skipping" }
                 UpdateScheduler.cancel(context)
             }
         } catch (e: IllegalStateException) {

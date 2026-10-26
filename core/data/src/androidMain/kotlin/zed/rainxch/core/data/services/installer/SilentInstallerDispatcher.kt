@@ -66,10 +66,10 @@ class SilentInstallerDispatcher(
 
     override suspend fun ensurePermissionsOrThrow(extOrMime: String) {
         Logger.d(TAG) {
-            "ensurePermissionsOrThrow() — extOrMime=$extOrMime, cachedType=$cachedInstallerType"
+            "ensurePermissionsOrThrow(): extOrMime=$extOrMime, cachedType=$cachedInstallerType"
         }
         if (resolveActiveBackend() != Backend.DEFAULT) {
-            Logger.d(TAG) { "Silent backend active — skipping unknown sources permission check" }
+            Logger.d(TAG) { "Silent backend active, skipping unknown sources permission check" }
             return
         }
         // The picked app installs; runStandardInstall still checks if handing off fails.
@@ -116,7 +116,7 @@ class SilentInstallerDispatcher(
     }
 
     override fun uninstall(packageName: String) {
-        Logger.d(TAG) { "uninstall() called — packageName=$packageName, cached=$cachedInstallerType" }
+        Logger.d(TAG) { "uninstall() called: packageName=$packageName, cached=$cachedInstallerType" }
 
         when (val backend = resolveActiveBackend()) {
             Backend.SHIZUKU, Backend.DHIZUKU, Backend.ROOT -> {

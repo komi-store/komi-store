@@ -50,12 +50,12 @@ class RootServiceManager(
     fun requestPermission() {
         configureDefaultShell()
         scope.launch(Dispatchers.IO) {
-            Logger.d(TAG) { "requestPermission() — forcing main shell creation" }
+            Logger.d(TAG) { "requestPermission(): forcing main shell creation" }
             try {
                 val shell = Shell.getShell()
-                Logger.d(TAG) { "requestPermission() — shell rootStatus=${shell.status}" }
+                Logger.d(TAG) { "requestPermission(): shell rootStatus=${shell.status}" }
             } catch (e: NoShellException) {
-                Logger.w(TAG) { "requestPermission() — getShell failed: ${e.javaClass.simpleName}: ${e.message}" }
+                Logger.w(TAG) { "requestPermission(): getShell failed: ${e.javaClass.simpleName}: ${e.message}" }
             }
             refreshStatusBlocking()
         }
@@ -68,13 +68,13 @@ class RootServiceManager(
         withContext(Dispatchers.IO) {
             configureDefaultShell()
             if (!isRootGranted()) {
-                Logger.w(TAG) { "installPackage() — root not granted, aborting" }
+                Logger.w(TAG) { "installPackage(): root not granted, aborting" }
                 return@withContext null
             }
             val safeInstaller = installerPackageName?.takeIf { it.isNotBlank() }
             if (safeInstaller != null && !PACKAGE_NAME_PATTERN.matches(safeInstaller)) {
                 Logger.w(TAG) {
-                    "installPackage() — rejecting non-conformant installerPackageName='$safeInstaller'"
+                    "installPackage(): rejecting non-conformant installerPackageName='$safeInstaller'"
                 }
                 return@withContext STATUS_FAILURE
             }
@@ -87,7 +87,7 @@ class RootServiceManager(
                 val copyRes = Shell.cmd("cp $srcPath $tmpPathQuoted && chmod 644 $tmpPathQuoted").exec()
                 if (!copyRes.isSuccess) {
                     Logger.e(TAG) {
-                        "installPackage() — staging copy failed: exit=${copyRes.code} out='${copyRes.out.joinToString(
+                        "installPackage(): staging copy failed: exit=${copyRes.code} out='${copyRes.out.joinToString(
                             "\n",
                         )}' err='${copyRes.err.joinToString("\n")}'"
                     }
@@ -101,15 +101,15 @@ class RootServiceManager(
                         append("-r ")
                         append(tmpPathQuoted)
                     }
-                Logger.d(TAG) { "installPackage() — executing: $command" }
+                Logger.d(TAG) { "installPackage(): executing: $command" }
                 val result = Shell.cmd(command).exec()
                 val stdout = result.out.joinToString("\n").trim()
                 val stderr = result.err.joinToString("\n").trim()
-                Logger.d(TAG) { "installPackage() — exit=${result.code} stdout='$stdout' stderr='$stderr'" }
+                Logger.d(TAG) { "installPackage(): exit=${result.code} stdout='$stdout' stderr='$stderr'" }
                 if (result.isSuccess && stdout.contains("Success")) {
                     STATUS_SUCCESS
                 } else {
-                    Logger.w(TAG) { "installPackage() — pm reported failure: stdout='$stdout' stderr='$stderr'" }
+                    Logger.w(TAG) { "installPackage(): pm reported failure: stdout='$stdout' stderr='$stderr'" }
                     STATUS_FAILURE
                 }
             } finally {
@@ -121,25 +121,25 @@ class RootServiceManager(
         withContext(Dispatchers.IO) {
             configureDefaultShell()
             if (!isRootGranted()) {
-                Logger.w(TAG) { "uninstallPackage() — root not granted, aborting" }
+                Logger.w(TAG) { "uninstallPackage(): root not granted, aborting" }
                 return@withContext null
             }
             if (!PACKAGE_NAME_PATTERN.matches(packageName)) {
                 Logger.w(TAG) {
-                    "uninstallPackage() — rejecting non-conformant packageName='$packageName'"
+                    "uninstallPackage(): rejecting non-conformant packageName='$packageName'"
                 }
                 return@withContext STATUS_FAILURE
             }
             val result = Shell.cmd("pm uninstall $packageName").exec()
             val stdout = result.out.joinToString("\n").trim()
-            Logger.d(TAG) { "uninstallPackage($packageName) — exit=${result.code} stdout='$stdout'" }
+            Logger.d(TAG) { "uninstallPackage($packageName): exit=${result.code} stdout='$stdout'" }
             if (result.isSuccess && stdout.contains("Success")) STATUS_SUCCESS else STATUS_FAILURE
         }
 
     private fun refreshStatusBlocking() {
         val computed = computeStatus()
         if (_status.value != computed) {
-            Logger.d(TAG) { "refreshStatus() — $computed (was ${_status.value})" }
+            Logger.d(TAG) { "refreshStatus(): $computed (was ${_status.value})" }
         }
         _status.value = computed
     }
@@ -169,7 +169,7 @@ class RootServiceManager(
             rememberGranted(granted)
             granted
         } catch (e: NoShellException) {
-            Logger.w(TAG) { "isRootGranted() — getShell failed: ${e.message}" }
+            Logger.w(TAG) { "isRootGranted(): getShell failed: ${e.message}" }
             false
         }
 

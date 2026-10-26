@@ -204,7 +204,7 @@ class AssetFetcher(
             java.io.File(filePath).delete()
             entries.markFailed(
                 spec.packageName,
-                "Checksum mismatch — file may have been tampered with",
+                "Checksum mismatch: file may have been tampered with",
             )
             return null
         }

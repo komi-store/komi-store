@@ -46,7 +46,7 @@ private fun ObtainiumApp.exportOrUnsupported(
     parsed: AdditionalSettingsParse,
 ): ObtainiumMapResult =
     if (parsed.invertFilter) {
-        unsupported("$owner/$repo (inverted APK filter — not supported)")
+        unsupported("$owner/$repo (inverted APK filter, not supported)")
     } else {
         ObtainiumMapResult(
             exported =

@@ -46,7 +46,7 @@ internal suspend fun fetchGithubReleaseWindow(
                 Logger.w {
                     "Pre-release flag/tag mismatch for $owner/$repo " +
                         "release '${release.tagName}' (name='${release.name}'): " +
-                        "apiFlag=$flagSays, tagMarker=$tagSays — " +
+                        "apiFlag=$flagSays, tagMarker=$tagSays; " +
                         "treating as pre-release=${true}"
                 }
             }

@@ -54,7 +54,7 @@ class DhizukuInstallerServiceImpl : IDhizukuInstallerService.Stub() {
 
         val ctx: Context =
             currentApplicationOrNull() ?: run {
-                logE("currentApplication() returned null — no context available")
+                logE("currentApplication() returned null; no context available")
                 return STATUS_FAILURE
             }
 
@@ -200,7 +200,7 @@ class DhizukuInstallerServiceImpl : IDhizukuInstallerService.Stub() {
 
         val ctx: Context =
             currentApplicationOrNull() ?: run {
-                logE("currentApplication() returned null — no context available")
+                logE("currentApplication() returned null; no context available")
                 return STATUS_FAILURE
             }
 
@@ -260,7 +260,7 @@ class DhizukuInstallerServiceImpl : IDhizukuInstallerService.Stub() {
         }
 
     override fun destroy() {
-        log("destroy() — service being unbound")
+        log("destroy(): service being unbound")
     }
 
     private inline fun failureAsStatus(

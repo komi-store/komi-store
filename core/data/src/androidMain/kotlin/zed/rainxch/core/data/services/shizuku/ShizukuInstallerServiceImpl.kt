@@ -29,7 +29,7 @@ class ShizukuInstallerServiceImpl : IShizukuInstallerService.Stub() {
         fileSize: Long,
         installerPackageName: String?,
     ): Int {
-        log("installPackage() called — fileSize=$fileSize, installer=$installerPackageName")
+        log("installPackage() called: fileSize=$fileSize, installer=$installerPackageName")
         log("Process UID: ${android.os.Process.myUid()}, PID: ${android.os.Process.myPid()}")
 
         return try {
@@ -131,13 +131,13 @@ class ShizukuInstallerServiceImpl : IShizukuInstallerService.Stub() {
             }
 
             val exitCode = process.exitValue()
-            log("pm uninstall — exitCode=$exitCode, stdout='$stdout', stderr='$stderr'")
+            log("pm uninstall: exitCode=$exitCode, stdout='$stdout', stderr='$stderr'")
 
             if (exitCode == 0 && stdout.contains("Success")) {
                 log("Uninstall SUCCESS")
                 STATUS_SUCCESS
             } else {
-                logE("Uninstall FAILED — exitCode=$exitCode, stdout='$stdout', stderr='$stderr'")
+                logE("Uninstall FAILED: exitCode=$exitCode, stdout='$stdout', stderr='$stderr'")
                 STATUS_FAILURE
             }
         } catch (e: IOException) {
@@ -153,6 +153,6 @@ class ShizukuInstallerServiceImpl : IShizukuInstallerService.Stub() {
     }
 
     override fun destroy() {
-        log("destroy() — service being unbound")
+        log("destroy(): service being unbound")
     }
 }
