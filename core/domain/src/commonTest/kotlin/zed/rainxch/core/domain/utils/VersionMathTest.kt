@@ -147,6 +147,12 @@ class VersionMathTest {
     }
 
     @Test
+    fun hyphenated_calver_is_padded_and_keeps_its_tail() {
+        assertEquals("2026.07.05", VersionMath.normalizeVersion("2026-7-5"))
+        assertEquals("2026.07.05-rc1", VersionMath.normalizeVersion("2026-07-05.rc1"))
+    }
+
+    @Test
     fun detect_scheme_for_nightly() {
         assertEquals(VersionMath.Scheme.Unknown, VersionMath.detectScheme("nightly"))
         assertEquals(VersionMath.Scheme.Unknown, VersionMath.detectScheme("nightly-abc"))
