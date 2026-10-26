@@ -17,36 +17,20 @@ fun isAndroidApk(assetName: String): Boolean {
     return !alpineApkSignature.containsMatchIn(lower)
 }
 
+private val installerExtensions: Map<DiscoveryPlatform, List<String>> =
+    mapOf(
+        DiscoveryPlatform.Ios to listOf(".ipa"),
+        DiscoveryPlatform.Windows to listOf(".exe", ".msi"),
+        DiscoveryPlatform.Macos to listOf(".dmg", ".pkg"),
+        DiscoveryPlatform.Linux to listOf(".deb", ".rpm", ".appimage", ".pkg.tar.zst", ".snap", ".flatpakref"),
+    )
+
 fun assetPlatformOf(assetName: String): DiscoveryPlatform? {
     val lower = assetName.lowercase()
-    return when {
-        lower.endsWith(".apk") -> {
-            if (isAndroidApk(assetName)) DiscoveryPlatform.Android else DiscoveryPlatform.Linux
-        }
-
-        lower.endsWith(".ipa") -> {
-            DiscoveryPlatform.Ios
-        }
-
-        lower.endsWith(".exe") || lower.endsWith(".msi") -> {
-            DiscoveryPlatform.Windows
-        }
-
-        lower.endsWith(".dmg") || lower.endsWith(".pkg") -> {
-            DiscoveryPlatform.Macos
-        }
-
-        lower.endsWith(".deb") ||
-            lower.endsWith(".rpm") ||
-            lower.endsWith(".appimage") ||
-            lower.endsWith(".pkg.tar.zst") ||
-            lower.endsWith(".snap") ||
-            lower.endsWith(".flatpakref") -> {
-            DiscoveryPlatform.Linux
-        }
-
-        else -> {
-            null
-        }
+    if (lower.endsWith(".apk")) {
+        return if (isAndroidApk(assetName)) DiscoveryPlatform.Android else DiscoveryPlatform.Linux
     }
+    return installerExtensions.entries
+        .firstOrNull { (_, extensions) -> extensions.any { lower.endsWith(it) } }
+        ?.key
 }

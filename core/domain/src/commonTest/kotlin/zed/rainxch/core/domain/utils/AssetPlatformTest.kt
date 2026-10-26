@@ -49,4 +49,18 @@ class AssetPlatformTest {
         assertEquals(DiscoveryPlatform.Android, assetPlatformOf("app-arm64-v8a-release.apk"))
         assertEquals(DiscoveryPlatform.Android, assetPlatformOf("v2rayNG_2.2.5_universal.apk"))
     }
+
+    @Test
+    fun installer_extensions_group_under_their_platform() {
+        assertEquals(DiscoveryPlatform.Ios, assetPlatformOf("App.ipa"))
+        assertEquals(DiscoveryPlatform.Windows, assetPlatformOf("setup.EXE"))
+        assertEquals(DiscoveryPlatform.Windows, assetPlatformOf("app-x64.msi"))
+        assertEquals(DiscoveryPlatform.Macos, assetPlatformOf("App-1.0.dmg"))
+        assertEquals(DiscoveryPlatform.Macos, assetPlatformOf("App-1.0.pkg"))
+        assertEquals(DiscoveryPlatform.Linux, assetPlatformOf("app-1.0-x86_64.pkg.tar.zst"))
+        assertEquals(DiscoveryPlatform.Linux, assetPlatformOf("App-1.0.AppImage"))
+        assertEquals(DiscoveryPlatform.Linux, assetPlatformOf("app_1.0_amd64.deb"))
+        assertEquals(DiscoveryPlatform.Linux, assetPlatformOf("app.flatpakref"))
+        assertEquals(null, assetPlatformOf("app-1.0.zip"))
+    }
 }
