@@ -40,8 +40,6 @@ import zed.rainxch.core.domain.repository.UserSessionRepository
 import zed.rainxch.core.domain.usecases.SyncInstalledAppsUseCase
 import zed.rainxch.core.presentation.model.DiscoveryRepositoryUi
 import zed.rainxch.core.presentation.utils.toUi
-import zed.rainxch.search.domain.repository.SearchHistoryRepository
-import zed.rainxch.search.domain.repository.SearchRepository
 import zed.rainxch.githubstore.core.presentation.res.Res
 import zed.rainxch.githubstore.core.presentation.res.explore_error
 import zed.rainxch.githubstore.core.presentation.res.failed_to_share_link
@@ -50,6 +48,8 @@ import zed.rainxch.githubstore.core.presentation.res.no_github_link_in_clipboard
 import zed.rainxch.githubstore.core.presentation.res.rate_limit_exceeded
 import zed.rainxch.githubstore.core.presentation.res.rate_limit_exceeded_retry_in
 import zed.rainxch.githubstore.core.presentation.res.search_failed
+import zed.rainxch.search.domain.repository.SearchHistoryRepository
+import zed.rainxch.search.domain.repository.SearchRepository
 import zed.rainxch.search.presentation.mappers.toDomain
 import zed.rainxch.search.presentation.model.ProgrammingLanguageUi
 import zed.rainxch.search.presentation.model.SearchSourceUi
