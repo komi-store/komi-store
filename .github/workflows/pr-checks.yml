@@ -122,7 +122,7 @@ jobs:
 
       - name: Upload detekt SARIF
         if: always() && hashFiles('detekt.sarif') != '' && (github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository)
-        uses: github/codeql-action/upload-sarif@6f2ac81f5cd81fe351a197ba0b00d91d03cd2aee # v4.39.0
+        uses: github/codeql-action/upload-sarif@9b3254085494b55a0f7c4c2b3d2d52cc712ce370 # v4.39.1
         with:
           sarif_file: detekt.sarif
           category: detekt
@@ -161,7 +161,7 @@ jobs:
 
       - name: Upload lint SARIF
         if: always() && hashFiles('lint.sarif') != '' && (github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository)
-        uses: github/codeql-action/upload-sarif@6f2ac81f5cd81fe351a197ba0b00d91d03cd2aee # v4.39.0
+        uses: github/codeql-action/upload-sarif@9b3254085494b55a0f7c4c2b3d2d52cc712ce370 # v4.39.1
         with:
           sarif_file: lint.sarif
           category: android-lint
@@ -182,7 +182,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: agnix
-        uses: agent-sh/agnix@cc559089a2e5fec8b84229c810827ff8d4685a22 # v0.59.0
+        uses: agent-sh/agnix@36c6801f79a12fb1c639696d4095182a322362f2 # v0.59.3
         with:
           target: claude-code
           version: v0.59.0
