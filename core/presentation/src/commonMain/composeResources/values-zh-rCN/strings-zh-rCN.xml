@@ -535,6 +535,8 @@
     </plurals>
     <string name="fallback_older_releases_title">回退到旧版本</string>
     <string name="fallback_older_releases_description">遍历过去的版本，直到找到匹配过滤器的版本。最新版本属于其他应用的单一仓库需要此功能。</string>
+    <string name="asset_rebuild_detection_title">检测同一 Release 内资源重建</string>
+    <string name="asset_rebuild_detection_description">优先比对哈希和资源标识；文件名版本仅辅助。关闭后只用 tag 和发布时间。</string>
     <string name="advanced_settings_title">高级过滤器</string>
     <string name="advanced_settings_description">配置此应用在仓库中的匹配方式。当仓库包含多个应用时使用这些设置。</string>
     <string name="advanced_settings_open">打开高级过滤器</string>

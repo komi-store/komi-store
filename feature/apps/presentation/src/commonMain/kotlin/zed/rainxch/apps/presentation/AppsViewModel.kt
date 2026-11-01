@@ -636,6 +636,7 @@ class AppsViewModel(
                         advancedSettingsApp = null,
                         advancedFilterDraft = "",
                         advancedFallbackDraft = false,
+                        advancedDetectRebuildDraft = true,
                         advancedFilterError = null,
                         advancedPreviewLoading = false,
                         advancedPreviewMatched = persistentListOf(),
@@ -655,6 +656,10 @@ class AppsViewModel(
             is AppsAction.OnAdvancedFallbackToggled -> {
                 _state.update { it.copy(advancedFallbackDraft = action.enabled) }
                 schedulePreviewRefresh()
+            }
+
+            is AppsAction.OnAdvancedDetectRebuildToggled -> {
+                _state.update { it.copy(advancedDetectRebuildDraft = action.enabled) }
             }
 
             AppsAction.OnAdvancedSaveFilter -> {
@@ -890,6 +895,7 @@ class AppsViewModel(
                 advancedSettingsApp = app,
                 advancedFilterDraft = app.assetFilterRegex.orEmpty(),
                 advancedFallbackDraft = app.fallbackToOlderReleases,
+                advancedDetectRebuildDraft = app.detectAssetRebuildsInRelease,
                 advancedFilterError = null,
                 advancedPreviewLoading = true,
                 advancedPreviewMatched = persistentListOf(),
@@ -1104,6 +1110,7 @@ class AppsViewModel(
         val app = _state.value.advancedSettingsApp ?: return
         val draftFilter = _state.value.advancedFilterDraft.trim()
         val draftFallback = _state.value.advancedFallbackDraft
+        val draftDetectRebuilds = _state.value.advancedDetectRebuildDraft
 
         val parseResult = AssetFilter.parse(draftFilter)
         if (parseResult != null && parseResult.isFailure) {
@@ -1114,6 +1121,12 @@ class AppsViewModel(
         viewModelScope.launch {
             _state.update { it.copy(advancedSavingFilter = true) }
             try {
+                // The flag goes in first: the filter save below re-checks the row, and the check
+                // has to see the new setting.
+                installedAppsRepository.setDetectAssetRebuildsInRelease(
+                    packageName = app.packageName,
+                    enabled = draftDetectRebuilds,
+                )
                 installedAppsRepository.setAssetFilter(
                     packageName = app.packageName,
                     regex = draftFilter.takeIf { it.isNotEmpty() },
@@ -1124,6 +1137,7 @@ class AppsViewModel(
                         advancedSettingsApp = null,
                         advancedFilterDraft = "",
                         advancedFallbackDraft = false,
+                        advancedDetectRebuildDraft = true,
                         advancedFilterError = null,
                         advancedPreviewLoading = false,
                         advancedPreviewMatched = persistentListOf(),

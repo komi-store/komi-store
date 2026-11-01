@@ -807,6 +807,8 @@
     </plurals>
     <string name="fallback_older_releases_title">Fall back to older releases</string>
     <string name="fallback_older_releases_description">Walk back through past releases until one matches the filter. Required for monorepos where the latest release belongs to a sibling app.</string>
+    <string name="asset_rebuild_detection_title">Detect asset rebuilds within a release</string>
+    <string name="asset_rebuild_detection_description">Compares hashes and asset identity first; the filename version is only a hint. When off, only the tag and publish time are used.</string>
     <string name="advanced_settings_title">Advanced filter</string>
     <string name="advanced_settings_description">Configure how this app is matched in the repository. Use these settings when the repo ships multiple apps.</string>
     <string name="advanced_settings_open">Open advanced filter</string>

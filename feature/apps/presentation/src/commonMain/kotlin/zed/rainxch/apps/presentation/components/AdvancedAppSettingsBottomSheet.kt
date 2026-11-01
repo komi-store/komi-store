@@ -151,6 +151,35 @@ fun AdvancedAppSettingsBottomSheet(
                 )
             }
 
+            Spacer(Modifier.height(12.dp))
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 4.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    KomiText(
+                        text = stringResource(Res.string.asset_rebuild_detection_title),
+                        role = KomiTextRole.Label,
+                        color = colors.onSurface,
+                    )
+
+                    KomiText(
+                        text = stringResource(Res.string.asset_rebuild_detection_description),
+                        role = KomiTextRole.Body,
+                        color = colors.onSurfaceVariant,
+                    )
+                }
+
+                KomiSwitch(
+                    checked = state.advancedDetectRebuildDraft,
+                    onCheckedChange = { onAction(AppsAction.OnAdvancedDetectRebuildToggled(it)) },
+                    enabled = !state.advancedSavingFilter,
+                )
+            }
+
             Spacer(Modifier.height(16.dp))
 
             KomiHorizontalDivider(

@@ -58,6 +58,7 @@ data class AppsState(
     val advancedSettingsApp: InstalledAppUi? = null,
     val advancedFilterDraft: String = "",
     val advancedFallbackDraft: Boolean = false,
+    val advancedDetectRebuildDraft: Boolean = true,
     val advancedFilterError: String? = null,
     val advancedPreviewLoading: Boolean = false,
     val advancedPreviewMatched: ImmutableList<GithubAssetUi> = persistentListOf(),

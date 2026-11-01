@@ -160,6 +160,10 @@ sealed interface AppsAction {
         val enabled: Boolean,
     ) : AppsAction
 
+    data class OnAdvancedDetectRebuildToggled(
+        val enabled: Boolean,
+    ) : AppsAction
+
     data object OnAdvancedSaveFilter : AppsAction
 
     data object OnAdvancedClearFilter : AppsAction
