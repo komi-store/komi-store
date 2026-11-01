@@ -194,11 +194,23 @@ object UpdateVerdict {
                     storedDigest = bound.assetDigest,
                     storedSize = null,
                 )
+        // A forge can rebuild an asset inside the same release (same tag, same release id,
+        // same publishedAt) and only the asset identity moves. Asset ids are monotonic, so a
+        // newer asset id on the same release is a rebuild even when the timestamp is equal.
+        val sameReleaseAssetAdvanced =
+            matched.releaseId != null &&
+                stored.latestReleaseId == matched.releaseId &&
+                matched.assetId != null &&
+                bound?.assetId != null &&
+                matched.assetId > bound.assetId
         val sameTagRebuild =
             sameTag &&
                 bound != null &&
                 installedBytesDiffer &&
-                VersionMath.isPublishedAtAfter(matched.publishedAt, bound.releasePublishedAt)
+                (
+                    VersionMath.isPublishedAtAfter(matched.publishedAt, bound.releasePublishedAt) ||
+                        sameReleaseAssetAdvanced
+                )
 
         val isUpdateAvailable =
             when {
