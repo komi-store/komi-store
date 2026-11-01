@@ -428,6 +428,90 @@ class InstalledAppsUpdateCheckWindowTest {
             }
         }
 
+    // A forge can re-upload the asset of a release without touching the tag or the publish
+    // time. The per-app switch decides whether the new bytes count as an update.
+    @Test
+    fun the_per_app_switch_keeps_a_rebuilt_asset_quiet_until_it_is_on() =
+        runBlocking {
+            withRepo { repo, db ->
+                db.installedAppDao.insertApp(
+                    app(packageName = PKG, installed = "2.0.5", installedCode = 205L)
+                        .copy(
+                            installedAssetName = "app-2.0.5.apk",
+                            installedReleaseId = 100L,
+                            installedAssetId = 11L,
+                            installedAssetDigest = "sha256:old",
+                            installedReleasePublishedAt = "2026-10-01T00:00:00Z",
+                            detectAssetRebuildsInRelease = false,
+                        ),
+                )
+                val rebuilt = rebuiltRelease()
+
+                assertFalse(repo.checkForUpdatesWithReleases(PKG, listOf(rebuilt)))
+                assertFalse(db.installedAppDao.getAppByPackage(PKG)!!.isUpdateAvailable)
+
+                repo.setDetectAssetRebuildsInRelease(PKG, true)
+                assertTrue(repo.checkForUpdatesWithReleases(PKG, listOf(rebuilt)))
+                assertTrue(db.installedAppDao.getAppByPackage(PKG)!!.isUpdateAvailable)
+            }
+        }
+
+    // Several installed apps can share one release tag: only the app whose own asset was
+    // rebuilt may report.
+    @Test
+    fun a_rebuilt_asset_updates_only_the_package_that_owns_it() =
+        runBlocking {
+            withRepo { repo, db ->
+                val release = twoAssetRelease()
+                db.installedAppDao.insertApp(
+                    app(packageName = ONE, installed = "1.0.0", installedCode = 100L)
+                        .copy(
+                            installedAssetName = "one-1.0.0.apk",
+                            installedReleaseId = 100L,
+                            installedAssetId = 11L,
+                            installedAssetDigest = "sha256:one-old",
+                            installedReleasePublishedAt = "2026-10-01T00:00:00Z",
+                            assetFilterRegex = "one-.*\\.apk$",
+                        ),
+                )
+                db.installedAppDao.insertApp(
+                    app(packageName = TWO, installed = "1.0.0", installedCode = 100L)
+                        .copy(
+                            installedAssetName = "two-1.0.0.apk",
+                            installedReleaseId = 100L,
+                            installedAssetId = 12L,
+                            installedAssetDigest = "sha256:two-old",
+                            installedReleasePublishedAt = "2026-10-01T00:00:00Z",
+                            assetFilterRegex = "two-.*\\.apk$",
+                        ),
+                )
+
+                assertTrue(repo.checkForUpdatesWithReleases(ONE, listOf(release)))
+                assertFalse(repo.checkForUpdatesWithReleases(TWO, listOf(release)))
+
+                val changed = db.installedAppDao.getAppByPackage(ONE)!!
+                assertTrue(changed.isUpdateAvailable)
+                assertEquals(21L, changed.latestAssetId)
+                val untouched = db.installedAppDao.getAppByPackage(TWO)!!
+                assertFalse(untouched.isUpdateAvailable)
+            }
+        }
+
+    private fun rebuiltRelease(): GithubRelease {
+        val base =
+            release(id = 100L, tag = "2.0.5", publishedAt = "2026-10-01T00:00:00Z", assetName = "app-2.0.5.apk")
+        return base.copy(assets = base.assets.map { it.copy(id = 12L, digest = "sha256:new") })
+    }
+
+    private fun twoAssetRelease(): GithubRelease =
+        release(id = 100L, tag = "1.0.0", publishedAt = "2026-10-01T00:00:00Z").copy(
+            assets =
+                listOf(
+                    asset(id = 21L, name = "one-1.0.0.apk", digest = "sha256:one-new"),
+                    asset(id = 12L, name = "two-1.0.0.apk", digest = "sha256:two-old"),
+                ),
+        )
+
     private suspend fun withRepo(
         installedAppsDao: (AppDatabase) -> InstalledAppDao = { it.installedAppDao },
         block: suspend (InstalledAppsRepositoryImpl, AppDatabase) -> Unit,
@@ -556,6 +640,20 @@ class InstalledAppsUpdateCheckWindowTest {
             isPrerelease = isPrerelease,
         )
 
+    private fun asset(
+        id: Long,
+        name: String,
+        digest: String?,
+    ): GithubAsset =
+        GithubAsset(
+            id = id,
+            name = name,
+            contentType = "application/vnd.android.package-archive",
+            size = 1024L,
+            downloadUrl = "https://example.test/$name",
+            digest = digest,
+        )
+
     private class FakeInstaller : Installer {
         override suspend fun isSupported(extOrMime: String): Boolean = true
 
@@ -676,6 +774,8 @@ class InstalledAppsUpdateCheckWindowTest {
 
     private companion object {
         const val PKG = "com.example.app"
+        const val ONE = "com.example.one"
+        const val TWO = "com.example.two"
     }
 }
 

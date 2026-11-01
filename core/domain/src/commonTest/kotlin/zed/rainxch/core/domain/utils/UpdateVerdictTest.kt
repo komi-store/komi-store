@@ -176,6 +176,9 @@ class UpdateVerdictTest {
         installedVersionCode: Long = 100L,
         installedVersionName: String? = null,
         installedPublishedAt: String? = null,
+        installedReleaseId: Long? = null,
+        installedAssetId: Long? = null,
+        installedAssetName: String? = null,
         storedLatestTag: String? = null,
         storedLatestVersionCode: Long? = null,
         storedPublishedAt: String? = null,
@@ -188,6 +191,7 @@ class UpdateVerdictTest {
         storedAssetSize: Long? = null,
         matchedAssetDigest: String? = null,
         matchedAssetSize: Long? = null,
+        matchedAssetName: String? = null,
         storedReleaseId: Long? = null,
         storedAssetId: Long? = null,
         matchedReleaseId: Long? = null,
@@ -195,6 +199,7 @@ class UpdateVerdictTest {
         bound: UpdateVerdict.Bound? = null,
         selfAttestedDigest: String? = null,
         canReadInstalledFile: Boolean = true,
+        detectAssetRebuildsInRelease: Boolean = true,
     ): UpdateVerdict.Result =
         UpdateVerdict.decide(
             installed =
@@ -203,6 +208,9 @@ class UpdateVerdictTest {
                     versionCode = installedVersionCode,
                     versionName = installedVersionName,
                     publishedAt = installedPublishedAt,
+                    releaseId = installedReleaseId,
+                    assetId = installedAssetId,
+                    assetName = installedAssetName,
                 ),
             stored =
                 UpdateVerdict.Stored(
@@ -224,11 +232,13 @@ class UpdateVerdictTest {
                     assetId = matchedAssetId,
                     assetDigest = matchedAssetDigest,
                     assetSize = matchedAssetSize,
+                    assetName = matchedAssetName,
                 ),
             skippedTag = skippedTag,
             bound = bound,
             selfAttestedDigest = selfAttestedDigest,
             canReadInstalledFile = canReadInstalledFile,
+            detectAssetRebuildsInRelease = detectAssetRebuildsInRelease,
         )
 
     // com.yunx.app: v1.2.8 was offered, the install was blocked for want of installer
@@ -1362,6 +1372,195 @@ class UpdateVerdictTest {
                 matchedAssetDigest = "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
                 selfAttestedDigest = "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
                 skippedTag = "testbuild-all-prs-20261007",
+            )
+        assertFalse(result.isUpdateAvailable)
+    }
+
+    // An asset rebuilt inside its own release keeps the tag, the release id and the publish
+    // time; only the bytes and the asset id move. The switch decides whether that counts.
+    private fun sameReleaseRebuild(detectAssetRebuildsInRelease: Boolean) =
+        decide(
+            installedTag = "2.0.5",
+            installedReleaseId = 100L,
+            installedAssetId = 899L,
+            installedAssetName = "app-2.0.5.apk",
+            matchedTag = "2.0.5",
+            matchedPublishedAt = "2026-10-01T00:00:00Z",
+            matchedReleaseId = 100L,
+            matchedAssetId = 900L,
+            matchedAssetDigest = "sha256:new",
+            matchedAssetName = "app-2.0.5.apk",
+            bound =
+                UpdateVerdict.Bound(
+                    assetId = 899L,
+                    assetDigest = "sha256:old",
+                    releasePublishedAt = "2026-10-01T00:00:00Z",
+                ),
+            detectAssetRebuildsInRelease = detectAssetRebuildsInRelease,
+        )
+
+    @Test
+    fun detection_off_keeps_an_asset_rebuilt_at_the_same_time_quiet() {
+        assertFalse(sameReleaseRebuild(detectAssetRebuildsInRelease = false).isUpdateAvailable)
+    }
+
+    @Test
+    fun detection_on_reports_an_asset_rebuilt_at_the_same_time() {
+        assertTrue(sameReleaseRebuild(detectAssetRebuildsInRelease = true).isUpdateAvailable)
+    }
+
+    @Test
+    fun detection_off_keeps_the_publish_time_rule() {
+        val result =
+            decide(
+                installedTag = "2.0.5",
+                matchedTag = "2.0.5",
+                matchedPublishedAt = "2026-10-20T00:00:00Z",
+                matchedAssetId = 900L,
+                bound =
+                    UpdateVerdict.Bound(
+                        assetId = 899L,
+                        assetDigest = null,
+                        releasePublishedAt = "2026-10-01T00:00:00Z",
+                    ),
+                detectAssetRebuildsInRelease = false,
+            )
+        assertTrue(result.isUpdateAvailable)
+    }
+
+    @Test
+    fun detection_on_reports_a_newer_asset_id_in_the_same_release() {
+        val result =
+            decide(
+                installedTag = "testbuild-b",
+                installedReleaseId = 100L,
+                installedAssetId = 899L,
+                matchedTag = "testbuild-b",
+                matchedPublishedAt = "2026-10-01T00:00:00Z",
+                matchedReleaseId = 100L,
+                matchedAssetId = 900L,
+                bound =
+                    UpdateVerdict.Bound(
+                        assetId = 899L,
+                        assetDigest = null,
+                        releasePublishedAt = "2026-10-01T00:00:00Z",
+                    ),
+            )
+        assertTrue(result.isUpdateAvailable)
+    }
+
+    @Test
+    fun detection_off_ignores_a_newer_asset_id_in_the_same_release() {
+        val result =
+            decide(
+                installedTag = "testbuild-b",
+                installedReleaseId = 100L,
+                installedAssetId = 899L,
+                matchedTag = "testbuild-b",
+                matchedPublishedAt = "2026-10-01T00:00:00Z",
+                matchedReleaseId = 100L,
+                matchedAssetId = 900L,
+                bound =
+                    UpdateVerdict.Bound(
+                        assetId = 899L,
+                        assetDigest = null,
+                        releasePublishedAt = "2026-10-01T00:00:00Z",
+                    ),
+                detectAssetRebuildsInRelease = false,
+            )
+        assertFalse(result.isUpdateAvailable)
+    }
+
+    @Test
+    fun a_filename_version_bump_on_the_same_tag_is_an_update() {
+        val result =
+            decide(
+                installedTag = "1.0.6",
+                installedAssetName = "runtime-nodejs-1.0.5-arm64-v8a.apk",
+                matchedTag = "1.0.6",
+                matchedPublishedAt = "2026-10-01T00:00:00Z",
+                matchedAssetName = "runtime-nodejs-1.0.6-arm64-v8a.apk",
+            )
+        assertTrue(result.isUpdateAvailable)
+    }
+
+    @Test
+    fun a_filename_version_downgrade_on_the_same_tag_is_not_an_update() {
+        val result =
+            decide(
+                installedTag = "1.0.6",
+                installedAssetName = "runtime-nodejs-1.0.6-arm64-v8a.apk",
+                matchedTag = "1.0.6",
+                matchedPublishedAt = "2026-10-01T00:00:00Z",
+                matchedAssetName = "runtime-nodejs-1.0.5-arm64-v8a.apk",
+            )
+        assertFalse(result.isUpdateAvailable)
+    }
+
+    @Test
+    fun detection_off_ignores_a_filename_version() {
+        val result =
+            decide(
+                installedTag = "1.0.6",
+                installedAssetName = "runtime-nodejs-1.0.5-arm64-v8a.apk",
+                matchedTag = "1.0.6",
+                matchedPublishedAt = "2026-10-01T00:00:00Z",
+                matchedAssetName = "runtime-nodejs-1.0.6-arm64-v8a.apk",
+                detectAssetRebuildsInRelease = false,
+            )
+        assertFalse(result.isUpdateAvailable)
+    }
+
+    // An unparseable name leaves the digest in charge: a different file still reports.
+    @Test
+    fun an_unparseable_filename_leaves_the_digest_in_charge() {
+        val result =
+            decide(
+                installedTag = "1.0.6",
+                installedAssetName = "app-arm64-v8a.apk",
+                matchedTag = "1.0.6",
+                matchedPublishedAt = "2026-10-01T00:00:00Z",
+                matchedAssetName = "runtime-1.0.6-arm64-v8a.apk",
+                matchedAssetDigest = "sha256:new",
+                bound =
+                    UpdateVerdict.Bound(
+                        assetId = 11L,
+                        assetDigest = "sha256:old",
+                        releasePublishedAt = "2026-10-01T00:00:00Z",
+                    ),
+            )
+        assertTrue(result.isUpdateAvailable)
+    }
+
+    @Test
+    fun equal_digests_outrank_an_advanced_filename_version() {
+        val result =
+            decide(
+                installedTag = "1.0.6",
+                installedAssetName = "runtime-nodejs-1.0.5-arm64-v8a.apk",
+                matchedTag = "1.0.6",
+                matchedPublishedAt = "2026-10-01T00:00:00Z",
+                matchedAssetName = "runtime-nodejs-1.0.6-arm64-v8a.apk",
+                matchedAssetDigest = "sha256:same",
+                bound =
+                    UpdateVerdict.Bound(
+                        assetId = 11L,
+                        assetDigest = "sha256:same",
+                        releasePublishedAt = "2026-10-01T00:00:00Z",
+                    ),
+            )
+        assertFalse(result.isUpdateAvailable)
+    }
+
+    @Test
+    fun a_filename_version_does_not_reorder_two_different_tags() {
+        val result =
+            decide(
+                installedTag = "2.0.0",
+                installedAssetName = "app-2.0.0.apk",
+                matchedTag = "1.0.0",
+                matchedPublishedAt = "2026-10-01T00:00:00Z",
+                matchedAssetName = "app-3.0.0.apk",
             )
         assertFalse(result.isUpdateAvailable)
     }

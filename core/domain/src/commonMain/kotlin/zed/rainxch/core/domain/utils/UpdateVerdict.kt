@@ -6,6 +6,9 @@ object UpdateVerdict {
         val versionCode: Long,
         val versionName: String? = null,
         val publishedAt: String? = null,
+        val releaseId: Long? = null,
+        val assetId: Long? = null,
+        val assetName: String? = null,
     )
 
     data class Stored(
@@ -27,6 +30,7 @@ object UpdateVerdict {
         val assetId: Long? = null,
         val assetDigest: String? = null,
         val assetSize: Long? = null,
+        val assetName: String? = null,
     )
 
     data class Bound(
@@ -45,6 +49,7 @@ object UpdateVerdict {
         bound: Bound? = null,
         selfAttestedDigest: String? = null,
         canReadInstalledFile: Boolean = true,
+        detectAssetRebuildsInRelease: Boolean = true,
     ): Result {
         val reconcilable = VersionMath.versionsReconcilable(installed.tag, matched.tag)
         val codesAlreadyMatch =
@@ -197,19 +202,42 @@ object UpdateVerdict {
         // A forge can rebuild an asset inside the same release (same tag, same release id,
         // same publishedAt) and only the asset identity moves. Asset ids are monotonic, so a
         // newer asset id on the same release is a rebuild even when the timestamp is equal.
-        val sameReleaseAssetAdvanced =
+        // The bytes are the primary proof: an installed digest that differs from the resolved
+        // one is a different build whatever the timestamps say.
+        val installedDigestDiffers =
+            bound?.assetDigest != null &&
+                matched.assetDigest != null &&
+                bound.assetDigest != matched.assetDigest
+        val sameReleaseIdentity =
             matched.releaseId != null &&
-                stored.latestReleaseId == matched.releaseId &&
+                (
+                    matched.releaseId == installed.releaseId ||
+                        matched.releaseId == stored.latestReleaseId
+                )
+        val sameReleaseAssetAdvanced =
+            sameReleaseIdentity &&
                 matched.assetId != null &&
-                bound?.assetId != null &&
-                matched.assetId > bound.assetId
+                installed.assetId != null &&
+                matched.assetId > installed.assetId
+        // Off keeps the former tag plus publish-time comparison only: no bytes-without-time,
+        // no asset identity and no filename ordering.
+        val rebuildWithoutNewPublishTime =
+            detectAssetRebuildsInRelease && (installedDigestDiffers || sameReleaseAssetAdvanced)
+        val assetVersionOrder =
+            if (detectAssetRebuildsInRelease && sameTag) {
+                orderAssetVersions(installed.assetName, matched.assetName)
+            } else {
+                null
+            }
+        val sameTagFilenameRegressed = assetVersionOrder != null && assetVersionOrder < 0
+        val sameTagFilenameAdvanced = assetVersionOrder != null && assetVersionOrder > 0
         val sameTagRebuild =
             sameTag &&
                 bound != null &&
                 installedBytesDiffer &&
                 (
                     VersionMath.isPublishedAtAfter(matched.publishedAt, bound.releasePublishedAt) ||
-                        sameReleaseAssetAdvanced
+                        rebuildWithoutNewPublishTime
                 )
 
         val isUpdateAvailable =
@@ -226,15 +254,25 @@ object UpdateVerdict {
                     !selfAttestedSameFile
                 }
 
+                // Equal bytes outrank every rebuild signal, including a filename that says the
+                // release moved on.
+                boundMatchesInstalledFile -> {
+                    false
+                }
+
+                sameTagFilenameRegressed -> {
+                    false
+                }
+
                 sameTagRebuild -> {
                     true
                 }
 
-                deviceRunsMatchedRelease -> {
-                    false
+                sameTagFilenameAdvanced -> {
+                    true
                 }
 
-                boundMatchesInstalledFile -> {
+                deviceRunsMatchedRelease -> {
                     false
                 }
 
@@ -288,6 +326,18 @@ object UpdateVerdict {
             return installedAssetDigest == matchedAssetDigest
         }
         return installedAssetId != null && matchedAssetId != null && installedAssetId == matchedAssetId
+    }
+
+    // Negative when the installed name carries the newer version, positive when the resolved
+    // one does, null when either name has no dotted version to order by.
+    private fun orderAssetVersions(
+        installedAssetName: String?,
+        matchedAssetName: String?,
+    ): Int? {
+        val installedVersion = VersionMath.assetVersionInName(installedAssetName)
+        val matchedVersion = VersionMath.assetVersionInName(matchedAssetName)
+        if (installedVersion == null || matchedVersion == null) return null
+        return VersionMath.compareAssetVersions(matchedVersion, installedVersion)
     }
 
     fun decideBound(

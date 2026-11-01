@@ -115,3 +115,54 @@ internal fun windowWouldRegressStoredRelease(
     }
     return regresses
 }
+
+// The row fields and the resolved pair the verdict reads. Both the library window check and the
+// Details refresh map through here, so a new input cannot reach only one of the two paths.
+@Suppress("LongParameterList")
+internal fun decideUpdateVerdict(
+    app: InstalledAppEntity,
+    matchedRelease: GithubRelease,
+    matchedAsset: GithubAsset,
+    bound: UpdateVerdict.Bound?,
+    selfAttestedDigest: String?,
+    canReadInstalledFile: Boolean,
+): UpdateVerdict.Result =
+    UpdateVerdict.decide(
+        installed =
+            UpdateVerdict.Installed(
+                tag = app.installedVersion,
+                versionCode = app.installedVersionCode,
+                versionName = app.installedVersionName,
+                publishedAt = app.installedReleasePublishedAt,
+                releaseId = app.installedReleaseId,
+                assetId = app.installedAssetId,
+                assetName = app.installedAssetName,
+            ),
+        stored =
+            UpdateVerdict.Stored(
+                latestTag = app.latestVersion,
+                latestVersionCode = app.latestVersionCode,
+                publishedAt = app.latestReleasePublishedAt,
+                wasUpdateAvailable = app.isUpdateAvailable,
+                latestReleaseId = app.latestReleaseId,
+                latestAssetId = app.latestAssetId,
+                latestAssetDigest = app.latestAssetDigest,
+                latestAssetSize = app.latestAssetSize,
+            ),
+        matched =
+            UpdateVerdict.Matched(
+                tag = matchedRelease.tagName,
+                publishedAt = matchedRelease.publishedAt,
+                isPrerelease = matchedRelease.isPrerelease,
+                releaseId = matchedRelease.id,
+                assetId = matchedAsset.id,
+                assetDigest = matchedAsset.digest,
+                assetSize = matchedAsset.size,
+                assetName = matchedAsset.name,
+            ),
+        skippedTag = app.skippedReleaseTag,
+        bound = bound,
+        selfAttestedDigest = selfAttestedDigest,
+        canReadInstalledFile = canReadInstalledFile,
+        detectAssetRebuildsInRelease = app.detectAssetRebuildsInRelease,
+    )

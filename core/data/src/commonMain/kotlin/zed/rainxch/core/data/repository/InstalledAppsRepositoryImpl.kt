@@ -35,7 +35,6 @@ import zed.rainxch.core.domain.system.Installer
 import zed.rainxch.core.domain.system.PackageMonitor
 import zed.rainxch.core.domain.utils.AssetFilter
 import zed.rainxch.core.domain.utils.ResolvedRelease
-import zed.rainxch.core.domain.utils.UpdateVerdict
 import zed.rainxch.core.domain.utils.VersionMath
 import kotlin.coroutines.cancellation.CancellationException
 
@@ -319,41 +318,15 @@ class InstalledAppsRepositoryImpl(
                 )
             }
 
+            // A refresh may not read the installed file, so an unbound same-tag release has no
+            // proof its bytes differ from the build the device runs.
             val verdict =
-                UpdateVerdict.decide(
-                    installed =
-                        UpdateVerdict.Installed(
-                            tag = app.installedVersion,
-                            versionCode = app.installedVersionCode,
-                            versionName = app.installedVersionName,
-                            publishedAt = app.installedReleasePublishedAt,
-                        ),
-                    stored =
-                        UpdateVerdict.Stored(
-                            latestTag = app.latestVersion,
-                            latestVersionCode = app.latestVersionCode,
-                            publishedAt = app.latestReleasePublishedAt,
-                            wasUpdateAvailable = app.isUpdateAvailable,
-                            latestReleaseId = app.latestReleaseId,
-                            latestAssetId = app.latestAssetId,
-                            latestAssetDigest = app.latestAssetDigest,
-                            latestAssetSize = app.latestAssetSize,
-                        ),
-                    matched =
-                        UpdateVerdict.Matched(
-                            tag = matchedRelease.tagName,
-                            publishedAt = matchedRelease.publishedAt,
-                            isPrerelease = matchedRelease.isPrerelease,
-                            releaseId = matchedRelease.id,
-                            assetId = primaryAsset.id,
-                            assetDigest = primaryAsset.digest,
-                            assetSize = primaryAsset.size,
-                        ),
-                    skippedTag = app.skippedReleaseTag,
+                decideUpdateVerdict(
+                    app = app,
+                    matchedRelease = matchedRelease,
+                    matchedAsset = primaryAsset,
                     bound = bound,
                     selfAttestedDigest = selfAttestedDigest,
-                    // A refresh may not read the installed file, so an unbound same-tag release
-                    // has no proof its bytes differ from the build the device runs.
                     canReadInstalledFile = canReadInstalledFile,
                 )
 
@@ -593,6 +566,15 @@ class InstalledAppsRepositoryImpl(
                     "re-check failed: ${e.message}"
             }
         }
+    }
+
+    // The advanced-settings save writes this flag before the filter, and the filter's own
+    // re-check then judges the row with the new setting, so no second fetch runs here.
+    override suspend fun setDetectAssetRebuildsInRelease(
+        packageName: String,
+        enabled: Boolean,
+    ) {
+        installedAppsDao.updateDetectAssetRebuildsInRelease(packageName, enabled)
     }
 
     override suspend fun setPreferredVariant(

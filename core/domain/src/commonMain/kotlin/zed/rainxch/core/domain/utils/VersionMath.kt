@@ -494,6 +494,38 @@ object VersionMath {
         return Scheme.Unknown
     }
 
+    // The version an asset filename carries. Two names of one release can be ordered by it, but it
+    // never overrides the bytes or the asset identity they disagree with.
+    fun assetVersionInName(assetName: String?): String? {
+        val fileName = assetName?.substringAfterLast('/')?.trim()?.takeIf { it.isNotEmpty() } ?: return null
+        return AssetDottedVersion.find(stripAssetExtension(fileName))?.groupValues?.get(1)
+    }
+
+    // Missing trailing components count as zero, so 1.0 and 1.0.0 compare equal.
+    fun compareAssetVersions(
+        a: String,
+        b: String,
+    ): Int {
+        val aParts = a.split('.')
+        val bParts = b.split('.')
+        for (index in 0 until maxOf(aParts.size, bParts.size)) {
+            val aPart = aParts.getOrNull(index)?.toLongOrNull() ?: 0L
+            val bPart = bParts.getOrNull(index)?.toLongOrNull() ?: 0L
+            if (aPart != bPart) return aPart.compareTo(bPart)
+        }
+        return 0
+    }
+
+    // A numeric last segment is part of the version, not an extension.
+    private fun stripAssetExtension(fileName: String): String {
+        val dot = fileName.lastIndexOf('.')
+        if (dot <= 0 || dot == fileName.length - 1) return fileName
+        val extension = fileName.substring(dot + 1)
+        return if (extension.any { it.isDigit() }) fileName else fileName.substring(0, dot)
+    }
+
+    private val AssetDottedVersion = Regex("""(?<![0-9A-Za-z])(?:[vV])?(\d+(?:\.\d+)+)""")
+
     enum class Scheme {
         SemVer,
         CalVer,
