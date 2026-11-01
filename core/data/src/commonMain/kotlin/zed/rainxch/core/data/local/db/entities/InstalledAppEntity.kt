@@ -87,4 +87,6 @@ data class InstalledAppEntity(
     val sourceHost: String? = null,
     @ColumnInfo(defaultValue = "0")
     val updateStateRevision: Long = 0,
+    @ColumnInfo(defaultValue = "1")
+    val detectAssetRebuildsInRelease: Boolean = true,
 )

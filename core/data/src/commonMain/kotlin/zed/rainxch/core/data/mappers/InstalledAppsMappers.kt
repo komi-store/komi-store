@@ -67,6 +67,7 @@ fun InstalledApp.toEntity(): InstalledAppEntity =
         skippedReleaseTag = skippedReleaseTag,
         sourceHost = sourceHost,
         updateStateRevision = updateStateRevision,
+        detectAssetRebuildsInRelease = detectAssetRebuildsInRelease,
     )
 
 @Suppress("LongMethod")
@@ -133,4 +134,5 @@ fun InstalledAppEntity.toDomain(): InstalledApp =
         skippedReleaseTag = skippedReleaseTag,
         sourceHost = sourceHost,
         updateStateRevision = updateStateRevision,
+        detectAssetRebuildsInRelease = detectAssetRebuildsInRelease,
     )

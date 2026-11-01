@@ -69,6 +69,9 @@ data class InstalledApp(
     val skippedReleaseTag: String? = null,
     val sourceHost: String? = null,
     val updateStateRevision: Long = 0,
+    // Off for an app whose repo rebuilds its assets in place: only the tag and the publish
+    // time decide then.
+    val detectAssetRebuildsInRelease: Boolean = true,
 )
 
 fun InstalledApp?.isReallyInstalled(): Boolean = this != null && !this.isPendingInstall

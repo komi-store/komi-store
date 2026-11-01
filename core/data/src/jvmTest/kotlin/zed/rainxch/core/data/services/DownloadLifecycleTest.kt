@@ -390,6 +390,11 @@ class DownloadLifecycleTest {
             fallbackToOlderReleases: Boolean,
         ) = Unit
 
+        override suspend fun setDetectAssetRebuildsInRelease(
+            packageName: String,
+            enabled: Boolean,
+        ) = Unit
+
         override suspend fun setPreferredVariant(
             packageName: String,
             variant: String?,

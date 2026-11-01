@@ -108,6 +108,18 @@ interface InstalledAppDao {
     @Query(
         """
         UPDATE installed_apps
+           SET detectAssetRebuildsInRelease = :enabled
+         WHERE packageName = :packageName
+        """,
+    )
+    suspend fun updateDetectAssetRebuildsInRelease(
+        packageName: String,
+        enabled: Boolean,
+    )
+
+    @Query(
+        """
+        UPDATE installed_apps
            SET assetFilterRegex = :regex,
                fallbackToOlderReleases = :fallback
          WHERE packageName = :packageName

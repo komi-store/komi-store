@@ -51,6 +51,7 @@ fun InstalledApp.toUi(): InstalledAppUi =
         pendingInstallAssetName = pendingInstallAssetName,
         skippedReleaseTag = skippedReleaseTag,
         sourceHost = sourceHost,
+        detectAssetRebuildsInRelease = detectAssetRebuildsInRelease,
     )
 
 fun InstalledAppUi.toDomain(): InstalledApp =
@@ -101,4 +102,5 @@ fun InstalledAppUi.toDomain(): InstalledApp =
         pendingInstallAssetName = pendingInstallAssetName,
         skippedReleaseTag = skippedReleaseTag,
         sourceHost = sourceHost,
+        detectAssetRebuildsInRelease = detectAssetRebuildsInRelease,
     )

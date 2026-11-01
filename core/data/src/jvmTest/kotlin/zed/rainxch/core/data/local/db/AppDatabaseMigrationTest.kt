@@ -17,6 +17,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
+import kotlin.test.assertTrue
 
 class AppDatabaseMigrationTest {
     @get:Rule
@@ -50,6 +51,7 @@ class AppDatabaseMigrationTest {
                     assertEquals("1.0.0", app.installedVersion, "v$version")
                     assertEquals(InstallSource.THIS_APP, app.installSource, "v$version")
                     assertEquals(0L, app.updateStateRevision, "v$version")
+                    assertTrue(app.detectAssetRebuildsInRelease, "v$version")
 
                     val favourite = assertNotNull(db.favoriteRepoDao.getFavoriteById(REPO_ID), "v$version")
                     assertEquals("repo", favourite.repoName, "v$version")
@@ -60,6 +62,23 @@ class AppDatabaseMigrationTest {
             } finally {
                 db.close()
             }
+        }
+    }
+
+    @Test
+    fun the_rebuild_switch_defaults_on_for_rows_that_predate_it() {
+        val file = File(tmp.root, "v24.db")
+        openAtVersion(file, 24).use { it.insertRows() }
+
+        val db = buildDatabase(file)
+        try {
+            runBlocking {
+                val app = assertNotNull(db.installedAppDao.getAppByPackage(PACKAGE))
+                assertEquals("1.0.0", app.installedVersion)
+                assertTrue(app.detectAssetRebuildsInRelease)
+            }
+        } finally {
+            db.close()
         }
     }
 

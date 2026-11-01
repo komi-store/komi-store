@@ -107,6 +107,13 @@ interface InstalledAppsRepository {
         fallbackToOlderReleases: Boolean,
     )
 
+    // Per app: whether a rebuild inside one release is detected from the bytes and the asset
+    // identity. Off leaves only the tag and the publish time in the comparison.
+    suspend fun setDetectAssetRebuildsInRelease(
+        packageName: String,
+        enabled: Boolean,
+    )
+
     suspend fun setPreferredVariant(
         packageName: String,
         variant: String?,

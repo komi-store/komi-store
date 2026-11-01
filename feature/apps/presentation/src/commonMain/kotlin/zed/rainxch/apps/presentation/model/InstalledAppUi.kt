@@ -49,4 +49,5 @@ data class InstalledAppUi(
     val pendingInstallAssetName: String? = null,
     val skippedReleaseTag: String? = null,
     val sourceHost: String? = null,
+    val detectAssetRebuildsInRelease: Boolean = true,
 )
