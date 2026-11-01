@@ -1,6 +1,6 @@
 [versions]
 agp = "9.4.1"
-composeBom = "2025.07.00"
+composeBom = "2026.09.00"
 kermit = "2.0.8"
 kotlin = "2.4.20"
 ksp = "2.3.12"
