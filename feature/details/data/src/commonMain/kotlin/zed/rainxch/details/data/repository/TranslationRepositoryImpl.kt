@@ -49,7 +49,6 @@ class TranslationRepositoryImpl(
         )
 
     private val cacheMutex = Mutex()
-    private val requestMutex = Mutex()
     private val cache = LinkedHashMap<CacheKey, CachedTranslation>(MAX_CACHE_SIZE, 0.75f, true)
 
     @OptIn(ExperimentalTime::class)
@@ -69,34 +68,30 @@ class TranslationRepositoryImpl(
 
         val protection = protectFromTranslation(text)
 
-        // README and release notes are translated by separate jobs. Providers such as Baidu
-        // enforce a per-second quota, so only one HTTP translation may be in flight at a time.
-        val result =
-            requestMutex.withLock {
-                val translator = resolveTranslator()
-                val chunks = chunkText(protection.maskedText, translator.maxChunkSize)
-                val translatedParts = mutableListOf<Pair<String, String>>()
-                var detectedLang: String? = null
+        val translator = resolveTranslator()
+        val chunks = chunkText(protection.maskedText, translator.maxChunkSize)
+        val translatedParts = mutableListOf<Pair<String, String>>()
+        var detectedLang: String? = null
 
-                for ((chunkText, delimiter) in chunks) {
-                    val response = translator.translate(chunkText, targetLanguage, sourceLanguage)
-                    translatedParts.add(response.translatedText to delimiter)
-                    if (detectedLang == null) {
-                        detectedLang = response.detectedSourceLanguage
-                    }
-                }
-
-                val joined =
-                    translatedParts
-                        .dropLast(1)
-                        .joinToString("") { (text, delim) -> text + delim } +
-                        translatedParts.lastOrNull()?.first.orEmpty()
-
-                TranslationResult(
-                    translatedText = restoreProtectedSpans(joined, protection.spans),
-                    detectedSourceLanguage = detectedLang,
-                )
+        for ((chunkText, delimiter) in chunks) {
+            val response = translator.translate(chunkText, targetLanguage, sourceLanguage)
+            translatedParts.add(response.translatedText to delimiter)
+            if (detectedLang == null) {
+                detectedLang = response.detectedSourceLanguage
             }
+        }
+
+        val joined =
+            translatedParts
+                .dropLast(1)
+                .joinToString("") { (text, delim) -> text + delim } +
+                translatedParts.lastOrNull()?.first.orEmpty()
+
+        val result =
+            TranslationResult(
+                translatedText = restoreProtectedSpans(joined, protection.spans),
+                detectedSourceLanguage = detectedLang,
+            )
 
         cacheMutex.withLock {
             if (cache.size >= MAX_CACHE_SIZE) {

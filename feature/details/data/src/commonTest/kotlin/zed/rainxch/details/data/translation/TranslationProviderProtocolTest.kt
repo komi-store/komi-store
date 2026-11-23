@@ -53,6 +53,11 @@ class TranslationProviderProtocolTest {
                             """
                             data: {"choices":[{"delta":{"role":"assistant","content":null}}]}
 
+                            data: ping
+
+                            data:
+
+
                             data: {"choices":[{"delta":{"content":"你"}}]}
 
                             data: {"choices":[{"delta":{"content":"好"}}]}

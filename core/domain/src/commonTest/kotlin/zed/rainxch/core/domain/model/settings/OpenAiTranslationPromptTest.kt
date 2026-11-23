@@ -2,7 +2,6 @@ package zed.rainxch.core.domain.model.settings
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertTrue
 
 class OpenAiTranslationPromptTest {
     @Test
@@ -28,6 +27,22 @@ class OpenAiTranslationPromptTest {
                 text = "hello",
             )
 
-        assertTrue(rendered.endsWith("hello"))
+        assertEquals("Translate into Chinese.\n\nhello", rendered)
+    }
+
+    @Test
+    fun renders_the_default_prompt_when_the_template_is_blank() {
+        val rendered =
+            OpenAiTranslationPrompt.render(
+                template = "",
+                targetLanguage = "Chinese",
+                sourceLanguage = null,
+                text = "hello",
+            )
+
+        assertEquals(
+            OpenAiTranslationPrompt.DEFAULT.replace("{target}", "Chinese") + "\n\nhello",
+            rendered,
+        )
     }
 }

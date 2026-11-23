@@ -9,19 +9,24 @@ import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import io.ktor.http.isSuccess
+import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonArray
 import kotlinx.serialization.json.buildJsonObject
-import kotlinx.serialization.json.jsonArray
-import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
 import zed.rainxch.core.domain.model.settings.OpenAiTranslationPrompt
 import zed.rainxch.core.domain.model.settings.SupportedTranslationLanguages
 import zed.rainxch.details.domain.model.TranslationResult
 
+internal class TranslationResponseException(
+    message: String,
+    cause: Throwable? = null,
+) : RuntimeException(message, cause)
+
+@Suppress("SwallowedException")
 internal class OpenAiCompatibleTranslator(
     private val httpClient: () -> HttpClient,
     private val json: Json,
@@ -47,11 +52,12 @@ internal class OpenAiCompatibleTranslator(
             )
         }
 
+        val body = response.bodyAsText()
         val translated =
-            if (response.contentType()?.match(ContentType.Application.Json) == true) {
-                readCompleteResponse(response.bodyAsText())
+            if (body.lineSequence().any { it.startsWith("data:") }) {
+                readStreamingResponse(body)
             } else {
-                readStreamingResponse(response.bodyAsText())
+                readCompleteResponse(body)
             }
 
         return TranslationResult(
@@ -64,11 +70,6 @@ internal class OpenAiCompatibleTranslator(
         if (endpoint.isBlank() || model.isBlank()) {
             throw TranslationProviderNotConfiguredException(
                 "OpenAI-compatible endpoint/model not configured",
-            )
-        }
-        if (apiKey != null && apiKey.isBlank()) {
-            throw TranslationProviderNotConfiguredException(
-                "OpenAI-compatible provider API key not configured",
             )
         }
     }
@@ -119,12 +120,20 @@ internal class OpenAiCompatibleTranslator(
             )
         }
 
+    @Suppress("ThrowsCount")
     private fun readCompleteResponse(body: String): String {
-        val root = json.parseToJsonElement(body).jsonObject
+        val root =
+            try {
+                json.parseToJsonElement(body) as? JsonObject
+            } catch (e: SerializationException) {
+                throw TranslationResponseException("Translation response is not valid JSON: ${e.message}", e)
+            } catch (e: IllegalArgumentException) {
+                throw TranslationResponseException("Translation response is not valid JSON: ${e.message}", e)
+            } ?: throw TranslationResponseException("Translation response is not a JSON object")
         return root
             .choicesMessage()
             ?.messageContent()
-            ?: throw RuntimeException("Translation response missing message content")
+            ?: throw TranslationResponseException("Translation response missing message content")
     }
 
     private fun readStreamingResponse(body: String): String {
@@ -133,37 +142,50 @@ internal class OpenAiCompatibleTranslator(
             if (!line.startsWith("data:")) continue
             val payload = line.removePrefix("data:").trim()
             if (payload == "[DONE]") break
-            val delta =
-                json
-                    .parseToJsonElement(payload)
-                    .jsonObject
-                    .choicesMessage()
-                    ?.messageContent()
+            val delta = parseStreamFrame(payload)
             if (!delta.isNullOrEmpty()) content.append(delta)
         }
         if (content.isEmpty()) {
-            throw RuntimeException("Translation response missing streamed message content")
+            throw TranslationResponseException("Translation response missing streamed message content")
         }
         return content.toString()
     }
 
-    private fun JsonObject.messageContent(): String? =
-        this["content"]
-            ?.let { it as? JsonPrimitive }
-            ?.takeIf { it.isString }
-            ?.content
+    @Suppress("ReturnCount")
+    private fun parseStreamFrame(payload: String): String? {
+        if (payload.isEmpty()) return null
+        val root =
+            try {
+                json.parseToJsonElement(payload) as? JsonObject
+            } catch (e: SerializationException) {
+                return null
+            } catch (e: IllegalArgumentException) {
+                return null
+            } ?: return null
+        return root.choicesMessage()?.messageContent()
+    }
 
-    private fun JsonObject.choicesMessage(): JsonObject? =
-        this["choices"]
-            ?.jsonArray
-            ?.firstOrNull()
-            ?.jsonObject
-            ?.get("message")
-            ?.jsonObject
-            ?: this["choices"]
-                ?.jsonArray
-                ?.firstOrNull()
-                ?.jsonObject
-                ?.get("delta")
-                ?.jsonObject
+    private fun JsonObject.messageContent(): String? = this["content"].textContent()
+
+    private fun kotlinx.serialization.json.JsonElement?.textContent(): String? =
+        when (this) {
+            is JsonPrimitive -> {
+                takeIf { it.isString }?.content
+            }
+
+            is kotlinx.serialization.json.JsonArray -> {
+                mapNotNull { (it as? JsonObject)?.get("text").textContent() }
+                    .joinToString("")
+                    .takeIf { it.isNotEmpty() }
+            }
+
+            else -> {
+                null
+            }
+        }
+
+    private fun JsonObject.choicesMessage(): JsonObject? {
+        val choice = (this["choices"] as? kotlinx.serialization.json.JsonArray)?.firstOrNull() as? JsonObject
+        return (choice?.get("message") as? JsonObject) ?: (choice?.get("delta") as? JsonObject)
+    }
 }

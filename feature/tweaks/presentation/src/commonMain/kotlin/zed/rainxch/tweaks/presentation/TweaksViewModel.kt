@@ -2,6 +2,7 @@ package zed.rainxch.tweaks.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.collections.immutable.toImmutableMap
 import kotlinx.collections.immutable.toImmutableSet
@@ -1122,6 +1123,7 @@ class TweaksViewModel(
                         if (current.openAiModel.isNotBlank()) {
                             _state.update { it.copy(draftTranslationProvider = null) }
                             viewModelScope.launch {
+                                persistOpenAiSettings(current)
                                 tweaksRepository.setTranslationProvider(action.provider)
                                 _events.send(TweaksEvent.OnTranslationProviderSaved)
                             }
@@ -1140,6 +1142,7 @@ class TweaksViewModel(
                         if (hasCreds) {
                             _state.update { it.copy(draftTranslationProvider = null) }
                             viewModelScope.launch {
+                                persistBaiduSettings(current)
                                 tweaksRepository.setTranslationProvider(action.provider)
                                 _events.send(TweaksEvent.OnTranslationProviderSaved)
                             }
@@ -1265,8 +1268,7 @@ class TweaksViewModel(
             TweaksAction.OnBaiduCredentialsSave -> {
                 val current = _state.value
                 viewModelScope.launch {
-                    tweaksRepository.setBaiduAppId(current.baiduAppId)
-                    tweaksRepository.setBaiduAppSecret(current.baiduAppSecret)
+                    persistBaiduSettings(current)
 
                     val shouldActivate =
                         current.baiduAppId.isNotBlank() &&
@@ -1285,7 +1287,13 @@ class TweaksViewModel(
             }
 
             is TweaksAction.OnOpenAiBaseUrlChanged -> {
-                _state.update { it.copy(openAiBaseUrl = action.url) }
+                _state.update {
+                    it.copy(
+                        openAiBaseUrl = action.url,
+                        openAiModels = persistentListOf(),
+                        openAiModelsError = null,
+                    )
+                }
             }
 
             is TweaksAction.OnOpenAiModelChanged -> {
@@ -1293,7 +1301,13 @@ class TweaksViewModel(
             }
 
             is TweaksAction.OnOpenAiApiKeyChanged -> {
-                _state.update { it.copy(openAiApiKey = action.apiKey) }
+                _state.update {
+                    it.copy(
+                        openAiApiKey = action.apiKey,
+                        openAiModels = persistentListOf(),
+                        openAiModelsError = null,
+                    )
+                }
             }
 
             is TweaksAction.OnOpenAiPromptChanged -> {
@@ -1337,10 +1351,7 @@ class TweaksViewModel(
             TweaksAction.OnOpenAiCredentialsSave -> {
                 val current = _state.value
                 viewModelScope.launch {
-                    tweaksRepository.setOpenAiBaseUrl(current.openAiBaseUrl)
-                    tweaksRepository.setOpenAiModel(current.openAiModel)
-                    tweaksRepository.setOpenAiApiKey(current.openAiApiKey)
-                    tweaksRepository.setOpenAiPrompt(current.openAiPrompt)
+                    persistOpenAiSettings(current)
 
                     val shouldActivate =
                         current.openAiModel.isNotBlank() &&
@@ -1773,6 +1784,18 @@ class TweaksViewModel(
     }
 
     @Suppress("TooGenericExceptionCaught")
+    private suspend fun persistOpenAiSettings(current: TweaksState) {
+        tweaksRepository.setOpenAiBaseUrl(current.openAiBaseUrl)
+        tweaksRepository.setOpenAiModel(current.openAiModel)
+        tweaksRepository.setOpenAiApiKey(current.openAiApiKey)
+        tweaksRepository.setOpenAiPrompt(current.openAiPrompt)
+    }
+
+    private suspend fun persistBaiduSettings(current: TweaksState) {
+        tweaksRepository.setBaiduAppId(current.baiduAppId)
+        tweaksRepository.setBaiduAppSecret(current.baiduAppSecret)
+    }
+
     private suspend fun shareDiagnostics() {
         val bundle =
             try {

@@ -6,6 +6,8 @@ import io.ktor.client.statement.bodyAsText
 import io.ktor.http.Parameters
 import io.ktor.http.isSuccess
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
@@ -33,69 +35,70 @@ internal class BaiduTranslator(
             )
         }
 
-        val salt = Random.nextLong().toString()
-        val sign = baiduSign(appId, text, salt, appSecret)
-        val response =
-            httpClient().submitForm(
-                url = BAIDU_TRANSLATE_URL,
-                formParameters =
-                    Parameters.build {
-                        append("q", text)
-                        append("from", mapSourceLanguage(sourceLanguage))
-                        append("to", mapTargetLanguage(targetLanguage))
-                        append("appid", appId)
-                        append("salt", salt)
-                        append("sign", sign)
-                    },
-            )
+        return requestMutex.withLock {
+            if (hasRequested) delay(BAIDU_MIN_INTERVAL_MS)
+            hasRequested = true
 
-        val body = response.bodyAsText()
-        val root =
-            if (body.trimStart().startsWith("{")) {
-                json.parseToJsonElement(body).jsonObject
-            } else {
-                throw RuntimeException(
-                    "Baidu translate HTTP ${response.status.value}: ${body.take(200)}",
+            val salt = Random.nextLong().toString()
+            val sign = baiduSign(appId, text, salt, appSecret)
+            val response =
+                httpClient().submitForm(
+                    url = BAIDU_TRANSLATE_URL,
+                    formParameters =
+                        Parameters.build {
+                            append("q", text)
+                            append("from", mapSourceLanguage(sourceLanguage))
+                            append("to", mapTargetLanguage(targetLanguage))
+                            append("appid", appId)
+                            append("salt", salt)
+                            append("sign", sign)
+                        },
                 )
+
+            val body = response.bodyAsText()
+            val root =
+                if (body.trimStart().startsWith("{")) {
+                    json.parseToJsonElement(body).jsonObject
+                } else {
+                    throw RuntimeException(
+                        "Baidu translate HTTP ${response.status.value}: ${body.take(200)}",
+                    )
+                }
+
+            val errorCode = root["error_code"]?.jsonPrimitive?.content
+            if (errorCode != null && errorCode != "52000") {
+                val message = root["error_msg"]?.jsonPrimitive?.content.orEmpty()
+                throw RuntimeException("Baidu translate error $errorCode: $message")
+            }
+            if (!response.status.isSuccess()) {
+                throw RuntimeException("Baidu translate HTTP ${response.status.value}")
             }
 
-        val errorCode = root["error_code"]?.jsonPrimitive?.content
-        if (errorCode != null && errorCode != "52000") {
-            val message = root["error_msg"]?.jsonPrimitive?.content.orEmpty()
-            throw RuntimeException("Baidu translate error $errorCode: $message")
+            val translation =
+                root["trans_result"]
+                    ?.jsonArray
+                    ?.joinToString("\n") {
+                        it.jsonObject["dst"]
+                            ?.jsonPrimitive
+                            ?.content
+                            .orEmpty()
+                    }.orEmpty()
+            if (translation.isBlank()) {
+                throw RuntimeException("Baidu translate response missing trans_result")
+            }
+
+            val detected =
+                root["from"]
+                    ?.jsonPrimitive
+                    ?.content
+                    ?.takeIf { it.isNotBlank() && it != "auto" }
+                    ?.let(::reverseLanguage)
+
+            TranslationResult(
+                translatedText = translation,
+                detectedSourceLanguage = detected,
+            )
         }
-        if (!response.status.isSuccess()) {
-            throw RuntimeException("Baidu translate HTTP ${response.status.value}")
-        }
-
-        val translation =
-            root["trans_result"]
-                ?.jsonArray
-                ?.joinToString("\n") {
-                    it.jsonObject["dst"]
-                        ?.jsonPrimitive
-                        ?.content
-                        .orEmpty()
-                }.orEmpty()
-        if (translation.isBlank()) {
-            throw RuntimeException("Baidu translate response missing trans_result")
-        }
-
-        val detected =
-            root["from"]
-                ?.jsonPrimitive
-                ?.content
-                ?.takeIf { it.isNotBlank() && it != "auto" }
-                ?.let(::reverseLanguage)
-
-        // The free tier allows one request per second; keep the next queued translation outside
-        // that window instead of failing the second card with 54003.
-        delay(BAIDU_MIN_INTERVAL_MS)
-
-        return TranslationResult(
-            translatedText = translation,
-            detectedSourceLanguage = detected,
-        )
     }
 
     private fun mapSourceLanguage(code: String): String =
@@ -123,6 +126,8 @@ internal class BaiduTranslator(
     companion object {
         private const val BAIDU_TRANSLATE_URL = "https://fanyi-api.baidu.com/api/trans/vip/translate"
         private const val BAIDU_MIN_INTERVAL_MS = 1_100L
+        private val requestMutex = Mutex()
+        private var hasRequested = false
     }
 }
 
