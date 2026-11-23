@@ -7,12 +7,15 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.serialization.json.Json
 import zed.rainxch.core.data.network.TranslationClientProvider
 import zed.rainxch.core.data.services.LocalizationManager
+import zed.rainxch.core.domain.model.settings.OpenAiCompatibleDefaults
 import zed.rainxch.core.domain.model.settings.TranslationProvider
 import zed.rainxch.core.domain.repository.TweaksRepository
+import zed.rainxch.details.data.translation.BaiduTranslator
 import zed.rainxch.details.data.translation.DeeplTranslator
 import zed.rainxch.details.data.translation.GoogleTranslator
 import zed.rainxch.details.data.translation.LibreTranslator
 import zed.rainxch.details.data.translation.MicrosoftTranslator
+import zed.rainxch.details.data.translation.OpenAiCompatibleTranslator
 import zed.rainxch.details.data.translation.Translator
 import zed.rainxch.details.data.translation.YoudaoTranslator
 import zed.rainxch.details.domain.model.TranslationResult
@@ -36,7 +39,17 @@ class TranslationRepositoryImpl(
     private val googleTranslator: GoogleTranslator =
         GoogleTranslator(httpClient = { httpClient }, json = json)
 
+    private val indexTranslateTranslator: OpenAiCompatibleTranslator =
+        OpenAiCompatibleTranslator(
+            httpClient = { httpClient },
+            json = json,
+            endpoint = "https://index-translate.bilibili.com/v1/chat/completions",
+            model = "Index-Translate-35B-A3B",
+            userAgent = "Index-Translate-Client/1.0",
+        )
+
     private val cacheMutex = Mutex()
+    private val requestMutex = Mutex()
     private val cache = LinkedHashMap<CacheKey, CachedTranslation>(MAX_CACHE_SIZE, 0.75f, true)
 
     @OptIn(ExperimentalTime::class)
@@ -56,30 +69,34 @@ class TranslationRepositoryImpl(
 
         val protection = protectFromTranslation(text)
 
-        val translator = resolveTranslator()
-        val chunks = chunkText(protection.maskedText, translator.maxChunkSize)
-        val translatedParts = mutableListOf<Pair<String, String>>()
-        var detectedLang: String? = null
-
-        for ((chunkText, delimiter) in chunks) {
-            val response = translator.translate(chunkText, targetLanguage, sourceLanguage)
-            translatedParts.add(response.translatedText to delimiter)
-            if (detectedLang == null) {
-                detectedLang = response.detectedSourceLanguage
-            }
-        }
-
-        val joined =
-            translatedParts
-                .dropLast(1)
-                .joinToString("") { (text, delim) -> text + delim } +
-                translatedParts.lastOrNull()?.first.orEmpty()
-
+        // README and release notes are translated by separate jobs. Providers such as Baidu
+        // enforce a per-second quota, so only one HTTP translation may be in flight at a time.
         val result =
-            TranslationResult(
-                translatedText = restoreProtectedSpans(joined, protection.spans),
-                detectedSourceLanguage = detectedLang,
-            )
+            requestMutex.withLock {
+                val translator = resolveTranslator()
+                val chunks = chunkText(protection.maskedText, translator.maxChunkSize)
+                val translatedParts = mutableListOf<Pair<String, String>>()
+                var detectedLang: String? = null
+
+                for ((chunkText, delimiter) in chunks) {
+                    val response = translator.translate(chunkText, targetLanguage, sourceLanguage)
+                    translatedParts.add(response.translatedText to delimiter)
+                    if (detectedLang == null) {
+                        detectedLang = response.detectedSourceLanguage
+                    }
+                }
+
+                val joined =
+                    translatedParts
+                        .dropLast(1)
+                        .joinToString("") { (text, delim) -> text + delim } +
+                        translatedParts.lastOrNull()?.first.orEmpty()
+
+                TranslationResult(
+                    translatedText = restoreProtectedSpans(joined, protection.spans),
+                    detectedSourceLanguage = detectedLang,
+                )
+            }
 
         cacheMutex.withLock {
             if (cache.size >= MAX_CACHE_SIZE) {
@@ -172,6 +189,44 @@ class TranslationRepositoryImpl(
     private suspend fun resolveTranslator(): Translator {
         val provider = tweaksRepository.getTranslationProvider().first()
         return when (provider) {
+            TranslationProvider.INDEX_TRANSLATE -> {
+                indexTranslateTranslator
+            }
+
+            TranslationProvider.OPENAI_COMPATIBLE -> {
+                val baseUrl =
+                    tweaksRepository
+                        .getOpenAiBaseUrl()
+                        .first()
+                        .ifBlank { OpenAiCompatibleDefaults.BASE_URL }
+                        .trimEnd('/')
+                val endpoint =
+                    if (baseUrl.endsWith("/chat/completions")) {
+                        baseUrl
+                    } else {
+                        "$baseUrl/chat/completions"
+                    }
+                OpenAiCompatibleTranslator(
+                    httpClient = { httpClient },
+                    json = json,
+                    endpoint = endpoint,
+                    model = tweaksRepository.getOpenAiModel().first(),
+                    apiKey = tweaksRepository.getOpenAiApiKey().first().takeIf { it.isNotBlank() },
+                    promptTemplate = tweaksRepository.getOpenAiPrompt().first(),
+                )
+            }
+
+            TranslationProvider.BAIDU -> {
+                val appId = tweaksRepository.getBaiduAppId().first()
+                val appSecret = tweaksRepository.getBaiduAppSecret().first()
+                BaiduTranslator(
+                    httpClient = { httpClient },
+                    json = json,
+                    appId = appId,
+                    appSecret = appSecret,
+                )
+            }
+
             TranslationProvider.GOOGLE -> {
                 googleTranslator
             }

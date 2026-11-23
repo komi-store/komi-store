@@ -75,6 +75,9 @@ fun translationSectionContent(
                 }
             }
             when (provider) {
+                TranslationProvider.INDEX_TRANSLATE -> Unit
+                TranslationProvider.OPENAI_COMPATIBLE -> OpenAiCompatibleCredentialsForm(state, onAction)
+                TranslationProvider.BAIDU -> BaiduCredentialsForm(state, onAction)
                 TranslationProvider.YOUDAO -> YoudaoCredentialsForm(state, onAction)
                 TranslationProvider.LIBRE_TRANSLATE -> LibreTranslateCredentialsForm(state, onAction)
                 TranslationProvider.DEEPL -> DeeplCredentialsForm(state, onAction)
@@ -114,6 +117,9 @@ fun translationSectionContent(
 @Composable
 private fun providerLabel(provider: TranslationProvider): String =
     when (provider) {
+        TranslationProvider.INDEX_TRANSLATE -> stringResource(Res.string.translation_provider_index)
+        TranslationProvider.OPENAI_COMPATIBLE -> stringResource(Res.string.translation_provider_openai_compatible)
+        TranslationProvider.BAIDU -> stringResource(Res.string.translation_provider_baidu)
         TranslationProvider.GOOGLE -> stringResource(Res.string.translation_provider_google)
         TranslationProvider.YOUDAO -> stringResource(Res.string.translation_provider_youdao)
         TranslationProvider.LIBRE_TRANSLATE -> stringResource(Res.string.translation_provider_libre)
@@ -206,6 +212,150 @@ private fun YoudaoCredentialsForm(
         KomiButton(
             onClick = { onAction(TweaksAction.OnYoudaoCredentialsSave) },
             label = stringResource(Res.string.translation_youdao_save),
+            variant = KomiButtonVariant.Tonal,
+            size = KomiButtonSize.Sm,
+            enabled = canSave,
+            modifier = Modifier.align(Alignment.End),
+        )
+    }
+}
+
+@Composable
+private fun OpenAiCompatibleCredentialsForm(
+    state: TweaksState,
+    onAction: (TweaksAction) -> Unit,
+) {
+    val canSave = state.openAiModel.isNotBlank()
+    Column(
+        modifier = Modifier.padding(top = 12.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp),
+    ) {
+        KomiText(
+            text = stringResource(Res.string.translation_openai_compatible_help),
+            role = KomiTextRole.Body,
+            color = LocalPersonality.current.colors.onSurfaceVariant,
+        )
+        KomiTextField(
+            value = state.openAiBaseUrl,
+            onValueChange = { onAction(TweaksAction.OnOpenAiBaseUrlChanged(it)) },
+            label = stringResource(Res.string.translation_openai_compatible_base_url),
+            keyboardType = KeyboardType.Uri,
+            modifier = Modifier.fillMaxWidth(),
+        )
+        KomiTextField(
+            value = state.openAiModel,
+            onValueChange = { onAction(TweaksAction.OnOpenAiModelChanged(it)) },
+            label = stringResource(Res.string.translation_openai_compatible_model),
+            placeholder = "glm-4-flash",
+            modifier = Modifier.fillMaxWidth(),
+        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            KomiButton(
+                onClick = { onAction(TweaksAction.OnOpenAiModelsRefresh) },
+                label = stringResource(Res.string.translation_openai_models_refresh),
+                variant = KomiButtonVariant.Text,
+                size = KomiButtonSize.Sm,
+                enabled = !state.openAiModelsLoading,
+            )
+            if (state.openAiModelsLoading) {
+                KomiText(
+                    text = stringResource(Res.string.translation_openai_models_loading),
+                    role = KomiTextRole.Caption,
+                    color = LocalPersonality.current.colors.onSurfaceVariant,
+                )
+            }
+        }
+        if (state.openAiModels.isNotEmpty()) {
+            LazyRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                items(state.openAiModels) { model ->
+                    KomiChip(
+                        label = model,
+                        kind = KomiChipKind.Filter,
+                        selected = state.openAiModel == model,
+                        onClick = { onAction(TweaksAction.OnOpenAiModelSelected(model)) },
+                    )
+                }
+            }
+        }
+        state.openAiModelsError?.let { error ->
+            KomiText(
+                text = error,
+                role = KomiTextRole.Caption,
+                color = LocalPersonality.current.colors.error,
+            )
+        }
+        KomiTextField(
+            value = state.openAiPrompt,
+            onValueChange = { onAction(TweaksAction.OnOpenAiPromptChanged(it)) },
+            label = stringResource(Res.string.translation_openai_prompt),
+            helper = stringResource(Res.string.translation_openai_prompt_help),
+            multiline = true,
+            rows = 4,
+            modifier = Modifier.fillMaxWidth(),
+        )
+        KomiTextField(
+            value = state.openAiApiKey,
+            onValueChange = { onAction(TweaksAction.OnOpenAiApiKeyChanged(it)) },
+            label = stringResource(Res.string.translation_openai_compatible_api_key),
+            password = true,
+            keyboardType = KeyboardType.Password,
+            modifier = Modifier.fillMaxWidth(),
+        )
+        KomiButton(
+            onClick = { onAction(TweaksAction.OnOpenAiCredentialsSave) },
+            label = stringResource(Res.string.translation_openai_compatible_save),
+            variant = KomiButtonVariant.Tonal,
+            size = KomiButtonSize.Sm,
+            enabled = canSave,
+            modifier = Modifier.align(Alignment.End),
+        )
+    }
+}
+
+@Composable
+private fun BaiduCredentialsForm(
+    state: TweaksState,
+    onAction: (TweaksAction) -> Unit,
+) {
+    val canSave = state.baiduAppId.isNotBlank() && state.baiduAppSecret.isNotBlank()
+    val uriHandler = LocalUriHandler.current
+    Column(
+        modifier = Modifier.padding(top = 12.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp),
+    ) {
+        KomiText(
+            text = stringResource(Res.string.translation_baidu_help),
+            role = KomiTextRole.Body,
+            color = LocalPersonality.current.colors.onSurfaceVariant,
+        )
+        KomiButton(
+            onClick = { runCatching { uriHandler.openUri("https://fanyi-api.baidu.com/") } },
+            label = stringResource(Res.string.translation_baidu_get_key),
+            variant = KomiButtonVariant.Text,
+            size = KomiButtonSize.Sm,
+            modifier = Modifier.align(Alignment.Start),
+        )
+        KomiTextField(
+            value = state.baiduAppId,
+            onValueChange = { onAction(TweaksAction.OnBaiduAppIdChanged(it)) },
+            label = stringResource(Res.string.translation_baidu_app_id),
+            modifier = Modifier.fillMaxWidth(),
+        )
+        KomiTextField(
+            value = state.baiduAppSecret,
+            onValueChange = { onAction(TweaksAction.OnBaiduAppSecretChanged(it)) },
+            label = stringResource(Res.string.translation_baidu_app_secret),
+            password = true,
+            keyboardType = KeyboardType.Password,
+            modifier = Modifier.fillMaxWidth(),
+        )
+        KomiButton(
+            onClick = { onAction(TweaksAction.OnBaiduCredentialsSave) },
+            label = stringResource(Res.string.translation_baidu_save),
             variant = KomiButtonVariant.Tonal,
             size = KomiButtonSize.Sm,
             enabled = canSave,

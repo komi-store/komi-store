@@ -5,15 +5,22 @@
     <ID>CyclomaticComplexMethod:DetailsRepositoryImpl.kt$DetailsRepositoryImpl$private fun spdxFromLicenseHeader(text: String): String?</ID>
     <ID>CyclomaticComplexMethod:preprocessMarkdown.kt$fun preprocessMarkdown( markdown: String, baseUrl: String, linkBaseUrl: String = baseUrl, ): String</ID>
     <ID>LargeClass:DetailsRepositoryImpl.kt$DetailsRepositoryImpl : DetailsRepository</ID>
+    <ID>LongMethod:BaiduTranslator.kt$BaiduTranslator$override suspend fun translate( text: String, targetLanguage: String, sourceLanguage: String, ): TranslationResult</ID>
     <ID>LongMethod:DeeplTranslator.kt$DeeplTranslator$override suspend fun translate( text: String, targetLanguage: String, sourceLanguage: String, ): TranslationResult</ID>
     <ID>LongMethod:DetailsRepositoryImpl.kt$DetailsRepositoryImpl$override suspend fun getRepoStats( owner: String, repo: String, sourceHost: String?, ): RepoStats</ID>
     <ID>LongMethod:InstallationManagerImpl.kt$InstallationManagerImpl$@OptIn(ExperimentalTime::class) override suspend fun saveNewInstalledApp(params: SaveInstalledAppParams): InstalledApp?</ID>
     <ID>LongMethod:LibreTranslator.kt$LibreTranslator$override suspend fun translate( text: String, targetLanguage: String, sourceLanguage: String, ): TranslationResult</ID>
     <ID>LongMethod:MicrosoftTranslator.kt$MicrosoftTranslator$override suspend fun translate( text: String, targetLanguage: String, sourceLanguage: String, ): TranslationResult</ID>
     <ID>LongMethod:ReadmeLocalizationHelper.kt$ReadmeLocalizationHelper$fun generateReadmeAttempts(): List&lt;ReadmeAttempt&gt;</ID>
+    <ID>LongMethod:TranslationRepositoryImpl.kt$TranslationRepositoryImpl$private suspend fun resolveTranslator(): Translator</ID>
     <ID>LongMethod:preprocessMarkdown.kt$fun preprocessMarkdown( markdown: String, baseUrl: String, linkBaseUrl: String = baseUrl, ): String</ID>
     <ID>LongParameterList:DetailsRepositoryImpl.kt$DetailsRepositoryImpl$( private val clientProvider: GitHubClientProvider, private val backendApiClient: BackendApiClient, private val localizationManager: LocalizationManager, private val logger: KomiStoreLogger, private val cacheManager: CacheManager, private val forgejoClientRegistry: zed.rainxch.core.data.network.ForgejoClientRegistry, private val tokenStore: TokenStore, )</ID>
+    <ID>LoopWithTooManyJumpStatements:OpenAiCompatibleTranslator.kt$OpenAiCompatibleTranslator$for</ID>
     <ID>MagicNumber:AttestationVerifierImpl.kt$AttestationVerifierImpl$8192</ID>
+    <ID>MagicNumber:BaiduTranslator.kt$0x10</ID>
+    <ID>MagicNumber:BaiduTranslator.kt$0xff</ID>
+    <ID>MagicNumber:BaiduTranslator.kt$16</ID>
+    <ID>MagicNumber:BaiduTranslator.kt$BaiduTranslator$200</ID>
     <ID>MagicNumber:DeeplTranslator.kt$DeeplTranslator$200</ID>
     <ID>MagicNumber:DetailsRepositoryImpl.kt$DetailsRepositoryImpl$10</ID>
     <ID>MagicNumber:DetailsRepositoryImpl.kt$DetailsRepositoryImpl$3</ID>
@@ -25,6 +32,7 @@
     <ID>MagicNumber:InstallationManagerImpl.kt$InstallationManagerImpl$1000</ID>
     <ID>MagicNumber:LibreTranslator.kt$LibreTranslator$200</ID>
     <ID>MagicNumber:MicrosoftTranslator.kt$MicrosoftTranslator$200</ID>
+    <ID>MagicNumber:OpenAiCompatibleTranslator.kt$OpenAiCompatibleTranslator$200</ID>
     <ID>MagicNumber:ReadmeLocalizationHelper.kt$ReadmeLocalizationHelper$0.15</ID>
     <ID>MagicNumber:ReadmeLocalizationHelper.kt$ReadmeLocalizationHelper$100</ID>
     <ID>MagicNumber:ReadmeLocalizationHelper.kt$ReadmeLocalizationHelper$1000</ID>
@@ -66,6 +74,10 @@
     <ID>TooGenericExceptionCaught:DetailsRepositoryImpl.kt$DetailsRepositoryImpl$e: Throwable</ID>
     <ID>TooGenericExceptionCaught:DetailsRepositoryImpl.kt$DetailsRepositoryImpl$t: Throwable</ID>
     <ID>TooGenericExceptionCaught:InstallationManagerImpl.kt$InstallationManagerImpl$t: Throwable</ID>
+    <ID>TooGenericExceptionThrown:BaiduTranslator.kt$BaiduTranslator$throw RuntimeException( "Baidu translate HTTP ${response.status.value}: ${body.take(200)}", )</ID>
+    <ID>TooGenericExceptionThrown:BaiduTranslator.kt$BaiduTranslator$throw RuntimeException("Baidu translate HTTP ${response.status.value}")</ID>
+    <ID>TooGenericExceptionThrown:BaiduTranslator.kt$BaiduTranslator$throw RuntimeException("Baidu translate error $errorCode: $message")</ID>
+    <ID>TooGenericExceptionThrown:BaiduTranslator.kt$BaiduTranslator$throw RuntimeException("Baidu translate response missing trans_result")</ID>
     <ID>TooGenericExceptionThrown:DeeplTranslator.kt$DeeplTranslator$throw RuntimeException( "DeepL ${errorMessage?.let { "error: $it" } ?: "response missing translations"}", )</ID>
     <ID>TooGenericExceptionThrown:DeeplTranslator.kt$DeeplTranslator$throw RuntimeException( "DeepL HTTP ${response.status.value}: ${message ?: body.take(200)}", )</ID>
     <ID>TooGenericExceptionThrown:DeeplTranslator.kt$DeeplTranslator$throw RuntimeException( "DeepL returned non-JSON response: ${body.take(200)}", e, )</ID>
@@ -81,6 +93,9 @@
     <ID>TooGenericExceptionThrown:MicrosoftTranslator.kt$MicrosoftTranslator$throw RuntimeException("Microsoft Translator error: ${errorMsg ?: body}")</ID>
     <ID>TooGenericExceptionThrown:MicrosoftTranslator.kt$MicrosoftTranslator$throw RuntimeException("Microsoft Translator response empty")</ID>
     <ID>TooGenericExceptionThrown:MicrosoftTranslator.kt$MicrosoftTranslator$throw RuntimeException("Microsoft Translator response missing translation text")</ID>
+    <ID>TooGenericExceptionThrown:OpenAiCompatibleTranslator.kt$OpenAiCompatibleTranslator$throw RuntimeException( "Translation HTTP ${response.status.value}: ${response.bodyAsText().take(200)}", )</ID>
+    <ID>TooGenericExceptionThrown:OpenAiCompatibleTranslator.kt$OpenAiCompatibleTranslator$throw RuntimeException("Translation response missing message content")</ID>
+    <ID>TooGenericExceptionThrown:OpenAiCompatibleTranslator.kt$OpenAiCompatibleTranslator$throw RuntimeException("Translation response missing streamed message content")</ID>
     <ID>TooGenericExceptionThrown:YoudaoTranslator.kt$YoudaoTranslator$throw RuntimeException("Youdao translate error: $errorCode")</ID>
     <ID>TooManyFunctions:DetailsRepositoryImpl.kt$DetailsRepositoryImpl : DetailsRepository</ID>
   </CurrentIssues>

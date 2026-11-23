@@ -1,6 +1,7 @@
 package zed.rainxch.core.data.network
 
 import io.ktor.client.HttpClient
+import io.ktor.client.plugins.HttpTimeout
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -21,7 +22,7 @@ class TranslationClientProvider(
     private val mutex = Mutex()
 
     @Volatile
-    private var currentClient: HttpClient = createPlatformHttpClient(proxyConfigFlow.value)
+    private var currentClient: HttpClient = createTranslationClient(proxyConfigFlow.value)
 
     init {
         proxyConfigFlow
@@ -30,7 +31,7 @@ class TranslationClientProvider(
             .onEach { config ->
                 mutex.withLock {
 
-                    val replacement = createPlatformHttpClient(config)
+                    val replacement = createTranslationClient(config)
                     val previous = currentClient
                     currentClient = replacement
                     previous.close()
@@ -38,10 +39,24 @@ class TranslationClientProvider(
             }.launchIn(scope)
     }
 
+    private fun createTranslationClient(proxyConfig: ProxyConfig): HttpClient =
+        createPlatformHttpClient(proxyConfig).config {
+            install(HttpTimeout) {
+                requestTimeoutMillis = TRANSLATION_REQUEST_TIMEOUT_MS
+                connectTimeoutMillis = TRANSLATION_CONNECT_TIMEOUT_MS
+                socketTimeoutMillis = TRANSLATION_REQUEST_TIMEOUT_MS
+            }
+        }
+
     val client: HttpClient get() = currentClient
 
     fun close() {
         currentClient.close()
         scope.cancel()
+    }
+
+    private companion object {
+        private const val TRANSLATION_REQUEST_TIMEOUT_MS = 60_000L
+        private const val TRANSLATION_CONNECT_TIMEOUT_MS = 15_000L
     }
 }

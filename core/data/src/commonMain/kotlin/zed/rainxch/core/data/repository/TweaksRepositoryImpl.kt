@@ -35,6 +35,8 @@ import zed.rainxch.core.domain.model.appearance.MangaPaperId
 import zed.rainxch.core.domain.model.installation.InstallerType
 import zed.rainxch.core.domain.model.repository.DiscoveryPlatform
 import zed.rainxch.core.domain.model.settings.AppLanguages
+import zed.rainxch.core.domain.model.settings.OpenAiCompatibleDefaults
+import zed.rainxch.core.domain.model.settings.OpenAiTranslationPrompt
 import zed.rainxch.core.domain.model.settings.TranslationProvider
 import zed.rainxch.core.domain.repository.SYSTEM_DEFAULT_DISPLAY_MODE_ID
 import zed.rainxch.core.domain.repository.TweaksRepository
@@ -286,6 +288,54 @@ class TweaksRepositoryImpl(
         migrationDeferred.await()
         val trimmed = appSecret.trim()
         if (trimmed.isEmpty()) ksafe.safeDelete(K_YOUDAO_APP_SECRET) else ksafe.safePut(K_YOUDAO_APP_SECRET, trimmed)
+    }
+
+    override fun getBaiduAppId(): Flow<String> = gatedGetFlow(K_BAIDU_APP_ID, "")
+
+    override suspend fun setBaiduAppId(appId: String) {
+        migrationDeferred.await()
+        val trimmed = appId.trim()
+        if (trimmed.isEmpty()) ksafe.safeDelete(K_BAIDU_APP_ID) else ksafe.safePut(K_BAIDU_APP_ID, trimmed)
+    }
+
+    override fun getBaiduAppSecret(): Flow<String> = gatedGetFlow(K_BAIDU_APP_SECRET, "")
+
+    override suspend fun setBaiduAppSecret(appSecret: String) {
+        migrationDeferred.await()
+        val trimmed = appSecret.trim()
+        if (trimmed.isEmpty()) ksafe.safeDelete(K_BAIDU_APP_SECRET) else ksafe.safePut(K_BAIDU_APP_SECRET, trimmed)
+    }
+
+    override fun getOpenAiBaseUrl(): Flow<String> = gatedGetFlow(K_OPENAI_BASE_URL, OpenAiCompatibleDefaults.BASE_URL)
+
+    override suspend fun setOpenAiBaseUrl(url: String) {
+        migrationDeferred.await()
+        val trimmed = url.trim()
+        if (trimmed.isEmpty()) ksafe.safeDelete(K_OPENAI_BASE_URL) else ksafe.safePut(K_OPENAI_BASE_URL, trimmed)
+    }
+
+    override fun getOpenAiModel(): Flow<String> = gatedGetFlow(K_OPENAI_MODEL, "")
+
+    override suspend fun setOpenAiModel(model: String) {
+        migrationDeferred.await()
+        val trimmed = model.trim()
+        if (trimmed.isEmpty()) ksafe.safeDelete(K_OPENAI_MODEL) else ksafe.safePut(K_OPENAI_MODEL, trimmed)
+    }
+
+    override fun getOpenAiApiKey(): Flow<String> = gatedGetFlow(K_OPENAI_API_KEY, "")
+
+    override suspend fun setOpenAiApiKey(apiKey: String) {
+        migrationDeferred.await()
+        val trimmed = apiKey.trim()
+        if (trimmed.isEmpty()) ksafe.safeDelete(K_OPENAI_API_KEY) else ksafe.safePut(K_OPENAI_API_KEY, trimmed)
+    }
+
+    override fun getOpenAiPrompt(): Flow<String> = gatedGetFlow(K_OPENAI_PROMPT, OpenAiTranslationPrompt.DEFAULT)
+
+    override suspend fun setOpenAiPrompt(prompt: String) {
+        migrationDeferred.await()
+        val trimmed = prompt.trim()
+        if (trimmed.isEmpty()) ksafe.safeDelete(K_OPENAI_PROMPT) else ksafe.safePut(K_OPENAI_PROMPT, trimmed)
     }
 
     override fun getLibreTranslateBaseUrl(): Flow<String> = gatedGetFlow(K_LIBRE_BASE_URL, "")
@@ -594,6 +644,12 @@ class TweaksRepositoryImpl(
         private const val K_TRANSLATION_PROVIDER = "translation_provider"
         private const val K_YOUDAO_APP_KEY = "youdao_app_key"
         private const val K_YOUDAO_APP_SECRET = "youdao_app_secret"
+        private const val K_BAIDU_APP_ID = "baidu_app_id"
+        private const val K_BAIDU_APP_SECRET = "baidu_app_secret"
+        private const val K_OPENAI_BASE_URL = "openai_compatible_base_url"
+        private const val K_OPENAI_MODEL = "openai_compatible_model"
+        private const val K_OPENAI_API_KEY = "openai_compatible_api_key"
+        private const val K_OPENAI_PROMPT = "openai_compatible_prompt"
         private const val K_LIBRE_BASE_URL = "libre_translate_base_url"
         private const val K_LIBRE_API_KEY = "libre_translate_api_key"
         private const val K_DEEPL_AUTH_KEY = "deepl_auth_key"
