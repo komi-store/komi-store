@@ -1,6 +1,7 @@
 package zed.rainxch.core.data.network
 
 import io.ktor.client.HttpClient
+import io.ktor.client.plugins.HttpTimeout
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -20,8 +21,13 @@ class TranslationClientProvider(
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
     private val mutex = Mutex()
 
+    private data class Clients(
+        val base: HttpClient,
+        val configured: HttpClient,
+    )
+
     @Volatile
-    private var currentClient: HttpClient = createPlatformHttpClient(proxyConfigFlow.value)
+    private var current: Clients = createTranslationClient(proxyConfigFlow.value)
 
     init {
         proxyConfigFlow
@@ -30,18 +36,38 @@ class TranslationClientProvider(
             .onEach { config ->
                 mutex.withLock {
 
-                    val replacement = createPlatformHttpClient(config)
-                    val previous = currentClient
-                    currentClient = replacement
-                    previous.close()
+                    val replacement = createTranslationClient(config)
+                    val previous = current
+                    current = replacement
+                    previous.configured.close()
+                    previous.base.close()
                 }
             }.launchIn(scope)
     }
 
-    val client: HttpClient get() = currentClient
+    private fun createTranslationClient(proxyConfig: ProxyConfig): Clients {
+        val base = createPlatformHttpClient(proxyConfig)
+        val configured =
+            base.config {
+                install(HttpTimeout) {
+                    requestTimeoutMillis = TRANSLATION_REQUEST_TIMEOUT_MS
+                    connectTimeoutMillis = TRANSLATION_CONNECT_TIMEOUT_MS
+                    socketTimeoutMillis = TRANSLATION_REQUEST_TIMEOUT_MS
+                }
+            }
+        return Clients(base, configured)
+    }
+
+    val client: HttpClient get() = current.configured
 
     fun close() {
-        currentClient.close()
+        current.configured.close()
+        current.base.close()
         scope.cancel()
+    }
+
+    private companion object {
+        private const val TRANSLATION_REQUEST_TIMEOUT_MS = 180_000L
+        private const val TRANSLATION_CONNECT_TIMEOUT_MS = 15_000L
     }
 }

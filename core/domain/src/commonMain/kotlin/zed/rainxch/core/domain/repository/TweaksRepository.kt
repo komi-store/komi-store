@@ -105,6 +105,34 @@ interface TweaksRepository {
 
     suspend fun setYoudaoAppSecret(appSecret: String)
 
+    fun getBaiduAppId(): Flow<String>
+
+    suspend fun setBaiduAppId(appId: String)
+
+    fun getBaiduAppSecret(): Flow<String>
+
+    suspend fun setBaiduAppSecret(appSecret: String)
+
+    fun getOpenAiBaseUrl(): Flow<String>
+
+    suspend fun setOpenAiBaseUrl(url: String)
+
+    fun getOpenAiModel(): Flow<String>
+
+    suspend fun setOpenAiModel(model: String)
+
+    fun getOpenAiApiKey(): Flow<String>
+
+    suspend fun setOpenAiApiKey(apiKey: String)
+
+    fun getOpenAiPrompt(): Flow<String>
+
+    suspend fun setOpenAiPrompt(prompt: String)
+
+    fun getAllowInsecureHttp(): Flow<Boolean>
+
+    suspend fun setAllowInsecureHttp(enabled: Boolean)
+
     fun getLibreTranslateBaseUrl(): Flow<String>
 
     suspend fun setLibreTranslateBaseUrl(url: String)

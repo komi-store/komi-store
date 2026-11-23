@@ -42,6 +42,7 @@ import zed.rainxch.core.data.network.MockExternalMatchApi
 import zed.rainxch.core.data.network.ProxyManager
 import zed.rainxch.core.data.network.ProxyTesterImpl
 import zed.rainxch.core.data.network.TranslationClientProvider
+import zed.rainxch.core.data.network.TranslationModelCatalogImpl
 import zed.rainxch.core.data.network.createPlatformHttpClient
 import zed.rainxch.core.data.repository.AnnouncementsCacheStoreImpl
 import zed.rainxch.core.data.repository.AnnouncementsRepositoryImpl
@@ -69,6 +70,7 @@ import zed.rainxch.core.domain.model.settings.ProxyScope
 import zed.rainxch.core.domain.model.system.Platform
 import zed.rainxch.core.domain.network.MirrorLatencyProbe
 import zed.rainxch.core.domain.network.ProxyTester
+import zed.rainxch.core.domain.network.TranslationModelCatalog
 import zed.rainxch.core.domain.repository.AnnouncementsCacheStore
 import zed.rainxch.core.domain.repository.AnnouncementsRepository
 import zed.rainxch.core.domain.repository.BrowseFilterStore
@@ -351,6 +353,10 @@ val networkModule =
             TranslationClientProvider(
                 proxyConfigFlow = ProxyManager.configFlow(ProxyScope.TRANSLATION),
             )
+        }
+
+        single<TranslationModelCatalog> {
+            TranslationModelCatalogImpl(client = { get<TranslationClientProvider>().client })
         }
 
         single<TokenStore> {

@@ -270,6 +270,14 @@ private fun zed.rainxch.tweaks.presentation.components.sections.AttributionRows(
     - onAction: STABLE (function type)
 
 @Composable
+private fun zed.rainxch.tweaks.presentation.components.sections.BaiduCredentialsForm(state: zed.rainxch.tweaks.presentation.TweaksState, onAction: kotlin.Function1<zed.rainxch.tweaks.presentation.TweaksAction, kotlin.Unit>): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - state: UNSTABLE (has mutable properties or unstable members)
+    - onAction: STABLE (function type)
+
+@Composable
 private fun zed.rainxch.tweaks.presentation.components.sections.BatteryOptimizationGroup(onOpenSettings: kotlin.Function0<kotlin.Unit>, onDismiss: kotlin.Function0<kotlin.Unit>): kotlin.Unit
   skippable: true
   restartable: true
@@ -324,6 +332,12 @@ private fun zed.rainxch.tweaks.presentation.components.sections.HintRow(text: ko
     - text: STABLE (String is immutable)
 
 @Composable
+private fun zed.rainxch.tweaks.presentation.components.sections.IndexTranslateDisclosure(): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+
+@Composable
 private fun zed.rainxch.tweaks.presentation.components.sections.InstallerTypeRow(type: zed.rainxch.core.domain.model.installation.InstallerType, title: kotlin.String, description: kotlin.String, selected: kotlin.Boolean, onClick: kotlin.Function0<kotlin.Unit>, badge: @[Composable] androidx.compose.runtime.internal.ComposableFunction0<kotlin.Unit>?, last: kotlin.Boolean): kotlin.Unit
   skippable: true
   restartable: true
@@ -355,6 +369,14 @@ private fun zed.rainxch.tweaks.presentation.components.sections.LibreTranslateCr
 
 @Composable
 private fun zed.rainxch.tweaks.presentation.components.sections.MicrosoftCredentialsForm(state: zed.rainxch.tweaks.presentation.TweaksState, onAction: kotlin.Function1<zed.rainxch.tweaks.presentation.TweaksAction, kotlin.Unit>): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - state: UNSTABLE (has mutable properties or unstable members)
+    - onAction: STABLE (function type)
+
+@Composable
+private fun zed.rainxch.tweaks.presentation.components.sections.OpenAiCompatibleCredentialsForm(state: zed.rainxch.tweaks.presentation.TweaksState, onAction: kotlin.Function1<zed.rainxch.tweaks.presentation.TweaksAction, kotlin.Unit>): kotlin.Unit
   skippable: true
   restartable: true
   params:

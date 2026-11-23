@@ -24,8 +24,16 @@ internal fun localNetworkHosts(tweaksRepository: TweaksRepository): Flow<Set<Str
             }
         }
     val translationHost =
-        combine(tweaksRepository.getTranslationProvider(), tweaksRepository.getLibreTranslateBaseUrl()) { provider, url ->
-            url.takeIf { provider == TranslationProvider.LIBRE_TRANSLATE && it.isNotBlank() }
+        combine(
+            tweaksRepository.getTranslationProvider(),
+            tweaksRepository.getLibreTranslateBaseUrl(),
+            tweaksRepository.getOpenAiBaseUrl(),
+        ) { provider, libreUrl, openAiUrl ->
+            when (provider) {
+                TranslationProvider.LIBRE_TRANSLATE -> libreUrl
+                TranslationProvider.OPENAI_COMPATIBLE -> openAiUrl
+                else -> null
+            }?.takeIf { it.isNotBlank() }
         }
     return combine(proxyHosts, tweaksRepository.getCustomForgeHosts(), translationHost) { proxies, forges, translation ->
         (proxies + forges + listOfNotNull(translation)).map(::hostOf).filter(::isOnLocalNetwork).toSet()

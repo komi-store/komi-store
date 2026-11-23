@@ -2,6 +2,9 @@ package zed.rainxch.core.domain.model.settings
 
 enum class TranslationProvider {
     GOOGLE,
+    INDEX_TRANSLATE,
+    OPENAI_COMPATIBLE,
+    BAIDU,
     YOUDAO,
     LIBRE_TRANSLATE,
     DEEPL,

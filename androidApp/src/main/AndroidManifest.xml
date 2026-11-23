@@ -61,7 +61,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.GitHubStore.Splash"
         android:enableOnBackInvokedCallback="true"
-        android:usesCleartextTraffic="false"
+        android:usesCleartextTraffic="true"
         tools:targetApi="33">
 
         <activity

@@ -2,6 +2,7 @@ package zed.rainxch.tweaks.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.collections.immutable.toImmutableMap
 import kotlinx.collections.immutable.toImmutableSet
@@ -26,11 +27,13 @@ import zed.rainxch.core.domain.helpers.ShareManager
 import zed.rainxch.core.domain.isDesktop
 import zed.rainxch.core.domain.logging.KomiStoreLogger
 import zed.rainxch.core.domain.model.installation.InstallerType
+import zed.rainxch.core.domain.model.settings.OpenAiCompatibleDefaults
 import zed.rainxch.core.domain.model.settings.ProxyConfig
 import zed.rainxch.core.domain.model.settings.ProxyScope
 import zed.rainxch.core.domain.model.settings.TranslationProvider
 import zed.rainxch.core.domain.network.ProxyTestOutcome
 import zed.rainxch.core.domain.network.ProxyTester
+import zed.rainxch.core.domain.network.TranslationModelCatalog
 import zed.rainxch.core.domain.repository.CacheRepository
 import zed.rainxch.core.domain.repository.ExternalInstallerRepository
 import zed.rainxch.core.domain.repository.ProxyRepository
@@ -51,6 +54,7 @@ import zed.rainxch.githubstore.core.presentation.res.proxy_test_error_status
 import zed.rainxch.githubstore.core.presentation.res.proxy_test_error_timeout
 import zed.rainxch.githubstore.core.presentation.res.proxy_test_error_unknown
 import zed.rainxch.githubstore.core.presentation.res.proxy_test_error_unreachable
+import zed.rainxch.githubstore.core.presentation.res.translation_openai_models_failed
 import zed.rainxch.githubstore.core.presentation.res.tweaks_clear_downloads_failed
 import zed.rainxch.githubstore.core.presentation.res.tweaks_custom_forge_invalid_hostname
 import zed.rainxch.githubstore.core.presentation.res.tweaks_custom_forge_remove_failed
@@ -64,6 +68,7 @@ import kotlin.time.Duration.Companion.milliseconds
 @Suppress("LongParameterList")
 class TweaksViewModel(
     private val tweaksRepository: TweaksRepository,
+    private val translationModelCatalog: TranslationModelCatalog,
     private val externalInstallerRepository: ExternalInstallerRepository,
     private val appVersionInfo: AppVersionInfo,
     private val installerStatusProvider: InstallerStatusProvider,
@@ -98,6 +103,7 @@ class TweaksViewModel(
 
     private var hasLoadedInitialData = false
     private var cacheSizeJob: Job? = null
+    private var openAiModelsJob: Job? = null
 
     private val _state = MutableStateFlow(TweaksState())
     val state =
@@ -536,6 +542,45 @@ class TweaksViewModel(
         viewModelScope.launch {
             tweaksRepository.getMicrosoftTranslatorRegion().collect { region ->
                 _state.update { it.copy(microsoftTranslatorRegion = region) }
+            }
+        }
+        loadNativeTranslationSettings()
+    }
+
+    private fun loadNativeTranslationSettings() {
+        viewModelScope.launch {
+            tweaksRepository.getBaiduAppId().collect { appId ->
+                _state.update { it.copy(baiduAppId = appId) }
+            }
+        }
+        viewModelScope.launch {
+            tweaksRepository.getBaiduAppSecret().collect { appSecret ->
+                _state.update { it.copy(baiduAppSecret = appSecret) }
+            }
+        }
+        viewModelScope.launch {
+            tweaksRepository.getOpenAiBaseUrl().collect { url ->
+                _state.update { it.copy(openAiBaseUrl = url) }
+            }
+        }
+        viewModelScope.launch {
+            tweaksRepository.getOpenAiModel().collect { model ->
+                _state.update { it.copy(openAiModel = model) }
+            }
+        }
+        viewModelScope.launch {
+            tweaksRepository.getOpenAiApiKey().collect { apiKey ->
+                _state.update { it.copy(openAiApiKey = apiKey) }
+            }
+        }
+        viewModelScope.launch {
+            tweaksRepository.getOpenAiPrompt().collect { prompt ->
+                _state.update { it.copy(openAiPrompt = prompt) }
+            }
+        }
+        viewModelScope.launch {
+            tweaksRepository.getAllowInsecureHttp().collect { enabled ->
+                _state.update { it.copy(allowInsecureHttp = enabled) }
             }
         }
     }
@@ -1071,6 +1116,49 @@ class TweaksViewModel(
 
             is TweaksAction.OnTranslationProviderSelected -> {
                 when (action.provider) {
+                    TranslationProvider.INDEX_TRANSLATE -> {
+                        _state.update { it.copy(draftTranslationProvider = null) }
+                        viewModelScope.launch {
+                            tweaksRepository.setTranslationProvider(action.provider)
+                            _events.send(TweaksEvent.OnTranslationProviderSaved)
+                        }
+                    }
+
+                    TranslationProvider.OPENAI_COMPATIBLE -> {
+                        val current = _state.value
+                        if (current.openAiModel.isNotBlank()) {
+                            _state.update { it.copy(draftTranslationProvider = null) }
+                            viewModelScope.launch {
+                                persistOpenAiSettings(current)
+                                tweaksRepository.setTranslationProvider(action.provider)
+                                _events.send(TweaksEvent.OnTranslationProviderSaved)
+                            }
+                        } else {
+                            _state.update {
+                                it.copy(draftTranslationProvider = TranslationProvider.OPENAI_COMPATIBLE)
+                            }
+                        }
+                    }
+
+                    TranslationProvider.BAIDU -> {
+                        val current = _state.value
+                        val hasCreds =
+                            current.baiduAppId.isNotBlank() &&
+                                current.baiduAppSecret.isNotBlank()
+                        if (hasCreds) {
+                            _state.update { it.copy(draftTranslationProvider = null) }
+                            viewModelScope.launch {
+                                persistBaiduSettings(current)
+                                tweaksRepository.setTranslationProvider(action.provider)
+                                _events.send(TweaksEvent.OnTranslationProviderSaved)
+                            }
+                        } else {
+                            _state.update {
+                                it.copy(draftTranslationProvider = TranslationProvider.BAIDU)
+                            }
+                        }
+                    }
+
                     TranslationProvider.GOOGLE -> {
                         _state.update { it.copy(draftTranslationProvider = null) }
                         viewModelScope.launch {
@@ -1172,6 +1260,133 @@ class TweaksViewModel(
 
                     _state.update { it.copy(draftTranslationProvider = null) }
                     _events.send(TweaksEvent.OnYoudaoCredentialsSaved)
+                }
+            }
+
+            is TweaksAction.OnBaiduAppIdChanged -> {
+                _state.update { it.copy(baiduAppId = action.appId) }
+            }
+
+            is TweaksAction.OnBaiduAppSecretChanged -> {
+                _state.update { it.copy(baiduAppSecret = action.appSecret) }
+            }
+
+            TweaksAction.OnBaiduCredentialsSave -> {
+                val current = _state.value
+                viewModelScope.launch {
+                    persistBaiduSettings(current)
+
+                    val shouldActivate =
+                        current.baiduAppId.isNotBlank() &&
+                            current.baiduAppSecret.isNotBlank() &&
+                            (
+                                current.translationProvider != TranslationProvider.BAIDU ||
+                                    current.draftTranslationProvider == TranslationProvider.BAIDU
+                            )
+                    if (shouldActivate) {
+                        tweaksRepository.setTranslationProvider(TranslationProvider.BAIDU)
+                    }
+
+                    _state.update { it.copy(draftTranslationProvider = null) }
+                    _events.send(TweaksEvent.OnTranslationProviderSaved)
+                }
+            }
+
+            is TweaksAction.OnOpenAiBaseUrlChanged -> {
+                openAiModelsJob?.cancel()
+                _state.update {
+                    it.copy(
+                        openAiBaseUrl = action.url,
+                        openAiModels = persistentListOf(),
+                        openAiModelsError = null,
+                        openAiModelsLoading = false,
+                    )
+                }
+            }
+
+            is TweaksAction.OnOpenAiModelChanged -> {
+                _state.update { it.copy(openAiModel = action.model) }
+            }
+
+            is TweaksAction.OnOpenAiApiKeyChanged -> {
+                openAiModelsJob?.cancel()
+                _state.update {
+                    it.copy(
+                        openAiApiKey = action.apiKey,
+                        openAiModels = persistentListOf(),
+                        openAiModelsError = null,
+                        openAiModelsLoading = false,
+                    )
+                }
+            }
+
+            is TweaksAction.OnOpenAiPromptChanged -> {
+                _state.update { it.copy(openAiPrompt = action.prompt) }
+            }
+
+            is TweaksAction.OnAllowInsecureHttpChanged -> {
+                _state.update { it.copy(allowInsecureHttp = action.enabled) }
+                viewModelScope.launch {
+                    tweaksRepository.setAllowInsecureHttp(action.enabled)
+                }
+            }
+
+            is TweaksAction.OnOpenAiModelSelected -> {
+                _state.update { it.copy(openAiModel = action.model) }
+            }
+
+            TweaksAction.OnOpenAiModelsRefresh -> {
+                val current = _state.value
+                openAiModelsJob?.cancel()
+                _state.update { it.copy(openAiModelsLoading = true, openAiModelsError = null) }
+                openAiModelsJob =
+                    viewModelScope.launch {
+                        try {
+                            val models =
+                                translationModelCatalog.listModels(
+                                    baseUrl = current.openAiBaseUrl.ifBlank { OpenAiCompatibleDefaults.BASE_URL },
+                                    apiKey = current.openAiApiKey.takeIf { it.isNotBlank() },
+                                    allowInsecureHttp = current.allowInsecureHttp,
+                                )
+                            if (!isCurrentOpenAiEndpoint(current)) return@launch
+                            _state.update {
+                                it.copy(
+                                    openAiModels = models.toImmutableList(),
+                                    openAiModelsLoading = false,
+                                )
+                            }
+                        } catch (e: CancellationException) {
+                            throw e
+                        } catch (t: Exception) {
+                            logger.warn("OpenAI-compatible model list failed: ${t.message}")
+                            if (!isCurrentOpenAiEndpoint(current)) return@launch
+                            _state.update {
+                                it.copy(
+                                    openAiModelsLoading = false,
+                                    openAiModelsError = getString(Res.string.translation_openai_models_failed),
+                                )
+                            }
+                        }
+                    }
+            }
+
+            TweaksAction.OnOpenAiCredentialsSave -> {
+                val current = _state.value
+                viewModelScope.launch {
+                    persistOpenAiSettings(current)
+
+                    val shouldActivate =
+                        current.openAiModel.isNotBlank() &&
+                            (
+                                current.translationProvider != TranslationProvider.OPENAI_COMPATIBLE ||
+                                    current.draftTranslationProvider == TranslationProvider.OPENAI_COMPATIBLE
+                            )
+                    if (shouldActivate) {
+                        tweaksRepository.setTranslationProvider(TranslationProvider.OPENAI_COMPATIBLE)
+                    }
+
+                    _state.update { it.copy(draftTranslationProvider = null) }
+                    _events.send(TweaksEvent.OnTranslationProviderSaved)
                 }
             }
 
@@ -1591,6 +1806,23 @@ class TweaksViewModel(
     }
 
     @Suppress("TooGenericExceptionCaught")
+    private fun isCurrentOpenAiEndpoint(requested: TweaksState): Boolean =
+        _state.value.openAiBaseUrl == requested.openAiBaseUrl &&
+            _state.value.openAiApiKey == requested.openAiApiKey &&
+            _state.value.allowInsecureHttp == requested.allowInsecureHttp
+
+    private suspend fun persistOpenAiSettings(current: TweaksState) {
+        tweaksRepository.setOpenAiBaseUrl(current.openAiBaseUrl)
+        tweaksRepository.setOpenAiModel(current.openAiModel)
+        tweaksRepository.setOpenAiApiKey(current.openAiApiKey)
+        tweaksRepository.setOpenAiPrompt(current.openAiPrompt)
+    }
+
+    private suspend fun persistBaiduSettings(current: TweaksState) {
+        tweaksRepository.setBaiduAppId(current.baiduAppId)
+        tweaksRepository.setBaiduAppSecret(current.baiduAppSecret)
+    }
+
     private suspend fun shareDiagnostics() {
         val bundle =
             try {

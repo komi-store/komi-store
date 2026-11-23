@@ -216,6 +216,44 @@ sealed interface TweaksAction {
 
     data object OnYoudaoCredentialsSave : TweaksAction
 
+    data class OnBaiduAppIdChanged(
+        val appId: String,
+    ) : TweaksAction
+
+    data class OnBaiduAppSecretChanged(
+        val appSecret: String,
+    ) : TweaksAction
+
+    data object OnBaiduCredentialsSave : TweaksAction
+
+    data class OnOpenAiBaseUrlChanged(
+        val url: String,
+    ) : TweaksAction
+
+    data class OnOpenAiModelChanged(
+        val model: String,
+    ) : TweaksAction
+
+    data class OnOpenAiApiKeyChanged(
+        val apiKey: String,
+    ) : TweaksAction
+
+    data class OnOpenAiPromptChanged(
+        val prompt: String,
+    ) : TweaksAction
+
+    data class OnOpenAiModelSelected(
+        val model: String,
+    ) : TweaksAction
+
+    data object OnOpenAiModelsRefresh : TweaksAction
+
+    data class OnAllowInsecureHttpChanged(
+        val enabled: Boolean,
+    ) : TweaksAction
+
+    data object OnOpenAiCredentialsSave : TweaksAction
+
     data class OnLibreTranslateBaseUrlChanged(
         val url: String,
     ) : TweaksAction

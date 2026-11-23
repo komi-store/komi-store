@@ -20,6 +20,8 @@ import zed.rainxch.core.domain.model.installation.InstallerType
 import zed.rainxch.core.domain.model.installation.RootAvailability
 import zed.rainxch.core.domain.model.installation.ShizukuAvailability
 import zed.rainxch.core.domain.model.settings.AppLanguages
+import zed.rainxch.core.domain.model.settings.OpenAiCompatibleDefaults
+import zed.rainxch.core.domain.model.settings.OpenAiTranslationPrompt
 import zed.rainxch.core.domain.model.settings.ProxyScope
 import zed.rainxch.core.domain.model.settings.SupportedTranslationLanguages
 import zed.rainxch.core.domain.model.settings.TranslationProvider
@@ -67,6 +69,16 @@ data class TweaksState(
     val youdaoAppKey: String = "",
     val youdaoAppSecret: String = "",
     val isYoudaoAppSecretVisible: Boolean = false,
+    val baiduAppId: String = "",
+    val baiduAppSecret: String = "",
+    val openAiBaseUrl: String = OpenAiCompatibleDefaults.BASE_URL,
+    val openAiModel: String = "",
+    val openAiApiKey: String = "",
+    val openAiPrompt: String = OpenAiTranslationPrompt.DEFAULT,
+    val allowInsecureHttp: Boolean = false,
+    val openAiModels: ImmutableList<String> = persistentListOf(),
+    val openAiModelsLoading: Boolean = false,
+    val openAiModelsError: String? = null,
     val libreTranslateBaseUrl: String = "",
     val libreTranslateApiKey: String = "",
     val isLibreTranslateApiKeyVisible: Boolean = false,

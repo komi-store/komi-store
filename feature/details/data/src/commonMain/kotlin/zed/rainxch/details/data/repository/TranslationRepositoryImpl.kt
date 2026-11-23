@@ -7,12 +7,15 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.serialization.json.Json
 import zed.rainxch.core.data.network.TranslationClientProvider
 import zed.rainxch.core.data.services.LocalizationManager
+import zed.rainxch.core.domain.model.settings.OpenAiCompatibleDefaults
 import zed.rainxch.core.domain.model.settings.TranslationProvider
 import zed.rainxch.core.domain.repository.TweaksRepository
+import zed.rainxch.details.data.translation.BaiduTranslator
 import zed.rainxch.details.data.translation.DeeplTranslator
 import zed.rainxch.details.data.translation.GoogleTranslator
 import zed.rainxch.details.data.translation.LibreTranslator
 import zed.rainxch.details.data.translation.MicrosoftTranslator
+import zed.rainxch.details.data.translation.OpenAiCompatibleTranslator
 import zed.rainxch.details.data.translation.Translator
 import zed.rainxch.details.data.translation.YoudaoTranslator
 import zed.rainxch.details.domain.model.TranslationResult
@@ -36,6 +39,15 @@ class TranslationRepositoryImpl(
     private val googleTranslator: GoogleTranslator =
         GoogleTranslator(httpClient = { httpClient }, json = json)
 
+    private val indexTranslateTranslator: OpenAiCompatibleTranslator =
+        OpenAiCompatibleTranslator(
+            httpClient = { httpClient },
+            json = json,
+            endpoint = "https://index-translate.bilibili.com/v1/chat/completions",
+            model = "Index-Translate-35B-A3B",
+            userAgent = "Index-Translate-Client/1.0",
+        )
+
     private val cacheMutex = Mutex()
     private val cache = LinkedHashMap<CacheKey, CachedTranslation>(MAX_CACHE_SIZE, 0.75f, true)
 
@@ -45,7 +57,9 @@ class TranslationRepositoryImpl(
         targetLanguage: String,
         sourceLanguage: String,
     ): TranslationResult {
-        val cacheKey = CacheKey(text, targetLanguage, sourceLanguage)
+        val provider = tweaksRepository.getTranslationProvider().first()
+        val providerConfig = providerCacheConfig(provider)
+        val cacheKey = CacheKey(provider, providerConfig, text, targetLanguage, sourceLanguage)
 
         cacheMutex.withLock {
             cache[cacheKey]?.let { cached ->
@@ -90,6 +104,24 @@ class TranslationRepositoryImpl(
         }
         return result
     }
+
+    private suspend fun providerCacheConfig(provider: TranslationProvider): String =
+        when (provider) {
+            TranslationProvider.OPENAI_COMPATIBLE -> {
+                val baseUrl =
+                    tweaksRepository
+                        .getOpenAiBaseUrl()
+                        .first()
+                        .ifBlank { OpenAiCompatibleDefaults.BASE_URL }
+                val model = tweaksRepository.getOpenAiModel().first()
+                val prompt = tweaksRepository.getOpenAiPrompt().first()
+                "$baseUrl|$model|${prompt.hashCode()}"
+            }
+
+            else -> {
+                ""
+            }
+        }
 
     private fun protectFromTranslation(text: String): TranslationProtection {
         val spans = mutableListOf<String>()
@@ -172,6 +204,44 @@ class TranslationRepositoryImpl(
     private suspend fun resolveTranslator(): Translator {
         val provider = tweaksRepository.getTranslationProvider().first()
         return when (provider) {
+            TranslationProvider.INDEX_TRANSLATE -> {
+                indexTranslateTranslator
+            }
+
+            TranslationProvider.OPENAI_COMPATIBLE -> {
+                val baseUrl =
+                    tweaksRepository
+                        .getOpenAiBaseUrl()
+                        .first()
+                        .ifBlank { OpenAiCompatibleDefaults.BASE_URL }
+                        .trimEnd('/')
+                val endpoint =
+                    if (baseUrl.endsWith("/chat/completions")) {
+                        baseUrl
+                    } else {
+                        "$baseUrl/chat/completions"
+                    }
+                OpenAiCompatibleTranslator(
+                    httpClient = { httpClient },
+                    json = json,
+                    endpoint = endpoint,
+                    model = tweaksRepository.getOpenAiModel().first(),
+                    apiKey = tweaksRepository.getOpenAiApiKey().first().takeIf { it.isNotBlank() },
+                    promptTemplate = tweaksRepository.getOpenAiPrompt().first(),
+                )
+            }
+
+            TranslationProvider.BAIDU -> {
+                val appId = tweaksRepository.getBaiduAppId().first()
+                val appSecret = tweaksRepository.getBaiduAppSecret().first()
+                BaiduTranslator(
+                    httpClient = { httpClient },
+                    json = json,
+                    appId = appId,
+                    appSecret = appSecret,
+                )
+            }
+
             TranslationProvider.GOOGLE -> {
                 googleTranslator
             }
@@ -304,6 +374,8 @@ class TranslationRepositoryImpl(
     }
 
     private data class CacheKey(
+        val provider: TranslationProvider,
+        val providerConfig: String,
         val text: String,
         val targetLanguage: String,
         val sourceLanguage: String,
