@@ -334,8 +334,14 @@ class TweaksRepositoryImpl(
 
     override suspend fun setOpenAiPrompt(prompt: String) {
         migrationDeferred.await()
-        val trimmed = prompt.trim()
-        if (trimmed.isEmpty()) ksafe.safeDelete(K_OPENAI_PROMPT) else ksafe.safePut(K_OPENAI_PROMPT, trimmed)
+        if (prompt.isBlank()) ksafe.safeDelete(K_OPENAI_PROMPT) else ksafe.safePut(K_OPENAI_PROMPT, prompt)
+    }
+
+    override fun getAllowInsecureHttp(): Flow<Boolean> = gatedGetFlow(K_ALLOW_INSECURE_HTTP, false)
+
+    override suspend fun setAllowInsecureHttp(enabled: Boolean) {
+        migrationDeferred.await()
+        ksafe.safePut(K_ALLOW_INSECURE_HTTP, enabled)
     }
 
     override fun getLibreTranslateBaseUrl(): Flow<String> = gatedGetFlow(K_LIBRE_BASE_URL, "")
@@ -651,6 +657,7 @@ class TweaksRepositoryImpl(
         private const val K_OPENAI_API_KEY = "openai_compatible_api_key"
         private const val K_OPENAI_PROMPT = "openai_compatible_prompt"
         private const val K_LIBRE_BASE_URL = "libre_translate_base_url"
+        private const val K_ALLOW_INSECURE_HTTP = "allow_insecure_http"
         private const val K_LIBRE_API_KEY = "libre_translate_api_key"
         private const val K_DEEPL_AUTH_KEY = "deepl_auth_key"
         private const val K_MS_KEY = "microsoft_translator_key"

@@ -75,7 +75,7 @@ fun translationSectionContent(
                 }
             }
             when (provider) {
-                TranslationProvider.INDEX_TRANSLATE -> Unit
+                TranslationProvider.INDEX_TRANSLATE -> IndexTranslateDisclosure()
                 TranslationProvider.OPENAI_COMPATIBLE -> OpenAiCompatibleCredentialsForm(state, onAction)
                 TranslationProvider.BAIDU -> BaiduCredentialsForm(state, onAction)
                 TranslationProvider.YOUDAO -> YoudaoCredentialsForm(state, onAction)
@@ -112,6 +112,16 @@ fun translationSectionContent(
             }
         }
     }
+}
+
+@Composable
+private fun IndexTranslateDisclosure() {
+    KomiText(
+        text = stringResource(Res.string.translation_index_disclosure),
+        role = KomiTextRole.Caption,
+        color = LocalPersonality.current.colors.onSurfaceVariant,
+        modifier = Modifier.padding(top = 8.dp),
+    )
 }
 
 @Composable
@@ -242,6 +252,26 @@ private fun OpenAiCompatibleCredentialsForm(
             keyboardType = KeyboardType.Uri,
             modifier = Modifier.fillMaxWidth(),
         )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                KomiText(
+                    text = stringResource(Res.string.translation_allow_insecure_http),
+                    role = KomiTextRole.Body,
+                )
+                KomiText(
+                    text = stringResource(Res.string.translation_allow_insecure_http_help),
+                    role = KomiTextRole.Caption,
+                    color = LocalPersonality.current.colors.onSurfaceVariant,
+                )
+            }
+            KomiSwitch(
+                checked = state.allowInsecureHttp,
+                onCheckedChange = { onAction(TweaksAction.OnAllowInsecureHttpChanged(it)) },
+            )
+        }
         KomiTextField(
             value = state.openAiModel,
             onValueChange = { onAction(TweaksAction.OnOpenAiModelChanged(it)) },

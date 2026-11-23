@@ -67,7 +67,7 @@ class TranslationClientProvider(
     }
 
     private companion object {
-        private const val TRANSLATION_REQUEST_TIMEOUT_MS = 60_000L
+        private const val TRANSLATION_REQUEST_TIMEOUT_MS = 180_000L
         private const val TRANSLATION_CONNECT_TIMEOUT_MS = 15_000L
     }
 }

@@ -15,6 +15,8 @@ import kotlinx.serialization.json.jsonPrimitive
 import zed.rainxch.details.domain.model.TranslationResult
 import java.security.MessageDigest
 import kotlin.random.Random
+import kotlin.time.TimeMark
+import kotlin.time.TimeSource
 
 internal class BaiduTranslator(
     private val httpClient: () -> HttpClient,
@@ -36,8 +38,13 @@ internal class BaiduTranslator(
         }
 
         return requestMutex.withLock {
-            if (hasRequested) delay(BAIDU_MIN_INTERVAL_MS)
-            hasRequested = true
+            lastRequestAt?.let { mark ->
+                val elapsed = mark.elapsedNow().inWholeMilliseconds
+                if (elapsed < BAIDU_MIN_INTERVAL_MS) {
+                    delay(BAIDU_MIN_INTERVAL_MS - elapsed)
+                }
+            }
+            lastRequestAt = TimeSource.Monotonic.markNow()
 
             val salt = Random.nextLong().toString()
             val sign = baiduSign(appId, text, salt, appSecret)
@@ -101,35 +108,91 @@ internal class BaiduTranslator(
         }
     }
 
-    private fun mapSourceLanguage(code: String): String =
-        when (code.lowercase()) {
-            "", "auto" -> "auto"
-            "zh", "zh-cn", "zh-hans" -> "zh"
-            "zh-tw", "zh-hant" -> "cht"
-            else -> code.substringBefore('-').lowercase()
-        }
+    private fun mapSourceLanguage(code: String): String = baiduLanguageCode(code, allowAuto = true)
 
-    private fun mapTargetLanguage(code: String): String =
-        when (code.lowercase()) {
-            "zh", "zh-cn", "zh-hans" -> "zh"
-            "zh-tw", "zh-hant" -> "cht"
-            else -> code.substringBefore('-').lowercase()
-        }
+    private fun mapTargetLanguage(code: String): String = baiduLanguageCode(code, allowAuto = false)
 
-    private fun reverseLanguage(code: String): String =
-        when (code) {
-            "zh" -> "zh-CN"
-            "cht" -> "zh-TW"
-            else -> code
-        }
+    private fun reverseLanguage(code: String): String = baiduLanguageFromCode(code)
 
     companion object {
         private const val BAIDU_TRANSLATE_URL = "https://fanyi-api.baidu.com/api/trans/vip/translate"
         private const val BAIDU_MIN_INTERVAL_MS = 1_100L
         private val requestMutex = Mutex()
-        private var hasRequested = false
+        private var lastRequestAt: TimeMark? = null
     }
 }
+
+private val BAIDU_LANGUAGE_CODES =
+    mapOf(
+        "ar" to "ara",
+        "bn" to "ben",
+        "zh" to "zh",
+        "zh-cn" to "zh",
+        "zh-hans" to "zh",
+        "zh-tw" to "cht",
+        "zh-hant" to "cht",
+        "cs" to "cs",
+        "da" to "dan",
+        "nl" to "nl",
+        "en" to "en",
+        "fi" to "fin",
+        "fr" to "fra",
+        "de" to "de",
+        "el" to "el",
+        "he" to "he",
+        "hi" to "hi",
+        "hu" to "hu",
+        "id" to "id",
+        "it" to "it",
+        "ja" to "jp",
+        "ko" to "kor",
+        "ms" to "may",
+        "no" to "nor",
+        "pl" to "pl",
+        "pt" to "pt",
+        "pt-br" to "pt",
+        "ro" to "rom",
+        "ru" to "ru",
+        "es" to "spa",
+        "sv" to "swe",
+        "th" to "th",
+        "tr" to "tr",
+        "uk" to "uk",
+        "uz" to "uz",
+        "vi" to "vie",
+    )
+
+internal fun baiduLanguageCode(
+    code: String,
+    allowAuto: Boolean,
+): String {
+    val normalized = code.trim().lowercase()
+    if (normalized.isEmpty() || normalized == "auto") {
+        if (allowAuto) return "auto"
+        throw TranslationUnsupportedLanguageException("Baidu target language cannot be auto")
+    }
+    return BAIDU_LANGUAGE_CODES[normalized]
+        ?: throw TranslationUnsupportedLanguageException("Baidu does not support language $code")
+}
+
+internal fun baiduLanguageFromCode(code: String): String {
+    val normalized = code.trim().lowercase()
+    return when (normalized) {
+        "zh" -> "zh-CN"
+        "cht" -> "zh-TW"
+        else -> BAIDU_APP_CODES[normalized] ?: normalized
+    }
+}
+
+private val BAIDU_APP_CODES =
+    BAIDU_LANGUAGE_CODES.entries
+        .filter { (appCode, _) ->
+            appCode != "zh" &&
+                appCode != "zh-cn" &&
+                appCode != "zh-hans" &&
+                appCode != "zh-tw" &&
+                appCode != "zh-hant"
+        }.associate { (appCode, baiduCode) -> baiduCode to appCode }
 
 internal fun baiduSign(
     appId: String,

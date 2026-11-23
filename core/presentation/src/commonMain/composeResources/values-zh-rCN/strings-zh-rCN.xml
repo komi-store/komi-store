@@ -1515,6 +1515,11 @@
     <string name="translation_openai_models_failed">获取模型列表失败。请检查 Base URL 和 Key，或手动填写模型。</string>
     <string name="translation_openai_prompt">提示词模板</string>
     <string name="translation_openai_prompt_help">可使用 {target}、{source}、{text} 占位符；未包含 {text} 时会自动在末尾追加原文。</string>
+
+    <string name="translation_allow_insecure_http">允许不安全的 HTTP</string>
+    <string name="translation_allow_insecure_http_help">用于 Ollama 等 http:// 局域网服务。开启后 Android 全局允许明文流量，请仅在可信网络使用。</string>
+
+    <string name="translation_index_disclosure">免费且无需 Key。README 内容会发送到 B 站公开的 index-translate 接口；请勿用于私有仓库。</string>
 <string name="reviews_section_title">评分和评价</string>
 <string name="reviews_screen_title">评价</string>
 <string name="reviews_rated">评分 %1$s 分（满分 5 分）</string>

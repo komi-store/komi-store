@@ -129,6 +129,10 @@ interface TweaksRepository {
 
     suspend fun setOpenAiPrompt(prompt: String)
 
+    fun getAllowInsecureHttp(): Flow<Boolean>
+
+    suspend fun setAllowInsecureHttp(enabled: Boolean)
+
     fun getLibreTranslateBaseUrl(): Flow<String>
 
     suspend fun setLibreTranslateBaseUrl(url: String)

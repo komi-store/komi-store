@@ -11,6 +11,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 
 class TranslationProviderProtocolTest {
     private val json = Json { ignoreUnknownKeys = true }
@@ -82,6 +83,31 @@ class TranslationProviderProtocolTest {
 
             assertEquals("你好", result.translatedText)
             assertEquals("Bearer test-key", authorization)
+        }
+
+    @Test
+    fun openai_compatible_rejects_a_truncated_completion() =
+        runBlocking {
+            val engine =
+                MockEngine {
+                    respond(
+                        content = """{"choices":[{"finish_reason":"length","message":{"content":"partial"}}]}""",
+                        status = HttpStatusCode.OK,
+                        headers = headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString()),
+                    )
+                }
+            val translator =
+                OpenAiCompatibleTranslator(
+                    httpClient = { HttpClient(engine) },
+                    json = json,
+                    endpoint = "https://example.test/v1/chat/completions",
+                    model = "test-model",
+                )
+
+            assertFailsWith<TranslationResponseTruncatedException> {
+                translator.translate("hello", "zh-CN", "en")
+            }
+            Unit
         }
 
     @Test

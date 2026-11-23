@@ -26,7 +26,11 @@ internal class TranslationResponseException(
     cause: Throwable? = null,
 ) : RuntimeException(message, cause)
 
-@Suppress("SwallowedException")
+class TranslationResponseTruncatedException(
+    message: String,
+) : RuntimeException(message)
+
+@Suppress("SwallowedException", "TooManyFunctions")
 internal class OpenAiCompatibleTranslator(
     private val httpClient: () -> HttpClient,
     private val json: Json,
@@ -35,6 +39,7 @@ internal class OpenAiCompatibleTranslator(
     private val apiKey: String? = null,
     private val userAgent: String? = null,
     private val promptTemplate: String? = null,
+    private val allowInsecureHttp: Boolean = false,
 ) : Translator {
     override val maxChunkSize: Int = 2_000
 
@@ -70,6 +75,11 @@ internal class OpenAiCompatibleTranslator(
         if (endpoint.isBlank() || model.isBlank()) {
             throw TranslationProviderNotConfiguredException(
                 "OpenAI-compatible endpoint/model not configured",
+            )
+        }
+        if (endpoint.startsWith("http://", ignoreCase = true) && !allowInsecureHttp) {
+            throw TranslationProviderNotConfiguredException(
+                "Insecure HTTP endpoint requires the allow-insecure-HTTP setting",
             )
         }
     }
@@ -130,6 +140,11 @@ internal class OpenAiCompatibleTranslator(
             } catch (e: IllegalArgumentException) {
                 throw TranslationResponseException("Translation response is not valid JSON: ${e.message}", e)
             } ?: throw TranslationResponseException("Translation response is not a JSON object")
+        if (root.finishReason() == "length") {
+            throw TranslationResponseTruncatedException(
+                "Translation response was truncated by the provider's output limit",
+            )
+        }
         return root
             .choicesMessage()
             ?.messageContent()
@@ -138,12 +153,20 @@ internal class OpenAiCompatibleTranslator(
 
     private fun readStreamingResponse(body: String): String {
         val content = StringBuilder()
+        var truncated = false
         for (line in body.lineSequence()) {
             if (!line.startsWith("data:")) continue
             val payload = line.removePrefix("data:").trim()
             if (payload == "[DONE]") break
-            val delta = parseStreamFrame(payload)
+            val root = parseStreamFrame(payload)
+            if (root?.finishReason() == "length") truncated = true
+            val delta = root?.choicesMessage()?.messageContent()
             if (!delta.isNullOrEmpty()) content.append(delta)
+        }
+        if (truncated) {
+            throw TranslationResponseTruncatedException(
+                "Translation response was truncated by the provider's output limit",
+            )
         }
         if (content.isEmpty()) {
             throw TranslationResponseException("Translation response missing streamed message content")
@@ -152,17 +175,15 @@ internal class OpenAiCompatibleTranslator(
     }
 
     @Suppress("ReturnCount")
-    private fun parseStreamFrame(payload: String): String? {
+    private fun parseStreamFrame(payload: String): JsonObject? {
         if (payload.isEmpty()) return null
-        val root =
-            try {
-                json.parseToJsonElement(payload) as? JsonObject
-            } catch (e: SerializationException) {
-                return null
-            } catch (e: IllegalArgumentException) {
-                return null
-            } ?: return null
-        return root.choicesMessage()?.messageContent()
+        return try {
+            json.parseToJsonElement(payload) as? JsonObject
+        } catch (e: SerializationException) {
+            null
+        } catch (e: IllegalArgumentException) {
+            null
+        }
     }
 
     private fun JsonObject.messageContent(): String? = this["content"].textContent()
@@ -184,8 +205,21 @@ internal class OpenAiCompatibleTranslator(
             }
         }
 
+    private fun JsonObject.firstChoice(): JsonObject? =
+        (this["choices"] as? kotlinx.serialization.json.JsonArray)?.firstOrNull() as? JsonObject
+
+    @Suppress("ReturnCount")
+    private fun JsonObject.finishReason(): String? {
+        val choices = this["choices"] as? kotlinx.serialization.json.JsonArray ?: return null
+        val choice = choices.firstOrNull() as? JsonObject ?: return null
+        val raw = choice["finish_reason"] ?: return null
+        return (raw as? JsonPrimitive)
+            ?.takeIf { it.isString }
+            ?.content
+    }
+
     private fun JsonObject.choicesMessage(): JsonObject? {
-        val choice = (this["choices"] as? kotlinx.serialization.json.JsonArray)?.firstOrNull() as? JsonObject
+        val choice = firstChoice()
         return (choice?.get("message") as? JsonObject) ?: (choice?.get("delta") as? JsonObject)
     }
 }

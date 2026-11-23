@@ -25,6 +25,7 @@ class TranslationModelCatalogImpl(
     override suspend fun listModels(
         baseUrl: String,
         apiKey: String?,
+        allowInsecureHttp: Boolean,
     ): List<String> {
         val root =
             baseUrl
@@ -35,6 +36,11 @@ class TranslationModelCatalogImpl(
                 .removeSuffix("/chat/completions")
         if (root.isEmpty()) {
             throw TranslationModelCatalogException("OpenAI-compatible base URL is empty")
+        }
+        if (root.startsWith("http://", ignoreCase = true) && !allowInsecureHttp) {
+            throw TranslationModelCatalogException(
+                "Insecure HTTP endpoint requires the allow-insecure-HTTP setting",
+            )
         }
 
         val response =

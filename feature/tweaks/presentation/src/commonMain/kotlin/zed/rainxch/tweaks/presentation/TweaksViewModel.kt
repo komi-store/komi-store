@@ -103,6 +103,7 @@ class TweaksViewModel(
 
     private var hasLoadedInitialData = false
     private var cacheSizeJob: Job? = null
+    private var openAiModelsJob: Job? = null
 
     private val _state = MutableStateFlow(TweaksState())
     val state =
@@ -575,6 +576,11 @@ class TweaksViewModel(
         viewModelScope.launch {
             tweaksRepository.getOpenAiPrompt().collect { prompt ->
                 _state.update { it.copy(openAiPrompt = prompt) }
+            }
+        }
+        viewModelScope.launch {
+            tweaksRepository.getAllowInsecureHttp().collect { enabled ->
+                _state.update { it.copy(allowInsecureHttp = enabled) }
             }
         }
     }
@@ -1287,11 +1293,13 @@ class TweaksViewModel(
             }
 
             is TweaksAction.OnOpenAiBaseUrlChanged -> {
+                openAiModelsJob?.cancel()
                 _state.update {
                     it.copy(
                         openAiBaseUrl = action.url,
                         openAiModels = persistentListOf(),
                         openAiModelsError = null,
+                        openAiModelsLoading = false,
                     )
                 }
             }
@@ -1301,11 +1309,13 @@ class TweaksViewModel(
             }
 
             is TweaksAction.OnOpenAiApiKeyChanged -> {
+                openAiModelsJob?.cancel()
                 _state.update {
                     it.copy(
                         openAiApiKey = action.apiKey,
                         openAiModels = persistentListOf(),
                         openAiModelsError = null,
+                        openAiModelsLoading = false,
                     )
                 }
             }
@@ -1314,38 +1324,50 @@ class TweaksViewModel(
                 _state.update { it.copy(openAiPrompt = action.prompt) }
             }
 
+            is TweaksAction.OnAllowInsecureHttpChanged -> {
+                _state.update { it.copy(allowInsecureHttp = action.enabled) }
+                viewModelScope.launch {
+                    tweaksRepository.setAllowInsecureHttp(action.enabled)
+                }
+            }
+
             is TweaksAction.OnOpenAiModelSelected -> {
                 _state.update { it.copy(openAiModel = action.model) }
             }
 
             TweaksAction.OnOpenAiModelsRefresh -> {
                 val current = _state.value
+                openAiModelsJob?.cancel()
                 _state.update { it.copy(openAiModelsLoading = true, openAiModelsError = null) }
-                viewModelScope.launch {
-                    try {
-                        val models =
-                            translationModelCatalog.listModels(
-                                baseUrl = current.openAiBaseUrl.ifBlank { OpenAiCompatibleDefaults.BASE_URL },
-                                apiKey = current.openAiApiKey.takeIf { it.isNotBlank() },
-                            )
-                        _state.update {
-                            it.copy(
-                                openAiModels = models.toImmutableList(),
-                                openAiModelsLoading = false,
-                            )
-                        }
-                    } catch (e: CancellationException) {
-                        throw e
-                    } catch (t: Exception) {
-                        logger.warn("OpenAI-compatible model list failed: ${t.message}")
-                        _state.update {
-                            it.copy(
-                                openAiModelsLoading = false,
-                                openAiModelsError = getString(Res.string.translation_openai_models_failed),
-                            )
+                openAiModelsJob =
+                    viewModelScope.launch {
+                        try {
+                            val models =
+                                translationModelCatalog.listModels(
+                                    baseUrl = current.openAiBaseUrl.ifBlank { OpenAiCompatibleDefaults.BASE_URL },
+                                    apiKey = current.openAiApiKey.takeIf { it.isNotBlank() },
+                                    allowInsecureHttp = current.allowInsecureHttp,
+                                )
+                            if (!isCurrentOpenAiEndpoint(current)) return@launch
+                            _state.update {
+                                it.copy(
+                                    openAiModels = models.toImmutableList(),
+                                    openAiModelsLoading = false,
+                                )
+                            }
+                        } catch (e: CancellationException) {
+                            throw e
+                        } catch (t: Exception) {
+                            logger.warn("OpenAI-compatible model list failed: ${t.message}")
+                            if (!isCurrentOpenAiEndpoint(current)) return@launch
+                            _state.update {
+                                it.copy(
+                                    openAiModelsLoading = false,
+                                    openAiModelsError = getString(Res.string.translation_openai_models_failed),
+                                )
+                            }
                         }
                     }
-                }
             }
 
             TweaksAction.OnOpenAiCredentialsSave -> {
@@ -1784,6 +1806,11 @@ class TweaksViewModel(
     }
 
     @Suppress("TooGenericExceptionCaught")
+    private fun isCurrentOpenAiEndpoint(requested: TweaksState): Boolean =
+        _state.value.openAiBaseUrl == requested.openAiBaseUrl &&
+            _state.value.openAiApiKey == requested.openAiApiKey &&
+            _state.value.allowInsecureHttp == requested.allowInsecureHttp
+
     private suspend fun persistOpenAiSettings(current: TweaksState) {
         tweaksRepository.setOpenAiBaseUrl(current.openAiBaseUrl)
         tweaksRepository.setOpenAiModel(current.openAiModel)

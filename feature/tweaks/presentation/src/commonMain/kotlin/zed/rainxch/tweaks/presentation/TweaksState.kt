@@ -75,6 +75,7 @@ data class TweaksState(
     val openAiModel: String = "",
     val openAiApiKey: String = "",
     val openAiPrompt: String = OpenAiTranslationPrompt.DEFAULT,
+    val allowInsecureHttp: Boolean = false,
     val openAiModels: ImmutableList<String> = persistentListOf(),
     val openAiModelsLoading: Boolean = false,
     val openAiModelsError: String? = null,

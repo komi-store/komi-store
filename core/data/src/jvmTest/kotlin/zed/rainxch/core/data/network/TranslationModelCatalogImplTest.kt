@@ -76,6 +76,17 @@ class TranslationModelCatalogImplTest {
         }
 
     @Test
+    fun rejects_cleartext_when_insecure_http_is_disabled() =
+        runBlocking {
+            val catalog = TranslationModelCatalogImpl(client = { HttpClient(MockEngine { respond("") }) })
+
+            assertFailsWith<TranslationModelCatalogException> {
+                catalog.listModels("http://192.168.1.10:11434/v1", null, allowInsecureHttp = false)
+            }
+            Unit
+        }
+
+    @Test
     fun reports_an_empty_model_list_as_a_catalog_error() =
         runBlocking {
             val engine =

@@ -1592,6 +1592,11 @@
     <string name="translation_openai_models_failed">Could not fetch the model list. Check the base URL and key, or enter the model manually.</string>
     <string name="translation_openai_prompt">Prompt template</string>
     <string name="translation_openai_prompt_help">Use {target}, {source} and {text} as placeholders. If {text} is omitted, the source text is appended.</string>
+
+    <string name="translation_allow_insecure_http">Allow insecure HTTP</string>
+    <string name="translation_allow_insecure_http_help">Needed for http:// LAN servers such as Ollama. Android permits cleartext app-wide while on; use only with trusted networks.</string>
+
+    <string name="translation_index_disclosure">Free and keyless. README text is sent to Bilibili's public index-translate endpoint; do not use it for private repositories.</string>
 <string name="reviews_section_title">Ratings &amp; reviews</string>
 <string name="reviews_screen_title">Reviews</string>
 <string name="reviews_rated">Rated %1$s out of 5</string>

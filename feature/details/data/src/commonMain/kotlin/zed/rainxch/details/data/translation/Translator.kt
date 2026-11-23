@@ -15,3 +15,7 @@ internal interface Translator {
 internal class TranslationProviderNotConfiguredException(
     message: String,
 ) : RuntimeException(message)
+
+internal class TranslationUnsupportedLanguageException(
+    message: String,
+) : RuntimeException(message)

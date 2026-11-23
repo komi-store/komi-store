@@ -248,6 +248,10 @@ sealed interface TweaksAction {
 
     data object OnOpenAiModelsRefresh : TweaksAction
 
+    data class OnAllowInsecureHttpChanged(
+        val enabled: Boolean,
+    ) : TweaksAction
+
     data object OnOpenAiCredentialsSave : TweaksAction
 
     data class OnLibreTranslateBaseUrlChanged(

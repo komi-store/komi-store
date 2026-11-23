@@ -57,7 +57,9 @@ class TranslationRepositoryImpl(
         targetLanguage: String,
         sourceLanguage: String,
     ): TranslationResult {
-        val cacheKey = CacheKey(text, targetLanguage, sourceLanguage)
+        val provider = tweaksRepository.getTranslationProvider().first()
+        val providerConfig = providerCacheConfig(provider)
+        val cacheKey = CacheKey(provider, providerConfig, text, targetLanguage, sourceLanguage)
 
         cacheMutex.withLock {
             cache[cacheKey]?.let { cached ->
@@ -102,6 +104,24 @@ class TranslationRepositoryImpl(
         }
         return result
     }
+
+    private suspend fun providerCacheConfig(provider: TranslationProvider): String =
+        when (provider) {
+            TranslationProvider.OPENAI_COMPATIBLE -> {
+                val baseUrl =
+                    tweaksRepository
+                        .getOpenAiBaseUrl()
+                        .first()
+                        .ifBlank { OpenAiCompatibleDefaults.BASE_URL }
+                val model = tweaksRepository.getOpenAiModel().first()
+                val prompt = tweaksRepository.getOpenAiPrompt().first()
+                "$baseUrl|$model|${prompt.hashCode()}"
+            }
+
+            else -> {
+                ""
+            }
+        }
 
     private fun protectFromTranslation(text: String): TranslationProtection {
         val spans = mutableListOf<String>()
@@ -354,6 +374,8 @@ class TranslationRepositoryImpl(
     }
 
     private data class CacheKey(
+        val provider: TranslationProvider,
+        val providerConfig: String,
         val text: String,
         val targetLanguage: String,
         val sourceLanguage: String,
