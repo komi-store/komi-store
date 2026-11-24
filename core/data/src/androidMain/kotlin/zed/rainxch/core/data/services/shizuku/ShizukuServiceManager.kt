@@ -15,6 +15,8 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withTimeoutOrNull
 import rikka.shizuku.Shizuku
 import zed.rainxch.core.data.services.shizuku.model.ShizukuStatus
+import zed.rainxch.core.data.services.systemServiceCall
+import zed.rainxch.core.domain.model.error.SystemPackagesException
 import kotlin.coroutines.resume
 
 class ShizukuServiceManager(
@@ -70,10 +72,9 @@ class ShizukuServiceManager(
         return if (binderAlive) statusWithBinder() else statusWithoutBinder()
     }
 
-    // Shizuku rethrows a dead binder's RemoteException as a bare RuntimeException, so no narrower catch exists.
     private fun statusWithBinder(): ShizukuStatus =
         try {
-            val permResult = Shizuku.checkSelfPermission()
+            val permResult = shizukuCall { Shizuku.checkSelfPermission() }
             Logger.d(TAG) {
                 "computeStatus(): checkSelfPermission=$permResult (GRANTED=${PackageManager.PERMISSION_GRANTED})"
             }
@@ -83,8 +84,8 @@ class ShizukuServiceManager(
                 Logger.d(TAG) { "computeStatus(): READY" }
                 ShizukuStatus.READY
             }
-        } catch (e: Exception) {
-            Logger.w(TAG) { "Error checking Shizuku status: ${e.javaClass.simpleName}: ${e.message}" }
+        } catch (e: SystemPackagesException) {
+            Logger.w(TAG) { "Error checking Shizuku status: ${e.cause}" }
             ShizukuStatus.NOT_RUNNING
         }
 
@@ -98,21 +99,20 @@ class ShizukuServiceManager(
 
     private fun isPackageInstalled(packageName: String): Boolean =
         try {
-            context.packageManager.getPackageInfo(packageName, 0)
+            systemServiceCall { context.packageManager.getPackageInfo(packageName, 0) }
             true
         } catch (_: PackageManager.NameNotFoundException) {
             false
-        } catch (_: Exception) {
+        } catch (_: SystemPackagesException) {
             false
         }
 
     fun requestPermission() {
         if (!Shizuku.pingBinder()) return
-        // The binder can die after the ping, and Shizuku rethrows that as a bare RuntimeException.
         try {
-            Shizuku.requestPermission(SHIZUKU_PERMISSION_REQUEST_CODE)
-        } catch (e: Exception) {
-            Logger.w(TAG) { "Failed to request Shizuku permission: ${e.message}" }
+            shizukuCall { Shizuku.requestPermission(SHIZUKU_PERMISSION_REQUEST_CODE) }
+        } catch (e: SystemPackagesException) {
+            Logger.w(TAG) { "Failed to request Shizuku permission: ${e.cause}" }
         }
     }
 
@@ -185,12 +185,11 @@ class ShizukuServiceManager(
                 boundUserServiceArgs = args
 
                 Logger.d(TAG) { "Calling Shizuku.bindUserService()..." }
-                // Throws IllegalStateException without a binder, or a bare RuntimeException when it dies mid-call.
                 try {
-                    Shizuku.bindUserService(args, connection)
+                    shizukuCall { Shizuku.bindUserService(args, connection) }
                     Logger.d(TAG) { "Shizuku.bindUserService() called, waiting for callback..." }
-                } catch (e: Exception) {
-                    Logger.e(TAG) { "Failed to bind Shizuku service: ${e.javaClass.simpleName}: ${e.message}" }
+                } catch (e: SystemPackagesException) {
+                    Logger.e(TAG) { "Failed to bind Shizuku service: ${e.cause}" }
                     Logger.e(TAG) { e.stackTraceToString() }
                     if (continuation.isActive) continuation.resume(null)
                 }
@@ -198,8 +197,8 @@ class ShizukuServiceManager(
                 continuation.invokeOnCancellation {
                     Logger.d(TAG) { "bindService() coroutine cancelled, unbinding..." }
                     try {
-                        Shizuku.unbindUserService(args, connection, true)
-                    } catch (_: Exception) {
+                        shizukuCall { Shizuku.unbindUserService(args, connection, true) }
+                    } catch (_: SystemPackagesException) {
                     }
                 }
             }

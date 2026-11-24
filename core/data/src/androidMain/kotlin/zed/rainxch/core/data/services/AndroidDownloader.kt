@@ -34,6 +34,7 @@ import zed.rainxch.core.data.download.RangeRequest
 import zed.rainxch.core.data.network.GithubAssetAuth
 import zed.rainxch.core.data.network.ProxyManager
 import zed.rainxch.core.data.network.resolveAndroidSystemProxy
+import zed.rainxch.core.domain.model.error.LocalStoreException
 import zed.rainxch.core.domain.model.installation.DownloadProgress
 import zed.rainxch.core.domain.model.settings.ProxyConfig
 import zed.rainxch.core.domain.model.settings.ProxyScope
@@ -475,9 +476,8 @@ class AndroidDownloader(
                 ?.accessToken
                 ?.trim()
                 ?.takeIf { it.isNotEmpty() }
-        } catch (e: CancellationException) {
-            throw e
-        } catch (_: Exception) {
+        } catch (e: LocalStoreException) {
+            Logger.w(e) { "Could not read the GitHub token; downloading without it" }
             null
         }
 

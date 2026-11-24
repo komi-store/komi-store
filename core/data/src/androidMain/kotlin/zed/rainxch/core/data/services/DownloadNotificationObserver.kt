@@ -7,6 +7,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import zed.rainxch.core.data.download.DownloadNotificationAction
 import zed.rainxch.core.data.download.notificationActionsFor
+import zed.rainxch.core.domain.model.error.SystemPackagesException
 import zed.rainxch.core.domain.model.installation.DownloadProgress
 import zed.rainxch.core.domain.system.DownloadOrchestrator
 import zed.rainxch.core.domain.system.DownloadProgressNotifier
@@ -119,29 +120,29 @@ class DownloadNotificationObserver(
         paused: Boolean,
     ) {
         try {
-            notifier.notifyProgress(
-                packageName = pkg,
-                appName = entry.displayAppName,
-                versionTag = entry.releaseTag.ifBlank { entry.assetName },
-                progress =
-                    DownloadProgress(
-                        bytesDownloaded = entry.bytesDownloaded,
-                        totalBytes = entry.totalBytes,
-                        percent = entry.progressPercent,
-                    ),
-                paused = paused,
-            )
-        } catch (e: SecurityException) {
-            Logger.w(e) { "DownloadNotificationObserver: notifyProgress failed for $pkg" }
-        } catch (e: IllegalArgumentException) {
+            systemServiceCall {
+                notifier.notifyProgress(
+                    packageName = pkg,
+                    appName = entry.displayAppName,
+                    versionTag = entry.releaseTag.ifBlank { entry.assetName },
+                    progress =
+                        DownloadProgress(
+                            bytesDownloaded = entry.bytesDownloaded,
+                            totalBytes = entry.totalBytes,
+                            percent = entry.progressPercent,
+                        ),
+                    paused = paused,
+                )
+            }
+        } catch (e: SystemPackagesException) {
             Logger.w(e) { "DownloadNotificationObserver: notifyProgress failed for $pkg" }
         }
     }
 
     private fun clearProgressSafely(pkg: String) {
         try {
-            notifier.clearProgress(pkg)
-        } catch (e: SecurityException) {
+            systemServiceCall { notifier.clearProgress(pkg) }
+        } catch (e: SystemPackagesException) {
             Logger.w(e) { "DownloadNotificationObserver: clearProgress failed for $pkg" }
         }
     }

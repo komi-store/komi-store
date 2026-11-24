@@ -9,6 +9,8 @@ import android.content.pm.PackageInstaller
 import android.os.Build
 import android.os.ParcelFileDescriptor
 import androidx.core.content.pm.PackageInfoCompat
+import zed.rainxch.core.data.services.systemServiceCall
+import zed.rainxch.core.domain.model.error.SystemPackagesException
 import java.io.IOException
 import java.util.UUID
 import java.util.concurrent.CountDownLatch
@@ -95,13 +97,13 @@ class DhizukuInstallerServiceImpl : IDhizukuInstallerService.Stub() {
         } finally {
             if (!committed && sessionId >= 0) {
                 try {
-                    installer.abandonSession(sessionId)
-                } catch (_: Exception) {
+                    systemServiceCall { installer.abandonSession(sessionId) }
+                } catch (_: SystemPackagesException) {
                 }
             }
             try {
-                session?.close()
-            } catch (_: Exception) {
+                systemServiceCall { session?.close() }
+            } catch (_: SystemPackagesException) {
             }
             unregisterQuietly(ctx, receiver)
         }
@@ -312,7 +314,7 @@ class DhizukuInstallerServiceImpl : IDhizukuInstallerService.Stub() {
         if (receiver != null) {
             try {
                 ctx.unregisterReceiver(receiver)
-            } catch (_: Exception) {
+            } catch (_: IllegalArgumentException) {
             }
         }
     }
@@ -350,10 +352,10 @@ class DhizukuInstallerServiceImpl : IDhizukuInstallerService.Stub() {
         packageName: String,
     ): android.content.pm.PackageInfo? =
         try {
-            ctx.packageManager.getPackageInfo(packageName, 0)
+            systemServiceCall { ctx.packageManager.getPackageInfo(packageName, 0) }
         } catch (_: android.content.pm.PackageManager.NameNotFoundException) {
             null
-        } catch (e: SecurityException) {
+        } catch (e: SystemPackagesException) {
             logE("getPackageInfo($packageName) failed", e)
             null
         }

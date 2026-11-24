@@ -19,6 +19,8 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withTimeoutOrNull
 import zed.rainxch.core.data.services.dhizuku.model.DhizukuStatus
+import zed.rainxch.core.data.services.systemServiceCall
+import zed.rainxch.core.domain.model.error.SystemPackagesException
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.coroutines.resume
 
@@ -36,8 +38,7 @@ class DhizukuServiceManager(
         private set
 
     fun initialize() {
-        runCatching { Dhizuku.init(context) }
-            .onFailure { Logger.w(TAG) { "warm-up Dhizuku.init() threw: ${it.message}" } }
+        initDhizuku()
         refreshStatus()
     }
 
@@ -82,22 +83,21 @@ class DhizukuServiceManager(
         }
     }
 
-    // Dhizuku rethrows a dead binder's RemoteException as a bare RuntimeException, so no narrower catch exists.
     private fun permissionGrantedOrNull(): Boolean? =
         try {
-            Dhizuku.isPermissionGranted()
-        } catch (e: Exception) {
-            Logger.w(TAG) { "Dhizuku.isPermissionGranted() threw: ${e.message}" }
+            dhizukuCall { Dhizuku.isPermissionGranted() }
+        } catch (e: SystemPackagesException) {
+            Logger.w(TAG) { "Dhizuku.isPermissionGranted() threw: ${e.cause}" }
             null
         }
 
     private fun isPackageInstalled(packageName: String): Boolean =
         try {
-            context.packageManager.getPackageInfo(packageName, 0)
+            systemServiceCall { context.packageManager.getPackageInfo(packageName, 0) }
             true
         } catch (_: PackageManager.NameNotFoundException) {
             false
-        } catch (_: Exception) {
+        } catch (_: SystemPackagesException) {
             false
         }
 
@@ -206,8 +206,8 @@ class DhizukuServiceManager(
                     continuation.invokeOnCancellation {
                         Logger.d(TAG) { "bindService() coroutine cancelled, unbinding..." }
                         try {
-                            Dhizuku.unbindUserService(connection)
-                        } catch (_: Exception) {
+                            dhizukuCall { Dhizuku.unbindUserService(connection) }
+                        } catch (_: SystemPackagesException) {
                         }
                     }
                 }

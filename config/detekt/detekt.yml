@@ -8,6 +8,18 @@ complexity:
     # Private helpers are how LongMethod gets fixed; counting them would set the two rules against each other.
     ignorePrivate: true
 
+exceptions:
+  TooGenericExceptionCaught:
+    # Naming a catch-all _, ignored or expected doesn't make it any less generic.
+    allowedExceptionNameRegex: '^$'
+    # The only APIs that throw nothing narrower than RuntimeException; each boundary rethrows a typed failure or falls back.
+    excludes:
+      - '**/core/data/src/androidMain/kotlin/zed/rainxch/core/data/services/SystemServiceBoundary.kt'
+      - '**/core/data/src/androidMain/kotlin/zed/rainxch/core/data/services/shizuku/ShizukuBoundary.kt'
+      - '**/core/data/src/androidMain/kotlin/zed/rainxch/core/data/services/dhizuku/DhizukuBoundary.kt'
+      - '**/core/data/src/commonMain/kotlin/zed/rainxch/core/data/secure/KSafeSafe.kt'
+      - '**/core/presentation/src/androidMain/kotlin/zed/rainxch/core/presentation/components/SystemServiceBoundary.kt'
+
 naming:
   FunctionNaming:
     ignoreAnnotated: ['Composable']

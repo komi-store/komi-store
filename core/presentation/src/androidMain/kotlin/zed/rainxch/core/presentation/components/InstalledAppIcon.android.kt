@@ -10,6 +10,7 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.graphics.drawable.toBitmap
+import zed.rainxch.core.domain.model.error.SystemPackagesException
 
 private const val TAG = "InstalledAppIcon"
 
@@ -44,11 +45,13 @@ internal fun resolveInstalledIcon(
     packageName: String,
 ): ImageBitmap? =
     try {
-        packageManager
-            .getApplicationIcon(packageName)
+        systemServiceCall { packageManager.getApplicationIcon(packageName) }
             .toBitmap()
             .asImageBitmap()
     } catch (e: PackageManager.NameNotFoundException) {
+        Log.w(TAG, "failed to load installed icon for $packageName", e)
+        null
+    } catch (e: SystemPackagesException) {
         Log.w(TAG, "failed to load installed icon for $packageName", e)
         null
     } catch (e: IllegalArgumentException) {
@@ -67,10 +70,12 @@ private fun resolveApkIcon(
         val appInfo = packageManager.getPackageArchiveInfo(apkFilePath, 0)?.applicationInfo ?: return null
         appInfo.sourceDir = apkFilePath
         appInfo.publicSourceDir = apkFilePath
-        appInfo
-            .loadIcon(packageManager)
+        systemServiceCall { appInfo.loadIcon(packageManager) }
             ?.toBitmap()
             ?.asImageBitmap()
+    } catch (e: SystemPackagesException) {
+        Log.w(TAG, "failed to load icon from APK at $apkFilePath", e)
+        null
     } catch (e: IllegalArgumentException) {
         Log.w(TAG, "failed to load icon from APK at $apkFilePath", e)
         null

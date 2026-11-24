@@ -8,6 +8,8 @@ import android.net.Uri
 import androidx.core.content.FileProvider
 import androidx.core.net.toUri
 import co.touchlab.kermit.Logger
+import zed.rainxch.core.data.services.systemServiceCall
+import zed.rainxch.core.domain.model.error.SystemPackagesException
 import zed.rainxch.core.domain.system.InstallerHandoff
 import java.io.File
 
@@ -38,9 +40,11 @@ class AndroidInstallerAppHandoff(
 
     private fun isInstalled(packageName: String): Boolean =
         try {
-            context.packageManager.getPackageInfo(packageName, 0)
+            systemServiceCall { context.packageManager.getPackageInfo(packageName, 0) }
             true
         } catch (_: PackageManager.NameNotFoundException) {
+            false
+        } catch (_: SystemPackagesException) {
             false
         }
 

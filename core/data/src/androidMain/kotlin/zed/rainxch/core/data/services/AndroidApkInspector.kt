@@ -15,6 +15,7 @@ import kotlinx.coroutines.withContext
 import zed.rainxch.core.domain.model.apk.ApkInspection
 import zed.rainxch.core.domain.model.apk.ApkPermission
 import zed.rainxch.core.domain.model.apk.ProtectionLevel
+import zed.rainxch.core.domain.model.error.SystemPackagesException
 import zed.rainxch.core.domain.system.ApkInspector
 import java.io.File
 
@@ -56,12 +57,12 @@ class AndroidApkInspector(
         withContext(Dispatchers.IO) {
             val info =
                 try {
-                    pm.getPackageInfoCompat(packageName, FULL_FLAGS)
+                    systemServiceCall { pm.getPackageInfoCompat(packageName, FULL_FLAGS) }
                 } catch (_: PackageManager.NameNotFoundException) {
                     null
-                } catch (e: SecurityException) {
+                } catch (e: SystemPackagesException) {
                     Logger.w(TAG) {
-                        "inspectInstalled: PackageManager threw for $packageName: $e"
+                        "inspectInstalled: PackageManager threw for $packageName: ${e.cause}"
                     }
                     null
                 }

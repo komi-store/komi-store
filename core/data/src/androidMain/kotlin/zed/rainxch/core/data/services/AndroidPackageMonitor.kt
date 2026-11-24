@@ -2,8 +2,8 @@ package zed.rainxch.core.data.services
 
 import android.content.Context
 import android.content.pm.ApplicationInfo
+import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
-import android.os.BadParcelableException
 import android.os.Build
 import androidx.core.content.pm.PackageInfoCompat
 import co.touchlab.kermit.Logger
@@ -30,13 +30,15 @@ class AndroidPackageMonitor(
                 val flags = SigningFingerprint.SIGNER_FLAG.toLong()
 
                 val packageInfo =
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                        packageManager.getPackageInfo(
-                            packageName,
-                            PackageManager.PackageInfoFlags.of(flags),
-                        )
-                    } else {
-                        packageManager.getPackageInfo(packageName, flags.toInt())
+                    systemServiceCall {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                            packageManager.getPackageInfo(
+                                packageName,
+                                PackageManager.PackageInfoFlags.of(flags),
+                            )
+                        } else {
+                            packageManager.getPackageInfo(packageName, flags.toInt())
+                        }
                     }
 
                 val versionCode = PackageInfoCompat.getLongVersionCode(packageInfo)
@@ -53,37 +55,21 @@ class AndroidPackageMonitor(
                 )
             } catch (_: PackageManager.NameNotFoundException) {
                 null
-            } catch (e: SecurityException) {
-                Logger.w(e) { "getInstalledPackageInfo($packageName) failed: ${e.message}" }
-                throw SystemPackagesException(e)
+            } catch (e: SystemPackagesException) {
+                Logger.w(e) { "getInstalledPackageInfo($packageName) failed: ${e.cause}" }
+                throw e
             }
         }
 
+    // A long list arrives in chunks; a chunk that fails to arrive throws BadParcelableException, a RuntimeException.
     override suspend fun getAllInstalledPackageNames(): Set<String> =
         withContext(Dispatchers.IO) {
-            // A long list arrives in chunks, and a chunk that fails to arrive throws BadParcelableException.
-            val packages =
-                try {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                        packageManager.getInstalledPackages(PackageManager.PackageInfoFlags.of(0L))
-                    } else {
-                        packageManager.getInstalledPackages(0)
-                    }
-                } catch (e: BadParcelableException) {
-                    throw SystemPackagesException(e)
-                }
-
-            packages.map { it.packageName }.toSet()
+            installedPackages().map { it.packageName }.toSet()
         }
 
     override suspend fun getAllInstalledApps(): List<DeviceApp> =
         withContext(Dispatchers.IO) {
-            val packages =
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    packageManager.getInstalledPackages(PackageManager.PackageInfoFlags.of(0L))
-                } else {
-                    packageManager.getInstalledPackages(0)
-                }
+            val packages = installedPackages()
 
             packages
                 .filter { pkg ->
@@ -106,6 +92,15 @@ class AndroidPackageMonitor(
                         isUpdatedSystemApp = isUpdatedSystem,
                     )
                 }.sortedBy { it.appName.lowercase() }
+        }
+
+    private fun installedPackages(): List<PackageInfo> =
+        systemServiceCall {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                packageManager.getInstalledPackages(PackageManager.PackageInfoFlags.of(0L))
+            } else {
+                packageManager.getInstalledPackages(0)
+            }
         }
 
     private fun resolveInstallerPackageName(pkg: String): String? = runCatching { packageManager.installingPackageNameOf(pkg) }.getOrNull()

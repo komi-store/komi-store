@@ -78,7 +78,7 @@ class AndroidInstaller(
 
     override suspend fun ensurePermissionsOrThrow(extOrMime: String) {
         val pm = context.packageManager
-        if (!pm.canRequestPackageInstalls()) {
+        if (!systemServiceCall { pm.canRequestPackageInstalls() }) {
             val intent =
                 Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES).apply {
                     data = "package:${context.packageName}".toUri()
@@ -108,7 +108,7 @@ class AndroidInstaller(
                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             }
 
-        check(intent.resolveActivity(context.packageManager) != null) { "No installer available on this device" }
+        check(systemServiceCall { intent.resolveActivity(context.packageManager) } != null) { "No installer available on this device" }
         intent.preferSystemInstaller()
         startActivityOrThrow(intent)
         Logger.d { "APK installation intent launched" }
@@ -128,8 +128,8 @@ class AndroidInstaller(
     // Several installers and no Android default would open a chooser per install, so Default means the system installer.
     private fun Intent.preferSystemInstaller() {
         val packageManager = context.packageManager
-        val resolved = resolveActivity(packageManager) ?: return
-        val handlers = packageManager.defaultHandlers(this)
+        val resolved = systemServiceCall { resolveActivity(packageManager) } ?: return
+        val handlers = systemServiceCall { packageManager.defaultHandlers(this) }
         if (handlers.any { it.activityInfo.packageName == resolved.packageName }) return
         handlers
             .firstOrNull { it.activityInfo.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM != 0 }
