@@ -162,8 +162,9 @@ private fun convertInlineHtml(
                 .joinToString("\n") { "> $it" }
         }.replace(STRIKE_TAG) { "~~${it.groupValues[2]}~~" }
         .replace(ANCHOR_TAG) { match ->
-            val resolvedUrl = urls.resolve(match.groupValues[2], asImage = false)
-            val text = match.groupValues[3].trim()
+            val (_, href, linkText) = match.destructured
+            val resolvedUrl = urls.resolve(href, asImage = false)
+            val text = linkText.trim()
             if (text.isEmpty()) "[$resolvedUrl]($resolvedUrl)" else "[$text]($resolvedUrl)"
         }.replace(KBD_TAG) { "`${it.groupValues[1]}`" }
 

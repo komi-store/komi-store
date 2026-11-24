@@ -62,9 +62,13 @@ internal class RepoContentReader(
             return cached.toTriple()
         }
         return when (val answer = readmeFromBackend(owner, repo, defaultBranch, cacheKey)) {
-            is BackendReadme.Answered -> answer.readme
-            BackendReadme.FailedOver ->
+            is BackendReadme.Answered -> {
+                answer.readme
+            }
+
+            BackendReadme.FailedOver -> {
                 readmeFromRawUrl(owner, repo, defaultBranch)?.also { cacheManager.put(cacheKey, it.toCachedReadme(), README) }
+            }
         }
     }
 
@@ -179,13 +183,13 @@ internal class RepoContentReader(
         url: String,
     ): String {
         val match = GITHUB_FILE_URL.find(url) ?: return rawMarkdown
-        val (owner, repo, branch, path) = match.destructured
+        val (ownerAndRepo, branch, path) = match.destructured
         val basePath = path.substringBeforeLast("/", "")
         val pathPrefix = if (basePath.isNotEmpty()) "$basePath/" else ""
         return preprocessMarkdown(
             markdown = rawMarkdown,
-            baseUrl = "https://raw.githubusercontent.com/$owner/$repo/$branch/$pathPrefix",
-            linkBaseUrl = "https://github.com/$owner/$repo/blob/$branch/$pathPrefix",
+            baseUrl = "https://raw.githubusercontent.com/$ownerAndRepo/$branch/$pathPrefix",
+            linkBaseUrl = "https://github.com/$ownerAndRepo/blob/$branch/$pathPrefix",
         )
     }
 
@@ -199,6 +203,6 @@ internal class RepoContentReader(
 
     private companion object {
         const val README_PATH = "README.md"
-        val GITHUB_FILE_URL = Regex("""https://(?:raw\.githubusercontent\.com|github\.com)/([^/]+)/([^/]+)/(?:blob/)?([^/]+)/(.*)""")
+        val GITHUB_FILE_URL = Regex("""https://(?:raw\.githubusercontent\.com|github\.com)/([^/]+/[^/]+)/(?:blob/)?([^/]+)/(.*)""")
     }
 }
