@@ -15,3 +15,5 @@ internal interface Translator {
 internal class TranslationProviderNotConfiguredException(
     message: String,
 ) : RuntimeException(message)
+
+internal const val ERROR_BODY_PREVIEW_CHARS = 200
