@@ -1,5 +1,8 @@
 package zed.rainxch.details.presentation.model
 
+import androidx.compose.runtime.Immutable
+
+@Immutable
 sealed class LogResult {
     data object DownloadStarted : LogResult()
 

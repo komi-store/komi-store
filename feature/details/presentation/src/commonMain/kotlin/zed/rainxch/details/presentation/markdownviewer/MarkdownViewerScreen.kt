@@ -192,7 +192,7 @@ private fun MarkdownViewerScreen(
         selectedLanguageCode = state.translation.targetLanguageCode ?: state.deviceLanguageCode,
         deviceLanguageCode = state.deviceLanguageCode,
         onQueryChange = onLanguageQueryChange,
-        onLanguageSelected = { lang ->
+        onLanguageSelect = { lang ->
             onDismissLanguagePicker()
             onTranslate(lang.code)
         },

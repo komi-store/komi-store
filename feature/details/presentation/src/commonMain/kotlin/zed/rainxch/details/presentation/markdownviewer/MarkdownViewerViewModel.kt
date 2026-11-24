@@ -15,10 +15,13 @@ import org.intellij.markdown.flavours.gfm.GFMFlavourDescriptor
 import org.intellij.markdown.parser.CancellationToken
 import org.intellij.markdown.parser.MarkdownParser
 import org.jetbrains.compose.resources.getString
+import zed.rainxch.core.domain.model.error.RateLimitException
 import zed.rainxch.details.domain.repository.DetailsRepository
 import zed.rainxch.details.domain.repository.TranslationRepository
 import zed.rainxch.details.presentation.model.SupportedLanguages
 import zed.rainxch.details.presentation.model.TranslationState
+import zed.rainxch.details.presentation.utils.UntypedFailureException
+import zed.rainxch.details.presentation.utils.untypedFailures
 import zed.rainxch.githubstore.core.presentation.res.Res
 import zed.rainxch.githubstore.core.presentation.res.failed_to_load
 import zed.rainxch.githubstore.core.presentation.res.translation_failed
@@ -66,9 +69,8 @@ class MarkdownViewerViewModel(
             )
         }
         viewModelScope.launch {
-            runCatching {
-                translationRepository.translate(markdown, targetLanguageCode)
-            }.onSuccess { result ->
+            try {
+                val result = untypedFailures { translationRepository.translate(markdown, targetLanguageCode) }
                 _state.update {
                     it.copy(
                         translation =
@@ -82,18 +84,22 @@ class MarkdownViewerViewModel(
                     )
                 }
                 recompose()
-            }.onFailure { _ ->
-                _state.update {
-                    it.copy(
-                        translation =
-                            it.translation.copy(
-                                isTranslating = false,
-                                error = getString(Res.string.translation_failed),
-                            ),
-                    )
-                }
+            } catch (_: UntypedFailureException) {
+                showTranslationFailure()
+            } catch (_: RateLimitException) {
+                showTranslationFailure()
             }
         }
+    }
+
+    private suspend fun showTranslationFailure() {
+        val message = getString(Res.string.translation_failed)
+        _state.update { it.copy(translation = it.translation.copy(isTranslating = false, error = message)) }
+    }
+
+    private suspend fun showLoadFailure() {
+        val message = getString(Res.string.failed_to_load)
+        _state.update { it.copy(isLoading = false, errorMessage = message) }
     }
 
     fun toggleTranslation() {
@@ -145,22 +151,18 @@ class MarkdownViewerViewModel(
     private fun load() {
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true, errorMessage = null) }
-            runCatching {
-                detailsRepository.fetchRawMarkdown(url)
-            }.onSuccess { rawMarkdown ->
+            try {
+                val rawMarkdown = untypedFailures { detailsRepository.fetchRawMarkdown(url) }
                 if (rawMarkdown != null) {
-                    _state.update {
-                        it.copy(
-                            isLoading = false,
-                            markdown = rawMarkdown,
-                        )
-                    }
+                    _state.update { it.copy(isLoading = false, markdown = rawMarkdown) }
                     recompose()
                 } else {
-                    _state.update { it.copy(isLoading = false, errorMessage = getString(Res.string.failed_to_load)) }
+                    showLoadFailure()
                 }
-            }.onFailure { _ ->
-                _state.update { it.copy(isLoading = false, errorMessage = getString(Res.string.failed_to_load)) }
+            } catch (_: UntypedFailureException) {
+                showLoadFailure()
+            } catch (_: RateLimitException) {
+                showLoadFailure()
             }
         }
     }

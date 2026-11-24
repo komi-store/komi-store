@@ -9,12 +9,15 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.getString
 import zed.rainxch.core.domain.model.account.github.GithubRelease
+import zed.rainxch.core.domain.model.error.RateLimitException
 import zed.rainxch.core.presentation.utils.formatIsoDateOrRaw
 import zed.rainxch.details.domain.repository.DetailsRepository
 import zed.rainxch.details.domain.repository.TranslationRepository
 import zed.rainxch.details.presentation.model.SupportedLanguages
 import zed.rainxch.details.presentation.model.TranslationState
 import zed.rainxch.details.presentation.model.WhatsNewReleaseUi
+import zed.rainxch.details.presentation.utils.UntypedFailureException
+import zed.rainxch.details.presentation.utils.untypedFailures
 import zed.rainxch.githubstore.core.presentation.res.Res
 import zed.rainxch.githubstore.core.presentation.res.failed_to_load
 import zed.rainxch.githubstore.core.presentation.res.no_release_notes
@@ -61,9 +64,8 @@ class DetailsWhatsNewViewModel(
             )
         }
         viewModelScope.launch {
-            runCatching {
-                translationRepository.translate(body, targetLanguageCode)
-            }.onSuccess { result ->
+            try {
+                val result = untypedFailures { translationRepository.translate(body, targetLanguageCode) }
                 _state.update {
                     it.copy(
                         translation =
@@ -77,18 +79,22 @@ class DetailsWhatsNewViewModel(
                     )
                 }
                 rebuild()
-            }.onFailure { _ ->
-                _state.update {
-                    it.copy(
-                        translation =
-                            it.translation.copy(
-                                isTranslating = false,
-                                error = getString(Res.string.translation_failed),
-                            ),
-                    )
-                }
+            } catch (_: UntypedFailureException) {
+                showTranslationFailure()
+            } catch (_: RateLimitException) {
+                showTranslationFailure()
             }
         }
+    }
+
+    private suspend fun showTranslationFailure() {
+        val message = getString(Res.string.translation_failed)
+        _state.update { it.copy(translation = it.translation.copy(isTranslating = false, error = message)) }
+    }
+
+    private suspend fun showLoadFailure() {
+        val message = getString(Res.string.failed_to_load)
+        _state.update { it.copy(isLoading = false, errorMessage = message) }
     }
 
     fun toggleTranslation() {
@@ -139,27 +145,31 @@ class DetailsWhatsNewViewModel(
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true, errorMessage = null) }
             if (noReleaseNotes.isBlank()) noReleaseNotes = getString(Res.string.no_release_notes)
-            runCatching {
-                val resolved =
-                    if (owner.isNotBlank() && repo.isNotBlank()) {
-                        detailsRepository.getRepositoryByOwnerAndName(owner, repo, sourceHost)
-                    } else {
-                        detailsRepository.getRepositoryById(repositoryId)
+            try {
+                val (resolved, releases) =
+                    untypedFailures {
+                        val resolved =
+                            if (owner.isNotBlank() && repo.isNotBlank()) {
+                                detailsRepository.getRepositoryByOwnerAndName(owner, repo, sourceHost)
+                            } else {
+                                detailsRepository.getRepositoryById(repositoryId)
+                            }
+                        val releases =
+                            detailsRepository.getAllReleases(
+                                owner = resolved.owner.login,
+                                repo = resolved.name,
+                                defaultBranch = resolved.defaultBranch,
+                                sourceHost = sourceHost,
+                            )
+                        resolved to releases
                     }
-                val releases =
-                    detailsRepository.getAllReleases(
-                        owner = resolved.owner.login,
-                        repo = resolved.name,
-                        defaultBranch = resolved.defaultBranch,
-                        sourceHost = sourceHost,
-                    )
-                resolved to releases
-            }.onSuccess { (resolved, releases) ->
                 rawReleases = releases
                 _state.update { it.copy(isLoading = false, repoName = resolved.name) }
                 rebuild()
-            }.onFailure { _ ->
-                _state.update { it.copy(isLoading = false, errorMessage = getString(Res.string.failed_to_load)) }
+            } catch (_: UntypedFailureException) {
+                showLoadFailure()
+            } catch (_: RateLimitException) {
+                showLoadFailure()
             }
         }
     }

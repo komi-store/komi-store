@@ -2,7 +2,7 @@ package zed.rainxch.details.presentation.about
 
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
-import zed.rainxch.details.domain.model.SupportedLanguage
+import zed.rainxch.details.presentation.model.SupportedLanguage
 import zed.rainxch.details.presentation.model.SupportedLanguages
 import zed.rainxch.details.presentation.model.TranslationState
 

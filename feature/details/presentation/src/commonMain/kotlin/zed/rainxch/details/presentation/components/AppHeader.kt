@@ -48,15 +48,12 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.graphics.shapes.Morph
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.first
 import org.jetbrains.compose.resources.stringResource
-import zed.rainxch.core.domain.model.account.github.GithubRelease
-import zed.rainxch.core.domain.model.account.github.GithubRepoSummary
-import zed.rainxch.core.domain.model.account.github.GithubUserProfile
-import zed.rainxch.core.domain.model.installation.InstalledApp
-import zed.rainxch.core.domain.model.installation.isReallyInstalled
 import zed.rainxch.core.domain.model.repository.DiscoveryPlatform
-import zed.rainxch.core.domain.utils.PlatformRelease
 import zed.rainxch.core.presentation.components.GitHubStoreImage
 import zed.rainxch.core.presentation.components.InstalledAppIcon
 import zed.rainxch.core.presentation.components.chips.KomiChip
@@ -77,29 +74,30 @@ import zed.rainxch.core.presentation.personality.manga.decoration.hardShadow
 import zed.rainxch.core.presentation.spacing.Spacing
 import zed.rainxch.core.presentation.utils.formatReleasedAgo
 import zed.rainxch.details.presentation.model.DownloadStage
+import zed.rainxch.details.presentation.model.InstalledAppUi
+import zed.rainxch.details.presentation.model.OwnerProfileUi
+import zed.rainxch.details.presentation.model.PlatformReleaseUi
+import zed.rainxch.details.presentation.model.RepositoryUi
 import zed.rainxch.githubstore.core.presentation.res.Res
 import zed.rainxch.githubstore.core.presentation.res.details_last_push
 import zed.rainxch.githubstore.core.presentation.res.forked_repository
 import zed.rainxch.githubstore.core.presentation.res.no_description
 import zed.rainxch.githubstore.core.presentation.res.self_owned_badge
 
-// Classic sets the header on a tinted card (the page takes its colors from the app's icon, see
-// DetailsRoot) and badges the picture with the install status; Manga inks it into a panel with the
-// status as a sticker on its corner. Both share the body below.
+// Classic badges the picture with the install status on a tinted card; Manga inks a panel with the status as a sticker.
 @Composable
 fun AppHeader(
-    author: GithubUserProfile?,
-    repository: GithubRepoSummary,
-    release: GithubRelease?,
-    installedApp: InstalledApp?,
+    author: OwnerProfileUi?,
+    repository: RepositoryUi,
+    installedApp: InstalledAppUi?,
     modifier: Modifier = Modifier,
-    installedApps: List<InstalledApp> = emptyList(),
+    installedApps: ImmutableList<InstalledAppUi> = persistentListOf(),
     onSelectInstalledApp: (String) -> Unit = {},
     downloadStage: DownloadStage = DownloadStage.IDLE,
     downloadProgress: Int? = null,
     isCurrentUserOwner: Boolean = false,
     onPlatformClick: ((DiscoveryPlatform) -> Unit)? = null,
-    platformReleases: List<PlatformRelease> = emptyList(),
+    platformReleases: ImmutableList<PlatformReleaseUi> = persistentListOf(),
     devicePlatform: DiscoveryPlatform? = null,
     appLabel: String? = null,
     onAppLabelClick: () -> Unit = {},
@@ -111,22 +109,22 @@ fun AppHeader(
     val status = headerStatusOf(installedApp, showAppSwitcher)
     val switcherApps =
         remember(installedApps, showAppSwitcher) {
-            if (showAppSwitcher) installedApps.sortedBy { it.appName.lowercase() } else emptyList()
+            if (showAppSwitcher) installedApps.sortedBy { it.appName.lowercase() }.toImmutableList() else persistentListOf()
         }
     val progress by animateFloatAsState(
         targetValue = (downloadProgress ?: 0) / 100f,
         animationSpec = personality.motion.defaultEffects(),
         label = "header-progress",
     )
-    val avatarUrl = author?.avatarUrl ?: repository.owner.avatarUrl
-    val deviceApp = installedApp?.takeIf { it.isReallyInstalled() }
+    val avatarUrl = author?.avatarUrl ?: repository.ownerAvatarUrl
+    val deviceApp = installedApp?.takeIf { !it.isPendingInstall }
     // Plays once per visit, not each time the header scrolls back into view.
     var entered by rememberSaveable { mutableStateOf(false) }
     LaunchedEffect(Unit) { entered = true }
     val playEntrance = !entered && !manga && personality.motion.animates
     val body: @Composable () -> Unit = {
         HeaderBody(
-            owner = author?.login ?: repository.owner.login,
+            owner = author?.login ?: repository.ownerLogin,
             avatarUrl = avatarUrl,
             repository = repository,
             deviceApp = deviceApp,
@@ -174,8 +172,8 @@ fun AppHeader(
 private fun HeaderBody(
     owner: String,
     avatarUrl: String?,
-    repository: GithubRepoSummary,
-    deviceApp: InstalledApp?,
+    repository: RepositoryUi,
+    deviceApp: InstalledAppUi?,
     status: HeaderStatus?,
     downloadStage: DownloadStage,
     progress: () -> Float,
@@ -206,7 +204,7 @@ private fun HeaderBody(
                 if (manga) OwnerLine(owner, isCurrentUserOwner, onOwnerClick)
                 RepoTitle(name = repository.name)
                 if (!manga) OwnerLine(owner, isCurrentUserOwner, onOwnerClick)
-                LastPush(repository = repository)
+                LastPush(lastPushAt = repository.lastPushAt)
             }
         }
         KomiText(
@@ -218,14 +216,11 @@ private fun HeaderBody(
     }
 }
 
-// The installed app's own icon when it is on the device, else the owner's avatar. Classic sets the
-// icon on a cookie-shaped plate (the avatar is cut to the cookie), pops it in and badges its corner
-// with [status]; Manga squares and tilts it. While a download runs, the picture shrinks into the
-// progress ring, and in Classic the cookie morphs into a circle.
+// The app's icon when installed, else the owner's avatar; while a download runs it shrinks into the progress ring.
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun HeaderPicture(
-    deviceApp: InstalledApp?,
+    deviceApp: InstalledAppUi?,
     avatarUrl: String?,
     status: HeaderStatus?,
     downloadStage: DownloadStage,
@@ -300,7 +295,7 @@ private fun HeaderPicture(
 // An installed app's icon carries its own shape, so on a plate it sits inset rather than cut.
 @Composable
 private fun PictureImage(
-    deviceApp: InstalledApp?,
+    deviceApp: InstalledAppUi?,
     avatarUrl: String?,
     plated: Boolean,
 ) {
@@ -394,8 +389,8 @@ private fun RepoTitle(name: String) {
 }
 
 @Composable
-private fun LastPush(repository: GithubRepoSummary) {
-    val label = formatReleasedAgo(repository.pushedAt?.takeIf { it.isNotBlank() } ?: repository.updatedAt) ?: return
+private fun LastPush(lastPushAt: String) {
+    val label = formatReleasedAgo(lastPushAt) ?: return
     val colors = LocalPersonality.current.colors
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -417,13 +412,13 @@ private fun LastPush(repository: GithubRepoSummary) {
 
 @Composable
 private fun HeaderChips(
-    installedApp: InstalledApp?,
-    switcherApps: List<InstalledApp>,
+    installedApp: InstalledAppUi?,
+    switcherApps: ImmutableList<InstalledAppUi>,
     appLabel: String?,
     onAppLabelClick: () -> Unit,
     onSelectInstalledApp: (String) -> Unit,
     isFork: Boolean,
-    platformReleases: List<PlatformRelease>,
+    platformReleases: ImmutableList<PlatformReleaseUi>,
     devicePlatform: DiscoveryPlatform?,
     onPlatformClick: ((DiscoveryPlatform) -> Unit)?,
     playEntrance: Boolean,
@@ -462,8 +457,8 @@ private fun HeaderChips(
 // The monorepo app label and one chip per installed app; the selected chip scrolls into view.
 @Composable
 private fun AppChipRow(
-    installedApp: InstalledApp?,
-    switcherApps: List<InstalledApp>,
+    installedApp: InstalledAppUi?,
+    switcherApps: ImmutableList<InstalledAppUi>,
     appLabel: String?,
     onAppLabelClick: () -> Unit,
     onSelectInstalledApp: (String) -> Unit,

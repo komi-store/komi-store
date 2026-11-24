@@ -192,9 +192,6 @@ private fun MainDetailPane(
         onNavigateToSecurity = { owner, repo ->
             navController.navigate(GithubStoreGraph.RepoSecurityScreen(owner = owner, repo = repo))
         },
-        onNavigateToMarkdownViewer = { url ->
-            navController.navigate(GithubStoreGraph.MarkdownViewerScreen(url))
-        },
         onNavigateToReviews = { owner, repo, sourceHost, openComposer, composerRating, version, appLabel ->
             navController.navigate(
                 GithubStoreGraph.ReviewsScreen(

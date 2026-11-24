@@ -2,9 +2,11 @@ package zed.rainxch.details.presentation.components.sections
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -28,46 +30,67 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import org.intellij.markdown.flavours.gfm.GFMFlavourDescriptor
-import org.intellij.markdown.parser.CancellationToken
-import org.intellij.markdown.parser.MarkdownParser
 import org.jetbrains.compose.resources.stringResource
-import zed.rainxch.core.domain.model.account.github.GithubRelease
+import org.koin.compose.koinInject
+import org.koin.core.qualifier.named
 import zed.rainxch.core.domain.utils.applyThemeAwareImages
+import zed.rainxch.core.domain.utils.separateAdjacentImageLinks
+import zed.rainxch.core.presentation.components.icon.KomiIcon
 import zed.rainxch.core.presentation.components.markdown.MarkdownImageTransformer
 import zed.rainxch.core.presentation.components.markdown.githubStoreMarkdownComponents
-import zed.rainxch.core.presentation.components.icon.KomiIcon
 import zed.rainxch.core.presentation.components.markdown.rememberMarkdownColors
 import zed.rainxch.core.presentation.components.markdown.rememberMarkdownTypography
 import zed.rainxch.core.presentation.components.text.KomiText
 import zed.rainxch.core.presentation.components.text.KomiTextRole
 import zed.rainxch.core.presentation.locals.LocalPersonality
+import zed.rainxch.core.presentation.personality.fadeOutBrush
 import zed.rainxch.core.presentation.utils.formatIsoDateOrRaw
-import zed.rainxch.githubstore.core.presentation.res.*
+import zed.rainxch.details.presentation.DetailsAction
+import zed.rainxch.details.presentation.DetailsState
+import zed.rainxch.details.presentation.model.ReleaseUi
+import zed.rainxch.details.presentation.utils.splitMarkdownIntoChunks
+import zed.rainxch.githubstore.core.presentation.res.Res
+import zed.rainxch.githubstore.core.presentation.res.no_release_notes
+import zed.rainxch.githubstore.core.presentation.res.read_more
+import zed.rainxch.githubstore.core.presentation.res.show_less
+import zed.rainxch.githubstore.core.presentation.res.whats_new
 
 fun LazyListScope.whatsNew(
-    release: GithubRelease,
-    isExpanded: Boolean,
-    onToggleExpanded: () -> Unit,
+    release: ReleaseUi,
+    state: DetailsState,
     collapsedHeight: Dp,
-    measuredHeightPx: Float?,
-    onMeasured: (Float) -> Unit,
+    onAction: (DetailsAction) -> Unit,
     onReadMore: (() -> Unit)? = null,
 ) {
-    item {
-        val colors = LocalPersonality.current.colors
-        Spacer(Modifier.height(20.dp))
+    item { WhatsNewHeading(release = release) }
+    item(key = "whats_new_markdown") {
+        Spacer(Modifier.height(12.dp))
+        ExpandableMarkdownContent(
+            release = release,
+            collapsedHeight = collapsedHeight,
+            isExpanded = state.isWhatsNewExpanded,
+            onToggleExpand = onReadMore ?: { onAction(DetailsAction.ToggleWhatsNewExpanded) },
+            measuredHeightPx = state.whatsNewMeasuredHeightPx,
+            onMeasure = { onAction(DetailsAction.OnWhatsNewMeasured(it)) },
+        )
+    }
+}
 
+@Composable
+private fun WhatsNewHeading(release: ReleaseUi) {
+    val colors = LocalPersonality.current.colors
+    Column {
+        Spacer(Modifier.height(20.dp))
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 6.dp),
+            modifier = Modifier.fillMaxWidth().padding(bottom = 6.dp),
             verticalArrangement = Arrangement.spacedBy(2.dp),
         ) {
             KomiText(
@@ -76,189 +99,159 @@ fun LazyListScope.whatsNew(
                 color = colors.onBackground,
             )
         }
-
         Spacer(Modifier.height(10.dp))
-
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(
-                    color = colors.surface,
-                    shape = RoundedCornerShape(LocalPersonality.current.shape.corner),
-                )
-                .padding(horizontal = 14.dp, vertical = 10.dp),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            KomiText(
-                text = release.tagName,
-                role = KomiTextRole.CardTitle,
-                color = colors.primary,
-                maxLines = 1,
-                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
-                modifier = Modifier.weight(1f),
-            )
-            KomiText(
-                text = formatIsoDateOrRaw(release.publishedAt),
-                role = KomiTextRole.Caption,
-                color = colors.onSurfaceVariant,
-                maxLines = 1,
-            )
-        }
+        ReleaseLine(release = release)
     }
+}
 
-    item(key = "whats_new_markdown") {
-        Spacer(Modifier.height(12.dp))
-
-        ExpandableMarkdownContent(
-            release = release,
-            collapsedHeight = collapsedHeight,
-            isExpanded = isExpanded,
-            onToggleExpanded = onReadMore ?: onToggleExpanded,
-            measuredHeightPx = measuredHeightPx,
-            onMeasured = onMeasured,
+@Composable
+private fun ReleaseLine(release: ReleaseUi) {
+    val colors = LocalPersonality.current.colors
+    Row(
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .background(color = colors.surface, shape = RoundedCornerShape(LocalPersonality.current.shape.corner))
+                .padding(horizontal = 14.dp, vertical = 10.dp),
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        KomiText(
+            text = release.tagName,
+            role = KomiTextRole.CardTitle,
+            color = colors.primary,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.weight(1f),
+        )
+        KomiText(
+            text = formatIsoDateOrRaw(release.publishedAt),
+            role = KomiTextRole.Caption,
+            color = colors.onSurfaceVariant,
+            maxLines = 1,
         )
     }
 }
 
 @Composable
 private fun ExpandableMarkdownContent(
-    release: GithubRelease,
+    release: ReleaseUi,
     collapsedHeight: Dp,
     isExpanded: Boolean,
-    onToggleExpanded: () -> Unit,
+    onToggleExpand: () -> Unit,
     measuredHeightPx: Float?,
-    onMeasured: (Float) -> Unit,
+    onMeasure: (Float) -> Unit,
 ) {
     val raw = release.description ?: stringResource(Res.string.no_release_notes)
-    val isDark = androidx.compose.foundation.isSystemInDarkTheme()
-
-    var fullChunks by remember(raw, isDark) { mutableStateOf<List<String>?>(null) }
-    LaunchedEffect(raw, isDark) {
-        val processed = withContext(Dispatchers.Default) {
-            val themed = applyThemeAwareImages(raw, isDark)
-            zed.rainxch.core.domain.utils.separateAdjacentImageLinks(themed)
-        }
-        val chunks = withContext(Dispatchers.Default) {
-            zed.rainxch.details.presentation.utils
-                .splitMarkdownIntoChunks(processed, targetChunkChars = 4000)
-        }
-        fullChunks = chunks
-    }
-
+    val isDark = isSystemInDarkTheme()
+    val fullChunks = rememberMarkdownChunks(raw, isDark)
     val density = LocalDensity.current
-    val colors = rememberMarkdownColors()
-    val typography = rememberMarkdownTypography()
-    val flavour = remember { GFMFlavourDescriptor() }
-    val parser = remember(flavour) { MarkdownParser(flavour, cancellationToken = CancellationToken.NonCancellable) }
-    val probeClient = org.koin.compose.koinInject<io.ktor.client.HttpClient>(
-        qualifier = org.koin.core.qualifier.named("test"),
-    )
-    val imageTransformer = remember(probeClient) {
-        MarkdownImageTransformer(probeClient)
-    }
-    val components = remember(isDark, imageTransformer) {
-        githubStoreMarkdownComponents(imageTransformer, isDark)
-    }
-    val personalityColors = LocalPersonality.current.colors
-    val shape = LocalPersonality.current.shape
-    val cardColor = personalityColors.background
-
+    val probeClient = koinInject<io.ktor.client.HttpClient>(qualifier = named("test"))
+    val imageTransformer = remember(probeClient) { MarkdownImageTransformer(probeClient) }
+    val components = remember(isDark, imageTransformer) { githubStoreMarkdownComponents(imageTransformer, isDark) }
     val collapsedHeightPx = with(density) { collapsedHeight.toPx() }
+    val measuredDp = measuredHeightPx?.let { with(density) { it.toDp() } }
     val effectiveHeight = measuredHeightPx ?: 0f
     val needsExpansion = effectiveHeight > collapsedHeightPx && collapsedHeightPx > 0f
-    val measuredDp =
-        measuredHeightPx?.let { with(density) { it.toDp() } }
-
     val bringIntoViewRequester = remember { BringIntoViewRequester() }
     LaunchedEffect(isExpanded) {
-        if (isExpanded) {
-            bringIntoViewRequester.bringIntoView()
-        }
+        if (isExpanded) bringIntoViewRequester.bringIntoView()
     }
-
     Column(modifier = Modifier.bringIntoViewRequester(bringIntoViewRequester)) {
         Box {
-            Box(
-                modifier =
-                    when {
-                        !isExpanded && needsExpansion ->
-                            Modifier
-                                .height(collapsedHeight)
-                                .clipToBounds()
-                        isExpanded && measuredDp != null ->
-                            Modifier.heightIn(min = measuredDp)
-                        else -> Modifier
-                    },
-            ) {
+            Box(modifier = Modifier.markdownBox(isExpanded, needsExpansion, collapsedHeight, measuredDp)) {
                 ProgressiveMarkdown(
                     isExpanded = isExpanded,
                     fullChunks = fullChunks,
                     collapsedHeight = collapsedHeight,
-                    colors = colors,
-                    typography = typography,
+                    colors = rememberMarkdownColors(),
+                    typography = rememberMarkdownTypography(),
                     components = components,
-                    flavour = flavour,
-                    parser = parser,
                     imageTransformer = imageTransformer,
-                    onMeasured = onMeasured,
+                    onMeasure = onMeasure,
                     effectiveHeight = effectiveHeight,
                     collapsedHeightPx = collapsedHeightPx,
                     rawKey = raw,
                 )
             }
-
             if (!isExpanded && needsExpansion) {
                 Box(
-                    modifier = Modifier
-                        .align(Alignment.BottomCenter)
-                        .fillMaxWidth()
-                        .height(140.dp)
-                        .background(
-                            Brush.verticalGradient(
-                                colorStops = arrayOf(
-                                    0f to cardColor.copy(alpha = 0f),
-                                    0.35f to cardColor.copy(alpha = 0.10f),
-                                    0.6f to cardColor.copy(alpha = 0.35f),
-                                    0.8f to cardColor.copy(alpha = 0.7f),
-                                    1f to cardColor,
-                                ),
-                            ),
-                        ),
+                    modifier =
+                        Modifier
+                            .align(Alignment.BottomCenter)
+                            .fillMaxWidth()
+                            .height(140.dp)
+                            .background(LocalPersonality.current.colors.background.fadeOutBrush),
                 )
             }
         }
-
         if (needsExpansion) {
             Spacer(Modifier.height(12.dp))
-            Row(
-                modifier = Modifier
-                    .align(Alignment.CenterHorizontally)
-                    .clip(RoundedCornerShape(shape.cornerSmall))
-                    .background(personalityColors.onSurface)
-                    .clickable(onClick = onToggleExpanded)
-                    .padding(horizontal = 22.dp, vertical = 12.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
-                KomiText(
-                    text = if (isExpanded) {
-                        stringResource(Res.string.show_less)
-                    } else {
-                        stringResource(Res.string.read_more)
-                    },
-                    role = KomiTextRole.CardTitle,
-                    color = personalityColors.surface,
-                )
-                if (!isExpanded) {
-                    KomiIcon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-                        contentDescription = null,
-                        tint = personalityColors.surface,
-                        modifier = Modifier.size(18.dp),
-                    )
-                }
-            }
+            ReadMoreToggle(isExpanded = isExpanded, onToggleExpand = onToggleExpand)
         }
     }
 }
+
+// Release notes are themed and chunked off the main thread so a long changelog doesn't stall the page.
+@Composable
+private fun rememberMarkdownChunks(
+    raw: String,
+    isDark: Boolean,
+): ImmutableList<String>? {
+    var fullChunks by remember(raw, isDark) { mutableStateOf<ImmutableList<String>?>(null) }
+    LaunchedEffect(raw, isDark) {
+        fullChunks =
+            withContext(Dispatchers.Default) {
+                splitMarkdownIntoChunks(separateAdjacentImageLinks(applyThemeAwareImages(raw, isDark)), targetChunkChars = CHUNK_CHARS)
+                    .toImmutableList()
+            }
+    }
+    return fullChunks
+}
+
+private fun Modifier.markdownBox(
+    isExpanded: Boolean,
+    needsExpansion: Boolean,
+    collapsedHeight: Dp,
+    measuredDp: Dp?,
+): Modifier =
+    when {
+        !isExpanded && needsExpansion -> height(collapsedHeight).clipToBounds()
+        isExpanded && measuredDp != null -> heightIn(min = measuredDp)
+        else -> this
+    }
+
+@Composable
+private fun ColumnScope.ReadMoreToggle(
+    isExpanded: Boolean,
+    onToggleExpand: () -> Unit,
+) {
+    val colors = LocalPersonality.current.colors
+    Row(
+        modifier =
+            Modifier
+                .align(Alignment.CenterHorizontally)
+                .clip(RoundedCornerShape(LocalPersonality.current.shape.cornerSmall))
+                .background(colors.onSurface)
+                .clickable(onClick = onToggleExpand)
+                .padding(horizontal = 22.dp, vertical = 12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        KomiText(
+            text = stringResource(if (isExpanded) Res.string.show_less else Res.string.read_more),
+            role = KomiTextRole.CardTitle,
+            color = colors.surface,
+        )
+        if (!isExpanded) {
+            KomiIcon(
+                imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                contentDescription = null,
+                tint = colors.surface,
+                modifier = Modifier.size(18.dp),
+            )
+        }
+    }
+}
+
+private const val CHUNK_CHARS = 4000

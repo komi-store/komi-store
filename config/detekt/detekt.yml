@@ -19,6 +19,7 @@ exceptions:
       - '**/core/data/src/androidMain/kotlin/zed/rainxch/core/data/services/dhizuku/DhizukuBoundary.kt'
       - '**/core/data/src/commonMain/kotlin/zed/rainxch/core/data/secure/KSafeSafe.kt'
       - '**/core/presentation/src/androidMain/kotlin/zed/rainxch/core/presentation/components/SystemServiceBoundary.kt'
+      - '**/feature/details/presentation/src/commonMain/kotlin/zed/rainxch/details/presentation/utils/UntypedFailures.kt'
 
 naming:
   FunctionNaming:

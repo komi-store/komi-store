@@ -11,14 +11,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.OpenInNew
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
-import zed.rainxch.core.domain.utils.PlatformRelease
-import zed.rainxch.core.domain.utils.assetPlatformOf
 import zed.rainxch.core.presentation.components.buttons.KomiButtonVariant
 import zed.rainxch.core.presentation.components.buttons.KomiIconButton
 import zed.rainxch.core.presentation.components.buttons.KomiIconButtonSize
@@ -34,6 +31,7 @@ import zed.rainxch.core.presentation.utils.formatIsoDateOrRaw
 import zed.rainxch.core.presentation.utils.toIcon
 import zed.rainxch.core.presentation.utils.toLabel
 import zed.rainxch.details.presentation.DetailsAction
+import zed.rainxch.details.presentation.model.PlatformHandoffUi
 import zed.rainxch.githubstore.core.presentation.res.Res
 import zed.rainxch.githubstore.core.presentation.res.get_it_on_platform
 import zed.rainxch.githubstore.core.presentation.res.open_in_browser
@@ -41,17 +39,16 @@ import zed.rainxch.githubstore.core.presentation.res.share_link
 
 @Composable
 fun PlatformHandoffSheet(
-    handoff: PlatformRelease,
+    handoff: PlatformHandoffUi,
     onAction: (DetailsAction) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val colors = LocalPersonality.current.colors
-    val (platform, release) = handoff
-    val assets = remember(handoff) {
-        release.assets.filter { assetPlatformOf(it.name) == platform }
-    }
+    val platform = handoff.platform
 
     KomiSheet(
         onDismiss = { onAction(DetailsAction.OnDismissPlatformHandoff) },
+        modifier = modifier,
         placement = KomiSheetPlacement.Bottom,
     ) {
         Row(
@@ -74,7 +71,7 @@ fun PlatformHandoffSheet(
             )
         }
         KomiText(
-            text = "${release.tagName} · ${formatIsoDateOrRaw(release.publishedAt)}",
+            text = "${handoff.tagName} · ${formatIsoDateOrRaw(handoff.publishedAt)}",
             role = KomiTextRole.Body,
             color = colors.onSurfaceVariant,
         )
@@ -82,12 +79,13 @@ fun PlatformHandoffSheet(
 
         val shareLabel = stringResource(Res.string.share_link)
         val openLabel = stringResource(Res.string.open_in_browser)
-        assets.forEachIndexed { index, asset ->
+        handoff.assets.forEachIndexed { index, asset ->
             if (index > 0) KomiHorizontalDivider()
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 10.dp),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 10.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {

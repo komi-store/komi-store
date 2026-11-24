@@ -8,10 +8,13 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.getString
+import zed.rainxch.core.domain.model.error.RateLimitException
 import zed.rainxch.details.domain.repository.DetailsRepository
 import zed.rainxch.details.domain.repository.TranslationRepository
 import zed.rainxch.details.presentation.model.SupportedLanguages
 import zed.rainxch.details.presentation.model.TranslationState
+import zed.rainxch.details.presentation.utils.UntypedFailureException
+import zed.rainxch.details.presentation.utils.untypedFailures
 import zed.rainxch.githubstore.core.presentation.res.Res
 import zed.rainxch.githubstore.core.presentation.res.failed_to_load
 import zed.rainxch.githubstore.core.presentation.res.translation_failed
@@ -34,10 +37,6 @@ class DetailsAboutViewModel(
         load()
     }
 
-    fun retry() {
-        load()
-    }
-
     fun translate(targetLanguageCode: String) {
         val markdown = _state.value.readmeMarkdown
         if (markdown.isBlank()) return
@@ -54,9 +53,8 @@ class DetailsAboutViewModel(
             )
         }
         viewModelScope.launch {
-            runCatching {
-                translationRepository.translate(markdown, targetLanguageCode)
-            }.onSuccess { result ->
+            try {
+                val result = untypedFailures { translationRepository.translate(markdown, targetLanguageCode) }
                 _state.update {
                     it.copy(
                         translation =
@@ -70,18 +68,22 @@ class DetailsAboutViewModel(
                     )
                 }
                 rebuildDisplayed()
-            }.onFailure { _ ->
-                _state.update {
-                    it.copy(
-                        translation =
-                            it.translation.copy(
-                                isTranslating = false,
-                                error = getString(Res.string.translation_failed),
-                            ),
-                    )
-                }
+            } catch (_: UntypedFailureException) {
+                showTranslationFailure()
+            } catch (_: RateLimitException) {
+                showTranslationFailure()
             }
         }
+    }
+
+    private suspend fun showTranslationFailure() {
+        val message = getString(Res.string.translation_failed)
+        _state.update { it.copy(translation = it.translation.copy(isTranslating = false, error = message)) }
+    }
+
+    private suspend fun showLoadFailure() {
+        val message = getString(Res.string.failed_to_load)
+        _state.update { it.copy(isLoading = false, errorMessage = message) }
     }
 
     fun toggleTranslation() {
@@ -133,22 +135,24 @@ class DetailsAboutViewModel(
     private fun load() {
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true, errorMessage = null) }
-            runCatching {
-                val resolved =
-                    if (owner.isNotBlank() && repo.isNotBlank()) {
-                        detailsRepository.getRepositoryByOwnerAndName(owner, repo, sourceHost)
-                    } else {
-                        detailsRepository.getRepositoryById(repositoryId)
+            try {
+                val (resolved, readme) =
+                    untypedFailures {
+                        val resolved =
+                            if (owner.isNotBlank() && repo.isNotBlank()) {
+                                detailsRepository.getRepositoryByOwnerAndName(owner, repo, sourceHost)
+                            } else {
+                                detailsRepository.getRepositoryById(repositoryId)
+                            }
+                        val readme =
+                            detailsRepository.getReadme(
+                                owner = resolved.owner.login,
+                                repo = resolved.name,
+                                defaultBranch = resolved.defaultBranch,
+                                sourceHost = sourceHost,
+                            )
+                        resolved to readme
                     }
-                val readme =
-                    detailsRepository.getReadme(
-                        owner = resolved.owner.login,
-                        repo = resolved.name,
-                        defaultBranch = resolved.defaultBranch,
-                        sourceHost = sourceHost,
-                    )
-                resolved to readme
-            }.onSuccess { (resolved, readme) ->
                 _state.update {
                     it.copy(
                         isLoading = false,
@@ -158,8 +162,10 @@ class DetailsAboutViewModel(
                     )
                 }
                 rebuildDisplayed()
-            }.onFailure { _ ->
-                _state.update { it.copy(isLoading = false, errorMessage = getString(Res.string.failed_to_load)) }
+            } catch (_: UntypedFailureException) {
+                showLoadFailure()
+            } catch (_: RateLimitException) {
+                showLoadFailure()
             }
         }
     }

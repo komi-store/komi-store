@@ -9,6 +9,7 @@ import zed.rainxch.apps.presentation.import.ExternalImportViewModel
 import zed.rainxch.apps.presentation.starred.StarredPickerViewModel
 import zed.rainxch.auth.presentation.AuthenticationViewModel
 import zed.rainxch.core.domain.model.repository.DiscoveryPlatform
+import zed.rainxch.details.presentation.DetailsArgs
 import zed.rainxch.details.presentation.DetailsViewModel
 import zed.rainxch.details.presentation.about.DetailsAboutViewModel
 import zed.rainxch.details.presentation.whatsnew.DetailsWhatsNewViewModel
@@ -46,36 +47,18 @@ val viewModelsModule =
         viewModelOf(::AuthenticationViewModel)
         viewModel { params ->
             DetailsViewModel(
-                repositoryId = params[0],
-                ownerParam = params[1],
-                repoParam = params[2],
-                isComingFromUpdate = params[3],
-                sourceHostParam = if (params.size() > 4) params[4] else null,
-                packageNameParam = if (params.size() > 5) params[5] else null,
-                detailsRepository = get(),
-                downloader = get(),
-                installer = get(),
+                args =
+                    DetailsArgs(
+                        repositoryId = params[0],
+                        owner = params[1],
+                        repo = params[2],
+                        isComingFromUpdate = params[3],
+                        sourceHost = if (params.size() > 4) params[4] else null,
+                        packageName = if (params.size() > 5) params[5] else null,
+                    ),
                 platform = get(),
-                helper = get(),
-                shareManager = get(),
-                installedAppsRepository = get(),
-                favouritesRepository = get(),
-                starredRepository = get(),
-                packageMonitor = get(),
-                syncInstalledAppsUseCase = get(),
-                translationRepository = get(),
-                logger = get(),
-                tweaksRepository = get(),
-                seenReposRepository = get(),
-                installationManager = get(),
-                attestationVerifier = get(),
-                downloadOrchestrator = get(),
-                externalImportRepository = get(),
-                apkInspector = get(),
-                userSessionRepository = get(),
-                reviewsRepository = get(),
-                systemInstallSerializer = get(),
-                appScope = get(),
+                page = get(),
+                app = get(),
             )
         }
         viewModel { params ->

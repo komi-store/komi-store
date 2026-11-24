@@ -3,7 +3,7 @@ package zed.rainxch.details.presentation.markdownviewer
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
-import zed.rainxch.details.domain.model.SupportedLanguage
+import zed.rainxch.details.presentation.model.SupportedLanguage
 import zed.rainxch.details.presentation.model.SupportedLanguages
 import zed.rainxch.details.presentation.model.TranslationState
 

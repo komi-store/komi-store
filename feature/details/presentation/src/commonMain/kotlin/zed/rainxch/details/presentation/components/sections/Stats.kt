@@ -18,13 +18,13 @@ import org.jetbrains.compose.resources.stringResource
 import zed.rainxch.core.presentation.components.text.KomiText
 import zed.rainxch.core.presentation.components.text.KomiTextRole
 import zed.rainxch.core.presentation.locals.LocalPersonality
-import zed.rainxch.details.domain.model.RepoStats
 import zed.rainxch.details.presentation.components.StatItem
 import zed.rainxch.details.presentation.components.TextStatItem
+import zed.rainxch.details.presentation.model.RepoStatsUi
 import zed.rainxch.githubstore.core.presentation.res.*
 
 fun LazyListScope.stats(
-    repoStats: RepoStats,
+    repoStats: RepoStatsUi,
     onOpenIssues: (() -> Unit)?,
     onOpenSecurity: (() -> Unit)?,
 ) {
@@ -52,7 +52,7 @@ fun LazyListScope.stats(
 
 @Composable
 private fun StatsGrid(
-    repoStats: RepoStats,
+    repoStats: RepoStatsUi,
     onOpenIssues: (() -> Unit)?,
     onOpenSecurity: (() -> Unit)?,
 ) {
