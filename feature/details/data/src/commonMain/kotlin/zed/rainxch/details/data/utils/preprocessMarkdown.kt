@@ -1,567 +1,207 @@
 package zed.rainxch.details.data.utils
 
+import zed.rainxch.core.domain.utils.EmojiShortcodes
+
 fun preprocessMarkdown(
     markdown: String,
     baseUrl: String,
     linkBaseUrl: String = baseUrl,
 ): String {
-    val normalizedBaseUrl = if (baseUrl.endsWith("/")) baseUrl else "$baseUrl/"
-    val normalizedLinkBaseUrl = if (linkBaseUrl.endsWith("/")) linkBaseUrl else "$linkBaseUrl/"
-
-    var processed = markdown
-
-    fun normalizeGitHubUrl(url: String): String =
-        if (url.contains("github.com") && url.contains("/blob/")) {
-            url
-                .replace("github.com", "raw.githubusercontent.com")
-                .replace("/blob/", "/")
-        } else {
-            url
-        }
-
-    fun isSvgUrl(url: String): Boolean {
-        val lower = url.lowercase()
-        return lower.endsWith(".svg") ||
-            lower.contains(".svg?") ||
-            lower.contains(".svg#") ||
-            lower.contains("/svg-badge") ||
-            lower.contains("badge.svg")
-    }
-
-    fun isBadgeUrl(url: String): Boolean {
-        val lower = url.lowercase()
-        return lower.contains("img.shields.io") ||
-            lower.contains("shields.io/badge") ||
-            lower.contains("badge.fury.io") ||
-            lower.contains("badgen.net") ||
-            lower.contains("repology.org/badge") ||
-            lower.contains("hosted.weblate.org/widget") ||
-            lower.contains("codecov.io") ||
-            lower.contains("coveralls.io") ||
-            lower.contains("travis-ci.") ||
-            lower.contains("circleci.com") ||
-            lower.contains("github.com/workflows") ||
-            (lower.contains("/badge") && isSvgUrl(lower))
-    }
-
-    fun shouldSkipImage(url: String): Boolean = isBadgeUrl(url)
-
-    fun resolveUrl(
-        path: String,
-        asImage: Boolean,
-    ): String {
-        val trimmed = path.trim()
-        if (trimmed.startsWith("#") && !asImage) return trimmed
-
-        val isAbsolute =
-            trimmed.startsWith("http://") ||
-                trimmed.startsWith("https://") ||
-                trimmed.startsWith("data:") ||
-                trimmed.startsWith("mailto:") ||
-                trimmed.startsWith("tel:") ||
-                trimmed.startsWith("sms:") ||
-                trimmed.startsWith("intent:")
-
-        val baseForPath = if (asImage) normalizedBaseUrl else normalizedLinkBaseUrl
-
-        return if (isAbsolute) {
-            if (asImage) normalizeGitHubUrl(trimmed) else trimmed
-        } else {
-            when {
-                trimmed.startsWith("./") -> {
-                    "$baseForPath${trimmed.removePrefix("./")}"
-                }
-
-                trimmed.startsWith("/") -> {
-                    "$baseForPath${trimmed.removePrefix("/")}"
-                }
-
-                trimmed.startsWith("../") -> {
-                    var base = baseForPath.trimEnd('/')
-                    var rel = trimmed
-                    while (rel.startsWith("../")) {
-                        base = base.substringBeforeLast('/', base)
-                        rel = rel.removePrefix("../")
-                    }
-                    "$base/$rel"
-                }
-
-                else -> {
-                    "$baseForPath$trimmed"
-                }
-            }
-        }
-    }
-
-    val refDefinitionRegex =
-        Regex(
-            """^\[([^\]]+)\]:\s*(\S+).*$""",
-            RegexOption.MULTILINE,
-        )
-    val referenceMap = mutableMapOf<String, String>()
-    for (match in refDefinitionRegex.findAll(processed)) {
-        val refName = match.groupValues[1].lowercase()
-        val url = match.groupValues[2]
-        referenceMap[refName] = url
-    }
-
-    val skipRefNames =
-        referenceMap
-            .filter { (_, url) ->
-                shouldSkipImage(resolveUrl(url, asImage = true))
-            }.keys
-
-    if (skipRefNames.isNotEmpty()) {
-        processed =
-            processed.replace(
-                Regex("""!\[([^\]]*)\]\[([^\]]+)\]"""),
-            ) { match ->
-                val alt = match.groupValues[1]
-                val refName = match.groupValues[2].lowercase()
-                if (refName in skipRefNames) {
-                    if (alt.isNotEmpty()) "**$alt**" else ""
-                } else {
-                    match.value
-                }
-            }
-    }
-
-    processed =
-        processed.replace(
-            Regex("""!\[([^\]]*)\]\[([^\]]+)\]"""),
-        ) { match ->
-            val alt = match.groupValues[1]
-            val refName = match.groupValues[2].lowercase()
-            val url = referenceMap[refName]
-            if (url != null) {
-                val resolved = resolveUrl(url, asImage = true)
-                "![$alt]($resolved)"
-            } else {
-                match.value
-            }
-        }
-
-    processed =
-        processed.replace(
-            Regex("""\[(\*\*[^*]*\*\*)\]\[([^\]]+)\]"""),
-        ) { match ->
-            val boldText = match.groupValues[1]
-            val refName = match.groupValues[2].lowercase()
-            val url = referenceMap[refName]
-            if (url != null) {
-                "[$boldText](${resolveUrl(url, asImage = false)})"
-            } else {
-                boldText
-            }
-        }
-
-    processed =
-        processed.replace(
-            Regex("""\[\s*\]\[([^\]]+)\]"""),
-            "",
-        )
-
-    processed =
-        processed.replace(
-            Regex("""\[([^\]]+)\]\[([^\]]+)\]"""),
-        ) { match ->
-            val text = match.groupValues[1]
-            val refName = match.groupValues[2].lowercase()
-            val url = referenceMap[refName]
-
-            if (url != null && !text.startsWith("!")) {
-                "[$text](${resolveUrl(url, asImage = false)})"
-            } else {
-                match.value
-            }
-        }
-
-    processed =
-        processed.replace(
-            Regex("""^\[([^\]]+)\]:\s*\S+.*$""", RegexOption.MULTILINE),
-        ) { match ->
-            val refName = match.groupValues[1].lowercase()
-            if (refName in referenceMap) "" else match.value
-        }
-
-    processed =
-        processed.replace(
-            Regex(
-                """<details\b[^>]*?>.*?<summary[^>]*?>(.*?)</summary>(.*?)</details>""",
-                setOf(RegexOption.IGNORE_CASE, RegexOption.DOT_MATCHES_ALL),
-            ),
-        ) { match ->
-            val summary = match.groupValues[1].trim()
-            val body = match.groupValues[2].trim()
-            val isInline = !match.value.contains('\n')
-            val lineStart = processed.lastIndexOf('\n', match.range.first) + 1
-            val linePrefix = processed.substring(lineStart, match.range.first)
-            val isInTableCell = linePrefix.contains('|')
-            val mustFlatten = isInline || isInTableCell
-
-            if (mustFlatten) {
-                val flatBody =
-                    body
-                        .replace(Regex("""<br\s*/?>""", RegexOption.IGNORE_CASE), " ")
-                        .replace(Regex("""\s+"""), " ")
-                        .trim()
-                when {
-                    summary.isEmpty() && flatBody.isEmpty() -> ""
-                    flatBody.isEmpty() -> "**$summary**"
-                    summary.isEmpty() -> flatBody
-                    else -> "**$summary**: $flatBody"
-                }
-            } else {
-                val encodedSummary = encodeDetailsSummary(summary)
-
-                val longestRun = longestBacktickRun(body)
-                val fence = "`".repeat(maxOf(4, longestRun + 1))
-                "\n\n${fence}ghs-details|$encodedSummary\n$body\n$fence\n\n"
-            }
-        }
-
-    processed =
-        processed.replace(
-            Regex(
-                """<picture[^>]*>.*?(<img\s[^>]*?>).*?</picture>""",
-                setOf(RegexOption.IGNORE_CASE, RegexOption.DOT_MATCHES_ALL),
-            ),
-        ) { match ->
-            match.groupValues[1]
-        }
-
-    processed =
-        processed.replace(
-            Regex("""<source\s[^>]*?/?>""", RegexOption.IGNORE_CASE),
-            "",
-        )
-
-    processed =
-        processed.replace(
-            Regex(
-                """<a\s[^>]*?>\s*(<img\s[^>]*?>)\s*</a>""",
-                setOf(RegexOption.IGNORE_CASE, RegexOption.DOT_MATCHES_ALL),
-            ),
-        ) { match ->
-            match.groupValues[1]
-        }
-
-    processed =
-        processed.replace(
-            Regex(
-                """<img\s+([^>]*?)\s*/?>""",
-                setOf(RegexOption.IGNORE_CASE, RegexOption.DOT_MATCHES_ALL),
-            ),
-        ) { imgMatch ->
-            val imgTag = imgMatch.groupValues[1]
-
-            val srcMatch = Regex("""src\s*=\s*(["'])([^"']+)\1""").find(imgTag)
-            val src = srcMatch?.groupValues?.get(2) ?: ""
-
-            val altMatch = Regex("""alt\s*=\s*(["'])([^"']*)\1""").find(imgTag)
-            val alt = altMatch?.groupValues?.get(2) ?: ""
-
-            if (src.isNotEmpty()) {
-                val normalizedSrc = resolveUrl(src, asImage = true)
-
-                if (shouldSkipImage(normalizedSrc)) {
-                    if (alt.isNotEmpty()) "**$alt**" else ""
-                } else {
-                    "![$alt]($normalizedSrc)"
-                }
-            } else {
-                ""
-            }
-        }
-
-    processed =
-        processed.replace(
-            Regex("""!\[([^\]]*)\]\(([^)]+)\)"""),
-        ) { match ->
-            val alt = match.groupValues[1]
-            val originalPath = match.groupValues[2].trim()
-            val finalUrl = resolveUrl(originalPath, asImage = true)
-
-            if (shouldSkipImage(finalUrl)) {
-                if (alt.isNotEmpty()) "**$alt**" else ""
-            } else {
-                "![$alt]($finalUrl)"
-            }
-        }
-
-    processed =
-        processed.replace(
-            Regex("""(?<!\!)\[([^\]]*)\]\(([^)]+)\)"""),
-        ) { match ->
-            val text = match.groupValues[1]
-            val originalPath = match.groupValues[2].trim()
-            val finalUrl = resolveUrl(originalPath, asImage = false)
-            "[$text]($finalUrl)"
-        }
-
-    processed =
-        processed.replace(
-            Regex(
-                """<video[^>]*?\ssrc=(["'])([^"']+)\1[^>]*>.*?</video>""",
-                setOf(RegexOption.IGNORE_CASE, RegexOption.DOT_MATCHES_ALL),
-            ),
-        ) { match ->
-            val src = match.groupValues[2]
-            "[Video](${resolveUrl(src, asImage = true)})"
-        }
-
-    processed =
-        processed.replace(
-            Regex(
-                """<video[^>]*>.*?<source\s[^>]*?\ssrc=(["'])([^"']+)\1[^>]*?>.*?</video>""",
-                setOf(RegexOption.IGNORE_CASE, RegexOption.DOT_MATCHES_ALL),
-            ),
-        ) { match ->
-            val src = match.groupValues[2]
-            "[Video](${resolveUrl(src, asImage = true)})"
-        }
-
-    for (level in 1..6) {
-        val hashes = "#".repeat(level)
-        processed =
-            processed.replace(
-                Regex(
-                    """<h$level[^>]*>(.*?)</h$level>""",
-                    setOf(RegexOption.IGNORE_CASE, RegexOption.DOT_MATCHES_ALL),
-                ),
-            ) { match ->
-                val content = match.groupValues[1].trim()
-                "\n$hashes $content\n"
-            }
-    }
-
-    processed =
-        processed.replace(
-            Regex("""<br\s*/?>""", RegexOption.IGNORE_CASE),
-            "\n",
-        )
-    processed =
-        processed.replace(
-            Regex("""<hr\s*/?>""", RegexOption.IGNORE_CASE),
-            "\n---\n",
-        )
-
-    processed =
-        processed.replace(
-            Regex(
-                """<(b|strong)>(.*?)</\1>""",
-                setOf(RegexOption.IGNORE_CASE, RegexOption.DOT_MATCHES_ALL),
-            ),
-        ) { match ->
-            "**${match.groupValues[2]}**"
-        }
-
-    processed =
-        processed.replace(
-            Regex(
-                """<(i|em)>(.*?)</\1>""",
-                setOf(RegexOption.IGNORE_CASE, RegexOption.DOT_MATCHES_ALL),
-            ),
-        ) { match ->
-            "*${match.groupValues[2]}*"
-        }
-
-    processed =
-        processed.replace(
-            Regex(
-                """<pre[^>]*>\s*<code(?:\s+[^>]*?class\s*=\s*["'][^"']*?language-(\w+)[^"']*?["'])?[^>]*>(.*?)</code>\s*</pre>""",
-                setOf(RegexOption.IGNORE_CASE, RegexOption.DOT_MATCHES_ALL),
-            ),
-        ) { match ->
-            val lang = match.groupValues[1]
-            val code = match.groupValues[2]
-            "\n```$lang\n$code\n```\n"
-        }
-
-    processed =
-        processed.replace(
-            Regex(
-                """<code>([^<]*?)</code>""",
-                RegexOption.IGNORE_CASE,
-            ),
-        ) { match ->
-            "`${match.groupValues[1]}`"
-        }
-
-    processed =
-        processed.replace(
-            Regex(
-                """<blockquote[^>]*>(.*?)</blockquote>""",
-                setOf(RegexOption.IGNORE_CASE, RegexOption.DOT_MATCHES_ALL),
-            ),
-        ) { match ->
-            val body = match.groupValues[1].trim()
-            body.lineSequence().joinToString("\n") { "> $it" }
-        }
-
-    processed =
-        processed.replace(
-            Regex(
-                """<(s|del|strike)>(.*?)</\1>""",
-                setOf(RegexOption.IGNORE_CASE, RegexOption.DOT_MATCHES_ALL),
-            ),
-        ) { match ->
-            "~~${match.groupValues[2]}~~"
-        }
-
-    processed =
-        processed.replace(
-            Regex(
-                """<a\s+[^>]*?href\s*=\s*(["'])([^"']+)\1[^>]*>(.*?)</a>""",
-                setOf(RegexOption.IGNORE_CASE, RegexOption.DOT_MATCHES_ALL),
-            ),
-        ) { match ->
-            val url = match.groupValues[2]
-            val text = match.groupValues[3].trim()
-            val resolvedUrl = resolveUrl(url, asImage = false)
-            if (text.isEmpty()) {
-                "[$resolvedUrl]($resolvedUrl)"
-            } else {
-                "[$text]($resolvedUrl)"
-            }
-        }
-
-    processed =
-        processed.replace(
-            Regex(
-                """<kbd>(.*?)</kbd>""",
-                setOf(RegexOption.IGNORE_CASE, RegexOption.DOT_MATCHES_ALL),
-            ),
-        ) { match ->
-            "`${match.groupValues[1]}`"
-        }
-
-    processed =
-        processed.replace(
-            Regex("""<div[^>]*?>\s*""", RegexOption.IGNORE_CASE),
-            "\n\n",
-        )
-    processed =
-        processed.replace(
-            Regex("""</div>\s*""", RegexOption.IGNORE_CASE),
-            "\n\n",
-        )
-
-    processed =
-        processed.replace(
-            Regex("""<p[^>]*?>""", RegexOption.IGNORE_CASE),
-            "\n",
-        )
-    processed =
-        processed.replace(
-            Regex("""</p>""", RegexOption.IGNORE_CASE),
-            "\n",
-        )
-
-    processed =
-        processed.replace(
-            Regex("""</?details[^>]*?>""", RegexOption.IGNORE_CASE),
-            "\n",
-        )
-    processed =
-        processed.replace(
-            Regex(
-                """<summary[^>]*?>(.*?)</summary>""",
-                setOf(RegexOption.IGNORE_CASE, RegexOption.DOT_MATCHES_ALL),
-            ),
-        ) { match ->
-            "**${match.groupValues[1].trim()}**\n"
-        }
-
-    processed =
-        processed.replace(
-            Regex("""<sup[^>]*>(.*?)</sup>""", setOf(RegexOption.IGNORE_CASE, RegexOption.DOT_MATCHES_ALL)),
-        ) { match ->
-            match.groupValues[1].map { SUPERSCRIPTS[it] ?: it }.joinToString("")
-        }
-    processed =
-        processed.replace(
-            Regex("""<sub[^>]*>(.*?)</sub>""", setOf(RegexOption.IGNORE_CASE, RegexOption.DOT_MATCHES_ALL)),
-        ) { match ->
-            match.groupValues[1].map { SUBSCRIPTS[it] ?: it }.joinToString("")
-        }
-
-    processed =
-        processed.replace(
-            Regex("""</?span[^>]*?>""", RegexOption.IGNORE_CASE),
-            "",
-        )
-
-    processed =
-        processed.replace(
-            Regex(
-                """</?(?:center|font|u|section|article|header|footer|nav|main|aside|figure|figcaption)[^>]*?>""",
-                RegexOption.IGNORE_CASE,
-            ),
-            "\n",
-        )
-
-    // The renderer can't lay out HTML tables, so each cell becomes its own block. The cells'
-    // indentation goes too: after a blank line, 4+ spaces would make Markdown read them as code.
-    processed =
-        processed.replace(
-            Regex("""<table\b[^>]*>(.*?)</table>""", setOf(RegexOption.IGNORE_CASE, RegexOption.DOT_MATCHES_ALL)),
-        ) { match ->
-            val cells =
-                match.groupValues[1]
-                    .replace(Regex("""</?(?:thead|tbody|tfoot|tr|td|th)\b[^>]*>""", RegexOption.IGNORE_CASE), "\n\n")
-                    .lines()
-                    .joinToString("\n") { it.trim() }
-            "\n\n$cells\n\n"
-        }
-
-    HTML_ENTITIES.forEach { (entity, char) -> processed = processed.replace(entity, char) }
-
-    processed =
-        processed.replace(Regex("""&#(\d+);""")) { match ->
-            val code = match.groupValues[1].toIntOrNull()
-            if (code != null && code in 32..0x10FFFF) {
-                code.toChar().toString()
-            } else {
-                match.value
-            }
-        }
-
-    processed =
-        processed.replace(Regex("""&#x([0-9A-Fa-f]+);""")) { match ->
-            val code = match.groupValues[1].toIntOrNull(16)
-            if (code != null && code in 32..0x10FFFF) {
-                code.toChar().toString()
-            } else {
-                match.value
-            }
-        }
-
-    processed =
-        processed.replace(
-            Regex("""<p[^>]*?>\s*</p>""", RegexOption.IGNORE_CASE),
-            "",
-        )
-    processed =
-        processed.replace(
-            Regex("""\n{3,}"""),
-            "\n\n",
-        )
-
-    processed =
-        processed.replace(
-            Regex("""^\]\([^)]+\)""", RegexOption.MULTILINE),
-            "",
-        )
-
-    processed =
-        zed.rainxch.core.domain.utils.EmojiShortcodes
-            .render(processed)
-
-    processed = joinAdjacentImageLines(processed)
-
-    return processed.trim()
+    val urls = MarkdownUrlResolver(baseUrl, linkBaseUrl)
+    return markdown
+        .let { inlineReferenceLinks(it, urls) }
+        .let(::convertDetailsBlocks)
+        .let { convertImages(it, urls) }
+        .replace(INLINE_LINK) { match ->
+            "[${match.groupValues[1]}](${urls.resolve(match.groupValues[2].trim(), asImage = false)})"
+        }.let { convertVideos(it, urls) }
+        .let(::convertHeadings)
+        .let { convertInlineHtml(it, urls) }
+        .let(::stripLayoutHtml)
+        .let(::flattenTables)
+        .let(::decodeHtmlEntities)
+        .replace(EMPTY_PARAGRAPH, "")
+        .replace(BLANK_LINE_RUN, "\n\n")
+        .replace(STRAY_LINK_TARGET, "")
+        .let(EmojiShortcodes::render)
+        .let(::joinAdjacentImageLines)
+        .trim()
 }
+
+private fun inlineReferenceLinks(
+    markdown: String,
+    urls: MarkdownUrlResolver,
+): String {
+    val references =
+        REFERENCE_DEFINITION
+            .findAll(markdown)
+            .associate { it.groupValues[1].lowercase() to it.groupValues[2] }
+    val badgeReferences = references.filterValues { url -> isBadgeUrl(urls.resolve(url, asImage = true)) }.keys
+    val withoutBadges =
+        if (badgeReferences.isEmpty()) {
+            markdown
+        } else {
+            markdown.replace(IMAGE_REFERENCE) { match ->
+                if (match.groupValues[2].lowercase() in badgeReferences) boldAlt(match.groupValues[1]) else match.value
+            }
+        }
+    return withoutBadges
+        .replace(IMAGE_REFERENCE) { match ->
+            references[match.groupValues[2].lowercase()]
+                ?.let { url -> "![${match.groupValues[1]}](${urls.resolve(url, asImage = true)})" }
+                ?: match.value
+        }.replace(BOLD_LINK_REFERENCE) { match ->
+            val boldText = match.groupValues[1]
+            references[match.groupValues[2].lowercase()]
+                ?.let { url -> "[$boldText](${urls.resolve(url, asImage = false)})" }
+                ?: boldText
+        }.replace(EMPTY_LINK_REFERENCE, "")
+        .replace(LINK_REFERENCE) { match ->
+            val text = match.groupValues[1]
+            val url = references[match.groupValues[2].lowercase()]
+            if (url != null && !text.startsWith("!")) "[$text](${urls.resolve(url, asImage = false)})" else match.value
+        }.replace(REFERENCE_DEFINITION) { match ->
+            if (match.groupValues[1].lowercase() in references) "" else match.value
+        }
+}
+
+private fun convertDetailsBlocks(markdown: String): String =
+    markdown.replace(DETAILS_BLOCK) { match ->
+        val summary = match.groupValues[1].trim()
+        val body = match.groupValues[2].trim()
+        val lineStart = markdown.lastIndexOf('\n', match.range.first) + 1
+        val isInTableCell = markdown.substring(lineStart, match.range.first).contains('|')
+        if (!match.value.contains('\n') || isInTableCell) flatDetails(summary, body) else fencedDetails(summary, body)
+    }
+
+private fun flatDetails(
+    summary: String,
+    body: String,
+): String {
+    val flatBody =
+        body
+            .replace(BR_TAG, " ")
+            .replace(WHITESPACE_RUN, " ")
+            .trim()
+    return when {
+        summary.isEmpty() && flatBody.isEmpty() -> ""
+        flatBody.isEmpty() -> "**$summary**"
+        summary.isEmpty() -> flatBody
+        else -> "**$summary**: $flatBody"
+    }
+}
+
+private fun fencedDetails(
+    summary: String,
+    body: String,
+): String {
+    val fence = "`".repeat(maxOf(MIN_DETAILS_FENCE, longestBacktickRun(body) + 1))
+    return "\n\n${fence}ghs-details|${encodeDetailsSummary(summary)}\n$body\n$fence\n\n"
+}
+
+private fun convertImages(
+    markdown: String,
+    urls: MarkdownUrlResolver,
+): String =
+    markdown
+        .replace(PICTURE_BLOCK) { it.groupValues[1] }
+        .replace(SOURCE_TAG, "")
+        .replace(LINKED_IMG_TAG) { it.groupValues[1] }
+        .replace(IMG_TAG) { match -> imgTagToMarkdown(match.groupValues[1], urls) }
+        .replace(MARKDOWN_IMAGE) { match ->
+            markdownImage(match.groupValues[1], urls.resolve(match.groupValues[2].trim(), asImage = true))
+        }
+
+private fun imgTagToMarkdown(
+    attributes: String,
+    urls: MarkdownUrlResolver,
+): String {
+    val src = IMG_SRC.find(attributes)?.groupValues?.get(2) ?: ""
+    val alt = IMG_ALT.find(attributes)?.groupValues?.get(2) ?: ""
+    return if (src.isNotEmpty()) markdownImage(alt, urls.resolve(src, asImage = true)) else ""
+}
+
+private fun markdownImage(
+    alt: String,
+    url: String,
+): String = if (isBadgeUrl(url)) boldAlt(alt) else "![$alt]($url)"
+
+private fun boldAlt(alt: String): String = if (alt.isNotEmpty()) "**$alt**" else ""
+
+private fun convertVideos(
+    markdown: String,
+    urls: MarkdownUrlResolver,
+): String =
+    markdown
+        .replace(VIDEO_WITH_SRC) { "[Video](${urls.resolve(it.groupValues[2], asImage = true)})" }
+        .replace(VIDEO_WITH_SOURCE) { "[Video](${urls.resolve(it.groupValues[2], asImage = true)})" }
+
+private fun convertHeadings(markdown: String): String =
+    (1..MAX_HEADING_LEVEL).fold(markdown) { text, level ->
+        val hashes = "#".repeat(level)
+        text.replace(Regex("""<h$level[^>]*>(.*?)</h$level>""", BLOCK_OPTIONS)) { match ->
+            "\n$hashes ${match.groupValues[1].trim()}\n"
+        }
+    }
+
+private fun convertInlineHtml(
+    markdown: String,
+    urls: MarkdownUrlResolver,
+): String =
+    markdown
+        .replace(BR_TAG, "\n")
+        .replace(HR_TAG, "\n---\n")
+        .replace(BOLD_TAG) { "**${it.groupValues[2]}**" }
+        .replace(ITALIC_TAG) { "*${it.groupValues[2]}*" }
+        .replace(PRE_CODE_BLOCK) { "\n```${it.groupValues[1]}\n${it.groupValues[2]}\n```\n" }
+        .replace(CODE_TAG) { "`${it.groupValues[1]}`" }
+        .replace(BLOCKQUOTE) { match ->
+            match.groupValues[1]
+                .trim()
+                .lineSequence()
+                .joinToString("\n") { "> $it" }
+        }.replace(STRIKE_TAG) { "~~${it.groupValues[2]}~~" }
+        .replace(ANCHOR_TAG) { match ->
+            val resolvedUrl = urls.resolve(match.groupValues[2], asImage = false)
+            val text = match.groupValues[3].trim()
+            if (text.isEmpty()) "[$resolvedUrl]($resolvedUrl)" else "[$text]($resolvedUrl)"
+        }.replace(KBD_TAG) { "`${it.groupValues[1]}`" }
+
+private fun stripLayoutHtml(markdown: String): String =
+    markdown
+        .replace(DIV_OPEN, "\n\n")
+        .replace(DIV_CLOSE, "\n\n")
+        .replace(PARAGRAPH_OPEN, "\n")
+        .replace(PARAGRAPH_CLOSE, "\n")
+        .replace(DETAILS_TAG, "\n")
+        .replace(SUMMARY_TAG) { "**${it.groupValues[1].trim()}**\n" }
+        .replace(SUP_TAG) { match -> match.groupValues[1].map { SUPERSCRIPTS[it] ?: it }.joinToString("") }
+        .replace(SUB_TAG) { match -> match.groupValues[1].map { SUBSCRIPTS[it] ?: it }.joinToString("") }
+        .replace(SPAN_TAG, "")
+        .replace(SECTIONING_TAG, "\n")
+
+// Cells become separate blocks without indentation: after a blank line, 4+ spaces would read as code.
+private fun flattenTables(markdown: String): String =
+    markdown.replace(TABLE) { match ->
+        val cells =
+            match.groupValues[1]
+                .replace(TABLE_PART_TAG, "\n\n")
+                .lines()
+                .joinToString("\n") { it.trim() }
+        "\n\n$cells\n\n"
+    }
+
+private fun decodeHtmlEntities(markdown: String): String =
+    HTML_ENTITIES
+        .entries
+        .fold(markdown) { text, (entity, char) -> text.replace(entity, char) }
+        .replace(DECIMAL_ENTITY) { match -> codePointText(match.groupValues[1].toIntOrNull(), match.value) }
+        .replace(HEX_ENTITY) { match -> codePointText(match.groupValues[1].toIntOrNull(HEX_RADIX), match.value) }
+
+private fun codePointText(
+    code: Int?,
+    entity: String,
+): String = if (code != null && code in PRINTABLE_CODE_POINTS) code.toChar().toString() else entity
 
 private fun longestBacktickRun(text: String): Int {
     var max = 0
@@ -584,7 +224,7 @@ private fun encodeDetailsSummary(text: String): String {
             '\n', '\r', '\t', '`', ' ', '|' -> {
                 safe.append("%").append(
                     c.code
-                        .toString(16)
+                        .toString(HEX_RADIX)
                         .padStart(2, '0')
                         .uppercase(),
                 )
@@ -599,17 +239,15 @@ private fun encodeDetailsSummary(text: String): String {
 }
 
 private fun joinAdjacentImageLines(content: String): String {
-    val imageOnlyLine =
-        Regex("""^\s*(?:!\[[^\]]*]\([^)]+\)\s*){1,}\s*$""")
     val lines = content.split('\n')
     val out = StringBuilder()
     var i = 0
     while (i < lines.size) {
         val line = lines[i]
-        if (imageOnlyLine.matches(line)) {
+        if (IMAGE_ONLY_LINE.matches(line)) {
             val group = StringBuilder(line.trim())
             var j = i + 1
-            while (j < lines.size && imageOnlyLine.matches(lines[j])) {
+            while (j < lines.size && IMAGE_ONLY_LINE.matches(lines[j])) {
                 group.append(' ').append(lines[j].trim())
                 j++
             }
@@ -625,108 +263,70 @@ private fun joinAdjacentImageLines(content: String): String {
     return out.toString()
 }
 
-private val HTML_ENTITIES: Map<String, String> =
-    mapOf(
-        "&amp;" to "&",
-        "&lt;" to "<",
-        "&gt;" to ">",
-        "&quot;" to "\"",
-        "&apos;" to "'",
-        "&#39;" to "'",
-        "&nbsp;" to " ",
-        "&ensp;" to " ",
-        "&emsp;" to " ",
-        "&thinsp;" to " ",
-        "&hellip;" to "…",
-        "&mdash;" to "—",
-        "&ndash;" to "–",
-        "&laquo;" to "«",
-        "&raquo;" to "»",
-        "&ldquo;" to "“",
-        "&rdquo;" to "”",
-        "&lsquo;" to "‘",
-        "&rsquo;" to "’",
-        "&sbquo;" to "‚",
-        "&bdquo;" to "„",
-        "&bull;" to "•",
-        "&middot;" to "·",
-        "&sect;" to "§",
-        "&para;" to "¶",
-        "&times;" to "×",
-        "&divide;" to "÷",
-        "&plusmn;" to "±",
-        "&deg;" to "°",
-        "&micro;" to "µ",
-        "&fnof;" to "ƒ",
-        "&infin;" to "∞",
-        "&asymp;" to "≈",
-        "&ne;" to "≠",
-        "&le;" to "≤",
-        "&ge;" to "≥",
-        "&larr;" to "←",
-        "&rarr;" to "→",
-        "&uarr;" to "↑",
-        "&darr;" to "↓",
-        "&harr;" to "↔",
-        "&lArr;" to "⇐",
-        "&rArr;" to "⇒",
-        "&copy;" to "©",
-        "&reg;" to "®",
-        "&trade;" to "™",
-        "&euro;" to "€",
-        "&pound;" to "£",
-        "&yen;" to "¥",
-        "&cent;" to "¢",
+private const val MIN_DETAILS_FENCE = 4
+private const val MAX_HEADING_LEVEL = 6
+private const val HEX_RADIX = 16
+private val PRINTABLE_CODE_POINTS = 32..0x10FFFF
+
+private val BLOCK_OPTIONS = setOf(RegexOption.IGNORE_CASE, RegexOption.DOT_MATCHES_ALL)
+
+private val REFERENCE_DEFINITION = Regex("""^\[([^\]]+)\]:\s*(\S+).*$""", RegexOption.MULTILINE)
+private val IMAGE_REFERENCE = Regex("""!\[([^\]]*)\]\[([^\]]+)\]""")
+private val BOLD_LINK_REFERENCE = Regex("""\[(\*\*[^*]*\*\*)\]\[([^\]]+)\]""")
+private val EMPTY_LINK_REFERENCE = Regex("""\[\s*\]\[([^\]]+)\]""")
+private val LINK_REFERENCE = Regex("""\[([^\]]+)\]\[([^\]]+)\]""")
+
+private val DETAILS_BLOCK = Regex("""<details\b[^>]*?>.*?<summary[^>]*?>(.*?)</summary>(.*?)</details>""", BLOCK_OPTIONS)
+private val WHITESPACE_RUN = Regex("""\s+""")
+
+private val PICTURE_BLOCK = Regex("""<picture[^>]*>.*?(<img\s[^>]*?>).*?</picture>""", BLOCK_OPTIONS)
+private val SOURCE_TAG = Regex("""<source\s[^>]*?/?>""", RegexOption.IGNORE_CASE)
+private val LINKED_IMG_TAG = Regex("""<a\s[^>]*?>\s*(<img\s[^>]*?>)\s*</a>""", BLOCK_OPTIONS)
+private val IMG_TAG = Regex("""<img\s+([^>]*?)\s*/?>""", BLOCK_OPTIONS)
+private val IMG_SRC = Regex("""src\s*=\s*(["'])([^"']+)\1""")
+private val IMG_ALT = Regex("""alt\s*=\s*(["'])([^"']*)\1""")
+private val MARKDOWN_IMAGE = Regex("""!\[([^\]]*)\]\(([^)]+)\)""")
+private val INLINE_LINK = Regex("""(?<!\!)\[([^\]]*)\]\(([^)]+)\)""")
+private val VIDEO_WITH_SRC = Regex("""<video[^>]*?\ssrc=(["'])([^"']+)\1[^>]*>.*?</video>""", BLOCK_OPTIONS)
+private val VIDEO_WITH_SOURCE = Regex("""<video[^>]*>.*?<source\s[^>]*?\ssrc=(["'])([^"']+)\1[^>]*?>.*?</video>""", BLOCK_OPTIONS)
+
+private val BR_TAG = Regex("""<br\s*/?>""", RegexOption.IGNORE_CASE)
+private val HR_TAG = Regex("""<hr\s*/?>""", RegexOption.IGNORE_CASE)
+private val BOLD_TAG = Regex("""<(b|strong)>(.*?)</\1>""", BLOCK_OPTIONS)
+private val ITALIC_TAG = Regex("""<(i|em)>(.*?)</\1>""", BLOCK_OPTIONS)
+private val PRE_CODE_BLOCK =
+    Regex(
+        """<pre[^>]*>\s*<code(?:\s+[^>]*?class\s*=\s*["'][^"']*?language-(\w+)[^"']*?["'])?[^>]*>(.*?)</code>\s*</pre>""",
+        BLOCK_OPTIONS,
+    )
+private val CODE_TAG = Regex("""<code>([^<]*?)</code>""", RegexOption.IGNORE_CASE)
+private val BLOCKQUOTE = Regex("""<blockquote[^>]*>(.*?)</blockquote>""", BLOCK_OPTIONS)
+private val STRIKE_TAG = Regex("""<(s|del|strike)>(.*?)</\1>""", BLOCK_OPTIONS)
+private val ANCHOR_TAG = Regex("""<a\s+[^>]*?href\s*=\s*(["'])([^"']+)\1[^>]*>(.*?)</a>""", BLOCK_OPTIONS)
+private val KBD_TAG = Regex("""<kbd>(.*?)</kbd>""", BLOCK_OPTIONS)
+
+private val DIV_OPEN = Regex("""<div[^>]*?>\s*""", RegexOption.IGNORE_CASE)
+private val DIV_CLOSE = Regex("""</div>\s*""", RegexOption.IGNORE_CASE)
+private val PARAGRAPH_OPEN = Regex("""<p[^>]*?>""", RegexOption.IGNORE_CASE)
+private val PARAGRAPH_CLOSE = Regex("""</p>""", RegexOption.IGNORE_CASE)
+private val DETAILS_TAG = Regex("""</?details[^>]*?>""", RegexOption.IGNORE_CASE)
+private val SUMMARY_TAG = Regex("""<summary[^>]*?>(.*?)</summary>""", BLOCK_OPTIONS)
+private val SUP_TAG = Regex("""<sup[^>]*>(.*?)</sup>""", BLOCK_OPTIONS)
+private val SUB_TAG = Regex("""<sub[^>]*>(.*?)</sub>""", BLOCK_OPTIONS)
+private val SPAN_TAG = Regex("""</?span[^>]*?>""", RegexOption.IGNORE_CASE)
+private val SECTIONING_TAG =
+    Regex(
+        """</?(?:center|font|u|section|article|header|footer|nav|main|aside|figure|figcaption)[^>]*?>""",
+        RegexOption.IGNORE_CASE,
     )
 
-private val SUPERSCRIPTS: Map<Char, Char> =
-    mapOf(
-        '0' to '⁰',
-        '1' to '¹',
-        '2' to '²',
-        '3' to '³',
-        '4' to '⁴',
-        '5' to '⁵',
-        '6' to '⁶',
-        '7' to '⁷',
-        '8' to '⁸',
-        '9' to '⁹',
-        '+' to '⁺',
-        '-' to '⁻',
-        '=' to '⁼',
-        '(' to '⁽',
-        ')' to '⁾',
-        'n' to 'ⁿ',
-        'i' to 'ⁱ',
-    )
+private val TABLE = Regex("""<table\b[^>]*>(.*?)</table>""", BLOCK_OPTIONS)
+private val TABLE_PART_TAG = Regex("""</?(?:thead|tbody|tfoot|tr|td|th)\b[^>]*>""", RegexOption.IGNORE_CASE)
 
-private val SUBSCRIPTS: Map<Char, Char> =
-    mapOf(
-        '0' to '₀',
-        '1' to '₁',
-        '2' to '₂',
-        '3' to '₃',
-        '4' to '₄',
-        '5' to '₅',
-        '6' to '₆',
-        '7' to '₇',
-        '8' to '₈',
-        '9' to '₉',
-        '+' to '₊',
-        '-' to '₋',
-        '=' to '₌',
-        '(' to '₍',
-        ')' to '₎',
-        'a' to 'ₐ',
-        'e' to 'ₑ',
-        'o' to 'ₒ',
-        'x' to 'ₓ',
-        'h' to 'ₕ',
-        'k' to 'ₖ',
-        'l' to 'ₗ',
-        'm' to 'ₘ',
-        'n' to 'ₙ',
-        'p' to 'ₚ',
-        's' to 'ₛ',
-        't' to 'ₜ',
-    )
+private val DECIMAL_ENTITY = Regex("""&#(\d+);""")
+private val HEX_ENTITY = Regex("""&#x([0-9A-Fa-f]+);""")
+
+private val EMPTY_PARAGRAPH = Regex("""<p[^>]*?>\s*</p>""", RegexOption.IGNORE_CASE)
+private val BLANK_LINE_RUN = Regex("""\n{3,}""")
+private val STRAY_LINK_TARGET = Regex("""^\]\([^)]+\)""", RegexOption.MULTILINE)
+private val IMAGE_ONLY_LINE = Regex("""^\s*(?:!\[[^\]]*]\([^)]+\)\s*){1,}\s*$""")
