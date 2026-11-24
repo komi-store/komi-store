@@ -11,5 +11,8 @@ interface CachedRepositoriesDataSource {
 
     suspend fun getCachedMostPopularRepos(platform: DiscoveryPlatform): CachedRepoResponse?
 
-    suspend fun getCachedTopicRepos(topic: TopicCategory, platform: DiscoveryPlatform): CachedRepoResponse?
+    suspend fun getCachedTopicRepos(
+        topic: TopicCategory,
+        platform: DiscoveryPlatform,
+    ): CachedRepoResponse?
 }

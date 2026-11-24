@@ -1,10 +1,10 @@
 package zed.rainxch.search.data.di
 
 import org.koin.dsl.module
-import zed.rainxch.search.domain.repository.SearchHistoryRepository
-import zed.rainxch.search.domain.repository.SearchRepository
 import zed.rainxch.search.data.repository.SearchHistoryRepositoryImpl
 import zed.rainxch.search.data.repository.SearchRepositoryImpl
+import zed.rainxch.search.domain.repository.SearchHistoryRepository
+import zed.rainxch.search.domain.repository.SearchRepository
 
 val searchModule =
     module {

@@ -45,11 +45,26 @@ private class CommentScanner(
         var depth = 0
         while (index < text.length) {
             when {
-                text.startsWith("//", index) -> lineComment()
-                text.startsWith("/*", index) -> blockComment()
-                text.startsWith("\"\"\"", index) -> rawString()
-                text[index] == '"' -> string()
-                text[index] == '\'' -> charLiteral()
+                text.startsWith("//", index) -> {
+                    lineComment()
+                }
+
+                text.startsWith("/*", index) -> {
+                    blockComment()
+                }
+
+                text.startsWith("\"\"\"", index) -> {
+                    rawString()
+                }
+
+                text[index] == '"' -> {
+                    string()
+                }
+
+                text[index] == '\'' -> {
+                    charLiteral()
+                }
+
                 insideTemplate && text[index] == '{' -> {
                     depth++
                     advance()
