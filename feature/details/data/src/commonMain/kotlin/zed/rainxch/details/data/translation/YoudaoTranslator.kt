@@ -36,7 +36,11 @@ internal class YoudaoTranslator(
         }
 
         val salt = Uuid.random().toString()
-        val curtime = Clock.System.now().epochSeconds.toString()
+        val curtime =
+            Clock.System
+                .now()
+                .epochSeconds
+                .toString()
         val signInput = buildSignInput(text)
         val sign = sha256Hex(appKey + signInput + salt + curtime + appSecret)
 

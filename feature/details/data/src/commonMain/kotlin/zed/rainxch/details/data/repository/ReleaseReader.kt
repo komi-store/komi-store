@@ -139,8 +139,10 @@ internal class ReleaseReader(
                 val result = releases.toDomainReleases(read.owner, read.repo, read.defaultBranch)
                 when {
                     result.isNotEmpty() -> result.also { cacheManager.put(read.cacheKey, it, RELEASES) }
+
                     // The backend's copy can lag behind the host, so an empty answer is checked there unless the host was just read.
                     hostTried -> result
+
                     else -> readHostWhenBackendEmpty(read)
                 }
             },

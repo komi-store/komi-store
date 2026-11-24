@@ -76,8 +76,7 @@ internal class MicrosoftTranslator(
         }
     }
 
-    private fun errorMessage(body: String): String? =
-        runCatching { json.parseToJsonElement(body).jsonObject.apiErrorMessage() }.getOrNull()
+    private fun errorMessage(body: String): String? = runCatching { json.parseToJsonElement(body).jsonObject.apiErrorMessage() }.getOrNull()
 
     private fun parseTranslation(body: String): TranslationResult {
         val parsed: JsonElement =
