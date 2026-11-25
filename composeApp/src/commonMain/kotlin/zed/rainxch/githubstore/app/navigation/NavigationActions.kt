@@ -23,7 +23,7 @@ internal fun NavHostController.navigateSingleTop(route: GithubStoreGraph) {
     }
 }
 
-internal fun NavHostController.openSearch() {
+private fun NavHostController.openSearch() {
     if (currentBackStackEntry.getCurrentScreen() !is GithubStoreGraph.SearchScreen) {
         navigateToTopLevel(GithubStoreGraph.SearchScreen())
     }

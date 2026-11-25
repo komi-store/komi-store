@@ -44,7 +44,7 @@ fun AppNavigation(
     val announcementsViewModel = koinViewModel<AnnouncementsViewModel>()
     val announcementsUnreadCount by announcementsViewModel.unreadCount.collectAsStateWithLifecycle()
 
-    HandleKeyboardEvents(onOpenSearch = { navController.openSearch() })
+    HandleKeyboardEvents(onOpenSearch = { navController.navigateToTopLevel(GithubStoreGraph.SearchScreen()) })
 
     HandleDesktopToolbarDeeplinks(
         deepLinkUris = deepLinkUris,
