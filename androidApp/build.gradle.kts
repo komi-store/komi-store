@@ -20,6 +20,10 @@ dependencies {
 
     implementation(libs.core.splashscreen)
 
+    // The manifest declares WorkManager's foreground service and the Shizuku provider by class name
+    implementation(libs.androidx.work.runtime)
+    implementation(libs.shizuku.provider)
+
     implementation(libs.koin.android)
     implementation(libs.touchlab.kermit)
 }

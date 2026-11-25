@@ -1,3 +1,5 @@
 package zed.rainxch.core.data.network
 
-class RepoNotFoundException : Exception("Repository not found")
+import zed.rainxch.core.domain.model.error.NetworkException
+
+class RepoNotFoundException : NetworkException("Repository not found", null)

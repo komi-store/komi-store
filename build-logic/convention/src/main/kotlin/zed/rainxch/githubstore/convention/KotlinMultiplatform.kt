@@ -10,6 +10,7 @@ internal fun Project.configureKotlinMultiplatform() {
 
     extensions.configure<KotlinMultiplatformExtension> {
         compilerOptions {
+            allWarningsAsErrors.set(true)
             freeCompilerArgs.add("-Xexpect-actual-classes")
             freeCompilerArgs.add("-opt-in=kotlin.RequiresOptIn")
             freeCompilerArgs.add("-opt-in=kotlin.time.ExperimentalTime")

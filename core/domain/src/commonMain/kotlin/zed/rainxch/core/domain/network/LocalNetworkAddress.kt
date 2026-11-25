@@ -7,9 +7,7 @@ private const val HIGH_BIT = 0x80
 private const val IPV4_BYTES = 4
 private const val IPV6_BYTES = 16
 
-// Android 17's local network definition (developer.android.com/privacy-and-security/local-network-definition).
-// It also counts any directly connected IPv6 route, which an address alone can't show; unique-local fc00::/7 is
-// the part that can.
+// Android 17's local network definition: developer.android.com/privacy-and-security/local-network-definition
 private val LOCAL_NETWORK_RANGES =
     listOf(
         AddressRange(IPV4_BYTES, listOf(10), 8),
@@ -21,7 +19,7 @@ private val LOCAL_NETWORK_RANGES =
         AddressRange(IPV4_BYTES, listOf(255, 255, 255, 255), 32),
         AddressRange(IPV6_BYTES, listOf(0xFE, 0x80), 10),
         AddressRange(IPV6_BYTES, listOf(0xFF), 8),
-        AddressRange(IPV6_BYTES, listOf(0xFC), 7),
+        AddressRange(IPV6_BYTES, listOf(0xFC), 7), // unique-local; directly connected IPv6 routes can't be told from an address
     )
 
 private class AddressRange(

@@ -61,10 +61,7 @@ import zed.rainxch.githubstore.core.presentation.res.clear
 import zed.rainxch.githubstore.core.presentation.res.hide_password
 import zed.rainxch.githubstore.core.presentation.res.show_password
 
-// Material's filled field made organic, after Chocola's search bar: a pill on a tonal container
-// with no underline (a card corner when it holds several lines). Focus springs in a ring, in the
-// error color when there is an error; clear and show-password are Material icon buttons that pop
-// in and swap with a bouncy scale.
+// Material's filled field as a pill on a tonal container, after Chocola's search bar; focus springs in a ring.
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun ClassicTextField(
@@ -173,8 +170,7 @@ private fun placeholderSlot(
         }
     }
 
-// A screen's own trailing content wins, then show-password (a password field passes its
-// visibility), then clear.
+// The screen's own trailing content wins, then show-password, then clear.
 private fun trailingSlot(
     trailing: (@Composable () -> Unit)?,
     passwordVisible: MutableState<Boolean>?,
@@ -209,8 +205,7 @@ private fun FieldContainer(
 ) {
     val colors = personality.colors
     val motion = personality.motion
-    // The highest tonal step, so the field still reads on a dialog's raised surface; the ring and
-    // the primary label mark focus.
+    // The highest tonal step, so the field still reads on a dialog's raised surface.
     val container by animateColorAsState(
         targetValue = if (enabled) personality.colorScheme.surfaceContainerHighest else colors.disabledContainer,
         animationSpec = motion.fastEffects(),

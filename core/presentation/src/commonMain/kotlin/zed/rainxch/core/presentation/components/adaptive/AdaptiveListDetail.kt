@@ -23,10 +23,12 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import zed.rainxch.core.presentation.components.bars.LocalTabCardSlot
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.movableContentOf
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -37,6 +39,7 @@ import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
+import zed.rainxch.core.presentation.components.bars.LocalTabCardSlot
 import zed.rainxch.core.presentation.layout.WindowBreakpoints
 import zed.rainxch.core.presentation.locals.LocalPersonality
 
@@ -60,20 +63,19 @@ private val AdaptiveListDetailStateSaver: Saver<AdaptiveListDetailState, Any> =
             )
         },
         restore = { saved ->
-            if (saved is BooleanArray || saved !is List<*> || saved.isEmpty() || saved[0] != true) {
-                AdaptiveListDetailState(initial = null)
-            } else {
-                AdaptiveListDetailState(
-                    initial =
+            val values = (saved as? List<*>)?.takeIf { it.firstOrNull() == true }
+            AdaptiveListDetailState(
+                initial =
+                    values?.let {
                         AdaptiveDetailArgs(
-                            repositoryId = (saved[1] as? Long) ?: 0L,
-                            owner = (saved[2] as? String)?.takeIf { it.isNotEmpty() },
-                            repo = (saved[3] as? String)?.takeIf { it.isNotEmpty() },
-                            isComingFromUpdate = (saved[4] as? Boolean) ?: false,
-                            sourceHost = (saved[5] as? String)?.takeIf { it.isNotEmpty() },
-                        ),
-                )
-            }
+                            repositoryId = (it[1] as? Long) ?: 0L,
+                            owner = (it[2] as? String)?.takeIf { owner -> owner.isNotEmpty() },
+                            repo = (it[3] as? String)?.takeIf { repo -> repo.isNotEmpty() },
+                            isComingFromUpdate = (it[4] as? Boolean) ?: false,
+                            sourceHost = (it[5] as? String)?.takeIf { host -> host.isNotEmpty() },
+                        )
+                    },
+            )
         },
     )
 
@@ -90,13 +92,15 @@ fun AdaptiveListDetailScaffold(
     minDetailWidthDp: Int = 600,
     expandedBreakpointDp: Int = WindowBreakpoints.Expanded.value.toInt(),
 ) {
+    val currentList by rememberUpdatedState(list)
+    val movableList = remember { movableContentOf { expanded: Boolean -> currentList(expanded) } }
     BoxWithConstraints(modifier = modifier.fillMaxSize()) {
         val totalWidthDp = maxWidth.value
         val effectiveBreakpoint =
             maxOf(expandedBreakpointDp.toFloat(), (minListWidthDp + minDetailWidthDp).toFloat())
         val isExpanded = totalWidthDp >= effectiveBreakpoint
         if (!isExpanded) {
-            Box(modifier = Modifier.fillMaxSize()) { list(false) }
+            Box(modifier = Modifier.fillMaxSize()) { movableList(false) }
             return@BoxWithConstraints
         }
 
@@ -116,7 +120,7 @@ fun AdaptiveListDetailScaffold(
                         .width(clamped.dp)
                         .fillMaxHeight(),
             ) {
-                list(true)
+                movableList(true)
             }
             PaneResizeHandle(
                 onDrag = { deltaPx ->

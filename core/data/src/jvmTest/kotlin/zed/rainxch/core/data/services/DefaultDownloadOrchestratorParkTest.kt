@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeout
-import zed.rainxch.core.data.data_source.TokenStore
+import zed.rainxch.core.data.datasource.TokenStore
 import zed.rainxch.core.data.download.AssetSourceRefetcher
 import zed.rainxch.core.data.dto.GithubDeviceTokenSuccessDto
 import zed.rainxch.core.domain.model.account.github.GithubAsset
@@ -15,8 +15,9 @@ import zed.rainxch.core.domain.model.apk.ApkPackageInfo
 import zed.rainxch.core.domain.model.installation.DownloadProgress
 import zed.rainxch.core.domain.model.installation.InstallSource
 import zed.rainxch.core.domain.model.installation.InstalledApp
+import zed.rainxch.core.domain.model.installation.InstalledBuild
 import zed.rainxch.core.domain.model.installation.ParkedInstallDisposal
-import zed.rainxch.core.domain.model.smart_detect.MatchingPreview
+import zed.rainxch.core.domain.model.smartdetect.MatchingPreview
 import zed.rainxch.core.domain.model.system.SystemArchitecture
 import zed.rainxch.core.domain.network.AssetIdentity
 import zed.rainxch.core.domain.network.DigestVerifier
@@ -63,18 +64,32 @@ class DefaultDownloadOrchestratorParkTest {
         notifier: PendingInstallNotifier = RecordingPendingInstallNotifier(),
         installer: Installer = FakeInstaller,
         serializer: SystemInstallSerializer = FakeSystemInstallSerializer,
-    ) = DefaultDownloadOrchestrator(
-        downloader = FakeDownloader(parkedPath),
-        multiSourceDownloader = FakeMultiSourceDownloader,
-        assetSourceRefetcher = StubAssetSourceRefetcher,
-        digestVerifier = FakeDigestVerifier,
-        installer = installer,
-        installedAppsRepository = repository,
-        pendingInstallNotifier = notifier,
-        appScope = scope,
-        systemInstallSerializer = serializer,
-        tokenStore = FakeTokenStore,
-    )
+    ): DefaultDownloadOrchestrator {
+        val downloader = FakeDownloader(parkedPath)
+        return DefaultDownloadOrchestrator(
+            downloader = downloader,
+            assetFetcher =
+                AssetFetcher(
+                    downloader = downloader,
+                    multiSourceDownloader = FakeMultiSourceDownloader,
+                    assetSourceRefetcher = StubAssetSourceRefetcher,
+                    digestVerifier = FakeDigestVerifier,
+                    tokenStore = FakeTokenStore,
+                    installedAppsRepository = repository,
+                ),
+            installRunner =
+                DownloadInstallRunner(
+                    installer = installer,
+                    installedAppsRepository = repository,
+                    pendingInstallNotifier = notifier,
+                    systemInstallSerializer = serializer,
+                    digestVerifier = FakeDigestVerifier,
+                ),
+            installedAppsRepository = repository,
+            pendingInstallNotifier = notifier,
+            appScope = scope,
+        )
+    }
 
     @Test
     fun parking_a_finished_download_goes_through_the_combined_write_only() =
@@ -424,16 +439,7 @@ class DefaultDownloadOrchestratorParkTest {
 
         override suspend fun updateAppVersion(
             packageName: String,
-            newTag: String,
-            newReleaseId: Long?,
-            newAssetId: Long?,
-            newAssetDigest: String?,
-            newReleasePublishedAt: String?,
-            newAssetName: String?,
-            newAssetUrl: String?,
-            newVersionName: String,
-            newVersionCode: Long,
-            signingFingerprint: String?,
+            build: InstalledBuild,
             isPendingInstall: Boolean,
         ) = Unit
 

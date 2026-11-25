@@ -32,12 +32,6 @@ import zed.rainxch.githubstore.core.presentation.res.releases_load_failed
 import zed.rainxch.githubstore.core.presentation.res.releases_load_failed_description
 import zed.rainxch.githubstore.core.presentation.res.retry
 
-enum class ReleasesStatus {
-    FAILED,
-    RETRYING,
-    EMPTY,
-}
-
 @Composable
 fun ReleasesStatusCard(
     status: ReleasesStatus,

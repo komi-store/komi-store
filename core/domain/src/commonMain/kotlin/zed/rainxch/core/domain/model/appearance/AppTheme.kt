@@ -19,9 +19,7 @@ enum class AppTheme {
 
         fun fromName(name: String?): AppTheme {
             if (name.isNullOrEmpty()) return NORD
-            entries.firstOrNull { it.name == name }?.let { return it }
-            LEGACY_MIGRATION[name]?.let { return it }
-            return NORD
+            return entries.firstOrNull { it.name == name } ?: LEGACY_MIGRATION[name] ?: NORD
         }
     }
 }

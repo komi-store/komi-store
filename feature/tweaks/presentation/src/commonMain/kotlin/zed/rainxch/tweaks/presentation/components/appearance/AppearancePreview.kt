@@ -50,8 +50,8 @@ private fun AppearanceSectionPreview() {
             AppearanceHeadline(
                 personality = personality,
                 accent = accent,
-                onPersonalitySelected = { personality = it },
-                onAccentSelected = { accent = it },
+                onPersonalitySelect = { personality = it },
+                onAccentSelect = { accent = it },
             )
             SettingsGroup {
                 SettingsRow(

@@ -10,13 +10,14 @@ import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
 import io.ktor.http.isSuccess
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.withContext
 import zed.rainxch.core.data.network.GitHubClientProvider
+import zed.rainxch.core.data.network.networkFailures
 import zed.rainxch.core.domain.logging.KomiStoreLogger
+import zed.rainxch.core.domain.model.error.NetworkException
 import zed.rainxch.core.domain.model.error.RateLimitException
 import zed.rainxch.repopages.data.dto.CreateCommentRequest
 import zed.rainxch.repopages.data.dto.CreateIssueRequest
@@ -28,9 +29,8 @@ import zed.rainxch.repopages.data.dto.RepoContentDto
 import zed.rainxch.repopages.data.dto.SecurityAdvisoryDto
 import zed.rainxch.repopages.data.mappers.toApiValue
 import zed.rainxch.repopages.data.mappers.toIssueComment
-import zed.rainxch.repopages.data.mappers.toIssueLabel
-import zed.rainxch.repopages.data.mappers.toIssueState
 import zed.rainxch.repopages.data.mappers.toRepoIssue
+import zed.rainxch.repopages.data.mappers.toRepoIssueDetail
 import zed.rainxch.repopages.data.mappers.toRepoPullRequest
 import zed.rainxch.repopages.data.mappers.toSecurityAdvisory
 import zed.rainxch.repopages.domain.model.IssueComment
@@ -56,32 +56,21 @@ class RepoPagesRepositoryImpl(
         state: IssueState,
         page: Int,
     ): Result<IssuesPage> =
-        withContext(Dispatchers.IO) {
-            try {
-                val response =
-                    httpClient.get("/repos/$owner/$repo/issues") {
-                        parameter("state", state.toApiValue())
-                        parameter("per_page", PER_PAGE)
-                        parameter("page", page)
-                        parameter("sort", "created")
-                        parameter("direction", "desc")
-                    }
-                if (!response.status.isSuccess()) {
-                    return@withContext Result.failure(
-                        Exception("Failed to fetch issues: ${response.status.description}"),
-                    )
+        githubCall("Failed to fetch issues for $owner/$repo") {
+            val response =
+                httpClient.get("/repos/$owner/$repo/issues") {
+                    parameter("state", state.toApiValue())
+                    parameter("per_page", PER_PAGE)
+                    parameter("page", page)
+                    parameter("sort", "created")
+                    parameter("direction", "desc")
                 }
-                val dtos: List<IssueDto> = response.body()
-                val issues = dtos.filter { it.pullRequest == null }.map { it.toRepoIssue() }
-                Result.success(IssuesPage(issues = issues, hasMore = dtos.size >= PER_PAGE))
-            } catch (e: RateLimitException) {
-                Result.failure(e)
-            } catch (e: CancellationException) {
-                throw e
-            } catch (e: Exception) {
-                logger.error("Failed to fetch issues for $owner/$repo: ${e.message}")
-                Result.failure(e)
+            if (!response.status.isSuccess()) {
+                return@githubCall Result.failure(NetworkException("Failed to fetch issues: ${response.status.description}", null))
             }
+            val dtos: List<IssueDto> = response.body()
+            val issues = dtos.filter { it.pullRequest == null }.map { it.toRepoIssue() }
+            Result.success(IssuesPage(issues = issues, hasMore = dtos.size >= PER_PAGE))
         }
 
     override suspend fun getIssueDetail(
@@ -89,59 +78,33 @@ class RepoPagesRepositoryImpl(
         repo: String,
         number: Int,
     ): Result<RepoIssueDetail> =
-        withContext(Dispatchers.IO) {
-            try {
-                coroutineScope {
-                    val issueDeferred =
-                        async {
-                            httpClient.get("/repos/$owner/$repo/issues/$number")
+        githubCall("Failed to fetch issue $owner/$repo#$number") {
+            coroutineScope {
+                val issueDeferred = async { httpClient.get("/repos/$owner/$repo/issues/$number") }
+                val commentsDeferred =
+                    async {
+                        httpClient.get("/repos/$owner/$repo/issues/$number/comments") {
+                            parameter("per_page", COMMENTS_PER_PAGE)
                         }
-                    val commentsDeferred =
-                        async {
-                            httpClient.get("/repos/$owner/$repo/issues/$number/comments") {
-                                parameter("per_page", COMMENTS_PER_PAGE)
-                            }
-                        }
-
-                    val issueResponse = issueDeferred.await()
-                    if (!issueResponse.status.isSuccess()) {
-                        return@coroutineScope Result.failure(
-                            Exception("Failed to fetch issue: ${issueResponse.status.description}"),
-                        )
                     }
-                    val issueDto: IssueDto = issueResponse.body()
 
-                    val commentsResponse = commentsDeferred.await()
-                    val comments =
-                        if (commentsResponse.status.isSuccess()) {
-                            val commentDtos: List<IssueCommentDto> = commentsResponse.body()
-                            commentDtos.map { it.toIssueComment() }
-                        } else {
-                            emptyList()
-                        }
-
-                    Result.success(
-                        RepoIssueDetail(
-                            number = issueDto.number,
-                            title = issueDto.title,
-                            state = issueDto.state.toIssueState(),
-                            authorLogin = issueDto.user?.login.orEmpty(),
-                            authorAvatarUrl = issueDto.user?.avatarUrl,
-                            bodyMarkdown = issueDto.body.orEmpty(),
-                            createdAt = issueDto.createdAt,
-                            labels = issueDto.labels.map { it.toIssueLabel() },
-                            comments = comments,
-                            reactionThumbsUp = issueDto.reactions?.plusOne ?: 0,
-                        ),
+                val issueResponse = issueDeferred.await()
+                if (!issueResponse.status.isSuccess()) {
+                    return@coroutineScope Result.failure(
+                        NetworkException("Failed to fetch issue: ${issueResponse.status.description}", null),
                     )
                 }
-            } catch (e: RateLimitException) {
-                Result.failure(e)
-            } catch (e: CancellationException) {
-                throw e
-            } catch (e: Exception) {
-                logger.error("Failed to fetch issue $owner/$repo#$number: ${e.message}")
-                Result.failure(e)
+                val issueDto: IssueDto = issueResponse.body()
+
+                val commentsResponse = commentsDeferred.await()
+                val comments =
+                    if (commentsResponse.status.isSuccess()) {
+                        commentsResponse.body<List<IssueCommentDto>>().map { it.toIssueComment() }
+                    } else {
+                        emptyList()
+                    }
+
+                Result.success(issueDto.toRepoIssueDetail(comments))
             }
         }
 
@@ -149,75 +112,62 @@ class RepoPagesRepositoryImpl(
         owner: String,
         repo: String,
     ): Result<SecurityOverview> =
-        withContext(Dispatchers.IO) {
-            try {
-                coroutineScope {
-                    val advisoriesDeferred = async { fetchAdvisories(owner, repo) }
-                    val policyDeferred = async { fetchSecurityPolicy(owner, repo) }
-                    Result.success(
-                        SecurityOverview(
-                            advisories = advisoriesDeferred.await(),
-                            securityPolicyMarkdown = policyDeferred.await(),
-                        ),
-                    )
-                }
-            } catch (e: RateLimitException) {
-                Result.failure(e)
-            } catch (e: CancellationException) {
-                throw e
-            } catch (e: Exception) {
-                logger.error("Failed to fetch security overview for $owner/$repo: ${e.message}")
-                Result.failure(e)
+        githubCall("Failed to fetch security overview for $owner/$repo") {
+            coroutineScope {
+                val advisoriesDeferred = async { fetchAdvisories(owner, repo) }
+                val policyDeferred = async { fetchSecurityPolicy(owner, repo) }
+                Result.success(
+                    SecurityOverview(
+                        advisories = advisoriesDeferred.await(),
+                        securityPolicyMarkdown = policyDeferred.await(),
+                    ),
+                )
             }
         }
 
     private suspend fun fetchAdvisories(
         owner: String,
         repo: String,
-    ): List<SecurityAdvisory> {
-        return try {
-            val response =
-                httpClient.get("/repos/$owner/$repo/security-advisories") {
-                    parameter("per_page", PER_PAGE)
-                    parameter("state", "published")
+    ): List<SecurityAdvisory> =
+        try {
+            networkFailures {
+                val response =
+                    httpClient.get("/repos/$owner/$repo/security-advisories") {
+                        parameter("per_page", PER_PAGE)
+                        parameter("state", "published")
+                    }
+                if (response.status.isSuccess()) {
+                    response.body<List<SecurityAdvisoryDto>>().map { it.toSecurityAdvisory() }
+                } else {
+                    emptyList()
                 }
-            if (!response.status.isSuccess()) return emptyList()
-            val dtos: List<SecurityAdvisoryDto> = response.body()
-            dtos.map { it.toSecurityAdvisory() }
-        } catch (e: RateLimitException) {
-            throw e
-        } catch (e: CancellationException) {
-            throw e
-        } catch (e: Exception) {
+            }
+        } catch (e: NetworkException) {
             logger.warn("Failed to fetch advisories for $owner/$repo: ${e.message}")
             emptyList()
         }
-    }
 
-    @OptIn(ExperimentalEncodingApi::class)
     private suspend fun fetchSecurityPolicy(
         owner: String,
         repo: String,
-    ): String? {
-        for (path in SECURITY_PATHS) {
-            try {
+    ): String? = SECURITY_PATHS.firstNotNullOfOrNull { path -> readSecurityPolicy(owner, repo, path) }
+
+    @OptIn(ExperimentalEncodingApi::class)
+    private suspend fun readSecurityPolicy(
+        owner: String,
+        repo: String,
+        path: String,
+    ): String? =
+        try {
+            networkFailures {
                 val response = httpClient.get("/repos/$owner/$repo/contents/$path")
-                if (response.status == HttpStatusCode.NotFound) continue
-                if (!response.status.isSuccess()) continue
-                val dto: RepoContentDto = response.body()
-                val raw = dto.content ?: continue
-                val decoded = Base64.Mime.decode(raw).decodeToString()
-                if (decoded.isNotBlank()) return decoded
-            } catch (e: RateLimitException) {
-                throw e
-            } catch (e: CancellationException) {
-                throw e
-            } catch (e: Exception) {
-                logger.warn("Failed to read $path for $owner/$repo: ${e.message}")
+                val raw = if (response.status.isSuccess()) response.body<RepoContentDto>().content else null
+                raw?.let { Base64.Mime.decode(it).decodeToString() }?.takeIf { it.isNotBlank() }
             }
+        } catch (e: NetworkException) {
+            logger.warn("Failed to read $path for $owner/$repo: ${e.message}")
+            null
         }
-        return null
-    }
 
     override suspend fun addIssueComment(
         owner: String,
@@ -225,27 +175,16 @@ class RepoPagesRepositoryImpl(
         number: Int,
         body: String,
     ): Result<IssueComment> =
-        withContext(Dispatchers.IO) {
-            try {
-                val response =
-                    httpClient.post("/repos/$owner/$repo/issues/$number/comments") {
-                        contentType(ContentType.Application.Json)
-                        setBody(CreateCommentRequest(body = body))
-                    }
-                if (!response.status.isSuccess()) {
-                    return@withContext Result.failure(
-                        authAwareError(response.status.value, "Failed to post comment"),
-                    )
+        githubCall("Failed to post comment on $owner/$repo#$number") {
+            val response =
+                httpClient.post("/repos/$owner/$repo/issues/$number/comments") {
+                    contentType(ContentType.Application.Json)
+                    setBody(CreateCommentRequest(body = body))
                 }
-                val dto: IssueCommentDto = response.body()
-                Result.success(dto.toIssueComment())
-            } catch (e: RateLimitException) {
-                Result.failure(e)
-            } catch (e: CancellationException) {
-                throw e
-            } catch (e: Exception) {
-                logger.error("Failed to post comment on $owner/$repo#$number: ${e.message}")
-                Result.failure(e)
+            if (response.status.isSuccess()) {
+                Result.success(response.body<IssueCommentDto>().toIssueComment())
+            } else {
+                Result.failure(authAwareError(response.status, "Failed to post comment"))
             }
         }
 
@@ -255,27 +194,16 @@ class RepoPagesRepositoryImpl(
         title: String,
         body: String,
     ): Result<Int> =
-        withContext(Dispatchers.IO) {
-            try {
-                val response =
-                    httpClient.post("/repos/$owner/$repo/issues") {
-                        contentType(ContentType.Application.Json)
-                        setBody(CreateIssueRequest(title = title, body = body))
-                    }
-                if (!response.status.isSuccess()) {
-                    return@withContext Result.failure(
-                        authAwareError(response.status.value, "Failed to create issue"),
-                    )
+        githubCall("Failed to create issue on $owner/$repo") {
+            val response =
+                httpClient.post("/repos/$owner/$repo/issues") {
+                    contentType(ContentType.Application.Json)
+                    setBody(CreateIssueRequest(title = title, body = body))
                 }
-                val dto: IssueDto = response.body()
-                Result.success(dto.number)
-            } catch (e: RateLimitException) {
-                Result.failure(e)
-            } catch (e: CancellationException) {
-                throw e
-            } catch (e: Exception) {
-                logger.error("Failed to create issue on $owner/$repo: ${e.message}")
-                Result.failure(e)
+            if (response.status.isSuccess()) {
+                Result.success(response.body<IssueDto>().number)
+            } else {
+                Result.failure(authAwareError(response.status, "Failed to create issue"))
             }
         }
 
@@ -292,24 +220,16 @@ class RepoPagesRepositoryImpl(
     ): Result<Boolean> = postReaction("/repos/$owner/$repo/issues/comments/$commentId/reactions")
 
     private suspend fun postReaction(path: String): Result<Boolean> =
-        withContext(Dispatchers.IO) {
-            try {
-                val response =
-                    httpClient.post(path) {
-                        contentType(ContentType.Application.Json)
-                        setBody(CreateReactionRequest(content = "+1"))
-                    }
-                if (response.status.isSuccess()) {
-                    Result.success(response.status == HttpStatusCode.Created)
-                } else {
-                    Result.failure(authAwareError(response.status.value, "Failed to add reaction"))
+        githubCall("Failed to add reaction on $path") {
+            val response =
+                httpClient.post(path) {
+                    contentType(ContentType.Application.Json)
+                    setBody(CreateReactionRequest(content = "+1"))
                 }
-            } catch (e: RateLimitException) {
-                Result.failure(e)
-            } catch (e: CancellationException) {
-                throw e
-            } catch (e: Exception) {
-                Result.failure(e)
+            if (response.status.isSuccess()) {
+                Result.success(response.status == HttpStatusCode.Created)
+            } else {
+                Result.failure(authAwareError(response.status, "Failed to add reaction"))
             }
         }
 
@@ -319,42 +239,50 @@ class RepoPagesRepositoryImpl(
         state: IssueState,
         page: Int,
     ): Result<List<RepoPullRequest>> =
+        githubCall("Failed to fetch pull requests for $owner/$repo") {
+            val response =
+                httpClient.get("/repos/$owner/$repo/pulls") {
+                    parameter("state", state.toApiValue())
+                    parameter("per_page", PER_PAGE)
+                    parameter("page", page)
+                    parameter("sort", "created")
+                    parameter("direction", "desc")
+                }
+            if (response.status.isSuccess()) {
+                Result.success(response.body<List<PullRequestDto>>().map { it.toRepoPullRequest() })
+            } else {
+                Result.failure(NetworkException("Failed to fetch pull requests: ${response.status.description}", null))
+            }
+        }
+
+    // A failed call comes back as a Result failure, a rate limit included, so the screens show it in place.
+    private suspend fun <T> githubCall(
+        failureLog: String,
+        block: suspend () -> Result<T>,
+    ): Result<T> =
         withContext(Dispatchers.IO) {
             try {
-                val response =
-                    httpClient.get("/repos/$owner/$repo/pulls") {
-                        parameter("state", state.toApiValue())
-                        parameter("per_page", PER_PAGE)
-                        parameter("page", page)
-                        parameter("sort", "created")
-                        parameter("direction", "desc")
-                    }
-                if (!response.status.isSuccess()) {
-                    return@withContext Result.failure(
-                        Exception("Failed to fetch pull requests: ${response.status.description}"),
-                    )
-                }
-                val dtos: List<PullRequestDto> = response.body()
-                Result.success(dtos.map { it.toRepoPullRequest() })
-            } catch (e: RateLimitException) {
+                networkFailures { block() }
+            } catch (e: NetworkException) {
+                logger.error(failureLog, e)
                 Result.failure(e)
-            } catch (e: CancellationException) {
-                throw e
-            } catch (e: Exception) {
-                logger.error("Failed to fetch pull requests for $owner/$repo: ${e.message}")
+            } catch (e: RateLimitException) {
                 Result.failure(e)
             }
         }
 
     private fun authAwareError(
-        statusCode: Int,
+        status: HttpStatusCode,
         fallback: String,
-    ): Exception =
-        when (statusCode) {
-            401 -> Exception("Authentication required. Please sign in with GitHub.")
-            403 -> Exception("$fallback (forbidden — you may lack permission or be rate-limited).")
-            else -> Exception(fallback)
-        }
+    ): NetworkException =
+        NetworkException(
+            when (status) {
+                HttpStatusCode.Unauthorized -> "Authentication required. Please sign in with GitHub."
+                HttpStatusCode.Forbidden -> "$fallback (forbidden — you may lack permission or be rate-limited)."
+                else -> fallback
+            },
+            null,
+        )
 
     companion object {
         private const val PER_PAGE = 30

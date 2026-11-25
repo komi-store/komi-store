@@ -6,6 +6,7 @@ import zed.rainxch.core.data.network.DesktopDigestVerifier
 import zed.rainxch.core.domain.network.AssetIdentity
 import zed.rainxch.core.domain.utils.AssetFileName
 import java.io.File
+import java.io.IOException
 import java.nio.file.Files
 import java.security.MessageDigest
 import kotlin.test.Test
@@ -56,7 +57,7 @@ class FinishedFileReuseIntegrationTest {
                 File(dir, safeName).writeBytes(content)
 
                 val downloader = newDownloader(dir)
-                var failure: Throwable? = null
+                var failure: IOException? = null
                 try {
                     downloader
                         .download(
@@ -70,7 +71,7 @@ class FinishedFileReuseIntegrationTest {
                                     size = contentSize + 1,
                                 ),
                         ).toList()
-                } catch (e: Exception) {
+                } catch (e: IOException) {
                     failure = e
                 }
 

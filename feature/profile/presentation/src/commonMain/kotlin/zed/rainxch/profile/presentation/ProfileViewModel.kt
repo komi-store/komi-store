@@ -2,7 +2,6 @@ package zed.rainxch.profile.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -11,6 +10,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import zed.rainxch.core.domain.model.account.SessionSnapshot
+import zed.rainxch.core.domain.model.error.LocalStoreException
 import zed.rainxch.core.domain.repository.UserSessionRepository
 
 class ProfileViewModel(
@@ -68,6 +68,21 @@ class ProfileViewModel(
             }
     }
 
+    private fun logout() {
+        viewModelScope.launch {
+            try {
+                userSessionRepository.logout()
+            } catch (e: LocalStoreException) {
+                _state.update { it.copy(isLogoutDialogVisible = false) }
+                e.message?.let { _events.send(ProfileEvent.OnLogoutError(it)) }
+                return@launch
+            }
+            _state.update { it.copy(isLogoutDialogVisible = false) }
+            setSession(ProfileSession.SignedOut)
+            _events.send(ProfileEvent.OnLogoutSuccessful)
+        }
+    }
+
     fun onAction(action: ProfileAction) {
         when (action) {
             ProfileAction.OnLogoutClick -> {
@@ -79,21 +94,7 @@ class ProfileViewModel(
             }
 
             ProfileAction.OnLogoutConfirmClick -> {
-                viewModelScope.launch {
-                    runCatching {
-                        userSessionRepository.logout()
-                    }.onSuccess {
-                        _state.update { it.copy(isLogoutDialogVisible = false) }
-                        setSession(ProfileSession.SignedOut)
-                        _events.send(ProfileEvent.OnLogoutSuccessful)
-                    }.onFailure { error ->
-                        if (error is CancellationException) throw error
-                        _state.update { it.copy(isLogoutDialogVisible = false) }
-                        error.message?.let {
-                            _events.send(ProfileEvent.OnLogoutError(it))
-                        }
-                    }
-                }
+                logout()
             }
 
             ProfileAction.OnLogoutDismiss -> {

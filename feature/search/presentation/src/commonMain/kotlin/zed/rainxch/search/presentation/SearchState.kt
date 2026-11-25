@@ -1,7 +1,9 @@
 package zed.rainxch.search.presentation
 
 import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.ImmutableSet
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.persistentSetOf
 import zed.rainxch.core.domain.model.repository.DiscoveryPlatform
 import zed.rainxch.core.presentation.model.DiscoveryRepositoryUi
 import zed.rainxch.search.presentation.model.ParsedGithubLink
@@ -20,8 +22,8 @@ data class SearchState(
     val selectedLanguage: ProgrammingLanguageUi = ProgrammingLanguageUi.All,
     val isLoading: Boolean = false,
     val isHideSeenEnabled: Boolean = false,
-    val seenRepoIds: Set<Long> = emptySet(),
-    val hiddenRepoIds: Set<Long> = emptySet(),
+    val seenRepoIds: ImmutableSet<Long> = persistentSetOf(),
+    val hiddenRepoIds: ImmutableSet<Long> = persistentSetOf(),
     val isLoadingMore: Boolean = false,
     val errorMessage: String? = null,
     val hasMorePages: Boolean = true,
@@ -41,6 +43,10 @@ data class SearchState(
     val isFiltersSheetVisible: Boolean = false,
     val activeFilterCount: Int = 0,
     val isGridLayout: Boolean = false,
+    val canLoadMore: Boolean = true,
+    val areResultsHiddenBySeen: Boolean = false,
+    val isHistoryVisible: Boolean = false,
+    val isNoResultsVisible: Boolean = false,
 ) {
     enum class ExploreStatus {
         IDLE,
@@ -48,3 +54,12 @@ data class SearchState(
         EXHAUSTED,
     }
 }
+
+internal fun SearchState.withoutResults(): SearchState =
+    copy(
+        repositories = persistentListOf(),
+        isLoading = false,
+        isLoadingMore = false,
+        errorMessage = null,
+        totalCount = null,
+    )

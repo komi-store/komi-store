@@ -19,14 +19,14 @@ class LayerRulesTest {
     @Test
     fun presentation_modules_never_import_data_packages() {
         production.files
-            .filter { it.layer == Layer.Presentation && it.relativePath !in DATA_IMPORT_EXCEPTIONS }
+            .filter { it.layer == Layer.Presentation }
             .assertFalse { file -> file.imports.any { DATA_PACKAGE.matches(it.name) } }
     }
 
     @Test
     fun packages_follow_owner_and_layer() {
         production.files
-            .filter { it.expectedPackagePrefix != null && it.relativePath !in PACKAGE_EXCEPTIONS }
+            .filter { it.expectedPackagePrefix != null }
             .assertTrue { file ->
                 val name = file.packagee?.name ?: return@assertTrue false
                 val prefix = file.expectedPackagePrefix!!
@@ -46,22 +46,5 @@ class LayerRulesTest {
             )
 
         val DATA_PACKAGE = Regex("""^zed\.rainxch\.[a-z]+\.data(\..+)?$""")
-
-        val DATA_IMPORT_EXCEPTIONS =
-            setOf(
-                "feature/tweaks/presentation/src/commonMain/kotlin/zed/rainxch/tweaks/presentation/mirror/MirrorPickerViewModel.kt",
-            )
-
-        val PACKAGE_EXCEPTIONS =
-            listOf(
-                "model/ExploreResult.kt",
-                "model/ProgrammingLanguage.kt",
-                "model/SearchSource.kt",
-                "model/SortBy.kt",
-                "model/SortOrder.kt",
-                "repository/SearchHistoryRepository.kt",
-                "repository/SearchRepository.kt",
-            ).map { "feature/search/domain/src/commonMain/kotlin/zed/rainxch/domain/$it" }
-                .toSet()
     }
 }

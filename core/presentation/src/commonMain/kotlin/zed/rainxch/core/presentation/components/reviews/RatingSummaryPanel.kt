@@ -58,9 +58,7 @@ import zed.rainxch.githubstore.core.presentation.res.reviews_count
 import zed.rainxch.githubstore.core.presentation.res.reviews_star_bar
 import kotlin.math.roundToInt
 
-// The average on a cookie (an ink stamp in Manga) over its stars and the review count, beside one bar per
-// star level. The cookie turns into place and the bars grow in, once per visit. With [onStarsClick], a bar
-// picks its level, which stays lit as [selectedStars] while the other bars dim.
+// The average over its stars beside one bar per level; with onStarsClick a bar picks its level and the others dim.
 @Composable
 fun RatingSummaryPanel(
     summary: RatingSummaryUi,

@@ -295,7 +295,7 @@ private fun PreviewSizeRow() {
 @Preview
 @Composable
 private fun KomiIconButtonMangaPreview() {
-    PersonalityPreview(mangaPersonality()) {
+    PersonalityPreview(personality = mangaPersonality()) {
         Row(horizontalArrangement = Arrangement.spacedBy(Spacing.lg)) { PreviewIconRow() }
     }
 }
@@ -303,28 +303,29 @@ private fun KomiIconButtonMangaPreview() {
 @Preview
 @Composable
 private fun KomiIconButtonMangaSizesPreview() {
-    PersonalityPreview(mangaPersonality()) { PreviewSizeRow() }
+    PersonalityPreview(personality = mangaPersonality()) { PreviewSizeRow() }
 }
 
 @Preview
 @Composable
 private fun KomiIconButtonMangaNightPreview() {
     PersonalityPreview(
-        mangaPersonality(
-            paper = MangaPaper.NIGHT,
-            accent = MangaAccent.SUN,
-        ),
+        personality =
+            mangaPersonality(
+                paper = MangaPaper.NIGHT,
+                accent = MangaAccent.SUN,
+            ),
     ) { PreviewIconRow() }
 }
 
 @Preview
 @Composable
 private fun KomiIconButtonClassicPreview() {
-    PersonalityPreview(classicPersonality()) { PreviewIconRow() }
+    PersonalityPreview(personality = classicPersonality()) { PreviewIconRow() }
 }
 
 @Preview
 @Composable
 private fun KomiIconButtonClassicDarkPreview() {
-    PersonalityPreview(classicPersonality(dark = true)) { PreviewIconRow() }
+    PersonalityPreview(personality = classicPersonality(dark = true)) { PreviewIconRow() }
 }

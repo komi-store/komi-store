@@ -5,8 +5,8 @@ import androidx.datastore.preferences.core.Preferences
 import kotlinx.coroutines.CoroutineScope
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
-import zed.rainxch.core.data.local.data_store.createAnnouncementsDataStore
-import zed.rainxch.core.data.local.data_store.createDataStore
+import zed.rainxch.core.data.local.datastore.createAnnouncementsDataStore
+import zed.rainxch.core.data.local.datastore.createDataStore
 import zed.rainxch.core.data.local.db.AppDatabase
 import zed.rainxch.core.data.local.db.initDatabase
 import zed.rainxch.core.data.network.AndroidDigestVerifier
@@ -30,6 +30,7 @@ import zed.rainxch.core.data.services.external.InstallerSourceClassifier
 import zed.rainxch.core.data.services.external.ManifestHintExtractor
 import zed.rainxch.core.data.services.installer.AndroidInstallerStatusProvider
 import zed.rainxch.core.data.services.installer.ExternalInstallerDiscovery
+import zed.rainxch.core.data.services.installer.SilentInstallBackends
 import zed.rainxch.core.data.services.installer.SilentInstallerDispatcher
 import zed.rainxch.core.data.services.root.RootServiceManager
 import zed.rainxch.core.data.services.shizuku.ShizukuServiceManager
@@ -95,9 +96,12 @@ actual val corePlatformModule =
             SilentInstallerDispatcher(
                 androidContext = androidContext(),
                 androidInstaller = get<AndroidInstaller>(),
-                shizukuServiceManager = get(),
-                dhizukuServiceManager = get(),
-                rootServiceManager = get(),
+                backends =
+                    SilentInstallBackends(
+                        shizuku = get(),
+                        dhizuku = get(),
+                        root = get(),
+                    ),
                 tweaksRepository = get(),
                 scope = get<CoroutineScope>(),
             ).also { dispatcher ->

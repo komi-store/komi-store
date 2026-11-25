@@ -10,8 +10,7 @@ class BackgroundRequest : AbstractCoroutineContextElement(Key) {
     companion object Key : CoroutineContext.Key<BackgroundRequest>
 }
 
-// Same marker on every install, no identifiers. The User-Agent copy is what Cloudflare
-// analytics can filter on; it can't filter on custom headers.
+// Same marker on every install; the User-Agent copy exists because Cloudflare analytics can't filter on custom headers.
 internal val BackgroundRequestMarker =
     createClientPlugin("BackgroundRequestMarker") {
         onRequest { request, _ ->

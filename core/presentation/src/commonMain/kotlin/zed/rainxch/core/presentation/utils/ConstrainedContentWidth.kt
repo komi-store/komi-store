@@ -12,12 +12,15 @@ import zed.rainxch.core.presentation.locals.LocalContentWidth
 
 private val MIN_CONTENT_DP = 480.dp
 private val MAX_CONTENT_DP = 1600.dp
+private const val COMPACT_FRACTION = 0.55f
+private const val WIDE_FRACTION = 0.75f
+private const val EXTRA_WIDE_FRACTION = 0.95f
 
 private fun ContentWidth.fraction(): Float =
     when (this) {
-        ContentWidth.COMPACT -> 0.55f
-        ContentWidth.WIDE -> 0.75f
-        ContentWidth.EXTRA_WIDE -> 0.95f
+        ContentWidth.COMPACT -> COMPACT_FRACTION
+        ContentWidth.WIDE -> WIDE_FRACTION
+        ContentWidth.EXTRA_WIDE -> EXTRA_WIDE_FRACTION
     }
 
 @Composable

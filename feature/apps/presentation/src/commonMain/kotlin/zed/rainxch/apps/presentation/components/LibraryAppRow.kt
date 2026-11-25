@@ -49,8 +49,7 @@ import zed.rainxch.githubstore.core.presentation.res.variant_label_inline
 import zed.rainxch.githubstore.core.presentation.res.variant_picker_open
 import zed.rainxch.githubstore.core.presentation.res.variant_stale_hint
 
-// A tracked app in any state but a running download: what it is, where it stands, one action
-// (Install, Update or Open) and a menu with everything else.
+// A tracked app in any state but a running download: one main action (Install, Update or Open) and a menu for the rest.
 @Composable
 fun LibraryAppRow(
     appItem: AppItem,
@@ -139,8 +138,7 @@ private fun staleStatus(app: InstalledAppUi): String =
 private val InstalledAppUi.hasUpdate: Boolean
     get() = isUpdateAvailable && updateCheckEnabled && !isPendingInstall
 
-// The sync keeps a file whose park was cleared until it can prove the install; that file is not
-// something to offer, so only a live park counts.
+// The sync keeps a file whose park was cleared until it can prove the install, so only a live park counts.
 private val InstalledAppUi.isParked: Boolean
     get() = isPendingInstall && pendingInstallFilePath != null
 

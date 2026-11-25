@@ -2,8 +2,8 @@ package zed.rainxch.core.data.services.external
 
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
-import android.content.pm.PackageManager.GET_SIGNING_CERTIFICATES
 import android.os.Build
+import zed.rainxch.core.data.services.SigningFingerprint
 import java.security.MessageDigest
 
 object SigningFingerprintComputer {
@@ -13,46 +13,35 @@ object SigningFingerprintComputer {
     ): String? =
         runCatching {
             val info = loadPackageInfo(packageManager, packageName) ?: return null
-            certBytes(info)?.let(::sha256Hex)
+            fingerprintOf(info)
         }.getOrNull()
 
     fun computeFrom(info: PackageInfo): String? =
         runCatching {
-            certBytes(info)?.let(::sha256Hex)
+            fingerprintOf(info)
         }.getOrNull()
 
     private fun loadPackageInfo(
         pm: PackageManager,
         packageName: String,
     ): PackageInfo? {
-        val flags =
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                GET_SIGNING_CERTIFICATES.toLong()
-            } else {
-                @Suppress("DEPRECATION")
-                PackageManager.GET_SIGNATURES.toLong()
-            }
+        val flags = SigningFingerprint.SIGNER_FLAG.toLong()
         return runCatching {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 pm.getPackageInfo(packageName, PackageManager.PackageInfoFlags.of(flags))
             } else {
-                @Suppress("DEPRECATION")
                 pm.getPackageInfo(packageName, flags.toInt())
             }
         }.getOrNull()
     }
 
-    private fun certBytes(info: PackageInfo): ByteArray? =
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            val sigInfo = info.signingInfo ?: return null
-
-            val current = sigInfo.apkContentsSigners?.firstOrNull()
-            val fallback = sigInfo.signingCertificateHistory?.lastOrNull()
-            (current ?: fallback)?.toByteArray()
-        } else {
-            @Suppress("DEPRECATION")
-            info.signatures?.firstOrNull()?.toByteArray()
-        }
+    private fun fingerprintOf(info: PackageInfo): String? {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) return SigningFingerprint.fromPackageInfo(info)
+        val sigInfo = info.signingInfo
+        val current = sigInfo?.apkContentsSigners?.firstOrNull()
+        val fallback = sigInfo?.signingCertificateHistory?.lastOrNull()
+        return (current ?: fallback)?.toByteArray()?.let(::sha256Hex)
+    }
 
     private fun sha256Hex(bytes: ByteArray): String =
         MessageDigest

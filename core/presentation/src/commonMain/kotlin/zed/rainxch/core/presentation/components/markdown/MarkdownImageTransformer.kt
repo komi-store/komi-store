@@ -16,6 +16,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.PlaceholderVerticalAlign
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
+import co.touchlab.kermit.Logger
 import coil3.compose.LocalPlatformContext
 import coil3.compose.rememberAsyncImagePainter
 import coil3.network.NetworkHeaders
@@ -38,30 +39,15 @@ import kotlinx.coroutines.withContext
 import org.jetbrains.compose.resources.stringResource
 import zed.rainxch.githubstore.core.presentation.res.Res
 import zed.rainxch.githubstore.core.presentation.res.cd_image
+import java.io.IOException
+import kotlin.coroutines.cancellation.CancellationException
 
 class MarkdownImageTransformer(
     private val probeClient: HttpClient,
 ) : ImageTransformer {
     @Composable
     override fun transform(link: String): ImageData? {
-        if (link.isBlank()) return null
-
-        val normalizedLink =
-            if (link.contains("github.com") && link.contains("/blob/")) {
-                link
-                    .replace("github.com", "raw.githubusercontent.com")
-                    .replace("/blob/", "/")
-            } else {
-                link
-            }
-
-        if (!normalizedLink.startsWith("http://") &&
-            !normalizedLink.startsWith("https://") &&
-            !normalizedLink.startsWith("data:")
-        ) {
-            return null
-        }
-
+        val normalizedLink = normalizeLink(link) ?: return null
         val isDataUri = normalizedLink.startsWith("data:")
 
         var probeResult by remember(normalizedLink) {
@@ -123,6 +109,21 @@ class MarkdownImageTransformer(
         )
     }
 
+    private fun normalizeLink(link: String): String? {
+        if (link.isBlank()) return null
+        val normalized =
+            if (link.contains("github.com") && link.contains("/blob/")) {
+                link
+                    .replace("github.com", "raw.githubusercontent.com")
+                    .replace("/blob/", "/")
+            } else {
+                link
+            }
+        return normalized.takeIf {
+            it.startsWith("http://") || it.startsWith("https://") || it.startsWith("data:")
+        }
+    }
+
     private fun looksLikeBadge(url: String): Boolean {
         val lower = url.lowercase()
 
@@ -138,7 +139,7 @@ class MarkdownImageTransformer(
 
             "/badge" in pathOnly ||
             "/badges/" in pathOnly ||
-            "/workflows/" in pathOnly && pathOnly.endsWith("/badge") ||
+            ("/workflows/" in pathOnly && pathOnly.endsWith("/badge")) ||
             "/bestpractices/" in pathOnly
     }
 
@@ -198,7 +199,7 @@ class MarkdownImageTransformer(
         probeMutex.withLock {
             probeCache[url]?.let { return it }
             val result =
-                runCatching {
+                try {
                     val response: HttpResponse = probeClient.head(url)
                     val contentLength = response.headers[HttpHeaders.ContentLength]?.toLongOrNull()
                     when {
@@ -206,12 +207,27 @@ class MarkdownImageTransformer(
                         contentLength > MAX_IMAGE_BYTES -> ProbeResult.Skipped(contentLength)
                         else -> ProbeResult.Allowed
                     }
-                }.getOrElse {
-                    ProbeResult.Allowed
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (e: IOException) {
+                    probeFailed(url, e)
+                } catch (e: IllegalArgumentException) {
+                    probeFailed(url, e)
+                } catch (e: IllegalStateException) {
+                    probeFailed(url, e)
                 }
             probeCache[url] = result
             return result
         }
+    }
+
+    // A failed probe still lets Coil try the image; network errors, bad URLs and unresolved hosts end here.
+    private fun probeFailed(
+        url: String,
+        cause: Exception,
+    ): ProbeResult {
+        Logger.w(cause) { "Image size probe failed for $url" }
+        return ProbeResult.Allowed
     }
 
     sealed interface ProbeResult {

@@ -1,172 +1,187 @@
 package zed.rainxch.details.presentation
 
 import org.jetbrains.compose.resources.StringResource
-import zed.rainxch.core.domain.model.account.github.GithubAsset
-import zed.rainxch.core.domain.model.account.github.GithubRelease
 import zed.rainxch.core.domain.model.repository.DiscoveryPlatform
 import zed.rainxch.details.domain.model.ReleaseCategory
 import zed.rainxch.details.presentation.model.TranslationTarget
 
+// Grouped by the handler that answers them, so each handler's dispatch stays small.
 sealed interface DetailsAction {
+    sealed interface Load : DetailsAction
+
+    sealed interface Release : DetailsAction
+
+    sealed interface Install : DetailsAction
+
+    sealed interface Handoff : DetailsAction
+
+    sealed interface App : DetailsAction
+
+    sealed interface Repo : DetailsAction
+
+    sealed interface Content : DetailsAction
+
+    sealed interface Navigation : DetailsAction
+
     data class OnPlatformChipClick(
         val platform: DiscoveryPlatform,
-    ) : DetailsAction
+    ) : Release
 
-    data object OnJumpToDeviceBuild : DetailsAction
+    data object OnJumpToDeviceBuild : Release
 
-    data object OnDismissPlatformHandoff : DetailsAction
+    data object OnDismissPlatformHandoff : Release
 
     data class OnShareAssetLink(
         val assetUrl: String,
-    ) : DetailsAction
+    ) : Repo
 
-    data object Retry : DetailsAction
+    data object Retry : Load
 
-    data object RetryReleases : DetailsAction
+    data object RetryReleases : Load
 
-    data object Refresh : DetailsAction
+    data object Refresh : Load
 
-    data object InstallPrimary : DetailsAction
+    data object InstallPrimary : Install
 
-    data object OnDismissDowngradeWarning : DetailsAction
+    data object OnDismissDowngradeWarning : Install
 
-    data object OnConfirmDowngradeInstall : DetailsAction
+    data object OnConfirmDowngradeInstall : Install
 
-    data object OnConfirmDowngradeUninstall : DetailsAction
+    data object OnConfirmDowngradeUninstall : App
 
-    data object OnDismissSigningKeyWarning : DetailsAction
+    data object OnDismissSigningKeyWarning : Install
 
-    data object OnOverrideSigningKeyWarning : DetailsAction
+    data object OnOverrideSigningKeyWarning : Install
 
-    data object UninstallApp : DetailsAction
+    data object UninstallApp : App
 
-    data object OnRequestUninstall : DetailsAction
+    data object OnRequestUninstall : App
 
-    data object OnDismissUninstallConfirmation : DetailsAction
+    data object OnDismissUninstallConfirmation : App
 
-    data object OnConfirmUninstall : DetailsAction
+    data object OnConfirmUninstall : App
 
-    data object OnUnlinkExternalApp : DetailsAction
+    data object OnUnlinkExternalApp : App
 
-    data object OnDismissUnlinkConfirmation : DetailsAction
+    data object OnDismissUnlinkConfirmation : App
 
-    data object OnConfirmUnlinkExternalApp : DetailsAction
+    data object OnConfirmUnlinkExternalApp : App
 
     data class DownloadAsset(
         val downloadUrl: String,
         val assetName: String,
         val sizeBytes: Long,
-    ) : DetailsAction
+    ) : Install
 
-    data object PauseDownload : DetailsAction
+    data object PauseDownload : Install
 
-    data object ResumeDownload : DetailsAction
+    data object ResumeDownload : Install
 
-    data object DiscardDownload : DetailsAction
+    data object DiscardDownload : Install
 
-    data object OpenRepoInBrowser : DetailsAction
+    data object OpenRepoInBrowser : Repo
 
-    data object OpenAuthorInBrowser : DetailsAction
+    data object OpenAuthorInBrowser : Repo
 
     data class OpenDeveloperProfile(
         val username: String,
-    ) : DetailsAction
+    ) : Navigation
 
-    data object OpenInObtainium : DetailsAction
+    data object OpenInObtainium : Handoff
 
-    data object OpenInAppManager : DetailsAction
+    data object OpenInAppManager : Handoff
 
-    data object InstallWithExternalApp : DetailsAction
+    data object InstallWithExternalApp : Handoff
 
-    data object OpenWithExternalInstaller : DetailsAction
+    data object OpenWithExternalInstaller : Handoff
 
-    data object DismissExternalInstallerPrompt : DetailsAction
+    data object DismissExternalInstallerPrompt : Handoff
 
-    data object OnNavigateBackClick : DetailsAction
+    data object OnNavigateBackClick : Navigation
 
-    data object OnToggleFavorite : DetailsAction
+    data object OnToggleFavorite : Repo
 
-    data object OnToggleStar : DetailsAction
+    data object OnToggleStar : Repo
 
-    data object OnShareClick : DetailsAction
+    data object OnShareClick : Repo
 
-    data object UpdateApp : DetailsAction
+    data object UpdateApp : Install
 
-    data object OpenApp : DetailsAction
+    data object OpenApp : App
 
     data class OnMessage(
         val messageText: StringResource,
-    ) : DetailsAction
+    ) : Navigation
 
     data class SelectReleaseCategory(
         val category: ReleaseCategory,
-    ) : DetailsAction
+    ) : Release
 
     data class SelectRelease(
-        val release: GithubRelease,
-    ) : DetailsAction
+        val releaseId: Long,
+    ) : Release
 
-    data object ToggleVersionPicker : DetailsAction
+    data object ToggleVersionPicker : Release
 
-    data object ToggleAboutExpanded : DetailsAction
+    data object ToggleAboutExpanded : Content
 
-    data object ToggleWhatsNewExpanded : DetailsAction
+    data object ToggleWhatsNewExpanded : Content
 
     data class OnAboutMeasured(
         val heightPx: Float,
-    ) : DetailsAction
+    ) : Content
 
     data class OnWhatsNewMeasured(
         val heightPx: Float,
-    ) : DetailsAction
+    ) : Content
 
     data class TranslateAbout(
         val targetLanguageCode: String,
-    ) : DetailsAction
+    ) : Content
 
     data class TranslateWhatsNew(
         val targetLanguageCode: String,
-    ) : DetailsAction
+    ) : Content
 
-    data object ToggleAboutTranslation : DetailsAction
+    data object ToggleAboutTranslation : Content
 
-    data object ToggleWhatsNewTranslation : DetailsAction
+    data object ToggleWhatsNewTranslation : Content
 
     data class ShowLanguagePicker(
         val target: TranslationTarget,
-    ) : DetailsAction
+    ) : Content
 
-    data object DismissLanguagePicker : DetailsAction
+    data object DismissLanguagePicker : Content
 
     data class SelectDownloadAsset(
-        val release: GithubAsset,
-    ) : DetailsAction
+        val assetId: Long,
+    ) : Release
 
     data class OnSelectInstalledApp(
         val packageName: String,
-    ) : DetailsAction
+    ) : Release
 
-    data object ToggleReleaseAssetsPicker : DetailsAction
+    data object ToggleReleaseAssetsPicker : Release
 
-    data object UnpinPreferredVariant : DetailsAction
+    data object UnpinPreferredVariant : Release
 
-    data object ToggleIncludeBetas : DetailsAction
+    data object ToggleIncludeBetas : Release
 
-    data object SwitchToStable : DetailsAction
+    data object SwitchToStable : Install
 
-    data object OnInspectApk : DetailsAction
+    data object OnInspectApk : App
 
-    data object OnDismissApkInspect : DetailsAction
+    data object OnDismissApkInspect : App
 
-    data object OnAcknowledgeApkInspectCoachmark : DetailsAction
+    data object OnAcknowledgeApkInspectCoachmark : App
 
-    data object OnAcknowledgeChannelChipCoachmark : DetailsAction
+    data object OnAcknowledgeChannelChipCoachmark : Release
 
     data class OnToggleShowAllPlatforms(
         val enabled: Boolean,
-    ) : DetailsAction
+    ) : Release
 
     data class OnDownloadForTransfer(
         val assetUrl: String,
-    ) : DetailsAction
+    ) : Repo
 }

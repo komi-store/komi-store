@@ -5,13 +5,17 @@ import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.content.pm.PermissionInfo
+import android.content.res.Resources
 import android.os.Build
+import androidx.core.content.pm.PackageInfoCompat
+import androidx.core.content.pm.PermissionInfoCompat
 import co.touchlab.kermit.Logger
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import zed.rainxch.core.domain.model.apk.ApkInspection
 import zed.rainxch.core.domain.model.apk.ApkPermission
 import zed.rainxch.core.domain.model.apk.ProtectionLevel
+import zed.rainxch.core.domain.model.error.SystemPackagesException
 import zed.rainxch.core.domain.system.ApkInspector
 import java.io.File
 
@@ -38,7 +42,7 @@ class AndroidApkInspector(
                 publicSourceDir = filePath
             }
 
-            try {
+            inspectionOrNull("inspectFile: failed to extract APK metadata for $filePath") {
                 buildInspection(
                     info = info,
                     source = ApkInspection.Source.FILE,
@@ -46,9 +50,6 @@ class AndroidApkInspector(
                     fileSizeBytes = file.length(),
                     packageNameForGrantState = null,
                 )
-            } catch (t: Throwable) {
-                Logger.w(TAG) { "inspectFile: failed to extract APK metadata for $filePath: $t" }
-                null
             }
         }
 
@@ -56,12 +57,12 @@ class AndroidApkInspector(
         withContext(Dispatchers.IO) {
             val info =
                 try {
-                    pm.getPackageInfoCompat(packageName, FULL_FLAGS)
+                    systemServiceCall { pm.getPackageInfoCompat(packageName, FULL_FLAGS) }
                 } catch (_: PackageManager.NameNotFoundException) {
                     null
-                } catch (t: Throwable) {
+                } catch (e: SystemPackagesException) {
                     Logger.w(TAG) {
-                        "inspectInstalled: PackageManager threw for $packageName: $t"
+                        "inspectInstalled: PackageManager threw for $packageName: ${e.cause}"
                     }
                     null
                 }
@@ -71,7 +72,7 @@ class AndroidApkInspector(
             }
             val sourceDir = info.applicationInfo?.sourceDir
             val sizeBytes = sourceDir?.let { runCatching { File(it).length() }.getOrNull() }
-            try {
+            inspectionOrNull("inspectInstalled: failed to extract metadata for $packageName") {
                 buildInspection(
                     info = info,
                     source = ApkInspection.Source.INSTALLED,
@@ -79,10 +80,21 @@ class AndroidApkInspector(
                     fileSizeBytes = sizeBytes,
                     packageNameForGrantState = packageName,
                 )
-            } catch (t: Throwable) {
-                Logger.w(TAG) { "inspectInstalled: failed to extract metadata for $packageName: $t" }
-                null
             }
+        }
+
+    private inline fun inspectionOrNull(
+        failure: String,
+        build: () -> ApkInspection,
+    ): ApkInspection? =
+        try {
+            build()
+        } catch (e: Resources.NotFoundException) {
+            Logger.w(TAG) { "$failure: $e" }
+            null
+        } catch (e: SecurityException) {
+            Logger.w(TAG) { "$failure: $e" }
+            null
         }
 
     private fun buildInspection(
@@ -94,13 +106,7 @@ class AndroidApkInspector(
     ): ApkInspection {
         val appInfo = info.applicationInfo
         val label = appInfo?.loadLabel(pm)?.toString().orEmpty()
-        val versionCode =
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                info.longVersionCode
-            } else {
-                @Suppress("DEPRECATION")
-                info.versionCode.toLong()
-            }
+        val versionCode = PackageInfoCompat.getLongVersionCode(info)
 
         val permissions = info.requestedPermissions?.toList().orEmpty()
         val grantFlags = info.requestedPermissionsFlags
@@ -127,12 +133,7 @@ class AndroidApkInspector(
             versionName = info.versionName,
             versionCode = versionCode,
             signingFingerprint = SigningFingerprint.fromPackageInfo(info),
-            minSdk =
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                    appInfo?.minSdkVersion
-                } else {
-                    null
-                },
+            minSdk = appInfo?.minSdkVersion,
             targetSdk = appInfo?.targetSdkVersion,
             permissions = resolvedPermissions,
             mainActivity = mainActivity,
@@ -179,21 +180,8 @@ class AndroidApkInspector(
     }
 
     private fun resolveProtectionLevel(info: PermissionInfo): ProtectionLevel {
-        val base =
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                info.protection
-            } else {
-                @Suppress("DEPRECATION")
-                info.protectionLevel and PermissionInfo.PROTECTION_MASK_BASE
-            }
-        val flags =
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                info.protectionFlags
-            } else {
-                @Suppress("DEPRECATION")
-                info.protectionLevel and PermissionInfo.PROTECTION_MASK_FLAGS
-            }
-        return when (base) {
+        val flags = PermissionInfoCompat.getProtectionFlags(info)
+        return when (PermissionInfoCompat.getProtection(info)) {
             PermissionInfo.PROTECTION_DANGEROUS -> {
                 ProtectionLevel.DANGEROUS
             }
@@ -219,19 +207,12 @@ class AndroidApkInspector(
     private companion object {
         const val TAG = "AndroidApkInspector"
 
-        @Suppress("DEPRECATION")
         val FULL_FLAGS: Int =
-            (
-                PackageManager.GET_PERMISSIONS or
-                    PackageManager.GET_ACTIVITIES or
-                    PackageManager.GET_SERVICES or
-                    PackageManager.GET_RECEIVERS
-            ) or
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                    PackageManager.GET_SIGNING_CERTIFICATES
-                } else {
-                    PackageManager.GET_SIGNATURES
-                }
+            PackageManager.GET_PERMISSIONS or
+                PackageManager.GET_ACTIVITIES or
+                PackageManager.GET_SERVICES or
+                PackageManager.GET_RECEIVERS or
+                SigningFingerprint.SIGNER_FLAG
     }
 }
 
@@ -242,7 +223,6 @@ private fun PackageManager.getPackageArchiveInfoCompat(
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
         getPackageArchiveInfo(filePath, PackageManager.PackageInfoFlags.of(flags.toLong()))
     } else {
-        @Suppress("DEPRECATION")
         getPackageArchiveInfo(filePath, flags)
     }
 
@@ -253,6 +233,5 @@ private fun PackageManager.getPackageInfoCompat(
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
         getPackageInfo(packageName, PackageManager.PackageInfoFlags.of(flags.toLong()))
     } else {
-        @Suppress("DEPRECATION")
         getPackageInfo(packageName, flags)
     }

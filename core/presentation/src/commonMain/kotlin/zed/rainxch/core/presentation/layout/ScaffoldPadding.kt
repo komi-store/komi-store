@@ -6,9 +6,7 @@ import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalLayoutDirection
 
-// For a tab screen's list, which scrolls under Classic's floating tab card: the container takes the
-// scaffold padding without its bottom, and the list adds the bottom to its content padding so its
-// last item can scroll clear of the card.
+// For a list under Classic's tab card: the container drops the bottom padding and the list adds it to its content padding.
 @Composable
 fun PaddingValues.withoutBottom(): PaddingValues {
     val direction = LocalLayoutDirection.current

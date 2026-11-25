@@ -2,7 +2,6 @@ package zed.rainxch.reviews.presentation.moderation
 
 import zed.rainxch.core.domain.model.reviews.ModerationDecision
 import zed.rainxch.core.domain.model.reviews.ModerationStatus
-import zed.rainxch.core.domain.model.reviews.ReviewTarget
 
 sealed interface ModerationAction {
     data object OnBackClick : ModerationAction
@@ -16,7 +15,7 @@ sealed interface ModerationAction {
     ) : ModerationAction
 
     data class OnOpenRepo(
-        val repo: ReviewTarget,
+        val repo: ModerationRepoUi,
     ) : ModerationAction
 
     // DELETE asks first; the other decisions run at once.

@@ -14,6 +14,10 @@ import zed.rainxch.core.presentation.components.bars.LocalTabCardSlot
 import zed.rainxch.core.presentation.locals.LocalAnimatedVisibilityScope
 import zed.rainxch.core.presentation.locals.LocalSharedTransitionScope
 import zed.rainxch.profile.presentation.ProfileRoot
+import zed.rainxch.profile.presentation.announcements.AnnouncementsScreen
+import zed.rainxch.profile.presentation.announcements.AnnouncementsViewModel
+import zed.rainxch.profile.presentation.whatsnew.WhatsNewHistoryScreen
+import zed.rainxch.profile.presentation.whatsnew.WhatsNewViewModel
 
 fun NavGraphBuilder.profileGraph(
     navController: NavHostController,
@@ -41,7 +45,7 @@ fun NavGraphBuilder.profileGraph(
                     onNavigateToFavouriteRepos = {
                         navController.navigate(GithubStoreGraph.FavouritesScreen)
                     },
-                    onNavigateToRecentlyViewed = {
+                    onNavigateToRecentlyViewedRepos = {
                         navController.navigate(GithubStoreGraph.RecentlyViewedScreen)
                     },
                     onNavigateToDevProfile = { username ->
@@ -67,5 +71,29 @@ fun NavGraphBuilder.profileGraph(
                 )
             }
         }
+    }
+}
+
+// Both view models are app-wide: the unread badge and the what's-new sheet read them too.
+internal fun NavGraphBuilder.profilePages(
+    navController: NavHostController,
+    whatsNewViewModel: WhatsNewViewModel,
+    announcementsViewModel: AnnouncementsViewModel,
+) {
+    composable<GithubStoreGraph.WhatsNewHistoryScreen> {
+        val historyEntries by whatsNewViewModel.historyEntries.collectAsStateWithLifecycle()
+        WhatsNewHistoryScreen(
+            entries = historyEntries,
+            onNavigateBack = { navController.navigateUp() },
+        )
+    }
+
+    composable<GithubStoreGraph.AnnouncementsScreen> {
+        val announcementsState by announcementsViewModel.state.collectAsStateWithLifecycle()
+        AnnouncementsScreen(
+            state = announcementsState,
+            onAction = announcementsViewModel::onAction,
+            onNavigateBack = { navController.navigateUp() },
+        )
     }
 }

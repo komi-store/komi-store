@@ -1,22 +1,17 @@
 package zed.rainxch.apps.presentation.import.components
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.background
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
-import zed.rainxch.core.presentation.components.buttons.KomiButton
-import zed.rainxch.core.presentation.components.buttons.KomiButtonVariant
-import zed.rainxch.core.presentation.components.text.KomiText
-import zed.rainxch.core.presentation.components.text.KomiTextRole
-import zed.rainxch.core.presentation.locals.LocalPersonality
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -31,6 +26,11 @@ import org.jetbrains.compose.resources.pluralStringResource
 import org.jetbrains.compose.resources.stringResource
 import zed.rainxch.apps.presentation.import.model.CandidateUi
 import zed.rainxch.apps.presentation.import.model.RepoSuggestionUi
+import zed.rainxch.core.presentation.components.buttons.KomiButton
+import zed.rainxch.core.presentation.components.buttons.KomiButtonVariant
+import zed.rainxch.core.presentation.components.text.KomiText
+import zed.rainxch.core.presentation.components.text.KomiTextRole
+import zed.rainxch.core.presentation.locals.LocalPersonality
 import zed.rainxch.githubstore.core.presentation.res.Res
 import zed.rainxch.githubstore.core.presentation.res.external_import_list_add_manually
 import zed.rainxch.githubstore.core.presentation.res.external_import_list_remaining
@@ -44,7 +44,7 @@ fun WizardList(
     searchResults: ImmutableList<RepoSuggestionUi>,
     isSearching: Boolean,
     searchError: String?,
-    onToggleExpanded: (packageName: String) -> Unit,
+    onToggleExpand: (packageName: String) -> Unit,
     onPick: (packageName: String, RepoSuggestionUi) -> Unit,
     onSkip: (packageName: String) -> Unit,
     onLink: (packageName: String) -> Unit,
@@ -62,17 +62,19 @@ fun WizardList(
             val colors = LocalPersonality.current.colors
             val shape = LocalPersonality.current.shape
             Box(
-                modifier = Modifier
-                    .semantics { liveRegion = LiveRegionMode.Polite }
-                    .clip(RoundedCornerShape(shape.corner))
-                    .background(colors.surfaceVariant),
+                modifier =
+                    Modifier
+                        .semantics { liveRegion = LiveRegionMode.Polite }
+                        .clip(RoundedCornerShape(shape.corner))
+                        .background(colors.surfaceVariant),
             ) {
                 KomiText(
-                    text = pluralStringResource(
-                        Res.plurals.external_import_list_remaining,
-                        cards.size,
-                        cards.size,
-                    ),
+                    text =
+                        pluralStringResource(
+                            Res.plurals.external_import_list_remaining,
+                            cards.size,
+                            cards.size,
+                        ),
                     role = KomiTextRole.LabelSmall,
                     color = colors.onSurfaceVariant,
                     modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
@@ -93,7 +95,7 @@ fun WizardList(
                 searchResults = if (isActive) searchResults else persistentListOf(),
                 isSearching = isActive && isSearching,
                 searchError = if (isActive) searchError else null,
-                onToggleExpanded = { onToggleExpanded(card.packageName) },
+                onToggleExpand = { onToggleExpand(card.packageName) },
                 onPick = { suggestion -> onPick(card.packageName, suggestion) },
                 onSkip = { onSkip(card.packageName) },
                 onLink = { onLink(card.packageName) },

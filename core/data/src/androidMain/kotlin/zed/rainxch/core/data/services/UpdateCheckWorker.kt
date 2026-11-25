@@ -1,7 +1,6 @@
 package zed.rainxch.core.data.services
 
 import android.Manifest
-import android.annotation.SuppressLint
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
@@ -21,12 +20,16 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import zed.rainxch.core.data.local.db.dao.ExternalLinkDao
 import zed.rainxch.core.data.network.BackgroundRequest
+import zed.rainxch.core.data.repository.localStore
+import zed.rainxch.core.domain.model.error.LocalStoreException
 import zed.rainxch.core.domain.model.installation.InstallerType
 import zed.rainxch.core.domain.repository.ExternalImportRepository
 import zed.rainxch.core.domain.repository.InstalledAppsRepository
 import zed.rainxch.core.domain.repository.TweaksRepository
 import zed.rainxch.core.domain.system.PackageMonitor
-import zed.rainxch.core.domain.use_cases.SyncInstalledAppsUseCase
+import zed.rainxch.core.domain.usecases.SyncInstalledAppsUseCase
+import java.io.IOException
+import kotlin.coroutines.cancellation.CancellationException
 
 class UpdateCheckWorker(
     context: Context,
@@ -64,7 +67,8 @@ class UpdateCheckWorker(
                 val isSilentBackend = installerType == InstallerType.SHIZUKU || installerType == InstallerType.DHIZUKU
                 if (autoUpdateEnabled && isSilentBackend) {
                     Logger.i {
-                        "UpdateCheckWorker: Auto-update enabled with $installerType, scheduling AutoUpdateWorker for ${appsWithUpdates.size} apps"
+                        "UpdateCheckWorker: Auto-update enabled with $installerType, " +
+                            "scheduling AutoUpdateWorker for ${appsWithUpdates.size} apps"
                     }
                     UpdateScheduler.scheduleAutoUpdate(applicationContext)
                 } else {
@@ -78,14 +82,26 @@ class UpdateCheckWorker(
 
             Logger.i { "UpdateCheckWorker: Periodic update check completed successfully" }
             Result.success()
-        } catch (e: Exception) {
-            Logger.e { "UpdateCheckWorker: Update check failed: ${e.message}" }
-            if (runAttemptCount < 3) {
-                Result.retry()
-            } else {
-                Result.failure()
-            }
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: IOException) {
+            retryOrFail(e)
+        } catch (e: LocalStoreException) {
+            retryOrFail(e)
+        } catch (e: IllegalStateException) {
+            retryOrFail(e)
+        } catch (e: SecurityException) {
+            retryOrFail(e)
         }
+
+    private fun retryOrFail(e: Exception): Result {
+        Logger.e { "UpdateCheckWorker: Update check failed: ${e.message}" }
+        return if (runAttemptCount < MAX_ATTEMPTS) {
+            Result.retry()
+        } else {
+            Result.failure()
+        }
+    }
 
     private suspend fun runPeriodicExternalDeltaScan() {
         try {
@@ -98,10 +114,10 @@ class UpdateCheckWorker(
             val tracked = trackedFlow.map { it.packageName }.toSet()
 
             val permanent =
-                (
+                localStore {
                     externalLinkDao.getDoNotRescanPackageNames() +
                         externalLinkDao.getActiveSkippedPackageNames(System.currentTimeMillis())
-                ).toSet()
+                }.toSet()
 
             val delta = (installed - tracked - permanent).take(MAX_DELTA_PACKAGES).toSet()
             if (delta.isEmpty()) {
@@ -111,9 +127,21 @@ class UpdateCheckWorker(
 
             Logger.d { "UpdateCheckWorker: external delta scan ${delta.size} package(s)" }
             externalImportRepository.runDeltaScan(delta)
-        } catch (e: Exception) {
-            Logger.w { "UpdateCheckWorker: external delta scan failed: ${e.message}" }
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: IOException) {
+            logDeltaScanFailure(e)
+        } catch (e: LocalStoreException) {
+            logDeltaScanFailure(e)
+        } catch (e: SecurityException) {
+            logDeltaScanFailure(e)
+        } catch (e: IllegalStateException) {
+            logDeltaScanFailure(e)
         }
+    }
+
+    private fun logDeltaScanFailure(e: Exception) {
+        Logger.w { "UpdateCheckWorker: external delta scan failed: ${e.message}" }
     }
 
     private fun createForegroundInfo(message: String): ForegroundInfo {
@@ -139,7 +167,6 @@ class UpdateCheckWorker(
         }
     }
 
-    @SuppressLint("MissingPermission")
     private suspend fun showUpdateNotification(appsWithUpdates: List<zed.rainxch.core.domain.model.installation.InstalledApp>) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             val granted =
@@ -207,5 +234,6 @@ class UpdateCheckWorker(
         private const val NOTIFICATION_ID = 1001
         private const val FOREGROUND_NOTIFICATION_ID = 1003
         private const val MAX_DELTA_PACKAGES = 50
+        private const val MAX_ATTEMPTS = 3
     }
 }

@@ -7,7 +7,6 @@ import io.ktor.client.request.headers
 import io.ktor.client.request.parameter
 import io.ktor.client.request.url
 import io.ktor.http.isSuccess
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -18,11 +17,20 @@ import kotlinx.coroutines.sync.withPermit
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import zed.rainxch.core.data.dto.ReleaseNetwork
 import zed.rainxch.core.data.local.db.dao.InstalledAppDao
 import zed.rainxch.core.data.network.BackendApiClient
 import zed.rainxch.core.data.network.GitHubClientProvider
+import zed.rainxch.core.data.network.asNetworkFailure
+import zed.rainxch.core.data.network.getReleases
+import zed.rainxch.core.data.network.getUser
+import zed.rainxch.core.data.network.getUserRepos
+import zed.rainxch.core.data.network.networkFailures
 import zed.rainxch.core.data.network.shouldFallbackToGithubOrRethrow
+import zed.rainxch.core.data.repository.localStore
 import zed.rainxch.core.domain.logging.KomiStoreLogger
+import zed.rainxch.core.domain.model.error.LocalStoreException
+import zed.rainxch.core.domain.model.error.NetworkException
 import zed.rainxch.core.domain.model.error.RateLimitException
 import zed.rainxch.core.domain.model.system.Platform
 import zed.rainxch.core.domain.repository.FavouritesRepository
@@ -33,7 +41,6 @@ import zed.rainxch.devprofile.data.mappers.toDeveloperProfile
 import zed.rainxch.devprofile.data.mappers.toDomain
 import zed.rainxch.devprofile.data.mappers.toGitHubRepoResponse
 import zed.rainxch.devprofile.domain.model.ContributionCalendar
-import zed.rainxch.devprofile.domain.model.ContributionDay
 import zed.rainxch.devprofile.domain.model.DeveloperProfile
 import zed.rainxch.devprofile.domain.model.DeveloperRepository
 import zed.rainxch.devprofile.domain.repository.DeveloperProfileRepository
@@ -50,8 +57,7 @@ class DeveloperProfileRepositoryImpl(
 
     override suspend fun getDeveloperProfile(username: String): Result<DeveloperProfile> {
         return withContext(Dispatchers.IO) {
-            val backendResult = backendApiClient.getUser(username)
-            backendResult.fold(
+            backendApiClient.getUser(username).fold(
                 onSuccess = { return@withContext Result.success(it.toDeveloperProfile()) },
                 onFailure = { error ->
                     if (!shouldFallbackToGithubOrRethrow(error)) return@withContext Result.failure(error)
@@ -59,169 +65,207 @@ class DeveloperProfileRepositoryImpl(
             )
 
             try {
-                val response = httpClient.get("/users/$username")
-
-                if (!response.status.isSuccess()) {
-                    return@withContext Result.failure(
-                        Exception("Failed to fetch developer profile: ${response.status.description}"),
-                    )
+                networkFailures {
+                    val response = httpClient.get("/users/$username")
+                    if (response.status.isSuccess()) {
+                        Result.success(response.body<GitHubUserResponse>().toDomain())
+                    } else {
+                        Result.failure(NetworkException("Failed to fetch developer profile: ${response.status.description}", null))
+                    }
                 }
-
-                val userResponse: GitHubUserResponse = response.body()
-                Result.success(userResponse.toDomain())
-            } catch (e: RateLimitException) {
-                throw e
-            } catch (e: CancellationException) {
-                throw e
-            } catch (e: Exception) {
-                logger.error("Failed to fetch developer profile for $username")
+            } catch (e: NetworkException) {
+                logger.error("Failed to fetch developer profile for $username", e)
                 Result.failure(e)
             }
         }
     }
 
-    override suspend fun getContributionCalendar(username: String): Result<ContributionCalendar> {
-        return withContext(Dispatchers.IO) {
+    override suspend fun getContributionCalendar(username: String): Result<ContributionCalendar> =
+        withContext(Dispatchers.IO) {
             try {
-                val response =
-                    httpClient.get {
-                        url("https://github-contributions-api.jogruber.de/v4/$username?y=last")
-                        headers { remove("X-GitHub-Token") }
+                networkFailures {
+                    val response =
+                        httpClient.get {
+                            url("$CONTRIBUTIONS_API/$username?y=last")
+                            headers { remove("X-GitHub-Token") }
+                        }
+                    if (response.status.isSuccess()) {
+                        Result.success(response.body<ContributionsResponse>().toDomain())
+                    } else {
+                        Result.failure(NetworkException("Failed to fetch contributions: ${response.status.description}", null))
                     }
-                if (!response.status.isSuccess()) {
-                    return@withContext Result.failure(
-                        Exception("Failed to fetch contributions: ${response.status.description}"),
-                    )
                 }
-                val body: ContributionsResponse = response.body()
-                val days =
-                    body.contributions.map {
-                        ContributionDay(date = it.date, count = it.count, level = it.level)
-                    }
-                val total = body.total["lastYear"] ?: body.total.values.firstOrNull() ?: 0
-                Result.success(ContributionCalendar(totalLastYear = total, days = days))
-            } catch (e: CancellationException) {
-                throw e
-            } catch (e: Exception) {
+            } catch (e: NetworkException) {
                 logger.warn("Failed to fetch contributions for $username: ${e.message}")
                 Result.failure(e)
-            }
-        }
-    }
-
-    override suspend fun getDeveloperRepositories(username: String): Result<List<DeveloperRepository>> {
-        return withContext(Dispatchers.IO) {
-            try {
-                val allRepos = mutableListOf<GitHubRepoResponse>()
-                var page = 1
-                val perPage = 100
-                var useBackend = true
-
-                while (true) {
-                    val pageRepos: List<GitHubRepoResponse> =
-                        if (useBackend) {
-                            val backendResult =
-                                backendApiClient.getUserRepos(
-                                    username = username,
-                                    page = page,
-                                    perPage = perPage,
-                                    sort = "updated",
-                                    type = "owner",
-                                )
-                            val mapped =
-                                backendResult.fold(
-                                    onSuccess = { it.map { repo -> repo.toGitHubRepoResponse() } },
-                                    onFailure = { error ->
-                                        if (!shouldFallbackToGithubOrRethrow(error)) {
-                                            return@withContext Result.failure(error)
-                                        }
-                                        useBackend = false
-                                        null
-                                    },
-                                )
-                            if (mapped != null) {
-                                mapped
-                            } else {
-                                continue
-                            }
-                        } else {
-                            val response =
-                                httpClient.get("/users/$username/repos") {
-                                    parameter("per_page", perPage)
-                                    parameter("page", page)
-                                    parameter("type", "owner")
-                                    parameter("sort", "updated")
-                                    parameter("direction", "desc")
-                                }
-
-                            if (!response.status.isSuccess()) {
-                                return@withContext Result.failure(
-                                    Exception("Failed to fetch repositories: ${response.status.description}"),
-                                )
-                            }
-
-                            response.body()
-                        }
-
-                    if (pageRepos.isEmpty()) break
-
-                    allRepos.addAll(pageRepos.filter { !it.archived && !it.fork })
-
-                    if (pageRepos.size < perPage) break
-                    page++
-                }
-
-                val allFavorites = favouritesRepository.getAllFavorites().first()
-                val favoriteIds = allFavorites.map { it.repoId }.toSet()
-
-                val processedRepos =
-                    coroutineScope {
-                        val semaphore = Semaphore(20)
-                        val deferredResults =
-                            allRepos.map { repo ->
-                                async {
-                                    semaphore.withPermit {
-                                        processRepository(repo, favoriteIds)
-                                    }
-                                }
-                            }
-                        deferredResults.awaitAll()
-                    }
-
-                Result.success(processedRepos)
             } catch (e: RateLimitException) {
-                throw e
-            } catch (e: CancellationException) {
-                throw e
-            } catch (e: Exception) {
-                logger.error("Failed to fetch repositories for $username")
+                logger.warn("Failed to fetch contributions for $username: rate limited")
                 Result.failure(e)
             }
         }
+
+    override suspend fun getDeveloperRepositories(username: String): Result<List<DeveloperRepository>> =
+        withContext(Dispatchers.IO) {
+            try {
+                val repos = ownedRepos(username)
+                val favoriteIds =
+                    favouritesRepository
+                        .getAllFavorites()
+                        .first()
+                        .map { it.repoId }
+                        .toSet()
+                Result.success(withReleaseChecks(repos, favoriteIds))
+            } catch (e: NetworkException) {
+                logger.error("Failed to fetch repositories for $username", e)
+                Result.failure(e)
+            } catch (e: LocalStoreException) {
+                logger.error("Failed to fetch repositories for $username", e)
+                Result.failure(e)
+            }
+        }
+
+    // Pages through the user's own repos, backend first; once the backend falls back, the rest come from GitHub.
+    private suspend fun ownedRepos(username: String): List<GitHubRepoResponse> {
+        val repos = mutableListOf<GitHubRepoResponse>()
+        var useBackend = true
+        var page = 1
+        do {
+            val backendPage = if (useBackend) backendRepoPage(username, page) else null
+            useBackend = backendPage != null
+            val pageRepos = backendPage ?: githubRepoPage(username, page)
+            repos += pageRepos.filter { !it.archived && !it.fork }
+            page++
+        } while (pageRepos.size >= REPOS_PAGE_SIZE)
+        return repos
     }
+
+    // Null asks for the GitHub fallback.
+    private suspend fun backendRepoPage(
+        username: String,
+        page: Int,
+    ): List<GitHubRepoResponse>? =
+        backendApiClient
+            .getUserRepos(
+                username = username,
+                page = page,
+                perPage = REPOS_PAGE_SIZE,
+                sort = "updated",
+                type = "owner",
+            ).fold(
+                onSuccess = { repos -> repos.map { it.toGitHubRepoResponse() } },
+                onFailure = { error -> if (shouldFallbackToGithubOrRethrow(error)) null else throw error.asNetworkFailure() },
+            )
+
+    private suspend fun githubRepoPage(
+        username: String,
+        page: Int,
+    ): List<GitHubRepoResponse> =
+        networkFailures {
+            val response =
+                httpClient.get("/users/$username/repos") {
+                    parameter("per_page", REPOS_PAGE_SIZE)
+                    parameter("page", page)
+                    parameter("type", "owner")
+                    parameter("sort", "updated")
+                    parameter("direction", "desc")
+                }
+            if (!response.status.isSuccess()) {
+                throw NetworkException("Failed to fetch repositories: ${response.status.description}", null)
+            }
+            response.body()
+        }
+
+    private suspend fun withReleaseChecks(
+        repos: List<GitHubRepoResponse>,
+        favoriteIds: Set<Long>,
+    ): List<DeveloperRepository> =
+        coroutineScope {
+            val semaphore = Semaphore(RELEASE_CHECK_CONCURRENCY)
+            repos
+                .map { repo ->
+                    async { semaphore.withPermit { processRepository(repo, favoriteIds) } }
+                }.awaitAll()
+        }
 
     private suspend fun processRepository(
         repo: GitHubRepoResponse,
         favoriteIds: Set<Long>,
     ): DeveloperRepository {
-        val installedApps = installedAppsDao.getAppsByRepoId(repo.id)
-        val isFavorite = favoriteIds.contains(repo.id)
-
-        val info =
-            checkReleaseInfo(
-                owner = repo.fullName.split("/")[0],
-                repoName = repo.name,
-            )
-
+        val installedApps = localStore { installedAppsDao.getAppsByRepoId(repo.id) }
+        val info = releaseInfo(owner = repo.fullName.split("/")[0], repoName = repo.name)
         return repo.toDomain(
             hasReleases = info.hasReleases,
             hasInstallableAssets = info.hasInstallable,
             isInstalled = installedApps.any { !it.isPendingInstall },
-            isFavorite = isFavorite,
+            isFavorite = favoriteIds.contains(repo.id),
             latestVersion = info.latestVersion,
             latestReleaseAt = info.publishedAt,
         )
     }
+
+    private suspend fun releaseInfo(
+        owner: String,
+        repoName: String,
+    ): ReleaseInfo =
+        backendApiClient
+            .getReleases(owner, repoName, perPage = RELEASE_CHECK_PAGE_SIZE)
+            .fold(
+                onSuccess = { releases -> releases.map { it.toReleaseNetworkModel() }.toReleaseInfo() },
+                onFailure = { error ->
+                    if (shouldFallbackToGithubOrRethrow(error)) githubReleaseInfo(owner, repoName) else ReleaseInfo.EMPTY
+                },
+            )
+
+    private suspend fun githubReleaseInfo(
+        owner: String,
+        repoName: String,
+    ): ReleaseInfo =
+        try {
+            networkFailures {
+                val response =
+                    httpClient.get("/repos/$owner/$repoName/releases") {
+                        parameter("per_page", RELEASE_CHECK_PAGE_SIZE)
+                    }
+                if (response.status.isSuccess()) {
+                    response.body<List<ReleaseNetworkModel>>().toReleaseInfo()
+                } else {
+                    ReleaseInfo.EMPTY
+                }
+            }
+        } catch (e: NetworkException) {
+            logger.warn("Failed to check releases for $owner/$repoName : ${e.message}")
+            ReleaseInfo.EMPTY
+        }
+
+    private fun List<ReleaseNetworkModel>.toReleaseInfo(): ReleaseInfo {
+        val stable =
+            firstOrNull { it.draft != true && it.prerelease != true }
+                ?: return ReleaseInfo(hasReleases = isNotEmpty(), hasInstallable = false, latestVersion = null, publishedAt = null)
+        val extensions = platform.installerExtensions()
+        return ReleaseInfo(
+            hasReleases = true,
+            hasInstallable = stable.assets.any { asset -> extensions.any { asset.name.lowercase().endsWith(it) } },
+            latestVersion = stable.tagName,
+            publishedAt = stable.publishedAt,
+        )
+    }
+
+    private fun Platform.installerExtensions(): List<String> =
+        when (this) {
+            Platform.ANDROID -> listOf(".apk")
+            Platform.WINDOWS -> listOf(".msi", ".exe")
+            Platform.MACOS -> listOf(".dmg", ".pkg")
+            Platform.LINUX -> listOf(".appimage", ".deb", ".rpm", ".pkg.tar.zst")
+        }
+
+    private fun ReleaseNetwork.toReleaseNetworkModel(): ReleaseNetworkModel =
+        ReleaseNetworkModel(
+            assets = assets.map { AssetNetworkModel(name = it.name) },
+            draft = draft,
+            prerelease = prerelease,
+            tagName = tagName,
+            publishedAt = publishedAt,
+        )
 
     private data class ReleaseInfo(
         val hasReleases: Boolean,
@@ -231,111 +275,6 @@ class DeveloperProfileRepositoryImpl(
     ) {
         companion object {
             val EMPTY = ReleaseInfo(false, false, null, null)
-        }
-    }
-
-    private suspend fun checkReleaseInfo(
-        owner: String,
-        repoName: String,
-    ): ReleaseInfo {
-        val backendResult = backendApiClient.getReleases(owner, repoName, perPage = 10)
-        backendResult.fold(
-            onSuccess = { releases ->
-                val stableRelease = releases.firstOrNull { it.draft != true && it.prerelease != true }
-                if (stableRelease == null) {
-                    return ReleaseInfo(releases.isNotEmpty(), false, null, null)
-                }
-                val hasInstallable =
-                    stableRelease.assets.any { asset ->
-                        val name = asset.name.lowercase()
-                        when (platform) {
-                            Platform.ANDROID -> {
-                                name.endsWith(".apk")
-                            }
-
-                            Platform.WINDOWS -> {
-                                name.endsWith(".msi") || name.endsWith(".exe")
-                            }
-
-                            Platform.MACOS -> {
-                                name.endsWith(".dmg") || name.endsWith(".pkg")
-                            }
-
-                            Platform.LINUX -> {
-                                name.endsWith(".appimage") || name.endsWith(".deb") ||
-                                    name.endsWith(".rpm") || name.endsWith(".pkg.tar.zst")
-                            }
-                        }
-                    }
-                return ReleaseInfo(
-                    hasReleases = true,
-                    hasInstallable = hasInstallable,
-                    latestVersion = stableRelease.tagName,
-                    publishedAt = stableRelease.publishedAt,
-                )
-            },
-            onFailure = { error ->
-                if (!shouldFallbackToGithubOrRethrow(error)) return ReleaseInfo.EMPTY
-            },
-        )
-
-        return try {
-            val response =
-                httpClient.get("/repos/$owner/$repoName/releases") {
-                    parameter("per_page", 10)
-                }
-
-            if (!response.status.isSuccess()) {
-                return ReleaseInfo.EMPTY
-            }
-
-            val releases: List<ReleaseNetworkModel> = response.body()
-
-            val stableRelease =
-                releases.firstOrNull {
-                    it.draft != true && it.prerelease != true
-                }
-
-            if (stableRelease == null) {
-                return ReleaseInfo(releases.isNotEmpty(), false, null, null)
-            }
-
-            val hasInstallableAssets =
-                stableRelease.assets.any { asset ->
-                    val name = asset.name.lowercase()
-                    when (platform) {
-                        Platform.ANDROID -> {
-                            name.endsWith(".apk")
-                        }
-
-                        Platform.WINDOWS -> {
-                            name.endsWith(".msi") || name.endsWith(".exe")
-                        }
-
-                        Platform.MACOS -> {
-                            name.endsWith(".dmg") || name.endsWith(".pkg")
-                        }
-
-                        Platform.LINUX -> {
-                            name.endsWith(".appimage") || name.endsWith(".deb") ||
-                                name.endsWith(".rpm") || name.endsWith(".pkg.tar.zst")
-                        }
-                    }
-                }
-
-            ReleaseInfo(
-                hasReleases = true,
-                hasInstallable = hasInstallableAssets,
-                latestVersion = stableRelease.tagName,
-                publishedAt = stableRelease.publishedAt,
-            )
-        } catch (e: RateLimitException) {
-            throw e
-        } catch (e: CancellationException) {
-            throw e
-        } catch (e: Exception) {
-            logger.warn("Failed to check releases for $owner/$repoName : ${e.message}")
-            ReleaseInfo.EMPTY
         }
     }
 
@@ -352,4 +291,11 @@ class DeveloperProfileRepositoryImpl(
     private data class AssetNetworkModel(
         val name: String,
     )
+
+    private companion object {
+        const val CONTRIBUTIONS_API = "https://github-contributions-api.jogruber.de/v4"
+        const val REPOS_PAGE_SIZE = 100
+        const val RELEASE_CHECK_PAGE_SIZE = 10
+        const val RELEASE_CHECK_CONCURRENCY = 20
+    }
 }

@@ -19,6 +19,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
@@ -44,11 +45,11 @@ import zed.rainxch.githubstore.core.presentation.res.repo_pages_pulls_empty_open
 import zed.rainxch.githubstore.core.presentation.res.repo_pages_pulls_title
 import zed.rainxch.repopages.domain.model.IssueState
 import zed.rainxch.repopages.domain.model.PullRequestState
-import zed.rainxch.repopages.domain.model.RepoPullRequest
 import zed.rainxch.repopages.presentation.components.RepoPagesEmpty
 import zed.rainxch.repopages.presentation.components.RepoPagesError
 import zed.rainxch.repopages.presentation.components.RepoPagesLoading
 import zed.rainxch.repopages.presentation.components.RepoPagesTopBar
+import zed.rainxch.repopages.presentation.model.RepoPullRequestUi
 
 @Composable
 fun PullsRoot(
@@ -84,14 +85,16 @@ private fun PullsScreen(
         },
     ) { innerPadding ->
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding),
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding),
         ) {
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 4.dp),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 4.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 KomiChip(
@@ -110,27 +113,34 @@ private fun PullsScreen(
             }
 
             when {
-                state.isLoading -> RepoPagesLoading()
+                state.isLoading -> {
+                    RepoPagesLoading()
+                }
 
-                state.errorMessage != null -> RepoPagesError(
-                    message = state.errorMessage,
-                    onRetry = { onAction(PullsAction.OnRetry) },
-                )
+                state.errorMessage != null -> {
+                    RepoPagesError(
+                        message = state.errorMessage,
+                        onRetry = { onAction(PullsAction.OnRetry) },
+                    )
+                }
 
                 state.pulls.isEmpty() -> {
-                    val emptyText = if (state.filter == IssueState.OPEN) {
-                        stringResource(Res.string.repo_pages_pulls_empty_open)
-                    } else {
-                        stringResource(Res.string.repo_pages_pulls_empty_closed)
-                    }
+                    val emptyText =
+                        if (state.filter == IssueState.OPEN) {
+                            stringResource(Res.string.repo_pages_pulls_empty_open)
+                        } else {
+                            stringResource(Res.string.repo_pages_pulls_empty_closed)
+                        }
                     RepoPagesEmpty(message = emptyText)
                 }
 
-                else -> PullsList(
-                    state = state,
-                    onLoadMore = { onAction(PullsAction.OnLoadMore) },
-                    onOpenPull = { onAction(PullsAction.OnOpenPull(it)) },
-                )
+                else -> {
+                    PullsList(
+                        state = state,
+                        onLoadMore = { onAction(PullsAction.OnLoadMore) },
+                        onOpenPull = { onAction(PullsAction.OnOpenPull(it)) },
+                    )
+                }
             }
         }
     }
@@ -150,8 +160,9 @@ private fun PullsList(
             info.totalItemsCount > 0 && last >= info.totalItemsCount - 4
         }
     }
+    val currentOnLoadMore by rememberUpdatedState(onLoadMore)
     LaunchedEffect(shouldLoadMore) {
-        if (shouldLoadMore) onLoadMore()
+        if (shouldLoadMore) currentOnLoadMore()
     }
 
     LazyColumn(
@@ -179,7 +190,7 @@ private fun PullsList(
 
 @Composable
 private fun PullRow(
-    pull: RepoPullRequest,
+    pull: RepoPullRequestUi,
     onClick: () -> Unit,
 ) {
     val colors = LocalPersonality.current.colors
@@ -193,17 +204,19 @@ private fun PullRow(
             horizontalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             val statusColors = LocalStatusColors.current
-            val pullStateColor = when (pull.state) {
-                PullRequestState.OPEN -> statusColors.pullOpen
-                PullRequestState.MERGED -> statusColors.pullMerged
-                PullRequestState.CLOSED -> statusColors.pullClosed
-            }
+            val pullStateColor =
+                when (pull.state) {
+                    PullRequestState.OPEN -> statusColors.pullOpen
+                    PullRequestState.MERGED -> statusColors.pullMerged
+                    PullRequestState.CLOSED -> statusColors.pullClosed
+                }
 
             Box(
-                modifier = Modifier
-                    .padding(top = 5.dp)
-                    .size(10.dp)
-                    .background(color = pullStateColor, shape = RoundedCornerShape(shape.cornerSmall)),
+                modifier =
+                    Modifier
+                        .padding(top = 5.dp)
+                        .size(10.dp)
+                        .background(color = pullStateColor, shape = RoundedCornerShape(shape.cornerSmall)),
             )
 
             Column(
@@ -216,9 +229,10 @@ private fun PullRow(
                             text = stringResource(Res.string.repo_pages_pr_draft),
                             role = KomiTextRole.Caption,
                             color = colors.onSurfaceVariant,
-                            modifier = Modifier
-                                .background(colors.surfaceContainerHigh, RoundedCornerShape(shape.cornerSmall))
-                                .padding(horizontal = 6.dp, vertical = 1.dp),
+                            modifier =
+                                Modifier
+                                    .background(colors.surfaceContainerHigh, RoundedCornerShape(shape.cornerSmall))
+                                    .padding(horizontal = 6.dp, vertical = 1.dp),
                         )
                     }
 
@@ -232,8 +246,9 @@ private fun PullRow(
                 }
 
                 KomiText(
-                    text = "#${pull.number} · " +
-                        stringResource(Res.string.repo_pages_issue_opened_by, pull.authorLogin),
+                    text =
+                        "#${pull.number} · " +
+                            stringResource(Res.string.repo_pages_issue_opened_by, pull.authorLogin),
                     role = KomiTextRole.Body,
                     color = colors.onSurfaceVariant,
                     maxLines = 1,

@@ -4,6 +4,8 @@ import io.ktor.client.plugins.HttpRequestTimeoutException
 import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.request.get
 import io.ktor.client.statement.HttpResponse
+import io.ktor.http.HttpStatusCode
+import io.ktor.http.isSuccess
 import io.ktor.util.network.UnresolvedAddressException
 import zed.rainxch.core.domain.model.settings.ProxyConfig
 import zed.rainxch.core.domain.network.ProxyTestOutcome
@@ -38,11 +40,11 @@ class ProxyTesterImpl : ProxyTester {
             val elapsed = started.elapsedNow().inWholeMilliseconds
 
             when {
-                response.status.value == 407 -> {
+                response.status == HttpStatusCode.ProxyAuthenticationRequired -> {
                     ProxyTestOutcome.Failure.ProxyAuthRequired
                 }
 
-                response.status.value in 200..299 -> {
+                response.status.isSuccess() -> {
                     ProxyTestOutcome.Success(latencyMs = elapsed)
                 }
 
@@ -52,21 +54,23 @@ class ProxyTesterImpl : ProxyTester {
             }
         } catch (e: CancellationException) {
             throw e
-        } catch (e: HttpRequestTimeoutException) {
+        } catch (_: HttpRequestTimeoutException) {
             ProxyTestOutcome.Failure.Timeout
-        } catch (e: SocketTimeoutException) {
+        } catch (_: SocketTimeoutException) {
             ProxyTestOutcome.Failure.Timeout
-        } catch (e: UnresolvedAddressException) {
+        } catch (_: UnresolvedAddressException) {
             ProxyTestOutcome.Failure.DnsFailure
-        } catch (e: UnknownHostException) {
+        } catch (_: UnknownHostException) {
             ProxyTestOutcome.Failure.DnsFailure
-        } catch (e: ConnectException) {
+        } catch (_: ConnectException) {
             ProxyTestOutcome.Failure.ProxyUnreachable
         } catch (e: IOException) {
             ProxyTestOutcome.Failure.Unknown(e.message)
-        } catch (e: CancellationException) {
-            throw e
-        } catch (e: Exception) {
+        } catch (e: IllegalStateException) {
+            // A URL that doesn't parse, or the client closing under the request.
+            ProxyTestOutcome.Failure.Unknown(e.message)
+        } catch (e: IllegalArgumentException) {
+            // A proxy host or URL that OkHttp rejects.
             ProxyTestOutcome.Failure.Unknown(e.message)
         } finally {
             client.close()

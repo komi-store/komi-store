@@ -46,7 +46,14 @@ fun KomiFab(
 ) {
     when (val personality = LocalPersonality.current) {
         is MangaPersonality -> {
-            MangaFab(personality, onClick, icon, contentDescription, modifier, label)
+            MangaFab(
+                personality = personality,
+                onClick = onClick,
+                icon = icon,
+                contentDescription = contentDescription,
+                label = label,
+                modifier = modifier,
+            )
         }
 
         is ClassicPersonality -> {
@@ -89,8 +96,8 @@ private fun MangaFab(
     onClick: () -> Unit,
     icon: ImageVector,
     contentDescription: String,
-    modifier: Modifier = Modifier,
     label: String?,
+    modifier: Modifier = Modifier,
 ) {
     val colors = personality.colors
     val shape = remember(personality.shape.cornerSmall) { RoundedCornerShape(personality.shape.cornerSmall) }

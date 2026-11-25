@@ -15,13 +15,12 @@ fun initDatabase(): AppDatabase {
     return buildDatabase(File(DesktopAppDataPaths.appDataDir(), "github_store.db"))
 }
 
-@Suppress("SpreadOperator")
 internal fun buildDatabase(dbFile: File): AppDatabase =
     Room
         .databaseBuilder<AppDatabase>(
             name = dbFile.absolutePath,
         ).setDriver(BundledSQLiteDriver())
         .setQueryCoroutineContext(Dispatchers.IO)
-        .addMigrations(*MIGRATIONS)
+        .apply { MIGRATIONS.forEach { addMigrations(it) } }
         .fallbackToDestructiveMigrationOnDowngrade(dropAllTables = true)
         .build()

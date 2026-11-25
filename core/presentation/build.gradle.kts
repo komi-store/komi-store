@@ -9,6 +9,7 @@ kotlin {
                 implementation(libs.kotlin.stdlib)
                 implementation(libs.kotlinx.datetime)
                 implementation(libs.kotlinx.collections.immutable)
+                implementation(libs.touchlab.kermit)
 
                 implementation(projects.core.domain)
 

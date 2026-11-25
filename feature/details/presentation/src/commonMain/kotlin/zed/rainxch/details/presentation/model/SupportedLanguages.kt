@@ -1,7 +1,5 @@
 package zed.rainxch.details.presentation.model
 
-import zed.rainxch.details.domain.model.SupportedLanguage
-
 object SupportedLanguages {
     val all: List<SupportedLanguage> =
         listOf(

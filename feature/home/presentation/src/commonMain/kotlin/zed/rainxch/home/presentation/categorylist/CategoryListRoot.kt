@@ -15,6 +15,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -22,10 +23,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
-import zed.rainxch.githubstore.core.presentation.res.Res
-import zed.rainxch.githubstore.core.presentation.res.home_section_hot_releases
-import zed.rainxch.githubstore.core.presentation.res.home_section_most_popular
-import zed.rainxch.githubstore.core.presentation.res.home_section_trending_now
 import zed.rainxch.core.presentation.components.bars.KomiTopBar
 import zed.rainxch.core.presentation.components.bars.KomiTopBarSize
 import zed.rainxch.core.presentation.components.cards.DiscoveryRepoCard
@@ -33,11 +30,15 @@ import zed.rainxch.core.presentation.components.cards.KomiRepoCardFeed
 import zed.rainxch.core.presentation.components.progress.KomiCircularProgress
 import zed.rainxch.core.presentation.components.progress.KomiLoadingIndicator
 import zed.rainxch.core.presentation.components.scaffold.KomiScaffold
-import zed.rainxch.core.presentation.utils.ObserveAsEvents
-import zed.rainxch.home.domain.model.HomeCategory
-import zed.rainxch.home.presentation.model.toDiscoveryUi
 import zed.rainxch.core.presentation.layout.CardGridSpec
 import zed.rainxch.core.presentation.layout.rememberWidthCappedStaggeredCells
+import zed.rainxch.core.presentation.utils.ObserveAsEvents
+import zed.rainxch.githubstore.core.presentation.res.Res
+import zed.rainxch.githubstore.core.presentation.res.home_section_hot_releases
+import zed.rainxch.githubstore.core.presentation.res.home_section_most_popular
+import zed.rainxch.githubstore.core.presentation.res.home_section_trending_now
+import zed.rainxch.home.domain.model.HomeCategory
+import zed.rainxch.home.presentation.model.toDiscoveryUi
 
 @Composable
 fun CategoryListRoot(
@@ -68,6 +69,7 @@ private fun CategoryListScreen(
     onBack: () -> Unit,
 ) {
     val listState = rememberLazyStaggeredGridState()
+    val currentOnAction by rememberUpdatedState(onAction)
 
     val shouldLoadMore by remember {
         derivedStateOf {
@@ -79,29 +81,31 @@ private fun CategoryListScreen(
 
     LaunchedEffect(shouldLoadMore) {
         if (shouldLoadMore && !state.isLoadingMore && state.hasMorePages) {
-            onAction(CategoryListAction.OnLoadMore)
+            currentOnAction(CategoryListAction.OnLoadMore)
         }
     }
 
     KomiScaffold(
         topBar = {
             KomiTopBar(
-                title = stringResource(
-                    when (state.category) {
-                        HomeCategory.HOT_RELEASE -> Res.string.home_section_hot_releases
-                        HomeCategory.TRENDING -> Res.string.home_section_trending_now
-                        HomeCategory.MOST_POPULAR -> Res.string.home_section_most_popular
-                    },
-                ),
+                title =
+                    stringResource(
+                        when (state.category) {
+                            HomeCategory.HOT_RELEASE -> Res.string.home_section_hot_releases
+                            HomeCategory.TRENDING -> Res.string.home_section_trending_now
+                            HomeCategory.MOST_POPULAR -> Res.string.home_section_most_popular
+                        },
+                    ),
                 size = KomiTopBarSize.Compact,
                 onBack = onBack,
             )
         },
     ) { innerPadding ->
         Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding),
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding),
         ) {
             if (state.isLoading && state.cards.isEmpty()) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -130,11 +134,12 @@ private fun CategoryListScreen(
                             onClick = { onAction(CategoryListAction.OnRepoClick(card.id)) },
                             onShareClick = { },
                             rank = index + 1,
-                            feed = if (state.category == HomeCategory.MOST_POPULAR) {
-                                KomiRepoCardFeed.Popular
-                            } else {
-                                KomiRepoCardFeed.Plain
-                            },
+                            feed =
+                                if (state.category == HomeCategory.MOST_POPULAR) {
+                                    KomiRepoCardFeed.Popular
+                                } else {
+                                    KomiRepoCardFeed.Plain
+                                },
                             compact = state.isGridLayout,
                         )
                     }
@@ -142,9 +147,10 @@ private fun CategoryListScreen(
                     if (state.isLoadingMore) {
                         item(span = StaggeredGridItemSpan.FullLine) {
                             Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(vertical = 12.dp),
+                                modifier =
+                                    Modifier
+                                        .fillMaxWidth()
+                                        .padding(vertical = 12.dp),
                                 contentAlignment = Alignment.Center,
                             ) {
                                 KomiCircularProgress(modifier = Modifier.size(24.dp))

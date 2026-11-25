@@ -1,14 +1,15 @@
 package zed.rainxch.core.domain.model.installation
 
-enum class InstallerCategory(
-    val sortPriority: Int,
-) {
-    SIDE_STORE(0),
-    SIDELOADED(1),
-    PLAY_STORE(2),
-    VENDOR_STORE(3),
-    SYSTEM_UPDATE(4),
+enum class InstallerCategory {
+    SIDE_STORE,
+    SIDELOADED,
+    PLAY_STORE,
+    VENDOR_STORE,
+    SYSTEM_UPDATE,
     ;
+
+    // Declaration order is the sort order.
+    val sortPriority: Int get() = ordinal
 
     companion object {
         private val SIDE_STORE_INSTALLERS =
@@ -81,18 +82,20 @@ enum class InstallerCategory(
             packageName: String? = null,
         ): InstallerCategory {
             if (isUpdatedSystemApp) return SYSTEM_UPDATE
-            when (installerPackageName) {
-                null -> Unit
-                PLAY_STORE_INSTALLER -> return PLAY_STORE
-                in SIDE_STORE_INSTALLERS -> return SIDE_STORE
-                in VENDOR_STORE_INSTALLERS -> return VENDOR_STORE
-                else -> Unit
+            return when (installerPackageName) {
+                PLAY_STORE_INSTALLER -> PLAY_STORE
+                in SIDE_STORE_INSTALLERS -> SIDE_STORE
+                in VENDOR_STORE_INSTALLERS -> VENDOR_STORE
+                else -> classifyByPackageName(packageName)
             }
-            if (packageName != null) {
-                if (SYSTEM_PACKAGE_PREFIXES.any { packageName.startsWith(it) }) return SYSTEM_UPDATE
-                if (VENDOR_PACKAGE_PREFIXES.any { packageName.startsWith(it) }) return VENDOR_STORE
-            }
-            return SIDELOADED
         }
+
+        private fun classifyByPackageName(packageName: String?): InstallerCategory =
+            when {
+                packageName == null -> SIDELOADED
+                SYSTEM_PACKAGE_PREFIXES.any { packageName.startsWith(it) } -> SYSTEM_UPDATE
+                VENDOR_PACKAGE_PREFIXES.any { packageName.startsWith(it) } -> VENDOR_STORE
+                else -> SIDELOADED
+            }
     }
 }

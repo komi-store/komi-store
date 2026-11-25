@@ -68,38 +68,45 @@ object MirrorRewriter {
 
     private fun decompose(githubUrl: String): Decomposed? {
         val parsed = runCatching { Url(githubUrl) }.getOrNull() ?: return null
-        val host = parsed.host.lowercase()
         val segments =
             parsed.encodedPath
                 .trimStart('/')
                 .split('/')
                 .filter { it.isNotEmpty() }
-        return when (host) {
-            "raw.githubusercontent.com" -> {
-                if (segments.size < 4) return null
-                Decomposed(
-                    owner = segments[0],
-                    repo = segments[1],
-                    ref = segments[2],
-                    path = segments.drop(3).joinToString("/"),
-                )
-            }
-
-            "github.com" -> {
-                if (segments.size < 5) return null
-                val verb = segments[2]
-                if (verb != "raw" && verb != "blob") return null
-                Decomposed(
-                    owner = segments[0],
-                    repo = segments[1],
-                    ref = segments[3],
-                    path = segments.drop(4).joinToString("/"),
-                )
-            }
-
-            else -> {
-                null
-            }
+        return when (parsed.host.lowercase()) {
+            "raw.githubusercontent.com" -> decomposeRaw(segments)
+            "github.com" -> decomposeRawOrBlob(segments)
+            else -> null
         }
     }
+
+    // owner/repo/ref/path...
+    private fun decomposeRaw(segments: List<String>): Decomposed? =
+        if (segments.size > RAW_PATH_START) {
+            Decomposed(
+                owner = segments[0],
+                repo = segments[1],
+                ref = segments[2],
+                path = segments.drop(RAW_PATH_START).joinToString("/"),
+            )
+        } else {
+            null
+        }
+
+    // owner/repo/{raw|blob}/ref/path...
+    private fun decomposeRawOrBlob(segments: List<String>): Decomposed? =
+        if (segments.size > BLOB_PATH_START && segments[2] in RAW_OR_BLOB) {
+            Decomposed(
+                owner = segments[0],
+                repo = segments[1],
+                ref = segments[BLOB_PATH_START - 1],
+                path = segments.drop(BLOB_PATH_START).joinToString("/"),
+            )
+        } else {
+            null
+        }
+
+    private const val RAW_PATH_START = 3
+    private const val BLOB_PATH_START = 4
+    private val RAW_OR_BLOB = setOf("raw", "blob")
 }

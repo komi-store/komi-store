@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.LockOpen
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
 import zed.rainxch.core.presentation.components.buttons.KomiButton
@@ -15,16 +16,23 @@ import zed.rainxch.core.presentation.components.overlays.KomiDialog
 import zed.rainxch.core.presentation.components.text.KomiText
 import zed.rainxch.core.presentation.components.text.KomiTextRole
 import zed.rainxch.core.presentation.locals.LocalPersonality
-import zed.rainxch.githubstore.core.presentation.res.*
+import zed.rainxch.githubstore.core.presentation.res.Res
+import zed.rainxch.githubstore.core.presentation.res.continue_as_guest
+import zed.rainxch.githubstore.core.presentation.res.session_expired_hint
+import zed.rainxch.githubstore.core.presentation.res.session_expired_message
+import zed.rainxch.githubstore.core.presentation.res.session_expired_title
+import zed.rainxch.githubstore.core.presentation.res.sign_in_again
 
 @Composable
 fun SessionExpiredDialog(
     onDismiss: () -> Unit,
     onSignIn: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val colors = LocalPersonality.current.colors
     KomiDialog(
         onDismissRequest = onDismiss,
+        modifier = modifier,
         icon = {
             KomiIcon(
                 imageVector = Icons.Default.LockOpen,

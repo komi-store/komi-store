@@ -1,12 +1,13 @@
 package zed.rainxch.details.data.system
 
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import zed.rainxch.core.domain.logging.KomiStoreLogger
 import zed.rainxch.core.domain.model.apk.ApkPackageInfo
+import zed.rainxch.core.domain.model.error.LocalStoreException
 import zed.rainxch.core.domain.model.installation.InstallSource
 import zed.rainxch.core.domain.model.installation.InstalledApp
+import zed.rainxch.core.domain.model.installation.InstalledBuild
 import zed.rainxch.core.domain.repository.FavouritesRepository
 import zed.rainxch.core.domain.repository.InstalledAppsRepository
 import zed.rainxch.core.domain.repository.TweaksRepository
@@ -53,8 +54,7 @@ class InstallationManagerImpl(
             installedAppsRepository.getAppByPackage(apkInfo.packageName)
                 ?: return FingerprintCheckResult.Ok
 
-        // DB may predate fingerprint recording. Fall back to the package actually installed
-        // on this device; both sides are still local signatures. Unknown stays silent.
+        // Rows older than fingerprint recording fall back to the installed package; unknown stays silent.
         val expectedFp =
             existingApp.signingFingerprint
                 ?: packageMonitor.getInstalledPackageInfo(apkInfo.packageName)?.signingFingerprint
@@ -71,116 +71,122 @@ class InstallationManagerImpl(
         }
     }
 
-    @OptIn(ExperimentalTime::class)
     override suspend fun saveNewInstalledApp(params: SaveInstalledAppParams): InstalledApp? =
         try {
-            val apkInfo = params.apkInfo
-            val repo = params.repo
-
-            val fingerprint =
-                AssetVariant.fingerprintFromPickedAsset(
-                    pickedAssetName = params.assetName,
-                    siblingAssetCount = params.siblingAssetCount,
-                    releaseTag = params.releaseTag,
-                )
-            val serializedTokens = fingerprint?.tokens?.let(AssetVariant::serializeTokens)
-            val pickedIndex = params.pickedAssetIndex?.takeIf { it >= 0 }
-            val siblingCount = params.siblingAssetCount.takeIf { it > 0 }
-
-            val defaultIncludePreReleases =
-                runCatching { tweaksRepository.getIncludePreReleases().first() }
-                    .getOrDefault(false)
-
+            val packageName = params.apkInfo.packageName
             val installedApp =
-                InstalledApp(
-                    packageName = apkInfo.packageName,
-                    repoId = repo.id,
-                    repoName = repo.name,
-                    repoOwner = repo.owner.login,
-                    repoOwnerAvatarUrl = repo.owner.avatarUrl,
-                    repoDescription = repo.description,
-                    primaryLanguage = repo.language,
-                    repoUrl = repo.htmlUrl,
-                    installedVersion = params.releaseTag,
-                    installedAssetName = params.assetName,
-                    installedAssetUrl = params.assetUrl,
-                    installedReleaseId = params.releaseId,
-                    installedAssetId = params.assetId,
-                    installedAssetDigest = params.assetDigest,
-                    installedReleasePublishedAt = params.releasePublishedAt,
-                    latestVersion = null,
-                    latestAssetName = null,
-                    latestAssetUrl = null,
-                    latestAssetSize = null,
-                    appName = apkInfo.appName,
-                    installSource = InstallSource.THIS_APP,
-                    installedAt = System.now().toEpochMilliseconds(),
-                    lastCheckedAt = System.now().toEpochMilliseconds(),
-                    lastUpdatedAt = System.now().toEpochMilliseconds(),
-                    isUpdateAvailable = false,
-                    updateCheckEnabled = true,
-                    releaseNotes = "",
-                    systemArchitecture = installer.detectSystemArchitecture().name,
-                    fileExtension = params.assetName.substringAfterLast('.', ""),
-                    isPendingInstall = params.isPendingInstall,
-                    installedVersionName = apkInfo.versionName,
-                    installedVersionCode = apkInfo.versionCode,
-                    latestVersionName = null,
-                    latestVersionCode = null,
+                newInstalledApp(
+                    params = params,
+                    includePreReleases = tweaksRepository.getIncludePreReleases().first(),
                     // Details also installs a tracked app this way, and the insert replaces its row.
                     signingFingerprint =
-                        apkInfo.signingFingerprint
-                            ?: installedAppsRepository.getAppByPackage(apkInfo.packageName)?.signingFingerprint,
-                    preferredAssetVariant = fingerprint?.variant,
-                    preferredAssetTokens = serializedTokens,
-                    assetGlobPattern = fingerprint?.glob,
-                    pickedAssetIndex = pickedIndex,
-                    pickedAssetSiblingCount = siblingCount,
-                    includePreReleases = defaultIncludePreReleases,
-                    pendingInstallFilePath = params.pendingInstallFilePath,
-                    pendingInstallVersion =
-                        params.releaseTag.takeIf { params.pendingInstallFilePath != null },
-                    pendingInstallAssetName =
-                        params.assetName.takeIf { params.pendingInstallFilePath != null },
-                    sourceHost = params.sourceHost,
-                )
+                        params.apkInfo.signingFingerprint
+                            ?: installedAppsRepository.getAppByPackage(packageName)?.signingFingerprint,
+                ).withPickedVariant(params)
 
             installedAppsRepository.saveInstalledApp(installedApp)
-
             if (params.isFavourite) {
-                favouritesRepository.updateFavoriteInstallStatus(
-                    repoId = repo.id,
-                    installed = true,
-                    packageName = apkInfo.packageName,
-                )
+                favouritesRepository.updateFavoriteInstallStatus(repoId = params.repo.id, installed = true, packageName = packageName)
             }
 
-            delay(1000)
-            val reloaded = installedAppsRepository.getAppByPackage(apkInfo.packageName)
+            delay(RELOAD_DELAY_MS)
+            val reloaded = installedAppsRepository.getAppByPackage(packageName)
             logger.debug("Successfully saved and reloaded app: ${reloaded?.packageName}")
             reloaded
-        } catch (e: CancellationException) {
-            throw e
-        } catch (t: Throwable) {
-            logger.error("Failed to save installed app to database: ${t.message}")
-            t.printStackTrace()
+        } catch (e: LocalStoreException) {
+            logger.error("Failed to save installed app to database: ${e.message}", e)
             null
         }
+
+    @OptIn(ExperimentalTime::class)
+    private fun newInstalledApp(
+        params: SaveInstalledAppParams,
+        includePreReleases: Boolean,
+        signingFingerprint: String?,
+    ): InstalledApp {
+        val apkInfo = params.apkInfo
+        val repo = params.repo
+        return InstalledApp(
+            packageName = apkInfo.packageName,
+            repoId = repo.id,
+            repoName = repo.name,
+            repoOwner = repo.owner.login,
+            repoOwnerAvatarUrl = repo.owner.avatarUrl,
+            repoDescription = repo.description,
+            primaryLanguage = repo.language,
+            repoUrl = repo.htmlUrl,
+            installedVersion = params.releaseTag,
+            installedAssetName = params.assetName,
+            installedAssetUrl = params.assetUrl,
+            installedReleaseId = params.releaseId,
+            installedAssetId = params.assetId,
+            installedAssetDigest = params.assetDigest,
+            installedReleasePublishedAt = params.releasePublishedAt,
+            latestVersion = null,
+            latestAssetName = null,
+            latestAssetUrl = null,
+            latestAssetSize = null,
+            appName = apkInfo.appName,
+            installSource = InstallSource.THIS_APP,
+            installedAt = System.now().toEpochMilliseconds(),
+            lastCheckedAt = System.now().toEpochMilliseconds(),
+            lastUpdatedAt = System.now().toEpochMilliseconds(),
+            isUpdateAvailable = false,
+            updateCheckEnabled = true,
+            releaseNotes = "",
+            systemArchitecture = installer.detectSystemArchitecture().name,
+            fileExtension = params.assetName.substringAfterLast('.', ""),
+            isPendingInstall = params.isPendingInstall,
+            installedVersionName = apkInfo.versionName,
+            installedVersionCode = apkInfo.versionCode,
+            latestVersionName = null,
+            latestVersionCode = null,
+            signingFingerprint = signingFingerprint,
+            includePreReleases = includePreReleases,
+            pendingInstallFilePath = params.pendingInstallFilePath,
+            pendingInstallVersion = params.releaseTag.takeIf { params.pendingInstallFilePath != null },
+            pendingInstallAssetName = params.assetName.takeIf { params.pendingInstallFilePath != null },
+            sourceHost = params.sourceHost,
+        )
+    }
+
+    private fun InstalledApp.withPickedVariant(params: SaveInstalledAppParams): InstalledApp {
+        val fingerprint =
+            AssetVariant.fingerprintFromPickedAsset(
+                pickedAssetName = params.assetName,
+                siblingAssetCount = params.siblingAssetCount,
+                releaseTag = params.releaseTag,
+            )
+        return copy(
+            preferredAssetVariant = fingerprint?.variant,
+            preferredAssetTokens = fingerprint?.tokens?.let(AssetVariant::serializeTokens),
+            assetGlobPattern = fingerprint?.glob,
+            pickedAssetIndex = params.pickedAssetIndex?.takeIf { it >= 0 },
+            pickedAssetSiblingCount = params.siblingAssetCount.takeIf { it > 0 },
+        )
+    }
 
     override suspend fun updateInstalledAppVersion(params: UpdateInstalledAppParams) {
         installedAppsRepository.updateAppVersion(
             packageName = params.apkInfo.packageName,
-            newTag = params.releaseTag,
-            newReleaseId = params.releaseId,
-            newAssetId = params.assetId,
-            newAssetDigest = params.assetDigest,
-            newReleasePublishedAt = params.releasePublishedAt,
-            newAssetName = params.assetName,
-            newAssetUrl = params.assetUrl,
-            newVersionName = params.apkInfo.versionName,
-            newVersionCode = params.apkInfo.versionCode,
-            signingFingerprint = params.apkInfo.signingFingerprint,
+            build =
+                InstalledBuild(
+                    tag = params.releaseTag,
+                    releaseId = params.releaseId,
+                    assetId = params.assetId,
+                    assetDigest = params.assetDigest,
+                    releasePublishedAt = params.releasePublishedAt,
+                    assetName = params.assetName,
+                    assetUrl = params.assetUrl,
+                    versionName = params.apkInfo.versionName,
+                    versionCode = params.apkInfo.versionCode,
+                    signingFingerprint = params.apkInfo.signingFingerprint,
+                ),
             isPendingInstall = params.isPendingInstall,
         )
+    }
+
+    private companion object {
+        const val RELOAD_DELAY_MS = 1_000L
     }
 }

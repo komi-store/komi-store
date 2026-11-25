@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeout
-import zed.rainxch.core.data.data_source.TokenStore
+import zed.rainxch.core.data.datasource.TokenStore
 import zed.rainxch.core.data.download.AssetSourceGoneException
 import zed.rainxch.core.data.download.AssetSourceRefetcher
 import zed.rainxch.core.data.download.assetReplacementFor
@@ -17,8 +17,9 @@ import zed.rainxch.core.domain.model.account.github.GithubRelease
 import zed.rainxch.core.domain.model.apk.ApkPackageInfo
 import zed.rainxch.core.domain.model.installation.DownloadProgress
 import zed.rainxch.core.domain.model.installation.InstalledApp
+import zed.rainxch.core.domain.model.installation.InstalledBuild
 import zed.rainxch.core.domain.model.installation.ParkedInstallDisposal
-import zed.rainxch.core.domain.model.smart_detect.MatchingPreview
+import zed.rainxch.core.domain.model.smartdetect.MatchingPreview
 import zed.rainxch.core.domain.model.system.SystemArchitecture
 import zed.rainxch.core.domain.network.AssetIdentity
 import zed.rainxch.core.domain.network.DigestVerifier
@@ -36,8 +37,7 @@ import zed.rainxch.core.domain.system.SystemInstallSerializer
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-// The host is asked once where a gone asset lives now. The download, the digest check, the parked
-// record and the notification then follow the replacement. When nothing moved, the failure stands.
+// A gone asset is looked up once; download, digest, parked record and notification follow the replacement.
 class DefaultDownloadOrchestratorAssetRefetchTest {
     private companion object {
         const val PKG = "zed.rainxch.githubstore"
@@ -87,31 +87,42 @@ class DefaultDownloadOrchestratorAssetRefetchTest {
             releaseTag = OLD_TAG,
         )
 
-    private fun orchestrator(
-        downloader: Downloader,
+    private fun CoroutineScope.orchestrator(
         multi: MultiSourceDownloader,
         verifier: DigestVerifier,
         repo: InstalledAppsRepository,
         notifier: PendingInstallNotifier,
         refetcher: AssetSourceRefetcher,
-        scope: CoroutineScope,
-    ) = DefaultDownloadOrchestrator(
-        downloader = downloader,
-        multiSourceDownloader = multi,
-        assetSourceRefetcher = refetcher,
-        digestVerifier = verifier,
-        installer = StubInstaller,
-        installedAppsRepository = repo,
-        pendingInstallNotifier = notifier,
-        appScope = scope,
-        systemInstallSerializer = StubInstallSerializer,
-        tokenStore = StubTokenStore,
-    )
+    ): DefaultDownloadOrchestrator {
+        val downloader = TrackingDownloader()
+        return DefaultDownloadOrchestrator(
+            downloader = downloader,
+            assetFetcher =
+                AssetFetcher(
+                    downloader = downloader,
+                    multiSourceDownloader = multi,
+                    assetSourceRefetcher = refetcher,
+                    digestVerifier = verifier,
+                    tokenStore = StubTokenStore,
+                    installedAppsRepository = repo,
+                ),
+            installRunner =
+                DownloadInstallRunner(
+                    installer = StubInstaller,
+                    installedAppsRepository = repo,
+                    pendingInstallNotifier = notifier,
+                    systemInstallSerializer = StubInstallSerializer,
+                    digestVerifier = verifier,
+                ),
+            installedAppsRepository = repo,
+            pendingInstallNotifier = notifier,
+            appScope = this,
+        )
+    }
 
     @Test
     fun theGoneAssetIsRefetchedFromTheHostAndTheDownloadEndsOnTheReplacement() =
         runBlocking {
-            val downloader = TrackingDownloader()
             val multi = ThrowingOnceMultiSource()
             val verifier = RecordingVerifier()
             val repo = RecordingInstalledAppsRepository()
@@ -120,7 +131,7 @@ class DefaultDownloadOrchestratorAssetRefetchTest {
                 RecordingRefetcher(
                     spec().copy(asset = newAsset(), releaseTag = NEW_TAG, releaseId = 99L),
                 )
-            val orchestrator = orchestrator(downloader, multi, verifier, repo, notifier, refetcher, scope = this)
+            val orchestrator = orchestrator(multi, verifier, repo, notifier, refetcher)
 
             orchestrator.enqueue(spec())
             val entry =
@@ -169,13 +180,12 @@ class DefaultDownloadOrchestratorAssetRefetchTest {
     @Test
     fun whenNothingMovedTheFailureStandsJustAsItWas() =
         runBlocking {
-            val downloader = TrackingDownloader()
             val multi = ThrowingOnceMultiSource()
             val verifier = RecordingVerifier()
             val repo = RecordingInstalledAppsRepository()
             val notifier = RecordingNotifier()
             val refetcher = RecordingRefetcher(null)
-            val orchestrator = orchestrator(downloader, multi, verifier, repo, notifier, refetcher, scope = this)
+            val orchestrator = orchestrator(multi, verifier, repo, notifier, refetcher)
 
             orchestrator.enqueue(spec())
             val entry =
@@ -195,7 +205,6 @@ class DefaultDownloadOrchestratorAssetRefetchTest {
     @Test
     fun aRenamedAssetIsFoundByResolvingTheTrackedRelease() =
         runBlocking {
-            val downloader = TrackingDownloader()
             val multi = ThrowingOnceMultiSource()
             val verifier = RecordingVerifier()
             val renamed =
@@ -213,7 +222,7 @@ class DefaultDownloadOrchestratorAssetRefetchTest {
             val repo = RecordingInstalledAppsRepository(tracked = resolved)
             val notifier = RecordingNotifier()
             val refetcher = RecordingRefetcher(null)
-            val orchestrator = orchestrator(downloader, multi, verifier, repo, notifier, refetcher, scope = this)
+            val orchestrator = orchestrator(multi, verifier, repo, notifier, refetcher)
 
             orchestrator.enqueue(spec())
             val entry =
@@ -239,7 +248,6 @@ class DefaultDownloadOrchestratorAssetRefetchTest {
     @Test
     fun aTrackedReleaseWithAnotherTagIsNotSwappedIn() =
         runBlocking {
-            val downloader = TrackingDownloader()
             val multi = ThrowingOnceMultiSource()
             val verifier = RecordingVerifier()
             val latest = newAsset().copy(id = 44L, name = "komi-store-latest.apk")
@@ -252,7 +260,7 @@ class DefaultDownloadOrchestratorAssetRefetchTest {
             val repo = RecordingInstalledAppsRepository(tracked = resolved)
             val notifier = RecordingNotifier()
             val refetcher = RecordingRefetcher(null)
-            val orchestrator = orchestrator(downloader, multi, verifier, repo, notifier, refetcher, scope = this)
+            val orchestrator = orchestrator(multi, verifier, repo, notifier, refetcher)
 
             orchestrator.enqueue(spec())
             val entry =
@@ -468,16 +476,7 @@ class DefaultDownloadOrchestratorAssetRefetchTest {
 
         override suspend fun updateAppVersion(
             packageName: String,
-            newTag: String,
-            newReleaseId: Long?,
-            newAssetId: Long?,
-            newAssetDigest: String?,
-            newReleasePublishedAt: String?,
-            newAssetName: String?,
-            newAssetUrl: String?,
-            newVersionName: String,
-            newVersionCode: Long,
-            signingFingerprint: String?,
+            build: InstalledBuild,
             isPendingInstall: Boolean,
         ) = Unit
 

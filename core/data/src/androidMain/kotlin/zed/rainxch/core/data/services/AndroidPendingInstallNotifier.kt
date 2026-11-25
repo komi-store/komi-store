@@ -1,7 +1,6 @@
 package zed.rainxch.core.data.services
 
 import android.Manifest
-import android.annotation.SuppressLint
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
@@ -16,7 +15,6 @@ import zed.rainxch.core.domain.system.PendingInstallNotifier
 class AndroidPendingInstallNotifier(
     private val context: Context,
 ) : PendingInstallNotifier {
-    @SuppressLint("MissingPermission")
     override fun notifyPending(
         packageName: String,
         repoOwner: String,
@@ -24,7 +22,7 @@ class AndroidPendingInstallNotifier(
         appName: String,
         versionTag: String,
     ) {
-        if (!hasNotificationPermission()) return
+        if (!checkNotificationPermission()) return
 
         val safeOwner = sanitizeForUri(repoOwner)
         val safeRepo = sanitizeForUri(repoName)
@@ -73,7 +71,7 @@ class AndroidPendingInstallNotifier(
             .cancel(notificationIdFor(packageName))
     }
 
-    private fun hasNotificationPermission(): Boolean {
+    private fun checkNotificationPermission(): Boolean {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return true
         return ContextCompat.checkSelfPermission(
             context,
@@ -81,7 +79,7 @@ class AndroidPendingInstallNotifier(
         ) == PackageManager.PERMISSION_GRANTED
     }
 
-    private fun notificationIdFor(packageName: String): Int = NOTIFICATION_ID_BASE + (packageName.hashCode() and 0x00FFFFFF)
+    private fun notificationIdFor(packageName: String): Int = NOTIFICATION_ID_BASE + (packageName.hashCode() and NOTIFICATION_ID_MASK)
 
     private fun sanitizeForUri(input: String): String {
         if (input.isBlank()) return ""
@@ -96,5 +94,6 @@ class AndroidPendingInstallNotifier(
         const val SUBTEXT = "Ready to install"
 
         const val NOTIFICATION_ID_BASE = 2000
+        const val NOTIFICATION_ID_MASK = 0x00FFFFFF
     }
 }

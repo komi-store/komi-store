@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Komi Store</string>
+    <string name="app_name" translatable="false">Komi Store</string>
     <string name="shortcut_search">Search</string>
     <string name="shortcut_library">Library</string>
     <string name="shortcut_favourites">Favourites</string>

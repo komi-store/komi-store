@@ -43,7 +43,7 @@ private fun zed.rainxch.home.presentation.categorylist.CategoryListScreen(state:
     - onBack: STABLE (function type)
 
 @Composable
-public fun zed.rainxch.home.presentation.components.RepositoryActionsSheet(repository: zed.rainxch.core.presentation.model.GithubRepoSummaryUi, isSeen: kotlin.Boolean, onDismiss: kotlin.Function0<kotlin.Unit>, onShare: kotlin.Function0<kotlin.Unit>, onOpenOnGithub: kotlin.Function0<kotlin.Unit>, onToggleSeen: kotlin.Function0<kotlin.Unit>, onHide: kotlin.Function0<kotlin.Unit>): kotlin.Unit
+public fun zed.rainxch.home.presentation.components.RepositoryActionsSheet(repository: zed.rainxch.core.presentation.model.GithubRepoSummaryUi, isSeen: kotlin.Boolean, onDismiss: kotlin.Function0<kotlin.Unit>, onShare: kotlin.Function0<kotlin.Unit>, onOpenOnGithub: kotlin.Function0<kotlin.Unit>, onToggleSeenClick: kotlin.Function0<kotlin.Unit>, onHide: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
   skippable: true
   restartable: true
   params:
@@ -52,8 +52,9 @@ public fun zed.rainxch.home.presentation.components.RepositoryActionsSheet(repos
     - onDismiss: STABLE (function type)
     - onShare: STABLE (function type)
     - onOpenOnGithub: STABLE (function type)
-    - onToggleSeen: STABLE (function type)
+    - onToggleSeenClick: STABLE (function type)
     - onHide: STABLE (function type)
+    - modifier: STABLE (marked @Stable or @Immutable)
 
 @Composable
 private fun zed.rainxch.home.presentation.components.SheetRow(label: kotlin.String, icon: androidx.compose.ui.graphics.vector.ImageVector, onClick: kotlin.Function0<kotlin.Unit>, tint: androidx.compose.ui.graphics.Color): kotlin.Unit

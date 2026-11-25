@@ -8,6 +8,7 @@ kotlin {
             dependencies {
                 implementation(libs.kotlin.stdlib)
                 implementation(libs.kotlinx.collections.immutable)
+                implementation(libs.kotlinx.datetime)
 
                 implementation(projects.core.domain)
                 implementation(projects.core.presentation)

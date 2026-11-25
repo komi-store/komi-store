@@ -39,6 +39,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -154,7 +155,6 @@ private fun MangaTextField(
     personality: MangaPersonality,
     value: String,
     onValueChange: (String) -> Unit,
-    modifier: Modifier,
     label: String?,
     helper: String?,
     error: String?,
@@ -170,57 +170,22 @@ private fun MangaTextField(
     password: Boolean,
     keyboardType: KeyboardType,
     onCommit: (() -> Unit)?,
+    modifier: Modifier = Modifier,
 ) {
     val colors = personality.colors
     val metrics = fieldMetrics(size)
-    val type = personality.type
     val hasError = error != null
-    val hasAccent = colors.primary != colors.onSurface
 
     val interaction = remember { MutableInteractionSource() }
     val focused by interaction.collectIsFocusedAsState()
     val focusRequester = remember { FocusRequester() }
     val shellInteraction = remember { MutableInteractionSource() }
     var passwordVisible by remember { mutableStateOf(false) }
-    val visualTransformation =
-        if (password && !passwordVisible) PasswordVisualTransformation() else VisualTransformation.None
-
-    val borderColor = if (hasError) colors.error else colors.outline
-    val borderWidth = metrics.border + if (focused && !hasAccent && !hasError) 0.5.dp else 0.dp
-    val shadowColor =
-        when {
-            hasError -> colors.error
-            focused && hasAccent -> colors.primary
-            else -> colors.shadow
-        }
-    val iconColor =
-        when {
-            hasError -> colors.error
-            focused && hasAccent -> colors.primary
-            else -> colors.onSurface
-        }
-    val fill = if (enabled) colors.surface else colors.surfaceVariant
-    val showClear = clearable && enabled && value.isNotEmpty() && trailing == null
+    val tones = mangaFieldTones(colors, metrics.border, hasError = hasError, focused = focused, enabled = enabled)
 
     Column(modifier = modifier.then(if (enabled) Modifier else Modifier.alpha(0.5f))) {
         if (label != null) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                KomiText(text = label, role = KomiTextRole.Overline, color = colors.onSurface)
-                if (required) {
-                    KomiText(
-                        text = "*",
-                        role = KomiTextRole.Overline,
-                        color =
-                            if (hasError) {
-                                colors.error
-                            } else if (hasAccent) {
-                                colors.primary
-                            } else {
-                                colors.onSurface
-                            },
-                    )
-                }
-            }
+            MangaFieldLabel(label = label, required = required, hasError = hasError, colors = colors)
             Spacer(modifier = Modifier.height(7.dp))
         }
 
@@ -232,14 +197,14 @@ private fun MangaTextField(
                         if (enabled) {
                             Modifier.hardShadow(
                                 offset = DpOffset(metrics.shadow, metrics.shadow),
-                                color = shadowColor,
+                                color = tones.shadow,
                                 shape = RectangleShape,
                             )
                         } else {
                             Modifier
                         },
-                    ).background(color = fill, shape = RectangleShape)
-                    .border(width = borderWidth, color = borderColor, shape = RectangleShape)
+                    ).background(color = tones.fill, shape = RectangleShape)
+                    .border(width = tones.borderWidth, color = tones.border, shape = RectangleShape)
                     .then(
                         if (enabled) {
                             Modifier.clickable(
@@ -254,7 +219,8 @@ private fun MangaTextField(
                         if (multiline) {
                             Modifier.padding(10.dp)
                         } else {
-                            Modifier.heightIn(min = metrics.height)
+                            Modifier
+                                .heightIn(min = metrics.height)
                                 .padding(horizontal = metrics.paddingX)
                         },
                     ),
@@ -266,55 +232,37 @@ private fun MangaTextField(
                     imageVector = leadingIcon,
                     contentDescription = null,
                     modifier = Modifier.size(metrics.icon),
-                    tint = iconColor
+                    tint = tones.icon,
                 )
             }
-            BasicTextField(
+            MangaFieldInput(
                 value = value,
                 onValueChange = onValueChange,
-                modifier = Modifier.weight(1f).focusRequester(focusRequester),
+                placeholder = placeholder,
+                multiline = multiline,
+                rows = rows,
                 enabled = enabled,
-                textStyle = type.reading.copy(color = colors.onSurface),
-                cursorBrush = SolidColor(if (hasAccent) colors.primary else colors.onSurface),
-                visualTransformation = visualTransformation,
-                singleLine = !multiline,
-                minLines = if (multiline) rows else 1,
-                maxLines = if (multiline) Int.MAX_VALUE else 1,
-                keyboardOptions =
-                    KeyboardOptions(
-                        keyboardType = keyboardType,
-                        imeAction = if (!multiline && onCommit != null) ImeAction.Done else ImeAction.Default,
-                    ),
-                keyboardActions = KeyboardActions(onDone = { onCommit?.invoke() }),
-                interactionSource = interaction,
-                decorationBox = { inner ->
-                    if (value.isEmpty() && placeholder != null) {
-                        KomiText(
-                            text = placeholder,
-                            role = KomiTextRole.Reading,
-                            color = colors.onSurfaceVariant,
-                            maxLines = if (multiline) Int.MAX_VALUE else 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
-                    }
-                    inner()
-                },
+                masked = password && !passwordVisible,
+                keyboardType = keyboardType,
+                onCommit = onCommit,
+                interaction = interaction,
+                colors = colors,
+                textStyle = personality.type.reading,
+                modifier = Modifier.weight(1f).focusRequester(focusRequester),
             )
-            if (trailing != null) {
-                trailing()
-            } else if (password) {
-                PasswordToggle(
-                    visible = passwordVisible,
-                    onToggle = { passwordVisible = !passwordVisible },
-                    iconSize = metrics.icon,
-                    tint = iconColor,
-                )
-            } else if (showClear) {
-                ClearButton(
-                    colors = colors,
-                    iconSize = metrics.icon,
-                    onClear = { onValueChange("") })
-            }
+            MangaFieldTrailing(
+                trailing = trailing,
+                password = password,
+                passwordVisible = passwordVisible,
+                onTogglePassword = { passwordVisible = !passwordVisible },
+                value = value,
+                clearable = clearable,
+                enabled = enabled,
+                onClear = { onValueChange("") },
+                iconSize = metrics.icon,
+                tint = tones.icon,
+                colors = colors,
+            )
         }
 
         val supporting = error ?: helper
@@ -327,6 +275,148 @@ private fun MangaTextField(
             )
         }
     }
+}
+
+@Composable
+private fun MangaFieldLabel(
+    label: String,
+    required: Boolean,
+    hasError: Boolean,
+    colors: PersonalityColors,
+) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        KomiText(text = label, role = KomiTextRole.Overline, color = colors.onSurface)
+        if (required) {
+            KomiText(
+                text = "*",
+                role = KomiTextRole.Overline,
+                color =
+                    if (hasError) {
+                        colors.error
+                    } else if (colors.primary != colors.onSurface) {
+                        colors.primary
+                    } else {
+                        colors.onSurface
+                    },
+            )
+        }
+    }
+}
+
+@Composable
+private fun MangaFieldInput(
+    value: String,
+    onValueChange: (String) -> Unit,
+    placeholder: String?,
+    multiline: Boolean,
+    rows: Int,
+    enabled: Boolean,
+    masked: Boolean,
+    keyboardType: KeyboardType,
+    onCommit: (() -> Unit)?,
+    interaction: MutableInteractionSource,
+    colors: PersonalityColors,
+    textStyle: TextStyle,
+    modifier: Modifier = Modifier,
+) {
+    val hasAccent = colors.primary != colors.onSurface
+    BasicTextField(
+        value = value,
+        onValueChange = onValueChange,
+        modifier = modifier,
+        enabled = enabled,
+        textStyle = textStyle.copy(color = colors.onSurface),
+        cursorBrush = SolidColor(if (hasAccent) colors.primary else colors.onSurface),
+        visualTransformation = if (masked) PasswordVisualTransformation() else VisualTransformation.None,
+        singleLine = !multiline,
+        minLines = if (multiline) rows else 1,
+        maxLines = if (multiline) Int.MAX_VALUE else 1,
+        keyboardOptions =
+            KeyboardOptions(
+                keyboardType = keyboardType,
+                imeAction = if (!multiline && onCommit != null) ImeAction.Done else ImeAction.Default,
+            ),
+        keyboardActions = KeyboardActions(onDone = { onCommit?.invoke() }),
+        interactionSource = interaction,
+        decorationBox = { inner ->
+            if (value.isEmpty() && placeholder != null) {
+                KomiText(
+                    text = placeholder,
+                    role = KomiTextRole.Reading,
+                    color = colors.onSurfaceVariant,
+                    maxLines = if (multiline) Int.MAX_VALUE else 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
+            inner()
+        },
+    )
+}
+
+@Composable
+private fun MangaFieldTrailing(
+    trailing: @Composable (() -> Unit)?,
+    password: Boolean,
+    passwordVisible: Boolean,
+    onTogglePassword: () -> Unit,
+    value: String,
+    clearable: Boolean,
+    enabled: Boolean,
+    onClear: () -> Unit,
+    iconSize: Dp,
+    tint: Color,
+    colors: PersonalityColors,
+) {
+    if (trailing != null) {
+        trailing()
+    } else if (password) {
+        PasswordToggle(
+            visible = passwordVisible,
+            onToggle = onTogglePassword,
+            iconSize = iconSize,
+            tint = tint,
+        )
+    } else if (clearable && enabled && value.isNotEmpty()) {
+        ClearButton(colors = colors, iconSize = iconSize, onClear = onClear)
+    }
+}
+
+private val FocusedBorderBoost = 0.5.dp
+
+private data class MangaFieldTones(
+    val fill: Color,
+    val border: Color,
+    val borderWidth: Dp,
+    val shadow: Color,
+    val icon: Color,
+)
+
+private fun mangaFieldTones(
+    colors: PersonalityColors,
+    baseBorder: Dp,
+    hasError: Boolean,
+    focused: Boolean,
+    enabled: Boolean,
+): MangaFieldTones {
+    val hasAccent = colors.primary != colors.onSurface
+    val accentFocused = focused && hasAccent
+    return MangaFieldTones(
+        fill = if (enabled) colors.surface else colors.surfaceVariant,
+        border = if (hasError) colors.error else colors.outline,
+        borderWidth = baseBorder + if (focused && !hasAccent && !hasError) FocusedBorderBoost else 0.dp,
+        shadow =
+            when {
+                hasError -> colors.error
+                accentFocused -> colors.primary
+                else -> colors.shadow
+            },
+        icon =
+            when {
+                hasError -> colors.error
+                accentFocused -> colors.primary
+                else -> colors.onSurface
+            },
+    )
 }
 
 @Composable
@@ -406,7 +496,7 @@ private fun PreviewFields() {
             onValueChange = {},
             label = "Owner",
             required = true,
-            helper = "GitHub org or user."
+            helper = "GitHub org or user.",
         )
         KomiTextField(
             value = "not-an-email",
@@ -422,7 +512,7 @@ private fun PreviewFields() {
             onValueChange = {},
             label = "Disabled",
             enabled = false,
-            helper = "Read-only."
+            helper = "Read-only.",
         )
     }
 }
@@ -430,28 +520,29 @@ private fun PreviewFields() {
 @Preview
 @Composable
 private fun KomiTextFieldMangaPreview() {
-    PersonalityPreview(mangaPersonality()) { PreviewFields() }
+    PersonalityPreview(personality = mangaPersonality()) { PreviewFields() }
 }
 
 @Preview
 @Composable
 private fun KomiTextFieldMangaNightPreview() {
     PersonalityPreview(
-        mangaPersonality(
-            paper = MangaPaper.NIGHT,
-            accent = MangaAccent.FROST
-        )
+        personality =
+            mangaPersonality(
+                paper = MangaPaper.NIGHT,
+                accent = MangaAccent.FROST,
+            ),
     ) { PreviewFields() }
 }
 
 @Preview
 @Composable
 private fun KomiTextFieldClassicPreview() {
-    PersonalityPreview(classicPersonality()) { PreviewFields() }
+    PersonalityPreview(personality = classicPersonality()) { PreviewFields() }
 }
 
 @Preview
 @Composable
 private fun KomiTextFieldClassicDarkPreview() {
-    PersonalityPreview(classicPersonality(dark = true)) { PreviewFields() }
+    PersonalityPreview(personality = classicPersonality(dark = true)) { PreviewFields() }
 }

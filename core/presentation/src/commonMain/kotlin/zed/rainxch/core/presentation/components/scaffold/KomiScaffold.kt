@@ -68,8 +68,7 @@ fun KomiScaffold(
     val colors = LocalPersonality.current.colors
     val isManga = LocalPersonality.current is MangaPersonality
     val inkDividers = isManga && dividers
-    // On a Classic tab screen the tab card at the bottom holds the top bar's search and actions
-    // and the FAB, and folds as the content scrolls; the content keeps room for the status bar.
+    // A Classic tab screen's card holds the top bar's search, actions and FAB; the content keeps room for the status bar.
     val tabCard = LocalTabCardSlot.current?.takeIf { !isManga }
     val scaffoldTopBar = topBar.takeIf { tabCard == null }
     val scaffoldFab = floatingActionButton.takeIf { tabCard == null }
@@ -131,8 +130,7 @@ fun KomiScaffold(
     }
 }
 
-// Floats over the content, above any bottom bar, and slides out of the way while the content
-// scrolls down, so it neither reserves a strip of the screen nor hides the end of a list.
+// Floats over the content and slides away while it scrolls down, so it neither reserves a strip nor hides a list's end.
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun BoxScope.FloatingActionBar(
@@ -221,11 +219,11 @@ private fun PreviewScaffold() {
 @Preview
 @Composable
 private fun KomiScaffoldMangaPreview() {
-    PersonalityPreview(mangaPersonality()) { PreviewScaffold() }
+    PersonalityPreview(personality = mangaPersonality()) { PreviewScaffold() }
 }
 
 @Preview
 @Composable
 private fun KomiScaffoldClassicPreview() {
-    PersonalityPreview(classicPersonality()) { PreviewScaffold() }
+    PersonalityPreview(personality = classicPersonality()) { PreviewScaffold() }
 }

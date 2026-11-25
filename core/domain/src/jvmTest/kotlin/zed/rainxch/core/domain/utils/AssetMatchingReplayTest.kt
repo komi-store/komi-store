@@ -9,18 +9,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-/**
- * Replays the update check over the real release histories of 48 Android projects.
- * The corpus is a snapshot collected by tools/asset-replay/collect_corpus.py and
- * served from the test resources, so the replay itself never touches the network.
- *
- * The pick below mirrors InstalledAppsRepositoryImpl.resolveTrackedRelease for a
- * single tracked app, on the release window ReleaseWindow.kt builds with its
- * default settings (newest first, pre-releases filtered). The device-only parts
- * are pinned so every machine replays the same data: "installable" means the
- * name ends in .apk (no arch filter), and the primary pick falls back to the
- * first same-app candidate.
- */
+// Replays the update check offline over 48 projects' real release histories (tools/asset-replay/collect_corpus.py).
 class AssetMatchingReplayTest {
     private data class CorpusRelease(
         val tag: String,
@@ -57,8 +46,7 @@ class AssetMatchingReplayTest {
 
     // ---- the replay, a single-app copy of resolveTrackedRelease ----
 
-    // The window rules of ReleaseWindow.kt at its defaults: newest first by publish date,
-    // pre-releases filtered out (both the API flag and a pre-release tag count).
+    // ReleaseWindow.kt's defaults: newest first by publish date, pre-releases (API flag or tag) filtered out.
     private fun windowOf(releases: List<CorpusRelease>): List<CorpusRelease> =
         releases
             .sortedByDescending { it.published }
@@ -70,60 +58,65 @@ class AssetMatchingReplayTest {
         installedAssetName: String?,
     ): CorpusRelease? {
         val self = replayApp(installedTag, installedAssetName)
-        val repoApps = listOf(self)
+        return releases.firstOrNull { release -> replayPrimary(self, releases, release)?.name?.isNotEmpty() == true }
+    }
 
-        fun belongsElsewhere(
-            assetName: String,
-            releaseTag: String,
-            releaseAssets: List<String>,
-        ): Boolean {
-            if (!AssetOwnership.canOwn(self, assetName)) return true
-            val owner =
-                AssetOwnership.ownerOf(
-                    assetName = assetName,
-                    apps = repoApps,
-                    releaseAssets = releaseAssets.map(::replayAsset),
-                    releaseHistory = releases.map(::replayRelease),
-                    releaseTag = releaseTag,
-                ) ?: return self.installedAssetName != null || !self.assetGlobPattern.isNullOrBlank()
-            return owner.packageName != self.packageName
-        }
+    // Device-only parts are pinned: installable means a .apk name, and the pick falls back to the first same-app candidate.
+    private fun replayPrimary(
+        self: InstalledApp,
+        releases: List<CorpusRelease>,
+        release: CorpusRelease,
+    ): GithubAsset? {
+        val installableForPlatform = release.assets.filter { it.endsWith(".apk", ignoreCase = true) }
+        val installableForApp =
+            installableForPlatform.filterNot { belongsElsewhere(self, releases, it, release.tag, installableForPlatform) }
+        if (installableForApp.isEmpty()) return null
 
-        for (release in releases) {
-            val installableForPlatform = release.assets.filter { it.endsWith(".apk", ignoreCase = true) }
-            val installableForApp =
-                installableForPlatform.filterNot { belongsElsewhere(it, release.tag, installableForPlatform) }
-            if (installableForApp.isEmpty()) continue
+        val sameApp =
+            AssetOwnership.narrowToApp(
+                installableForApp.map(::replayAsset),
+                self.installedAssetName,
+                release.tag,
+                self.installedVersion,
+            )
 
-            val sameApp =
-                AssetOwnership.narrowToApp(
-                    installableForApp.map(::replayAsset),
-                    installedAssetName,
-                    release.tag,
-                    self.installedVersion,
-                )
+        val fingerprintMatch =
+            AssetVariant.resolvePreferredAsset(
+                assets = sameApp,
+                pinnedVariant = null,
+                pinnedTokens = null,
+                pinnedGlob = null,
+                releaseTag = release.tag,
+            )
 
-            val fingerprintMatch =
-                AssetVariant.resolvePreferredAsset(
-                    assets = sameApp,
-                    pinnedVariant = null,
-                    pinnedTokens = null,
-                    pinnedGlob = null,
-                    releaseTag = release.tag,
-                )
+        val autoPickPool =
+            AssetOwnership.narrowToApp(
+                AssetVariant.filterByPackageFlavor(installableForApp.map(::replayAsset), self.packageName),
+                self.installedAssetName,
+                release.tag,
+                self.installedVersion,
+            )
 
-            val autoPickPool =
-                AssetOwnership.narrowToApp(
-                    AssetVariant.filterByPackageFlavor(installableForApp.map(::replayAsset), self.packageName),
-                    installedAssetName,
-                    release.tag,
-                    self.installedVersion,
-                )
+        return fingerprintMatch ?: autoPickPool.firstOrNull()
+    }
 
-            val primary = fingerprintMatch ?: autoPickPool.firstOrNull() ?: continue
-            if (primary.name.isNotEmpty()) return release
-        }
-        return null
+    private fun belongsElsewhere(
+        self: InstalledApp,
+        releases: List<CorpusRelease>,
+        assetName: String,
+        releaseTag: String,
+        releaseAssets: List<String>,
+    ): Boolean {
+        if (!AssetOwnership.canOwn(self, assetName)) return true
+        val owner =
+            AssetOwnership.ownerOf(
+                assetName = assetName,
+                apps = listOf(self),
+                releaseAssets = releaseAssets.map(::replayAsset),
+                releaseHistory = releases.map(::replayRelease),
+                releaseTag = releaseTag,
+            ) ?: return self.installedAssetName != null || !self.assetGlobPattern.isNullOrBlank()
+        return owner.packageName != self.packageName
     }
 
     private fun replayApp(
@@ -182,24 +175,17 @@ class AssetMatchingReplayTest {
 
     // ---- the pass ----
 
-    // Repos where landing on a release behind the newest one is the designed conservative
-    // behaviour, not a miss:
-    //  - variant lock, where an offline/debug pick is never offered its online/release
-    //    sibling: InstallerX-Revived, iamr0s/InstallerX, VegaBobo/DSU-Sideloader;
-    //  - renamed or dual-brand projects that ship two names side by side, where each brand
-    //    keeps updating in its own family: thunderbird-android (K9MAIL_*), Magisk (manager-*);
-    //  - separate lines that must not cross: godot (3.x vs 4.x), KernelSU (a dev-build
-    //    asset name), winlator (a Revision-suffixed name).
+    // Repos where landing behind the newest release is the designed conservative behaviour, not a miss.
     private val conservativeFallbackRepos =
         setOf(
-            "wxxsfxyzm/InstallerX-Revived",
-            "iamr0s/InstallerX",
-            "VegaBobo/DSU-Sideloader",
-            "thunderbird/thunderbird-android",
-            "topjohnwu/Magisk",
-            "godotengine/godot",
-            "tiann/KernelSU",
-            "brunodev85/winlator",
+            "wxxsfxyzm/InstallerX-Revived", // variant lock: an offline/debug pick never gets its online/release sibling
+            "iamr0s/InstallerX", // variant lock
+            "VegaBobo/DSU-Sideloader", // variant lock
+            "thunderbird/thunderbird-android", // two brands side by side (K9MAIL_*), each updating in its own family
+            "topjohnwu/Magisk", // two brands side by side (manager-*)
+            "godotengine/godot", // separate lines that must not cross: 3.x vs 4.x
+            "tiann/KernelSU", // separate lines: a dev-build asset name
+            "brunodev85/winlator", // separate lines: a Revision-suffixed name
         )
 
     @Test
@@ -218,9 +204,7 @@ class AssetMatchingReplayTest {
             if (apkReleases.isEmpty()) return@forEach
             val newestApk = apkReleases.first()
 
-            // An app must never lose its own newest release to the ownership check: installing
-            // the newest release itself must match it, never fall behind it. This is the shape
-            // the 26.09 -> 26.09.8ede272 defect had.
+            // An app must never lose its own newest release to the ownership check (the 26.09 -> 26.09.8ede272 defect).
             val newestMatch = replayPick(releases, newestApk.tag, newestApk.apkNames.first())
             if (newestMatch == null || newestMatch.tag != newestApk.tag) {
                 lostNewest++

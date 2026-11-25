@@ -37,6 +37,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextOverflow
@@ -58,6 +59,7 @@ import zed.rainxch.core.presentation.personality.manga.MangaPaper
 import zed.rainxch.core.presentation.personality.manga.decoration.hardShadow
 import zed.rainxch.core.presentation.personality.manga.decoration.inkFocusRing
 import zed.rainxch.core.presentation.personality.mangaPersonality
+import zed.rainxch.core.presentation.personality.model.PersonalityColors
 import zed.rainxch.core.presentation.personality.utils.PersonalityPreview
 import zed.rainxch.core.presentation.spacing.Spacing
 
@@ -65,8 +67,7 @@ private val SelectionBarWidth = 5.dp
 private val ClassicDividerInset = 56.dp
 private const val DISABLED_ALPHA = 0.45f
 
-// Classic draws Material 3 Expressive's segmented list: one tonal tile per row, 2dp apart,
-// with the outer corners rounded more than the inner ones.
+// Classic draws Material 3 Expressive's segmented list: a tonal tile per row, outer corners rounder than inner.
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun KomiList(
@@ -157,7 +158,6 @@ fun KomiListContainer(
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun KomiListRow(
     title: String,
@@ -180,44 +180,17 @@ fun KomiListRow(
     val interaction = remember { MutableInteractionSource() }
     val hovered by interaction.collectIsHoveredAsState()
     val focused by interaction.collectIsFocusedAsState()
-    val titleColor =
-        when {
-            destructive -> colors.error
-            selected && !isManga -> colors.onPrimaryContainer
-            else -> colors.onSurface
-        }
-    val subtitleColor =
-        if (selected && !isManga) colors.onPrimaryContainer else colors.onSurfaceVariant
-    val clickModifier =
-        when {
-            onClick == null && onLongClick == null -> {
-                Modifier
-            }
-
-            isManga -> {
-                Modifier.combinedClickable(
-                    interactionSource = interaction,
-                    indication = null,
-                    enabled = enabled,
-                    onLongClick = onLongClick,
-                    onClick = onClick ?: {},
-                )
-            }
-
-            else -> {
-                Modifier.combinedClickable(enabled = enabled, onLongClick = onLongClick, onClick = onClick ?: {})
-            }
-        }
+    val (titleColor, subtitleColor) = listRowTextColors(destructive, selected, isManga, colors)
     Row(
         modifier =
             modifier
                 .fillMaxWidth()
                 .then(if (isManga) Modifier.inkFocusRing(focused = { focused }, color = colors.primary) else Modifier)
                 .then(if (!isManga) Modifier.clip(RoundedCornerShape(shape.cornerSmall)) else Modifier)
-                .then(rowFill(selected, hovered, isManga, colors.surfaceVariant, colors.primaryContainer))
-                .then(rowDivider(showDivider, isManga, icon != null, colors.outline, colors.outlineVariant))
-                .then(selectionBar(selected && isManga, colors.primary))
-                .then(clickModifier)
+                .rowFill(selected, hovered, isManga, colors.surfaceVariant, colors.primaryContainer)
+                .rowDivider(showDivider, isManga, icon != null, colors.outline, colors.outlineVariant)
+                .selectionBar(selected && isManga, colors.primary)
+                .listRowClickable(onClick, onLongClick, enabled, isManga, interaction)
                 .padding(
                     horizontal = if (isManga) 14.dp else 12.dp,
                     vertical = if (isManga) 12.dp else 10.dp,
@@ -309,30 +282,75 @@ private fun RowLeadingIcon(
     }
 }
 
-private fun rowFill(
+private fun listRowTextColors(
+    destructive: Boolean,
+    selected: Boolean,
+    isManga: Boolean,
+    colors: PersonalityColors,
+): Pair<Color, Color> {
+    val tonal = selected && !isManga
+    val title =
+        when {
+            destructive -> colors.error
+            tonal -> colors.onPrimaryContainer
+            else -> colors.onSurface
+        }
+    val subtitle = if (tonal) colors.onPrimaryContainer else colors.onSurfaceVariant
+    return title to subtitle
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+private fun Modifier.listRowClickable(
+    onClick: (() -> Unit)?,
+    onLongClick: (() -> Unit)?,
+    enabled: Boolean,
+    isManga: Boolean,
+    interaction: MutableInteractionSource,
+): Modifier =
+    when {
+        onClick == null && onLongClick == null -> {
+            this
+        }
+
+        isManga -> {
+            combinedClickable(
+                interactionSource = interaction,
+                indication = null,
+                enabled = enabled,
+                onLongClick = onLongClick,
+                onClick = onClick ?: {},
+            )
+        }
+
+        else -> {
+            combinedClickable(enabled = enabled, onLongClick = onLongClick, onClick = onClick ?: {})
+        }
+    }
+
+private fun Modifier.rowFill(
     selected: Boolean,
     hovered: Boolean,
     isManga: Boolean,
-    mangaFill: androidx.compose.ui.graphics.Color,
-    classicFill: androidx.compose.ui.graphics.Color,
+    mangaFill: Color,
+    classicFill: Color,
 ): Modifier =
     when {
-        selected -> Modifier.background(if (isManga) mangaFill else classicFill)
-        hovered && isManga -> Modifier.background(mangaFill)
-        else -> Modifier
+        selected -> background(if (isManga) mangaFill else classicFill)
+        hovered && isManga -> background(mangaFill)
+        else -> this
     }
 
-private fun rowDivider(
+private fun Modifier.rowDivider(
     show: Boolean,
     isManga: Boolean,
     hasLeading: Boolean,
-    mangaColor: androidx.compose.ui.graphics.Color,
-    classicColor: androidx.compose.ui.graphics.Color,
+    mangaColor: Color,
+    classicColor: Color,
 ): Modifier =
     if (!show) {
-        Modifier
+        this
     } else {
-        Modifier.drawBehind {
+        drawBehind {
             val stroke = (if (isManga) 2.dp else 1.dp).toPx()
             val startX = if (!isManga && hasLeading) ClassicDividerInset.toPx() else 0f
             val y = size.height - stroke / 2f
@@ -345,14 +363,14 @@ private fun rowDivider(
         }
     }
 
-private fun selectionBar(
+private fun Modifier.selectionBar(
     show: Boolean,
-    color: androidx.compose.ui.graphics.Color,
+    color: Color,
 ): Modifier =
     if (!show) {
-        Modifier
+        this
     } else {
-        Modifier.drawBehind {
+        drawBehind {
             drawRect(color = color, size = Size(SelectionBarWidth.toPx(), size.height))
         }
     }
@@ -504,29 +522,29 @@ private fun PreviewLists() {
 @Preview
 @Composable
 private fun KomiListMangaDayPreview() {
-    PersonalityPreview(mangaPersonality()) { PreviewLists() }
+    PersonalityPreview(personality = mangaPersonality()) { PreviewLists() }
 }
 
 @Preview
 @Composable
 private fun KomiListMangaNightPreview() {
-    PersonalityPreview(mangaPersonality(paper = MangaPaper.NIGHT, accent = MangaAccent.SUN)) { PreviewLists() }
+    PersonalityPreview(personality = mangaPersonality(paper = MangaPaper.NIGHT, accent = MangaAccent.SUN)) { PreviewLists() }
 }
 
 @Preview
 @Composable
 private fun KomiListMangaNordPreview() {
-    PersonalityPreview(mangaPersonality(paper = MangaPaper.NORD, accent = MangaAccent.FROST)) { PreviewLists() }
+    PersonalityPreview(personality = mangaPersonality(paper = MangaPaper.NORD, accent = MangaAccent.FROST)) { PreviewLists() }
 }
 
 @Preview
 @Composable
 private fun KomiListClassicPreview() {
-    PersonalityPreview(classicPersonality()) { PreviewLists() }
+    PersonalityPreview(personality = classicPersonality()) { PreviewLists() }
 }
 
 @Preview
 @Composable
 private fun KomiListClassicDarkPreview() {
-    PersonalityPreview(classicPersonality(dark = true)) { PreviewLists() }
+    PersonalityPreview(personality = classicPersonality(dark = true)) { PreviewLists() }
 }

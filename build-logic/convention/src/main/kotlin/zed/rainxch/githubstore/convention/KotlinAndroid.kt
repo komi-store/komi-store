@@ -40,21 +40,19 @@ internal fun Project.configureKotlinAndroid(commonExtension: CommonExtension) {
 }
 
 internal fun Project.configureLint(lint: Lint) {
-    lint.baseline = file("lint-baseline.xml")
     lint.disable.addAll(setOf("NewerVersionAvailable", "GradleDependency", "AndroidGradlePluginVersion"))
+    // Play-policy checks: an app store needs to see every installed package and to ask about battery optimisation.
+    lint.disable.addAll(setOf("QueryAllPackagesPermission", "BatteryLife"))
     lint.abortOnError = true
+    lint.warningsAsErrors = true
     lint.checkReleaseBuilds = false
-    lint.htmlReport = true
-    lint.xmlReport = true
-    lint.sarifReport = true
 }
 
 internal fun Project.configureKotlin() {
-    val warningsAsErrors = findProperty("komi.warningsAsErrors")?.toString()?.toBoolean() ?: true
     tasks.withType<KotlinCompile>().configureEach {
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_17)
-            allWarningsAsErrors.set(warningsAsErrors)
+            allWarningsAsErrors.set(true)
         }
     }
 }

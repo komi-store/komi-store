@@ -1,5 +1,6 @@
 package zed.rainxch.githubstore
 
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -8,20 +9,24 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.isCtrlPressed
 import androidx.compose.ui.input.key.isMetaPressed
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.type
+import androidx.compose.ui.window.ApplicationScope
+import androidx.compose.ui.window.FrameWindowScope
 import androidx.compose.ui.window.MenuBar
 import androidx.compose.ui.window.Window
+import androidx.compose.ui.window.WindowState
 import androidx.compose.ui.window.application
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
@@ -86,165 +91,182 @@ fun main(args: Array<String>) {
     initKoin()
 
     // title/MenuBar compose outside App() and never recompose, so apply the stored language first.
-    runBlocking {
-        val koin = GlobalContext.get()
-        val tweaksRepo = koin.get<TweaksRepository>()
-        val localization = koin.get<LocalizationManager>()
-        val tag =
-            try {
-                withTimeoutOrNull(STARTUP_PREFERENCE_TIMEOUT_MS.milliseconds) {
-                    tweaksRepo.getAppLanguage().first()
-                }
-            } catch (_: Exception) {
-                null
-            }
-        localization.setActiveLanguageTag(tag)
-    }
+    applyStoredAppLanguage()
 
     bootstrapProxy()
 
     DesktopDeepLink.registerUriSchemeIfNeeded()
 
     application {
-        var deepLinkUri by mutableStateOf(deepLinkArg)
-        val windowState = remember { WindowStateStore.load() }
+        KomiStoreApplication(deepLinkArg)
+    }
+}
 
-        DisposableEffect(windowState) {
-            val hook = Thread { WindowStateStore.save(windowState) }
-            runCatching { Runtime.getRuntime().addShutdownHook(hook) }
-            onDispose {
-                runCatching { Runtime.getRuntime().removeShutdownHook(hook) }
-            }
+@Composable
+private fun ApplicationScope.KomiStoreApplication(deepLinkArg: String?) {
+    var deepLinkUri by remember { mutableStateOf(deepLinkArg) }
+    val windowState = remember { WindowStateStore.load() }
+
+    PersistWindowState(windowState)
+
+    LaunchedEffect(Unit) {
+        DesktopDeepLink.startInstanceListener { uri ->
+            deepLinkUri = uri
         }
+    }
 
-        @OptIn(FlowPreview::class)
-        LaunchedEffect(windowState) {
-            snapshotFlow {
-                Triple(windowState.placement, windowState.position, windowState.size)
-            }.distinctUntilChanged()
-                .debounce(500.milliseconds)
-                .collect {
-                    withContext(Dispatchers.IO) {
-                        WindowStateStore.save(windowState)
-                    }
-                }
+    installDesktopHandlers(onUri = { uri -> deepLinkUri = uri })
+
+    Window(
+        onCloseRequest = {
+            WindowStateStore.save(windowState)
+            exitApplication()
+        },
+        state = windowState,
+        title = stringResource(Res.string.app_name),
+        icon = painterResource(Res.drawable.app_icon),
+        onKeyEvent = ::handleFindShortcut,
+    ) {
+        var resolvedDark by remember { mutableStateOf<Boolean?>(null) }
+        LaunchedEffect(window, resolvedDark) {
+            val dark = resolvedDark ?: return@LaunchedEffect
+            applyWindowsImmersiveDarkMode(window, dark)
+            applyMacosWindowAppearance(window, dark)
         }
-
-        LaunchedEffect(Unit) {
-            DesktopDeepLink.startInstanceListener { uri ->
-                deepLinkUri = uri
-            }
-        }
-
-        if (Desktop.isDesktopSupported()) {
-            Desktop.getDesktop().let { desktop ->
-                if (desktop.isSupported(Desktop.Action.APP_OPEN_URI)) {
-                    desktop.setOpenURIHandler { event ->
-                        deepLinkUri = event.uri.toString()
-                    }
-                }
-                if (desktop.isSupported(Desktop.Action.APP_ABOUT)) {
-                    runCatching {
-                        desktop.setAboutHandler {
-                            deepLinkUri = "githubstore://tweaks/app-info"
-                        }
-                    }
-                }
-            }
-        }
-
-        Window(
-            onCloseRequest = {
+        AppMenuBar(
+            onOpenLink = { uri -> deepLinkUri = uri },
+            onQuit = {
                 WindowStateStore.save(windowState)
                 exitApplication()
             },
-            state = windowState,
-            title = stringResource(Res.string.app_name),
-            icon = painterResource(Res.drawable.app_icon),
-            onKeyEvent = { keyEvent ->
-                if (keyEvent.key == Key.F && keyEvent.type == KeyEventType.KeyDown) {
-                    if (keyEvent.isCtrlPressed || keyEvent.isMetaPressed) {
-                        KeyboardNavigation.onKeyClicked(KeyboardNavigationEvent.OnCtrlFClick)
-                        true
-                    } else {
-                        false
-                    }
-                } else {
-                    false
-                }
-            },
-        ) {
-            var resolvedDark by remember { mutableStateOf<Boolean?>(null) }
-            LaunchedEffect(window, resolvedDark) {
-                val dark = resolvedDark ?: return@LaunchedEffect
-                applyWindowsImmersiveDarkMode(window, dark)
-                applyMacosWindowAppearance(window, dark)
-            }
-            MenuBar {
-                Menu(text = stringResource(Res.string.menubar_file_menu)) {
-                    Item(
-                        text = stringResource(Res.string.tweaks_title),
-                        onClick = { deepLinkUri = "githubstore://tweaks" },
-                    )
-                    Separator()
-                    Item(
-                        text = stringResource(Res.string.menubar_file_quit),
-                        onClick = {
-                            WindowStateStore.save(windowState)
-                            exitApplication()
-                        },
-                    )
-                }
-                Menu(text = stringResource(Res.string.menubar_go_menu)) {
-                    Item(
-                        text = stringResource(Res.string.bottom_nav_explore_title),
-                        onClick = { deepLinkUri = "githubstore://home" },
-                    )
-                    Item(
-                        text = stringResource(Res.string.bottom_nav_search_title),
-                        onClick = { deepLinkUri = "githubstore://search" },
-                    )
-                    Item(
-                        text = stringResource(Res.string.favourites),
-                        onClick = { deepLinkUri = "githubstore://favourites" },
-                    )
-                    Item(
-                        text = stringResource(Res.string.recently_viewed),
-                        onClick = { deepLinkUri = "githubstore://recent" },
-                    )
-                }
-                Menu(text = stringResource(Res.string.menubar_help_menu)) {
-                    Item(
-                        text = stringResource(Res.string.menubar_help_about),
-                        onClick = { deepLinkUri = "githubstore://tweaks/app-info" },
-                    )
-                    Item(
-                        text = stringResource(Res.string.menubar_help_feedback),
-                        onClick = { deepLinkUri = "githubstore://tweaks/feedback" },
-                    )
-                    Item(
-                        text = stringResource(Res.string.menubar_help_licenses),
-                        onClick = { deepLinkUri = "githubstore://tweaks/licenses" },
-                    )
-                    Item(
-                        text = stringResource(Res.string.menubar_help_privacy),
-                        onClick = {
-                            runCatching {
-                                if (Desktop.isDesktopSupported() &&
-                                    Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)
-                                ) {
-                                    Desktop.getDesktop().browse(URI(PRIVACY_POLICY_URL))
-                                }
-                            }
-                        },
-                    )
+        )
+        App(
+            deepLinkUri = deepLinkUri,
+            onDeepLinkConsume = { deepLinkUri = null },
+            onResolvedDarkTheme = { resolvedDark = it },
+        )
+    }
+}
+
+@OptIn(FlowPreview::class)
+@Composable
+private fun PersistWindowState(windowState: WindowState) {
+    DisposableEffect(windowState) {
+        val hook = Thread { WindowStateStore.save(windowState) }
+        runCatching { Runtime.getRuntime().addShutdownHook(hook) }
+        onDispose {
+            runCatching { Runtime.getRuntime().removeShutdownHook(hook) }
+        }
+    }
+
+    LaunchedEffect(windowState) {
+        snapshotFlow {
+            Triple(windowState.placement, windowState.position, windowState.size)
+        }.distinctUntilChanged()
+            .debounce(500.milliseconds)
+            .collect {
+                withContext(Dispatchers.IO) {
+                    WindowStateStore.save(windowState)
                 }
             }
-            App(
-                deepLinkUri = deepLinkUri,
-                onDeepLinkConsumed = { deepLinkUri = null },
-                onResolvedDarkTheme = { resolvedDark = it },
+    }
+}
+
+@Composable
+private fun FrameWindowScope.AppMenuBar(
+    onOpenLink: (String) -> Unit,
+    onQuit: () -> Unit,
+) {
+    MenuBar {
+        Menu(text = stringResource(Res.string.menubar_file_menu)) {
+            Item(
+                text = stringResource(Res.string.tweaks_title),
+                onClick = { onOpenLink("githubstore://tweaks") },
             )
+            Separator()
+            Item(
+                text = stringResource(Res.string.menubar_file_quit),
+                onClick = onQuit,
+            )
+        }
+        Menu(text = stringResource(Res.string.menubar_go_menu)) {
+            Item(
+                text = stringResource(Res.string.bottom_nav_explore_title),
+                onClick = { onOpenLink("githubstore://home") },
+            )
+            Item(
+                text = stringResource(Res.string.bottom_nav_search_title),
+                onClick = { onOpenLink("githubstore://search") },
+            )
+            Item(
+                text = stringResource(Res.string.favourites),
+                onClick = { onOpenLink("githubstore://favourites") },
+            )
+            Item(
+                text = stringResource(Res.string.recently_viewed),
+                onClick = { onOpenLink("githubstore://recent") },
+            )
+        }
+        Menu(text = stringResource(Res.string.menubar_help_menu)) {
+            Item(
+                text = stringResource(Res.string.menubar_help_about),
+                onClick = { onOpenLink("githubstore://tweaks/app-info") },
+            )
+            Item(
+                text = stringResource(Res.string.menubar_help_feedback),
+                onClick = { onOpenLink("githubstore://tweaks/feedback") },
+            )
+            Item(
+                text = stringResource(Res.string.menubar_help_licenses),
+                onClick = { onOpenLink("githubstore://tweaks/licenses") },
+            )
+            Item(
+                text = stringResource(Res.string.menubar_help_privacy),
+                onClick = ::openPrivacyPolicy,
+            )
+        }
+    }
+}
+
+private fun applyStoredAppLanguage() {
+    runBlocking {
+        val koin = GlobalContext.get()
+        val tweaksRepo = koin.get<TweaksRepository>()
+        val localization = koin.get<LocalizationManager>()
+        val tag =
+            withTimeoutOrNull(STARTUP_PREFERENCE_TIMEOUT_MS.milliseconds) {
+                tweaksRepo.getAppLanguage().firstOrNull()
+            }
+        localization.setActiveLanguageTag(tag)
+    }
+}
+
+private fun installDesktopHandlers(onUri: (String) -> Unit) {
+    if (!Desktop.isDesktopSupported()) return
+    val desktop = Desktop.getDesktop()
+    if (desktop.isSupported(Desktop.Action.APP_OPEN_URI)) {
+        desktop.setOpenURIHandler { event -> onUri(event.uri.toString()) }
+    }
+    if (desktop.isSupported(Desktop.Action.APP_ABOUT)) {
+        runCatching {
+            desktop.setAboutHandler { onUri("githubstore://tweaks/app-info") }
+        }
+    }
+}
+
+private fun handleFindShortcut(keyEvent: KeyEvent): Boolean {
+    val withModifier = keyEvent.isCtrlPressed || keyEvent.isMetaPressed
+    val isFind = keyEvent.key == Key.F && keyEvent.type == KeyEventType.KeyDown && withModifier
+    if (isFind) KeyboardNavigation.onKeyClicked(KeyboardNavigationEvent.OnCtrlFClick)
+    return isFind
+}
+
+private fun openPrivacyPolicy() {
+    runCatching {
+        if (Desktop.isDesktopSupported() &&
+            Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)
+        ) {
+            Desktop.getDesktop().browse(URI(PRIVACY_POLICY_URL))
         }
     }
 }

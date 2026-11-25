@@ -24,11 +24,21 @@ import zed.rainxch.core.domain.repository.StarredRepository
 import zed.rainxch.core.domain.repository.TweaksRepository
 import zed.rainxch.core.domain.repository.UserSessionRepository
 import zed.rainxch.core.presentation.utils.toUserMessage
-import zed.rainxch.githubstore.core.presentation.res.*
+import zed.rainxch.githubstore.core.presentation.res.Res
+import zed.rainxch.githubstore.core.presentation.res.days_ago
+import zed.rainxch.githubstore.core.presentation.res.hours_ago
+import zed.rainxch.githubstore.core.presentation.res.just_now
+import zed.rainxch.githubstore.core.presentation.res.last_synced
+import zed.rainxch.githubstore.core.presentation.res.minutes_ago
+import zed.rainxch.githubstore.core.presentation.res.sync_starred_failed
 import zed.rainxch.starred.presentation.mappers.toStarredRepositoryUi
 import zed.rainxch.starred.presentation.model.StarredRepositoryUi
 import zed.rainxch.starred.presentation.model.StarredSortRule
 import kotlin.time.Clock
+import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.ExperimentalTime
 
 class StarredReposViewModel(
@@ -80,13 +90,13 @@ class StarredReposViewModel(
     private suspend fun lastSyncSubtitle(lastSyncTime: Long?): String? {
         if (lastSyncTime == null) return null
 
-        val diff = Clock.System.now().toEpochMilliseconds() - lastSyncTime
+        val elapsed = (Clock.System.now().toEpochMilliseconds() - lastSyncTime).milliseconds
         val relative =
             when {
-                diff < 60_000 -> getString(Res.string.just_now)
-                diff < 3_600_000 -> getString(Res.string.minutes_ago, diff / 60_000)
-                diff < 86_400_000 -> getString(Res.string.hours_ago, diff / 3_600_000)
-                else -> getString(Res.string.days_ago, diff / 86_400_000)
+                elapsed < 1.minutes -> getString(Res.string.just_now)
+                elapsed < 1.hours -> getString(Res.string.minutes_ago, elapsed.inWholeMinutes)
+                elapsed < 1.days -> getString(Res.string.hours_ago, elapsed.inWholeHours)
+                else -> getString(Res.string.days_ago, elapsed.inWholeDays)
             }
 
         return "${getString(Res.string.last_synced)}: $relative"
@@ -232,14 +242,7 @@ class StarredReposViewModel(
             }
 
             is StarredReposAction.OnSortRuleSelected -> {
-                viewModelScope.launch {
-                    try {
-                        tweaksRepository.setStarredSortRule(action.sortRule.name)
-                    } catch (e: CancellationException) {
-                        throw e
-                    } catch (_: Throwable) {
-                    }
-                }
+                viewModelScope.launch { tweaksRepository.setStarredSortRule(action.sortRule.name) }
             }
 
             is StarredReposAction.OnToggleFavorite -> {

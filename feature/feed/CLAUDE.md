@@ -10,6 +10,7 @@ feature/feed/
 ├── data/     # FeedRepositoryImpl + di (feedModule)
 └── presentation/
     ├── FeedViewModel / State / Action / Event / Root
+    ├── marks/       LibraryMarks + FeedLibraryMarksSource, ViewingMarks + FeedViewingMarksStore
     ├── components/  FeedPlatformBar (unused)
     └── model/       GithubRepoSummary.toDiscoveryRepoUi
 ```
@@ -27,6 +28,7 @@ feature/feed/
 - The screen body is core's `DiscoveryFeed` (`components/discovery`), shared with Top Charts: the category chips, the grid with its loading / error / empty / offline / load-more / end states, and pull to refresh; `FeedRoot` brings the cards and its empty state with Reset. The only top-bar action is `DiscoveryPlatformButton`, which opens `DiscoveryPlatformPicker`. On Desktop the sidebar holds categories and platform, so the chips and the button are hidden there.
 - `DiscoveryPlatformPicker` offers every `DiscoveryPlatform` except iOS: `/v1/feed` rejects `platform=ios` and its items carry no iOS data. The Desktop sidebar leaves iOS out too, so Feed never receives it; iOS discovery is in Search.
 - List or grid comes from `TweaksRepository.getRepoGridLayout`, set in Tweaks (Look & feel).
-- Long-press opens `DiscoveryRepoCard`'s built-in action sheet (Share / Open on GitHub / seen toggle / Hide), unlike Home's VM-driven `RepositoryActionsSheet`. Hidden repos, and seen ones when hide-seen is on, are filtered in `rebuild()`.
+- Long-press opens `DiscoveryRepoCard`'s built-in action sheet (Share / Open on GitHub / seen toggle / Hide), unlike Home's VM-driven `RepositoryActionsSheet`. Hidden repos, and seen ones when hide-seen is on, are filtered in `rebuild()` through `ViewingMarks.isVisible`.
+- Card badges come from `FeedLibraryMarksSource` (installed / update, favourite, starred, owner) and `FeedViewingMarksStore` (seen, hidden, hide-seen, plus the hide and seen writes), combined in the VM. Each source starts empty, so a slow profile fetch doesn't hold back the rest. `FeedAction` groups its actions (`Paging`, `Filters`, `RepoAction`) so `onAction` routes each group to one handler.
 - Search is not a tab: in Manga (no tab card, `LocalTabCardSlot` null) the top bar also has `DiscoverySearchButton`, which sends `FeedAction.OnSearchClick`; `FeedRoot` opens Search.
 - Unused: `FeedPlatformBar`, and `FeedAction.OnProfileClick` (handled by `FeedRoot`, never dispatched).

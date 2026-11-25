@@ -436,17 +436,17 @@ The higher the rung, the less it depends on anyone remembering.
 
 | Rule | Rung | Status |
 |---|---|---|
-| Formatting, imports, naming basics | Spotless (ktlint 1.8.0) | blocking on files changed against `main` |
+| Formatting, imports, naming basics | Spotless (ktlint 1.8.0) | blocking on every file, no baseline |
 | Compose API basics (modifier, parameter order, naming) | Spotless with the Compose rules | same |
-| Complexity, exceptions, smells | detekt | per-module baselines, new findings fail |
-| Android Lint | `lintDebug` | per-module baselines |
+| Complexity, exceptions, smells | detekt | no baselines, any finding fails |
+| Android Lint | `lintDebug` | no baselines, warnings fail |
 | Compose stability | stability analyzer | committed `stability/*.stability` files |
 | Common domain code imports no Ktor, Room, Compose, lifecycle, Koin or Android | Konsist | passing |
-| Presentation never imports data | Konsist | passing; `MirrorPickerViewModel` is allowlisted for the `core.data` import that came with #1015 |
-| Packages under `zed.rainxch.<owner>.<layer>` | Konsist | passing, 7 search files allowlisted |
+| Presentation never imports data | Konsist | passing |
+| Packages under `zed.rainxch.<owner>.<layer>` | Konsist | passing |
 | ViewModels named `*ViewModel` and only in presentation or composeApp | Konsist | passing |
 | Top-level `*Action` / `*Event` types are sealed | Konsist | passing |
-| File size ratchet, 800 lines (D8) | Konsist | passing, 15 files allowlisted |
+| File size limit, 800 lines (D8) | Konsist | passing, no allowlist |
 | `XViewModel` shape (D1) | Konsist | follow-up, with an allowlist of today's off-pattern ViewModels |
 | No `runCatching` around suspend calls (A1), no `e.message` in presentation (A3), no `MaterialTheme` or `Color(0x...)` in features, no `koinInject` in composables | Konsist | follow-up, with allowlists |
 | Previews (A5), CLAUDE.md changes with the code (A9) | review | |

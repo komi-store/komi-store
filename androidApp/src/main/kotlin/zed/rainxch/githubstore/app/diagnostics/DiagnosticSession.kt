@@ -13,8 +13,7 @@ import java.io.IOException
 import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
 
-// Every run is logged: the log never leaves the device unless shared, and the run that crashed is
-// the one worth sharing. Each start appends a session header; the writer trims the file at 2 MB.
+// Every run is logged, because the run that crashed is the one worth sharing; the writer trims the file at 2 MB.
 object DiagnosticSession {
     private val lock = Any()
     private val timestampFormat: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSXXX")

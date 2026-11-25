@@ -159,15 +159,18 @@ class InstallBindingTest {
     fun confirmInstallRecordsTheBindingIdentity() {
         val after =
             app().confirmInstall(
-                tag = "2.0.0",
-                releaseId = 7001L,
-                assetId = 7002L,
-                assetDigest = "sha256:aaa",
-                assetName = "app-2.0.0.apk",
-                assetUrl = "https://dl/app-2.0.0.apk",
-                versionName = "2.0.0",
-                versionCode = 200L,
-                signingFingerprint = "AAAA",
+                build =
+                    InstalledBuild(
+                        tag = "2.0.0",
+                        releaseId = 7001L,
+                        assetId = 7002L,
+                        assetDigest = "sha256:aaa",
+                        assetName = "app-2.0.0.apk",
+                        assetUrl = "https://dl/app-2.0.0.apk",
+                        versionName = "2.0.0",
+                        versionCode = 200L,
+                        signingFingerprint = "AAAA",
+                    ),
                 at = 3000L,
             )
         assertEquals(7001L, after.installedReleaseId)
@@ -179,15 +182,18 @@ class InstallBindingTest {
     fun confirmInstallTakesTheIdentityFromItsArgumentsNotTheSnapshot() {
         val after =
             app().confirmInstall(
-                tag = "2.0.0",
-                releaseId = 999L,
-                assetId = 998L,
-                assetDigest = "sha256:zzz",
-                assetName = "app-2.0.0.apk",
-                assetUrl = "https://dl/app-2.0.0.apk",
-                versionName = "2.0.0",
-                versionCode = 200L,
-                signingFingerprint = "AAAA",
+                build =
+                    InstalledBuild(
+                        tag = "2.0.0",
+                        releaseId = 999L,
+                        assetId = 998L,
+                        assetDigest = "sha256:zzz",
+                        assetName = "app-2.0.0.apk",
+                        assetUrl = "https://dl/app-2.0.0.apk",
+                        versionName = "2.0.0",
+                        versionCode = 200L,
+                        signingFingerprint = "AAAA",
+                    ),
                 at = 3000L,
             )
         assertEquals(999L, after.installedReleaseId)
@@ -199,12 +205,15 @@ class InstallBindingTest {
     fun confirmInstallDropsAnIdentityItWasNotGiven() {
         val after =
             app().confirmInstall(
-                tag = "2.0.0",
-                assetName = "app-2.0.0.apk",
-                assetUrl = "https://dl/app-2.0.0.apk",
-                versionName = "2.0.0",
-                versionCode = 200L,
-                signingFingerprint = "AAAA",
+                build =
+                    InstalledBuild(
+                        tag = "2.0.0",
+                        assetName = "app-2.0.0.apk",
+                        assetUrl = "https://dl/app-2.0.0.apk",
+                        versionName = "2.0.0",
+                        versionCode = 200L,
+                        signingFingerprint = "AAAA",
+                    ),
                 at = 3000L,
             )
         assertEquals(null, after.installedReleaseId)
@@ -398,15 +407,18 @@ class InstallBindingTest {
             app()
                 .markPending(releaseId = 7001L, assetId = 7002L, assetDigest = "sha256:aaa")
                 .confirmInstall(
-                    tag = "2.0.0",
-                    releaseId = 8001L,
-                    assetId = 8002L,
-                    assetDigest = "sha256:bbb",
-                    assetName = "app-2.0.0.apk",
-                    assetUrl = "https://dl/app-2.0.0.apk",
-                    versionName = "2.0.0",
-                    versionCode = 200L,
-                    signingFingerprint = "AAAA",
+                    build =
+                        InstalledBuild(
+                            tag = "2.0.0",
+                            releaseId = 8001L,
+                            assetId = 8002L,
+                            assetDigest = "sha256:bbb",
+                            assetName = "app-2.0.0.apk",
+                            assetUrl = "https://dl/app-2.0.0.apk",
+                            versionName = "2.0.0",
+                            versionCode = 200L,
+                            signingFingerprint = "AAAA",
+                        ),
                     at = 3000L,
                     isPending = true,
                 )
@@ -461,8 +473,7 @@ class InstallBindingTest {
 
     @Test
     fun aDowngradeOutranksASignerChange() {
-        // Precedence kept from the inline version: a lower code was reported as a downgrade even
-        // when the signer had also moved.
+        // Precedence kept from the inline version: a lower code reads as a downgrade even when the signer also moved.
         assertEquals(
             DeviceChange.DOWNGRADE,
             app().deviceChangeAgainst(local(versionCode = 99L, versionName = "0.9.0", signingFingerprint = "BBBB")),
@@ -487,8 +498,7 @@ class InstallBindingTest {
 
     @Test
     fun anUnknownSignerOnEitherSideIsNeverADrift() {
-        // A key we do not have cannot disagree with anything. Both directions, so neither side can
-        // quietly turn an unknown into a false alarm.
+        // A key we lack cannot disagree with anything, in both directions, so an unknown never becomes a false alarm.
         assertEquals(DeviceChange.NONE, app(signingFingerprint = null).deviceChangeAgainst(local()))
         assertEquals(DeviceChange.NONE, app().deviceChangeAgainst(local(signingFingerprint = null)))
     }

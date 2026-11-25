@@ -3,8 +3,7 @@ package zed.rainxch.core.presentation.status
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
 
-// Domain-semantic status colors (GitHub conventions). Shared-neutral, but light/dark
-// resolved from the active personality's mode by PersonalityThemeProvider.
+// GitHub-convention status colors, light or dark by the active personality's mode.
 @Immutable
 data class StatusColors(
     val issueOpen: Color,
@@ -22,4 +21,5 @@ data class StatusColors(
     val statusError: Color,
     val protectionSignature: Color,
     val protectionPrivileged: Color,
+    val versionDowngrade: Color,
 )

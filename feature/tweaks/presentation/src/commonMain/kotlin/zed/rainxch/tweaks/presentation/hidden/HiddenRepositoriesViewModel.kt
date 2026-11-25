@@ -3,7 +3,6 @@ package zed.rainxch.tweaks.presentation.hidden
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.collections.immutable.toImmutableList
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -12,6 +11,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import zed.rainxch.core.domain.logging.KomiStoreLogger
+import zed.rainxch.core.domain.model.error.LocalStoreException
 import zed.rainxch.core.domain.repository.HiddenReposRepository
 
 class HiddenRepositoriesViewModel(
@@ -62,9 +62,7 @@ class HiddenRepositoriesViewModel(
             try {
                 hiddenReposRepository.unhide(repoId)
                 _events.send(HiddenRepositoriesEvent.Unhidden(fullName))
-            } catch (e: CancellationException) {
-                throw e
-            } catch (e: Throwable) {
+            } catch (e: LocalStoreException) {
                 logger.error("HiddenRepositoriesViewModel: failed to unhide $repoId", e)
                 _events.send(HiddenRepositoriesEvent.Failure)
             }
@@ -76,9 +74,7 @@ class HiddenRepositoriesViewModel(
             try {
                 hiddenReposRepository.clearAll()
                 _events.send(HiddenRepositoriesEvent.UnhiddenAll)
-            } catch (e: CancellationException) {
-                throw e
-            } catch (e: Throwable) {
+            } catch (e: LocalStoreException) {
                 logger.error("HiddenRepositoriesViewModel: failed to unhide all", e)
                 _events.send(HiddenRepositoriesEvent.Failure)
             }

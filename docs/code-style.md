@@ -5,7 +5,7 @@ Status: **adopted** on 2026-10-19 from the decisions in [findings.md](quality/fi
 This file is for people and agents writing code here. CLAUDE.md files point to it. A tag after a rule says what enforces it:
 
 - **[Spotless]**: `./gradlew spotlessCheck` in CI: ktlint 1.8.0 with the Compose rules, on files changed against `main`
-- **[detekt]**: `./gradlew detekt` in CI, with per-module baselines
+- **[detekt]**: `./gradlew detekt` in CI, with no baselines
 - **[Konsist]**: `./gradlew :konsist-test:test` in CI
 - **[review]**: maintainer review, and agents' own review before opening a PR; the mechanical ones move to Konsist in follow-up work
 
@@ -16,12 +16,13 @@ When a rule and nearby code disagree, follow the rule. Fix the nearby code only 
 - ktlint with the Compose rules decides formatting. Run `./gradlew spotlessApply` before pushing; nothing formats on compile. **[Spotless]**
 - No wildcard imports, including `res.*`. ktlint's `no-wildcard-imports` is still disabled in `.editorconfig`. **[review]**
 - One top-level public type per file, named after it. **[review]**
-- Production files stay under 800 lines. Today's larger files are on an allowlist that can only shrink. **[Konsist]**
+- Production files stay under 800 lines. **[Konsist]**
 
 ## 2. Comments
 
-- No KDoc, no comments that restate the code. **[review]**
-- Comment only a non-obvious invariant, tricky concurrency or a workaround, in one or two lines. Good: [AppsRepositoryImpl.kt:300-301](https://github.com/komi-store/komi-store/blob/cfa6bd30e6b35cbbc369d78a4599182a9a66beac/feature/apps/data/src/commonMain/kotlin/zed/rainxch/apps/data/repository/AppsRepositoryImpl.kt#L300-L301), [BackgroundRequest.kt:13-14](https://github.com/komi-store/komi-store/blob/cfa6bd30e6b35cbbc369d78a4599182a9a66beac/core/data/src/commonMain/kotlin/zed/rainxch/core/data/network/BackgroundRequest.kt#L13-L14).
+- No KDoc, no comments that restate the code. **[Konsist]** for KDoc, **[review]** for the rest
+- A comment is one line, in one place: two comment-only lines never sit together, and no block comment spans lines. Trailing comments on separate code lines are separate comments. If it needs more, cut it to the one non-obvious fact, or move the explanation to the feature's `CLAUDE.md` or `docs/agents`. This covers code, tests and build scripts. **[Konsist]**
+- Comment only a non-obvious invariant, tricky concurrency or a workaround. **[review]**
 - No em-dashes anywhere: code, strings, logs, comments. **[review]**
 
 ## 3. Modules and packages
@@ -83,6 +84,11 @@ class FooViewModel(
 - A broad `catch` around suspend code rethrows `CancellationException` first. Good: [DetailsViewModel.kt:208-212](https://github.com/komi-store/komi-store/blob/cfa6bd30e6b35cbbc369d78a4599182a9a66beac/feature/details/presentation/src/commonMain/kotlin/zed/rainxch/details/presentation/DetailsViewModel.kt#L208-L212). **[review]**
 - `Throwable.message` never reaches the user. Map typed errors to resources at render time. Good: the typed cases in [MirrorPickerRoot.kt:240-245](https://github.com/komi-store/komi-store/blob/cfa6bd30e6b35cbbc369d78a4599182a9a66beac/feature/tweaks/presentation/src/commonMain/kotlin/zed/rainxch/tweaks/presentation/mirror/MirrorPickerRoot.kt#L240-L245) (its fallback case on the next line still shows exception text). Bad: [DetailsViewModel.kt:3009](https://github.com/komi-store/komi-store/blob/cfa6bd30e6b35cbbc369d78a4599182a9a66beac/feature/details/presentation/src/commonMain/kotlin/zed/rainxch/details/presentation/DetailsViewModel.kt#L3009). **[review]**
 - Fallible repository calls return `Result<T>` with typed domain exceptions. A typed outcome to copy: [ProxyTestOutcome.kt:3-27](https://github.com/komi-store/komi-store/blob/cfa6bd30e6b35cbbc369d78a4599182a9a66beac/core/domain/src/commonMain/kotlin/zed/rainxch/core/domain/network/ProxyTestOutcome.kt#L3-L27).
+- Catch the exceptions the code can actually throw, never `Exception`, `Throwable` or `RuntimeException`, whatever the variable is called. **[detekt]**
+- core/data turns platform failures into `LocalStoreException` (Room, SQLite, DataStore), `SystemPackagesException` (PackageManager and other binder calls) and `NetworkException` (a remote call failed: no connection, an error status, a body that would not decode; `BackendException` and the other core/data network exceptions extend it) at its boundary; code above it catches those. **[review]**
+- Our own layers never get a catch-all boundary: when a repository or data source lets an untyped failure out, fix that layer so it raises the typed exception. **[review]**
+- An API that throws nothing narrower than a bare `RuntimeException` (a system service's `rethrowFromSystemServer`, Shizuku, Dhizuku, the KSafe keyring, AWT's event dispatch on Desktop) goes through a small boundary file that rethrows a typed exception (or, for AWT, rethrows everything but the one known crash it filters), such as `systemServiceCall {}` in `SystemServiceBoundary.kt`. Only those files are excluded from `TooGenericExceptionCaught` in `config/detekt/detekt.yml`. **[detekt]**
+- A deprecated API that an old Android version still needs gets `@Suppress("DEPRECATION")` on that one statement inside its `SDK_INT` branch, with a one-line reason. **[review]**
 - Log with the injected `KomiStoreLogger` and pass the throwable, never only `.message`. **[review]**
 
 ## 7. Navigation

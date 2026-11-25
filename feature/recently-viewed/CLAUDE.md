@@ -17,6 +17,6 @@ feature/recently-viewed/presentation/
 
 ## Notes
 
-- Rows come from `SeenReposRepository.markAsSeen`: `DetailsViewModel` calls it when a repo loads, and the "Mark as seen" card action on Home / Search / Feed writes the same table. So the list is not only repos whose Details was opened.
+- Rows come from `SeenReposRepository.markAsSeen`: `DetailsPageLoader`, a handler `DetailsViewModel` owns, calls it when a repo loads, and the "Mark as seen" card action on Home / Search / Feed writes the same table. So the list is not only repos whose Details was opened.
 - No network. Rows are removed one at a time (`removeFromHistory(repoId)`). `OnClearAllHistory` exists but nothing in the UI sends it; clearing all seen history is in Tweaks (Privacy & data).
 - `SeenRepo` stores no `sourceHost`; the Details link recovers it with `RepoIdCodec.sourceHostOf(repoId, repoUrl)`.

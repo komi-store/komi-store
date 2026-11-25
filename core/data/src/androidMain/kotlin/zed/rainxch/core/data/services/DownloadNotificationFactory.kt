@@ -1,5 +1,3 @@
-@file:Suppress("MagicNumber", "ReturnCount")
-
 package zed.rainxch.core.data.services
 
 import android.Manifest
@@ -8,10 +6,10 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.net.Uri
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import java.util.Locale
 
 object DownloadNotificationFactory {
@@ -19,12 +17,15 @@ object DownloadNotificationFactory {
 
     const val FOREGROUND_NOTIFICATION_ID = 1006
 
+    internal const val PROGRESS_MAX = 100
+
     private const val NOTIFICATION_ID_BASE = 3000
+    private const val NOTIFICATION_ID_MASK = 0x00FFFFFF
     private const val PAUSE_LABEL = "Pause"
     private const val DELETE_LABEL = "Delete task"
-    private const val PROGRESS_MAX = 100
+    private const val BYTES_PER_UNIT = 1024.0
 
-    fun hasNotificationPermission(context: Context): Boolean {
+    fun checkNotificationPermission(context: Context): Boolean {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return true
         return ContextCompat.checkSelfPermission(
             context,
@@ -32,7 +33,7 @@ object DownloadNotificationFactory {
         ) == PackageManager.PERMISSION_GRANTED
     }
 
-    fun notificationIdFor(packageName: String): Int = NOTIFICATION_ID_BASE + (packageName.hashCode() and 0x00FFFFFF)
+    fun notificationIdFor(packageName: String): Int = NOTIFICATION_ID_BASE + (packageName.hashCode() and NOTIFICATION_ID_MASK)
 
     fun buildNotification(
         context: Context,
@@ -98,9 +99,7 @@ object DownloadNotificationFactory {
         }
     }
 
-    // Pause keeps the partial so it can be resumed, delete erases it. The two must differ in
-    // both the action and the data URI: with FLAG_UPDATE_CURRENT a shared identity collapses
-    // them into one PendingIntent and both buttons fire the same broadcast.
+    // Pause and delete differ in action and data URI, or FLAG_UPDATE_CURRENT merges them into one PendingIntent.
     private fun actionPendingIntent(
         context: Context,
         packageName: String,
@@ -110,7 +109,7 @@ object DownloadNotificationFactory {
         val intent =
             Intent(context, DownloadCancelReceiver::class.java).apply {
                 this.action = action
-                data = Uri.parse("$uriScheme://$packageName")
+                data = "$uriScheme://$packageName".toUri()
                 setPackage(context.packageName)
                 putExtra(DownloadCancelReceiver.EXTRA_PACKAGE_NAME, packageName)
             }
@@ -123,12 +122,14 @@ object DownloadNotificationFactory {
     }
 
     private fun formatBytes(bytes: Long): String {
-        if (bytes < 1024) return "$bytes B"
-        val kb = bytes / 1024.0
-        if (kb < 1024) return "%.1f KB".format(Locale.getDefault(), kb)
-        val mb = kb / 1024.0
-        if (mb < 1024) return "%.1f MB".format(Locale.getDefault(), mb)
-        val gb = mb / 1024.0
-        return "%.2f GB".format(Locale.getDefault(), gb)
+        val kb = bytes / BYTES_PER_UNIT
+        val mb = kb / BYTES_PER_UNIT
+        val gb = mb / BYTES_PER_UNIT
+        return when {
+            bytes < BYTES_PER_UNIT -> "$bytes B"
+            kb < BYTES_PER_UNIT -> "%.1f KB".format(Locale.getDefault(), kb)
+            mb < BYTES_PER_UNIT -> "%.1f MB".format(Locale.getDefault(), mb)
+            else -> "%.2f GB".format(Locale.getDefault(), gb)
+        }
     }
 }

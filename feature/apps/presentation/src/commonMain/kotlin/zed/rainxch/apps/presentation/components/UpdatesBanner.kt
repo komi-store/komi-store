@@ -57,7 +57,7 @@ fun UpdatesBanner(
     updateAllEnabled: Boolean,
     onUpdateAll: () -> Unit,
     onCancelUpdateAll: () -> Unit,
-    onToggleExpanded: () -> Unit,
+    onToggleExpand: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val rotation by animateFloatAsState(
@@ -67,37 +67,41 @@ fun UpdatesBanner(
     )
     val colors = LocalPersonality.current.colors
     val shape = LocalPersonality.current.shape
-    val title = if (count == 1) {
-        stringResource(Res.string.apps_updates_banner_title_one)
-    } else {
-        stringResource(Res.string.apps_updates_banner_title_other, count)
-    }
+    val title =
+        if (count == 1) {
+            stringResource(Res.string.apps_updates_banner_title_one)
+        } else {
+            stringResource(Res.string.apps_updates_banner_title_other, count)
+        }
 
     Box(
-        modifier = modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(shape.corner))
-            .background(colors.primaryContainer)
-            .border(
-                width = 0.5.dp,
-                color = colors.divider,
-                shape = RoundedCornerShape(shape.corner),
-            ),
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(shape.corner))
+                .background(colors.primaryContainer)
+                .border(
+                    width = 0.5.dp,
+                    color = colors.divider,
+                    shape = RoundedCornerShape(shape.corner),
+                ),
     ) {
         CompositionLocalProvider(LocalContentColor provides colors.onPrimaryContainer) {
             Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 14.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Box(
-                        modifier = Modifier
-                            .size(36.dp)
-                            .padding(2.dp),
+                        modifier =
+                            Modifier
+                                .size(36.dp)
+                                .padding(2.dp),
                         contentAlignment = Alignment.Center,
                     ) {
                         Box(
-                            modifier = Modifier
-                                .size(32.dp)
-                                .clip(RoundedCornerShape(shape.corner))
-                                .background(colors.primaryTint),
+                            modifier =
+                                Modifier
+                                    .size(32.dp)
+                                    .clip(RoundedCornerShape(shape.corner))
+                                    .background(colors.primaryTint),
                             contentAlignment = Alignment.Center,
                         ) {
                             KomiIcon(
@@ -133,9 +137,10 @@ fun UpdatesBanner(
                         imageVector = Icons.Default.ExpandMore,
                         contentDescription = null,
                         tint = colors.onPrimaryContainer,
-                        modifier = Modifier
-                            .size(22.dp)
-                            .rotate(rotation),
+                        modifier =
+                            Modifier
+                                .size(22.dp)
+                                .rotate(rotation),
                     )
                 }
 
@@ -149,20 +154,22 @@ fun UpdatesBanner(
                         ) {
                             Column(modifier = Modifier.weight(1f)) {
                                 KomiText(
-                                    text = stringResource(
-                                        Res.string.updating_x_of_y,
-                                        updateAllProgress.current,
-                                        updateAllProgress.total,
-                                    ),
+                                    text =
+                                        stringResource(
+                                            Res.string.updating_x_of_y,
+                                            updateAllProgress.current,
+                                            updateAllProgress.total,
+                                        ),
                                     role = KomiTextRole.ItemTitle,
                                     color = colors.onPrimaryContainer,
                                 )
 
                                 KomiText(
-                                    text = stringResource(
-                                        Res.string.currently_updating,
-                                        updateAllProgress.currentAppName,
-                                    ),
+                                    text =
+                                        stringResource(
+                                            Res.string.currently_updating,
+                                            updateAllProgress.currentAppName,
+                                        ),
                                     role = KomiTextRole.Body,
                                     color = colors.onPrimaryContainer,
                                     maxLines = 1,
@@ -204,12 +211,13 @@ fun UpdatesBanner(
                         )
 
                         KomiButton(
-                            onClick = onToggleExpanded,
-                            label = if (isExpanded) {
-                                stringResource(Res.string.apps_updates_banner_hide)
-                            } else {
-                                stringResource(Res.string.apps_updates_banner_show)
-                            },
+                            onClick = onToggleExpand,
+                            label =
+                                if (isExpanded) {
+                                    stringResource(Res.string.apps_updates_banner_hide)
+                                } else {
+                                    stringResource(Res.string.apps_updates_banner_show)
+                                },
                             variant = KomiButtonVariant.Outline,
                             modifier = Modifier.height(44.dp),
                         )
@@ -219,4 +227,3 @@ fun UpdatesBanner(
         }
     }
 }
-

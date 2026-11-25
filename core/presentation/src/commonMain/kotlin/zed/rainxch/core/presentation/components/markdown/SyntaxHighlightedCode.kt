@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import zed.rainxch.core.presentation.locals.LocalPersonality
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -17,30 +16,61 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.mikepenz.markdown.compose.components.MarkdownComponentModel
 import dev.snipme.highlights.Highlights
 import dev.snipme.highlights.model.BoldHighlight
 import dev.snipme.highlights.model.ColorHighlight
 import dev.snipme.highlights.model.SyntaxLanguage
-import dev.snipme.highlights.model.SyntaxThemes
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import org.intellij.markdown.MarkdownElementTypes
 import org.intellij.markdown.MarkdownTokenTypes
 import org.intellij.markdown.ast.ASTNode
+import zed.rainxch.core.presentation.locals.LocalPersonality
+import zed.rainxch.core.presentation.personality.CodeSyntaxStyle
 
 private const val MAX_HIGHLIGHTABLE_CHARS = 16_000
+
+private val LanguageByHint: Map<String, SyntaxLanguage> =
+    mapOf(
+        "kt" to SyntaxLanguage.KOTLIN,
+        "kotlin" to SyntaxLanguage.KOTLIN,
+        "kts" to SyntaxLanguage.KOTLIN,
+        "java" to SyntaxLanguage.JAVA,
+        "py" to SyntaxLanguage.PYTHON,
+        "python" to SyntaxLanguage.PYTHON,
+        "js" to SyntaxLanguage.JAVASCRIPT,
+        "javascript" to SyntaxLanguage.JAVASCRIPT,
+        "node" to SyntaxLanguage.JAVASCRIPT,
+        "nodejs" to SyntaxLanguage.JAVASCRIPT,
+        "ts" to SyntaxLanguage.TYPESCRIPT,
+        "typescript" to SyntaxLanguage.TYPESCRIPT,
+        "rs" to SyntaxLanguage.RUST,
+        "rust" to SyntaxLanguage.RUST,
+        "swift" to SyntaxLanguage.SWIFT,
+        "cs" to SyntaxLanguage.CSHARP,
+        "csharp" to SyntaxLanguage.CSHARP,
+        "c#" to SyntaxLanguage.CSHARP,
+        "rb" to SyntaxLanguage.RUBY,
+        "ruby" to SyntaxLanguage.RUBY,
+        "perl" to SyntaxLanguage.PERL,
+        "pl" to SyntaxLanguage.PERL,
+        "sh" to SyntaxLanguage.SHELL,
+        "bash" to SyntaxLanguage.SHELL,
+        "zsh" to SyntaxLanguage.SHELL,
+        "shell" to SyntaxLanguage.SHELL,
+        "coffee" to SyntaxLanguage.COFFEESCRIPT,
+        "coffeescript" to SyntaxLanguage.COFFEESCRIPT,
+        "dart" to SyntaxLanguage.DART,
+    )
 
 @Composable
 fun SyntaxHighlightedCode(
     model: MarkdownComponentModel,
     isDark: Boolean,
+    modifier: Modifier = Modifier,
 ) {
     val (language, code) =
         remember(model.node, model.content) {
@@ -69,7 +99,7 @@ fun SyntaxHighlightedCode(
         style = MaterialTheme.typography.bodySmall.copy(fontFamily = FontFamily.Monospace),
         color = onContainer,
         modifier =
-            Modifier
+            modifier
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(LocalPersonality.current.shape.cornerSmall))
                 .background(container)
@@ -112,23 +142,7 @@ private fun extractFenceContent(
     return language to body.toString()
 }
 
-private fun languageOf(hint: String): SyntaxLanguage =
-    when (hint) {
-        "kt", "kotlin", "kts" -> SyntaxLanguage.KOTLIN
-        "java" -> SyntaxLanguage.JAVA
-        "py", "python" -> SyntaxLanguage.PYTHON
-        "js", "javascript", "node", "nodejs" -> SyntaxLanguage.JAVASCRIPT
-        "ts", "typescript" -> SyntaxLanguage.TYPESCRIPT
-        "rs", "rust" -> SyntaxLanguage.RUST
-        "swift" -> SyntaxLanguage.SWIFT
-        "cs", "csharp", "c#" -> SyntaxLanguage.CSHARP
-        "rb", "ruby" -> SyntaxLanguage.RUBY
-        "perl", "pl" -> SyntaxLanguage.PERL
-        "sh", "bash", "zsh", "shell" -> SyntaxLanguage.SHELL
-        "coffee", "coffeescript" -> SyntaxLanguage.COFFEESCRIPT
-        "dart" -> SyntaxLanguage.DART
-        else -> SyntaxLanguage.DEFAULT
-    }
+private fun languageOf(hint: String): SyntaxLanguage = LanguageByHint[hint] ?: SyntaxLanguage.DEFAULT
 
 private fun buildHighlighted(
     code: String,
@@ -136,7 +150,7 @@ private fun buildHighlighted(
     isDark: Boolean,
 ): AnnotatedString {
     if (code.isEmpty()) return AnnotatedString(code)
-    val theme = if (isDark) SyntaxThemes.darcula() else SyntaxThemes.atom()
+    val theme = CodeSyntaxStyle.theme(isDark)
     val tokens =
         runCatching {
             Highlights
@@ -153,7 +167,7 @@ private fun buildHighlighted(
             when (highlight) {
                 is ColorHighlight -> {
                     addStyle(
-                        SpanStyle(color = Color(0xFF000000 or highlight.rgb.toLong())),
+                        CodeSyntaxStyle.color(highlight.rgb),
                         highlight.location.start,
                         highlight.location.end.coerceAtMost(code.length),
                     )
@@ -161,7 +175,7 @@ private fun buildHighlighted(
 
                 is BoldHighlight -> {
                     addStyle(
-                        SpanStyle(fontWeight = FontWeight.Bold),
+                        CodeSyntaxStyle.bold,
                         highlight.location.start,
                         highlight.location.end.coerceAtMost(code.length),
                     )
@@ -175,6 +189,3 @@ private inline fun buildAnnotatedString(
     base: String,
     block: AnnotatedString.Builder.() -> Unit,
 ): AnnotatedString = AnnotatedString.Builder(base).apply(block).toAnnotatedString()
-
-@Suppress("UnusedReceiverParameter")
-private fun MarkdownElementTypes.placeholder(): Nothing = error("placeholder")

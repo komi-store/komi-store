@@ -18,28 +18,30 @@ class FavouritesRepositoryImpl(
             .getAllFavorites()
             .map { favoriteRepos ->
                 favoriteRepos.map { favoriteRepo -> favoriteRepo.toDomain() }
-            }
+            }.localStoreFailures()
 
-    override fun isFavorite(repoId: Long): Flow<Boolean> = favoriteRepoDao.isFavorite(repoId)
+    override fun isFavorite(repoId: Long): Flow<Boolean> = favoriteRepoDao.isFavorite(repoId).localStoreFailures()
 
-    override suspend fun isFavoriteSync(repoId: Long): Boolean = favoriteRepoDao.isFavoriteSync(repoId)
+    override suspend fun isFavoriteSync(repoId: Long): Boolean = localStore { favoriteRepoDao.isFavoriteSync(repoId) }
 
     suspend fun addFavorite(repo: FavoriteRepo) {
-        val installedApps = installedAppsDao.getAppsByRepoId(repo.repoId)
-        val firstInstalled = installedApps.firstOrNull { !it.isPendingInstall }
-        favoriteRepoDao.insertFavorite(
-            repo
-                .toEntity()
-                .copy(
-                    isInstalled = firstInstalled != null,
-                    installedPackageName = firstInstalled?.packageName,
-                ),
-        )
+        localStore {
+            val installedApps = installedAppsDao.getAppsByRepoId(repo.repoId)
+            val firstInstalled = installedApps.firstOrNull { !it.isPendingInstall }
+            favoriteRepoDao.insertFavorite(
+                repo
+                    .toEntity()
+                    .copy(
+                        isInstalled = firstInstalled != null,
+                        installedPackageName = firstInstalled?.packageName,
+                    ),
+            )
+        }
     }
 
     override suspend fun toggleFavorite(repo: FavoriteRepo) {
-        if (favoriteRepoDao.isFavoriteSync(repo.repoId)) {
-            favoriteRepoDao.deleteFavoriteById(repo.repoId)
+        if (isFavoriteSync(repo.repoId)) {
+            localStore { favoriteRepoDao.deleteFavoriteById(repo.repoId) }
         } else {
             addFavorite(repo)
         }
@@ -50,6 +52,6 @@ class FavouritesRepositoryImpl(
         installed: Boolean,
         packageName: String?,
     ) {
-        favoriteRepoDao.updateInstallStatus(repoId, installed, packageName)
+        localStore { favoriteRepoDao.updateInstallStatus(repoId, installed, packageName) }
     }
 }

@@ -11,8 +11,8 @@ import kotlinx.coroutines.SupervisorJob
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import zed.rainxch.core.data.cache.CacheManager
-import zed.rainxch.core.data.data_source.TokenStore
-import zed.rainxch.core.data.data_source.impl.DefaultTokenStore
+import zed.rainxch.core.data.datasource.TokenStore
+import zed.rainxch.core.data.datasource.impl.DefaultTokenStore
 import zed.rainxch.core.data.download.AssetSourceRefetcher
 import zed.rainxch.core.data.download.DefaultAssetSourceRefetcher
 import zed.rainxch.core.data.download.MultiSourceDownloaderImpl
@@ -28,10 +28,12 @@ import zed.rainxch.core.data.local.db.dao.SigningFingerprintDao
 import zed.rainxch.core.data.local.db.dao.StarredRepoDao
 import zed.rainxch.core.data.local.db.dao.UpdateHistoryDao
 import zed.rainxch.core.data.logging.KermitLogger
+import zed.rainxch.core.data.mirror.MirrorConnectionTesterImpl
 import zed.rainxch.core.data.mirror.MirrorLatencyProbeImpl
 import zed.rainxch.core.data.mirror.MirrorRepositoryImpl
 import zed.rainxch.core.data.network.BackendApiClient
 import zed.rainxch.core.data.network.BackendExternalMatchApi
+import zed.rainxch.core.data.network.BackendReviewModerationApi
 import zed.rainxch.core.data.network.BackendReviewsApi
 import zed.rainxch.core.data.network.ExternalMatchApi
 import zed.rainxch.core.data.network.ExternalMatchApiSelector
@@ -48,25 +50,33 @@ import zed.rainxch.core.data.repository.AnnouncementsRepositoryImpl
 import zed.rainxch.core.data.repository.BrowseFilterStoreImpl
 import zed.rainxch.core.data.repository.CacheRepositoryImpl
 import zed.rainxch.core.data.repository.ExternalImportRepositoryImpl
+import zed.rainxch.core.data.repository.ExternalMatchResolver
 import zed.rainxch.core.data.repository.FavouritesRepositoryImpl
 import zed.rainxch.core.data.repository.HiddenReposRepositoryImpl
 import zed.rainxch.core.data.repository.HostTokenRepositoryImpl
+import zed.rainxch.core.data.repository.InitialScanMarker
+import zed.rainxch.core.data.repository.InstalledAppUpdateChecker
 import zed.rainxch.core.data.repository.InstalledAppsRepositoryImpl
+import zed.rainxch.core.data.repository.InstalledReleaseSource
 import zed.rainxch.core.data.repository.ProxyRepositoryImpl
 import zed.rainxch.core.data.repository.RateLimitRepositoryImpl
 import zed.rainxch.core.data.repository.ReviewsRepositoryImpl
 import zed.rainxch.core.data.repository.SeenReposRepositoryImpl
+import zed.rainxch.core.data.repository.SigningFingerprintIndex
 import zed.rainxch.core.data.repository.StarredRepositoryImpl
 import zed.rainxch.core.data.repository.TweaksRepositoryImpl
 import zed.rainxch.core.data.repository.UserSessionRepositoryImpl
+import zed.rainxch.core.data.services.AssetFetcher
 import zed.rainxch.core.data.services.BuildKonfigAppVersionInfo
 import zed.rainxch.core.data.services.DefaultDownloadOrchestrator
 import zed.rainxch.core.data.services.DefaultSystemInstallSerializer
+import zed.rainxch.core.data.services.DownloadInstallRunner
 import zed.rainxch.core.domain.getPlatform
 import zed.rainxch.core.domain.logging.KomiStoreLogger
 import zed.rainxch.core.domain.model.settings.ProxyConfig
 import zed.rainxch.core.domain.model.settings.ProxyScope
 import zed.rainxch.core.domain.model.system.Platform
+import zed.rainxch.core.domain.network.MirrorConnectionTester
 import zed.rainxch.core.domain.network.MirrorLatencyProbe
 import zed.rainxch.core.domain.network.ProxyTester
 import zed.rainxch.core.domain.repository.AnnouncementsCacheStore
@@ -91,7 +101,7 @@ import zed.rainxch.core.domain.system.DownloadOrchestrator
 import zed.rainxch.core.domain.system.ExternalAppScanner
 import zed.rainxch.core.domain.system.MultiSourceDownloader
 import zed.rainxch.core.domain.system.SystemInstallSerializer
-import zed.rainxch.core.domain.use_cases.SyncInstalledAppsUseCase
+import zed.rainxch.core.domain.usecases.SyncInstalledAppsUseCase
 
 val coreModule =
     module {
@@ -143,12 +153,19 @@ val coreModule =
                 database = get(),
                 installedAppsDao = get(),
                 historyDao = get(),
-                installer = get(),
-                clientProvider = get(),
-                backendApiClient = get(),
-                forgejoClientRegistry = get(),
-                packageMonitor = get(),
-                digestVerifier = get(),
+                updateChecker =
+                    InstalledAppUpdateChecker(
+                        dao = get(),
+                        installer = get(),
+                        releaseSource =
+                            InstalledReleaseSource(
+                                clientProvider = get(),
+                                backendApiClient = get(),
+                                forgejoClientRegistry = get(),
+                            ),
+                        packageMonitor = get(),
+                        digestVerifier = get(),
+                    ),
             )
         }
 
@@ -199,6 +216,13 @@ val coreModule =
         single<MirrorLatencyProbe> {
             MirrorLatencyProbeImpl(
                 client = get(qualifier = named("test")),
+            )
+        }
+
+        single<MirrorConnectionTester> {
+            MirrorConnectionTesterImpl(
+                client = get(qualifier = named("test")),
+                logger = get(),
             )
         }
 
@@ -273,7 +297,9 @@ val coreModule =
 
         single { BackendReviewsApi(get()) }
 
-        single<ReviewsRepository> { ReviewsRepositoryImpl(get()) }
+        single { BackendReviewModerationApi(get()) }
+
+        single<ReviewsRepository> { ReviewsRepositoryImpl(get(), get()) }
 
         single { MockExternalMatchApi() }
 
@@ -287,18 +313,31 @@ val coreModule =
         }
 
         single<ExternalImportRepository> {
+            val fingerprints =
+                SigningFingerprintIndex(
+                    dao = get(),
+                    backendClient = get(),
+                    ksafe = get(qualifier = named("prefs")),
+                )
             ExternalImportRepositoryImpl(
                 scanner = get<ExternalAppScanner>(),
                 externalLinkDao = get(),
                 installedAppDao = get(),
-                signingFingerprintDao = get(),
-                ksafe = get(qualifier = named("prefs")),
-                legacyDataStore = get(),
-                externalMatchApi = get(),
-                backendClient = get(),
-                forgejoClientRegistry = get(),
-                tweaksRepository = get(),
-                starredRepository = get(),
+                fingerprints = fingerprints,
+                matchResolver =
+                    ExternalMatchResolver(
+                        fingerprints = fingerprints,
+                        externalMatchApi = get(),
+                        backendClient = get(),
+                        forgejoClientRegistry = get(),
+                        tweaksRepository = get(),
+                        starredRepository = get(),
+                    ),
+                initialScan =
+                    InitialScanMarker(
+                        ksafe = get(qualifier = named("prefs")),
+                        legacyDataStore = get(),
+                    ),
             )
         }
 
@@ -315,18 +354,35 @@ val coreModule =
             )
         }
 
-        single<DownloadOrchestrator> {
-            DefaultDownloadOrchestrator(
+        single {
+            AssetFetcher(
                 downloader = get(),
                 multiSourceDownloader = get(),
                 assetSourceRefetcher = get(),
                 digestVerifier = get(),
+                tokenStore = get(),
+                installedAppsRepository = get(),
+            )
+        }
+
+        single {
+            DownloadInstallRunner(
                 installer = get(),
                 installedAppsRepository = get(),
                 pendingInstallNotifier = get(),
-                appScope = get(),
                 systemInstallSerializer = get(),
-                tokenStore = get(),
+                digestVerifier = get(),
+            )
+        }
+
+        single<DownloadOrchestrator> {
+            DefaultDownloadOrchestrator(
+                downloader = get(),
+                assetFetcher = get(),
+                installRunner = get(),
+                installedAppsRepository = get(),
+                pendingInstallNotifier = get(),
+                appScope = get(),
             )
         }
 

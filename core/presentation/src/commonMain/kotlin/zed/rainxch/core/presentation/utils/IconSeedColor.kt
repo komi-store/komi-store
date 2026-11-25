@@ -10,8 +10,7 @@ import com.materialkolor.ktx.themeColorOrNull
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-// The color an icon is built around: the installed app's own icon when there is one, else the
-// image at [imageUrl]. Null until it is known, and for icons too gray to give one.
+// The color an icon is built around, from the installed icon or imageUrl; null until known, or when too gray.
 @Composable
 fun rememberIconSeedColor(
     packageName: String?,

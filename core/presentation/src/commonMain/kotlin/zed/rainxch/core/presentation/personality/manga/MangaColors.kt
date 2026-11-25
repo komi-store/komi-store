@@ -16,52 +16,53 @@ private data class PaperInk(
     val gridOpacity: Float,
 )
 
+private val DayInk =
+    PaperInk(
+        page = Color(0xFFF1EADC),
+        panel = Color(0xFFFAF5EA),
+        well = Color(0xFFE7DEC9),
+        ink = Color(0xFF1B150D),
+        muted = Color(0xFF695F50),
+        shadow = Color(0xFF1B150D),
+        error = Color(0xFFB3261E),
+        onError = Color(0xFFFFFFFF),
+        screentoneOpacity = 0.16f,
+        gridOpacity = 0.05f,
+    )
+
+private val NightInk =
+    PaperInk(
+        page = Color(0xFF0C0A07),
+        panel = Color(0xFF16120C),
+        well = Color(0xFF211B12),
+        ink = Color(0xFFF0E9DA),
+        muted = Color(0xFF968B77),
+        shadow = Color(0xFF000000),
+        error = Color(0xFFFF6B5E),
+        onError = Color(0xFF1B150D),
+        screentoneOpacity = 0.20f,
+        gridOpacity = 0.06f,
+    )
+
+private val NordInk =
+    PaperInk(
+        page = Color(0xFF2E3440),
+        panel = Color(0xFF3B4252),
+        well = Color(0xFF434C5E),
+        ink = Color(0xFFECEFF4),
+        muted = Color(0xFF9AA5BD),
+        shadow = Color(0xFF20242E),
+        error = Color(0xFFE5818A),
+        onError = Color(0xFF20242E),
+        screentoneOpacity = 0.16f,
+        gridOpacity = 0.05f,
+    )
+
 private fun paperInk(paper: MangaPaper): PaperInk =
     when (paper) {
-        MangaPaper.DAY -> {
-            PaperInk(
-                page = Color(0xFFF1EADC),
-                panel = Color(0xFFFAF5EA),
-                well = Color(0xFFE7DEC9),
-                ink = Color(0xFF1B150D),
-                muted = Color(0xFF695F50),
-                shadow = Color(0xFF1B150D),
-                error = Color(0xFFB3261E),
-                onError = Color(0xFFFFFFFF),
-                screentoneOpacity = 0.16f,
-                gridOpacity = 0.05f,
-            )
-        }
-
-        MangaPaper.NIGHT -> {
-            PaperInk(
-                page = Color(0xFF0C0A07),
-                panel = Color(0xFF16120C),
-                well = Color(0xFF211B12),
-                ink = Color(0xFFF0E9DA),
-                muted = Color(0xFF968B77),
-                shadow = Color(0xFF000000),
-                error = Color(0xFFFF6B5E),
-                onError = Color(0xFF1B150D),
-                screentoneOpacity = 0.20f,
-                gridOpacity = 0.06f,
-            )
-        }
-
-        MangaPaper.NORD -> {
-            PaperInk(
-                page = Color(0xFF2E3440),
-                panel = Color(0xFF3B4252),
-                well = Color(0xFF434C5E),
-                ink = Color(0xFFECEFF4),
-                muted = Color(0xFF9AA5BD),
-                shadow = Color(0xFF20242E),
-                error = Color(0xFFE5818A),
-                onError = Color(0xFF20242E),
-                screentoneOpacity = 0.16f,
-                gridOpacity = 0.05f,
-            )
-        }
+        MangaPaper.DAY -> DayInk
+        MangaPaper.NIGHT -> NightInk
+        MangaPaper.NORD -> NordInk
     }
 
 fun mangaColors(

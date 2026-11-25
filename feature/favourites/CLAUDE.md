@@ -10,7 +10,7 @@ feature/favourites/presentation/
 ├── model/        # FavouriteRepository (UI model), FavouritesSortRule
 ├── mappers/FavouriteRepositoryMapper
 ├── components/FavouriteRepositoryItem
-└── import/       # ImportStarsRoot / ViewModel / State / Action / Event, ImportCandidateUi
+└── import/       # ImportStarsRoot / ViewModel / State / Action / Event, ImportCandidateUi + ImportCandidateMapper
 ```
 
 ## Deps

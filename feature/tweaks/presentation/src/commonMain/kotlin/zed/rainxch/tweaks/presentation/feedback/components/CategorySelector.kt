@@ -3,7 +3,6 @@ package zed.rainxch.tweaks.presentation.feedback.components
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,6 +12,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -31,7 +31,7 @@ import zed.rainxch.tweaks.presentation.feedback.model.FeedbackCategory
 @Composable
 fun CategorySelector(
     selected: FeedbackCategory,
-    onSelected: (FeedbackCategory) -> Unit,
+    onSelect: (FeedbackCategory) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val colors = LocalPersonality.current.colors
@@ -51,7 +51,7 @@ fun CategorySelector(
                 FeedbackPillChip(
                     label = stringResource(category.label),
                     isSelected = category == selected,
-                    onClick = { onSelected(category) },
+                    onClick = { onSelect(category) },
                 )
             }
         }
@@ -66,29 +66,32 @@ internal fun FeedbackPillChip(
 ) {
     val colors = LocalPersonality.current.colors
     val container by animateColorAsState(
-        targetValue = if (isSelected) {
-            colors.primary
-        } else {
-            colors.surfaceContainerHigh
-        },
+        targetValue =
+            if (isSelected) {
+                colors.primary
+            } else {
+                colors.surfaceContainerHigh
+            },
         animationSpec = LocalPersonality.current.motion.fastEffects(),
         label = "chip_container",
     )
     val content by animateColorAsState(
-        targetValue = if (isSelected) {
-            colors.onPrimary
-        } else {
-            colors.onSurface
-        },
+        targetValue =
+            if (isSelected) {
+                colors.onPrimary
+            } else {
+                colors.onSurface
+            },
         animationSpec = LocalPersonality.current.motion.fastEffects(),
         label = "chip_content",
     )
     Box(
-        modifier = Modifier
-            .clip(RoundedCornerShape(LocalPersonality.current.shape.cornerSmall))
-            .background(container)
-            .clickable(onClick = onClick)
-            .padding(horizontal = 14.dp, vertical = 10.dp),
+        modifier =
+            Modifier
+                .clip(RoundedCornerShape(LocalPersonality.current.shape.cornerSmall))
+                .background(container)
+                .clickable(onClick = onClick)
+                .padding(horizontal = 14.dp, vertical = 10.dp),
         contentAlignment = Alignment.Center,
     ) {
         KomiText(

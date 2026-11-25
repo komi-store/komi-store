@@ -59,9 +59,7 @@ class UpdateCheckWindowTest {
 
     @Test
     fun the_cap_counts_raw_entries_like_the_fetch_path_not_filtered_ones() {
-        // The fetch path's per_page caps the raw window server-side, before any pre-release
-        // filter: a window of mostly pre-releases must not reach past the cap for the stable
-        // entries the fetch-driven check can never see.
+        // per_page caps the raw window before any pre-release filter, so stable entries past the cap stay unseen.
         val oldestStable = release(id = 1L, tag = "1.0.0", publishedAt = "2026-09-01T00:00:00Z")
         val newestStable = release(id = 2L, tag = "2.0.0", publishedAt = "2026-09-05T00:00:00Z")
         val preReleases =

@@ -2,38 +2,31 @@ package zed.rainxch.githubstore
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import co.touchlab.kermit.Logger
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
-import zed.rainxch.core.data.services.LocalizationManager
 import zed.rainxch.core.domain.logging.KomiStoreLogger
-import zed.rainxch.core.domain.model.appearance.AccentId
-import zed.rainxch.core.domain.model.appearance.AppPersonality
-import zed.rainxch.core.domain.model.appearance.MangaPaperId
+import zed.rainxch.core.domain.model.error.LocalStoreException
 import zed.rainxch.core.domain.repository.InstalledAppsRepository
 import zed.rainxch.core.domain.repository.RateLimitRepository
-import zed.rainxch.core.domain.repository.TweaksRepository
 import zed.rainxch.core.domain.repository.UserSessionRepository
-import zed.rainxch.core.domain.use_cases.SyncInstalledAppsUseCase
+import zed.rainxch.core.domain.usecases.SyncInstalledAppsUseCase
+import zed.rainxch.githubstore.app.components.toUi
 import zed.rainxch.githubstore.utils.STARTUP_PREFERENCE_TIMEOUT_MS
 import kotlin.time.Duration.Companion.milliseconds
 
 class MainViewModel(
-    private val tweaksRepository: TweaksRepository,
+    private val appearancePreferences: AppearancePreferences,
     private val installedAppsRepository: InstalledAppsRepository,
     private val userSessionRepository: UserSessionRepository,
     private val rateLimitRepository: RateLimitRepository,
     private val syncUseCase: SyncInstalledAppsUseCase,
     private val logger: KomiStoreLogger,
-    private val localizationManager: LocalizationManager,
 ) : ViewModel() {
     private val _state = MutableStateFlow(MainState())
     val state = _state.asStateFlow()
@@ -42,9 +35,7 @@ class MainViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 userSessionRepository.primeSession()
-            } catch (e: CancellationException) {
-                throw e
-            } catch (e: Exception) {
+            } catch (e: LocalStoreException) {
                 logger.warn("Session prime failed; continuing without it: ${e.message}")
             }
             _state.update {
@@ -101,43 +92,24 @@ class MainViewModel(
                         firstEmitted.await()
                     } == null
                 ) {
-                    Logger.w { "Appearance preference load timed out, releasing gate on defaults" }
+                    logger.warn("Appearance preference load timed out, releasing gate on defaults")
                     _state.update { it.copy(isAppearanceLoaded = true) }
                 }
             }
-            try {
-                combine(
-                    tweaksRepository.getPersonality(),
-                    tweaksRepository.getAccentId(),
-                    tweaksRepository.getMangaPaper(),
-                    tweaksRepository.getAmoledTheme(),
-                    tweaksRepository.getIsDarkTheme(),
-                ) { personality, accent, paper, amoled, isDark ->
-                    Appearance(personality, accent, paper, amoled, isDark)
-                }.combine(tweaksRepository.getAppLanguage()) { appearance, appLanguageTag ->
-                    appearance.copy(appLanguageTag = appLanguageTag)
-                }.collect { snapshot ->
-                    localizationManager.setActiveLanguageTag(snapshot.appLanguageTag)
-                    _state.update { it.withAppearance(snapshot).copy(isAppearanceLoaded = true) }
-                    firstEmitted.complete(Unit)
-                }
-            } catch (e: CancellationException) {
-                throw e
-            } catch (e: Exception) {
-                Logger.w(e) { "Appearance preference stream failed, releasing gate on defaults" }
-                _state.update { it.copy(isAppearanceLoaded = true) }
+            appearancePreferences.appearance().collect { snapshot ->
+                _state.update { it.withAppearance(snapshot).copy(isAppearanceLoaded = true) }
                 firstEmitted.complete(Unit)
             }
         }
 
         viewModelScope.launch {
-            tweaksRepository.getScrollbarEnabled().collect { enabled ->
+            appearancePreferences.scrollbarEnabled().collect { enabled ->
                 _state.update { it.copy(isScrollbarEnabled = enabled) }
             }
         }
 
         viewModelScope.launch {
-            tweaksRepository.getContentWidth().collect { width ->
+            appearancePreferences.contentWidth().collect { width ->
                 _state.update { it.copy(contentWidth = width) }
             }
         }
@@ -145,14 +117,14 @@ class MainViewModel(
         viewModelScope.launch {
             rateLimitRepository.rateLimitState.collect { rateLimitInfo ->
                 _state.update { currentState ->
-                    currentState.copy(rateLimitInfo = rateLimitInfo)
+                    currentState.copy(rateLimit = rateLimitInfo?.toUi())
                 }
             }
         }
 
         viewModelScope.launch {
             rateLimitRepository.rateLimitExhaustedEvent.collect { info ->
-                _state.update { it.copy(showRateLimitDialog = true, rateLimitInfo = info) }
+                _state.update { it.copy(showRateLimitDialog = true, rateLimit = info.toUi()) }
             }
         }
 
@@ -183,15 +155,6 @@ class MainViewModel(
         }
     }
 }
-
-private data class Appearance(
-    val personality: AppPersonality,
-    val accent: AccentId,
-    val mangaPaper: MangaPaperId,
-    val isAmoledTheme: Boolean,
-    val isDarkTheme: Boolean?,
-    val appLanguageTag: String? = null,
-)
 
 private fun MainState.withAppearance(snapshot: Appearance): MainState =
     copy(

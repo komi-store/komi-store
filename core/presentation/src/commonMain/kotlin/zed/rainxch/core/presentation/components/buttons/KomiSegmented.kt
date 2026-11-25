@@ -94,8 +94,8 @@ private fun <T> MangaSegmented(
     selected: T,
     items: ImmutableList<KomiSegmentedItem<T>>,
     onSelect: (T) -> Unit,
-    modifier: Modifier = Modifier,
     size: KomiIconButtonSize,
+    modifier: Modifier = Modifier,
 ) {
     val colors = personality.colors
     val metrics = size.metrics
@@ -172,8 +172,8 @@ private fun <T> ClassicSegmented(
     selected: T,
     items: ImmutableList<KomiSegmentedItem<T>>,
     onSelect: (T) -> Unit,
-    modifier: Modifier = Modifier,
     size: KomiIconButtonSize,
+    modifier: Modifier = Modifier,
 ) {
     val colors = LocalPersonality.current.colors
     val metrics = size.metrics
@@ -321,29 +321,29 @@ private fun PreviewStack() {
 @Preview
 @Composable
 private fun KomiSegmentedMangaPreview() {
-    PersonalityPreview(mangaPersonality()) { PreviewStack() }
+    PersonalityPreview(personality = mangaPersonality()) { PreviewStack() }
 }
 
 @Preview
 @Composable
 private fun KomiSegmentedMangaNightPreview() {
-    PersonalityPreview(mangaPersonality(paper = MangaPaper.NIGHT, accent = MangaAccent.SUN)) { PreviewStack() }
+    PersonalityPreview(personality = mangaPersonality(paper = MangaPaper.NIGHT, accent = MangaAccent.SUN)) { PreviewStack() }
 }
 
 @Preview
 @Composable
 private fun KomiSegmentedMangaNordPreview() {
-    PersonalityPreview(mangaPersonality(paper = MangaPaper.NORD, accent = MangaAccent.FROST)) { PreviewStack() }
+    PersonalityPreview(personality = mangaPersonality(paper = MangaPaper.NORD, accent = MangaAccent.FROST)) { PreviewStack() }
 }
 
 @Preview
 @Composable
 private fun KomiSegmentedClassicPreview() {
-    PersonalityPreview(classicPersonality()) { PreviewStack() }
+    PersonalityPreview(personality = classicPersonality()) { PreviewStack() }
 }
 
 @Preview
 @Composable
 private fun KomiSegmentedClassicDarkPreview() {
-    PersonalityPreview(classicPersonality(dark = true)) { PreviewStack() }
+    PersonalityPreview(personality = classicPersonality(dark = true)) { PreviewStack() }
 }

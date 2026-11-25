@@ -4,11 +4,11 @@ import zed.rainxch.core.domain.model.appearance.AccentId
 import zed.rainxch.core.domain.model.appearance.AppPersonality
 import zed.rainxch.core.domain.model.appearance.ContentWidth
 import zed.rainxch.core.domain.model.appearance.MangaPaperId
-import zed.rainxch.core.domain.model.error.RateLimitInfo
+import zed.rainxch.githubstore.app.components.RateLimitUi
 
 data class MainState(
     val isLoggedIn: Boolean = false,
-    val rateLimitInfo: RateLimitInfo? = null,
+    val rateLimit: RateLimitUi? = null,
     val showRateLimitDialog: Boolean = false,
     val showSessionExpiredDialog: Boolean = false,
     val personality: AppPersonality = AppPersonality.MANGA,

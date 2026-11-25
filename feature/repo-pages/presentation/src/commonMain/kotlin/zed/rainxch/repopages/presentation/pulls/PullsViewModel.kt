@@ -13,6 +13,7 @@ import zed.rainxch.githubstore.core.presentation.res.Res
 import zed.rainxch.githubstore.core.presentation.res.failed_to_load
 import zed.rainxch.repopages.domain.model.IssueState
 import zed.rainxch.repopages.domain.repository.RepoPagesRepository
+import zed.rainxch.repopages.presentation.mappers.toUi
 
 class PullsViewModel(
     private val owner: String,
@@ -45,7 +46,7 @@ class PullsViewModel(
 
     private fun loadNextPage() {
         val current = _state.value
-        if (current.isLoading || current.isLoadingMore || current.endReached || current.errorMessage != null) return
+        if (!current.canLoadMore) return
         loadPage(current.filter, current.page + 1, append = true, generation = requestGeneration)
     }
 
@@ -79,7 +80,8 @@ class PullsViewModel(
                 .onSuccess { newPulls ->
                     if (generation != requestGeneration) return@onSuccess
                     _state.update { st ->
-                        val merged = if (append) st.pulls + newPulls else newPulls
+                        val pulls = newPulls.map { it.toUi() }
+                        val merged = if (append) st.pulls + pulls else pulls
                         st.copy(
                             isLoading = false,
                             isLoadingMore = false,
@@ -101,6 +103,8 @@ class PullsViewModel(
                 }
         }
     }
+
+    private val PullsUiState.canLoadMore: Boolean get() = !isLoading && !isLoadingMore && !endReached && errorMessage == null
 
     companion object {
         private const val PER_PAGE = 30

@@ -1,5 +1,7 @@
 package zed.rainxch.core.data.network
 
+import zed.rainxch.core.domain.model.error.NetworkException
+
 class RefreshBudgetExhaustedException(
     val retryAfterSeconds: Long,
-) : Exception("Refresh budget exhausted ($retryAfterSeconds s)")
+) : NetworkException("Refresh budget exhausted ($retryAfterSeconds s)", null)

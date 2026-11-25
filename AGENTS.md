@@ -23,16 +23,16 @@ JDK 21+ and the Android SDK. Sign-in uses `GITHUB_CLIENT_ID` from `local.propert
 
 ## Before you push
 
-CI runs these on every pull request. Existing findings live in committed baselines, so only new ones fail.
+CI runs these on every pull request. There are no baselines: any finding fails the check.
 
 ```bash
-./gradlew spotlessApply                  # formats the files you changed
-./gradlew compileKotlinJvm compileAndroidMain :androidApp:compileDebugKotlin jvmTest detekt :konsist-test:test
+./gradlew spotlessApply                  # formats every Kotlin file and build script
+./gradlew compileKotlinJvm compileAndroidMain :androidApp:compileDebugKotlin jvmTest testAndroidHostTest detekt :konsist-test:test
 ./gradlew lintDebug lintAndroidMain
 ./gradlew stabilityCheck                 # its own invocation, after compileKotlinJvm compileAndroidMain
 ```
 
-In Claude Code, `/verify` runs the same steps. CI also lints agent docs with agnix. Details and baseline rules: `docs/agents/checks.md`.
+In Claude Code, `/verify` runs the same steps. CI also lints agent docs with agnix. Details: `docs/agents/checks.md`.
 
 ## Rules the tools don't check
 
@@ -43,13 +43,13 @@ The full rule set, with examples, is `docs/code-style.md`. These apply to almost
 - Errors are typed and become string resources in the UI. Never show `Throwable.message`, and never wrap suspend calls in `runCatching`.
 - Use `Komi*` components and `LocalPersonality` tokens, not `MaterialTheme` or color literals.
 - All user-visible text, content descriptions included, comes from `Res.string`.
-- No KDoc and no comments that restate the code; comment only non-obvious invariants and workarounds. No em-dashes.
+- No KDoc and no comments that restate the code; comment only non-obvious invariants and workarounds. A comment is one line and never stacked with another (Konsist checks it). No em-dashes.
 - Don't guess APIs, versions or flags. Read the code or the docs first.
 
 ## Read when relevant
 
 - `docs/agents/architecture.md`: layers, navigation, DI, core repositories, adding a feature
-- `docs/agents/checks.md`: CI checks, baselines, warnings as errors, the stability analyzer
+- `docs/agents/checks.md`: CI checks, warnings as errors, the stability analyzer
 - `docs/agents/sign-in.md`: OAuth handoff, device flow, personal access tokens, the `X-GitHub-Token` header
 - `docs/agents/forges.md`: Codeberg and Forgejo clients, per-host tokens, `RepoIdCodec`
 - `docs/agents/releases-and-assets.md`: how releases, assets and installed apps are matched

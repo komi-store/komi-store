@@ -64,11 +64,11 @@ fun KomiHeadline(
 @Composable
 private fun MangaHeadline(
     text: String,
-    modifier: Modifier = Modifier,
     role: KomiTextRole,
     color: Color,
     maxLines: Int,
     marker: HeadlineMarker,
+    modifier: Modifier = Modifier,
 ) {
     if (marker == HeadlineMarker.None) {
         KomiText(
@@ -103,9 +103,11 @@ private fun MangaHeadline(
     }
 }
 
+private const val STAMP_SKEW_RATIO = 0.30f
+
 private val SkewStampShape =
     GenericShape { size, _ ->
-        val skew = size.height * 0.30f
+        val skew = size.height * STAMP_SKEW_RATIO
         moveTo(skew, 0f)
         lineTo(size.width, 0f)
         lineTo(size.width - skew, size.height)
@@ -150,7 +152,7 @@ private fun HeadlineSpeedLines(color: Color) {
 @Preview
 @Composable
 private fun KomiHeadlineStampPreview() {
-    PersonalityPreview(mangaPersonality(headlineMarker = HeadlineMarker.Stamp)) {
+    PersonalityPreview(personality = mangaPersonality(headlineMarker = HeadlineMarker.Stamp)) {
         Column(verticalArrangement = Arrangement.spacedBy(18.dp)) {
             KomiHeadline("Discover", role = KomiTextRole.Display)
             KomiHeadline("Trending Now")
@@ -161,7 +163,7 @@ private fun KomiHeadlineStampPreview() {
 @Preview
 @Composable
 private fun KomiHeadlineSpeedLinesPreview() {
-    PersonalityPreview(mangaPersonality(headlineMarker = HeadlineMarker.SpeedLines)) {
+    PersonalityPreview(personality = mangaPersonality(headlineMarker = HeadlineMarker.SpeedLines)) {
         Column(verticalArrangement = Arrangement.spacedBy(18.dp)) {
             KomiHeadline("Discover", role = KomiTextRole.Display)
             KomiHeadline("Trending Now")
@@ -173,11 +175,12 @@ private fun KomiHeadlineSpeedLinesPreview() {
 @Composable
 private fun KomiHeadlineSpeedLinesDarkPreview() {
     PersonalityPreview(
-        mangaPersonality(
-            headlineMarker = HeadlineMarker.SpeedLines,
-            paper = MangaPaper.NIGHT,
-            accent = MangaAccent.FROST,
-        ),
+        personality =
+            mangaPersonality(
+                headlineMarker = HeadlineMarker.SpeedLines,
+                paper = MangaPaper.NIGHT,
+                accent = MangaAccent.FROST,
+            ),
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(18.dp)) {
             KomiHeadline("Discover", role = KomiTextRole.Display)
@@ -189,7 +192,7 @@ private fun KomiHeadlineSpeedLinesDarkPreview() {
 @Preview
 @Composable
 private fun KomiHeadlineClassicPreview() {
-    PersonalityPreview(classicPersonality()) {
+    PersonalityPreview(personality = classicPersonality()) {
         Column(verticalArrangement = Arrangement.spacedBy(18.dp)) {
             KomiHeadline("Discover", role = KomiTextRole.Display)
             KomiHeadline("Trending Now")
@@ -201,11 +204,12 @@ private fun KomiHeadlineClassicPreview() {
 @Composable
 private fun KomiHeadlineNightPreview() {
     PersonalityPreview(
-        mangaPersonality(
-            paper = MangaPaper.NIGHT,
-            accent = MangaAccent.SUN,
-            headlineMarker = HeadlineMarker.Stamp,
-        ),
+        personality =
+            mangaPersonality(
+                paper = MangaPaper.NIGHT,
+                accent = MangaAccent.SUN,
+                headlineMarker = HeadlineMarker.Stamp,
+            ),
     ) {
         KomiHeadline("Trending Now")
     }

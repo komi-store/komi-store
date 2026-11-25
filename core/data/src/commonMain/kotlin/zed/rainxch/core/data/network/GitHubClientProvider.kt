@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import zed.rainxch.core.data.data_source.TokenStore
+import zed.rainxch.core.data.datasource.TokenStore
 import zed.rainxch.core.domain.model.settings.ProxyConfig
 import zed.rainxch.core.domain.repository.HostTokenRepository
 import zed.rainxch.core.domain.repository.RateLimitRepository

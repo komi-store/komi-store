@@ -7,10 +7,13 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import zed.rainxch.core.data.download.DownloadNotificationAction
 import zed.rainxch.core.data.download.notificationActionsFor
+import zed.rainxch.core.domain.model.error.SystemPackagesException
+import zed.rainxch.core.domain.model.installation.DownloadProgress
 import zed.rainxch.core.domain.system.DownloadOrchestrator
 import zed.rainxch.core.domain.system.DownloadProgressNotifier
 import zed.rainxch.core.domain.system.DownloadStage
 import zed.rainxch.core.domain.system.OrchestratedDownload
+import kotlin.coroutines.cancellation.CancellationException
 
 class DownloadNotificationObserver(
     private val orchestrator: DownloadOrchestrator,
@@ -28,17 +31,29 @@ class DownloadNotificationObserver(
         job =
             scope.launch {
                 try {
-                    orchestrator.downloads.collect { snapshot ->
-                        try {
-                            reconcile(snapshot)
-                        } catch (t: Throwable) {
-                            Logger.w(t) { "DownloadNotificationObserver: reconcile failed, continuing" }
-                        }
-                    }
+                    orchestrator.downloads.collect { snapshot -> reconcileSafely(snapshot) }
                 } finally {
                     job = null
                 }
             }
+    }
+
+    private fun reconcileSafely(snapshot: Map<String, OrchestratedDownload>) {
+        try {
+            reconcile(snapshot)
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: IllegalStateException) {
+            logReconcileFailure(e)
+        } catch (e: IllegalArgumentException) {
+            logReconcileFailure(e)
+        } catch (e: SecurityException) {
+            logReconcileFailure(e)
+        }
+    }
+
+    private fun logReconcileFailure(e: RuntimeException) {
+        Logger.w(e) { "DownloadNotificationObserver: reconcile failed, continuing" }
     }
 
     private fun reconcile(snapshot: Map<String, OrchestratedDownload>) {
@@ -59,7 +74,7 @@ class DownloadNotificationObserver(
                     val last = lastNotifiedAt[pkg] ?: 0L
                     val shouldPost =
                         stageChanged ||
-                            entry.progressPercent == 100 ||
+                            entry.progressPercent == COMPLETE_PERCENT ||
                             (now - last) >= PROGRESS_UPDATE_INTERVAL_MS
                     if (shouldPost) {
                         postProgress(pkg, entry, paused = false)
@@ -105,29 +120,35 @@ class DownloadNotificationObserver(
         paused: Boolean,
     ) {
         try {
-            notifier.notifyProgress(
-                packageName = pkg,
-                appName = entry.displayAppName,
-                versionTag = entry.releaseTag.ifBlank { entry.assetName },
-                percent = entry.progressPercent,
-                bytesDownloaded = entry.bytesDownloaded,
-                totalBytes = entry.totalBytes,
-                paused = paused,
-            )
-        } catch (t: Throwable) {
-            Logger.w(t) { "DownloadNotificationObserver: notifyProgress failed for $pkg" }
+            systemServiceCall {
+                notifier.notifyProgress(
+                    packageName = pkg,
+                    appName = entry.displayAppName,
+                    versionTag = entry.releaseTag.ifBlank { entry.assetName },
+                    progress =
+                        DownloadProgress(
+                            bytesDownloaded = entry.bytesDownloaded,
+                            totalBytes = entry.totalBytes,
+                            percent = entry.progressPercent,
+                        ),
+                    paused = paused,
+                )
+            }
+        } catch (e: SystemPackagesException) {
+            Logger.w(e) { "DownloadNotificationObserver: notifyProgress failed for $pkg" }
         }
     }
 
     private fun clearProgressSafely(pkg: String) {
         try {
-            notifier.clearProgress(pkg)
-        } catch (t: Throwable) {
-            Logger.w(t) { "DownloadNotificationObserver: clearProgress failed for $pkg" }
+            systemServiceCall { notifier.clearProgress(pkg) }
+        } catch (e: SystemPackagesException) {
+            Logger.w(e) { "DownloadNotificationObserver: clearProgress failed for $pkg" }
         }
     }
 
     private companion object {
         const val PROGRESS_UPDATE_INTERVAL_MS = 400L
+        const val COMPLETE_PERCENT = 100
     }
 }

@@ -3,61 +3,69 @@ package zed.rainxch.apps.presentation.import
 import zed.rainxch.apps.presentation.import.model.RepoSuggestionUi
 
 sealed interface ExternalImportAction {
-    data object OnStart : ExternalImportAction
+    sealed interface Scan : ExternalImportAction
 
-    data object OnRequestPermission : ExternalImportAction
+    sealed interface Review : ExternalImportAction
+
+    sealed interface Search : ExternalImportAction
+
+    sealed interface Summary : ExternalImportAction
+
+    data object OnStart : Scan
+
+    data object OnRequestPermission : Scan
 
     data class OnPermissionGranted(
         val sdkInt: Int?,
-    ) : ExternalImportAction
+    ) : Scan
 
     data class OnPermissionDenied(
         val sdkInt: Int?,
-    ) : ExternalImportAction
+    ) : Scan
 
     data class OnSkipCard(
         val packageName: String,
-    ) : ExternalImportAction
+    ) : Review
 
     data class OnSkipForever(
         val packageName: String,
-    ) : ExternalImportAction
+    ) : Review
 
-    data object OnSkipRemaining : ExternalImportAction
+    data object OnSkipRemaining : Review
 
     data class OnPickSuggestion(
         val packageName: String,
         val suggestion: RepoSuggestionUi,
-    ) : ExternalImportAction
+    ) : Review
 
     data class OnLinkCard(
         val packageName: String,
-    ) : ExternalImportAction
+    ) : Review
 
     data class OnToggleCardExpanded(
         val packageName: String,
-    ) : ExternalImportAction
+    ) : Review
 
     data class OnSearchOverrideChanged(
         val packageName: String,
         val query: String,
-    ) : ExternalImportAction
+    ) : Search
 
     data class OnSearchOverrideSubmit(
         val packageName: String,
-    ) : ExternalImportAction
+    ) : Search
 
-    data object OnUndoLast : ExternalImportAction
+    data object OnUndoLast : Review
 
     data object OnExit : ExternalImportAction
 
-    data object OnDismissCompletionToast : ExternalImportAction
+    data object OnDismissCompletionToast : Summary
 
-    data object OnAutoSummaryContinue : ExternalImportAction
+    data object OnAutoSummaryContinue : Summary
 
-    data object OnAutoSummaryUndoAll : ExternalImportAction
+    data object OnAutoSummaryUndoAll : Summary
 
     data object OnAddManually : ExternalImportAction
 
-    data object OnSkipLongScan : ExternalImportAction
+    data object OnSkipLongScan : Scan
 }

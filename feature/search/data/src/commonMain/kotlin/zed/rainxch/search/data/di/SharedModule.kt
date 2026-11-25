@@ -1,20 +1,36 @@
 package zed.rainxch.search.data.di
 
 import org.koin.dsl.module
-import zed.rainxch.domain.repository.SearchHistoryRepository
-import zed.rainxch.domain.repository.SearchRepository
+import zed.rainxch.search.data.repository.BackendSearch
+import zed.rainxch.search.data.repository.GithubSearch
+import zed.rainxch.search.data.repository.InstallerReleaseCheck
 import zed.rainxch.search.data.repository.SearchHistoryRepositoryImpl
 import zed.rainxch.search.data.repository.SearchRepositoryImpl
+import zed.rainxch.search.domain.repository.SearchHistoryRepository
+import zed.rainxch.search.domain.repository.SearchRepository
 
 val searchModule =
     module {
+        single { InstallerReleaseCheck(clientProvider = get()) }
+
+        single {
+            GithubSearch(
+                clientProvider = get(),
+                cacheManager = get(),
+                tokenStore = get(),
+                installerCheck = get(),
+            )
+        }
+
+        single { BackendSearch(backendApiClient = get(), tokenStore = get()) }
+
         single<SearchRepository> {
             SearchRepositoryImpl(
-                clientProvider = get(),
-                backendApiClient = get(),
                 cacheManager = get(),
                 forgejoClientRegistry = get(),
-                tokenStore = get(),
+                backendApiClient = get(),
+                backendSearch = get(),
+                githubSearch = get(),
             )
         }
 

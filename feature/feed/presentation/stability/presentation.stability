@@ -34,10 +34,11 @@ private fun zed.rainxch.feed.presentation.FeedScreen(state: zed.rainxch.feed.pre
     - onAction: STABLE (function type)
 
 @Composable
-public fun zed.rainxch.feed.presentation.components.FeedPlatformBar(platform: zed.rainxch.core.domain.model.repository.DiscoveryPlatform, onOpenPicker: kotlin.Function0<kotlin.Unit>): kotlin.Unit
+public fun zed.rainxch.feed.presentation.components.FeedPlatformBar(platform: zed.rainxch.core.domain.model.repository.DiscoveryPlatform, onOpenPicker: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
   skippable: true
   restartable: true
   params:
     - platform: STABLE (class with no mutable properties)
     - onOpenPicker: STABLE (function type)
+    - modifier: STABLE (marked @Stable or @Immutable)
 

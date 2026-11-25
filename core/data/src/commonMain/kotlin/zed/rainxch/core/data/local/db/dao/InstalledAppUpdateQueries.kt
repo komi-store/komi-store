@@ -2,10 +2,8 @@ package zed.rainxch.core.data.local.db.dao
 
 import zed.rainxch.core.data.local.db.entities.InstalledAppEntity
 import zed.rainxch.core.domain.model.account.github.GithubRelease
-import zed.rainxch.core.domain.utils.VersionMath
+import zed.rainxch.core.domain.utils.ReleaseChange
 
-// Small DAO write helpers used by the repository, kept here so the repository file stays
-// within the architecture line limit.
 internal suspend fun InstalledAppDao.recordUnmatchedRelease(packageName: String) {
     clearUpdateFlagKeepBaseline(packageName, System.currentTimeMillis())
 }
@@ -24,8 +22,7 @@ internal suspend fun InstalledAppDao.adoptMatchedTag(
     )
 }
 
-// The window is the fresher record; the stored value only covers a release the window no
-// longer carries (deleted upstream, or rotated out by newer releases). Backfill on a hit.
+// The window is the fresher record; the stored value covers only a release it no longer carries, and a hit backfills it.
 internal suspend fun InstalledAppDao.resolveInstalledReleasePublishedAt(
     app: InstalledAppEntity,
     window: List<GithubRelease>,
@@ -34,5 +31,5 @@ internal suspend fun InstalledAppDao.resolveInstalledReleasePublishedAt(
     if (fromWindow != null && fromWindow != app.installedReleasePublishedAt) {
         setInstalledReleasePublishedAt(app.packageName, fromWindow)
     }
-    return fromWindow ?: VersionMath.publishedAtOrNull(app.installedReleasePublishedAt)
+    return fromWindow ?: ReleaseChange.publishedAtOrNull(app.installedReleasePublishedAt)
 }

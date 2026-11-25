@@ -45,6 +45,7 @@ import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -120,8 +121,9 @@ private fun KomiToastItem(
             }
         }
 
+    val currentOnDismiss by rememberUpdatedState(onDismiss)
     LaunchedEffect(leaving, visibleState.isIdle) {
-        if (leaving && visibleState.isIdle && !visibleState.currentState) onDismiss(data.id)
+        if (leaving && visibleState.isIdle && !visibleState.currentState) currentOnDismiss(data.id)
     }
 
     LaunchedEffect(hovered, data.persistent, visibleState.targetState) {
@@ -455,17 +457,17 @@ private fun PreviewToastStack() {
 @Preview
 @Composable
 private fun KomiToastMangaPreview() {
-    PersonalityPreview(mangaPersonality()) { PreviewToastStack() }
+    PersonalityPreview(personality = mangaPersonality()) { PreviewToastStack() }
 }
 
 @Preview
 @Composable
 private fun KomiToastMangaNightPreview() {
-    PersonalityPreview(mangaPersonality(paper = MangaPaper.NIGHT, accent = MangaAccent.SUN)) { PreviewToastStack() }
+    PersonalityPreview(personality = mangaPersonality(paper = MangaPaper.NIGHT, accent = MangaAccent.SUN)) { PreviewToastStack() }
 }
 
 @Preview
 @Composable
 private fun KomiToastClassicPreview() {
-    PersonalityPreview(classicPersonality()) { PreviewToastStack() }
+    PersonalityPreview(personality = classicPersonality()) { PreviewToastStack() }
 }

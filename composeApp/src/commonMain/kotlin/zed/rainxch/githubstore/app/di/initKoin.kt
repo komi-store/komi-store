@@ -9,6 +9,7 @@ import zed.rainxch.core.data.di.corePlatformModule
 import zed.rainxch.core.data.di.databaseModule
 import zed.rainxch.core.data.di.networkModule
 import zed.rainxch.details.data.di.detailsModule
+import zed.rainxch.details.presentation.di.detailsPresentationModule
 import zed.rainxch.devprofile.data.di.devProfileModule
 import zed.rainxch.feed.data.di.feedModule
 import zed.rainxch.home.data.di.homeModule
@@ -29,6 +30,7 @@ fun initKoin(config: KoinAppDeclaration? = null) {
             appsModule,
             authModule,
             detailsModule,
+            detailsPresentationModule,
             devProfileModule,
             homeModule,
             feedModule,

@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
-import zed.rainxch.core.data.data_source.TokenStore
+import zed.rainxch.core.data.datasource.TokenStore
 import zed.rainxch.core.data.dto.GithubDeviceTokenSuccessDto
 import zed.rainxch.core.data.local.db.AppDatabase
 import zed.rainxch.core.data.local.db.entities.InstalledAppEntity
@@ -45,8 +45,7 @@ import kotlin.test.assertFalse
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
-// Every client points at a discard port, so a path that fetched instead of judging the fed
-// list would fail loudly instead of reaching the network.
+// Every client points at a discard port, so a path that fetched instead of judging the fed list fails loudly.
 class InstalledAppsUpdateCheckWindowTest {
     @Test
     fun a_fed_window_settles_the_stored_update_state() =
@@ -183,9 +182,7 @@ class InstalledAppsUpdateCheckWindowTest {
         }
     }
 
-    // The proxy points at a discard port on purpose: construction is pure wiring, and any
-    // request that ever leaves one of these clients fails at once instead of hitting a real
-    // host.
+    // A discard port on purpose: any request that leaves these clients fails at once instead of hitting a real host.
     private val offlineProxy = ProxyConfig.Http(host = "127.0.0.1", port = 9)
 
     private fun newRepo(db: AppDatabase): InstalledAppsRepositoryImpl =
@@ -193,27 +190,34 @@ class InstalledAppsUpdateCheckWindowTest {
             database = db,
             installedAppsDao = db.installedAppDao,
             historyDao = db.updateHistoryDao,
-            installer = FakeInstaller(),
-            clientProvider =
-                GitHubClientProvider(
-                    tokenStore = FakeTokenStore(),
-                    rateLimitRepository = FakeRateLimitRepository(),
-                    userSessionRepository = FakeUserSessionRepository(),
-                    hostTokenRepository = FakeHostTokenRepository(),
-                    proxyConfigFlow = MutableStateFlow(offlineProxy),
+            updateChecker =
+                InstalledAppUpdateChecker(
+                    dao = db.installedAppDao,
+                    installer = FakeInstaller(),
+                    releaseSource =
+                        InstalledReleaseSource(
+                            clientProvider =
+                                GitHubClientProvider(
+                                    tokenStore = FakeTokenStore(),
+                                    rateLimitRepository = FakeRateLimitRepository(),
+                                    userSessionRepository = FakeUserSessionRepository(),
+                                    hostTokenRepository = FakeHostTokenRepository(),
+                                    proxyConfigFlow = MutableStateFlow(offlineProxy),
+                                ),
+                            backendApiClient =
+                                BackendApiClient(
+                                    proxyConfigFlow = MutableStateFlow(offlineProxy),
+                                    tokenStore = FakeTokenStore(),
+                                ),
+                            forgejoClientRegistry =
+                                ForgejoClientRegistry(
+                                    proxyConfigFlow = MutableStateFlow(offlineProxy),
+                                    hostTokenRepository = FakeHostTokenRepository(),
+                                ),
+                        ),
+                    packageMonitor = NoPackageMonitor,
+                    digestVerifier = DesktopDigestVerifier(),
                 ),
-            backendApiClient =
-                BackendApiClient(
-                    proxyConfigFlow = MutableStateFlow(offlineProxy),
-                    tokenStore = FakeTokenStore(),
-                ),
-            forgejoClientRegistry =
-                ForgejoClientRegistry(
-                    proxyConfigFlow = MutableStateFlow(offlineProxy),
-                    hostTokenRepository = FakeHostTokenRepository(),
-                ),
-            packageMonitor = NoPackageMonitor,
-            digestVerifier = DesktopDigestVerifier(),
         )
 
     private object NoPackageMonitor : PackageMonitor {

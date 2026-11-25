@@ -11,15 +11,18 @@ feature/auth/
     crypto/PkceGenerator.kt                     # SHA-256 PKCE triplet (state + verifier + challenge)
     network/GitHubAuthApi.kt                    # direct + backend-proxied device-flow endpoints, PAT validation
     network/WebAuthApi.kt                       # web-OAuth register + handoff consume
+    network/AuthReply.kt                        # fetchReply (status, X-Request-ID, body) and decodeOrNull
     repository/AuthenticationRepositoryImpl.kt
     repository/AuthErrors.kt                    # toAuthException(), infra-error checks behind the Direct fallback
     di
   presentation/
     AuthenticationViewModel / State / Action / Events / Root
+    handlers/                                   # DeviceFlowHandler + DevicePoller, WebAuthHandler, PatHandler, AuthStore, AuthSavedState
+    components/                                 # StateLoggedOut, StateDevicePrompt, StateStatus (pending, signed in, error), the PAT sheet, PrimaryPillButton
     AuthDeepLinkBus.kt                          # SharedFlow bridge from app-level deep-link parser to VM
 ```
 
-`AuthenticationRepository.awaitDeviceToken` has no callers; the VM polls with `pollDeviceTokenOnce`.
+`AuthenticationViewModel` owns state and events and hands each `AuthenticationAction.DeviceFlow` / `WebAuth` / `Pat` action to its handler. `AuthSavedState` holds every `SavedStateHandle` key; clearing a finished device session also drops a pending web-auth state.
 
 ## Navigation
 
@@ -29,7 +32,7 @@ feature/auth/
 
 1. `PkceGenerator.generate()` -> `(state, codeVerifier, codeChallenge)` (S256).
 2. `WebAuthApi.register(state, codeChallenge, codeVerifier)` -> POST `https://github-store.org/auth/register`. Cloudflare Worker stores `(state -> {codeVerifier, codeChallenge})` in Workers KV with short TTL and returns `auth_url` (the `github.com/login/oauth/authorize?...` URL).
-3. VM saves `state` in `SavedStateHandle` and opens `auth_url` in user's browser via `BrowserHelper`. A watchdog errors out if no callback arrives in 11 minutes.
+3. VM saves `state` in `SavedStateHandle` and opens `auth_url` in user's browser via `BrowserHelper`. A watchdog errors out if no callback arrives in 11 minutes: 60 s past the 600 s ceiling of the Worker's `VERIFIER_TTL_SECONDS` and the backend's `STATE_TTL` on `oauth_ephemeral`, so only a lost deep link (the Windows browser-handler case, GitHub-Store#730) trips it.
 4. User authorizes on GitHub. GitHub redirects to `https://github-store.org/auth/callback?code=...&state=...`.
 5. Worker re-validates `state`, exchanges `code` against `api.github-store.org` (backend posts to GitHub `/oauth/access_token` with the stored verifier), backend writes `(handoffId -> access_token)` to Postgres with 60s TTL.
 6. Worker redirects browser to `githubstore://auth?handoff=<handoffId>&state=<state>` (or `?error=<reason>&state=<state>`), picked up by the app via OS deep link.
@@ -55,7 +58,8 @@ User picks it ("Use device code instead") when the web flow can't complete (brow
 
 ## Notes
 
-- Errors: the repository fails with `AuthException` (`Unreachable` for I/O, timeouts, proxy failures and backend 5xx; `RateLimited` for a 429; `Denied`; `CodeExpired`; `Failed`) and `PatRejectedException` for the PAT path. The ViewModel keeps `AuthError` / `PatError` in state and the Root picks the string, so no exception text reaches the screen.
+- Errors: `GitHubAuthApi` and `WebAuthApi` raise `NetworkException` (`BackendHttpException` extends it; Ktor failures arrive wrapped by `networkFailures {}`, so `AuthErrors.kt` classifies a `NetworkException` by its cause). A token that won't read back after five saves raises `LocalStoreException`. The repository fails with `AuthException` (`Unreachable` for I/O, timeouts, proxy failures and backend 5xx; `RateLimited` for a 429; `Denied`; `CodeExpired`; `Failed`, also for a build without `GITHUB_CLIENT_ID`) and `PatRejectedException` for the PAT path; `pollDeviceTokenOnce` lets the `LocalStoreException` through and `DevicePoller` skips that poll. The ViewModel keeps `AuthError` / `PatError` in state and the Root picks the string, so no exception text reaches the screen.
+- Copying the device code catches `SystemPackagesException`, which both `ClipboardHelper` implementations raise when the system clipboard refuses the write.
 - Token stored via `TokenStore` (`DefaultTokenStore`: KSafe-encrypted, migrates the legacy DataStore entry once). Only `AuthenticationViewModel` collects `accessTokenFlow`, on the injected app `CoroutineScope`.
 - `GitHubAuthApi` and `WebAuthApi` are Koin singles. Their clients come from `createPlatformHttpClient` with the `ProxyScope.DISCOVERY` proxy ("Search & metadata" in Tweaks) and are rebuilt when it changes, so every sign-in path follows the user's proxy.
 - `GITHUB_CLIENT_ID` in `local.properties` for builds; must match the OAuth App registered on the backend and used by the Worker.

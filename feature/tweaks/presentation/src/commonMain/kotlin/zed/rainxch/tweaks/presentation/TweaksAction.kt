@@ -7,321 +7,346 @@ import zed.rainxch.core.domain.model.appearance.ContentWidth
 import zed.rainxch.core.domain.model.appearance.FontTheme
 import zed.rainxch.core.domain.model.appearance.MangaPaperId
 import zed.rainxch.core.domain.model.installation.InstallerType
+import zed.rainxch.core.domain.model.installation.PresetKey
 import zed.rainxch.core.domain.model.settings.ProxyScope
 import zed.rainxch.core.domain.model.settings.TranslationProvider
 import zed.rainxch.tweaks.presentation.components.desktop.DesktopSection
 import zed.rainxch.tweaks.presentation.model.ProxyType
 
 sealed interface TweaksAction {
-    data object OnNavigateBackClick : TweaksAction
+    sealed interface LookAndFeel : TweaksAction
+
+    sealed interface Appearance : LookAndFeel
+
+    sealed interface Language : LookAndFeel
+
+    sealed interface Connection : TweaksAction
+
+    sealed interface ScopeProxy : Connection
+
+    sealed interface MainProxy : Connection
+
+    sealed interface CustomForge : Connection
+
+    sealed interface Installs : TweaksAction
+
+    sealed interface Installer : Installs
+
+    sealed interface Updates : Installs
+
+    sealed interface Translation : TweaksAction
+
+    sealed interface YoudaoCredentials : Translation
+
+    sealed interface LibreTranslateCredentials : Translation
+
+    sealed interface DeeplCredentials : Translation
+
+    sealed interface MicrosoftCredentials : Translation
+
+    sealed interface Privacy : TweaksAction
 
     data class OnPersonalitySelected(
         val personality: AppPersonality,
-    ) : TweaksAction
+    ) : Appearance
 
     data class OnAccentSelected(
         val accent: AccentId,
-    ) : TweaksAction
+    ) : Appearance
 
     data class OnMangaPaperSelected(
         val paper: MangaPaperId,
-    ) : TweaksAction
+    ) : Appearance
 
     data class OnThemeColorSelected(
         val themeColor: AppTheme,
-    ) : TweaksAction
+    ) : Appearance
 
     data class OnAmoledThemeToggled(
         val enabled: Boolean,
-    ) : TweaksAction
+    ) : Appearance
 
     data class OnRepoLayoutSelected(
         val grid: Boolean,
-    ) : TweaksAction
+    ) : Appearance
 
     data class OnDarkThemeChange(
         val isDarkTheme: Boolean?,
-    ) : TweaksAction
+    ) : Appearance
 
     data class OnFontThemeSelected(
         val fontTheme: FontTheme,
-    ) : TweaksAction
+    ) : Appearance
 
     data class OnScrollbarToggled(
         val enabled: Boolean,
-    ) : TweaksAction
+    ) : Appearance
 
     data class OnContentWidthSelected(
         val width: ContentWidth,
-    ) : TweaksAction
+    ) : Appearance
 
     data class OnDisplayModeSelected(
         val modeId: Int,
-    ) : TweaksAction
+    ) : Appearance
 
     data class OnProxyTypeSelected(
         val scope: ProxyScope,
         val type: ProxyType,
-    ) : TweaksAction
+    ) : ScopeProxy
 
     data class OnProxyHostChanged(
         val scope: ProxyScope,
         val host: String,
-    ) : TweaksAction
+    ) : ScopeProxy
 
     data class OnProxyPortChanged(
         val scope: ProxyScope,
         val port: String,
-    ) : TweaksAction
+    ) : ScopeProxy
 
     data class OnProxyUsernameChanged(
         val scope: ProxyScope,
         val username: String,
-    ) : TweaksAction
+    ) : ScopeProxy
 
     data class OnProxyPasswordChanged(
         val scope: ProxyScope,
         val password: String,
-    ) : TweaksAction
+    ) : ScopeProxy
 
     data class OnProxyPasswordVisibilityToggle(
         val scope: ProxyScope,
-    ) : TweaksAction
+    ) : ScopeProxy
 
     data class OnProxySave(
         val scope: ProxyScope,
-    ) : TweaksAction
+    ) : ScopeProxy
 
     data class OnProxyTest(
         val scope: ProxyScope,
-    ) : TweaksAction
+    ) : ScopeProxy
 
     data class OnExternalInstallerPickerOpenChanged(
         val open: Boolean,
-    ) : TweaksAction
+    ) : Installer
 
     data class OnExternalInstallerSelected(
         val packageName: String,
-    ) : TweaksAction
+    ) : Installer
 
     data class OnInstallerTypeSelected(
         val type: InstallerType,
-    ) : TweaksAction
+    ) : Installer
 
-    data object OnRequestShizukuPermission : TweaksAction
+    data object OnRequestShizukuPermission : Installer
 
-    data object OnRequestDhizukuPermission : TweaksAction
+    data object OnRequestDhizukuPermission : Installer
 
-    data object OnRequestRootPermission : TweaksAction
+    data object OnRequestRootPermission : Installer
 
-    data object OnInstallerAttributionSystemDefault : TweaksAction
+    data object OnInstallerAttributionSystemDefault : Installer
 
     data class OnInstallerAttributionPresetSelected(
-        val key: zed.rainxch.core.domain.model.installation.PresetKey,
-    ) : TweaksAction
+        val key: PresetKey,
+    ) : Installer
 
-    data object OnInstallerAttributionCustomToggleExpanded : TweaksAction
+    data object OnInstallerAttributionCustomToggleExpanded : Installer
 
     data class OnInstallerAttributionCustomChanged(
         val value: String,
-    ) : TweaksAction
+    ) : Installer
 
-    data object OnInstallerAttributionCustomSave : TweaksAction
+    data object OnInstallerAttributionCustomSave : Installer
 
     data class OnAutoUpdateToggled(
         val enabled: Boolean,
-    ) : TweaksAction
+    ) : Installer
 
     data class OnUpdateCheckIntervalChanged(
         val hours: Long,
-    ) : TweaksAction
+    ) : Updates
 
     data class OnUpdateCheckEnabledToggled(
         val enabled: Boolean,
-    ) : TweaksAction
+    ) : Updates
 
     data class OnIncludePreReleasesToggled(
         val enabled: Boolean,
-    ) : TweaksAction
+    ) : Updates
 
     data class OnAutoDetectClipboardToggled(
         val enabled: Boolean,
-    ) : TweaksAction
+    ) : Privacy
 
     data class OnHideSeenToggled(
         val enabled: Boolean,
-    ) : TweaksAction
+    ) : Privacy
 
-    data object OnClearSeenRepos : TweaksAction
+    data object OnClearSeenRepos : Privacy
 
-    data object OnRefreshCacheSize : TweaksAction
+    data object OnRefreshCacheSize : Privacy
 
-    data object OnClearCacheClick : TweaksAction
+    data object OnClearCacheClick : Privacy
 
-    data object OnClearDownloadsConfirm : TweaksAction
+    data object OnClearDownloadsConfirm : Privacy
 
-    data object OnClearDownloadsDismiss : TweaksAction
+    data object OnClearDownloadsDismiss : Privacy
 
     data object OnFeedbackClick : TweaksAction
 
     data object OnFeedbackDismiss : TweaksAction
 
-    data object OnLanguagePickerOpen : TweaksAction
+    data object OnLanguagePickerOpen : Language
 
-    data object OnLanguagePickerDismiss : TweaksAction
+    data object OnLanguagePickerDismiss : Language
 
     data class OnLanguageQueryChange(
         val query: String,
-    ) : TweaksAction
+    ) : Language
 
-    data object OnTranslationProviderExpandToggle : TweaksAction
+    data object OnTranslationProviderExpandToggle : Translation
 
-    data object OnTranslationTargetPickerOpen : TweaksAction
+    data object OnTranslationTargetPickerOpen : Translation
 
-    data object OnTranslationTargetPickerDismiss : TweaksAction
+    data object OnTranslationTargetPickerDismiss : Translation
 
-    data object OnConnectionPasteSheetOpen : TweaksAction
+    data object OnConnectionPasteSheetOpen : MainProxy
 
-    data object OnConnectionPasteSheetDismiss : TweaksAction
+    data object OnConnectionPasteSheetDismiss : MainProxy
 
-    data object OnConnectionMasterExpandToggle : TweaksAction
+    data object OnConnectionMasterExpandToggle : MainProxy
 
     data class OnProxyScopeExpandToggle(
         val scope: ProxyScope,
-    ) : TweaksAction
+    ) : ScopeProxy
 
     data class OnDesktopSectionSelected(
         val section: DesktopSection,
     ) : TweaksAction
 
-    data object OnMirrorPickerClick : TweaksAction
-
-    data object OnSkippedUpdatesClick : TweaksAction
-
-    data object OnHiddenRepositoriesClick : TweaksAction
-
     data class OnTranslationProviderSelected(
         val provider: TranslationProvider,
-    ) : TweaksAction
+    ) : Translation
 
     data class OnYoudaoAppKeyChanged(
         val appKey: String,
-    ) : TweaksAction
+    ) : YoudaoCredentials
 
     data class OnYoudaoAppSecretChanged(
         val appSecret: String,
-    ) : TweaksAction
+    ) : YoudaoCredentials
 
-    data object OnYoudaoAppSecretVisibilityToggle : TweaksAction
+    data object OnYoudaoAppSecretVisibilityToggle : YoudaoCredentials
 
-    data object OnYoudaoCredentialsSave : TweaksAction
+    data object OnYoudaoCredentialsSave : YoudaoCredentials
 
     data class OnLibreTranslateBaseUrlChanged(
         val url: String,
-    ) : TweaksAction
+    ) : LibreTranslateCredentials
 
     data class OnLibreTranslateApiKeyChanged(
         val apiKey: String,
-    ) : TweaksAction
+    ) : LibreTranslateCredentials
 
-    data object OnLibreTranslateApiKeyVisibilityToggle : TweaksAction
+    data object OnLibreTranslateApiKeyVisibilityToggle : LibreTranslateCredentials
 
-    data object OnLibreTranslateCredentialsSave : TweaksAction
+    data object OnLibreTranslateCredentialsSave : LibreTranslateCredentials
 
     data class OnDeeplAuthKeyChanged(
         val authKey: String,
-    ) : TweaksAction
+    ) : DeeplCredentials
 
-    data object OnDeeplAuthKeyVisibilityToggle : TweaksAction
+    data object OnDeeplAuthKeyVisibilityToggle : DeeplCredentials
 
-    data object OnDeeplCredentialsSave : TweaksAction
+    data object OnDeeplCredentialsSave : DeeplCredentials
 
     data class OnMicrosoftTranslatorKeyChanged(
         val key: String,
-    ) : TweaksAction
+    ) : MicrosoftCredentials
 
     data class OnMicrosoftTranslatorRegionChanged(
         val region: String,
-    ) : TweaksAction
+    ) : MicrosoftCredentials
 
-    data object OnMicrosoftTranslatorKeyVisibilityToggle : TweaksAction
+    data object OnMicrosoftTranslatorKeyVisibilityToggle : MicrosoftCredentials
 
-    data object OnMicrosoftTranslatorCredentialsSave : TweaksAction
+    data object OnMicrosoftTranslatorCredentialsSave : MicrosoftCredentials
 
     data class OnAutoTranslateEnabledToggle(
         val enabled: Boolean,
-    ) : TweaksAction
+    ) : Translation
 
     data class OnAutoTranslateTargetSelected(
         val tag: String?,
-    ) : TweaksAction
+    ) : Translation
 
     data class OnAppLanguageSelected(
         val tag: String?,
-    ) : TweaksAction
+    ) : Language
 
-    data object OnOpenBatteryOptimizationSettings : TweaksAction
+    data object OnOpenBatteryOptimizationSettings : Updates
 
-    data object OnDismissBatteryOptimizationCard : TweaksAction
+    data object OnDismissBatteryOptimizationCard : Updates
 
-    data object OnReevaluateBatteryOptimizationCard : TweaksAction
+    data object OnReevaluateBatteryOptimizationCard : Updates
 
-    data object OnOpenCustomForgesDialog : TweaksAction
+    data object OnOpenCustomForgesDialog : CustomForge
 
-    data object OnDismissCustomForgesDialog : TweaksAction
+    data object OnDismissCustomForgesDialog : CustomForge
 
     data class OnCustomForgeDraftChanged(
         val draft: String,
-    ) : TweaksAction
+    ) : CustomForge
 
-    data object OnAddCustomForge : TweaksAction
+    data object OnAddCustomForge : CustomForge
 
     data class OnRemoveCustomForge(
         val host: String,
-    ) : TweaksAction
+    ) : CustomForge
 
     data class OnMasterProxyTypeSelected(
         val type: ProxyType,
-    ) : TweaksAction
+    ) : MainProxy
 
     data class OnMasterProxyHostChanged(
         val host: String,
-    ) : TweaksAction
+    ) : MainProxy
 
     data class OnMasterProxyPortChanged(
         val port: String,
-    ) : TweaksAction
+    ) : MainProxy
 
     data class OnMasterProxyUsernameChanged(
         val username: String,
-    ) : TweaksAction
+    ) : MainProxy
 
     data class OnMasterProxyPasswordChanged(
         val password: String,
-    ) : TweaksAction
+    ) : MainProxy
 
-    data object OnMasterProxyPasswordVisibilityToggle : TweaksAction
+    data object OnMasterProxyPasswordVisibilityToggle : MainProxy
 
-    data object OnMasterProxySave : TweaksAction
+    data object OnMasterProxySave : MainProxy
 
-    data object OnMasterProxyTest : TweaksAction
+    data object OnMasterProxyTest : MainProxy
 
     data class OnProxyPasteUrlChanged(
         val value: String,
-    ) : TweaksAction
+    ) : MainProxy
 
-    data object OnProxyPasteUrlSubmit : TweaksAction
+    data object OnProxyPasteUrlSubmit : MainProxy
 
     data class OnScopeUseMainToggled(
         val scope: ProxyScope,
         val useMain: Boolean,
-    ) : TweaksAction
+    ) : ScopeProxy
 
-    data object OnClearSeenHistoryRequest : TweaksAction
+    data object OnClearSeenHistoryRequest : Privacy
 
-    data object OnClearSeenHistoryDismiss : TweaksAction
+    data object OnClearSeenHistoryDismiss : Privacy
 
-    data object OnClearSeenHistoryConfirm : TweaksAction
+    data object OnClearSeenHistoryConfirm : Privacy
 
     data object OnShareDiagnosticLogs : TweaksAction
 }

@@ -19,8 +19,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Sort
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowRight
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.outlined.Language
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -40,6 +40,7 @@ import zed.rainxch.core.presentation.components.overlays.KomiSheetPlacement
 import zed.rainxch.core.presentation.components.text.KomiText
 import zed.rainxch.core.presentation.components.text.KomiTextRole
 import zed.rainxch.core.presentation.locals.LocalPersonality
+import zed.rainxch.core.presentation.utils.toLabel
 import zed.rainxch.githubstore.core.presentation.res.Res
 import zed.rainxch.githubstore.core.presentation.res.search_filters_apply
 import zed.rainxch.githubstore.core.presentation.res.search_filters_reset
@@ -52,7 +53,6 @@ import zed.rainxch.search.presentation.model.ProgrammingLanguageUi
 import zed.rainxch.search.presentation.model.SearchSourceUi
 import zed.rainxch.search.presentation.model.SortByUi
 import zed.rainxch.search.presentation.utils.label
-import zed.rainxch.core.presentation.utils.toLabel
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -62,21 +62,24 @@ fun SearchFiltersSheet(
     selectedPlatform: DiscoveryPlatform,
     selectedLanguage: ProgrammingLanguageUi,
     selectedSortBy: SortByUi,
-    onSourceSelected: (SearchSourceUi) -> Unit,
-    onPlatformSelected: (DiscoveryPlatform) -> Unit,
+    onSourceSelect: (SearchSourceUi) -> Unit,
+    onPlatformSelect: (DiscoveryPlatform) -> Unit,
     onOpenLanguagePicker: () -> Unit,
     onOpenSortPicker: () -> Unit,
     onReset: () -> Unit,
     onDismiss: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     KomiSheet(
         onDismiss = onDismiss,
+        modifier = modifier,
         placement = KomiSheetPlacement.Bottom,
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 20.dp, vertical = 8.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp, vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(20.dp),
         ) {
             Row(
@@ -105,7 +108,7 @@ fun SearchFiltersSheet(
                         SelectableChip(
                             text = source.label,
                             selected = selectedSource == source,
-                            onClick = { onSourceSelected(source) },
+                            onClick = { onSourceSelect(source) },
                         )
                     }
                 }
@@ -120,7 +123,7 @@ fun SearchFiltersSheet(
                         SelectableChip(
                             text = platform.toLabel(),
                             selected = selectedPlatform == platform,
-                            onClick = { onPlatformSelected(platform) },
+                            onClick = { onPlatformSelect(platform) },
                         )
                     }
                 }
@@ -129,7 +132,7 @@ fun SearchFiltersSheet(
             FilterSection(title = stringResource(Res.string.search_filters_section_language)) {
                 NavRow(
                     leadingIcon = Icons.Outlined.Language,
-                    value = stringResource(selectedLanguage.label()),
+                    value = stringResource(selectedLanguage.label),
                     onClick = onOpenLanguagePicker,
                 )
             }
@@ -181,28 +184,32 @@ private fun SelectableChip(
 ) {
     val colors = LocalPersonality.current.colors
     val shape = LocalPersonality.current.shape
-    val container = if (selected) {
-        colors.primary
-    } else {
-        colors.surfaceContainerHigh
-    }
-    val content = if (selected) {
-        colors.onPrimary
-    } else {
-        colors.onSurface
-    }
-    val border = if (selected) {
-        BorderStroke(0.dp, colors.primary)
-    } else {
-        BorderStroke(1.dp, colors.divider)
-    }
+    val container =
+        if (selected) {
+            colors.primary
+        } else {
+            colors.surfaceContainerHigh
+        }
+    val content =
+        if (selected) {
+            colors.onPrimary
+        } else {
+            colors.onSurface
+        }
+    val border =
+        if (selected) {
+            BorderStroke(0.dp, colors.primary)
+        } else {
+            BorderStroke(1.dp, colors.divider)
+        }
     Box(
-        modifier = Modifier
-            .clip(RoundedCornerShape(shape.cornerSmall))
-            .border(border, RoundedCornerShape(shape.cornerSmall))
-            .background(container)
-            .clickable(onClick = onClick)
-            .padding(horizontal = 14.dp, vertical = 9.dp),
+        modifier =
+            Modifier
+                .clip(RoundedCornerShape(shape.cornerSmall))
+                .border(border, RoundedCornerShape(shape.cornerSmall))
+                .background(container)
+                .clickable(onClick = onClick)
+                .padding(horizontal = 14.dp, vertical = 9.dp),
         contentAlignment = Alignment.Center,
     ) {
         Row(
@@ -236,16 +243,16 @@ private fun NavRow(
     val colors = LocalPersonality.current.colors
     val shape = LocalPersonality.current.shape
     Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(shape.corner))
-            .border(
-                width = 1.dp,
-                color = colors.divider,
-                shape = RoundedCornerShape(shape.corner),
-            )
-            .clickable(onClick = onClick)
-            .padding(horizontal = 14.dp, vertical = 14.dp),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(shape.corner))
+                .border(
+                    width = 1.dp,
+                    color = colors.divider,
+                    shape = RoundedCornerShape(shape.corner),
+                ).clickable(onClick = onClick)
+                .padding(horizontal = 14.dp, vertical = 14.dp),
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,

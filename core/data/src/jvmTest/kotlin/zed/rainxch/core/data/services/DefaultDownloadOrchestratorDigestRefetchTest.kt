@@ -7,15 +7,16 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeout
-import zed.rainxch.core.data.data_source.TokenStore
+import zed.rainxch.core.data.datasource.TokenStore
 import zed.rainxch.core.data.download.AssetSourceRefetcher
 import zed.rainxch.core.data.dto.GithubDeviceTokenSuccessDto
 import zed.rainxch.core.domain.model.account.github.GithubAsset
 import zed.rainxch.core.domain.model.apk.ApkPackageInfo
 import zed.rainxch.core.domain.model.installation.DownloadProgress
 import zed.rainxch.core.domain.model.installation.InstalledApp
+import zed.rainxch.core.domain.model.installation.InstalledBuild
 import zed.rainxch.core.domain.model.installation.ParkedInstallDisposal
-import zed.rainxch.core.domain.model.smart_detect.MatchingPreview
+import zed.rainxch.core.domain.model.smartdetect.MatchingPreview
 import zed.rainxch.core.domain.model.system.SystemArchitecture
 import zed.rainxch.core.domain.network.AssetIdentity
 import zed.rainxch.core.domain.network.DigestVerifier
@@ -63,18 +64,32 @@ class DefaultDownloadOrchestratorDigestRefetchTest {
         multi: MultiSourceDownloader,
         verifier: DigestVerifier,
         scope: CoroutineScope,
-    ) = DefaultDownloadOrchestrator(
-        downloader = downloader,
-        multiSourceDownloader = multi,
-        assetSourceRefetcher = StubAssetSourceRefetcher,
-        digestVerifier = verifier,
-        installer = StubInstaller,
-        installedAppsRepository = StubInstalledAppsRepository(),
-        pendingInstallNotifier = StubNotifier,
-        appScope = scope,
-        systemInstallSerializer = StubInstallSerializer,
-        tokenStore = StubTokenStore,
-    )
+    ): DefaultDownloadOrchestrator {
+        val repository = StubInstalledAppsRepository()
+        return DefaultDownloadOrchestrator(
+            downloader = downloader,
+            assetFetcher =
+                AssetFetcher(
+                    downloader = downloader,
+                    multiSourceDownloader = multi,
+                    assetSourceRefetcher = StubAssetSourceRefetcher,
+                    digestVerifier = verifier,
+                    tokenStore = StubTokenStore,
+                    installedAppsRepository = repository,
+                ),
+            installRunner =
+                DownloadInstallRunner(
+                    installer = StubInstaller,
+                    installedAppsRepository = repository,
+                    pendingInstallNotifier = StubNotifier,
+                    systemInstallSerializer = StubInstallSerializer,
+                    digestVerifier = verifier,
+                ),
+            installedAppsRepository = repository,
+            pendingInstallNotifier = StubNotifier,
+            appScope = scope,
+        )
+    }
 
     @Test
     fun bytes_that_fail_verification_are_refetched_from_the_source_and_the_download_proceeds() =
@@ -120,7 +135,7 @@ class DefaultDownloadOrchestratorDigestRefetchTest {
 
             assertEquals(1, downloader.calls.size, "the source is tried exactly once")
             assertEquals(2, verifier.calls.size)
-            assertEquals("Checksum mismatch — file may have been tampered with", entry.errorMessage)
+            assertEquals("Checksum mismatch: file may have been tampered with", entry.errorMessage)
         }
 
     private object StubAssetSourceRefetcher : AssetSourceRefetcher {
@@ -304,16 +319,7 @@ class DefaultDownloadOrchestratorDigestRefetchTest {
 
         override suspend fun updateAppVersion(
             packageName: String,
-            newTag: String,
-            newReleaseId: Long?,
-            newAssetId: Long?,
-            newAssetDigest: String?,
-            newReleasePublishedAt: String?,
-            newAssetName: String?,
-            newAssetUrl: String?,
-            newVersionName: String,
-            newVersionCode: Long,
-            signingFingerprint: String?,
+            build: InstalledBuild,
             isPendingInstall: Boolean,
         ) = Unit
 

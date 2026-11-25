@@ -32,7 +32,7 @@ import zed.rainxch.core.data.utils.AndroidShareManager
 import zed.rainxch.core.domain.helpers.ShareManager
 import zed.rainxch.core.domain.repository.TweaksRepository
 import zed.rainxch.core.domain.system.SystemInstallSerializer
-import zed.rainxch.core.domain.use_cases.SyncInstalledAppsUseCase
+import zed.rainxch.core.domain.usecases.SyncInstalledAppsUseCase
 import zed.rainxch.githubstore.app.deeplink.DeepLinkParser
 import zed.rainxch.githubstore.utils.applyDisplayModePreference
 import zed.rainxch.githubstore.utils.updateSystemBars
@@ -62,8 +62,7 @@ class MainActivity : ComponentActivity() {
 
         super.onCreate(savedInstanceState)
 
-        // Cancels draw requests until the real UI past the gate has composed, so no placeholder
-        // frame is rendered.
+        // Cancels draw requests until the real UI past the gate has composed, so no placeholder frame is rendered.
         getViewModel<MainViewModel>()
         splash.setKeepOnScreenCondition { !contentPainted.get() }
 
@@ -112,14 +111,12 @@ class MainActivity : ComponentActivity() {
                 onResolvedDarkTheme = { isDarkTheme ->
                     this@MainActivity.updateSystemBars(isDarkTheme)
                 },
-                onContentPainted = { contentPainted.set(true) },
+                onContentReady = { contentPainted.set(true) },
             )
         }
     }
 
-    // Android 17 blocks LAN traffic without ACCESS_LOCAL_NETWORK. While the activity lives, asks again only when the
-    // set of LAN hosts in the proxy, forge or LibreTranslate settings changes; after two denials Android stops showing
-    // the prompt.
+    // Asks again only when the set of LAN hosts changes, since Android stops showing the prompt after two denials.
     @RequiresApi(Build.VERSION_CODES.CINNAMON_BUN)
     private fun requestLocalNetworkAccessWhenNeeded() {
         lifecycleScope.launch {
@@ -144,10 +141,9 @@ class MainActivity : ComponentActivity() {
     override fun onRestart() {
         super.onRestart()
         appScope.launch {
-            runCatching { syncInstalledAppsUseCase() }
-                .onFailure {
-                    Logger.w(it) { "onRestart sync failed" }
-                }
+            syncInstalledAppsUseCase().onFailure {
+                Logger.w(it) { "onRestart sync failed" }
+            }
         }
     }
 

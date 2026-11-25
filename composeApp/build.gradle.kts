@@ -109,10 +109,7 @@ compose.desktop {
         mainClass = "zed.rainxch.githubstore.DesktopAppKt"
         nativeDistributions {
             packageName = "Komi-Store"
-            packageVersion =
-                libs.versions.projectVersionName
-                    .get()
-                    .toString()
+            packageVersion = libs.versions.projectVersionName.get()
             vendor = "rainxchzed"
             includeAllModules = true
 
@@ -156,14 +153,8 @@ compose.desktop {
             }
             linux {
                 iconFile.set(project.file("src/jvmMain/resources/logo/app_icon.png"))
-                appRelease =
-                    libs.versions.projectVersionName
-                        .get()
-                        .toString()
-                debPackageVersion =
-                    libs.versions.projectVersionName
-                        .get()
-                        .toString()
+                appRelease = libs.versions.projectVersionName.get()
+                debPackageVersion = libs.versions.projectVersionName.get()
                 menuGroup = "Development"
                 appCategory = "Development"
             }

@@ -13,8 +13,9 @@ import zed.rainxch.core.domain.model.account.github.GithubAsset
 import zed.rainxch.core.domain.model.apk.ApkPackageInfo
 import zed.rainxch.core.domain.model.installation.DownloadProgress
 import zed.rainxch.core.domain.model.installation.InstalledApp
+import zed.rainxch.core.domain.model.installation.InstalledBuild
 import zed.rainxch.core.domain.model.installation.ParkedInstallDisposal
-import zed.rainxch.core.domain.model.smart_detect.MatchingPreview
+import zed.rainxch.core.domain.model.smartdetect.MatchingPreview
 import zed.rainxch.core.domain.model.system.SystemArchitecture
 import zed.rainxch.core.domain.network.AssetIdentity
 import zed.rainxch.core.domain.network.DigestVerifier
@@ -127,19 +128,32 @@ class DownloadLifecycleTest {
             assertEquals(2, source.calls)
         }
 
-    private fun kotlinx.coroutines.CoroutineScope.orchestrator(source: FileWritingSource) =
-        DefaultDownloadOrchestrator(
-            downloader = DirDownloader(dir),
-            multiSourceDownloader = source,
-            assetSourceRefetcher = StubAssetSourceRefetcher,
-            digestVerifier = UnusedVerifier,
-            installer = HandOffInstaller,
+    private fun kotlinx.coroutines.CoroutineScope.orchestrator(source: FileWritingSource): DefaultDownloadOrchestrator {
+        val downloader = DirDownloader(dir)
+        return DefaultDownloadOrchestrator(
+            downloader = downloader,
+            assetFetcher =
+                AssetFetcher(
+                    downloader = downloader,
+                    multiSourceDownloader = source,
+                    assetSourceRefetcher = StubAssetSourceRefetcher,
+                    digestVerifier = UnusedVerifier,
+                    tokenStore = FakeTokenStore(),
+                    installedAppsRepository = StubInstalledAppsRepository,
+                ),
+            installRunner =
+                DownloadInstallRunner(
+                    installer = HandOffInstaller,
+                    installedAppsRepository = StubInstalledAppsRepository,
+                    pendingInstallNotifier = StubNotifier,
+                    systemInstallSerializer = StubInstallSerializer,
+                    digestVerifier = UnusedVerifier,
+                ),
             installedAppsRepository = StubInstalledAppsRepository,
             pendingInstallNotifier = StubNotifier,
             appScope = this,
-            systemInstallSerializer = StubInstallSerializer,
-            tokenStore = FakeTokenStore(),
         )
+    }
 
     private suspend fun awaitStage(
         orchestrator: DefaultDownloadOrchestrator,
@@ -333,16 +347,7 @@ class DownloadLifecycleTest {
 
         override suspend fun updateAppVersion(
             packageName: String,
-            newTag: String,
-            newReleaseId: Long?,
-            newAssetId: Long?,
-            newAssetDigest: String?,
-            newReleasePublishedAt: String?,
-            newAssetName: String?,
-            newAssetUrl: String?,
-            newVersionName: String,
-            newVersionCode: Long,
-            signingFingerprint: String?,
+            build: InstalledBuild,
             isPendingInstall: Boolean,
         ) = Unit
 

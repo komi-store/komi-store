@@ -4,22 +4,21 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
-import android.net.Uri
 import android.os.Build
+import androidx.core.net.toUri
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import zed.rainxch.core.domain.model.installation.ExternalInstallerApp
 import zed.rainxch.core.domain.repository.ExternalInstallerRepository
 
-// Probe intents never open anything: queryIntentActivities only matches declared filters, so a
-// synthetic content URI carrying the APK mime type is enough to enumerate installers.
+// queryIntentActivities only matches declared filters, so a synthetic APK content URI enumerates installers.
 class ExternalInstallerDiscovery(
     private val context: Context,
 ) : ExternalInstallerRepository {
     override suspend fun listInstallers(): List<ExternalInstallerApp> =
         withContext(Dispatchers.IO) {
             val packageManager = context.packageManager
-            val probe = Uri.parse("content://${context.packageName}.fileprovider/probe.apk")
+            val probe = "content://${context.packageName}.fileprovider/probe.apk".toUri()
             val probes =
                 listOf(
                     Intent(Intent.ACTION_VIEW)
@@ -59,7 +58,6 @@ class ExternalInstallerDiscovery(
                 PackageManager.ResolveInfoFlags.of(PackageManager.MATCH_ALL.toLong()),
             )
         } else {
-            @Suppress("DEPRECATION")
             queryIntentActivities(intent, PackageManager.MATCH_ALL)
         }
 

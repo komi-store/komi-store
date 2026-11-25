@@ -6,18 +6,15 @@ fun truncateMarkdownPreview(
 ): String {
     if (content.length <= maxChars) return content
     val window = content.substring(0, maxChars)
-
-    val searchFrom = (maxChars * 0.75).toInt().coerceAtLeast(0)
-    val paragraphBreak = window.lastIndexOf("\n\n", maxChars).takeIf { it >= searchFrom }
-    if (paragraphBreak != null && paragraphBreak > 0) {
-        return window.substring(0, paragraphBreak).trimEnd() + "\n"
-    }
-    val newline = window.lastIndexOf('\n', maxChars).takeIf { it >= searchFrom }
-    if (newline != null && newline > 0) {
-        return window.substring(0, newline).trimEnd() + "\n"
-    }
-    return window.trimEnd() + "…"
+    val searchFrom = (maxChars * BREAK_SEARCH_FRACTION).toInt().coerceAtLeast(0)
+    val breakAt =
+        window.lastIndexOf("\n\n", maxChars).takeIf { it >= searchFrom && it > 0 }
+            ?: window.lastIndexOf('\n', maxChars).takeIf { it >= searchFrom && it > 0 }
+    return if (breakAt != null) window.substring(0, breakAt).trimEnd() + "\n" else window.trimEnd() + "…"
 }
+
+// A paragraph or line break only counts in the window's last quarter, so the preview isn't cut far short.
+private const val BREAK_SEARCH_FRACTION = 0.75
 
 fun splitMarkdownIntoChunks(
     content: String,

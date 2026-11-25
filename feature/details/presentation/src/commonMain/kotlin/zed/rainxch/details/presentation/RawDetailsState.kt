@@ -91,7 +91,7 @@ internal data class RawDetailsState(
     val isChannelChipCoachmarkPending: Boolean = false,
     val showAllPlatforms: Boolean = false,
     val devicePlatform: DiscoveryPlatform = DiscoveryPlatform.Android,
-    val releasePlatforms: ImmutableMap<Long, Set<DiscoveryPlatform>> = persistentMapOf(),
+    val releasePlatforms: ImmutableMap<Long, ImmutableSet<DiscoveryPlatform>> = persistentMapOf(),
     val deviceBuildReleaseIds: ImmutableSet<Long> = persistentSetOf(),
     val releaseLines: ImmutableMap<Long, String> = persistentMapOf(),
     val handoffPlatform: DiscoveryPlatform? = null,

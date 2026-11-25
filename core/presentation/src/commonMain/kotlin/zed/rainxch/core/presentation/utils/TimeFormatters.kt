@@ -12,43 +12,58 @@ import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 
+private const val DATE_ONLY_LENGTH = 10
+private const val YEAR_DASH_INDEX = 4
+private const val MONTH_DASH_INDEX = 7
+private const val TIME_START_INDEX = 11
+private const val SHORT_OFFSET_LENGTH = 3
+private const val HOURS_PER_DAY = 24
+private const val DAYS_PER_WEEK = 7
+
 @OptIn(ExperimentalTime::class)
 private fun parseIsoInstantLenient(isoInstant: String): Instant? {
     val trimmed = isoInstant.trim()
     if (trimmed.isEmpty()) return null
-    runCatching { return Instant.parse(trimmed) }
+    return lenientIsoCandidates(trimmed).firstNotNullOfOrNull { candidate ->
+        runCatching { Instant.parse(candidate) }.getOrNull()
+    }
+}
 
-    if (trimmed.length == 10 && trimmed[4] == '-' && trimmed[7] == '-') {
-        runCatching { return Instant.parse(trimmed + "T00:00:00Z") }
+private fun lenientIsoCandidates(trimmed: String): Sequence<String> =
+    sequence {
+        yield(trimmed)
+        if (isDateOnly(trimmed)) yield(trimmed + "T00:00:00Z")
+        yield(withShortOffsetMinutes(withTimeSeparator(trimmed)))
+        withMissingTimeFields(trimmed)?.let { yield(it) }
     }
 
-    var s = trimmed
-    if (s.length > 10 && s[10] == ' ') {
-        s = s.substring(0, 10) + "T" + s.substring(11)
-    }
-    val n = s.length
-    if (s.contains('T') && n >= 3 &&
-        (s[n - 3] == '+' || s[n - 3] == '-') && s[n - 2].isDigit() && s[n - 1].isDigit()
-    ) {
-        s += ":00"
-    }
-    runCatching { return Instant.parse(s) }
+private fun isDateOnly(s: String): Boolean = s.length == DATE_ONLY_LENGTH && s[YEAR_DASH_INDEX] == '-' && s[MONTH_DASH_INDEX] == '-'
 
-    val normalized =
-        runCatching {
-            val tzStart = trimmed.indexOfAny(charArrayOf('Z', '+', '-'), startIndex = 11)
-            if (tzStart < 0) return@runCatching null
-            val head = trimmed.substring(0, tzStart)
-            val tail = trimmed.substring(tzStart)
-            val colonCount = head.count { it == ':' }
-            when (colonCount) {
-                1 -> "$head:00$tail"
-                0 -> "$head:00:00$tail"
-                else -> null
-            }
-        }.getOrNull() ?: return null
+private fun withTimeSeparator(s: String): String =
+    if (s.length > DATE_ONLY_LENGTH && s[DATE_ONLY_LENGTH] == ' ') {
+        s.substring(0, DATE_ONLY_LENGTH) + "T" + s.substring(DATE_ONLY_LENGTH + 1)
+    } else {
+        s
+    }
 
-    return runCatching { Instant.parse(normalized) }.getOrNull()
+private fun withShortOffsetMinutes(s: String): String = if (s.contains('T') && endsWithShortOffset(s)) "$s:00" else s
+
+private fun endsWithShortOffset(s: String): Boolean {
+    if (s.length < SHORT_OFFSET_LENGTH) return false
+    val sign = s[s.length - SHORT_OFFSET_LENGTH]
+    return (sign == '+' || sign == '-') && s.takeLast(2).all { it.isDigit() }
+}
+
+private fun withMissingTimeFields(s: String): String? {
+    val tzStart = s.indexOfAny(charArrayOf('Z', '+', '-'), startIndex = TIME_START_INDEX)
+    if (tzStart < 0) return null
+    val head = s.substring(0, tzStart)
+    val tail = s.substring(tzStart)
+    return when (head.count { it == ':' }) {
+        1 -> "$head:00$tail"
+        0 -> "$head:00:00$tail"
+        else -> null
+    }
 }
 
 @OptIn(ExperimentalTime::class)
@@ -113,7 +128,8 @@ fun formatIsoDate(isoTimestamp: String?): String? {
 }
 
 @OptIn(ExperimentalTime::class)
-fun formatIsoDateOrRaw(iso: String): String = if (iso.length > 10) formatIsoDate(iso) ?: iso.take(10) else iso.take(10)
+fun formatIsoDateOrRaw(iso: String): String =
+    if (iso.length > DATE_ONLY_LENGTH) formatIsoDate(iso) ?: iso.take(DATE_ONLY_LENGTH) else iso.take(DATE_ONLY_LENGTH)
 
 @OptIn(ExperimentalTime::class)
 fun formatEpochDate(timestamp: Long): String? {
@@ -152,7 +168,7 @@ suspend fun formatAddedAt(epochMillis: Long): String {
             getString(Res.string.added_just_now)
         }
 
-        hoursDiff < 24 -> {
+        hoursDiff < HOURS_PER_DAY -> {
             getString(Res.string.added_hours_ago, hoursDiff)
         }
 
@@ -160,7 +176,7 @@ suspend fun formatAddedAt(epochMillis: Long): String {
             getString(Res.string.added_yesterday)
         }
 
-        daysDiff < 7 -> {
+        daysDiff < DAYS_PER_WEEK -> {
             getString(Res.string.added_days_ago, daysDiff)
         }
 

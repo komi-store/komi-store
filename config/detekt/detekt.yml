@@ -1,9 +1,29 @@
+config:
+  # A deprecated or misspelt property in this file fails the build the way a finding does.
+  warningsAsErrors: true
+
 complexity:
   LongMethod:
     ignoreAnnotated: ['Composable']
   LongParameterList:
     ignoreAnnotated: ['Composable']
     ignoreDefaultParameters: true
+  TooManyFunctions:
+    # Private helpers are how LongMethod gets fixed; counting them would set the two rules against each other.
+    ignorePrivate: true
+
+exceptions:
+  TooGenericExceptionCaught:
+    # Naming a catch-all _, ignored or expected doesn't make it any less generic.
+    allowedExceptionNameRegex: '^$'
+    # The only APIs that throw nothing narrower than RuntimeException; each boundary rethrows a typed failure or falls back.
+    excludes:
+      - '**/core/data/src/androidMain/kotlin/zed/rainxch/core/data/services/SystemServiceBoundary.kt'
+      - '**/core/data/src/androidMain/kotlin/zed/rainxch/core/data/services/shizuku/ShizukuBoundary.kt'
+      - '**/core/data/src/androidMain/kotlin/zed/rainxch/core/data/services/dhizuku/DhizukuBoundary.kt'
+      - '**/core/data/src/commonMain/kotlin/zed/rainxch/core/data/secure/KSafeSafe.kt'
+      - '**/core/presentation/src/androidMain/kotlin/zed/rainxch/core/presentation/components/SystemServiceBoundary.kt'
+      - '**/composeApp/src/jvmMain/kotlin/zed/rainxch/githubstore/A11yFilteringEventQueue.kt'
 
 naming:
   FunctionNaming:
@@ -13,6 +33,8 @@ style:
   MagicNumber:
     ignorePropertyDeclaration: true
     ignoreAnnotated: ['Composable', 'Preview']
+  ReturnCount:
+    excludeGuardClauses: true
   MaxLineLength:
     # ktlint's default; Spotless joins lines up to this length
     maxLineLength: 140

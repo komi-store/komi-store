@@ -70,7 +70,6 @@ import zed.rainxch.core.presentation.utils.toIcon
 import zed.rainxch.core.presentation.utils.toLabel
 import kotlin.math.roundToInt
 
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun KomiRepoCard(
     name: String,
@@ -105,6 +104,14 @@ fun KomiRepoCard(
             0f
         }
     val gap = if (compact) 9.dp else 11.dp
+    val badge =
+        CardBadgeInfo(
+            feed = feed,
+            rank = rank,
+            dailyStars = dailyStars,
+            version = version,
+            releasedAgoDays = releasedAgoDays,
+        )
 
     KomiSurface(
         modifier = modifier.fillMaxWidth(),
@@ -116,66 +123,18 @@ fun KomiRepoCard(
         contentPadding = PaddingValues(if (compact) 13.dp else 15.dp),
     ) {
         Column {
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-                verticalAlignment = Alignment.Top,
-            ) {
-                CardIconTile(
-                    monogram = monogram ?: name.take(2),
-                    imageUrl = imageUrl,
-                    size = if (compact) 40.dp else 60.dp,
-                    colors = colors,
-                )
-                Column(modifier = Modifier.weight(1f)) {
-                    KomiText(
-                        text = name,
-                        role = KomiTextRole.CardTitle,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                    )
-                    Row(
-                        modifier = Modifier.padding(top = 5.dp),
-                        horizontalArrangement = Arrangement.spacedBy(7.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        KomiText(
-                            text = "@$owner",
-                            role = KomiTextRole.Caption,
-                            color = colors.onSurfaceVariant,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                            modifier = Modifier.weight(1f, fill = false),
-                        )
-                        if (!compact) {
-                            Diamond(color = colors.onSurfaceVariant)
-                            KomiText(
-                                text = language,
-                                role = KomiTextRole.Caption,
-                                color = colors.onSurfaceVariant,
-                                maxLines = 1,
-                            )
-                        }
-                    }
-                    // The review rating sits apart from the stats row, whose star is GitHub stars.
-                    if (ratingAverage != null && ratingCount > 0) {
-                        CompactRating(
-                            average = ratingAverage,
-                            count = ratingCount,
-                            modifier = Modifier.padding(top = 4.dp),
-                        )
-                    }
-                }
-                if (!compact) {
-                    CardBadge(
-                        feed = feed,
-                        rank = rank,
-                        dailyStars = dailyStars,
-                        version = version,
-                        releasedAgoDays = releasedAgoDays,
-                        colors = colors,
-                    )
-                }
-            }
+            RepoCardHeader(
+                name = name,
+                owner = owner,
+                language = language,
+                monogram = monogram ?: name.take(2),
+                imageUrl = imageUrl,
+                compact = compact,
+                ratingAverage = ratingAverage,
+                ratingCount = ratingCount,
+                badge = badge,
+                colors = colors,
+            )
 
             KomiText(
                 text = description,
@@ -186,128 +145,235 @@ fun KomiRepoCard(
                 modifier = Modifier.padding(top = gap),
             )
 
-            if (compact && (platforms.isNotEmpty() || feed != KomiRepoCardFeed.Plain)) {
-                Row(
-                    modifier = Modifier.fillMaxWidth().padding(top = gap),
-                    horizontalArrangement = Arrangement.spacedBy(6.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    platforms.forEach { platform ->
-                        platform.toIcon()?.let { icon ->
-                            Icon(
-                                imageVector = icon,
-                                contentDescription = platform.toLabel(),
-                                modifier = Modifier.size(16.dp),
-                                tint = colors.onSurfaceVariant,
-                            )
-                        }
-                    }
-                    // A narrow grid card has no room for the chart badge beside the name.
-                    Spacer(Modifier.weight(1f))
-                    CardBadge(
-                        feed = feed,
-                        rank = rank,
-                        dailyStars = dailyStars,
-                        version = version,
-                        releasedAgoDays = releasedAgoDays,
-                        colors = colors,
-                    )
-                }
-            } else if (platforms.isNotEmpty()) {
-                FlowRow(
-                    modifier = Modifier.padding(top = gap),
-                    horizontalArrangement = Arrangement.spacedBy(7.dp),
-                    verticalArrangement = Arrangement.spacedBy(7.dp),
-                ) {
-                    platforms.forEach { platform ->
-                        KomiChip(
-                            label = platform.toLabel(),
-                            kind = KomiChipKind.Info,
-                            size = KomiChipSize.Md,
-                            leadingContent = {
-                                Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                                    platform.toIcon()?.let { icon ->
-                                        Icon(
-                                            imageVector = icon,
-                                            contentDescription = null,
-                                            modifier = Modifier.size(14.dp),
-                                            tint = colors.onSurface,
-                                        )
-                                    }
-                                }
-                            },
-                        )
-                    }
-                }
-            }
+            RepoCardPlatforms(
+                platforms = platforms,
+                compact = compact,
+                gap = gap,
+                badge = badge,
+                colors = colors,
+            )
 
             HorizontalDivider(
                 modifier = Modifier.padding(top = if (compact) 9.dp else 12.dp),
                 thickness = 2.dp,
                 color = colors.divider,
             )
+            RepoCardFooter(
+                stars = stars,
+                downloads = downloads,
+                releasedAt = releasedAt,
+                compact = compact,
+                colors = colors,
+            )
+        }
+    }
+}
+
+@Composable
+private fun RepoCardHeader(
+    name: String,
+    owner: String,
+    language: String,
+    monogram: String,
+    imageUrl: String?,
+    compact: Boolean,
+    ratingAverage: Double?,
+    ratingCount: Int,
+    badge: CardBadgeInfo,
+    colors: PersonalityColors,
+) {
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        verticalAlignment = Alignment.Top,
+    ) {
+        CardIconTile(
+            monogram = monogram,
+            imageUrl = imageUrl,
+            size = if (compact) 40.dp else 60.dp,
+            colors = colors,
+        )
+        Column(modifier = Modifier.weight(1f)) {
+            KomiText(
+                text = name,
+                role = KomiTextRole.CardTitle,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
             Row(
-                modifier = Modifier.fillMaxWidth().padding(top = if (compact) 9.dp else 11.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.padding(top = 5.dp),
+                horizontalArrangement = Arrangement.spacedBy(7.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(if (compact) 8.dp else 13.dp),
-                    verticalAlignment = Alignment.CenterVertically,
+                KomiText(
+                    text = "@$owner",
+                    role = KomiTextRole.Caption,
+                    color = colors.onSurfaceVariant,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.weight(1f, fill = false),
-                ) {
-                    Stat(
-                        icon = Icons.Filled.Star,
-                        value = fmtCompact(stars),
-                        colors = colors,
-                        hero = true,
+                )
+                if (!compact) {
+                    Diamond(color = colors.onSurfaceVariant)
+                    KomiText(
+                        text = language,
+                        role = KomiTextRole.Caption,
+                        color = colors.onSurfaceVariant,
+                        maxLines = 1,
                     )
-                    Stat(
-                        icon = Icons.Outlined.Download,
-                        value = fmtCompact(downloads),
-                        colors = colors,
-                    )
-                    if (!compact) {
-                        formatReleasedAgo(releasedAt)?.let { ago ->
-                            Stat(
-                                icon = Icons.Outlined.Schedule,
-                                value = ago,
-                                colors = colors,
-                            )
-                        }
-                    }
                 }
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    if (!compact) {
-                        KomiText(
-                            text = "Read",
-                            role = KomiTextRole.LabelSmall,
-                            color = colors.onSurface,
-                            modifier = Modifier.padding(end = 2.dp),
-                        )
-                    }
+            }
+            // The review rating sits apart from the stats row, whose star is GitHub stars.
+            if (ratingAverage != null && ratingCount > 0) {
+                CompactRating(
+                    average = ratingAverage,
+                    count = ratingCount,
+                    modifier = Modifier.padding(top = 4.dp),
+                )
+            }
+        }
+        if (!compact) {
+            CardBadge(badge = badge, colors = colors)
+        }
+    }
+}
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun RepoCardPlatforms(
+    platforms: ImmutableList<DiscoveryPlatform>,
+    compact: Boolean,
+    gap: Dp,
+    badge: CardBadgeInfo,
+    colors: PersonalityColors,
+) {
+    if (compact && (platforms.isNotEmpty() || badge.feed != KomiRepoCardFeed.Plain)) {
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(top = gap),
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            platforms.forEach { platform ->
+                platform.toIcon()?.let { icon ->
                     Icon(
-                        imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                        contentDescription = null,
+                        imageVector = icon,
+                        contentDescription = platform.toLabel(),
                         modifier = Modifier.size(16.dp),
-                        tint = colors.onSurface,
+                        tint = colors.onSurfaceVariant,
                     )
                 }
+            }
+            // A narrow grid card has no room for the chart badge beside the name.
+            Spacer(Modifier.weight(1f))
+            CardBadge(badge = badge, colors = colors)
+        }
+    } else if (platforms.isNotEmpty()) {
+        FlowRow(
+            modifier = Modifier.padding(top = gap),
+            horizontalArrangement = Arrangement.spacedBy(7.dp),
+            verticalArrangement = Arrangement.spacedBy(7.dp),
+        ) {
+            platforms.forEach { platform ->
+                KomiChip(
+                    label = platform.toLabel(),
+                    kind = KomiChipKind.Info,
+                    size = KomiChipSize.Md,
+                    leadingContent = {
+                        Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                            platform.toIcon()?.let { icon ->
+                                Icon(
+                                    imageVector = icon,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(14.dp),
+                                    tint = colors.onSurface,
+                                )
+                            }
+                        }
+                    },
+                )
             }
         }
     }
 }
 
+@Composable
+private fun RepoCardFooter(
+    stars: Int,
+    downloads: Int,
+    releasedAt: String?,
+    compact: Boolean,
+    colors: PersonalityColors,
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth().padding(top = if (compact) 9.dp else 11.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(if (compact) 8.dp else 13.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.weight(1f, fill = false),
+        ) {
+            Stat(
+                icon = Icons.Filled.Star,
+                value = fmtCompact(stars),
+                colors = colors,
+                hero = true,
+            )
+            Stat(
+                icon = Icons.Outlined.Download,
+                value = fmtCompact(downloads),
+                colors = colors,
+            )
+            if (!compact) {
+                formatReleasedAgo(releasedAt)?.let { ago ->
+                    Stat(
+                        icon = Icons.Outlined.Schedule,
+                        value = ago,
+                        colors = colors,
+                    )
+                }
+            }
+        }
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            if (!compact) {
+                KomiText(
+                    text = "Read",
+                    role = KomiTextRole.LabelSmall,
+                    color = colors.onSurface,
+                    modifier = Modifier.padding(end = 2.dp),
+                )
+            }
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                contentDescription = null,
+                modifier = Modifier.size(16.dp),
+                tint = colors.onSurface,
+            )
+        }
+    }
+}
+
+private const val AVATAR_SATURATION = 0.15f
+private const val AVATAR_CONTRAST_DARK = 1.05f
+private const val AVATAR_CONTRAST_LIGHT = 1.15f
+private const val AVATAR_BRIGHTNESS_DARK = 0.95f
+private const val AVATAR_BRIGHTNESS_LIGHT = 1.02f
+private const val CONTRAST_PIVOT = 0.5f
+private const val CHANNEL_MAX = 255f
+private const val LUMA_RED = 0.299f
+private const val LUMA_GREEN = 0.587f
+private const val LUMA_BLUE = 0.114f
+
 private fun inkAvatarFilter(dark: Boolean): ColorFilter {
-    val saturation = 0.15f
-    val contrast = if (dark) 1.05f else 1.15f
-    val brightness = if (dark) 0.95f else 1.02f
+    val saturation = AVATAR_SATURATION
+    val contrast = if (dark) AVATAR_CONTRAST_DARK else AVATAR_CONTRAST_LIGHT
+    val brightness = if (dark) AVATAR_BRIGHTNESS_DARK else AVATAR_BRIGHTNESS_LIGHT
     val keep = 1f - saturation
     val cb = contrast * brightness
-    val t = (-.5f * contrast + .5f) * 255f
-    val lr = 0.299f
-    val lg = 0.587f
-    val lb = 0.114f
+    val t = (-CONTRAST_PIVOT * contrast + CONTRAST_PIVOT) * CHANNEL_MAX
+    val lr = LUMA_RED
+    val lg = LUMA_GREEN
+    val lb = LUMA_BLUE
     return ColorFilter.colorMatrix(
         ColorMatrix(
             floatArrayOf(
@@ -407,33 +473,37 @@ private fun CardIconTile(
     }
 }
 
+private data class CardBadgeInfo(
+    val feed: KomiRepoCardFeed,
+    val rank: Int,
+    val dailyStars: Int,
+    val version: String?,
+    val releasedAgoDays: Int,
+)
+
 @Composable
 private fun CardBadge(
-    feed: KomiRepoCardFeed,
-    rank: Int,
-    dailyStars: Int,
-    version: String?,
-    releasedAgoDays: Int,
+    badge: CardBadgeInfo,
     colors: PersonalityColors,
 ) {
-    if (feed == KomiRepoCardFeed.Plain) return
+    if (badge.feed == KomiRepoCardFeed.Plain) return
     when (LocalPersonality.current) {
         is MangaPersonality -> {
-            when (feed) {
+            when (badge.feed) {
                 KomiRepoCardFeed.Popular -> {
-                    RankStamp(rank = rank, colors = colors)
+                    RankStamp(rank = badge.rank, colors = colors)
                 }
 
                 KomiRepoCardFeed.Trending -> {
-                    if (dailyStars > 0) {
-                        BurstBadge(text = "+${fmtCompact(dailyStars)}", colors = colors)
+                    if (badge.dailyStars > 0) {
+                        BurstBadge(text = "+${fmtCompact(badge.dailyStars)}", colors = colors)
                     }
                 }
 
                 KomiRepoCardFeed.Release -> {
                     NewReleaseStamp(
-                        version = version,
-                        showStamp = releasedAgoDays <= 7,
+                        version = badge.version,
+                        showStamp = badge.releasedAgoDays <= 7,
                         colors = colors,
                     )
                 }
@@ -444,10 +514,10 @@ private fun CardBadge(
 
         is ClassicPersonality -> {
             ClassicBadge(
-                feed = feed,
-                rank = rank,
-                dailyStars = dailyStars,
-                releasedAgoDays = releasedAgoDays,
+                feed = badge.feed,
+                rank = badge.rank,
+                dailyStars = badge.dailyStars,
+                releasedAgoDays = badge.releasedAgoDays,
                 colors = colors,
             )
         }
@@ -476,7 +546,7 @@ private fun RankStamp(
                         3.dp,
                     ).border(
                         width = 1.5.dp,
-                        color = colors.onPrimary.copy(alpha = 0.55f),
+                        color = colors.onPrimaryMuted,
                         shape = CircleShape,
                     ),
         )
@@ -612,19 +682,22 @@ private fun Diamond(color: Color) {
     Box(modifier = Modifier.size(4.dp).rotate(45f).background(color))
 }
 
+private const val THOUSAND = 1_000.0
+private const val MILLION = 1_000_000.0
+private const val WHOLE_UNITS_FROM = 10.0
+private const val ONE_DECIMAL = 10.0
+
 private fun fmtCompact(n: Int): String =
     when {
-        n >= 1_000_000 -> shorten(n / 1_000_000.0, n >= 10_000_000) + "M"
-        n >= 1_000 -> shorten(n / 1_000.0, n >= 10_000) + "k"
+        n >= MILLION -> shorten(n / MILLION) + "M"
+        n >= THOUSAND -> shorten(n / THOUSAND) + "k"
         else -> n.toString()
     }
 
-private fun shorten(
-    value: Double,
-    zeroDecimals: Boolean,
-): String {
-    if (zeroDecimals) return value.roundToInt().toString()
-    val rounded = (value * 10).roundToInt() / 10.0
+// Ten units and up drop the decimal: 12k, not 12.3k.
+private fun shorten(value: Double): String {
+    if (value >= WHOLE_UNITS_FROM) return value.roundToInt().toString()
+    val rounded = (value * ONE_DECIMAL).roundToInt() / ONE_DECIMAL
     return if (rounded == rounded.toLong().toDouble()) {
         rounded
             .toLong()
@@ -655,7 +728,7 @@ private fun PreviewCards() {
             name = "localsend",
             owner = "localsend",
             language = "Dart",
-            description = "Open-source AirDrop alternative — share files to nearby devices over your local network.",
+            description = "Open-source AirDrop alternative: share files to nearby devices over your local network.",
             platforms =
                 persistentListOf(
                     DiscoveryPlatform.Android,
@@ -690,22 +763,23 @@ private fun PreviewCards() {
 @Preview
 @Composable
 private fun KomiRepoCardMangaPreview() {
-    PersonalityPreview(mangaPersonality()) { PreviewCards() }
+    PersonalityPreview(personality = mangaPersonality()) { PreviewCards() }
 }
 
 @Preview
 @Composable
 private fun KomiRepoCardMangaNightPreview() {
     PersonalityPreview(
-        mangaPersonality(
-            paper = MangaPaper.NIGHT,
-            accent = MangaAccent.SUN,
-        ),
+        personality =
+            mangaPersonality(
+                paper = MangaPaper.NIGHT,
+                accent = MangaAccent.SUN,
+            ),
     ) { PreviewCards() }
 }
 
 @Preview
 @Composable
 private fun KomiRepoCardClassicPreview() {
-    PersonalityPreview(classicPersonality()) { PreviewCards() }
+    PersonalityPreview(personality = classicPersonality()) { PreviewCards() }
 }

@@ -1,14 +1,24 @@
 package zed.rainxch.githubstore.app.di
 
+import org.koin.core.module.dsl.factoryOf
 import org.koin.core.module.dsl.viewModel
 import org.koin.core.module.dsl.viewModelOf
-import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import zed.rainxch.apps.presentation.AppsViewModel
 import zed.rainxch.apps.presentation.import.ExternalImportViewModel
+import zed.rainxch.apps.presentation.library.LibraryBackup
+import zed.rainxch.apps.presentation.library.LibraryLoader
+import zed.rainxch.apps.presentation.link.LinkSheetActions
+import zed.rainxch.apps.presentation.settings.AppRowActions
+import zed.rainxch.apps.presentation.settings.AssetMatchSettings
 import zed.rainxch.apps.presentation.starred.StarredPickerViewModel
+import zed.rainxch.apps.presentation.updates.AppUpdates
+import zed.rainxch.apps.presentation.updates.UpdateDownloads
+import zed.rainxch.apps.presentation.updates.UpdateInstalls
+import zed.rainxch.apps.presentation.updates.UpdateTargetResolver
 import zed.rainxch.auth.presentation.AuthenticationViewModel
 import zed.rainxch.core.domain.model.repository.DiscoveryPlatform
+import zed.rainxch.details.presentation.DetailsArgs
 import zed.rainxch.details.presentation.DetailsViewModel
 import zed.rainxch.details.presentation.about.DetailsAboutViewModel
 import zed.rainxch.details.presentation.whatsnew.DetailsWhatsNewViewModel
@@ -16,8 +26,12 @@ import zed.rainxch.devprofile.presentation.DeveloperProfileViewModel
 import zed.rainxch.favourites.presentation.FavouritesViewModel
 import zed.rainxch.favourites.presentation.import.ImportStarsViewModel
 import zed.rainxch.feed.presentation.FeedViewModel
+import zed.rainxch.feed.presentation.marks.FeedLibraryMarksSource
+import zed.rainxch.feed.presentation.marks.FeedViewingMarksStore
 import zed.rainxch.home.presentation.HomeViewModel
 import zed.rainxch.home.presentation.categorylist.CategoryListViewModel
+import zed.rainxch.home.presentation.marks.HomeLibraryMarksSource
+import zed.rainxch.home.presentation.marks.HomeViewingMarksStore
 import zed.rainxch.profile.presentation.ProfileViewModel
 import zed.rainxch.profile.presentation.announcements.AnnouncementsViewModel
 import zed.rainxch.profile.presentation.whatsnew.WhatsNewViewModel
@@ -26,13 +40,25 @@ import zed.rainxch.repopages.presentation.issuedetail.IssueDetailViewModel
 import zed.rainxch.repopages.presentation.issues.IssuesViewModel
 import zed.rainxch.repopages.presentation.pulls.PullsViewModel
 import zed.rainxch.repopages.presentation.security.SecurityViewModel
+import zed.rainxch.reviews.presentation.ReviewsArgs
 import zed.rainxch.reviews.presentation.ReviewsViewModel
 import zed.rainxch.reviews.presentation.moderation.ModerationViewModel
 import zed.rainxch.search.presentation.SearchViewModel
+import zed.rainxch.search.presentation.handlers.ClipboardLinks
+import zed.rainxch.search.presentation.handlers.RepoCardActions
+import zed.rainxch.search.presentation.handlers.ResultRows
+import zed.rainxch.search.presentation.handlers.SearchFilters
+import zed.rainxch.search.presentation.handlers.SearchResults
 import zed.rainxch.starred.presentation.StarredReposViewModel
 import zed.rainxch.tweaks.presentation.TweaksViewModel
 import zed.rainxch.tweaks.presentation.appinfo.AppInfoViewModel
 import zed.rainxch.tweaks.presentation.feedback.FeedbackViewModel
+import zed.rainxch.tweaks.presentation.handlers.ConnectionHandler
+import zed.rainxch.tweaks.presentation.handlers.DiagnosticsHandler
+import zed.rainxch.tweaks.presentation.handlers.InstallsHandler
+import zed.rainxch.tweaks.presentation.handlers.LookAndFeelHandler
+import zed.rainxch.tweaks.presentation.handlers.PrivacyHandler
+import zed.rainxch.tweaks.presentation.handlers.TranslationHandler
 import zed.rainxch.tweaks.presentation.hidden.HiddenRepositoriesViewModel
 import zed.rainxch.tweaks.presentation.hosttokens.HostTokensViewModel
 import zed.rainxch.tweaks.presentation.licenses.LicensesViewModel
@@ -41,41 +67,33 @@ import zed.rainxch.tweaks.presentation.skipped.SkippedUpdatesViewModel
 
 val viewModelsModule =
     module {
+        // Factories, not singles: each collaborator keeps the state of the one AppsViewModel it serves.
+        factoryOf(::LibraryLoader)
+        factoryOf(::UpdateTargetResolver)
+        factoryOf(::UpdateDownloads)
+        factoryOf(::UpdateInstalls)
+        factoryOf(::AppUpdates)
+        factoryOf(::LinkSheetActions)
+        factoryOf(::AppRowActions)
+        factoryOf(::AssetMatchSettings)
+        factoryOf(::LibraryBackup)
         viewModelOf(::AppsViewModel)
         viewModelOf(::ExternalImportViewModel)
         viewModelOf(::AuthenticationViewModel)
         viewModel { params ->
             DetailsViewModel(
-                repositoryId = params[0],
-                ownerParam = params[1],
-                repoParam = params[2],
-                isComingFromUpdate = params[3],
-                sourceHostParam = if (params.size() > 4) params[4] else null,
-                packageNameParam = if (params.size() > 5) params[5] else null,
-                detailsRepository = get(),
-                downloader = get(),
-                installer = get(),
+                args =
+                    DetailsArgs(
+                        repositoryId = params[0],
+                        owner = params[1],
+                        repo = params[2],
+                        isComingFromUpdate = params[3],
+                        sourceHost = if (params.size() > 4) params[4] else null,
+                        packageName = if (params.size() > 5) params[5] else null,
+                    ),
                 platform = get(),
-                helper = get(),
-                shareManager = get(),
-                installedAppsRepository = get(),
-                favouritesRepository = get(),
-                starredRepository = get(),
-                packageMonitor = get(),
-                syncInstalledAppsUseCase = get(),
-                translationRepository = get(),
-                logger = get(),
-                tweaksRepository = get(),
-                seenReposRepository = get(),
-                installationManager = get(),
-                attestationVerifier = get(),
-                downloadOrchestrator = get(),
-                externalImportRepository = get(),
-                apkInspector = get(),
-                userSessionRepository = get(),
-                reviewsRepository = get(),
-                systemInstallSerializer = get(),
-                appScope = get(),
+                page = get(),
+                app = get(),
             )
         }
         viewModel { params ->
@@ -109,13 +127,16 @@ val viewModelsModule =
         viewModelOf(::ModerationViewModel)
         viewModel { params ->
             ReviewsViewModel(
-                owner = params[0],
-                repo = params[1],
-                sourceHost = params[2],
-                openComposer = params[3],
-                composerRating = params[4],
-                version = params[5],
-                appLabel = params[6],
+                args =
+                    ReviewsArgs(
+                        owner = params[0],
+                        repo = params[1],
+                        sourceHost = params[2],
+                        openComposer = params[3],
+                        composerRating = params[4],
+                        version = params[5],
+                        appLabel = params[6],
+                    ),
                 repository = get(),
                 userSessionRepository = get(),
             )
@@ -153,30 +174,35 @@ val viewModelsModule =
         }
         viewModelOf(::FavouritesViewModel)
         viewModelOf(::ImportStarsViewModel)
+        factoryOf(::HomeLibraryMarksSource)
+        factoryOf(::HomeViewingMarksStore)
         viewModelOf(::HomeViewModel)
+        factoryOf(::FeedLibraryMarksSource)
+        factoryOf(::FeedViewingMarksStore)
         viewModelOf(::FeedViewModel)
         viewModelOf(::RecentlyViewedViewModel)
+        factoryOf(::ResultRows)
+        factoryOf(::SearchResults)
+        factoryOf(::SearchFilters)
+        factoryOf(::ClipboardLinks)
+        factoryOf(::RepoCardActions)
         viewModel { params ->
             SearchViewModel(
-                searchRepository = get(),
-                installedAppsRepository = get(),
-                syncInstalledAppsUseCase = get(),
-                favouritesRepository = get(),
-                starredRepository = get(),
-                logger = get(),
-                shareManager = get(),
-                platform = get(),
-                clipboardHelper = get(),
-                tweaksRepository = get(),
-                seenReposRepository = get(),
+                results = get(),
+                filters = get(),
+                links = get(),
+                cardActions = get(),
                 searchHistoryRepository = get(),
-                hiddenReposRepository = get(),
-                userSessionRepository = get(),
-                browseFilterStore = get(),
                 initialPlatform = params.getOrNull<DiscoveryPlatform>(),
             )
         }
         viewModelOf(::ProfileViewModel)
+        factoryOf(::LookAndFeelHandler)
+        factoryOf(::ConnectionHandler)
+        factoryOf(::InstallsHandler)
+        factoryOf(::TranslationHandler)
+        factoryOf(::PrivacyHandler)
+        factoryOf(::DiagnosticsHandler)
         viewModelOf(::TweaksViewModel)
         viewModelOf(::FeedbackViewModel)
         viewModelOf(::StarredReposViewModel)
@@ -195,11 +221,5 @@ val viewModelsModule =
                 tweaksRepository = get(),
             )
         }
-        viewModel {
-            MirrorPickerViewModel(
-                mirrorRepository = get(),
-                testHttpClient = get(qualifier = named("test")),
-                logger = get(),
-            )
-        }
+        viewModelOf(::MirrorPickerViewModel)
     }

@@ -15,6 +15,7 @@ import zed.rainxch.core.data.network.DesktopDigestVerifier
 import zed.rainxch.core.domain.network.AssetIdentity
 import zed.rainxch.core.domain.utils.AssetFileName
 import java.io.File
+import java.io.IOException
 import java.net.InetSocketAddress
 import java.nio.file.Files
 import java.security.MessageDigest
@@ -100,7 +101,7 @@ class ResumeAgainstServerTest {
                     withTempDownloadsDir { dir ->
                         val downloader = newDownloader(dir)
 
-                        var failure: Throwable? = null
+                        var failure: IOException? = null
                         val job =
                             launch(Dispatchers.IO) {
                                 try {
@@ -111,7 +112,7 @@ class ResumeAgainstServerTest {
                                             bypassMirror = true,
                                             identity = identity,
                                         ).toList()
-                                } catch (e: Throwable) {
+                                } catch (e: IOException) {
                                     failure = e
                                 }
                             }
@@ -255,23 +256,6 @@ class ResumeAgainstServerTest {
             requestLog.add(range)
             if (requestLog.size == 1) arrival.countDown()
 
-            if (mode == Mode.FAIL_FIRST_REQUEST && requestLog.size == 1) {
-                exchange.sendResponseHeaders(500, -1)
-                exchange.close()
-                return
-            }
-
-            if (mode == Mode.GONE) {
-                exchange.sendResponseHeaders(404, -1)
-                exchange.close()
-                return
-            }
-
-            if (mode == Mode.IGNORE_RANGE) {
-                send(exchange, 200, body, contentRange = null)
-                return
-            }
-
             val requested =
                 range?.let {
                     RANGE_HEADER
@@ -280,12 +264,20 @@ class ResumeAgainstServerTest {
                         ?.get(1)
                         ?.toLong()
                 }
-            if (requested == null) {
-                send(exchange, 200, body, contentRange = null)
-                return
-            }
-            when (mode) {
-                Mode.ANSWER_206_FOR_THE_WRONG_SPAN -> {
+            when {
+                mode == Mode.FAIL_FIRST_REQUEST && requestLog.size == 1 -> {
+                    fail(exchange, 500)
+                }
+
+                mode == Mode.GONE -> {
+                    fail(exchange, 404)
+                }
+
+                mode == Mode.IGNORE_RANGE || requested == null -> {
+                    send(exchange, 200, body, contentRange = null)
+                }
+
+                mode == Mode.ANSWER_206_FOR_THE_WRONG_SPAN -> {
                     send(exchange, 206, body, contentRange = "bytes 0-${body.size - 1}/${body.size}")
                 }
 
@@ -298,6 +290,14 @@ class ResumeAgainstServerTest {
                     )
                 }
             }
+        }
+
+        private fun fail(
+            exchange: HttpExchange,
+            code: Int,
+        ) {
+            exchange.sendResponseHeaders(code, -1)
+            exchange.close()
         }
 
         private fun send(

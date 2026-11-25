@@ -35,8 +35,7 @@ class AppDatabaseMigrationTest {
 
     @Test
     fun everyOlderVersionUpgradesWithoutLosingData() {
-        // 10 never shipped. A database created at 10 lacks the DEFAULT 0 on fallbackToOlderReleases
-        // that MIGRATION_9_10 adds, so it cannot pass schema validation at 11+.
+        // 10 never shipped, and a database created at it lacks MIGRATION_9_10's DEFAULT 0, so it fails validation at 11+.
         val versions = listOf(1, 2) + exportedVersions.filter { it < latestVersion && it != 10 }
 
         versions.forEach { version ->

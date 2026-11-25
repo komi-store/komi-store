@@ -20,7 +20,7 @@ import zed.rainxch.tweaks.presentation.components.shell.SettingsGroup
 import zed.rainxch.tweaks.presentation.components.shell.SettingsRow
 
 @Composable
-fun storageSectionContent(
+fun StorageSectionContent(
     state: TweaksState,
     onAction: (TweaksAction) -> Unit,
     modifier: Modifier = Modifier,

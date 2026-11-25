@@ -98,8 +98,7 @@ class GitHubAuthApiProxyTest {
             }
         }
 
-        // Answers plain-HTTP requests with a device-flow start and refuses
-        // every CONNECT, so HTTPS targets never leave the machine.
+        // Answers plain HTTP with a device-flow start and refuses every CONNECT, so HTTPS targets never leave the machine.
         private fun answer(socket: Socket) {
             val input = socket.getInputStream().bufferedReader()
             val requestLine = input.readLine() ?: return

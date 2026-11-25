@@ -112,8 +112,7 @@ class PendingInstallResolutionTest {
         )
     }
 
-    // The device already runs the release the park points at: a duplicate install must settle,
-    // not keep the ready-to-install row alive forever.
+    // The device already runs the release the park points at: a duplicate install settles instead of keeping the row.
     @Test
     fun a_park_on_the_release_the_device_already_runs_converges() {
         assertTrue(
@@ -146,8 +145,7 @@ class PendingInstallResolutionTest {
         )
     }
 
-    // A park from Details writes the downloaded build into the installed fields before the system
-    // installs it. Until the device reports that build, the park has to hold.
+    // A Details park writes the downloaded build into the installed fields early; it holds until the device reports it.
     @Test
     fun a_details_park_the_device_has_not_installed_keeps_the_park() {
         assertEquals(

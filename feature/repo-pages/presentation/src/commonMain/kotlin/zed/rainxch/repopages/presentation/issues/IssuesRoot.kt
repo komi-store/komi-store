@@ -5,8 +5,8 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -17,13 +17,12 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import zed.rainxch.core.presentation.components.overlays.KomiToastState
-import zed.rainxch.core.presentation.components.overlays.rememberKomiToastState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
@@ -34,24 +33,36 @@ import zed.rainxch.core.presentation.components.buttons.KomiButton
 import zed.rainxch.core.presentation.components.buttons.KomiFab
 import zed.rainxch.core.presentation.components.chips.KomiChip
 import zed.rainxch.core.presentation.components.chips.KomiChipKind
+import zed.rainxch.core.presentation.components.inputs.KomiTextField
 import zed.rainxch.core.presentation.components.overlays.KomiSheet
+import zed.rainxch.core.presentation.components.overlays.KomiToastState
+import zed.rainxch.core.presentation.components.overlays.rememberKomiToastState
 import zed.rainxch.core.presentation.components.progress.KomiCircularProgress
 import zed.rainxch.core.presentation.components.scaffold.KomiScaffold
 import zed.rainxch.core.presentation.components.surfaces.KomiSurface
 import zed.rainxch.core.presentation.components.text.KomiText
 import zed.rainxch.core.presentation.components.text.KomiTextRole
-import zed.rainxch.core.presentation.components.inputs.KomiTextField
 import zed.rainxch.core.presentation.locals.LocalPersonality
 import zed.rainxch.core.presentation.locals.LocalStatusColors
 import zed.rainxch.core.presentation.utils.ObserveAsEvents
-import zed.rainxch.githubstore.core.presentation.res.*
+import zed.rainxch.githubstore.core.presentation.res.Res
+import zed.rainxch.githubstore.core.presentation.res.repo_pages_issue_opened_by
+import zed.rainxch.githubstore.core.presentation.res.repo_pages_issues_empty_closed
+import zed.rainxch.githubstore.core.presentation.res.repo_pages_issues_empty_open
+import zed.rainxch.githubstore.core.presentation.res.repo_pages_issues_filter_closed
+import zed.rainxch.githubstore.core.presentation.res.repo_pages_issues_filter_open
+import zed.rainxch.githubstore.core.presentation.res.repo_pages_issues_title
+import zed.rainxch.githubstore.core.presentation.res.repo_pages_new_issue
+import zed.rainxch.githubstore.core.presentation.res.repo_pages_new_issue_body_hint
+import zed.rainxch.githubstore.core.presentation.res.repo_pages_new_issue_submit
+import zed.rainxch.githubstore.core.presentation.res.repo_pages_new_issue_title_hint
 import zed.rainxch.repopages.domain.model.IssueState
-import zed.rainxch.repopages.domain.model.RepoIssue
 import zed.rainxch.repopages.presentation.components.LabelChip
 import zed.rainxch.repopages.presentation.components.RepoPagesEmpty
 import zed.rainxch.repopages.presentation.components.RepoPagesError
 import zed.rainxch.repopages.presentation.components.RepoPagesLoading
 import zed.rainxch.repopages.presentation.components.RepoPagesTopBar
+import zed.rainxch.repopages.presentation.model.RepoIssueUi
 
 @Composable
 fun IssuesRoot(
@@ -97,7 +108,7 @@ fun IssuesRoot(
                 is IssuesAction.OnOpenIssue -> onOpenIssue(action.issueNumber)
                 else -> viewModel.onAction(action)
             }
-        }
+        },
     )
 }
 
@@ -105,7 +116,7 @@ fun IssuesRoot(
 private fun IssuesScreen(
     state: IssuesUiState,
     toastState: KomiToastState,
-    onAction: (IssuesAction) -> Unit
+    onAction: (IssuesAction) -> Unit,
 ) {
     KomiScaffold(
         topBar = {
@@ -131,14 +142,16 @@ private fun IssuesScreen(
         },
     ) { innerPadding ->
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding),
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding),
         ) {
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 4.dp),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 4.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 KomiChip(
@@ -161,33 +174,40 @@ private fun IssuesScreen(
             }
 
             when {
-                state.isLoading -> RepoPagesLoading()
+                state.isLoading -> {
+                    RepoPagesLoading()
+                }
 
-                state.errorMessage != null -> RepoPagesError(
-                    message = state.errorMessage,
-                    onRetry = {
-                        onAction(IssuesAction.OnRetry)
-                    },
-                )
+                state.errorMessage != null -> {
+                    RepoPagesError(
+                        message = state.errorMessage,
+                        onRetry = {
+                            onAction(IssuesAction.OnRetry)
+                        },
+                    )
+                }
 
                 state.issues.isEmpty() -> {
-                    val emptyText = if (state.filter == IssueState.OPEN) {
-                        stringResource(Res.string.repo_pages_issues_empty_open)
-                    } else {
-                        stringResource(Res.string.repo_pages_issues_empty_closed)
-                    }
+                    val emptyText =
+                        if (state.filter == IssueState.OPEN) {
+                            stringResource(Res.string.repo_pages_issues_empty_open)
+                        } else {
+                            stringResource(Res.string.repo_pages_issues_empty_closed)
+                        }
                     RepoPagesEmpty(message = emptyText)
                 }
 
-                else -> IssuesList(
-                    state = state,
-                    onLoadMore = {
-                        onAction(IssuesAction.OnLoadMore)
-                    },
-                    onOpenIssue = {
-                        onAction(IssuesAction.OnOpenIssue(it))
-                    },
-                )
+                else -> {
+                    IssuesList(
+                        state = state,
+                        onLoadMore = {
+                            onAction(IssuesAction.OnLoadMore)
+                        },
+                        onOpenIssue = {
+                            onAction(IssuesAction.OnOpenIssue(it))
+                        },
+                    )
+                }
             }
         }
     }
@@ -206,10 +226,11 @@ private fun NewIssueSheet(
         title = stringResource(Res.string.repo_pages_new_issue),
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp)
-                .padding(bottom = 24.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
+                    .padding(bottom = 24.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             KomiTextField(
@@ -255,8 +276,9 @@ private fun IssuesList(
             info.totalItemsCount > 0 && last >= info.totalItemsCount - 4
         }
     }
+    val currentOnLoadMore by rememberUpdatedState(onLoadMore)
     LaunchedEffect(shouldLoadMore) {
-        if (shouldLoadMore) onLoadMore()
+        if (shouldLoadMore) currentOnLoadMore()
     }
 
     LazyColumn(
@@ -267,13 +289,13 @@ private fun IssuesList(
     ) {
         items(
             items = state.issues,
-            key = { it.issueId }
+            key = { it.issueId },
         ) { issue ->
             IssueRow(
                 issue = issue,
                 onClick = {
                     onOpenIssue(issue.issueId)
-                }
+                },
             )
         }
 
@@ -292,7 +314,7 @@ private fun IssuesList(
 
 @Composable
 private fun IssueRow(
-    issue: RepoIssue,
+    issue: RepoIssueUi,
     onClick: () -> Unit,
 ) {
     val colors = LocalPersonality.current.colors
@@ -307,17 +329,19 @@ private fun IssueRow(
         ) {
             val statusColors = LocalStatusColors.current
             Box(
-                modifier = Modifier
-                    .padding(top = 5.dp)
-                    .size(10.dp)
-                    .background(
-                        color = if (issue.state == IssueState.OPEN) {
-                            statusColors.issueOpen
-                        } else {
-                            statusColors.issueClosed
-                        },
-                        shape = RoundedCornerShape(shape.cornerSmall),
-                    ),
+                modifier =
+                    Modifier
+                        .padding(top = 5.dp)
+                        .size(10.dp)
+                        .background(
+                            color =
+                                if (issue.state == IssueState.OPEN) {
+                                    statusColors.issueOpen
+                                } else {
+                                    statusColors.issueClosed
+                                },
+                            shape = RoundedCornerShape(shape.cornerSmall),
+                        ),
             )
 
             Column(
@@ -333,10 +357,11 @@ private fun IssueRow(
                 )
 
                 KomiText(
-                    text = "#${issue.issueId} · " +
+                    text =
+                        "#${issue.issueId} · " +
                             stringResource(
                                 Res.string.repo_pages_issue_opened_by,
-                                issue.authorLogin
+                                issue.authorLogin,
                             ),
                     role = KomiTextRole.Body,
                     color = colors.onSurfaceVariant,

@@ -24,6 +24,7 @@ import zed.rainxch.core.presentation.components.text.KomiText
 import zed.rainxch.core.presentation.components.text.KomiTextRole
 import zed.rainxch.core.presentation.locals.LocalPersonality
 import zed.rainxch.core.presentation.locals.LocalStatusColors
+import zed.rainxch.core.presentation.personality.softFill
 import zed.rainxch.core.presentation.utils.formatIsoDateOrRaw
 import zed.rainxch.githubstore.core.presentation.res.Res
 import zed.rainxch.githubstore.core.presentation.res.repo_pages_security_advisories_header
@@ -37,12 +38,12 @@ import zed.rainxch.githubstore.core.presentation.res.repo_pages_severity_low
 import zed.rainxch.githubstore.core.presentation.res.repo_pages_severity_medium
 import zed.rainxch.githubstore.core.presentation.res.repo_pages_severity_unknown
 import zed.rainxch.repopages.domain.model.AdvisorySeverity
-import zed.rainxch.repopages.domain.model.SecurityAdvisory
-import zed.rainxch.repopages.domain.model.SecurityOverview
 import zed.rainxch.repopages.presentation.components.RepoMarkdown
 import zed.rainxch.repopages.presentation.components.RepoPagesError
 import zed.rainxch.repopages.presentation.components.RepoPagesLoading
 import zed.rainxch.repopages.presentation.components.RepoPagesTopBar
+import zed.rainxch.repopages.presentation.model.SecurityAdvisoryUi
+import zed.rainxch.repopages.presentation.model.SecurityOverviewUi
 
 @Composable
 fun SecurityRoot(
@@ -104,7 +105,7 @@ private fun SecurityScreen(
 
 @Composable
 private fun SecurityContent(
-    overview: SecurityOverview,
+    overview: SecurityOverviewUi,
     modifier: Modifier = Modifier,
 ) {
     val colors = LocalPersonality.current.colors
@@ -165,7 +166,7 @@ private fun SectionHeader(text: String) {
 }
 
 @Composable
-private fun AdvisoryCard(advisory: SecurityAdvisory) {
+private fun AdvisoryCard(advisory: SecurityAdvisoryUi) {
     val colors = LocalPersonality.current.colors
     val publishedDate =
         remember(advisory.publishedAt) {
@@ -237,7 +238,7 @@ private fun SeverityBadge(severity: AdvisorySeverity) {
         color = color,
         modifier =
             Modifier
-                .background(color.copy(alpha = 0.16f), RoundedCornerShape(shape.cornerSmall))
+                .background(color.softFill, RoundedCornerShape(shape.cornerSmall))
                 .padding(horizontal = 8.dp, vertical = 2.dp),
     )
 }

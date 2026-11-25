@@ -29,15 +29,15 @@ import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 import org.koin.core.qualifier.named
 import zed.rainxch.core.presentation.components.bars.KomiTopBar
-import zed.rainxch.core.presentation.components.progress.KomiLoadingIndicator
-import zed.rainxch.core.presentation.components.text.KomiText
-import zed.rainxch.core.presentation.components.text.KomiTextRole
-import zed.rainxch.core.presentation.locals.LocalPersonality
 import zed.rainxch.core.presentation.components.markdown.MarkdownImageTransformer
 import zed.rainxch.core.presentation.components.markdown.githubStoreMarkdownComponents
 import zed.rainxch.core.presentation.components.markdown.rememberMarkdownColors
 import zed.rainxch.core.presentation.components.markdown.rememberMarkdownTypography
+import zed.rainxch.core.presentation.components.progress.KomiLoadingIndicator
 import zed.rainxch.core.presentation.components.scaffold.KomiScaffold
+import zed.rainxch.core.presentation.components.text.KomiText
+import zed.rainxch.core.presentation.components.text.KomiTextRole
+import zed.rainxch.core.presentation.locals.LocalPersonality
 import zed.rainxch.details.presentation.components.LanguagePicker
 import zed.rainxch.details.presentation.components.TranslationCard
 import zed.rainxch.details.presentation.utils.ProvideLanguageLinkInterceptor
@@ -51,12 +51,13 @@ fun AboutRoot(
     owner: String,
     repo: String,
     sourceHost: String?,
-    translateTo: String? = null,
     onNavigateBack: () -> Unit,
     onNavigateToMarkdownViewer: (String) -> Unit,
-    viewModel: DetailsAboutViewModel = koinViewModel {
-        parametersOf(repositoryId, owner, repo, sourceHost)
-    },
+    translateTo: String? = null,
+    viewModel: DetailsAboutViewModel =
+        koinViewModel {
+            parametersOf(repositoryId, owner, repo, sourceHost)
+        },
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
@@ -69,7 +70,6 @@ fun AboutRoot(
     AboutScreen(
         state = state,
         onBack = onNavigateBack,
-        onRetry = viewModel::retry,
         onTranslate = viewModel::translate,
         onToggleTranslation = viewModel::toggleTranslation,
         onPickLanguage = viewModel::showLanguagePicker,
@@ -84,7 +84,6 @@ fun AboutRoot(
 private fun AboutScreen(
     state: DetailsAboutState,
     onBack: () -> Unit,
-    onRetry: () -> Unit,
     onTranslate: (String) -> Unit,
     onToggleTranslation: () -> Unit,
     onPickLanguage: () -> Unit,
@@ -98,9 +97,10 @@ private fun AboutScreen(
     val imageTransformer = remember(probeClient) { MarkdownImageTransformer(probeClient) }
     val colors = rememberMarkdownColors()
     val typography = rememberMarkdownTypography()
-    val components = remember(isDark, imageTransformer) {
-        githubStoreMarkdownComponents(imageTransformer, isDark)
-    }
+    val components =
+        remember(isDark, imageTransformer) {
+            githubStoreMarkdownComponents(imageTransformer, isDark)
+        }
     val personalityColors = LocalPersonality.current.colors
 
     KomiScaffold(
@@ -113,90 +113,97 @@ private fun AboutScreen(
     ) { innerPadding ->
         Box(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
             when {
-                state.isLoading -> Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center,
-                ) { KomiLoadingIndicator() }
+                state.isLoading -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center,
+                    ) { KomiLoadingIndicator() }
+                }
 
-                state.errorMessage != null -> Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        KomiText(
-                            text = state.errorMessage,
-                            role = KomiTextRole.Body,
-                            color = personalityColors.error,
-                        )
+                state.errorMessage != null -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            KomiText(
+                                text = state.errorMessage,
+                                role = KomiTextRole.Body,
+                                color = personalityColors.error,
+                            )
 
-                        Spacer(Modifier.size(8.dp))
+                            Spacer(Modifier.size(8.dp))
 
-                        KomiText(
-                            text = stringResource(Res.string.retry),
-                            role = KomiTextRole.Overline,
-                            color = personalityColors.primary,
-                            modifier = Modifier
-                                .padding(8.dp)
-                                .background(personalityColors.surfaceContainerHigh)
-                                .padding(horizontal = 12.dp, vertical = 6.dp),
-                        )
+                            KomiText(
+                                text = stringResource(Res.string.retry),
+                                role = KomiTextRole.Overline,
+                                color = personalityColors.primary,
+                                modifier =
+                                    Modifier
+                                        .padding(8.dp)
+                                        .background(personalityColors.surfaceContainerHigh)
+                                        .padding(horizontal = 12.dp, vertical = 6.dp),
+                            )
+                        }
                     }
                 }
 
-                else -> LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
-                    item(key = "header") {
-                        Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                            KomiText(
-                                text = stringResource(Res.string.details_about_screen_title),
-                                role = KomiTextRole.ScreenTitle,
-                                color = personalityColors.onBackground,
-                            )
-
-                            state.readmeLanguage?.let { lang ->
-                                Spacer(Modifier.height(4.dp))
-
+                else -> {
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        item(key = "header") {
+                            Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
                                 KomiText(
-                                    text = lang,
-                                    role = KomiTextRole.Caption,
-                                    color = personalityColors.onSurfaceVariant,
+                                    text = stringResource(Res.string.details_about_screen_title),
+                                    role = KomiTextRole.ScreenTitle,
+                                    color = personalityColors.onBackground,
                                 )
+
+                                state.readmeLanguage?.let { lang ->
+                                    Spacer(Modifier.height(4.dp))
+
+                                    KomiText(
+                                        text = lang,
+                                        role = KomiTextRole.Caption,
+                                        color = personalityColors.onSurfaceVariant,
+                                    )
+                                }
                             }
                         }
-                    }
 
-                    item(key = "translation_card") {
-                        Spacer(Modifier.height(4.dp))
+                        item(key = "translation_card") {
+                            Spacer(Modifier.height(4.dp))
 
-                        TranslationCard(
-                            state = state.translation,
-                            deviceLanguageCode = state.deviceLanguageCode,
-                            onPickLanguage = onPickLanguage,
-                            onTranslate = onTranslate,
-                            onToggle = onToggleTranslation,
-                            onCancel = onClearTranslation,
-                        )
-                    }
-
-                    item(key = "markdown") {
-                        Spacer(Modifier.height(4.dp))
-
-                        ProvideLanguageLinkInterceptor(
-                            onTranslate = onTranslate,
-                            onClearTranslation = onClearTranslation,
-                            onOpenInternalMarkdown = onNavigateToMarkdownViewer,
-                        ) {
-                            Markdown(
-                                content = state.displayedMarkdown,
-                                colors = colors,
-                                typography = typography,
-                                imageTransformer = imageTransformer,
-                                components = components,
-                                modifier = Modifier.fillMaxWidth(),
+                            TranslationCard(
+                                state = state.translation,
+                                deviceLanguageCode = state.deviceLanguageCode,
+                                onPickLanguage = onPickLanguage,
+                                onTranslate = onTranslate,
+                                onToggle = onToggleTranslation,
+                                onCancel = onClearTranslation,
                             )
+                        }
+
+                        item(key = "markdown") {
+                            Spacer(Modifier.height(4.dp))
+
+                            ProvideLanguageLinkInterceptor(
+                                onTranslate = onTranslate,
+                                onClearTranslation = onClearTranslation,
+                                onOpenInternalMarkdown = onNavigateToMarkdownViewer,
+                            ) {
+                                Markdown(
+                                    content = state.displayedMarkdown,
+                                    colors = colors,
+                                    typography = typography,
+                                    imageTransformer = imageTransformer,
+                                    components = components,
+                                    modifier = Modifier.fillMaxWidth(),
+                                )
+                            }
                         }
                     }
                 }
@@ -211,7 +218,7 @@ private fun AboutScreen(
         selectedLanguageCode = state.translation.targetLanguageCode ?: state.deviceLanguageCode,
         deviceLanguageCode = state.deviceLanguageCode,
         onQueryChange = onLanguageQueryChange,
-        onLanguageSelected = { lang ->
+        onLanguageSelect = { lang ->
             onDismissLanguagePicker()
             onTranslate(lang.code)
         },

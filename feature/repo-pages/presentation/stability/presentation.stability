@@ -5,11 +5,12 @@
 //   ./gradlew :presentation:stabilityDump
 
 @Composable
-internal fun zed.rainxch.repopages.presentation.components.LabelChip(label: zed.rainxch.repopages.domain.model.IssueLabel): kotlin.Unit
+internal fun zed.rainxch.repopages.presentation.components.LabelChip(label: zed.rainxch.repopages.presentation.model.IssueLabelUi, modifier: androidx.compose.ui.Modifier): kotlin.Unit
   skippable: true
   restartable: true
   params:
-    - label: UNSTABLE (cross-module type without @Stable/@Immutable)
+    - label: STABLE (class with no mutable properties)
+    - modifier: STABLE (marked @Stable or @Immutable)
 
 @Composable
 public fun zed.rainxch.repopages.presentation.components.RepoMarkdown(content: kotlin.String, modifier: androidx.compose.ui.Modifier): kotlin.Unit
@@ -52,11 +53,11 @@ public fun zed.rainxch.repopages.presentation.components.RepoPagesTopBar(title: 
     - onBack: STABLE (function type)
 
 @Composable
-private fun zed.rainxch.repopages.presentation.issuedetail.CommentCard(comment: zed.rainxch.repopages.domain.model.IssueComment, isReacting: kotlin.Boolean, onReact: kotlin.Function0<kotlin.Unit>): kotlin.Unit
+private fun zed.rainxch.repopages.presentation.issuedetail.CommentCard(comment: zed.rainxch.repopages.presentation.model.IssueCommentUi, isReacting: kotlin.Boolean, onReact: kotlin.Function0<kotlin.Unit>): kotlin.Unit
   skippable: true
   restartable: true
   params:
-    - comment: UNSTABLE (cross-module type without @Stable/@Immutable)
+    - comment: STABLE (class with no mutable properties)
     - isReacting: STABLE (primitive type)
     - onReact: STABLE (function type)
 
@@ -72,11 +73,11 @@ private fun zed.rainxch.repopages.presentation.issuedetail.CommentComposer(text:
     - onSend: STABLE (function type)
 
 @Composable
-private fun zed.rainxch.repopages.presentation.issuedetail.IssueDetailContent(detail: zed.rainxch.repopages.domain.model.RepoIssueDetail, isReactingIssue: kotlin.Boolean, reactingCommentIds: kotlinx.collections.immutable.PersistentSet<kotlin.Long>, onReactIssue: kotlin.Function0<kotlin.Unit>, onReactComment: kotlin.Function1<kotlin.Long, kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+private fun zed.rainxch.repopages.presentation.issuedetail.IssueDetailContent(detail: zed.rainxch.repopages.presentation.model.IssueDetailUi, isReactingIssue: kotlin.Boolean, reactingCommentIds: kotlinx.collections.immutable.PersistentSet<kotlin.Long>, onReactIssue: kotlin.Function0<kotlin.Unit>, onReactComment: kotlin.Function1<kotlin.Long, kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
   skippable: true
   restartable: true
   params:
-    - detail: UNSTABLE (cross-module type without @Stable/@Immutable)
+    - detail: STABLE (class with no mutable properties)
     - isReactingIssue: STABLE (primitive type)
     - reactingCommentIds: STABLE (known stable type)
     - onReactIssue: STABLE (function type)
@@ -96,7 +97,7 @@ private fun zed.rainxch.repopages.presentation.issuedetail.IssueDetailScreen(sta
   skippable: true
   restartable: true
   params:
-    - state: UNSTABLE (has mutable properties or unstable members)
+    - state: STABLE (class with no mutable properties)
     - toastState: STABLE (marked @Stable or @Immutable)
     - onAction: STABLE (function type)
 
@@ -110,11 +111,11 @@ private fun zed.rainxch.repopages.presentation.issuedetail.ThumbChip(count: kotl
     - onClick: STABLE (function type)
 
 @Composable
-private fun zed.rainxch.repopages.presentation.issues.IssueRow(issue: zed.rainxch.repopages.domain.model.RepoIssue, onClick: kotlin.Function0<kotlin.Unit>): kotlin.Unit
+private fun zed.rainxch.repopages.presentation.issues.IssueRow(issue: zed.rainxch.repopages.presentation.model.RepoIssueUi, onClick: kotlin.Function0<kotlin.Unit>): kotlin.Unit
   skippable: true
   restartable: true
   params:
-    - issue: UNSTABLE (cross-module type without @Stable/@Immutable)
+    - issue: STABLE (class with no mutable properties)
     - onClick: STABLE (function type)
 
 @Composable
@@ -156,11 +157,11 @@ private fun zed.rainxch.repopages.presentation.issues.NewIssueSheet(state: zed.r
     - onSubmit: STABLE (function type)
 
 @Composable
-private fun zed.rainxch.repopages.presentation.pulls.PullRow(pull: zed.rainxch.repopages.domain.model.RepoPullRequest, onClick: kotlin.Function0<kotlin.Unit>): kotlin.Unit
+private fun zed.rainxch.repopages.presentation.pulls.PullRow(pull: zed.rainxch.repopages.presentation.model.RepoPullRequestUi, onClick: kotlin.Function0<kotlin.Unit>): kotlin.Unit
   skippable: true
   restartable: true
   params:
-    - pull: UNSTABLE (cross-module type without @Stable/@Immutable)
+    - pull: STABLE (class with no mutable properties)
     - onClick: STABLE (function type)
 
 @Composable
@@ -168,7 +169,7 @@ private fun zed.rainxch.repopages.presentation.pulls.PullsList(state: zed.rainxc
   skippable: true
   restartable: true
   params:
-    - state: UNKNOWN (interface or non-final class; concrete implementation unknown)
+    - state: STABLE (class with no mutable properties)
     - onLoadMore: STABLE (function type)
     - onOpenPull: STABLE (function type)
 
@@ -186,15 +187,15 @@ private fun zed.rainxch.repopages.presentation.pulls.PullsScreen(state: zed.rain
   skippable: true
   restartable: true
   params:
-    - state: UNKNOWN (interface or non-final class; concrete implementation unknown)
+    - state: STABLE (class with no mutable properties)
     - onAction: STABLE (function type)
 
 @Composable
-private fun zed.rainxch.repopages.presentation.security.AdvisoryCard(advisory: zed.rainxch.repopages.domain.model.SecurityAdvisory): kotlin.Unit
+private fun zed.rainxch.repopages.presentation.security.AdvisoryCard(advisory: zed.rainxch.repopages.presentation.model.SecurityAdvisoryUi): kotlin.Unit
   skippable: true
   restartable: true
   params:
-    - advisory: UNSTABLE (cross-module type without @Stable/@Immutable)
+    - advisory: STABLE (class with no mutable properties)
 
 @Composable
 private fun zed.rainxch.repopages.presentation.security.SectionHeader(text: kotlin.String): kotlin.Unit
@@ -204,11 +205,11 @@ private fun zed.rainxch.repopages.presentation.security.SectionHeader(text: kotl
     - text: STABLE (String is immutable)
 
 @Composable
-private fun zed.rainxch.repopages.presentation.security.SecurityContent(overview: zed.rainxch.repopages.domain.model.SecurityOverview, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+private fun zed.rainxch.repopages.presentation.security.SecurityContent(overview: zed.rainxch.repopages.presentation.model.SecurityOverviewUi, modifier: androidx.compose.ui.Modifier): kotlin.Unit
   skippable: true
   restartable: true
   params:
-    - overview: UNSTABLE (cross-module type without @Stable/@Immutable)
+    - overview: STABLE (class with no mutable properties)
     - modifier: STABLE (marked @Stable or @Immutable)
 
 @Composable
@@ -224,7 +225,7 @@ private fun zed.rainxch.repopages.presentation.security.SecurityScreen(state: ze
   skippable: true
   restartable: true
   params:
-    - state: UNSTABLE (has mutable properties or unstable members)
+    - state: STABLE (class with no mutable properties)
     - onAction: STABLE (function type)
 
 @Composable

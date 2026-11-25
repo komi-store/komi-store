@@ -12,9 +12,7 @@ import zed.rainxch.core.presentation.locals.LocalPersonality
 import zed.rainxch.core.presentation.personality.ClassicPersonality
 import zed.rainxch.core.presentation.personality.classic.classicSeedScheme
 
-// Rebuilds Classic's colors from [seed] for [content], such as an app's icon color on its own
-// page. Manga keeps its paper and ink, and the Mono accent, whose scheme has no chroma, stays gray.
-// The colors switch at once: a fade would recompose the whole page on every frame.
+// Classic colors from seed for content; they switch at once, as a fade would recompose the whole page every frame.
 @Composable
 fun KomiSeededTheme(
     seed: Color?,

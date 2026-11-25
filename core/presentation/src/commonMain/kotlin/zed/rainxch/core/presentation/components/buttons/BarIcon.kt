@@ -18,8 +18,7 @@ import androidx.compose.ui.unit.dp
 import zed.rainxch.core.presentation.components.overlays.LocalMenuOpen
 import zed.rainxch.core.presentation.locals.LocalPersonality
 
-// In a bar an icon swaps with a bouncy scale (the layout toggle), and a menu's trigger shows a
-// close mark while its menu is open. The old icon leaves without overshoot, so it never flips.
+// The old icon leaves without overshoot, so a bouncy swap never flips it; a menu trigger shows a close mark while open.
 @Composable
 internal fun BarIcon(
     icon: ImageVector,

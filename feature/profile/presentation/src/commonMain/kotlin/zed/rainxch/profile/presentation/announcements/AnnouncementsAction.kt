@@ -1,6 +1,5 @@
 package zed.rainxch.profile.presentation.announcements
 
-import zed.rainxch.core.domain.model.announcement.Announcement
 import zed.rainxch.core.domain.model.announcement.AnnouncementCategory
 
 sealed interface AnnouncementsAction {
@@ -13,15 +12,15 @@ sealed interface AnnouncementsAction {
     data object OnEnterScreen : AnnouncementsAction
 
     data class OnCtaClick(
-        val announcement: Announcement,
+        val announcement: AnnouncementUi,
     ) : AnnouncementsAction
 
     data class OnDismissClick(
-        val announcement: Announcement,
+        val announcement: AnnouncementUi,
     ) : AnnouncementsAction
 
     data class OnAcknowledgeClick(
-        val announcement: Announcement,
+        val announcement: AnnouncementUi,
     ) : AnnouncementsAction
 
     data class OnToggleExpand(

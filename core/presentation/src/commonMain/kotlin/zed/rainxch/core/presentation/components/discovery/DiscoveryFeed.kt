@@ -76,9 +76,7 @@ data class DiscoveryFeedStatus(
     val isOffline: Boolean = false,
 )
 
-// Explore and Top Charts: filter chips over a grid of repository cards, with the same loading,
-// error, empty, load-more and end states, and pull to refresh on Android. Each screen brings its
-// cards (what a long press does differs) and, if it has one, its own empty state.
+// Explore and Top Charts: filter chips over a grid of cards; each screen brings its cards and, if any, its empty state.
 @Composable
 fun DiscoveryFeed(
     chips: ImmutableList<DiscoveryChip>,

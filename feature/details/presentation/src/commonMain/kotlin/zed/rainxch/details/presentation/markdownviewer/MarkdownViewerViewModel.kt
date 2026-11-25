@@ -15,6 +15,8 @@ import org.intellij.markdown.flavours.gfm.GFMFlavourDescriptor
 import org.intellij.markdown.parser.CancellationToken
 import org.intellij.markdown.parser.MarkdownParser
 import org.jetbrains.compose.resources.getString
+import zed.rainxch.core.domain.model.error.NetworkException
+import zed.rainxch.details.domain.model.TranslationProviderNotConfiguredException
 import zed.rainxch.details.domain.repository.DetailsRepository
 import zed.rainxch.details.domain.repository.TranslationRepository
 import zed.rainxch.details.presentation.model.SupportedLanguages
@@ -66,9 +68,8 @@ class MarkdownViewerViewModel(
             )
         }
         viewModelScope.launch {
-            runCatching {
-                translationRepository.translate(markdown, targetLanguageCode)
-            }.onSuccess { result ->
+            try {
+                val result = translationRepository.translate(markdown, targetLanguageCode)
                 _state.update {
                     it.copy(
                         translation =
@@ -82,18 +83,22 @@ class MarkdownViewerViewModel(
                     )
                 }
                 recompose()
-            }.onFailure { _ ->
-                _state.update {
-                    it.copy(
-                        translation =
-                            it.translation.copy(
-                                isTranslating = false,
-                                error = getString(Res.string.translation_failed),
-                            ),
-                    )
-                }
+            } catch (_: NetworkException) {
+                showTranslationFailure()
+            } catch (_: TranslationProviderNotConfiguredException) {
+                showTranslationFailure()
             }
         }
+    }
+
+    private suspend fun showTranslationFailure() {
+        val message = getString(Res.string.translation_failed)
+        _state.update { it.copy(translation = it.translation.copy(isTranslating = false, error = message)) }
+    }
+
+    private suspend fun showLoadFailure() {
+        val message = getString(Res.string.failed_to_load)
+        _state.update { it.copy(isLoading = false, errorMessage = message) }
     }
 
     fun toggleTranslation() {
@@ -145,22 +150,12 @@ class MarkdownViewerViewModel(
     private fun load() {
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true, errorMessage = null) }
-            runCatching {
-                detailsRepository.fetchRawMarkdown(url)
-            }.onSuccess { rawMarkdown ->
-                if (rawMarkdown != null) {
-                    _state.update {
-                        it.copy(
-                            isLoading = false,
-                            markdown = rawMarkdown,
-                        )
-                    }
-                    recompose()
-                } else {
-                    _state.update { it.copy(isLoading = false, errorMessage = getString(Res.string.failed_to_load)) }
-                }
-            }.onFailure { _ ->
-                _state.update { it.copy(isLoading = false, errorMessage = getString(Res.string.failed_to_load)) }
+            val rawMarkdown = detailsRepository.fetchRawMarkdown(url)
+            if (rawMarkdown != null) {
+                _state.update { it.copy(isLoading = false, markdown = rawMarkdown) }
+                recompose()
+            } else {
+                showLoadFailure()
             }
         }
     }

@@ -3,6 +3,7 @@ package zed.rainxch.core.data.services
 import co.touchlab.kermit.Logger
 import zed.rainxch.core.domain.model.system.Platform
 import java.io.File
+import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.attribute.PosixFilePermission
 
@@ -56,13 +57,25 @@ class DesktopFileLocationsProvider(
                 perms.add(PosixFilePermission.OTHERS_EXECUTE)
 
                 Files.setPosixFilePermissions(filePath, perms)
-            } catch (e: Exception) {
-                try {
-                    Runtime.getRuntime().exec(arrayOf("chmod", "+x", path)).waitFor()
-                } catch (e2: Exception) {
-                    println("Warning: Could not set executable permission on $path")
-                }
+            } catch (e: IOException) {
+                chmodExecutable(path, e)
+            } catch (e: UnsupportedOperationException) {
+                chmodExecutable(path, e)
             }
+        }
+    }
+
+    private fun chmodExecutable(
+        path: String,
+        posixFailure: Exception,
+    ) {
+        Logger.d(posixFailure) { "POSIX permissions unavailable for $path, falling back to chmod" }
+        try {
+            Runtime.getRuntime().exec(arrayOf("chmod", "+x", path)).waitFor()
+        } catch (e: IOException) {
+            Logger.w(e) { "Could not set executable permission on $path" }
+        } catch (e: InterruptedException) {
+            Logger.w(e) { "Could not set executable permission on $path" }
         }
     }
 
@@ -144,29 +157,22 @@ class DesktopFileLocationsProvider(
     }
 
     private fun getXdgDownloadsDir(): String? {
+        val userDirsFile =
+            File(
+                System.getProperty("user.home"),
+                ".config/user-dirs.dirs",
+            )
+        if (!userDirsFile.exists()) return null
         return try {
-            val userDirsFile =
-                File(
-                    System.getProperty("user.home"),
-                    ".config/user-dirs.dirs",
-                )
-
-            if (userDirsFile.exists()) {
-                userDirsFile.readLines().forEach { line ->
-                    if (line.trim().startsWith("XDG_DOWNLOAD_DIR=")) {
-                        val path =
-                            line
-                                .substringAfter("=")
-                                .trim()
-                                .removeSurrounding("\"")
-                                .replace("\$HOME", System.getProperty("user.home"))
-                        return path
-                    }
-                }
-            }
-            null
-        } catch (e: Exception) {
-            Logger.w { "Failed to read XDG user dirs: ${e.message}" }
+            userDirsFile
+                .readLines()
+                .firstOrNull { it.trim().startsWith("XDG_DOWNLOAD_DIR=") }
+                ?.substringAfter("=")
+                ?.trim()
+                ?.removeSurrounding("\"")
+                ?.replace("\$HOME", System.getProperty("user.home"))
+        } catch (e: IOException) {
+            Logger.w(e) { "Failed to read XDG user dirs" }
             null
         }
     }

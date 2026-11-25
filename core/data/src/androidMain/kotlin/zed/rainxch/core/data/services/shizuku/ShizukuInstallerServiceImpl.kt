@@ -2,6 +2,7 @@ package zed.rainxch.core.data.services.shizuku
 
 import android.os.ParcelFileDescriptor
 import java.io.BufferedReader
+import java.io.IOException
 import java.io.InputStreamReader
 import java.util.concurrent.TimeUnit
 
@@ -13,10 +14,9 @@ class ShizukuInstallerServiceImpl : IShizukuInstallerService.Stub() {
         private const val STATUS_FAILURE = -1
         private const val INSTALL_TIMEOUT_SECONDS = 120L
         private const val UNINSTALL_TIMEOUT_SECONDS = 30L
+        private const val PIPE_BUFFER_SIZE = 64 * 1024
 
         private fun log(msg: String) = android.util.Log.d(TAG, msg)
-
-        private fun logW(msg: String) = android.util.Log.w(TAG, msg)
 
         private fun logE(
             msg: String,
@@ -29,7 +29,7 @@ class ShizukuInstallerServiceImpl : IShizukuInstallerService.Stub() {
         fileSize: Long,
         installerPackageName: String?,
     ): Int {
-        log("installPackage() called — fileSize=$fileSize, installer=$installerPackageName")
+        log("installPackage() called: fileSize=$fileSize, installer=$installerPackageName")
         log("Process UID: ${android.os.Process.myUid()}, PID: ${android.os.Process.myPid()}")
 
         return try {
@@ -43,61 +43,74 @@ class ShizukuInstallerServiceImpl : IShizukuInstallerService.Stub() {
             log("Executing: ${command.joinToString(" ")}")
 
             val process = Runtime.getRuntime().exec(command)
-
-            val writeThread =
-                Thread {
-                    try {
-                        ParcelFileDescriptor.AutoCloseInputStream(pfd).use { input ->
-                            process.outputStream.use { output ->
-                                val buffer = ByteArray(65536)
-                                var bytesWritten = 0L
-                                var read: Int
-                                while (input.read(buffer).also { read = it } != -1) {
-                                    output.write(buffer, 0, read)
-                                    bytesWritten += read
-                                }
-                                output.flush()
-                                log("APK piped to pm stdin: $bytesWritten bytes (expected: $fileSize)")
-                            }
-                        }
-                    } catch (e: Exception) {
-                        logE("Error piping APK to pm stdin", e)
-                    }
-                }
-            writeThread.start()
+            val writeThread = startPipe(pfd, process, fileSize)
 
             val stdout = BufferedReader(InputStreamReader(process.inputStream)).readText().trim()
             val stderr = BufferedReader(InputStreamReader(process.errorStream)).readText().trim()
 
-            writeThread.join(INSTALL_TIMEOUT_SECONDS * 1000)
-            if (writeThread.isAlive) {
-                logE("Write thread timed out after ${INSTALL_TIMEOUT_SECONDS}s, aborting install")
-                writeThread.interrupt()
-                process.destroyForcibly()
-                return STATUS_FAILURE
-            }
-
-            val finished = process.waitFor(INSTALL_TIMEOUT_SECONDS, TimeUnit.SECONDS)
-            if (!finished) {
-                logE("pm install timed out after ${INSTALL_TIMEOUT_SECONDS}s, aborting")
-                process.destroyForcibly()
-                return STATUS_FAILURE
-            }
-
-            val exitCode = process.exitValue()
-            log("pm install — exitCode=$exitCode, stdout='$stdout', stderr='$stderr'")
-
-            if (exitCode == 0 && stdout.contains("Success")) {
-                log("Install SUCCESS")
-                STATUS_SUCCESS
-            } else {
-                logE("Install FAILED — exitCode=$exitCode, stdout='$stdout', stderr='$stderr'")
+            if (!pipeFinished(process, writeThread)) {
                 STATUS_FAILURE
+            } else {
+                val exitCode = process.exitValue()
+                log("pm install: exitCode=$exitCode, stdout='$stdout', stderr='$stderr'")
+
+                if (exitCode == 0 && stdout.contains("Success")) {
+                    log("Install SUCCESS")
+                    STATUS_SUCCESS
+                } else {
+                    logE("Install FAILED: exitCode=$exitCode, stdout='$stdout', stderr='$stderr'")
+                    STATUS_FAILURE
+                }
             }
-        } catch (e: Exception) {
+        } catch (e: IOException) {
+            logE("installPackage() exception", e)
+            STATUS_FAILURE
+        } catch (e: InterruptedException) {
+            logE("installPackage() exception", e)
+            STATUS_FAILURE
+        } catch (e: SecurityException) {
             logE("installPackage() exception", e)
             STATUS_FAILURE
         }
+    }
+
+    private fun startPipe(
+        pfd: ParcelFileDescriptor,
+        process: Process,
+        fileSize: Long,
+    ): Thread =
+        Thread {
+            try {
+                ParcelFileDescriptor.AutoCloseInputStream(pfd).use { input ->
+                    process.outputStream.use { output ->
+                        val bytesWritten = input.copyTo(output, PIPE_BUFFER_SIZE)
+                        output.flush()
+                        log("APK piped to pm stdin: $bytesWritten bytes (expected: $fileSize)")
+                    }
+                }
+            } catch (e: IOException) {
+                logE("Error piping APK to pm stdin", e)
+            }
+        }.also { it.start() }
+
+    private fun pipeFinished(
+        process: Process,
+        writeThread: Thread,
+    ): Boolean {
+        writeThread.join(TimeUnit.SECONDS.toMillis(INSTALL_TIMEOUT_SECONDS))
+        if (writeThread.isAlive) {
+            logE("Write thread timed out after ${INSTALL_TIMEOUT_SECONDS}s, aborting install")
+            writeThread.interrupt()
+            process.destroyForcibly()
+            return false
+        }
+
+        val finished = process.waitFor(INSTALL_TIMEOUT_SECONDS, TimeUnit.SECONDS)
+        if (!finished) {
+            logE("pm install timed out after ${INSTALL_TIMEOUT_SECONDS}s, aborting")
+            process.destroyForcibly()
+        }
+        return finished
     }
 
     override fun uninstallPackage(packageName: String): Int {
@@ -118,22 +131,28 @@ class ShizukuInstallerServiceImpl : IShizukuInstallerService.Stub() {
             }
 
             val exitCode = process.exitValue()
-            log("pm uninstall — exitCode=$exitCode, stdout='$stdout', stderr='$stderr'")
+            log("pm uninstall: exitCode=$exitCode, stdout='$stdout', stderr='$stderr'")
 
             if (exitCode == 0 && stdout.contains("Success")) {
                 log("Uninstall SUCCESS")
                 STATUS_SUCCESS
             } else {
-                logE("Uninstall FAILED — exitCode=$exitCode, stdout='$stdout', stderr='$stderr'")
+                logE("Uninstall FAILED: exitCode=$exitCode, stdout='$stdout', stderr='$stderr'")
                 STATUS_FAILURE
             }
-        } catch (e: Exception) {
+        } catch (e: IOException) {
+            logE("uninstallPackage() exception", e)
+            STATUS_FAILURE
+        } catch (e: InterruptedException) {
+            logE("uninstallPackage() exception", e)
+            STATUS_FAILURE
+        } catch (e: SecurityException) {
             logE("uninstallPackage() exception", e)
             STATUS_FAILURE
         }
     }
 
     override fun destroy() {
-        log("destroy() — service being unbound")
+        log("destroy(): service being unbound")
     }
 }

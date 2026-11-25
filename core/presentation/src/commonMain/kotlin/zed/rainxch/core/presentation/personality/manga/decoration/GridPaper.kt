@@ -7,8 +7,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
-// Grid-paper backdrop: faint 1px onSurface lines on a square cell, drawn behind content
-// (Manga Design Spec — the "paper" the panels sit on). Opacity is the paper's gridOpacity.
+// Faint 1px grid lines on square cells behind the content: the paper the Manga panels sit on.
 fun Modifier.gridPaper(
     color: Color,
     opacity: Float,

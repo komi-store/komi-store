@@ -70,30 +70,8 @@ fun KomiActionRow(
             is ClassicPersonality -> KomiButtonVariant.Text
         }
 
-    val (visible, overflow, danger) =
-        remember(items, maxVisible, showLabels) {
-            val dangerItems = items.filter { it.variant == KomiButtonVariant.Destructive }
-            val safeItems = items.filterNot { it.variant == KomiButtonVariant.Destructive }
-            val canOverflow = !showLabels && safeItems.size > maxVisible
-            Triple(
-                if (canOverflow) safeItems.take(maxVisible) else safeItems,
-                if (canOverflow) safeItems.drop(maxVisible) else emptyList(),
-                dangerItems,
-            )
-        }
-    val overflowEntries: ImmutableList<KomiMenuEntry> =
-        remember(overflow) {
-            overflow
-                .map<KomiActionRowItem, KomiMenuEntry> { item ->
-                    KomiMenuItem(
-                        id = item.title,
-                        label = item.title,
-                        icon = item.icon,
-                        tone = if (item.variant == KomiButtonVariant.Destructive) KomiMenuTone.Danger else KomiMenuTone.Default,
-                        enabled = item.enabled,
-                    )
-                }.toImmutableList()
-        }
+    val (visible, overflow, danger) = remember(items, maxVisible, showLabels) { groupActions(items, maxVisible, showLabels) }
+    val overflowEntries = remember(overflow) { overflowMenuEntries(overflow) }
 
     Row(
         modifier = modifier,
@@ -137,6 +115,40 @@ fun KomiActionRow(
         }
     }
 }
+
+private data class ActionRowGroups(
+    val visible: List<KomiActionRowItem>,
+    val overflow: List<KomiActionRowItem>,
+    val danger: List<KomiActionRowItem>,
+)
+
+// Destructive actions sit apart at the end and never fold into the overflow menu.
+private fun groupActions(
+    items: List<KomiActionRowItem>,
+    maxVisible: Int,
+    showLabels: Boolean,
+): ActionRowGroups {
+    val dangerItems = items.filter { it.variant == KomiButtonVariant.Destructive }
+    val safeItems = items.filterNot { it.variant == KomiButtonVariant.Destructive }
+    val canOverflow = !showLabels && safeItems.size > maxVisible
+    return ActionRowGroups(
+        visible = if (canOverflow) safeItems.take(maxVisible) else safeItems,
+        overflow = if (canOverflow) safeItems.drop(maxVisible) else emptyList(),
+        danger = dangerItems,
+    )
+}
+
+private fun overflowMenuEntries(overflow: List<KomiActionRowItem>): ImmutableList<KomiMenuEntry> =
+    overflow
+        .map<KomiActionRowItem, KomiMenuEntry> { item ->
+            KomiMenuItem(
+                id = item.title,
+                label = item.title,
+                icon = item.icon,
+                tone = if (item.variant == KomiButtonVariant.Destructive) KomiMenuTone.Danger else KomiMenuTone.Default,
+                enabled = item.enabled,
+            )
+        }.toImmutableList()
 
 @Composable
 private fun KomiActionTile(
@@ -227,17 +239,18 @@ private fun PreviewStack() {
 @Preview
 @Composable
 private fun KomiActionRowMangaPreview() {
-    PersonalityPreview(mangaPersonality()) { PreviewStack() }
+    PersonalityPreview(personality = mangaPersonality()) { PreviewStack() }
 }
 
 @Preview
 @Composable
 private fun KomiActionRowMangaNightPreview() {
     PersonalityPreview(
-        mangaPersonality(
-            paper = MangaPaper.NIGHT,
-            accent = MangaAccent.SUN,
-        ),
+        personality =
+            mangaPersonality(
+                paper = MangaPaper.NIGHT,
+                accent = MangaAccent.SUN,
+            ),
     ) { PreviewStack() }
 }
 
@@ -245,21 +258,22 @@ private fun KomiActionRowMangaNightPreview() {
 @Composable
 private fun KomiActionRowMangaNordPreview() {
     PersonalityPreview(
-        mangaPersonality(
-            paper = MangaPaper.NORD,
-            accent = MangaAccent.FROST,
-        ),
+        personality =
+            mangaPersonality(
+                paper = MangaPaper.NORD,
+                accent = MangaAccent.FROST,
+            ),
     ) { PreviewStack() }
 }
 
 @Preview
 @Composable
 private fun KomiActionRowClassicPreview() {
-    PersonalityPreview(classicPersonality()) { PreviewStack() }
+    PersonalityPreview(personality = classicPersonality()) { PreviewStack() }
 }
 
 @Preview
 @Composable
 private fun KomiActionRowClassicDarkPreview() {
-    PersonalityPreview(classicPersonality(dark = true)) { PreviewStack() }
+    PersonalityPreview(personality = classicPersonality(dark = true)) { PreviewStack() }
 }

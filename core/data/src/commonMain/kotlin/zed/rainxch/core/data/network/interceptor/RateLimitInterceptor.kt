@@ -5,6 +5,7 @@ import io.ktor.client.HttpClient
 import io.ktor.client.plugins.HttpClientPlugin
 import io.ktor.client.statement.HttpReceivePipeline
 import io.ktor.http.Headers
+import io.ktor.http.HttpStatusCode
 import io.ktor.util.AttributeKey
 import zed.rainxch.core.domain.model.error.RateLimitException
 import zed.rainxch.core.domain.model.error.RateLimitInfo
@@ -39,7 +40,8 @@ class RateLimitInterceptor(
                 val response = subject
 
                 parseRateLimitFromHeaders(response.headers)?.let { rateLimitInfo ->
-                    val isErrorResponse = response.status.value == 403 || response.status.value == 429
+                    val isErrorResponse =
+                        response.status == HttpStatusCode.Forbidden || response.status == HttpStatusCode.TooManyRequests
                     plugin.rateLimitRepository.updateRateLimit(
                         rateLimitInfo = rateLimitInfo,
                         notifyExhausted = isErrorResponse && rateLimitInfo.isExhausted,
@@ -55,32 +57,24 @@ class RateLimitInterceptor(
         }
 
         private fun parseRateLimitFromHeaders(headers: Headers): RateLimitInfo? {
-            return try {
-                val limitHeader =
-                    headers["X-RateLimit-Limit"]
-                        ?: return null.also { Logger.w { "Missing X-RateLimit-Limit" } }
-                val limit =
-                    limitHeader.toIntOrNull()
-                        ?: return null.also { Logger.w { "Malformed X-RateLimit-Limit: $limitHeader" } }
-                val remainingHeader =
-                    headers["X-RateLimit-Remaining"]
-                        ?: return null.also { Logger.w { "Missing X-RateLimit-Remaining" } }
-                val remaining =
-                    remainingHeader.toIntOrNull()
-                        ?: return null.also { Logger.w { "Malformed X-RateLimit-Remaining: $remainingHeader" } }
-                val resetHeader =
-                    headers["X-RateLimit-Reset"]
-                        ?: return null.also { Logger.w { "Missing X-RateLimit-Reset" } }
-                val reset =
-                    resetHeader.toLongOrNull()
-                        ?: return null.also { Logger.w { "Malformed X-RateLimit-Reset: $resetHeader" } }
-                val resource = headers["X-RateLimit-Resource"] ?: "core"
+            val limit = headers.parsedOrNull("X-RateLimit-Limit", String::toIntOrNull) ?: return null
+            val remaining = headers.parsedOrNull("X-RateLimit-Remaining", String::toIntOrNull) ?: return null
+            val reset = headers.parsedOrNull("X-RateLimit-Reset", String::toLongOrNull) ?: return null
+            val resource = headers["X-RateLimit-Resource"] ?: "core"
+            return RateLimitInfo(limit, remaining, reset, resource)
+        }
 
-                RateLimitInfo(limit, remaining, reset, resource)
-            } catch (e: Exception) {
-                Logger.e(e) { "Failed to parse rate limit headers" }
-                null
+        private fun <T : Any> Headers.parsedOrNull(
+            name: String,
+            parse: (String) -> T?,
+        ): T? {
+            val raw = this[name]
+            val value = raw?.let(parse)
+            when {
+                raw == null -> Logger.w { "Missing $name" }
+                value == null -> Logger.w { "Malformed $name: $raw" }
             }
+            return value
         }
     }
 }

@@ -1,7 +1,6 @@
 package zed.rainxch.core.data.download
 
 import co.touchlab.kermit.Logger
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -24,14 +23,16 @@ class MultiSourceDownloaderImpl(
         suggestedFileName: String?,
         identity: AssetIdentity?,
     ): Flow<DownloadProgress> {
-        val active = ProxyManager.currentMirror()
-        if (active == null || TrafficKind.RELEASE_ASSET !in active.trafficKinds) {
-            return downloader.download(githubUrl, suggestedFileName, identity = identity)
-        }
         val mirrorUrl =
-            MirrorRewriter.applyTemplate(active.template, githubUrl)
-                ?: return downloader.download(githubUrl, suggestedFileName, identity = identity)
-        return mirrorFirstWithFallback(mirrorUrl, githubUrl, suggestedFileName, identity)
+            ProxyManager
+                .currentMirror()
+                ?.takeIf { TrafficKind.RELEASE_ASSET in it.trafficKinds }
+                ?.let { MirrorRewriter.applyTemplate(it.template, githubUrl) }
+        return if (mirrorUrl == null) {
+            downloader.download(githubUrl, suggestedFileName, identity = identity)
+        } else {
+            mirrorFirstWithFallback(mirrorUrl, githubUrl, suggestedFileName, identity)
+        }
     }
 
     private fun mirrorFirstWithFallback(
@@ -41,16 +42,13 @@ class MultiSourceDownloaderImpl(
         identity: AssetIdentity?,
     ): Flow<DownloadProgress> =
         channelFlow {
-            try {
-                downloader
-                    .download(mirrorUrl, suggestedFileName, identity = identity)
-                    .collect { send(it) }
-                return@channelFlow
-            } catch (e: CancellationException) {
-                throw e
-            } catch (t: Throwable) {
-                Logger.w(t) { "Mirror download failed, falling back to direct." }
-            }
+            val mirrorFailure =
+                catchingStepFailures {
+                    downloader
+                        .download(mirrorUrl, suggestedFileName, identity = identity)
+                        .collect { send(it) }
+                }.exceptionOrNull() ?: return@channelFlow
+            Logger.w(mirrorFailure) { "Mirror download failed, falling back to direct." }
             downloader
                 .download(directUrl, suggestedFileName, bypassMirror = true, identity = identity)
                 .collect { send(it) }

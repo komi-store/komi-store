@@ -5,7 +5,7 @@
 //   ./gradlew :presentation:stabilityDump
 
 @Composable
-public fun zed.rainxch.profile.presentation.ProfileRoot(onNavigateToDevProfile: kotlin.Function1<@[ParameterName(name = \, onNavigateToAuthentication: kotlin.Function0<kotlin.Unit>, onNavigateToStarredRepos: kotlin.Function0<kotlin.Unit>, onNavigateToFavouriteRepos: kotlin.Function0<kotlin.Unit>, onNavigateToRecentlyViewed: kotlin.Function0<kotlin.Unit>, onNavigateToWhatsNew: kotlin.Function0<kotlin.Unit>, onNavigateToAnnouncements: kotlin.Function0<kotlin.Unit>, onNavigateToTweaks: kotlin.Function0<kotlin.Unit>, onNavigateToAbout: kotlin.Function0<kotlin.Unit>, hasUnreadAnnouncements: kotlin.Boolean, viewModel: zed.rainxch.profile.presentation.ProfileViewModel): kotlin.Unit
+public fun zed.rainxch.profile.presentation.ProfileRoot(onNavigateToDevProfile: kotlin.Function1<@[ParameterName(name = \, onNavigateToAuthentication: kotlin.Function0<kotlin.Unit>, onNavigateToStarredRepos: kotlin.Function0<kotlin.Unit>, onNavigateToFavouriteRepos: kotlin.Function0<kotlin.Unit>, onNavigateToRecentlyViewedRepos: kotlin.Function0<kotlin.Unit>, onNavigateToWhatsNew: kotlin.Function0<kotlin.Unit>, onNavigateToAnnouncements: kotlin.Function0<kotlin.Unit>, onNavigateToTweaks: kotlin.Function0<kotlin.Unit>, onNavigateToAbout: kotlin.Function0<kotlin.Unit>, hasUnreadAnnouncements: kotlin.Boolean, viewModel: zed.rainxch.profile.presentation.ProfileViewModel): kotlin.Unit
   skippable: true
   restartable: true
   params:
@@ -13,7 +13,7 @@ public fun zed.rainxch.profile.presentation.ProfileRoot(onNavigateToDevProfile: 
     - onNavigateToAuthentication: STABLE (function type)
     - onNavigateToStarredRepos: STABLE (function type)
     - onNavigateToFavouriteRepos: STABLE (function type)
-    - onNavigateToRecentlyViewed: STABLE (function type)
+    - onNavigateToRecentlyViewedRepos: STABLE (function type)
     - onNavigateToWhatsNew: STABLE (function type)
     - onNavigateToAnnouncements: STABLE (function type)
     - onNavigateToTweaks: STABLE (function type)
@@ -22,32 +22,33 @@ public fun zed.rainxch.profile.presentation.ProfileRoot(onNavigateToDevProfile: 
     - viewModel: UNSTABLE (has mutable properties or unstable members)
 
 @Composable
-public fun zed.rainxch.profile.presentation.ProfileScreen(state: zed.rainxch.profile.presentation.ProfileState, onAction: kotlin.Function1<zed.rainxch.profile.presentation.ProfileAction, kotlin.Unit>, toastState: zed.rainxch.core.presentation.components.overlays.KomiToastState, hasUnreadAnnouncements: kotlin.Boolean): kotlin.Unit
+public fun zed.rainxch.profile.presentation.ProfileScreen(state: zed.rainxch.profile.presentation.ProfileState, onAction: kotlin.Function1<zed.rainxch.profile.presentation.ProfileAction, kotlin.Unit>, toastState: zed.rainxch.core.presentation.components.overlays.KomiToastState, modifier: androidx.compose.ui.Modifier, hasUnreadAnnouncements: kotlin.Boolean): kotlin.Unit
   skippable: true
   restartable: true
   params:
     - state: UNKNOWN (interface or non-final class; concrete implementation unknown)
     - onAction: STABLE (function type)
     - toastState: STABLE (marked @Stable or @Immutable)
+    - modifier: STABLE (marked @Stable or @Immutable)
     - hasUnreadAnnouncements: STABLE (primitive type)
 
 @Composable
-private fun zed.rainxch.profile.presentation.announcements.ActionRow(announcement: zed.rainxch.core.domain.model.announcement.Announcement, isAcknowledged: kotlin.Boolean, onCtaClick: kotlin.Function0<kotlin.Unit>, onDismissClick: kotlin.Function0<kotlin.Unit>, onAcknowledgeClick: kotlin.Function0<kotlin.Unit>): kotlin.Unit
+private fun zed.rainxch.profile.presentation.announcements.ActionRow(announcement: zed.rainxch.profile.presentation.announcements.AnnouncementUi, isAcknowledged: kotlin.Boolean, onCtaClick: kotlin.Function0<kotlin.Unit>, onDismissClick: kotlin.Function0<kotlin.Unit>, onAcknowledgeClick: kotlin.Function0<kotlin.Unit>): kotlin.Unit
   skippable: true
   restartable: true
   params:
-    - announcement: UNSTABLE (cross-module type without @Stable/@Immutable)
+    - announcement: STABLE (class with no mutable properties)
     - isAcknowledged: STABLE (primitive type)
     - onCtaClick: STABLE (function type)
     - onDismissClick: STABLE (function type)
     - onAcknowledgeClick: STABLE (function type)
 
 @Composable
-public fun zed.rainxch.profile.presentation.announcements.AnnouncementCard(announcement: zed.rainxch.core.domain.model.announcement.Announcement, isAcknowledged: kotlin.Boolean, isExpanded: kotlin.Boolean, onToggleExpand: kotlin.Function0<kotlin.Unit>, onCtaClick: kotlin.Function0<kotlin.Unit>, onDismissClick: kotlin.Function0<kotlin.Unit>, onAcknowledgeClick: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+public fun zed.rainxch.profile.presentation.announcements.AnnouncementCard(announcement: zed.rainxch.profile.presentation.announcements.AnnouncementUi, isAcknowledged: kotlin.Boolean, isExpanded: kotlin.Boolean, onToggleExpand: kotlin.Function0<kotlin.Unit>, onCtaClick: kotlin.Function0<kotlin.Unit>, onDismissClick: kotlin.Function0<kotlin.Unit>, onAcknowledgeClick: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
   skippable: true
   restartable: true
   params:
-    - announcement: UNSTABLE (cross-module type without @Stable/@Immutable)
+    - announcement: STABLE (class with no mutable properties)
     - isAcknowledged: STABLE (primitive type)
     - isExpanded: STABLE (primitive type)
     - onToggleExpand: STABLE (function type)
@@ -57,13 +58,14 @@ public fun zed.rainxch.profile.presentation.announcements.AnnouncementCard(annou
     - modifier: STABLE (marked @Stable or @Immutable)
 
 @Composable
-public fun zed.rainxch.profile.presentation.announcements.AnnouncementsScreen(state: zed.rainxch.profile.presentation.announcements.AnnouncementsState, onAction: kotlin.Function1<zed.rainxch.profile.presentation.announcements.AnnouncementsAction, kotlin.Unit>, onNavigateBack: kotlin.Function0<kotlin.Unit>): kotlin.Unit
+public fun zed.rainxch.profile.presentation.announcements.AnnouncementsScreen(state: zed.rainxch.profile.presentation.announcements.AnnouncementsState, onAction: kotlin.Function1<zed.rainxch.profile.presentation.announcements.AnnouncementsAction, kotlin.Unit>, onNavigateBack: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
   skippable: true
   restartable: true
   params:
-    - state: UNKNOWN (interface or non-final class; concrete implementation unknown)
+    - state: STABLE (class with no mutable properties)
     - onAction: STABLE (function type)
     - onNavigateBack: STABLE (function type)
+    - modifier: STABLE (marked @Stable or @Immutable)
 
 @Composable
 private fun zed.rainxch.profile.presentation.announcements.CategoryChip(category: zed.rainxch.core.domain.model.announcement.AnnouncementCategory): kotlin.Unit
@@ -73,11 +75,10 @@ private fun zed.rainxch.profile.presentation.announcements.CategoryChip(category
     - category: STABLE (class with no mutable properties)
 
 @Composable
-private fun zed.rainxch.profile.presentation.announcements.CategoryRow(category: zed.rainxch.core.domain.model.announcement.AnnouncementCategory, label: kotlin.String, enabled: kotlin.Boolean, locked: kotlin.Boolean, onToggle: kotlin.Function1<kotlin.Boolean, kotlin.Unit>): kotlin.Unit
+private fun zed.rainxch.profile.presentation.announcements.CategoryRow(label: kotlin.String, enabled: kotlin.Boolean, locked: kotlin.Boolean, onToggle: kotlin.Function1<kotlin.Boolean, kotlin.Unit>): kotlin.Unit
   skippable: true
   restartable: true
   params:
-    - category: STABLE (class with no mutable properties)
     - label: STABLE (String is immutable)
     - enabled: STABLE (primitive type)
     - locked: STABLE (primitive type)
@@ -104,13 +105,14 @@ private fun zed.rainxch.profile.presentation.announcements.HeaderRow(severity: z
     - isAcknowledged: STABLE (primitive type)
 
 @Composable
-public fun zed.rainxch.profile.presentation.announcements.MuteSettingsBottomSheet(mutedCategories: kotlin.collections.Set<zed.rainxch.core.domain.model.announcement.AnnouncementCategory>, onToggle: kotlin.Function2<zed.rainxch.core.domain.model.announcement.AnnouncementCategory, kotlin.Boolean, kotlin.Unit>, onDismiss: kotlin.Function0<kotlin.Unit>): kotlin.Unit
+public fun zed.rainxch.profile.presentation.announcements.MuteSettingsBottomSheet(mutedCategories: kotlinx.collections.immutable.ImmutableSet<zed.rainxch.core.domain.model.announcement.AnnouncementCategory>, onToggle: kotlin.Function2<zed.rainxch.core.domain.model.announcement.AnnouncementCategory, kotlin.Boolean, kotlin.Unit>, onDismiss: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
   skippable: true
   restartable: true
   params:
-    - mutedCategories: RUNTIME (requires runtime check)
+    - mutedCategories: STABLE (known stable type)
     - onToggle: STABLE (function type)
     - onDismiss: STABLE (function type)
+    - modifier: STABLE (marked @Stable or @Immutable)
 
 @Composable
 private fun zed.rainxch.profile.presentation.announcements.severityAccent(severity: zed.rainxch.core.domain.model.announcement.AnnouncementSeverity): androidx.compose.ui.graphics.Color
@@ -128,12 +130,13 @@ private fun zed.rainxch.profile.presentation.components.HeroIdentityCard(state: 
     - onAction: STABLE (function type)
 
 @Composable
-public fun zed.rainxch.profile.presentation.components.LogoutDialog(onDismissRequest: kotlin.Function0<kotlin.Unit>, onLogout: kotlin.Function0<kotlin.Unit>): kotlin.Unit
+public fun zed.rainxch.profile.presentation.components.LogoutDialog(onDismissRequest: kotlin.Function0<kotlin.Unit>, onLogout: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
   skippable: true
   restartable: true
   params:
     - onDismissRequest: STABLE (function type)
     - onLogout: STABLE (function type)
+    - modifier: STABLE (marked @Stable or @Immutable)
 
 @Composable
 private fun zed.rainxch.profile.presentation.components.Metric(value: kotlin.String, label: kotlin.String, modifier: androidx.compose.ui.Modifier): kotlin.Unit
@@ -169,6 +172,13 @@ private fun zed.rainxch.profile.presentation.components.PlaceholderLine(widthFra
     - height: STABLE (marked @Stable or @Immutable)
 
 @Composable
+private fun zed.rainxch.profile.presentation.components.SectionHeader(title: kotlin.String?): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - title: STABLE (class with no mutable properties)
+
+@Composable
 private fun zed.rainxch.profile.presentation.components.SignedInContent(state: zed.rainxch.profile.presentation.ProfileState, onAction: kotlin.Function1<zed.rainxch.profile.presentation.ProfileAction, kotlin.Unit>): kotlin.Unit
   skippable: true
   restartable: true
@@ -191,11 +201,12 @@ private fun zed.rainxch.profile.presentation.whatsnew.BulletRow(text: kotlin.Str
     - text: STABLE (String is immutable)
 
 @Composable
-public fun zed.rainxch.profile.presentation.whatsnew.SectionBlock(section: zed.rainxch.core.domain.model.announcement.WhatsNewSection): kotlin.Unit
+public fun zed.rainxch.profile.presentation.whatsnew.SectionBlock(section: zed.rainxch.profile.presentation.whatsnew.WhatsNewSectionUi, modifier: androidx.compose.ui.Modifier): kotlin.Unit
   skippable: true
   restartable: true
   params:
-    - section: UNSTABLE (cross-module type without @Stable/@Immutable)
+    - section: STABLE (class with no mutable properties)
+    - modifier: STABLE (marked @Stable or @Immutable)
 
 @Composable
 private fun zed.rainxch.profile.presentation.whatsnew.SectionLabel(type: zed.rainxch.core.domain.model.announcement.WhatsNewSectionType): kotlin.Unit
@@ -205,17 +216,19 @@ private fun zed.rainxch.profile.presentation.whatsnew.SectionLabel(type: zed.rai
     - type: STABLE (class with no mutable properties)
 
 @Composable
-public fun zed.rainxch.profile.presentation.whatsnew.WhatsNewEntryCard(entry: zed.rainxch.core.domain.model.announcement.WhatsNewEntry): kotlin.Unit
+public fun zed.rainxch.profile.presentation.whatsnew.WhatsNewEntryCard(entry: zed.rainxch.profile.presentation.whatsnew.WhatsNewEntryUi, modifier: androidx.compose.ui.Modifier): kotlin.Unit
   skippable: true
   restartable: true
   params:
-    - entry: UNSTABLE (cross-module type without @Stable/@Immutable)
+    - entry: UNKNOWN (interface or non-final class; concrete implementation unknown)
+    - modifier: STABLE (marked @Stable or @Immutable)
 
 @Composable
-public fun zed.rainxch.profile.presentation.whatsnew.WhatsNewHistoryScreen(entries: kotlin.collections.List<zed.rainxch.core.domain.model.announcement.WhatsNewEntry>, onNavigateBack: kotlin.Function0<kotlin.Unit>): kotlin.Unit
+public fun zed.rainxch.profile.presentation.whatsnew.WhatsNewHistoryScreen(entries: kotlinx.collections.immutable.ImmutableList<zed.rainxch.profile.presentation.whatsnew.WhatsNewEntryUi>, onNavigateBack: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
   skippable: true
   restartable: true
   params:
-    - entries: RUNTIME (requires runtime check)
+    - entries: UNKNOWN (interface or non-final class; concrete implementation unknown)
     - onNavigateBack: STABLE (function type)
+    - modifier: STABLE (marked @Stable or @Immutable)
 

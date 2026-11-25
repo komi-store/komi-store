@@ -1,7 +1,7 @@
 package zed.rainxch.search.presentation.mappers
 
-import zed.rainxch.domain.model.SortOrder
-import zed.rainxch.domain.model.SortOrder.*
+import zed.rainxch.search.domain.model.SortOrder
+import zed.rainxch.search.domain.model.SortOrder.*
 import zed.rainxch.search.presentation.model.SortOrderUi
 
 fun SortOrderUi.toDomain(): SortOrder =

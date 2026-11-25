@@ -1,7 +1,6 @@
 package zed.rainxch.favourites.presentation.import
 
 import androidx.compose.foundation.clickable
-import androidx.compose.material.icons.rounded.Search
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,6 +18,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.FavoriteBorder
+import androidx.compose.material.icons.rounded.Search
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -26,14 +26,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import zed.rainxch.core.presentation.components.GitHubStoreImage
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
+import zed.rainxch.core.presentation.components.GitHubStoreImage
 import zed.rainxch.core.presentation.components.bars.KomiTopBar
 import zed.rainxch.core.presentation.components.bars.KomiTopBarSize
 import zed.rainxch.core.presentation.components.buttons.KomiButton
-import zed.rainxch.core.presentation.components.buttons.KomiButtonVariant
 import zed.rainxch.core.presentation.components.buttons.KomiButtonSize
+import zed.rainxch.core.presentation.components.buttons.KomiButtonVariant
 import zed.rainxch.core.presentation.components.icon.KomiIcon
 import zed.rainxch.core.presentation.components.inputs.KomiTextField
 import zed.rainxch.core.presentation.components.scaffold.KomiScaffold
@@ -57,15 +57,18 @@ import zed.rainxch.githubstore.core.presentation.res.import_stars_try_another
 
 @Composable
 fun ImportStarsRoot(
-    viewModel: ImportStarsViewModel = koinViewModel(),
     onNavigateBack: () -> Unit,
     onNavigateToDetails: (repoId: Long, owner: String, repo: String) -> Unit,
+    viewModel: ImportStarsViewModel = koinViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
     ObserveAsEvents(viewModel.events) { event ->
         when (event) {
-            ImportStarsEvent.NavigateBack -> onNavigateBack()
+            ImportStarsEvent.NavigateBack -> {
+                onNavigateBack()
+            }
+
             is ImportStarsEvent.NavigateToDetails -> {
                 onNavigateToDetails(event.repoId, event.owner, event.repo)
             }
@@ -90,20 +93,25 @@ private fun ImportStarsScreen(
         },
     ) { padding ->
         Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(padding),
         ) {
             when (state.phase) {
-                ImportStarsState.Phase.UsernameInput -> UsernameInputPanel(
-                    state = state,
-                    onAction = onAction,
-                )
+                ImportStarsState.Phase.UsernameInput -> {
+                    UsernameInputPanel(
+                        state = state,
+                        onAction = onAction,
+                    )
+                }
 
-                ImportStarsState.Phase.Results -> ResultsPanel(
-                    state = state,
-                    onAction = onAction,
-                )
+                ImportStarsState.Phase.Results -> {
+                    ResultsPanel(
+                        state = state,
+                        onAction = onAction,
+                    )
+                }
             }
         }
     }
@@ -116,9 +124,10 @@ private fun UsernameInputPanel(
 ) {
     val colors = LocalPersonality.current.colors
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 24.dp, vertical = 16.dp),
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .padding(horizontal = 24.dp, vertical = 16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         KomiText(
@@ -161,9 +170,10 @@ private fun ResultsPanel(
 ) {
     val colors = LocalPersonality.current.colors
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 16.dp)
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .padding(horizontal = 16.dp),
     ) {
         Spacer(Modifier.height(8.dp))
         Row(
@@ -171,11 +181,12 @@ private fun ResultsPanel(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             KomiText(
-                text = stringResource(
-                    resource = Res.string.import_stars_header_count,
-                    state.importedUsername ?: "",
-                    state.candidates.size,
-                ),
+                text =
+                    stringResource(
+                        resource = Res.string.import_stars_header_count,
+                        state.importedUsername ?: "",
+                        state.candidates.size,
+                    ),
                 role = KomiTextRole.Body,
                 color = colors.onSurfaceVariant,
                 modifier = Modifier.weight(1f),
@@ -218,14 +229,15 @@ private fun ResultsPanel(
                 contentAlignment = Alignment.Center,
             ) {
                 KomiText(
-                    text = if (state.candidates.isEmpty()) {
-                        stringResource(
-                            resource = Res.string.import_stars_empty,
-                            state.importedUsername ?: ""
-                        )
-                    } else {
-                        stringResource(Res.string.import_stars_no_match)
-                    },
+                    text =
+                        if (state.candidates.isEmpty()) {
+                            stringResource(
+                                resource = Res.string.import_stars_empty,
+                                state.importedUsername ?: "",
+                            )
+                        } else {
+                            stringResource(Res.string.import_stars_no_match)
+                        },
                     role = KomiTextRole.Body,
                     color = colors.onSurfaceVariant,
                 )
@@ -255,18 +267,20 @@ private fun CandidateRow(
 ) {
     val colors = LocalPersonality.current.colors
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick)
-            .padding(vertical = 6.dp),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .clickable(onClick = onClick)
+                .padding(vertical = 6.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         GitHubStoreImage(
             imageModel = { candidate.ownerAvatarUrl },
-            modifier = Modifier
-                .size(40.dp)
-                .clip(RoundedCornerShape(LocalPersonality.current.shape.cornerSmall)),
+            modifier =
+                Modifier
+                    .size(40.dp)
+                    .clip(RoundedCornerShape(LocalPersonality.current.shape.cornerSmall)),
         )
 
         Column(modifier = Modifier.weight(1f)) {
@@ -287,23 +301,26 @@ private fun CandidateRow(
         }
 
         KomiIcon(
-            imageVector = if (candidate.isAlreadyFavourited) {
-                Icons.Filled.Favorite
-            } else {
-                Icons.Outlined.FavoriteBorder
-            },
-            contentDescription = stringResource(
+            imageVector =
                 if (candidate.isAlreadyFavourited) {
-                    Res.string.import_stars_added
+                    Icons.Filled.Favorite
                 } else {
-                    Res.string.import_stars_add
+                    Icons.Outlined.FavoriteBorder
                 },
-            ),
-            tint = if (candidate.isAlreadyFavourited) {
-                colors.primary
-            } else {
-                colors.onSurfaceVariant
-            },
+            contentDescription =
+                stringResource(
+                    if (candidate.isAlreadyFavourited) {
+                        Res.string.import_stars_added
+                    } else {
+                        Res.string.import_stars_add
+                    },
+                ),
+            tint =
+                if (candidate.isAlreadyFavourited) {
+                    colors.primary
+                } else {
+                    colors.onSurfaceVariant
+                },
             modifier = Modifier.clickable(onClick = onToggle),
         )
     }

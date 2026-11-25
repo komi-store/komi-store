@@ -8,6 +8,8 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
+import zed.rainxch.core.data.network.networkFailures
+import zed.rainxch.details.domain.model.TranslationProviderNotConfiguredException
 import zed.rainxch.details.domain.model.TranslationResult
 import java.security.MessageDigest
 import kotlin.time.Clock
@@ -36,35 +38,43 @@ internal class YoudaoTranslator(
         }
 
         val salt = Uuid.random().toString()
-        val curtime = (Clock.System.now().toEpochMilliseconds() / 1000L).toString()
+        val curtime =
+            Clock.System
+                .now()
+                .epochSeconds
+                .toString()
         val signInput = buildSignInput(text)
         val sign = sha256Hex(appKey + signInput + salt + curtime + appSecret)
 
         val from = mapLanguageCode(sourceLanguage)
         val to = mapLanguageCode(targetLanguage)
 
-        val response =
-            httpClient().submitForm(
-                url = "https://openapi.youdao.com/api",
-                formParameters =
-                    Parameters.build {
-                        append("q", text)
-                        append("from", from)
-                        append("to", to)
-                        append("appKey", appKey)
-                        append("salt", salt)
-                        append("sign", sign)
-                        append("signType", "v3")
-                        append("curtime", curtime)
-                    },
-            )
+        val body =
+            networkFailures {
+                httpClient()
+                    .submitForm(
+                        url = "https://openapi.youdao.com/api",
+                        formParameters =
+                            Parameters.build {
+                                append("q", text)
+                                append("from", from)
+                                append("to", to)
+                                append("appKey", appKey)
+                                append("salt", salt)
+                                append("sign", sign)
+                                append("signType", "v3")
+                                append("curtime", curtime)
+                            },
+                    ).bodyAsText()
+            }
 
-        val body = response.bodyAsText()
+        return decodingAnswer("Youdao", body) { parseTranslation(body) }
+    }
+
+    private fun parseTranslation(body: String): TranslationResult {
         val root = json.parseToJsonElement(body).jsonObject
         val errorCode = root["errorCode"]?.jsonPrimitive?.content
-        if (errorCode != "0") {
-            throw RuntimeException("Youdao translate error: $errorCode")
-        }
+        if (errorCode != "0") translationFailed("Youdao translate error: $errorCode")
 
         val translation =
             root["translation"]
@@ -87,22 +97,17 @@ internal class YoudaoTranslator(
     }
 
     private fun buildSignInput(q: String): String =
-        if (q.length <= 20) {
+        if (q.length <= SIGN_INPUT_MAX_LENGTH) {
             q
         } else {
-            q.substring(0, 10) + q.length.toString() + q.substring(q.length - 10)
+            q.take(SIGN_INPUT_EDGE_LENGTH) + q.length.toString() + q.takeLast(SIGN_INPUT_EDGE_LENGTH)
         }
 
-    private fun sha256Hex(input: String): String {
-        val digest = MessageDigest.getInstance("SHA-256").digest(input.encodeToByteArray())
-        return buildString(digest.size * 2) {
-            for (byte in digest) {
-                val v = byte.toInt() and 0xff
-                if (v < 0x10) append('0')
-                append(v.toString(16))
-            }
-        }
-    }
+    private fun sha256Hex(input: String): String =
+        MessageDigest
+            .getInstance("SHA-256")
+            .digest(input.encodeToByteArray())
+            .joinToString("") { "%02x".format(it) }
 
     private fun mapLanguageCode(code: String): String =
         when (code.lowercase()) {
@@ -118,4 +123,9 @@ internal class YoudaoTranslator(
             "zh-CHT" -> "zh-TW"
             else -> code
         }
+
+    private companion object {
+        const val SIGN_INPUT_MAX_LENGTH = 20
+        const val SIGN_INPUT_EDGE_LENGTH = 10
+    }
 }
