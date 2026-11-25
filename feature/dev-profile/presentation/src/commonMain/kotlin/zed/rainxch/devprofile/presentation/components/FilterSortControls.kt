@@ -1,7 +1,6 @@
 package zed.rainxch.devprofile.presentation.components
 
 import androidx.compose.animation.animateColorAsState
-import androidx.compose.material.icons.rounded.Search
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
@@ -17,6 +16,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Sort
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.rounded.Search
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -57,10 +57,11 @@ fun FilterSortControls(
     repoCount: Int,
     totalCount: Int,
     onAction: (DeveloperProfileAction) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val colors = LocalPersonality.current.colors
     Column(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         KomiTextField(
@@ -78,20 +79,22 @@ fun FilterSortControls(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             Row(
-                modifier = Modifier
-                    .weight(1f)
-                    .horizontalScroll(rememberScrollState()),
+                modifier =
+                    Modifier
+                        .weight(1f)
+                        .horizontalScroll(rememberScrollState()),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 RepoFilterType.entries.forEach { filter ->
                     FilterPill(
-                        label = when (filter) {
-                            RepoFilterType.WITH_RELEASES -> stringResource(Res.string.filter_with_releases)
-                            RepoFilterType.WITH_INSTALLABLE -> stringResource(Res.string.filter_with_installable)
-                            RepoFilterType.INSTALLED -> stringResource(Res.string.filter_installed)
-                            RepoFilterType.FAVORITES -> stringResource(Res.string.filter_favorites)
-                        },
+                        label =
+                            when (filter) {
+                                RepoFilterType.WITH_RELEASES -> stringResource(Res.string.filter_with_releases)
+                                RepoFilterType.WITH_INSTALLABLE -> stringResource(Res.string.filter_with_installable)
+                                RepoFilterType.INSTALLED -> stringResource(Res.string.filter_installed)
+                                RepoFilterType.FAVORITES -> stringResource(Res.string.filter_favorites)
+                            },
                         isSelected = currentFilter == filter,
                         onClick = { onAction(DeveloperProfileAction.OnFilterChange(filter)) },
                     )
@@ -105,13 +108,14 @@ fun FilterSortControls(
         }
 
         KomiText(
-            text = if (repoCount == totalCount) {
-                "$repoCount ${stringResource(
-                    if (repoCount == 1) Res.string.repository_singular else Res.string.repositories,
-                )}"
-            } else {
-                stringResource(Res.string.showing_x_of_y_repositories, repoCount, totalCount)
-            },
+            text =
+                if (repoCount == totalCount) {
+                    "$repoCount ${stringResource(
+                        if (repoCount == 1) Res.string.repository_singular else Res.string.repositories,
+                    )}"
+                } else {
+                    stringResource(Res.string.showing_x_of_y_repositories, repoCount, totalCount)
+                },
             maxLines = 1,
             role = KomiTextRole.Body,
             color = colors.onSurfaceVariant,
@@ -127,29 +131,32 @@ private fun FilterPill(
 ) {
     val colors = LocalPersonality.current.colors
     val container by animateColorAsState(
-        targetValue = if (isSelected) {
-            colors.primary
-        } else {
-            colors.surfaceContainerHigh
-        },
+        targetValue =
+            if (isSelected) {
+                colors.primary
+            } else {
+                colors.surfaceContainerHigh
+            },
         animationSpec = LocalPersonality.current.motion.fastEffects(),
         label = "filter_container",
     )
     val content by animateColorAsState(
-        targetValue = if (isSelected) {
-            colors.onPrimary
-        } else {
-            colors.onSurface
-        },
+        targetValue =
+            if (isSelected) {
+                colors.onPrimary
+            } else {
+                colors.onSurface
+            },
         animationSpec = LocalPersonality.current.motion.fastEffects(),
         label = "filter_content",
     )
     Box(
-        modifier = Modifier
-            .clip(RoundedCornerShape(LocalPersonality.current.shape.cornerSmall))
-            .background(container)
-            .clickable(onClick = onClick)
-            .padding(horizontal = 14.dp, vertical = 10.dp),
+        modifier =
+            Modifier
+                .clip(RoundedCornerShape(LocalPersonality.current.shape.cornerSmall))
+                .background(container)
+                .clickable(onClick = onClick)
+                .padding(horizontal = 14.dp, vertical = 10.dp),
         contentAlignment = Alignment.Center,
     ) {
         KomiText(
@@ -168,29 +175,31 @@ private fun SortButton(
 ) {
     val colors = LocalPersonality.current.colors
     KomiDropdown(
-        entries = RepoSortType.entries
-            .map { sort ->
-                KomiMenuItem(
-                    id = sort.name,
-                    label = when (sort) {
-                        RepoSortType.UPDATED -> stringResource(Res.string.sort_recently_updated)
-                        RepoSortType.STARS -> stringResource(Res.string.sort_most_stars)
-                        RepoSortType.NAME -> stringResource(Res.string.sort_name)
-                    },
-                )
-            }
-            .toImmutableList(),
+        entries =
+            RepoSortType.entries
+                .map { sort ->
+                    KomiMenuItem(
+                        id = sort.name,
+                        label =
+                            when (sort) {
+                                RepoSortType.UPDATED -> stringResource(Res.string.sort_recently_updated)
+                                RepoSortType.STARS -> stringResource(Res.string.sort_most_stars)
+                                RepoSortType.NAME -> stringResource(Res.string.sort_name)
+                            },
+                    )
+                }.toImmutableList(),
         onSelect = { item ->
             RepoSortType.entries.firstOrNull { it.name == item.id }?.let(onSortChange)
         },
         value = currentSort.name,
         trigger = { onClick ->
             Box(
-                modifier = Modifier
-                    .size(40.dp)
-                    .clip(RoundedCornerShape(LocalPersonality.current.shape.cornerSmall))
-                    .background(colors.surfaceContainerHigh)
-                    .clickable { onClick() },
+                modifier =
+                    Modifier
+                        .size(40.dp)
+                        .clip(RoundedCornerShape(LocalPersonality.current.shape.cornerSmall))
+                        .background(colors.surfaceContainerHigh)
+                        .clickable { onClick() },
                 contentAlignment = Alignment.Center,
             ) {
                 KomiIcon(
