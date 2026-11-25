@@ -15,12 +15,13 @@ public fun zed.rainxch.recentlyviewed.presentation.RecentlyViewedRoot(onNavigate
     - viewModel: UNSTABLE (has mutable properties or unstable members)
 
 @Composable
-public fun zed.rainxch.recentlyviewed.presentation.RecentlyViewedScreen(state: zed.rainxch.recentlyviewed.presentation.RecentlyViewedState, onAction: kotlin.Function1<zed.rainxch.recentlyviewed.presentation.RecentlyViewedAction, kotlin.Unit>): kotlin.Unit
+public fun zed.rainxch.recentlyviewed.presentation.RecentlyViewedScreen(state: zed.rainxch.recentlyviewed.presentation.RecentlyViewedState, onAction: kotlin.Function1<zed.rainxch.recentlyviewed.presentation.RecentlyViewedAction, kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
   skippable: true
   restartable: true
   params:
     - state: STABLE (class with no mutable properties)
     - onAction: STABLE (function type)
+    - modifier: STABLE (marked @Stable or @Immutable)
 
 @Composable
 public fun zed.rainxch.recentlyviewed.presentation.components.RecentlyViewedItem(repo: zed.rainxch.recentlyviewed.presentation.model.RecentlyViewedRepo, onItemClick: kotlin.Function0<kotlin.Unit>, onRemoveClick: kotlin.Function0<kotlin.Unit>, onDevProfileClick: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
