@@ -26,7 +26,6 @@ val appsModule =
                 )
             AppsRepositoryImpl(
                 appLauncher = get(),
-                installedApps = get(),
                 logger = get(),
                 lookup = lookup,
                 linking = linking,
