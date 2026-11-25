@@ -109,6 +109,8 @@ internal class DetailsInstalledApps(
             }
         } catch (e: LocalStoreException) {
             logger.warn("Refresh: library update sync failed: ${e.message}")
+        } catch (e: SystemPackagesException) {
+            logger.warn("Refresh: library update sync failed: ${e.message}")
         }
     }
 

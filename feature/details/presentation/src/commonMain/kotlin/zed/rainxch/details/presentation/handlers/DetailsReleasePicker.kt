@@ -7,6 +7,7 @@ import zed.rainxch.core.domain.model.account.github.GithubAsset
 import zed.rainxch.core.domain.model.account.github.GithubRelease
 import zed.rainxch.core.domain.model.error.LocalStoreException
 import zed.rainxch.core.domain.model.error.RateLimitException
+import zed.rainxch.core.domain.model.error.SystemPackagesException
 import zed.rainxch.core.domain.model.installation.InstalledApp
 import zed.rainxch.core.domain.model.repository.DiscoveryPlatform
 import zed.rainxch.core.domain.repository.InstalledAppsRepository
@@ -285,6 +286,8 @@ internal class DetailsReleasePicker(
                 installedAppsRepository.setIncludePreReleases(packageName = app.packageName, enabled = !app.includePreReleases)
                 installedAppsRepository.checkForUpdates(app.packageName)
             } catch (e: LocalStoreException) {
+                logger.warn("toggleIncludeBetas failed for ${app.packageName}: ${e.message}")
+            } catch (e: SystemPackagesException) {
                 logger.warn("toggleIncludeBetas failed for ${app.packageName}: ${e.message}")
             } catch (e: RateLimitException) {
                 logger.warn("toggleIncludeBetas failed for ${app.packageName}: ${e.message}")
