@@ -18,7 +18,7 @@ feature/auth/
   presentation/
     AuthenticationViewModel / State / Action / Events / Root
     handlers/                                   # DeviceFlowHandler + DevicePoller, WebAuthHandler, PatHandler, AuthStore, AuthSavedState
-    components/                                 # one file per login state, the PAT sheet, PrimaryPillButton
+    components/                                 # StateLoggedOut, StateDevicePrompt, StateStatus (pending, signed in, error), the PAT sheet, PrimaryPillButton
     AuthDeepLinkBus.kt                          # SharedFlow bridge from app-level deep-link parser to VM
 ```
 
