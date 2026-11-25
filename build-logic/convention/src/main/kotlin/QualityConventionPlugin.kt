@@ -14,7 +14,6 @@ class QualityConventionPlugin : Plugin<Project> {
             extensions.configure<DetektExtension> {
                 buildUponDefaultConfig = true
                 config.setFrom(rootProject.file("config/detekt/detekt.yml"))
-                baseline = file("detekt-baseline.xml")
                 source.setFrom(fileTree("src") { include("*/kotlin/**/*.kt") })
             }
         }

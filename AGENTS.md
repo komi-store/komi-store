@@ -23,16 +23,16 @@ JDK 21+ and the Android SDK. Sign-in uses `GITHUB_CLIENT_ID` from `local.propert
 
 ## Before you push
 
-CI runs these on every pull request. Existing findings live in committed baselines, so only new ones fail.
+CI runs these on every pull request. There are no baselines: any finding fails the check.
 
 ```bash
-./gradlew spotlessApply                  # formats the files you changed
+./gradlew spotlessApply                  # formats every Kotlin file and build script
 ./gradlew compileKotlinJvm compileAndroidMain :androidApp:compileDebugKotlin jvmTest testAndroidHostTest detekt :konsist-test:test
 ./gradlew lintDebug lintAndroidMain
 ./gradlew stabilityCheck                 # its own invocation, after compileKotlinJvm compileAndroidMain
 ```
 
-In Claude Code, `/verify` runs the same steps. CI also lints agent docs with agnix. Details and baseline rules: `docs/agents/checks.md`.
+In Claude Code, `/verify` runs the same steps. CI also lints agent docs with agnix. Details: `docs/agents/checks.md`.
 
 ## Rules the tools don't check
 
@@ -49,7 +49,7 @@ The full rule set, with examples, is `docs/code-style.md`. These apply to almost
 ## Read when relevant
 
 - `docs/agents/architecture.md`: layers, navigation, DI, core repositories, adding a feature
-- `docs/agents/checks.md`: CI checks, baselines, warnings as errors, the stability analyzer
+- `docs/agents/checks.md`: CI checks, warnings as errors, the stability analyzer
 - `docs/agents/sign-in.md`: OAuth handoff, device flow, personal access tokens, the `X-GitHub-Token` header
 - `docs/agents/forges.md`: Codeberg and Forgejo clients, per-host tokens, `RepoIdCodec`
 - `docs/agents/releases-and-assets.md`: how releases, assets and installed apps are matched

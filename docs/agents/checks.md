@@ -1,11 +1,11 @@
 # Checks
 
-CI (`.github/workflows/pr-checks.yml`) runs on every pull request and every push to `main`. Existing findings live in committed baselines, so a check fails only on new issues.
+CI (`.github/workflows/pr-checks.yml`) runs on every pull request and every push to `main`. There are no baselines: every check covers the whole codebase, and any finding fails it.
 
 ```bash
-./gradlew spotlessApply                                   # format files changed vs origin/main (ktlint 1.8.0 + Compose rules + .editorconfig)
-./gradlew detekt                                          # static analysis; baseline: <module>/detekt-baseline.xml
-./gradlew lintDebug lintAndroidMain                       # Android Lint; baseline: <module>/lint-baseline.xml
+./gradlew spotlessApply                                   # format every Kotlin file and build script (ktlint 1.8.0 + Compose rules + .editorconfig)
+./gradlew detekt                                          # static analysis; config/detekt/detekt.yml
+./gradlew lintDebug lintAndroidMain                       # Android Lint; warnings fail it too
 ./gradlew jvmTest testAndroidHostTest koverXmlReport      # tests on the JVM and the Android host, merged coverage (build/reports/kover)
 ./gradlew compileKotlinJvm compileAndroidMain; ./gradlew stabilityCheck   # Compose stability vs <module>/stability/<project>.stability
 ./gradlew :konsist-test:test                              # architecture rules
@@ -16,7 +16,7 @@ CodeQL (`codeql.yml`) and Dependabot (`dependabot.yml`) run separately.
 
 ## Spotless
 
-Spotless checks only files changed against `origin/main`, but it checks the whole file. The codebase was formatted once in #1080 (listed in `.git-blame-ignore-revs`). Compose rule findings (missing `modifier`, parameter order, naming) are not auto-fixable and have to be fixed by hand in files you touch. A new `CompositionLocal` goes into `compose_allowed_composition_locals` in `.editorconfig`.
+Spotless checks every Kotlin file and Gradle script. Compose rule findings (missing `modifier`, parameter order, naming) are not auto-fixable and have to be fixed by hand. A new `CompositionLocal` goes into `compose_allowed_composition_locals` in `.editorconfig`.
 
 After editing `.editorconfig`, Spotless can keep reporting results from before the edit, because Gradle's build cache restores the `spotlessKotlin` lint output. To see the real result:
 
@@ -26,15 +26,17 @@ rm -rf build/spotless-clean build/spotless-lints .gradle/configuration-cache
 ./gradlew spotlessApply --no-build-cache
 ```
 
-## Baselines
+## No baselines
 
-ktlint findings the formatter can't fix (mostly Compose rules) are listed per file and rule in `config/ktlint/baseline.txt`, and Spotless suppresses exactly those. When you fix one, delete its line.
+detekt, Android Lint and ktlint have no baselines, and none may be added. Fix a finding in code; don't suppress it, ignore it in config or raise a threshold. The rules for the few allowed exceptions (third-party APIs that throw only a bare `RuntimeException`, min-SDK deprecations) are in `docs/code-style.md` section 6.
 
-Refresh a baseline only for an intentional change: `detektBaseline`, `updateLintBaseline` (`updateLintBaselineAndroidMain` in KMP modules) or `stabilityDump`. The stability analyzer (0.15.0) merges what every compilation that ran wrote under `build/stability/`, so compile the JVM and Android main targets first and run its tasks in their own Gradle invocation. Kotlin must match the stability analyzer's Kotlin version (see its version map) when bumping either.
+## Stability dumps
+
+Refresh a module's stability dump (`stabilityDump`) only for an intentional change. The stability analyzer (0.15.0) merges what every compilation that ran wrote under `build/stability/`, so compile the JVM and Android main targets first and run its tasks in their own Gradle invocation. Kotlin must match the stability analyzer's Kotlin version (see its version map) when bumping either.
 
 ## Warnings as errors
 
-Kotlin warnings are errors (`allWarningsAsErrors`). A module can opt out with `komi.warningsAsErrors=false` in its own `gradle.properties`; none does.
+Warnings are errors everywhere, with no opt-out: Kotlin in every module and in `build-logic` (`allWarningsAsErrors`), the Gradle Kotlin scripts (`org.gradle.kotlin.dsl.allWarningsAsErrors` in both `gradle.properties` files), Android Lint (`warningsAsErrors`) and detekt (any finding fails, and so does a config warning).
 
 ## Konsist
 

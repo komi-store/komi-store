@@ -5,7 +5,7 @@ Status: **adopted** on 2026-10-19 from the decisions in [findings.md](quality/fi
 This file is for people and agents writing code here. CLAUDE.md files point to it. A tag after a rule says what enforces it:
 
 - **[Spotless]**: `./gradlew spotlessCheck` in CI: ktlint 1.8.0 with the Compose rules, on files changed against `main`
-- **[detekt]**: `./gradlew detekt` in CI, with per-module baselines
+- **[detekt]**: `./gradlew detekt` in CI, with no baselines
 - **[Konsist]**: `./gradlew :konsist-test:test` in CI
 - **[review]**: maintainer review, and agents' own review before opening a PR; the mechanical ones move to Konsist in follow-up work
 

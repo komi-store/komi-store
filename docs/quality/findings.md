@@ -436,10 +436,10 @@ The higher the rung, the less it depends on anyone remembering.
 
 | Rule | Rung | Status |
 |---|---|---|
-| Formatting, imports, naming basics | Spotless (ktlint 1.8.0) | blocking on files changed against `main` |
+| Formatting, imports, naming basics | Spotless (ktlint 1.8.0) | blocking on every file, no baseline |
 | Compose API basics (modifier, parameter order, naming) | Spotless with the Compose rules | same |
-| Complexity, exceptions, smells | detekt | per-module baselines, new findings fail |
-| Android Lint | `lintDebug` | per-module baselines |
+| Complexity, exceptions, smells | detekt | no baselines, any finding fails |
+| Android Lint | `lintDebug` | no baselines, warnings fail |
 | Compose stability | stability analyzer | committed `stability/*.stability` files |
 | Common domain code imports no Ktor, Room, Compose, lifecycle, Koin or Android | Konsist | passing |
 | Presentation never imports data | Konsist | passing |
