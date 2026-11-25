@@ -4,6 +4,7 @@ import io.ktor.client.HttpClient
 import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.http.HttpHeaders
+import kotlin.coroutines.cancellation.CancellationException
 import zed.rainxch.core.data.cache.CacheManager
 import zed.rainxch.core.data.cache.CacheManager.CacheTtl.REPO_DETAILS
 import zed.rainxch.core.data.cache.CacheManager.CacheTtl.REPO_STATS
@@ -33,39 +34,16 @@ import zed.rainxch.details.data.mappers.toDomainProfile
 import zed.rainxch.details.data.mappers.toGithubRepoSummary
 import zed.rainxch.details.data.mappers.toRepoStats
 import zed.rainxch.details.domain.model.RepoStats
-import kotlin.coroutines.cancellation.CancellationException
+import zed.rainxch.details.domain.repository.RepoSummaryReader
 
-internal interface RepoInfoReads {
-    suspend fun getRepositoryById(id: Long): GithubRepoSummary
-
-    suspend fun getRepositoryByOwnerAndName(
-        owner: String,
-        name: String,
-        sourceHost: String?,
-    ): GithubRepoSummary
-
-    suspend fun refreshRepository(
-        owner: String,
-        name: String,
-    ): GithubRepoSummary
-
-    suspend fun getRepoStats(
-        owner: String,
-        repo: String,
-        sourceHost: String?,
-    ): RepoStats
-
-    suspend fun getUserProfile(username: String): GithubUserProfile
-}
-
-internal class RepoInfoReader(
+internal class RepoSummaryReaderImpl(
     private val clientProvider: GitHubClientProvider,
     private val backendApiClient: BackendApiClient,
     private val cacheManager: CacheManager,
     private val backendFallback: BackendFallback,
     private val forgejo: ForgejoDetailsSource,
     private val logger: KomiStoreLogger,
-) : RepoInfoReads {
+) : RepoSummaryReader {
     private val httpClient: HttpClient get() = clientProvider.client
 
     override suspend fun getRepositoryById(id: Long): GithubRepoSummary {

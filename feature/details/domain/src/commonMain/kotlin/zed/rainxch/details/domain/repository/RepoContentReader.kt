@@ -9,4 +9,10 @@ interface RepoContentReader {
     ): Triple<ReadmeContent, LanguageCode?, ReadmePath>?
 
     suspend fun fetchRawMarkdown(url: String): String?
+
+    suspend fun checkAttestations(
+        owner: String,
+        repo: String,
+        sha256Digest: String,
+    ): Boolean
 }

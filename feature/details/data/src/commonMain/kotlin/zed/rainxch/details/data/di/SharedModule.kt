@@ -4,9 +4,9 @@ import org.koin.dsl.module
 import zed.rainxch.details.data.repository.BackendFallback
 import zed.rainxch.details.data.repository.DetailsRepositoryImpl
 import zed.rainxch.details.data.repository.ForgejoDetailsSource
-import zed.rainxch.details.data.repository.ReleaseReader
-import zed.rainxch.details.data.repository.RepoContentReader
-import zed.rainxch.details.data.repository.RepoInfoReader
+import zed.rainxch.details.data.repository.ReleaseReaderImpl
+import zed.rainxch.details.data.repository.RepoContentReaderImpl
+import zed.rainxch.details.data.repository.RepoSummaryReaderImpl
 import zed.rainxch.details.data.repository.TranslationRepositoryImpl
 import zed.rainxch.details.data.system.AttestationVerifierImpl
 import zed.rainxch.details.data.system.InstallationManagerImpl
@@ -31,8 +31,8 @@ val detailsModule =
 
         single<DetailsRepository> {
             DetailsRepositoryImpl(
-                repoInfo =
-                    RepoInfoReader(
+                summary =
+                    RepoSummaryReaderImpl(
                         clientProvider = get(),
                         backendApiClient = get(),
                         cacheManager = get(),
@@ -41,7 +41,7 @@ val detailsModule =
                         logger = get(),
                     ),
                 releases =
-                    ReleaseReader(
+                    ReleaseReaderImpl(
                         clientProvider = get(),
                         backendApiClient = get(),
                         cacheManager = get(),
@@ -50,7 +50,7 @@ val detailsModule =
                         logger = get(),
                     ),
                 content =
-                    RepoContentReader(
+                    RepoContentReaderImpl(
                         clientProvider = get(),
                         backendApiClient = get(),
                         cacheManager = get(),

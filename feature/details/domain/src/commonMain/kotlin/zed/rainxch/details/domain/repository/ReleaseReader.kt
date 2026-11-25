@@ -27,10 +27,4 @@ interface ReleaseReader {
         repo: String,
         sourceHost: String? = null,
     ): CachedReleases?
-
-    suspend fun checkAttestations(
-        owner: String,
-        repo: String,
-        sha256Digest: String,
-    ): Boolean
 }

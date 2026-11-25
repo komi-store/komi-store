@@ -19,23 +19,7 @@ import zed.rainxch.core.domain.model.account.github.GithubRelease
 import zed.rainxch.core.domain.model.error.RateLimitException
 import zed.rainxch.details.data.utils.preprocessGithubMarkdown
 import zed.rainxch.details.domain.model.CachedReleases
-
-internal interface ReleaseReads {
-    suspend fun getLatestPublishedRelease(
-        owner: String,
-        repo: String,
-        defaultBranch: String,
-        sourceHost: String?,
-    ): GithubRelease?
-
-    suspend fun getAllReleases(read: ReleaseRead): List<GithubRelease>
-
-    suspend fun getCachedReleases(
-        owner: String,
-        repo: String,
-        sourceHost: String?,
-    ): CachedReleases?
-}
+import zed.rainxch.details.domain.repository.ReleaseReader
 
 internal data class ReleaseRead(
     val owner: String,
@@ -50,14 +34,14 @@ internal data class ReleaseRead(
     val subject: String get() = "$owner/$repo"
 }
 
-internal class ReleaseReader(
+internal class ReleaseReaderImpl(
     private val clientProvider: GitHubClientProvider,
     private val backendApiClient: BackendApiClient,
     private val cacheManager: CacheManager,
     private val backendFallback: BackendFallback,
     private val forgejo: ForgejoDetailsSource,
     private val logger: KomiStoreLogger,
-) : ReleaseReads {
+) : ReleaseReader {
     private val httpClient: HttpClient get() = clientProvider.client
 
     override suspend fun getLatestPublishedRelease(
@@ -84,7 +68,20 @@ internal class ReleaseReader(
         return if (cached != null && cachedAt != null) CachedReleases(cached, cachedAt) else null
     }
 
-    override suspend fun getAllReleases(read: ReleaseRead): List<GithubRelease> {
+    override suspend fun getAllReleases(
+        owner: String,
+        repo: String,
+        defaultBranch: String,
+        sourceHost: String?,
+        bypassCache: Boolean,
+        allowStale: Boolean,
+        preferDirectSource: Boolean,
+    ): List<GithubRelease> =
+        readReleases(
+            ReleaseRead(owner, repo, defaultBranch, sourceHost, bypassCache, allowStale, preferDirectSource),
+        )
+
+    private suspend fun readReleases(read: ReleaseRead): List<GithubRelease> {
         if (read.sourceHost != null) return forgejo.releases(read.owner, read.repo, read.sourceHost)
         val cached =
             if (read.bypassCache) {

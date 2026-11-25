@@ -21,32 +21,16 @@ import zed.rainxch.details.data.utils.detectReadmeLanguage
 import zed.rainxch.details.data.utils.githubRawBase
 import zed.rainxch.details.data.utils.preprocessGithubMarkdown
 import zed.rainxch.details.data.utils.preprocessMarkdown
+import zed.rainxch.details.domain.repository.RepoContentReader
 
-internal interface RepoContentReads {
-    suspend fun getReadme(
-        owner: String,
-        repo: String,
-        defaultBranch: String,
-        sourceHost: String?,
-    ): Triple<String, String?, String>?
-
-    suspend fun checkAttestations(
-        owner: String,
-        repo: String,
-        sha256Digest: String,
-    ): Boolean
-
-    suspend fun fetchRawMarkdown(url: String): String?
-}
-
-internal class RepoContentReader(
+internal class RepoContentReaderImpl(
     private val clientProvider: GitHubClientProvider,
     private val backendApiClient: BackendApiClient,
     private val cacheManager: CacheManager,
     private val backendFallback: BackendFallback,
     private val forgejo: ForgejoDetailsSource,
     private val logger: KomiStoreLogger,
-) : RepoContentReads {
+) : RepoContentReader {
     private val httpClient: HttpClient get() = clientProvider.client
 
     override suspend fun getReadme(
