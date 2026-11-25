@@ -37,9 +37,6 @@ import kotlinx.collections.immutable.ImmutableSet
 import kotlinx.collections.immutable.persistentMapOf
 import kotlinx.collections.immutable.persistentSetOf
 import org.jetbrains.compose.resources.stringResource
-import zed.rainxch.core.domain.model.account.github.GithubRelease
-import zed.rainxch.core.domain.model.account.github.isEffectivelyPreRelease
-import zed.rainxch.core.domain.model.account.github.preReleaseLabel
 import zed.rainxch.core.domain.model.repository.DiscoveryPlatform
 import zed.rainxch.core.domain.utils.VersionMath
 import zed.rainxch.core.presentation.components.chips.KomiChip
@@ -56,6 +53,7 @@ import zed.rainxch.core.presentation.utils.formatIsoDateOrRaw
 import zed.rainxch.core.presentation.utils.toIcon
 import zed.rainxch.core.presentation.utils.toLabel
 import zed.rainxch.details.presentation.DetailsAction
+import zed.rainxch.details.presentation.model.ReleaseUi
 import zed.rainxch.details.presentation.utils.releaseLineLabel
 import zed.rainxch.githubstore.core.presentation.res.Res
 import zed.rainxch.githubstore.core.presentation.res.category_all
@@ -70,22 +68,19 @@ import zed.rainxch.githubstore.core.presentation.res.versions_title
 
 @Composable
 fun VersionPicker(
-    selectedRelease: GithubRelease?,
-    filteredReleases: ImmutableList<GithubRelease>,
+    selectedRelease: ReleaseUi?,
+    filteredReleases: ImmutableList<ReleaseUi>,
     isPickerVisible: Boolean,
     onAction: (DetailsAction) -> Unit,
     modifier: Modifier = Modifier,
     devicePlatform: DiscoveryPlatform? = null,
-    releasePlatforms: ImmutableMap<Long, Set<DiscoveryPlatform>> = persistentMapOf(),
+    releasePlatforms: ImmutableMap<Long, ImmutableSet<DiscoveryPlatform>> = persistentMapOf(),
     deviceBuildReleaseIds: ImmutableSet<Long> = persistentSetOf(),
     releaseLines: ImmutableMap<Long, String> = persistentMapOf(),
     selectedAppLabel: String? = null,
     repoName: String = "",
 ) {
     val colors = LocalPersonality.current.colors
-    val isPickerEnabled = filteredReleases.isNotEmpty()
-
-    val rowShape = RoundedCornerShape(LocalPersonality.current.shape.corner)
     Column(
         modifier = modifier.wrapContentHeight(),
         verticalArrangement = Arrangement.spacedBy(4.dp),
@@ -96,143 +91,184 @@ fun VersionPicker(
             color = colors.primary,
             modifier = Modifier.padding(horizontal = 4.dp),
         )
-        Row(
-            modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .clip(rowShape)
-                    .border(
-                        width = 1.dp,
-                        color = colors.outline,
-                        shape = rowShape,
-                    ).background(colors.surface)
-                    .clickable(enabled = isPickerEnabled) {
-                        onAction(DetailsAction.ToggleVersionPicker)
-                    }.padding(horizontal = 14.dp, vertical = 10.dp)
-                    .heightIn(min = 36.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Column(modifier = Modifier.weight(1f)) {
-                KomiText(
-                    text =
-                        selectedRelease?.let { release ->
-                            if (selectedAppLabel != null) {
-                                VersionMath.normalizeVersion(release.tagName).ifBlank { release.tagName }
-                            } else {
-                                release.tagName
-                            }
-                        } ?: stringResource(Res.string.no_version_selected),
-                    role = KomiTextRole.Label,
-                    color = colors.onSurface,
-                    overflow = TextOverflow.Clip,
-                    maxLines = 1,
-                )
-                (selectedAppLabel ?: selectedRelease?.name)?.let { name ->
-                    if (name != selectedRelease?.tagName) {
-                        KomiText(
-                            text = name,
-                            role = KomiTextRole.Body,
-                            color = colors.onSurfaceVariant,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                        )
-                    }
-                }
-            }
-            KomiIcon(
-                imageVector = Icons.Default.UnfoldMore,
-                contentDescription = stringResource(Res.string.select_version),
-                tint = colors.onSurfaceVariant,
-                modifier = Modifier.size(18.dp),
-            )
-        }
+        VersionField(
+            selectedRelease = selectedRelease,
+            selectedAppLabel = selectedAppLabel,
+            enabled = filteredReleases.isNotEmpty(),
+            onClick = { onAction(DetailsAction.ToggleVersionPicker) },
+        )
     }
 
     if (isPickerVisible) {
-        val lines =
-            remember(filteredReleases, releaseLines) {
-                filteredReleases.mapNotNull { releaseLines[it.id] }.distinct()
-            }
-        var lineFilter by remember(selectedRelease?.id, lines) {
-            mutableStateOf(selectedRelease?.let { releaseLines[it.id] }?.takeIf { it in lines })
-        }
-        val visibleReleases =
-            remember(filteredReleases, releaseLines, lineFilter) {
-                val line = lineFilter
-                if (line == null) filteredReleases else filteredReleases.filter { releaseLines[it.id] == line }
-            }
-        KomiSheet(
-            onDismiss = { onAction(DetailsAction.ToggleVersionPicker) },
-            placement = KomiSheetPlacement.Bottom,
-        ) {
+        VersionSheet(
+            selectedRelease = selectedRelease,
+            filteredReleases = filteredReleases,
+            onAction = onAction,
+            devicePlatform = devicePlatform,
+            releasePlatforms = releasePlatforms,
+            deviceBuildReleaseIds = deviceBuildReleaseIds,
+            releaseLines = releaseLines,
+            repoName = repoName,
+        )
+    }
+}
+
+// The selected version, bare beside the app's name in a monorepo, else the tag beside the release name.
+@Composable
+private fun VersionField(
+    selectedRelease: ReleaseUi?,
+    selectedAppLabel: String?,
+    enabled: Boolean,
+    onClick: () -> Unit,
+) {
+    val colors = LocalPersonality.current.colors
+    val rowShape = RoundedCornerShape(LocalPersonality.current.shape.corner)
+    Row(
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .clip(rowShape)
+                .border(
+                    width = 1.dp,
+                    color = colors.outline,
+                    shape = rowShape,
+                ).background(colors.surface)
+                .clickable(enabled = enabled, onClick = onClick)
+                .padding(horizontal = 14.dp, vertical = 10.dp)
+                .heightIn(min = 36.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Column(modifier = Modifier.weight(1f)) {
             KomiText(
-                text = stringResource(Res.string.versions_title),
-                role = KomiTextRole.CardTitle,
+                text =
+                    selectedRelease?.let { release ->
+                        if (selectedAppLabel != null) {
+                            VersionMath.normalizeVersion(release.tagName).ifBlank { release.tagName }
+                        } else {
+                            release.tagName
+                        }
+                    } ?: stringResource(Res.string.no_version_selected),
+                role = KomiTextRole.Label,
                 color = colors.onSurface,
-                modifier = Modifier.padding(vertical = 6.dp),
+                overflow = TextOverflow.Clip,
+                maxLines = 1,
             )
-            Spacer(Modifier.size(8.dp))
-            if (lines.size > 1) {
-                LazyRow(
-                    horizontalArrangement = Arrangement.spacedBy(6.dp),
-                    modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
-                ) {
-                    item(key = "all") {
-                        KomiChip(
-                            label = stringResource(Res.string.category_all),
-                            kind = KomiChipKind.Filter,
-                            size = KomiChipSize.Sm,
-                            selected = lineFilter == null,
-                            onClick = { lineFilter = null },
-                        )
-                    }
-                    items(lines, key = { it }) { line ->
-                        KomiChip(
-                            label = releaseLineLabel(line, repoName),
-                            kind = KomiChipKind.Filter,
-                            size = KomiChipSize.Sm,
-                            selected = lineFilter == line,
-                            onClick = { lineFilter = line },
-                        )
-                    }
+            (selectedAppLabel ?: selectedRelease?.name)?.let { name ->
+                if (name != selectedRelease?.tagName) {
+                    KomiText(
+                        text = name,
+                        role = KomiTextRole.Body,
+                        color = colors.onSurfaceVariant,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
                 }
             }
-            if (filteredReleases.isEmpty()) {
-                KomiText(
-                    text = stringResource(Res.string.not_available),
-                    role = KomiTextRole.Body,
-                    color = colors.onSurfaceVariant,
-                    modifier = Modifier.padding(vertical = 16.dp),
-                )
-            } else {
-                val latestReleaseId = visibleReleases.firstOrNull()?.id
-                val latestDeviceBuildId =
-                    visibleReleases.firstOrNull { it.id in deviceBuildReleaseIds }?.id
-                LazyColumn(
-                    modifier = Modifier.fillMaxWidth().heightIn(max = 420.dp),
-                    contentPadding = PaddingValues(vertical = 8.dp),
-                ) {
-                    items(items = visibleReleases, key = { it.id }) { release ->
-                        VersionListItem(
-                            release = release,
-                            isSelected = release.id == selectedRelease?.id,
-                            isLatest = release.id == latestReleaseId,
-                            onClick = { onAction(DetailsAction.SelectRelease(release)) },
-                            latestForPlatform =
-                                devicePlatform?.takeIf {
-                                    release.id == latestDeviceBuildId && latestDeviceBuildId != latestReleaseId
-                                },
-                            hasDeviceBuild =
-                                deviceBuildReleaseIds.isEmpty() || release.id in deviceBuildReleaseIds,
-                            platforms = releasePlatforms[release.id].orEmpty(),
-                            devicePlatform = devicePlatform,
-                        )
-                        KomiHorizontalDivider(
-                            color = colors.divider,
-                            thickness = 0.5.dp,
-                        )
-                    }
+        }
+        KomiIcon(
+            imageVector = Icons.Default.UnfoldMore,
+            contentDescription = stringResource(Res.string.select_version),
+            tint = colors.onSurfaceVariant,
+            modifier = Modifier.size(18.dp),
+        )
+    }
+}
+
+@Composable
+private fun VersionSheet(
+    selectedRelease: ReleaseUi?,
+    filteredReleases: ImmutableList<ReleaseUi>,
+    onAction: (DetailsAction) -> Unit,
+    devicePlatform: DiscoveryPlatform?,
+    releasePlatforms: ImmutableMap<Long, ImmutableSet<DiscoveryPlatform>>,
+    deviceBuildReleaseIds: ImmutableSet<Long>,
+    releaseLines: ImmutableMap<Long, String>,
+    repoName: String,
+) {
+    val colors = LocalPersonality.current.colors
+    val lines =
+        remember(filteredReleases, releaseLines) {
+            filteredReleases.mapNotNull { releaseLines[it.id] }.distinct()
+        }
+    var lineFilter by remember(selectedRelease?.id, lines) {
+        mutableStateOf(selectedRelease?.let { releaseLines[it.id] }?.takeIf { it in lines })
+    }
+    val visibleReleases =
+        remember(filteredReleases, releaseLines, lineFilter) {
+            val line = lineFilter
+            if (line == null) filteredReleases else filteredReleases.filter { releaseLines[it.id] == line }
+        }
+    KomiSheet(
+        onDismiss = { onAction(DetailsAction.ToggleVersionPicker) },
+        placement = KomiSheetPlacement.Bottom,
+    ) {
+        KomiText(
+            text = stringResource(Res.string.versions_title),
+            role = KomiTextRole.CardTitle,
+            color = colors.onSurface,
+            modifier = Modifier.padding(vertical = 6.dp),
+        )
+        Spacer(Modifier.size(8.dp))
+        if (lines.size > 1) {
+            LazyRow(
+                horizontalArrangement = Arrangement.spacedBy(6.dp),
+                modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
+            ) {
+                item(key = "all") {
+                    KomiChip(
+                        label = stringResource(Res.string.category_all),
+                        kind = KomiChipKind.Filter,
+                        size = KomiChipSize.Sm,
+                        selected = lineFilter == null,
+                        onClick = { lineFilter = null },
+                    )
+                }
+                items(lines, key = { it }) { line ->
+                    KomiChip(
+                        label = releaseLineLabel(line, repoName),
+                        kind = KomiChipKind.Filter,
+                        size = KomiChipSize.Sm,
+                        selected = lineFilter == line,
+                        onClick = { lineFilter = line },
+                    )
+                }
+            }
+        }
+        if (filteredReleases.isEmpty()) {
+            KomiText(
+                text = stringResource(Res.string.not_available),
+                role = KomiTextRole.Body,
+                color = colors.onSurfaceVariant,
+                modifier = Modifier.padding(vertical = 16.dp),
+            )
+        } else {
+            val latestReleaseId = visibleReleases.firstOrNull()?.id
+            val latestDeviceBuildId =
+                visibleReleases.firstOrNull { it.id in deviceBuildReleaseIds }?.id
+            LazyColumn(
+                modifier = Modifier.fillMaxWidth().heightIn(max = 420.dp),
+                contentPadding = PaddingValues(vertical = 8.dp),
+            ) {
+                items(items = visibleReleases, key = { it.id }) { release ->
+                    VersionListItem(
+                        release = release,
+                        isSelected = release.id == selectedRelease?.id,
+                        isLatest = release.id == latestReleaseId,
+                        onClick = { onAction(DetailsAction.SelectRelease(release.id)) },
+                        latestForPlatform =
+                            devicePlatform?.takeIf {
+                                release.id == latestDeviceBuildId && latestDeviceBuildId != latestReleaseId
+                            },
+                        hasDeviceBuild =
+                            deviceBuildReleaseIds.isEmpty() || release.id in deviceBuildReleaseIds,
+                        platforms = releasePlatforms[release.id] ?: persistentSetOf(),
+                        devicePlatform = devicePlatform,
+                    )
+                    KomiHorizontalDivider(
+                        color = colors.divider,
+                        thickness = 0.5.dp,
+                    )
                 }
             }
         }
@@ -241,13 +277,13 @@ fun VersionPicker(
 
 @Composable
 private fun VersionListItem(
-    release: GithubRelease,
+    release: ReleaseUi,
     isSelected: Boolean,
     isLatest: Boolean,
     onClick: () -> Unit,
     latestForPlatform: DiscoveryPlatform? = null,
     hasDeviceBuild: Boolean = true,
-    platforms: Set<DiscoveryPlatform> = emptySet(),
+    platforms: ImmutableSet<DiscoveryPlatform> = persistentSetOf(),
     devicePlatform: DiscoveryPlatform? = null,
 ) {
     Row(
@@ -296,8 +332,8 @@ private fun VersionListItem(
                 latestForPlatform?.let { platform ->
                     VersionBadge(text = stringResource(Res.string.latest_for_platform, platform.toLabel()))
                 }
-                if (release.isEffectivelyPreRelease()) {
-                    val specificLabel = release.preReleaseLabel()
+                if (release.isPreRelease) {
+                    val specificLabel = release.preReleaseLabel
                     KomiText(
                         text = specificLabel ?: stringResource(Res.string.pre_release_badge),
                         role = KomiTextRole.Overline,
@@ -369,7 +405,7 @@ private fun VersionBadge(text: String) {
 
 @Composable
 private fun ReleasePlatformIcons(
-    platforms: Set<DiscoveryPlatform>,
+    platforms: ImmutableSet<DiscoveryPlatform>,
     devicePlatform: DiscoveryPlatform?,
 ) {
     val colors = LocalPersonality.current.colors

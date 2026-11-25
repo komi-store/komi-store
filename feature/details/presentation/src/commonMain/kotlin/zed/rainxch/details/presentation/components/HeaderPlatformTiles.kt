@@ -32,10 +32,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
+import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.delay
-import zed.rainxch.core.domain.model.account.github.GithubRelease
 import zed.rainxch.core.domain.model.repository.DiscoveryPlatform
-import zed.rainxch.core.domain.utils.PlatformRelease
 import zed.rainxch.core.domain.utils.VersionMath
 import zed.rainxch.core.presentation.components.icon.KomiIcon
 import zed.rainxch.core.presentation.components.text.KomiText
@@ -48,13 +47,13 @@ import zed.rainxch.core.presentation.spacing.Spacing
 import zed.rainxch.core.presentation.utils.daysSinceIso
 import zed.rainxch.core.presentation.utils.toIcon
 import zed.rainxch.core.presentation.utils.toLabel
+import zed.rainxch.details.presentation.model.PlatformReleaseUi
+import zed.rainxch.details.presentation.model.ReleaseUi
 
-// One tile per platform, each at most 96dp wide (the device's a little wider) so a couple of platforms
-// don't stretch across the card. Classic joins them into one connected group; Manga inks each apart.
-// With [playEntrance], the tiles rise in one after another.
+// Tiles stay at most 96dp wide, the device's 120dp, so a couple of platforms don't stretch across the card.
 @Composable
 internal fun PlatformDock(
-    platformReleases: List<PlatformRelease>,
+    platformReleases: ImmutableList<PlatformReleaseUi>,
     devicePlatform: DiscoveryPlatform?,
     onPlatformClick: ((DiscoveryPlatform) -> Unit)?,
     playEntrance: Boolean,
@@ -87,14 +86,11 @@ internal fun PlatformDock(
     }
 }
 
-// Its icon over the version of its newest build, or the year when that build is over a year old.
-// The device's tile is filled; in Manga every tile is inked. In Classic the ends of the group are
-// round, the device's tile is a pill and a pressed tile squares its inner corners, as Material's
-// connected button groups do.
+// In Classic a pressed tile squares its inner corners, as Material's connected button groups do.
 @Composable
 private fun PlatformTile(
     platform: DiscoveryPlatform,
-    release: GithubRelease,
+    release: ReleaseUi,
     isDevice: Boolean,
     first: Boolean,
     last: Boolean,
@@ -199,7 +195,7 @@ private fun platformTileColors(
         else -> colors.surface to colors.onSurfaceVariant
     }
 
-private fun platformVersion(release: GithubRelease): String = VersionMath.normalizeVersion(release.tagName).ifBlank { release.tagName }
+private fun platformVersion(release: ReleaseUi): String = VersionMath.normalizeVersion(release.tagName).ifBlank { release.tagName }
 
 private const val STALE_PLATFORM_DAYS = 365
 private const val DEVICE_TILE_WEIGHT = 1.25f

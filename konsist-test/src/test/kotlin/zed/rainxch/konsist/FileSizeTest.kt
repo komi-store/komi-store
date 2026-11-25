@@ -30,7 +30,6 @@ class FileSizeTest {
 
         val OVERSIZED =
             setOf(
-                "feature/details/presentation/src/commonMain/kotlin/zed/rainxch/details/presentation/DetailsViewModel.kt",
                 "feature/apps/presentation/src/commonMain/kotlin/zed/rainxch/apps/presentation/AppsViewModel.kt",
                 "feature/tweaks/presentation/src/commonMain/kotlin/zed/rainxch/tweaks/presentation/TweaksViewModel.kt",
                 "feature/search/presentation/src/commonMain/kotlin/zed/rainxch/search/presentation/SearchRoot.kt",
@@ -41,7 +40,6 @@ class FileSizeTest {
                 "feature/apps/presentation/src/commonMain/kotlin/zed/rainxch/apps/presentation/import/ExternalImportViewModel.kt",
                 "feature/auth/presentation/src/commonMain/kotlin/zed/rainxch/auth/presentation/AuthenticationViewModel.kt",
                 "feature/auth/presentation/src/commonMain/kotlin/zed/rainxch/auth/presentation/AuthenticationRoot.kt",
-                "feature/details/presentation/src/commonMain/kotlin/zed/rainxch/details/presentation/DetailsRoot.kt",
             )
     }
 }

@@ -1,4 +1,4 @@
-package zed.rainxch.details.domain.model
+package zed.rainxch.details.presentation.model
 
 data class SupportedLanguage(
     val code: String,

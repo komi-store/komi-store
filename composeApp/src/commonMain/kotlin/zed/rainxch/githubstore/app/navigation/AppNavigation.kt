@@ -47,11 +47,14 @@ import zed.rainxch.core.domain.model.repository.DiscoveryPlatform
 import zed.rainxch.core.presentation.components.adaptive.AdaptiveDetailArgs
 import zed.rainxch.core.presentation.components.adaptive.AdaptiveListDetailScaffold
 import zed.rainxch.core.presentation.components.adaptive.rememberAdaptiveListDetailState
+import zed.rainxch.core.presentation.components.bars.KomiTabCardState
+import zed.rainxch.core.presentation.components.bars.LocalTabCardSlot
 import zed.rainxch.core.presentation.locals.LocalAnimatedVisibilityScope
 import zed.rainxch.core.presentation.locals.LocalContentWidth
 import zed.rainxch.core.presentation.locals.LocalPersonality
 import zed.rainxch.core.presentation.locals.LocalScrollbarEnabled
 import zed.rainxch.core.presentation.locals.LocalSharedTransitionScope
+import zed.rainxch.core.presentation.personality.ClassicPersonality
 import zed.rainxch.details.presentation.DetailsRoot
 import zed.rainxch.details.presentation.about.AboutRoot
 import zed.rainxch.details.presentation.markdownviewer.MarkdownViewerRoot
@@ -88,9 +91,6 @@ import zed.rainxch.tweaks.presentation.hosttokens.HostTokensRoot
 import zed.rainxch.tweaks.presentation.licenses.LicensesRoot
 import zed.rainxch.tweaks.presentation.mirror.MirrorPickerRoot
 import zed.rainxch.tweaks.presentation.skipped.SkippedUpdatesRoot
-import zed.rainxch.core.presentation.components.bars.KomiTabCardState
-import zed.rainxch.core.presentation.components.bars.LocalTabCardSlot
-import zed.rainxch.core.presentation.personality.ClassicPersonality
 
 @Composable
 fun AppNavigation(
@@ -497,13 +497,6 @@ fun AppNavigation(
                                                     composerRating = composerRating,
                                                     version = version,
                                                     appLabel = appLabel,
-                                                ),
-                                            )
-                                        },
-                                        onNavigateToMarkdownViewer = { url ->
-                                            navController.navigate(
-                                                GithubStoreGraph.MarkdownViewerScreen(
-                                                    url,
                                                 ),
                                             )
                                         },

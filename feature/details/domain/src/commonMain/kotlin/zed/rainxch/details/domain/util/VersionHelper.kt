@@ -11,33 +11,30 @@ object VersionHelper {
         current: String,
         allReleases: List<GithubRelease>,
     ): Boolean {
-        val candidateScheme = VersionMath.detectScheme(candidate)
-        val currentScheme = VersionMath.detectScheme(current)
         val bothSchemed =
-            candidateScheme != VersionMath.Scheme.Unknown &&
-                currentScheme != VersionMath.Scheme.Unknown
-
+            VersionMath.detectScheme(candidate) != VersionMath.Scheme.Unknown &&
+                VersionMath.detectScheme(current) != VersionMath.Scheme.Unknown
         val cmp = VersionMath.compareVersions(candidate, current)
-
-        if (bothSchemed) {
-            return cmp < 0
+        return when {
+            bothSchemed -> cmp < 0
+            cmp == 0 -> false
+            else -> comesAfterInReleaseList(candidate, current, allReleases)
         }
+    }
 
-        if (cmp == 0) return false
+    // Without a version scheme to compare, the release list's newest-first order decides.
+    private fun comesAfterInReleaseList(
+        candidate: String,
+        current: String,
+        allReleases: List<GithubRelease>,
+    ): Boolean {
+        val candidateIndex = allReleases.indexOfVersion(candidate)
+        val currentIndex = allReleases.indexOfVersion(current)
+        return candidateIndex != -1 && currentIndex != -1 && candidateIndex > currentIndex
+    }
 
-        val normalizedCandidate = VersionMath.normalizeVersion(candidate)
-        val normalizedCurrent = VersionMath.normalizeVersion(current)
-        val candidateIndex =
-            allReleases.indexOfFirst {
-                VersionMath.normalizeVersion(it.tagName) == normalizedCandidate
-            }
-        val currentIndex =
-            allReleases.indexOfFirst {
-                VersionMath.normalizeVersion(it.tagName) == normalizedCurrent
-            }
-        if (candidateIndex != -1 && currentIndex != -1) {
-            return candidateIndex > currentIndex
-        }
-        return false
+    private fun List<GithubRelease>.indexOfVersion(version: String): Int {
+        val normalized = VersionMath.normalizeVersion(version)
+        return indexOfFirst { VersionMath.normalizeVersion(it.tagName) == normalized }
     }
 }

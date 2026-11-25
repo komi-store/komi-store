@@ -31,12 +31,13 @@ import androidx.compose.material.icons.filled.Tune
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
-import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
@@ -44,13 +45,13 @@ import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import zed.rainxch.core.domain.model.apk.ApkInspection
-import zed.rainxch.core.domain.model.apk.ApkPermission
 import zed.rainxch.core.domain.model.apk.ProtectionLevel
 import zed.rainxch.core.presentation.components.icon.KomiIcon
 import zed.rainxch.core.presentation.components.overlays.KomiSheet
@@ -62,7 +63,12 @@ import zed.rainxch.core.presentation.components.text.KomiText
 import zed.rainxch.core.presentation.components.text.KomiTextRole
 import zed.rainxch.core.presentation.locals.LocalPersonality
 import zed.rainxch.core.presentation.locals.LocalStatusColors
+import zed.rainxch.core.presentation.personality.softFill
+import zed.rainxch.core.presentation.personality.strongFill
 import zed.rainxch.core.presentation.utils.formatFileSize
+import zed.rainxch.details.presentation.model.ApkInspectionUi
+import zed.rainxch.details.presentation.model.ApkPermissionUi
+import zed.rainxch.details.presentation.utils.plainTextClipEntry
 import zed.rainxch.githubstore.core.presentation.res.Res
 import zed.rainxch.githubstore.core.presentation.res.apk_inspect_compatibility
 import zed.rainxch.githubstore.core.presentation.res.apk_inspect_components
@@ -95,12 +101,14 @@ import zed.rainxch.githubstore.core.presentation.res.apps_section_state_expanded
 
 @Composable
 fun ApkInspectSheet(
-    inspection: ApkInspection?,
+    inspection: ApkInspectionUi?,
     isLoading: Boolean,
     onDismiss: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     KomiSheet(
         onDismiss = onDismiss,
+        modifier = modifier,
         placement = KomiSheetPlacement.Bottom,
     ) {
         when {
@@ -143,7 +151,7 @@ private fun EmptyState() {
 }
 
 @Composable
-private fun InspectionContent(inspection: ApkInspection) {
+private fun InspectionContent(inspection: ApkInspectionUi) {
     LazyColumn(
         modifier = Modifier.fillMaxWidth().heightIn(max = 520.dp),
         contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
@@ -160,7 +168,7 @@ private fun InspectionContent(inspection: ApkInspection) {
 }
 
 @Composable
-private fun Header(inspection: ApkInspection) {
+private fun Header(inspection: ApkInspectionUi) {
     val colors = LocalPersonality.current.colors
     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
         KomiText(
@@ -209,7 +217,7 @@ private fun SourceChip(label: String) {
 }
 
 @Composable
-private fun IdentitySection(inspection: ApkInspection) {
+private fun IdentitySection(inspection: ApkInspectionUi) {
     InspectSection(
         title = stringResource(Res.string.apk_inspect_identity),
         icon = Icons.Default.Fingerprint,
@@ -235,7 +243,7 @@ private fun IdentitySection(inspection: ApkInspection) {
 }
 
 @Composable
-private fun CompatibilitySection(inspection: ApkInspection) {
+private fun CompatibilitySection(inspection: ApkInspectionUi) {
     InspectSection(
         title = stringResource(Res.string.apk_inspect_compatibility),
         icon = Icons.Default.Tune,
@@ -255,83 +263,78 @@ private fun CompatibilitySection(inspection: ApkInspection) {
     }
 }
 
+private val OrderedLevels =
+    listOf(
+        ProtectionLevel.DANGEROUS,
+        ProtectionLevel.PRIVILEGED,
+        ProtectionLevel.SIGNATURE,
+        ProtectionLevel.NORMAL,
+        ProtectionLevel.UNKNOWN,
+    )
+
 @Composable
-private fun PermissionsSection(permissions: List<ApkPermission>) {
-    val grouped = permissions.groupBy { it.protectionLevel }
-    val orderedLevels =
-        listOf(
-            ProtectionLevel.DANGEROUS,
-            ProtectionLevel.PRIVILEGED,
-            ProtectionLevel.SIGNATURE,
-            ProtectionLevel.NORMAL,
-            ProtectionLevel.UNKNOWN,
-        )
-
-    val dangerousWord = stringResource(Res.string.apk_inspect_protection_dangerous).lowercase()
-    val privilegedWord = stringResource(Res.string.apk_inspect_protection_privileged).lowercase()
-    val signatureWord = stringResource(Res.string.apk_inspect_protection_signature).lowercase()
-    val normalWord = stringResource(Res.string.apk_inspect_protection_normal).lowercase()
-    val unknownWord = stringResource(Res.string.apk_inspect_protection_unknown).lowercase()
-    val baseTitle = stringResource(Res.string.apk_inspect_permissions_title)
-
-    val title =
-        if (permissions.isEmpty()) {
-            stringResource(Res.string.apk_inspect_permissions, 0)
-        } else {
-            val parts =
-                orderedLevels.mapNotNull { level ->
-                    val count = grouped[level]?.size ?: 0
-                    if (count == 0) return@mapNotNull null
-                    val word =
-                        when (level) {
-                            ProtectionLevel.DANGEROUS -> dangerousWord
-                            ProtectionLevel.PRIVILEGED -> privilegedWord
-                            ProtectionLevel.SIGNATURE -> signatureWord
-                            ProtectionLevel.NORMAL -> normalWord
-                            ProtectionLevel.UNKNOWN -> unknownWord
-                        }
-                    "$count $word"
-                }
-            "$baseTitle  ·  ${parts.joinToString("  ·  ")}"
-        }
-
-    val colors = LocalPersonality.current.colors
-    InspectSection(title = title, icon = Icons.Default.PrivacyTip) {
+private fun PermissionsSection(permissions: ImmutableList<ApkPermissionUi>) {
+    InspectSection(title = permissionsTitle(permissions), icon = Icons.Default.PrivacyTip) {
         if (permissions.isEmpty()) {
             KomiText(
                 text = stringResource(Res.string.apk_inspect_permissions_empty),
                 role = KomiTextRole.Body,
-                color = colors.onSurfaceVariant,
+                color = LocalPersonality.current.colors.onSurfaceVariant,
             )
-            return@InspectSection
+        } else {
+            PermissionGroups(permissions = permissions)
         }
+    }
+}
 
-        val expanded =
-            remember(permissions) {
-                mutableStateMapOf<ProtectionLevel, Boolean>().apply {
-                    orderedLevels.forEach { put(it, defaultExpanded(it)) }
-                }
+// The section title counts the permissions per protection level, most dangerous first.
+@Composable
+private fun permissionsTitle(permissions: ImmutableList<ApkPermissionUi>): String {
+    if (permissions.isEmpty()) return stringResource(Res.string.apk_inspect_permissions, 0)
+    val grouped = permissions.groupBy { it.protectionLevel }
+    val words = OrderedLevels.associateWith { protectionWord(it) }
+    val parts =
+        OrderedLevels.mapNotNull { level ->
+            grouped[level]?.size?.takeIf { it > 0 }?.let { count -> "$count ${words.getValue(level)}" }
+        }
+    return "${stringResource(Res.string.apk_inspect_permissions_title)}  ·  ${parts.joinToString("  ·  ")}"
+}
+
+@Composable
+private fun protectionWord(level: ProtectionLevel): String =
+    when (level) {
+        ProtectionLevel.DANGEROUS -> stringResource(Res.string.apk_inspect_protection_dangerous)
+        ProtectionLevel.PRIVILEGED -> stringResource(Res.string.apk_inspect_protection_privileged)
+        ProtectionLevel.SIGNATURE -> stringResource(Res.string.apk_inspect_protection_signature)
+        ProtectionLevel.NORMAL -> stringResource(Res.string.apk_inspect_protection_normal)
+        ProtectionLevel.UNKNOWN -> stringResource(Res.string.apk_inspect_protection_unknown)
+    }.lowercase()
+
+@Composable
+private fun PermissionGroups(permissions: ImmutableList<ApkPermissionUi>) {
+    val grouped = remember(permissions) { permissions.groupBy { it.protectionLevel } }
+    val expanded =
+        remember(permissions) {
+            mutableStateMapOf<ProtectionLevel, Boolean>().apply {
+                OrderedLevels.forEach { put(it, defaultExpanded(it)) }
             }
-
-        Column(verticalArrangement = Arrangement.spacedBy(20.dp)) {
-            orderedLevels.forEach { level ->
-                val rows = grouped[level].orEmpty()
-                if (rows.isEmpty()) return@forEach
+        }
+    Column(verticalArrangement = Arrangement.spacedBy(20.dp)) {
+        OrderedLevels.forEach { level ->
+            val rows = grouped[level].orEmpty()
+            if (rows.isNotEmpty()) {
                 val isExpanded = expanded[level] ?: defaultExpanded(level)
-                val collapsible = isCollapsibleByDefault(level)
                 Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     PermissionGroupHeader(
                         level = level,
                         count = rows.size,
                         expanded = isExpanded,
-                        collapsible = collapsible,
+                        collapsible = isCollapsibleByDefault(level),
                         onToggle = { expanded[level] = !isExpanded },
                     )
                     if (isExpanded) {
                         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                            rows
-                                .sortedBy { it.displayName }
-                                .forEach { perm -> PermissionRow(perm) }
+                            rows.sortedBy { it.displayName }.forEach { perm -> PermissionRow(perm) }
                         }
                     }
                 }
@@ -394,7 +397,7 @@ private fun PermissionGroupHeader(
             modifier =
                 Modifier
                     .clip(RoundedCornerShape(shape.cornerSmall))
-                    .background(color.copy(alpha = 0.16f))
+                    .background(color.softFill)
                     .padding(horizontal = 8.dp, vertical = 1.dp),
         )
         Spacer(modifier = Modifier.weight(1f))
@@ -410,9 +413,9 @@ private fun PermissionGroupHeader(
 }
 
 @Composable
-private fun PermissionRow(permission: ApkPermission) {
+private fun PermissionRow(permission: ApkPermissionUi) {
     val (chipColor, chipLabel) = protectionStyle(permission.protectionLevel)
-    val chipAlpha = if (permission.protectionLevel == ProtectionLevel.DANGEROUS) 0.22f else 0.16f
+    val chipFill = if (permission.protectionLevel == ProtectionLevel.DANGEROUS) chipColor.strongFill else chipColor.softFill
 
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -454,7 +457,7 @@ private fun PermissionRow(permission: ApkPermission) {
             modifier =
                 Modifier
                     .clip(RoundedCornerShape(shape.cornerSmall))
-                    .background(chipColor.copy(alpha = chipAlpha))
+                    .background(chipFill)
                     .padding(horizontal = 10.dp, vertical = 2.dp),
         )
     }
@@ -475,7 +478,7 @@ private fun defaultExpanded(level: ProtectionLevel): Boolean =
 private fun isCollapsibleByDefault(level: ProtectionLevel): Boolean = level == ProtectionLevel.NORMAL || level == ProtectionLevel.UNKNOWN
 
 @Composable
-private fun ComponentsSection(inspection: ApkInspection) {
+private fun ComponentsSection(inspection: ApkInspectionUi) {
     InspectSection(
         title = stringResource(Res.string.apk_inspect_components),
         icon = Icons.Default.Apps,
@@ -503,7 +506,7 @@ private fun ComponentsSection(inspection: ApkInspection) {
 }
 
 @Composable
-private fun FileSection(inspection: ApkInspection) {
+private fun FileSection(inspection: ApkInspectionUi) {
     InspectSection(
         title = stringResource(Res.string.apk_inspect_file_info),
         icon = Icons.Default.Folder,
@@ -652,13 +655,13 @@ private fun protectionStyle(level: ProtectionLevel): Pair<Color, String> {
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun Modifier.copyableOnLongPress(value: String): Modifier {
-    @Suppress("DEPRECATION")
-    val clipboard = LocalClipboardManager.current
+    val clipboard = LocalClipboard.current
     val haptic = LocalHapticFeedback.current
+    val scope = rememberCoroutineScope()
     return this.combinedClickable(
         onClick = {},
         onLongClick = {
-            clipboard.setText(AnnotatedString(value))
+            scope.launch { clipboard.setClipEntry(plainTextClipEntry(value)) }
             haptic.performHapticFeedback(HapticFeedbackType.LongPress)
         },
     )

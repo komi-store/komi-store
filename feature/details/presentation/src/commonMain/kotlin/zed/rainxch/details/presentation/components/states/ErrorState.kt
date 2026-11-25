@@ -28,13 +28,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
-import zed.rainxch.core.presentation.components.icon.KomiIcon
-import zed.rainxch.core.presentation.components.surfaces.KomiSurface
 import zed.rainxch.core.presentation.components.buttons.KomiButton
 import zed.rainxch.core.presentation.components.buttons.KomiButtonVariant
+import zed.rainxch.core.presentation.components.icon.KomiIcon
+import zed.rainxch.core.presentation.components.surfaces.KomiSurface
 import zed.rainxch.core.presentation.components.text.KomiText
 import zed.rainxch.core.presentation.components.text.KomiTextRole
 import zed.rainxch.core.presentation.locals.LocalPersonality
+import zed.rainxch.core.presentation.personality.iconPlate
 import zed.rainxch.details.presentation.DetailsAction
 import zed.rainxch.githubstore.core.presentation.res.Res
 import zed.rainxch.githubstore.core.presentation.res.error_state_go_back
@@ -52,19 +53,21 @@ import zed.rainxch.githubstore.core.presentation.res.retry
 fun ErrorState(
     errorMessage: String,
     onAction: (DetailsAction) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val kind = classify(errorMessage)
     Box(
-        modifier = Modifier.fillMaxSize().padding(24.dp),
+        modifier = modifier.fillMaxSize().padding(24.dp),
         contentAlignment = Alignment.Center,
     ) {
         KomiSurface(
             modifier = Modifier.widthIn(max = 480.dp),
         ) {
             Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 24.dp, vertical = 32.dp),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 24.dp, vertical = 32.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
@@ -93,11 +96,12 @@ fun ErrorState(
                         role = KomiTextRole.Body,
                         color = colors.onSurfaceVariant,
                         textAlign = TextAlign.Center,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clip(RoundedCornerShape(shape.corner))
-                            .background(colors.surfaceContainerHigh)
-                            .padding(horizontal = 12.dp, vertical = 8.dp),
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .clip(RoundedCornerShape(shape.corner))
+                                .background(colors.surfaceContainerHigh)
+                                .padding(horizontal = 12.dp, vertical = 8.dp),
                     )
                 }
 
@@ -126,13 +130,17 @@ fun ErrorState(
 }
 
 @Composable
-private fun IconBadge(icon: ImageVector, tint: Color) {
+private fun IconBadge(
+    icon: ImageVector,
+    tint: Color,
+) {
     val shape = LocalPersonality.current.shape
     Box(
-        modifier = Modifier
-            .size(72.dp)
-            .clip(RoundedCornerShape(shape.cornerSmall))
-            .background(tint.copy(alpha = 0.15f)),
+        modifier =
+            Modifier
+                .size(72.dp)
+                .clip(RoundedCornerShape(shape.cornerSmall))
+                .background(tint.iconPlate),
         contentAlignment = Alignment.Center,
     ) {
         KomiIcon(
@@ -189,15 +197,25 @@ private fun ErrorKind.tint(): Color {
 private fun classify(message: String): ErrorKind {
     val lower = message.lowercase()
     return when {
-        lower.contains("rate limit") || lower.contains("retry in") || lower.contains("429") ->
+        lower.contains("rate limit") || lower.contains("retry in") || lower.contains("429") -> {
             ErrorKind.RATE_LIMIT
-        lower.contains("404") || lower.contains("not found") -> ErrorKind.NOT_FOUND
+        }
+
+        lower.contains("404") || lower.contains("not found") -> {
+            ErrorKind.NOT_FOUND
+        }
+
         lower.contains("unable to resolve host") ||
             lower.contains("unknownhost") ||
             lower.contains("connection refused") ||
             lower.contains("network is unreachable") ||
             lower.contains("timeout") ||
-            lower.contains("offline") -> ErrorKind.OFFLINE
-        else -> ErrorKind.GENERIC
+            lower.contains("offline") -> {
+            ErrorKind.OFFLINE
+        }
+
+        else -> {
+            ErrorKind.GENERIC
+        }
     }
 }

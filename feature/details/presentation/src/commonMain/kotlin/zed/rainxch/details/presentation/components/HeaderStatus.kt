@@ -21,7 +21,6 @@ import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
-import zed.rainxch.core.domain.model.installation.InstalledApp
 import zed.rainxch.core.presentation.components.icon.KomiIcon
 import zed.rainxch.core.presentation.components.overlays.KomiTooltip
 import zed.rainxch.core.presentation.components.text.KomiText
@@ -29,6 +28,7 @@ import zed.rainxch.core.presentation.components.text.KomiTextRole
 import zed.rainxch.core.presentation.locals.LocalPersonality
 import zed.rainxch.core.presentation.personality.manga.decoration.hardShadow
 import zed.rainxch.core.presentation.spacing.Spacing
+import zed.rainxch.details.presentation.model.InstalledAppUi
 import zed.rainxch.githubstore.core.presentation.res.Res
 import zed.rainxch.githubstore.core.presentation.res.installed
 import zed.rainxch.githubstore.core.presentation.res.pending_install
@@ -95,7 +95,7 @@ internal enum class HeaderStatus(
 
 // The plain "Installed" status gives way to the app switcher; pending and update stay.
 internal fun headerStatusOf(
-    app: InstalledApp?,
+    app: InstalledAppUi?,
     showAppSwitcher: Boolean,
 ): HeaderStatus? =
     when {

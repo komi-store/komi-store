@@ -1,9 +1,5 @@
 2 composeApp/src/commonMain/kotlin/zed/rainxch/githubstore/app/navigation/DesktopSidebar.kt
 1 feature/apps/presentation/src/commonMain/kotlin/zed/rainxch/apps/presentation/starred/components/StarredCandidateRow.kt
-1 feature/details/presentation/src/commonMain/kotlin/zed/rainxch/details/presentation/components/ApkInspectSheet.kt
-5 feature/details/presentation/src/commonMain/kotlin/zed/rainxch/details/presentation/components/SmartInstallButton.kt
-4 feature/details/presentation/src/commonMain/kotlin/zed/rainxch/details/presentation/components/sections/WhatsNew.kt
-1 feature/details/presentation/src/commonMain/kotlin/zed/rainxch/details/presentation/components/states/ErrorState.kt
 3 feature/dev-profile/presentation/src/commonMain/kotlin/zed/rainxch/devprofile/presentation/components/ContributionCalendar.kt
 1 feature/dev-profile/presentation/src/commonMain/kotlin/zed/rainxch/devprofile/presentation/components/ProfileInfoCard.kt
 1 feature/favourites/presentation/src/commonMain/kotlin/zed/rainxch/favourites/presentation/components/FavouriteRepositoryItem.kt
