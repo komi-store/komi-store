@@ -10,7 +10,6 @@ import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.navigation.NavHostController
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 import zed.rainxch.core.presentation.components.adaptive.AdaptiveDetailArgs
@@ -42,7 +41,7 @@ private sealed interface DetailPaneRoute {
 @Composable
 fun AdaptiveDetailPaneContent(
     args: AdaptiveDetailArgs,
-    navController: NavHostController,
+    onNavigate: (GithubStoreGraph) -> Unit,
     onCrossNavToRepo: (AdaptiveDetailArgs) -> Unit,
     onClearPane: () -> Unit,
 ) {
@@ -80,7 +79,7 @@ fun AdaptiveDetailPaneContent(
                 DetailPaneRoute.Main -> {
                     MainDetailPane(
                         args = args,
-                        navController = navController,
+                        onNavigate = onNavigate,
                         onCrossNavToRepo = onCrossNavToRepo,
                         onClearPane = onClearPane,
                         onOpenAbout = { repoId, owner, repo, sourceHost, translateTo ->
@@ -103,7 +102,7 @@ fun AdaptiveDetailPaneContent(
                         translateTo = current.translateTo,
                         onNavigateBack = { route = DetailPaneRoute.Main },
                         onNavigateToMarkdownViewer = { url ->
-                            navController.navigate(GithubStoreGraph.MarkdownViewerScreen(url))
+                            onNavigate(GithubStoreGraph.MarkdownViewerScreen(url))
                         },
                         viewModel =
                             koinViewModel(key = aboutKey) {
@@ -145,7 +144,7 @@ fun AdaptiveDetailPaneContent(
 @Composable
 private fun MainDetailPane(
     args: AdaptiveDetailArgs,
-    navController: NavHostController,
+    onNavigate: (GithubStoreGraph) -> Unit,
     onCrossNavToRepo: (AdaptiveDetailArgs) -> Unit,
     onClearPane: () -> Unit,
     onOpenAbout: (Long, String, String, String?, String?) -> Unit,
@@ -180,20 +179,18 @@ private fun MainDetailPane(
             onCrossNavToRepo(AdaptiveDetailArgs(repositoryId = repoId))
         },
         onNavigateToDeveloperProfile = { username ->
-            navController.navigate(
-                GithubStoreGraph.DeveloperProfileScreen(username = username),
-            )
+            onNavigate(GithubStoreGraph.DeveloperProfileScreen(username = username))
         },
         onNavigateToAbout = onOpenAbout,
         onNavigateToWhatsNew = onOpenWhatsNew,
         onNavigateToIssues = { owner, repo ->
-            navController.navigate(GithubStoreGraph.RepoIssuesScreen(owner = owner, repo = repo))
+            onNavigate(GithubStoreGraph.RepoIssuesScreen(owner = owner, repo = repo))
         },
         onNavigateToSecurity = { owner, repo ->
-            navController.navigate(GithubStoreGraph.RepoSecurityScreen(owner = owner, repo = repo))
+            onNavigate(GithubStoreGraph.RepoSecurityScreen(owner = owner, repo = repo))
         },
         onNavigateToReviews = { owner, repo, sourceHost, openComposer, composerRating, version, appLabel ->
-            navController.navigate(
+            onNavigate(
                 GithubStoreGraph.ReviewsScreen(
                     owner = owner,
                     repo = repo,

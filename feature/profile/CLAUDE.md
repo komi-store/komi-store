@@ -14,13 +14,13 @@ feature/profile/presentation/
 
 ## Navigation
 
-`GithubStoreGraph.ProfileGraph` > `ProfileScreen`, built by `profileGraph()` in `composeApp/.../app/navigation/ProfileGraph.kt`. Also `AnnouncementsScreen` and `WhatsNewHistoryScreen` (wired in `AppNavigation`).
+`GithubStoreGraph.ProfileGraph` > `ProfileScreen`, built by `profileGraph()` in `composeApp/.../app/navigation/ProfileGraph.kt`. Also `AnnouncementsScreen` and `WhatsNewHistoryScreen`, registered by `profilePages()` in the same file.
 
 ## Notes
 
 - `ProfileState.session` is sealed (`Loading` / `SignedOut` / `SignedIn`) and seeded from `UserSessionRepository.lastKnownSession` (primed by `MainViewModel` at startup), so the screen opens in the last known state instead of signed-out.
 - Stars and Logout rows show only when signed in.
-- `AnnouncementsViewModel` and `WhatsNewViewModel` are app-wide: created with `koinViewModel()` at the top of `AppNavigation` (and in `Main.kt` for the what's-new sheet), not inside a route. Their screens take state as parameters.
+- `AnnouncementsViewModel` and `WhatsNewViewModel` are app-wide: created with `koinViewModel()` at the top of `AppNavigation` (and in `AppOverlays` for the what's-new sheet), not inside a route. Their screens take state as parameters.
 - `AnnouncementsViewModel.unreadCount` drives the unread marker on the Profile row, the bottom nav and the desktop sidebar.
 - `WhatsNewViewModel.pendingEntry` feeds `WhatsNewSheet` (composeApp) once per version code; `markSeen()` persists `lastSeenWhatsNewVersionCode` in `TweaksRepository`. Entries come from `WhatsNewLoader` (impl in composeApp) and reload when the app language changes.
 - Both app-wide ViewModels map domain models to UI models (`AnnouncementUi`, `WhatsNewEntryUi`) before the screens and `WhatsNewSheet` see them. They catch nothing: `AnnouncementsRepository.refresh()` returns its failure as a `Result`, and the tweaks reads and writes and `WhatsNewLoader` swallow their own failures.

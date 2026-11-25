@@ -111,7 +111,7 @@ class MainActivity : ComponentActivity() {
                 onResolvedDarkTheme = { isDarkTheme ->
                     this@MainActivity.updateSystemBars(isDarkTheme)
                 },
-                onContentPainted = { contentPainted.set(true) },
+                onContentReady = { contentPainted.set(true) },
             )
         }
     }

@@ -28,9 +28,6 @@ class FileSizeTest {
     private companion object {
         const val MAX_LINES = 800
 
-        val OVERSIZED =
-            setOf(
-                "composeApp/src/commonMain/kotlin/zed/rainxch/githubstore/app/navigation/AppNavigation.kt",
-            )
+        val OVERSIZED = emptySet<String>()
     }
 }
