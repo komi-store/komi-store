@@ -442,7 +442,7 @@ The higher the rung, the less it depends on anyone remembering.
 | Android Lint | `lintDebug` | per-module baselines |
 | Compose stability | stability analyzer | committed `stability/*.stability` files |
 | Common domain code imports no Ktor, Room, Compose, lifecycle, Koin or Android | Konsist | passing |
-| Presentation never imports data | Konsist | passing; `MirrorPickerViewModel` is allowlisted for the `core.data` import that came with #1015 |
+| Presentation never imports data | Konsist | passing |
 | Packages under `zed.rainxch.<owner>.<layer>` | Konsist | passing, 7 search files allowlisted |
 | ViewModels named `*ViewModel` and only in presentation or composeApp | Konsist | passing |
 | Top-level `*Action` / `*Event` types are sealed | Konsist | passing |

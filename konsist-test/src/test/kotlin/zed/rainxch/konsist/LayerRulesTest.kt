@@ -19,7 +19,7 @@ class LayerRulesTest {
     @Test
     fun presentation_modules_never_import_data_packages() {
         production.files
-            .filter { it.layer == Layer.Presentation && it.relativePath !in DATA_IMPORT_EXCEPTIONS }
+            .filter { it.layer == Layer.Presentation }
             .assertFalse { file -> file.imports.any { DATA_PACKAGE.matches(it.name) } }
     }
 
@@ -46,10 +46,5 @@ class LayerRulesTest {
             )
 
         val DATA_PACKAGE = Regex("""^zed\.rainxch\.[a-z]+\.data(\..+)?$""")
-
-        val DATA_IMPORT_EXCEPTIONS =
-            setOf(
-                "feature/tweaks/presentation/src/commonMain/kotlin/zed/rainxch/tweaks/presentation/mirror/MirrorPickerViewModel.kt",
-            )
     }
 }

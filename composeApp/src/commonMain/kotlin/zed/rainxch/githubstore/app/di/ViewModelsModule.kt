@@ -2,7 +2,6 @@ package zed.rainxch.githubstore.app.di
 
 import org.koin.core.module.dsl.viewModel
 import org.koin.core.module.dsl.viewModelOf
-import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import zed.rainxch.apps.presentation.AppsViewModel
 import zed.rainxch.apps.presentation.import.ExternalImportViewModel
@@ -195,11 +194,5 @@ val viewModelsModule =
                 tweaksRepository = get(),
             )
         }
-        viewModel {
-            MirrorPickerViewModel(
-                mirrorRepository = get(),
-                testHttpClient = get(qualifier = named("test")),
-                logger = get(),
-            )
-        }
+        viewModelOf(::MirrorPickerViewModel)
     }

@@ -26,9 +26,11 @@ fun CustomMirrorDialog(
     onDraftChange: (String) -> Unit,
     onConfirm: () -> Unit,
     onDismiss: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     KomiDialog(
         onDismissRequest = onDismiss,
+        modifier = modifier,
         title = { KomiText(stringResource(Res.string.mirror_custom_dialog_title), role = KomiTextRole.CardTitle) },
         text = {
             Column(modifier = Modifier.fillMaxWidth()) {
