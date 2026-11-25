@@ -5,6 +5,12 @@ import zed.rainxch.core.domain.model.reviews.ReviewSort
 import zed.rainxch.core.domain.model.reviews.ReviewVote
 
 sealed interface ReviewsAction {
+    sealed interface ComposerAction : ReviewsAction
+
+    sealed interface ReportAction : ReviewsAction
+
+    sealed interface ReplyAction : ReviewsAction
+
     data object OnBackClick : ReviewsAction
 
     data object OnRetry : ReviewsAction
@@ -23,25 +29,25 @@ sealed interface ReviewsAction {
 
     data object OnOpenModeration : ReviewsAction
 
-    data object OnOpenComposer : ReviewsAction
+    data object OnOpenComposer : ComposerAction
 
-    data object OnDismissComposer : ReviewsAction
+    data object OnDismissComposer : ComposerAction
 
     data class OnComposerRatingChange(
         val rating: Int,
-    ) : ReviewsAction
+    ) : ComposerAction
 
     data class OnComposerTextChange(
         val text: String,
-    ) : ReviewsAction
+    ) : ComposerAction
 
-    data object OnSubmitReview : ReviewsAction
+    data object OnSubmitReview : ComposerAction
 
-    data object OnDeleteReview : ReviewsAction
+    data object OnDeleteReview : ComposerAction
 
-    data object OnConfirmDelete : ReviewsAction
+    data object OnConfirmDelete : ComposerAction
 
-    data object OnDismissDelete : ReviewsAction
+    data object OnDismissDelete : ComposerAction
 
     data class OnVote(
         val reviewId: String,
@@ -50,33 +56,33 @@ sealed interface ReviewsAction {
 
     data class OnOpenReport(
         val reviewId: String,
-    ) : ReviewsAction
+    ) : ReportAction
 
     data class OnReportReasonChange(
         val reason: ReportReason,
-    ) : ReviewsAction
+    ) : ReportAction
 
     data class OnReportNoteChange(
         val note: String,
-    ) : ReviewsAction
+    ) : ReportAction
 
-    data object OnSendReport : ReviewsAction
+    data object OnSendReport : ReportAction
 
-    data object OnDismissReport : ReviewsAction
+    data object OnDismissReport : ReportAction
 
     data class OnOpenReply(
         val reviewId: String,
-    ) : ReviewsAction
+    ) : ReplyAction
 
     data class OnReplyTextChange(
         val text: String,
-    ) : ReviewsAction
+    ) : ReplyAction
 
-    data object OnSendReply : ReviewsAction
+    data object OnSendReply : ReplyAction
 
-    data object OnDismissReply : ReviewsAction
+    data object OnDismissReply : ReplyAction
 
     data class OnDeleteReply(
         val reviewId: String,
-    ) : ReviewsAction
+    ) : ReplyAction
 }

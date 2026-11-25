@@ -6,7 +6,7 @@ The full Reviews screen for a repository: rating summary, sort and star filter, 
 
 ```text
 feature/reviews/
-  presentation/    # ReviewsRoot + ReviewsViewModel + ReviewsUiState + ReviewsAction + ReviewsEvent
+  presentation/    # ReviewsRoot + ReviewsViewModel + ReviewsArgs + ReviewsUiState + ReviewsAction + ReviewsEvent
     moderation/    # ModerationRoot + ModerationViewModel: the queue for moderators
     components/    # ReviewSheets: ComposerSheet, ReportSheet, ReplySheet; ReviewsEmpty
     utils/         # ReviewErrorMessages: ReviewError -> string resource
@@ -19,6 +19,8 @@ There are no domain or data layers here: Details needs reviews too, and features
 `GithubStoreGraph.ReviewsScreen(owner, repo, sourceHost, openComposer, composerRating, version, appLabel)`, opened from the Details section. `openComposer` opens the write sheet once `/mine` has loaded; `composerRating` (the star tapped on Details, 0 for none) fills that first sheet only, and `version` and `appLabel` prefill the review. Sign-in goes to `AuthenticationScreen`. When `/mine` says `isModerator`, a top bar action opens `GithubStoreGraph.ReviewModerationScreen`, whose repo labels open that repo's `ReviewsScreen`.
 
 ## Notes
+
+- `ReviewsArgs` carries the route's arguments into `ReviewsViewModel`. `ReviewsAction` groups the sheet actions under `ComposerAction`, `ReportAction` and `ReplyAction`, each handled by its own function.
 
 - The public list is a CDN copy that can lag a write by minutes, so the viewer's own review comes from `/mine`, is pinned above the list and is dropped from it. `isHidden` on it shows the moderator notice.
 - Every fresh load (sort, filter, retry) bumps `requestGeneration`; responses from an older generation are dropped.

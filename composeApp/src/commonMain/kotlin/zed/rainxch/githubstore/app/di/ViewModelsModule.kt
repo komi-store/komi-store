@@ -36,6 +36,7 @@ import zed.rainxch.repopages.presentation.issuedetail.IssueDetailViewModel
 import zed.rainxch.repopages.presentation.issues.IssuesViewModel
 import zed.rainxch.repopages.presentation.pulls.PullsViewModel
 import zed.rainxch.repopages.presentation.security.SecurityViewModel
+import zed.rainxch.reviews.presentation.ReviewsArgs
 import zed.rainxch.reviews.presentation.ReviewsViewModel
 import zed.rainxch.reviews.presentation.moderation.ModerationViewModel
 import zed.rainxch.search.presentation.SearchViewModel
@@ -117,13 +118,16 @@ val viewModelsModule =
         viewModelOf(::ModerationViewModel)
         viewModel { params ->
             ReviewsViewModel(
-                owner = params[0],
-                repo = params[1],
-                sourceHost = params[2],
-                openComposer = params[3],
-                composerRating = params[4],
-                version = params[5],
-                appLabel = params[6],
+                args =
+                    ReviewsArgs(
+                        owner = params[0],
+                        repo = params[1],
+                        sourceHost = params[2],
+                        openComposer = params[3],
+                        composerRating = params[4],
+                        version = params[5],
+                        appLabel = params[6],
+                    ),
                 repository = get(),
                 userSessionRepository = get(),
             )

@@ -45,17 +45,11 @@ import zed.rainxch.reviews.presentation.utils.isReviewsUnavailable
 import zed.rainxch.reviews.presentation.utils.reviewMessage
 
 class ReviewsViewModel(
-    owner: String,
-    repo: String,
-    sourceHost: String?,
-    openComposer: Boolean,
-    composerRating: Int,
-    private val version: String?,
-    private val appLabel: String?,
+    private val args: ReviewsArgs,
     private val repository: ReviewsRepository,
     private val userSessionRepository: UserSessionRepository,
 ) : ViewModel() {
-    private val target = ReviewTarget(owner = owner, name = repo, host = sourceHost)
+    private val target = ReviewTarget(owner = args.owner, name = args.repo, host = args.sourceHost)
 
     private val _state = MutableStateFlow(ReviewsUiState())
     val state = _state.asStateFlow()
@@ -75,18 +69,16 @@ class ReviewsViewModel(
     private val voteLocks = mutableMapOf<String, Mutex>()
     private val voteTaps = mutableMapOf<String, Int>()
 
-    // The token decides whether the viewer is signed in. The profile only supplies their id, and a
-    // failed /user call must not read as signed out.
+    // The stored token decides sign-in; a failed /user call only loses the viewer id.
     private var signedIn = false
     private var viewerId: Long? = null
     private var requestGeneration = 0
-    private var composerPending = openComposer
+    private var composerPending = args.openComposer
 
     // The rating tapped on Details; it fills the first composer only.
-    private var pendingRating = composerRating
+    private var pendingRating = args.composerRating
 
-    // Until /mine answers, the viewer's own review is unknown, and a composer opened then would start a
-    // new review over it.
+    // Until /mine answers, a composer would start a new review over the viewer's existing one.
     private var mineLoaded = false
 
     init {
@@ -133,6 +125,26 @@ class ReviewsViewModel(
                 if (action.rating != _state.value.ratingFilter) load(rating = action.rating)
             }
 
+            is ReviewsAction.OnVote -> {
+                vote(action.reviewId, action.vote)
+            }
+
+            is ReviewsAction.ComposerAction -> {
+                onComposerAction(action)
+            }
+
+            is ReviewsAction.ReportAction -> {
+                onReportAction(action)
+            }
+
+            is ReviewsAction.ReplyAction -> {
+                onReplyAction(action)
+            }
+        }
+    }
+
+    private fun onComposerAction(action: ReviewsAction.ComposerAction) {
+        when (action) {
             ReviewsAction.OnOpenComposer -> {
                 openComposer()
             }
@@ -164,11 +176,11 @@ class ReviewsViewModel(
             ReviewsAction.OnConfirmDelete -> {
                 deleteMine()
             }
+        }
+    }
 
-            is ReviewsAction.OnVote -> {
-                vote(action.reviewId, action.vote)
-            }
-
+    private fun onReportAction(action: ReviewsAction.ReportAction) {
+        when (action) {
             is ReviewsAction.OnOpenReport -> {
                 requireSignIn { _state.update { it.copy(report = ReportState(action.reviewId)) } }
             }
@@ -188,7 +200,11 @@ class ReviewsViewModel(
             ReviewsAction.OnDismissReport -> {
                 _state.update { it.copy(report = null) }
             }
+        }
+    }
 
+    private fun onReplyAction(action: ReviewsAction.ReplyAction) {
+        when (action) {
             is ReviewsAction.OnOpenReply -> {
                 openReply(action.reviewId)
             }
@@ -234,7 +250,7 @@ class ReviewsViewModel(
 
     private fun loadNextPage() {
         val current = _state.value
-        if (current.isLoading || current.isLoadingMore || current.endReached || current.errorMessage != null) return
+        if (!current.canLoadMore) return
         _state.update { it.copy(loadMoreFailed = false) }
         loadPage(page = current.page + 1, generation = requestGeneration)
     }
@@ -321,8 +337,7 @@ class ReviewsViewModel(
             }
     }
 
-    // The viewer's own review is pinned above the list, and dropped from it, because the public list is a
-    // CDN copy that can lag a few minutes behind a write.
+    // The public list is a CDN copy that can lag a write, so the viewer's own review is pinned above it instead.
     private fun publishReviews() {
         val own = mine
         _state.update {
@@ -355,7 +370,7 @@ class ReviewsViewModel(
                         ComposerState(
                             rating = rating,
                             text = own?.text.orEmpty(),
-                            version = version ?: own?.version,
+                            version = args.version ?: own?.version,
                             isEditing = own != null,
                         ),
                 )
@@ -382,7 +397,7 @@ class ReviewsViewModel(
                     text = composer.text,
                     version = composer.version,
                     platform = ReviewPlatform.valueOf(getPlatform().name),
-                    appLabel = appLabel ?: mine?.appLabel,
+                    appLabel = args.appLabel ?: mine?.appLabel,
                 )
             repository
                 .submit(target, draft)
@@ -416,8 +431,7 @@ class ReviewsViewModel(
         }
     }
 
-    // The public summary is a CDN copy that lags a write by minutes, so the viewer's own change is
-    // applied to it here.
+    // The public summary is a CDN copy that lags a write, so the viewer's own change is applied here.
     private fun adjustSummary(
         removed: Int?,
         added: Int?,
@@ -433,8 +447,7 @@ class ReviewsViewModel(
         _state.update { it.copy(summary = adjusted.toUi()) }
     }
 
-    // Tapping your current vote again takes it back. Optimistic: the score and the buttons change at
-    // once and roll back if the backend refuses.
+    // Optimistic, and tapping the current vote again takes it back; a refusal rolls it back.
     private fun vote(
         reviewId: String,
         direction: ReviewVote,
@@ -548,6 +561,10 @@ class ReviewsViewModel(
     private fun message(resource: StringResource) {
         viewModelScope.launch { _events.send(ReviewsEvent.OnMessage(getString(resource))) }
     }
+
+    private val ReviewsUiState.isFetching: Boolean get() = isLoading || isLoadingMore
+
+    private val ReviewsUiState.canLoadMore: Boolean get() = !isFetching && !endReached && errorMessage == null
 
     private fun CannotReviewReason.message(): StringResource =
         when (this) {

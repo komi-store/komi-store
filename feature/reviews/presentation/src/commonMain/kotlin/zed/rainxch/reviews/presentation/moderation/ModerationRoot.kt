@@ -103,7 +103,7 @@ fun ModerationRoot(
         onAction = { action ->
             when (action) {
                 ModerationAction.OnBackClick -> onNavigateBack()
-                is ModerationAction.OnOpenRepo -> onOpenRepo(action.repo)
+                is ModerationAction.OnOpenRepo -> onOpenRepo(action.repo.toTarget())
                 else -> viewModel.onAction(action)
             }
         },
@@ -209,8 +209,7 @@ private fun Queue(
         }
     }
     val currentOnAction by rememberUpdatedState(onAction)
-    // isLoadingMore is a key so a page that added nothing new asks for the next one; after a failure the
-    // retry item asks instead, or this would retry forever.
+    // isLoadingMore is a key so an empty page asks again; after a failure only the retry item asks.
     LaunchedEffect(nearEnd, state.items.size, state.isLoadingMore, state.loadMoreFailed) {
         if (nearEnd && !state.loadMoreFailed) currentOnAction(ModerationAction.OnLoadMore)
     }
@@ -394,6 +393,8 @@ private fun ErrorBlock(
         KomiButton(onClick = onRetry, label = stringResource(Res.string.reviews_retry), variant = KomiButtonVariant.Tonal)
     }
 }
+
+private fun ModerationRepoUi.toTarget(): ReviewTarget = ReviewTarget(owner = owner, name = name, host = host)
 
 private fun ReportReason.label(): StringResource =
     when (this) {
