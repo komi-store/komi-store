@@ -9,6 +9,7 @@ import androidx.compose.foundation.interaction.collectIsHoveredAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -52,6 +53,8 @@ import zed.rainxch.core.presentation.components.text.KomiText
 import zed.rainxch.core.presentation.components.text.KomiTextRole
 import zed.rainxch.core.presentation.locals.LocalPersonality
 import zed.rainxch.core.presentation.personality.MangaPersonality
+import zed.rainxch.core.presentation.personality.hoverFill
+import zed.rainxch.core.presentation.personality.kickerContent
 import zed.rainxch.core.presentation.personality.manga.decoration.hardShadow
 import zed.rainxch.core.presentation.personality.usesDecor
 import zed.rainxch.core.presentation.utils.toIcon
@@ -102,18 +105,6 @@ fun DesktopSidebar(
     val platform by store.platform.collectAsStateWithLifecycle()
     val category by store.category.collectAsStateWithLifecycle()
 
-    val browseItems =
-        BottomNavigationUtils.items().filterNot { it.screen == GithubStoreGraph.AppsScreen }
-    val isBrowseScreen =
-        currentScreen != null &&
-            (
-                currentScreen::class == GithubStoreGraph.ExploreScreen::class ||
-                    currentScreen::class == GithubStoreGraph.ChartsScreen::class ||
-                    currentScreen::class == GithubStoreGraph.SearchScreen()::class
-            )
-    val isHomeFeed =
-        currentScreen != null && currentScreen::class == GithubStoreGraph.ExploreScreen::class
-
     Column(
         modifier =
             modifier
@@ -141,62 +132,93 @@ fun DesktopSidebar(
                 ),
         verticalArrangement = Arrangement.spacedBy(if (rail) 6.dp else 4.dp),
     ) {
-        SidebarSideHeading(
-            stringResource(Res.string.sidebar_browse),
-            stringResource(Res.string.sidebar_browse_jp),
-            rail,
+        SidebarBrowseSection(
+            currentScreen = currentScreen,
+            rail = rail,
+            unreadAnnouncementsCount = unreadAnnouncementsCount,
+            onNavigate = onNavigate,
         )
-        browseItems.forEach { item ->
-            val selected = item.screen::class == currentScreen?.let { it::class }
-            val badge =
-                when (item.screen) {
-                    GithubStoreGraph.ProfileGraph.ProfileScreen -> unreadAnnouncementsCount
-                    else -> 0
-                }
-            SidebarNavRow(
-                label = stringResource(item.titleRes),
-                kicker = navKicker(item.screen),
-                icon = if (selected) item.iconFilled else item.iconOutlined,
-                selected = selected,
-                rail = rail,
-                badgeCount = badge,
-                onClick = { onNavigate(item.screen) },
-            )
+
+        if (currentScreen.isBrowseScreen()) {
+            SidebarPlatformSection(selected = platform, rail = rail, onSelect = store::setPlatform)
         }
 
-        if (isBrowseScreen) {
-            Spacer(Modifier.height(if (rail) 2.dp else 6.dp))
-            SidebarSideHeading(
-                stringResource(Res.string.sidebar_platform),
-                stringResource(Res.string.sidebar_platform_jp),
-                rail,
-            )
-            SidebarPlatforms.forEach { p ->
-                SidebarPlatformRow(
-                    platform = p,
-                    selected = p == platform,
-                    rail = rail,
-                    onClick = { store.setPlatform(p) },
-                )
-            }
+        if (currentScreen is GithubStoreGraph.ExploreScreen) {
+            SidebarCategorySection(selected = category, rail = rail, onSelect = store::setCategory)
         }
+    }
+}
 
-        if (isHomeFeed) {
-            Spacer(Modifier.height(if (rail) 2.dp else 6.dp))
-            SidebarSideHeading(
-                stringResource(Res.string.sidebar_categories),
-                stringResource(Res.string.sidebar_categories_jp),
-                rail,
-            )
-            FeedCategory.entries.forEach { c ->
-                SidebarCategoryRow(
-                    category = c,
-                    selected = c == category,
-                    rail = rail,
-                    onClick = { store.setCategory(c) },
-                )
-            }
-        }
+private fun GithubStoreGraph?.isBrowseScreen(): Boolean =
+    this is GithubStoreGraph.ExploreScreen || this is GithubStoreGraph.ChartsScreen || this is GithubStoreGraph.SearchScreen
+
+@Composable
+private fun ColumnScope.SidebarBrowseSection(
+    currentScreen: GithubStoreGraph?,
+    rail: Boolean,
+    unreadAnnouncementsCount: Int,
+    onNavigate: (GithubStoreGraph) -> Unit,
+) {
+    SidebarSideHeading(
+        stringResource(Res.string.sidebar_browse),
+        stringResource(Res.string.sidebar_browse_jp),
+        rail,
+    )
+    BottomNavigationUtils.items().filterNot { it.screen == GithubStoreGraph.AppsScreen }.forEach { item ->
+        val selected = item.screen::class == currentScreen?.let { it::class }
+        SidebarNavRow(
+            label = stringResource(item.titleRes),
+            kicker = navKicker(item.screen),
+            icon = if (selected) item.iconFilled else item.iconOutlined,
+            selected = selected,
+            rail = rail,
+            badgeCount = if (item.screen == GithubStoreGraph.ProfileGraph.ProfileScreen) unreadAnnouncementsCount else 0,
+            onClick = { onNavigate(item.screen) },
+        )
+    }
+}
+
+@Composable
+private fun ColumnScope.SidebarPlatformSection(
+    selected: DiscoveryPlatform,
+    rail: Boolean,
+    onSelect: (DiscoveryPlatform) -> Unit,
+) {
+    Spacer(Modifier.height(if (rail) 2.dp else 6.dp))
+    SidebarSideHeading(
+        stringResource(Res.string.sidebar_platform),
+        stringResource(Res.string.sidebar_platform_jp),
+        rail,
+    )
+    SidebarPlatforms.forEach { p ->
+        SidebarPlatformRow(
+            platform = p,
+            selected = p == selected,
+            rail = rail,
+            onClick = { onSelect(p) },
+        )
+    }
+}
+
+@Composable
+private fun ColumnScope.SidebarCategorySection(
+    selected: FeedCategory,
+    rail: Boolean,
+    onSelect: (FeedCategory) -> Unit,
+) {
+    Spacer(Modifier.height(if (rail) 2.dp else 6.dp))
+    SidebarSideHeading(
+        stringResource(Res.string.sidebar_categories),
+        stringResource(Res.string.sidebar_categories_jp),
+        rail,
+    )
+    FeedCategory.entries.forEach { c ->
+        SidebarCategoryRow(
+            category = c,
+            selected = c == selected,
+            rail = rail,
+            onClick = { onSelect(c) },
+        )
     }
 }
 
@@ -312,7 +334,7 @@ private fun SidebarNavRow(
                 KomiText(
                     text = it,
                     role = KomiTextRole.Caption,
-                    color = fg.copy(alpha = 0.8f),
+                    color = fg.kickerContent,
                     maxLines = 1,
                 )
             }
@@ -320,8 +342,7 @@ private fun SidebarNavRow(
     }
 }
 
-// Material 3 Expressive's wide rail item: a pill behind the selected icon, the label under the
-// icon when the rail is collapsed and beside it when expanded.
+// Material 3 Expressive's wide rail item: the label sits under the icon in the rail and beside it when the rail expands.
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun ClassicNavRow(
@@ -597,7 +618,7 @@ private fun Modifier.hoverWash(color: Color): Modifier {
     val hovered by interaction.collectIsHoveredAsState()
     return this
         .hoverable(interaction)
-        .background(if (hovered) color.copy(alpha = 0.08f) else Color.Transparent)
+        .background(if (hovered) color.hoverFill else Color.Transparent)
 }
 
 @Composable
