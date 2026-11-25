@@ -4,6 +4,7 @@ import io.ktor.client.HttpClient
 import io.ktor.client.request.header
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
+import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
@@ -11,6 +12,7 @@ import io.ktor.http.isSuccess
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.addJsonObject
 import kotlinx.serialization.json.buildJsonArray
@@ -39,8 +41,19 @@ internal class MicrosoftTranslator(
             )
         }
 
-        val target = mapLanguageCode(targetLanguage)
-        val source = mapSourceLanguageCode(sourceLanguage)
+        val response = requestTranslation(text, mapLanguageCode(targetLanguage), mapSourceLanguageCode(sourceLanguage))
+        val body = response.bodyAsText()
+        check(response.status.isSuccess()) {
+            "Microsoft Translator HTTP ${response.status.value}: ${errorMessage(body) ?: body.take(ERROR_BODY_PREVIEW_CHARS)}"
+        }
+        return parseTranslation(body)
+    }
+
+    private suspend fun requestTranslation(
+        text: String,
+        target: String,
+        source: String?,
+    ): HttpResponse {
         val sourceQuery = source?.let { "&from=$it" }.orEmpty()
         val url =
             "https://api.cognitive.microsofttranslator.com/translate" +
@@ -53,57 +66,32 @@ internal class MicrosoftTranslator(
                 }
             }
 
-        val response =
-            httpClient().post(url) {
-                header("Ocp-Apim-Subscription-Key", subscriptionKey)
-                if (subscriptionRegion.isNotBlank() && !subscriptionRegion.equals("global", ignoreCase = true)) {
-                    header("Ocp-Apim-Subscription-Region", subscriptionRegion.lowercase())
-                }
-                contentType(ContentType.Application.Json)
-                setBody(requestBody.toString())
+        return httpClient().post(url) {
+            header("Ocp-Apim-Subscription-Key", subscriptionKey)
+            if (subscriptionRegion.isNotBlank() && !subscriptionRegion.equals("global", ignoreCase = true)) {
+                header("Ocp-Apim-Subscription-Region", subscriptionRegion.lowercase())
             }
-
-        val body = response.bodyAsText()
-        if (!response.status.isSuccess()) {
-            val errorMsg =
-                runCatching {
-                    json
-                        .parseToJsonElement(body)
-                        .jsonObject["error"]
-                        ?.jsonObject
-                        ?.get("message")
-                        ?.jsonPrimitive
-                        ?.content
-                }.getOrNull()
-            throw RuntimeException(
-                "Microsoft Translator HTTP ${response.status.value}: ${errorMsg ?: body.take(200)}",
-            )
+            contentType(ContentType.Application.Json)
+            setBody(requestBody.toString())
         }
+    }
 
-        val parsed =
+    private fun errorMessage(body: String): String? = runCatching { json.parseToJsonElement(body).jsonObject.apiErrorMessage() }.getOrNull()
+
+    private fun parseTranslation(body: String): TranslationResult {
+        val parsed: JsonElement =
             try {
                 json.parseToJsonElement(body)
             } catch (e: SerializationException) {
-                throw RuntimeException(
-                    "Microsoft Translator returned non-JSON response: ${body.take(200)}",
+                throw IllegalStateException(
+                    "Microsoft Translator returned non-JSON response: ${body.take(ERROR_BODY_PREVIEW_CHARS)}",
                     e,
                 )
             }
 
-        if (parsed is JsonObject) {
-            val errorMsg =
-                parsed["error"]
-                    ?.jsonObject
-                    ?.get("message")
-                    ?.jsonPrimitive
-                    ?.content
-            throw RuntimeException("Microsoft Translator error: ${errorMsg ?: body}")
-        }
+        if (parsed is JsonObject) error("Microsoft Translator error: ${parsed.apiErrorMessage() ?: body}")
 
-        val first =
-            parsed.jsonArray.firstOrNull()?.jsonObject
-                ?: throw RuntimeException("Microsoft Translator response empty")
-
+        val first = parsed.jsonArray.firstOrNull()?.jsonObject ?: error("Microsoft Translator response empty")
         val translation =
             first["translations"]
                 ?.jsonArray
@@ -112,7 +100,7 @@ internal class MicrosoftTranslator(
                 ?.get("text")
                 ?.jsonPrimitive
                 ?.content
-                ?: throw RuntimeException("Microsoft Translator response missing translation text")
+                ?: error("Microsoft Translator response missing translation text")
 
         val detected =
             first["detectedLanguage"]
@@ -128,6 +116,13 @@ internal class MicrosoftTranslator(
             detectedSourceLanguage = detected,
         )
     }
+
+    private fun JsonObject.apiErrorMessage(): String? =
+        this["error"]
+            ?.jsonObject
+            ?.get("message")
+            ?.jsonPrimitive
+            ?.content
 
     private fun mapLanguageCode(code: String): String =
         when (code.lowercase()) {

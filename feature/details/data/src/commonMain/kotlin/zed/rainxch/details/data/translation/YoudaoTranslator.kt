@@ -36,7 +36,11 @@ internal class YoudaoTranslator(
         }
 
         val salt = Uuid.random().toString()
-        val curtime = (Clock.System.now().toEpochMilliseconds() / 1000L).toString()
+        val curtime =
+            Clock.System
+                .now()
+                .epochSeconds
+                .toString()
         val signInput = buildSignInput(text)
         val sign = sha256Hex(appKey + signInput + salt + curtime + appSecret)
 
@@ -62,9 +66,7 @@ internal class YoudaoTranslator(
         val body = response.bodyAsText()
         val root = json.parseToJsonElement(body).jsonObject
         val errorCode = root["errorCode"]?.jsonPrimitive?.content
-        if (errorCode != "0") {
-            throw RuntimeException("Youdao translate error: $errorCode")
-        }
+        check(errorCode == "0") { "Youdao translate error: $errorCode" }
 
         val translation =
             root["translation"]
@@ -87,22 +89,17 @@ internal class YoudaoTranslator(
     }
 
     private fun buildSignInput(q: String): String =
-        if (q.length <= 20) {
+        if (q.length <= SIGN_INPUT_MAX_LENGTH) {
             q
         } else {
-            q.substring(0, 10) + q.length.toString() + q.substring(q.length - 10)
+            q.take(SIGN_INPUT_EDGE_LENGTH) + q.length.toString() + q.takeLast(SIGN_INPUT_EDGE_LENGTH)
         }
 
-    private fun sha256Hex(input: String): String {
-        val digest = MessageDigest.getInstance("SHA-256").digest(input.encodeToByteArray())
-        return buildString(digest.size * 2) {
-            for (byte in digest) {
-                val v = byte.toInt() and 0xff
-                if (v < 0x10) append('0')
-                append(v.toString(16))
-            }
-        }
-    }
+    private fun sha256Hex(input: String): String =
+        MessageDigest
+            .getInstance("SHA-256")
+            .digest(input.encodeToByteArray())
+            .joinToString("") { "%02x".format(it) }
 
     private fun mapLanguageCode(code: String): String =
         when (code.lowercase()) {
@@ -118,4 +115,9 @@ internal class YoudaoTranslator(
             "zh-CHT" -> "zh-TW"
             else -> code
         }
+
+    private companion object {
+        const val SIGN_INPUT_MAX_LENGTH = 20
+        const val SIGN_INPUT_EDGE_LENGTH = 10
+    }
 }
