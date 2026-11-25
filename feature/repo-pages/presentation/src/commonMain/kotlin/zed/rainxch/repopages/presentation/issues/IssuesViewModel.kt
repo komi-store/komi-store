@@ -20,6 +20,7 @@ import zed.rainxch.githubstore.core.presentation.res.repo_pages_new_issue_failed
 import zed.rainxch.githubstore.core.presentation.res.repo_pages_new_issue_sign_in
 import zed.rainxch.repopages.domain.model.IssueState
 import zed.rainxch.repopages.domain.repository.RepoPagesRepository
+import zed.rainxch.repopages.presentation.mappers.toUi
 
 class IssuesViewModel(
     private val owner: String,
@@ -64,7 +65,7 @@ class IssuesViewModel(
 
     private fun loadNextPage() {
         val current = _state.value
-        if (current.isLoading || current.isLoadingMore || current.endReached || current.errorMessage != null) return
+        if (!current.canLoadMore) return
         loadPage(current.filter, current.page + 1, append = true, generation = requestGeneration)
     }
 
@@ -145,7 +146,8 @@ class IssuesViewModel(
                 .onSuccess { result ->
                     if (generation != requestGeneration) return@onSuccess
                     _state.update { st ->
-                        val merged = if (append) st.issues + result.issues else result.issues
+                        val issues = result.issues.map { it.toUi() }
+                        val merged = if (append) st.issues + issues else issues
                         st.copy(
                             isLoading = false,
                             isLoadingMore = false,
@@ -167,4 +169,8 @@ class IssuesViewModel(
                 }
         }
     }
+
+    private val IssuesUiState.isFetching: Boolean get() = isLoading || isLoadingMore
+
+    private val IssuesUiState.canLoadMore: Boolean get() = !isFetching && !endReached && errorMessage == null
 }

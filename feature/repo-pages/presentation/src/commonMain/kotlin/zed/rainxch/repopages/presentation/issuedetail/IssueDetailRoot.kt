@@ -24,6 +24,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.collections.immutable.PersistentSet
+import kotlinx.collections.immutable.persistentListOf
 import org.jetbrains.compose.resources.stringResource
 import zed.rainxch.core.presentation.components.buttons.KomiButton
 import zed.rainxch.core.presentation.components.dividers.KomiHorizontalDivider
@@ -48,14 +49,12 @@ import zed.rainxch.githubstore.core.presentation.res.repo_pages_comment_sign_in
 import zed.rainxch.githubstore.core.presentation.res.repo_pages_issue_comments_section
 import zed.rainxch.githubstore.core.presentation.res.repo_pages_issue_no_body
 import zed.rainxch.githubstore.core.presentation.res.repo_pages_issue_opened_by
-import zed.rainxch.repopages.domain.model.IssueComment
-import zed.rainxch.repopages.domain.model.IssueLabel
-import zed.rainxch.repopages.domain.model.IssueState
-import zed.rainxch.repopages.domain.model.RepoIssueDetail
 import zed.rainxch.repopages.presentation.components.RepoMarkdown
 import zed.rainxch.repopages.presentation.components.RepoPagesError
 import zed.rainxch.repopages.presentation.components.RepoPagesLoading
 import zed.rainxch.repopages.presentation.components.RepoPagesTopBar
+import zed.rainxch.repopages.presentation.model.IssueCommentUi
+import zed.rainxch.repopages.presentation.model.IssueDetailUi
 
 @Composable
 fun IssueDetailRoot(
@@ -154,7 +153,7 @@ private fun IssueDetailScreen(
 
 @Composable
 private fun IssueDetailContent(
-    detail: RepoIssueDetail,
+    detail: IssueDetailUi,
     isReactingIssue: Boolean,
     reactingCommentIds: PersistentSet<Long>,
     onReactIssue: () -> Unit,
@@ -243,7 +242,7 @@ private fun IssueDetailContent(
 
 @Composable
 private fun CommentCard(
-    comment: IssueComment,
+    comment: IssueCommentUi,
     isReacting: Boolean,
     onReact: () -> Unit,
 ) {
@@ -366,39 +365,27 @@ private fun IssueDetailScreenPreview() {
                 IssueDetailUiState(
                     issueNumber = 123,
                     detail =
-                        RepoIssueDetail(
+                        IssueDetailUi(
                             number = 123,
                             title = "Sample Issue Title",
-                            state = IssueState.OPEN,
                             authorLogin = "sampleuser",
-                            authorAvatarUrl = null,
                             bodyMarkdown = "This is a sample issue body with **markdown** support.",
-                            createdAt = "2023-10-27T10:00:00Z",
-                            labels =
-                                listOf(
-                                    IssueLabel(name = "bug", color = "ff0000"),
-                                    IssueLabel(name = "high priority", color = "00ff00"),
-                                ),
+                            reactionThumbsUp = 10,
                             comments =
-                                listOf(
-                                    IssueComment(
+                                persistentListOf(
+                                    IssueCommentUi(
                                         id = 1,
                                         authorLogin = "commenter1",
-                                        authorAvatarUrl = null,
                                         bodyMarkdown = "This is a comment.",
-                                        createdAt = "2023-10-27T11:00:00Z",
                                         reactionThumbsUp = 5,
                                     ),
-                                    IssueComment(
+                                    IssueCommentUi(
                                         id = 2,
                                         authorLogin = "commenter2",
-                                        authorAvatarUrl = null,
                                         bodyMarkdown = "Another comment with `code`.",
-                                        createdAt = "2023-10-27T12:00:00Z",
                                         reactionThumbsUp = 2,
                                     ),
                                 ),
-                            reactionThumbsUp = 10,
                         ),
                     isLoggedIn = true,
                 ),

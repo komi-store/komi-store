@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.collections.immutable.minus
 import kotlinx.collections.immutable.plus
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -20,8 +21,9 @@ import zed.rainxch.githubstore.core.presentation.res.repo_pages_comment_posted
 import zed.rainxch.githubstore.core.presentation.res.repo_pages_comment_sign_in
 import zed.rainxch.githubstore.core.presentation.res.repo_pages_react_failed
 import zed.rainxch.githubstore.core.presentation.res.repo_pages_react_sign_in
-import zed.rainxch.repopages.domain.model.RepoIssueDetail
 import zed.rainxch.repopages.domain.repository.RepoPagesRepository
+import zed.rainxch.repopages.presentation.mappers.toUi
+import zed.rainxch.repopages.presentation.model.IssueDetailUi
 
 class IssueDetailViewModel(
     private val owner: String,
@@ -90,7 +92,7 @@ class IssueDetailViewModel(
                         st.copy(
                             isPostingComment = false,
                             commentText = "",
-                            detail = detail?.copy(comments = detail.comments + comment),
+                            detail = detail?.copy(comments = (detail.comments + comment.toUi()).toImmutableList()),
                         )
                     }
                     _events.send(IssueDetailEvent.OnMessage(getString(Res.string.repo_pages_comment_posted)))
@@ -200,7 +202,7 @@ class IssueDetailViewModel(
                     _state.update {
                         it.copy(
                             isLoading = false,
-                            detail = detail,
+                            detail = detail.toUi(),
                             errorMessage = null,
                             issueNumber = issueNumber,
                         )
@@ -216,18 +218,19 @@ class IssueDetailViewModel(
         }
     }
 
-    private fun RepoIssueDetail.bumpComment(
+    private fun IssueDetailUi.bumpComment(
         commentId: Long,
         delta: Int,
-    ): RepoIssueDetail =
+    ): IssueDetailUi =
         copy(
             comments =
-                comments.map { c ->
-                    if (c.id == commentId) {
-                        c.copy(reactionThumbsUp = (c.reactionThumbsUp + delta).coerceAtLeast(0))
-                    } else {
-                        c
-                    }
-                },
+                comments
+                    .map { c ->
+                        if (c.id == commentId) {
+                            c.copy(reactionThumbsUp = (c.reactionThumbsUp + delta).coerceAtLeast(0))
+                        } else {
+                            c
+                        }
+                    }.toImmutableList(),
         )
 }

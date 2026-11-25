@@ -10,18 +10,20 @@ import androidx.compose.ui.unit.dp
 import zed.rainxch.core.presentation.components.text.KomiText
 import zed.rainxch.core.presentation.components.text.KomiTextRole
 import zed.rainxch.core.presentation.locals.LocalPersonality
-import zed.rainxch.repopages.domain.model.IssueLabel
-import zed.rainxch.repopages.presentation.utils.parseLabelColor
+import zed.rainxch.core.presentation.personality.labelFill
+import zed.rainxch.repopages.presentation.model.IssueLabelUi
 
 @Composable
-internal fun LabelChip(label: IssueLabel) {
+internal fun LabelChip(
+    label: IssueLabelUi,
+    modifier: Modifier = Modifier,
+) {
     val colors = LocalPersonality.current.colors
     val shape = LocalPersonality.current.shape
-    val color = parseLabelColor(label.color)
     Box(
         modifier =
-            Modifier
-                .background(color = color.copy(alpha = 0.18f), shape = RoundedCornerShape(shape.cornerSmall))
+            modifier
+                .background(color = label.color.labelFill, shape = RoundedCornerShape(shape.cornerSmall))
                 .padding(horizontal = 8.dp, vertical = 2.dp),
     ) {
         KomiText(
