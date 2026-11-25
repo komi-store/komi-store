@@ -9,11 +9,11 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
-import androidx.compose.foundation.shape.RoundedCornerShape
 import org.jetbrains.compose.resources.stringResource
 import zed.rainxch.core.presentation.components.buttons.KomiButton
 import zed.rainxch.core.presentation.components.buttons.KomiButtonSize
@@ -33,24 +33,26 @@ import zed.rainxch.tweaks.presentation.TweaksState
 fun CustomForgesDialog(
     state: TweaksState,
     onAction: (TweaksAction) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val personality = LocalPersonality.current
     val colors = personality.colors
     KomiDialog(
         onDismissRequest = { onAction(TweaksAction.OnDismissCustomForgesDialog) },
+        modifier = modifier,
         title = { KomiText(stringResource(Res.string.custom_forges_dialog_title), role = KomiTextRole.CardTitle) },
         text = {
             Column {
-
                 KomiText(
                     text = stringResource(Res.string.custom_forges_dialog_builtin_note),
                     role = KomiTextRole.Body,
                     color = colors.onPrimaryContainer,
-                    modifier = Modifier
-                        .padding(bottom = 10.dp)
-                        .clip(RoundedCornerShape(personality.shape.cornerSmall))
-                        .background(colors.primaryContainer)
-                        .padding(horizontal = 12.dp, vertical = 8.dp),
+                    modifier =
+                        Modifier
+                            .padding(bottom = 10.dp)
+                            .clip(RoundedCornerShape(personality.shape.cornerSmall))
+                            .background(colors.primaryContainer)
+                            .padding(horizontal = 12.dp, vertical = 8.dp),
                 )
                 KomiText(
                     text = stringResource(Res.string.custom_forges_dialog_help),

@@ -50,15 +50,16 @@ import zed.rainxch.tweaks.presentation.feedback.model.FeedbackChannel
 @Composable
 fun FeedbackBottomSheet(
     onDismiss: () -> Unit,
-    onSent: (FeedbackChannel) -> Unit,
+    onSendSuccess: (FeedbackChannel) -> Unit,
     onError: () -> Unit,
+    modifier: Modifier = Modifier,
     viewModel: FeedbackViewModel = koinViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
     ObserveAsEvents(viewModel.events) { event ->
         when (event) {
-            is FeedbackEvent.OnSent -> onSent(event.channel)
+            is FeedbackEvent.OnSent -> onSendSuccess(event.channel)
             FeedbackEvent.OnSendError -> onError()
         }
     }
@@ -71,15 +72,17 @@ fun FeedbackBottomSheet(
     if (isAndroid()) {
         KomiSheet(
             onDismiss = dismiss,
+            modifier = modifier,
         ) {
             FeedbackContent(
                 state = state,
                 onAction = viewModel::onAction,
                 onDismiss = dismiss,
                 scrollable = false,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 20.dp),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 20.dp),
             )
         }
     } else {
@@ -88,11 +91,12 @@ fun FeedbackBottomSheet(
             properties = DialogProperties(usePlatformDefaultWidth = false),
         ) {
             Box(
-                modifier = Modifier
-                    .widthIn(max = 560.dp)
-                    .heightIn(max = 720.dp)
-                    .clip(RoundedCornerShape(LocalPersonality.current.shape.corner))
-                    .background(LocalPersonality.current.colors.surface),
+                modifier =
+                    modifier
+                        .widthIn(max = 560.dp)
+                        .heightIn(max = 720.dp)
+                        .clip(RoundedCornerShape(LocalPersonality.current.shape.corner))
+                        .background(LocalPersonality.current.colors.surface),
             ) {
                 FeedbackContent(
                     state = state,
@@ -140,12 +144,12 @@ private fun FeedbackContent(
 
         CategorySelector(
             selected = state.category,
-            onSelected = { onAction(FeedbackAction.OnCategoryChange(it)) },
+            onSelect = { onAction(FeedbackAction.OnCategoryChange(it)) },
         )
 
         TopicSelector(
             selected = state.topic,
-            onSelected = { onAction(FeedbackAction.OnTopicChange(it)) },
+            onSelect = { onAction(FeedbackAction.OnTopicChange(it)) },
         )
 
         ConditionalFields(state = state, onAction = onAction)
@@ -191,7 +195,10 @@ private fun FeedbackHeader(onDismiss: () -> Unit) {
 }
 
 @Composable
-private fun SectionLabel(text: String, topGap: androidx.compose.ui.unit.Dp = 4.dp) {
+private fun SectionLabel(
+    text: String,
+    topGap: androidx.compose.ui.unit.Dp = 4.dp,
+) {
     Column {
         if (topGap > 0.dp) Spacer(Modifier.height(topGap))
         KomiText(

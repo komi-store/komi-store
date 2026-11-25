@@ -54,36 +54,8 @@ class FeedbackViewModel(
                 _state.update { it.copy(topic = action.topic) }
             }
 
-            is FeedbackAction.OnTitleChange -> {
-                _state.update { it.copy(title = action.value) }
-            }
-
-            is FeedbackAction.OnDescriptionChange -> {
-                _state.update { it.copy(description = action.value) }
-            }
-
-            is FeedbackAction.OnStepsToReproduceChange -> {
-                _state.update { it.copy(stepsToReproduce = action.value) }
-            }
-
-            is FeedbackAction.OnExpectedActualChange -> {
-                _state.update { it.copy(expectedActual = action.value) }
-            }
-
-            is FeedbackAction.OnUseCaseChange -> {
-                _state.update { it.copy(useCase = action.value) }
-            }
-
-            is FeedbackAction.OnProposedSolutionChange -> {
-                _state.update { it.copy(proposedSolution = action.value) }
-            }
-
-            is FeedbackAction.OnCurrentBehaviourChange -> {
-                _state.update { it.copy(currentBehaviour = action.value) }
-            }
-
-            is FeedbackAction.OnDesiredBehaviourChange -> {
-                _state.update { it.copy(desiredBehaviour = action.value) }
+            is FeedbackAction.FieldEdit -> {
+                _state.update { it.withField(action) }
             }
 
             FeedbackAction.OnAttachDiagnosticsToggle -> {
@@ -119,7 +91,7 @@ class FeedbackViewModel(
                 }
             }
 
-            delay(250)
+            delay(OPEN_FAILURE_GRACE_MS)
             _state.update { it.copy(isSending = false) }
             if (!failed) {
                 _events.send(FeedbackEvent.OnSent(channel))
@@ -127,6 +99,18 @@ class FeedbackViewModel(
             }
         }
     }
+
+    private fun FeedbackState.withField(edit: FeedbackAction.FieldEdit): FeedbackState =
+        when (edit) {
+            is FeedbackAction.OnTitleChange -> copy(title = edit.value)
+            is FeedbackAction.OnDescriptionChange -> copy(description = edit.value)
+            is FeedbackAction.OnStepsToReproduceChange -> copy(stepsToReproduce = edit.value)
+            is FeedbackAction.OnExpectedActualChange -> copy(expectedActual = edit.value)
+            is FeedbackAction.OnUseCaseChange -> copy(useCase = edit.value)
+            is FeedbackAction.OnProposedSolutionChange -> copy(proposedSolution = edit.value)
+            is FeedbackAction.OnCurrentBehaviourChange -> copy(currentBehaviour = edit.value)
+            is FeedbackAction.OnDesiredBehaviourChange -> copy(desiredBehaviour = edit.value)
+        }
 
     private fun resetForm() {
         _state.update { previous ->
@@ -179,4 +163,9 @@ class FeedbackViewModel(
             Platform.MACOS -> "macOS"
             Platform.LINUX -> "Linux"
         }
+
+    private companion object {
+        // The browser helper reports a failed open through its callback, so it gets a moment before the send counts.
+        const val OPEN_FAILURE_GRACE_MS = 250L
+    }
 }

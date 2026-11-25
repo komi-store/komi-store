@@ -19,9 +19,11 @@ import zed.rainxch.core.presentation.components.text.KomiTextRole
 import zed.rainxch.core.presentation.locals.LocalPersonality
 import zed.rainxch.core.presentation.personality.MangaPersonality
 
+private const val STAMP_SKEW_PER_HEIGHT = 0.21f
+
 private val SkewedStamp =
     GenericShape { size, _ ->
-        val k = size.height * 0.21f
+        val k = size.height * STAMP_SKEW_PER_HEIGHT
         moveTo(k, 0f)
         lineTo(size.width, 0f)
         lineTo(size.width - k, size.height)

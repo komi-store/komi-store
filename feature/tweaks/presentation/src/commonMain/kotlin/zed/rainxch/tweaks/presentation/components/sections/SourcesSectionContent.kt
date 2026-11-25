@@ -1,13 +1,13 @@
 package zed.rainxch.tweaks.presentation.components.sections
 
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.DeleteOutline
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import org.jetbrains.compose.resources.pluralStringResource
 import org.jetbrains.compose.resources.stringResource
 import zed.rainxch.core.presentation.components.buttons.KomiButtonVariant
 import zed.rainxch.core.presentation.components.buttons.KomiIconButton
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.DeleteOutline
 import zed.rainxch.githubstore.core.presentation.res.Res
 import zed.rainxch.githubstore.core.presentation.res.custom_forges_count
 import zed.rainxch.githubstore.core.presentation.res.custom_forges_entry_label
@@ -26,8 +26,8 @@ import zed.rainxch.tweaks.presentation.components.shell.SettingsRow
 fun SourcesSectionContent(
     state: TweaksState,
     onAction: (TweaksAction) -> Unit,
-    modifier: Modifier = Modifier,
     onNavigateToMirrorPicker: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val hosts = state.customForgeHosts.sorted()
     SettingsGroup(modifier = modifier) {

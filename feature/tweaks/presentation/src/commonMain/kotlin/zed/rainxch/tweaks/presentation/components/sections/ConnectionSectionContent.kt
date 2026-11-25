@@ -49,7 +49,7 @@ import zed.rainxch.tweaks.presentation.model.ProxyScopeFormState
 import zed.rainxch.tweaks.presentation.model.ProxyType
 
 @Composable
-fun connectionSectionContent(
+fun ConnectionSectionContent(
     state: TweaksState,
     onAction: (TweaksAction) -> Unit,
     modifier: Modifier = Modifier,
@@ -65,7 +65,7 @@ fun connectionSectionContent(
         ) {
             ProxyTypeSegmented(
                 selected = master.type,
-                onSelected = { onAction(TweaksAction.OnMasterProxyTypeSelected(it)) },
+                onSelect = { onAction(TweaksAction.OnMasterProxyTypeSelected(it)) },
             )
             AnimatedVisibility(visible = master.type == ProxyType.HTTP || master.type == ProxyType.SOCKS) {
                 Column {
@@ -130,7 +130,7 @@ fun connectionSectionContent(
                         Spacer(Modifier.height(10.dp))
                         ProxyTypeSegmented(
                             selected = form.type,
-                            onSelected = { onAction(TweaksAction.OnProxyTypeSelected(scope, it)) },
+                            onSelect = { onAction(TweaksAction.OnProxyTypeSelected(scope, it)) },
                         )
                         AnimatedVisibility(visible = form.type == ProxyType.HTTP || form.type == ProxyType.SOCKS) {
                             Column {
@@ -182,14 +182,27 @@ fun connectionSectionContent(
 @Composable
 private fun proxySummary(form: ProxyScopeFormState): String =
     when (form.type) {
-        ProxyType.NONE -> stringResource(Res.string.tweaks_connection_mode_no_proxy)
-        ProxyType.SYSTEM -> stringResource(Res.string.tweaks_connection_mode_system)
-        ProxyType.HTTP, ProxyType.SOCKS ->
-            (if (form.type == ProxyType.HTTP) {
-                stringResource(Res.string.tweaks_connection_mode_http)
-            } else {
-                stringResource(Res.string.tweaks_connection_mode_socks)
-            }) + form.host.takeIf { it.isNotBlank() }?.let { " · $it" }.orEmpty()
+        ProxyType.NONE -> {
+            stringResource(Res.string.tweaks_connection_mode_no_proxy)
+        }
+
+        ProxyType.SYSTEM -> {
+            stringResource(Res.string.tweaks_connection_mode_system)
+        }
+
+        ProxyType.HTTP, ProxyType.SOCKS -> {
+            (
+                if (form.type == ProxyType.HTTP) {
+                    stringResource(Res.string.tweaks_connection_mode_http)
+                } else {
+                    stringResource(Res.string.tweaks_connection_mode_socks)
+                }
+            ) +
+                form.host
+                    .takeIf { it.isNotBlank() }
+                    ?.let { " · $it" }
+                    .orEmpty()
+        }
     }
 
 @Composable
@@ -203,11 +216,11 @@ private fun scopeTitle(scope: ProxyScope): String =
 @Composable
 private fun ProxyTypeSegmented(
     selected: ProxyType,
-    onSelected: (ProxyType) -> Unit,
+    onSelect: (ProxyType) -> Unit,
 ) {
     KomiSegmented(
         selected = selected,
-        onSelect = onSelected,
+        onSelect = onSelect,
         size = KomiIconButtonSize.Sm,
         items =
             persistentListOf(
@@ -227,35 +240,37 @@ private fun ProxyFields(
     onUser: (String) -> Unit,
     onPass: (String) -> Unit,
 ) {
-    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+    Column {
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            KomiTextField(
+                value = form.host,
+                onValueChange = onHost,
+                modifier = Modifier.weight(2f),
+                label = stringResource(Res.string.proxy_host),
+            )
+            KomiTextField(
+                value = form.port,
+                onValueChange = onPort,
+                modifier = Modifier.weight(1f),
+                label = stringResource(Res.string.proxy_port),
+                keyboardType = KeyboardType.Number,
+            )
+        }
+        Spacer(Modifier.height(8.dp))
         KomiTextField(
-            value = form.host,
-            onValueChange = onHost,
-            modifier = Modifier.weight(2f),
-            label = stringResource(Res.string.proxy_host),
+            value = form.username,
+            onValueChange = onUser,
+            modifier = Modifier.fillMaxWidth(),
+            label = stringResource(Res.string.proxy_username),
         )
+        Spacer(Modifier.height(8.dp))
         KomiTextField(
-            value = form.port,
-            onValueChange = onPort,
-            modifier = Modifier.weight(1f),
-            label = stringResource(Res.string.proxy_port),
-            keyboardType = KeyboardType.Number,
+            value = form.password,
+            onValueChange = onPass,
+            modifier = Modifier.fillMaxWidth(),
+            label = stringResource(Res.string.proxy_password),
+            password = true,
+            keyboardType = KeyboardType.Password,
         )
     }
-    Spacer(Modifier.height(8.dp))
-    KomiTextField(
-        value = form.username,
-        onValueChange = onUser,
-        modifier = Modifier.fillMaxWidth(),
-        label = stringResource(Res.string.proxy_username),
-    )
-    Spacer(Modifier.height(8.dp))
-    KomiTextField(
-        value = form.password,
-        onValueChange = onPass,
-        modifier = Modifier.fillMaxWidth(),
-        label = stringResource(Res.string.proxy_password),
-        password = true,
-        keyboardType = KeyboardType.Password,
-    )
 }

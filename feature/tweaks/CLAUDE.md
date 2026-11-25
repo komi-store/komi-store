@@ -7,6 +7,7 @@ Single home for app-level settings: appearance, language, proxy, GitHub mirror, 
 ```
 feature/tweaks/presentation/
 ├── TweaksViewModel / State / Action / Event / Root, RestartApp (expect/actual)
+├── handlers/      # one handler per section (TweaksAction groups); TweaksViewModel hands each a TweaksStore
 ├── components/
 │   ├── sections/    # TweaksSections.kt groups the per-section content files into the sections below
 │   ├── shell/       # SettingsGroup / SettingsRow / SettingsDrillRow kit, also used by the sub-screens
@@ -20,7 +21,7 @@ feature/tweaks/presentation/
 ├── hosttokens/    # HostTokensRoot (per-host PATs)
 ├── mirror/        # MirrorPickerRoot
 ├── connection/    # paste-a-proxy-URL sheet
-├── model/         # ProxyScopeFormState, ProxyType, LanguagePickerOption
+├── model/         # ProxyScopeFormState, ProxyType, LanguagePickerOption, and the UI models TweaksState maps installer data to
 └── utils/         # TweaksDeepLinkBus: desktop Help > Feedback opens the feedback sheet
 ```
 
@@ -30,7 +31,7 @@ Android: one scrolling column of Look & feel, Connectivity, Installs & updates, 
 
 ## Sub-screen VMs (registered in `composeApp/.../app/di/ViewModelsModule.kt`)
 
-`SkippedUpdatesViewModel` (unskip = `setSkippedReleaseTag(pkg, null)` then `checkForUpdates`), `HiddenRepositoriesViewModel` (`HiddenReposRepository.unhide` / `clearAll`), `HostTokensViewModel` (`HostTokenRepository`), `FeedbackViewModel`, `MirrorPickerViewModel` (explicit `viewModel {}`; measures every mirror on open through `MirrorRepository.measureLatencies()`, Direct included (`MirrorRepositoryImpl` adds the bundled `direct` entry to a catalog that lacks it); "Pick fastest" (`OnAutoPickFastest`) applies `fastestReleaseMirror` once; the `named("test")` HttpClient only backs the 5 s "Test connection"), `AppInfoViewModel`, `LicensesViewModel`.
+`SkippedUpdatesViewModel` (unskip = `setSkippedReleaseTag(pkg, null)` then `checkForUpdates`), `HiddenRepositoriesViewModel` (`HiddenReposRepository.unhide` / `clearAll`), `HostTokensViewModel` (`HostTokenRepository`), `FeedbackViewModel`, `MirrorPickerViewModel` (measures every mirror on open through `MirrorRepository.measureLatencies()`, Direct included (`MirrorRepositoryImpl` adds the bundled `direct` entry to a catalog that lacks it); "Pick fastest" (`OnAutoPickFastest`) applies `fastestReleaseMirror` once; "Test connection" goes through `MirrorConnectionTester` (core/data, the `named("test")` client, 5 s)), `AppInfoViewModel`, `LicensesViewModel`. The `TweaksViewModel` handlers (`LookAndFeelHandler`, `ConnectionHandler`, `InstallsHandler`, `TranslationHandler`, `PrivacyHandler`, `DiagnosticsHandler`) are `factoryOf` entries there too.
 
 ## Navigation
 
@@ -39,7 +40,7 @@ Android: one scrolling column of Look & feel, Connectivity, Installs & updates, 
 ## Notes
 
 - `include_pre_releases` is only a default: new `InstalledApp` rows (install in `InstallationManagerImpl`, link in `AppsRepositoryImpl.linkAppToRepo`) copy it into `includePreReleases`. Existing rows keep their per-app value.
-- **Proxy:** a master config plus one config per `ProxyScope` (`DISCOVERY` / `DOWNLOAD` / `TRANSLATION`). Only the per-scope configs reach `ProxyManager`; `TweaksViewModel` copies the master into every scope flagged use-master when it is saved. `ProxyRepository.setMasterProxyConfig` alone changes no traffic.
+- **Proxy:** a master config plus one config per `ProxyScope` (`DISCOVERY` / `DOWNLOAD` / `TRANSLATION`). Only the per-scope configs reach `ProxyManager`; `ConnectionHandler` copies the master into every scope flagged use-master when it is saved. `ProxyRepository.setMasterProxyConfig` alone changes no traffic.
 - **Repository layout (Look & feel):** `OnRepoLayoutSelected` writes `TweaksRepository.setRepoGridLayout`, the list or grid that Explore, Top Charts, Search and the category list read. Those screens have no toggle of their own.
 - **Content width (desktop only, Look & feel):** `OnContentWidthSelected` persists `ContentWidth` (`COMPACT` / `WIDE` / `EXTRA_WIDE`). `MainViewModel` feeds it to `LocalContentWidth` (provided in `AppNavigation`); screens read it through `contentWidthCap()` / `Modifier.constrainedContentWidth()` (core/presentation).
 - **Refresh rate (Android only, Look & feel):** the row lists `rememberDisplayModeOptions()` (core/presentation; empty on desktop, which hides the row) plus Automatic. `OnDisplayModeSelected` persists the mode id (`SYSTEM_DEFAULT_DISPLAY_MODE_ID` = Automatic); `MainActivity` applies it to `preferredDisplayModeId` and falls back to the system default for an id the display no longer reports. Some devices (HyperOS) accept the request but keep the panel at its peak rate.

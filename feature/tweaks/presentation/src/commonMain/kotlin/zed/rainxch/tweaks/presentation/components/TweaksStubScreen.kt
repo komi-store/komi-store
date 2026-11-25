@@ -29,8 +29,10 @@ import zed.rainxch.githubstore.core.presentation.res.tweaks_stub_coming_soon_tit
 fun TweaksStubScreen(
     title: String,
     onNavigateBack: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     KomiScaffold(
+        modifier = modifier,
         topBar = {
             KomiTopBar(
                 title = title,
@@ -40,10 +42,11 @@ fun TweaksStubScreen(
         },
     ) { innerPadding ->
         Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-                .padding(horizontal = 32.dp),
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
+                    .padding(horizontal = 32.dp),
             contentAlignment = Alignment.Center,
         ) {
             val colors = LocalPersonality.current.colors

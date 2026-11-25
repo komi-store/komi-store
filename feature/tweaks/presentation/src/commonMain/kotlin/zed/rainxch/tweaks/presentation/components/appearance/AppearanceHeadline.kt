@@ -11,6 +11,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import org.jetbrains.compose.resources.StringResource
+import org.jetbrains.compose.resources.stringResource
 import zed.rainxch.core.domain.model.appearance.AccentId
 import zed.rainxch.core.domain.model.appearance.AppPersonality
 import zed.rainxch.core.presentation.components.text.KomiText
@@ -22,11 +24,6 @@ import zed.rainxch.core.presentation.personality.classic.systemWallpaperColorSch
 import zed.rainxch.core.presentation.personality.manga.mangaAccentSwatch
 import zed.rainxch.core.presentation.personality.toAccentId
 import zed.rainxch.core.presentation.personality.toMangaAccent
-import zed.rainxch.tweaks.presentation.components.shell.SettingsGroup
-import zed.rainxch.tweaks.presentation.components.shell.TweaksDecorSlot
-import zed.rainxch.tweaks.presentation.components.shell.tweaksKicker
-import org.jetbrains.compose.resources.StringResource
-import org.jetbrains.compose.resources.stringResource
 import zed.rainxch.githubstore.core.presentation.res.Res
 import zed.rainxch.githubstore.core.presentation.res.tweaks_accent_cobalt
 import zed.rainxch.githubstore.core.presentation.res.tweaks_accent_crimson
@@ -34,6 +31,9 @@ import zed.rainxch.githubstore.core.presentation.res.tweaks_accent_frost
 import zed.rainxch.githubstore.core.presentation.res.tweaks_accent_mono
 import zed.rainxch.githubstore.core.presentation.res.tweaks_accent_sun
 import zed.rainxch.githubstore.core.presentation.res.tweaks_accent_wallpaper
+import zed.rainxch.tweaks.presentation.components.shell.SettingsGroup
+import zed.rainxch.tweaks.presentation.components.shell.TweaksDecorSlot
+import zed.rainxch.tweaks.presentation.components.shell.tweaksKicker
 
 private val AccentOrder =
     listOf(
@@ -48,8 +48,8 @@ private val AccentOrder =
 fun AppearanceHeadline(
     personality: AppPersonality,
     accent: AccentId,
-    onPersonalitySelected: (AppPersonality) -> Unit,
-    onAccentSelected: (AccentId) -> Unit,
+    onPersonalitySelect: (AppPersonality) -> Unit,
+    onAccentSelect: (AccentId) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     SettingsGroup(modifier = modifier) {
@@ -62,19 +62,19 @@ fun AppearanceHeadline(
                 PersonalityTile(
                     kind = AppPersonality.MANGA,
                     selected = personality == AppPersonality.MANGA,
-                    onClick = { onPersonalitySelected(AppPersonality.MANGA) },
+                    onClick = { onPersonalitySelect(AppPersonality.MANGA) },
                     modifier = Modifier.weight(1f),
                 )
                 PersonalityTile(
                     kind = AppPersonality.CLASSIC,
                     selected = personality == AppPersonality.CLASSIC,
-                    onClick = { onPersonalitySelected(AppPersonality.CLASSIC) },
+                    onClick = { onPersonalitySelect(AppPersonality.CLASSIC) },
                     modifier = Modifier.weight(1f),
                 )
             }
 
             HeadlineLabel(latin = "Accent", slot = TweaksDecorSlot.Accent, modifier = Modifier.padding(top = 18.dp))
-            AccentRow(accent = accent, onAccentSelected = onAccentSelected, modifier = Modifier.padding(top = 10.dp))
+            AccentRow(accent = accent, onAccentSelect = onAccentSelect, modifier = Modifier.padding(top = 10.dp))
         }
     }
 }
@@ -110,7 +110,7 @@ private fun HeadlineLabel(
 @Composable
 private fun AccentRow(
     accent: AccentId,
-    onAccentSelected: (AccentId) -> Unit,
+    onAccentSelect: (AccentId) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val isManga = LocalPersonality.current is MangaPersonality
@@ -138,7 +138,7 @@ private fun AccentRow(
                 mono = isManga && entry == AccentId.MONO,
                 selected = picked == entry,
                 label = stringResource(entry.label),
-                onClick = { onAccentSelected(entry) },
+                onClick = { onAccentSelect(entry) },
                 icon = if (entry == AccentId.WALLPAPER) Icons.Outlined.Wallpaper else null,
             )
         }

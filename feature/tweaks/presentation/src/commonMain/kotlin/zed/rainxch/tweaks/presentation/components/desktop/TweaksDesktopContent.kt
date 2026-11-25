@@ -28,37 +28,30 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
+import zed.rainxch.core.domain.model.appearance.AccentId
+import zed.rainxch.core.domain.model.appearance.AppPersonality
 import zed.rainxch.core.presentation.components.buttons.KomiIconButton
 import zed.rainxch.core.presentation.components.text.KomiText
 import zed.rainxch.core.presentation.components.text.KomiTextRole
 import zed.rainxch.core.presentation.locals.LocalPersonality
 import zed.rainxch.core.presentation.personality.MangaPersonality
-import zed.rainxch.core.domain.model.appearance.AccentId
 import zed.rainxch.core.presentation.personality.manga.decoration.gridPaper
 import zed.rainxch.core.presentation.personality.manga.decoration.hardShadow
 import zed.rainxch.githubstore.core.presentation.res.Res
+import zed.rainxch.githubstore.core.presentation.res.navigate_back
 import zed.rainxch.githubstore.core.presentation.res.section_app_block
 import zed.rainxch.githubstore.core.presentation.res.section_connectivity
 import zed.rainxch.githubstore.core.presentation.res.section_look_and_feel
 import zed.rainxch.githubstore.core.presentation.res.section_privacy_and_data
 import zed.rainxch.githubstore.core.presentation.res.tweaks_title
-import zed.rainxch.githubstore.core.presentation.res.navigate_back
 import zed.rainxch.tweaks.presentation.TweaksAction
 import zed.rainxch.tweaks.presentation.TweaksState
-import zed.rainxch.core.domain.model.appearance.AppPersonality
-import zed.rainxch.tweaks.presentation.components.sections.appSection
+import zed.rainxch.tweaks.presentation.components.sections.AppSection
+import zed.rainxch.tweaks.presentation.components.sections.ConnectivitySection
+import zed.rainxch.tweaks.presentation.components.sections.LookAndFeelSection
+import zed.rainxch.tweaks.presentation.components.sections.PrivacySection
 import zed.rainxch.tweaks.presentation.components.shell.TweaksDecorSlot
 import zed.rainxch.tweaks.presentation.components.shell.tweaksKicker
-import zed.rainxch.tweaks.presentation.components.sections.connectivitySection
-import zed.rainxch.tweaks.presentation.components.sections.lookAndFeelSection
-import zed.rainxch.tweaks.presentation.components.sections.privacySection
-
-enum class DesktopSection(val slot: TweaksDecorSlot) {
-    LOOK(TweaksDecorSlot.LookAndFeel),
-    CONNECTIVITY(TweaksDecorSlot.Connectivity),
-    PRIVACY(TweaksDecorSlot.PrivacyData),
-    APP(TweaksDecorSlot.App),
-}
 
 @Composable
 private fun DesktopSection.label(): String =
@@ -75,8 +68,8 @@ fun TweaksDesktopContent(
     onAction: (TweaksAction) -> Unit,
     personality: AppPersonality,
     accent: AccentId,
-    onPersonalitySelected: (AppPersonality) -> Unit,
-    onAccentSelected: (AccentId) -> Unit,
+    onPersonalitySelect: (AppPersonality) -> Unit,
+    onAccentSelect: (AccentId) -> Unit,
     currentLanguageLabel: String,
     onOpenLanguage: () -> Unit,
     onOpenFeedback: () -> Unit,
@@ -104,8 +97,7 @@ fun TweaksDesktopContent(
                             end = Offset(size.width - stroke / 2f, size.height),
                             strokeWidth = stroke,
                         )
-                    }
-                    .padding(horizontal = 12.dp, vertical = 18.dp),
+                    }.padding(horizontal = 12.dp, vertical = 18.dp),
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -159,34 +151,39 @@ fun TweaksDesktopContent(
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
                 when (state.desktopSection) {
-                    DesktopSection.LOOK ->
-                        lookAndFeelSection(
+                    DesktopSection.LOOK -> {
+                        LookAndFeelSection(
                             state = state,
                             onAction = onAction,
                             personality = personality,
                             accent = accent,
-                            onPersonalitySelected = onPersonalitySelected,
-                            onAccentSelected = onAccentSelected,
+                            onPersonalitySelect = onPersonalitySelect,
+                            onAccentSelect = onAccentSelect,
                             currentLanguageLabel = currentLanguageLabel,
                             onOpenLanguage = onOpenLanguage,
                         )
+                    }
 
-                    DesktopSection.CONNECTIVITY ->
-                        connectivitySection(
+                    DesktopSection.CONNECTIVITY -> {
+                        ConnectivitySection(
                             state = state,
                             onAction = onAction,
                             onNavigateToMirrorPicker = onNavigateToMirrorPicker,
                         )
+                    }
 
-                    DesktopSection.PRIVACY ->
-                        privacySection(
+                    DesktopSection.PRIVACY -> {
+                        PrivacySection(
                             state = state,
                             onAction = onAction,
                             onNavigateToHiddenRepositories = onNavigateToHiddenRepositories,
                             onNavigateToHostTokens = onNavigateToHostTokens,
                         )
+                    }
 
-                    DesktopSection.APP -> appSection(onOpenFeedback = onOpenFeedback)
+                    DesktopSection.APP -> {
+                        AppSection(onOpenFeedback = onOpenFeedback)
+                    }
                 }
             }
         }
@@ -222,8 +219,7 @@ private fun NavRow(
                     } else {
                         Modifier
                     },
-                )
-                .height(40.dp)
+                ).height(40.dp)
                 .clickable(onClick = onClick)
                 .padding(horizontal = 11.dp),
         verticalAlignment = Alignment.CenterVertically,

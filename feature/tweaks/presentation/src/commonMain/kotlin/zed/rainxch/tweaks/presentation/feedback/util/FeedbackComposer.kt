@@ -3,6 +3,7 @@ package zed.rainxch.tweaks.presentation.feedback.util
 import io.ktor.http.URLBuilder
 import io.ktor.http.encodeURLParameter
 import zed.rainxch.tweaks.presentation.feedback.FeedbackState
+import zed.rainxch.tweaks.presentation.feedback.model.DiagnosticsInfo
 import zed.rainxch.tweaks.presentation.feedback.model.FeedbackCategory
 import zed.rainxch.tweaks.presentation.feedback.model.FeedbackChannel
 import zed.rainxch.tweaks.presentation.feedback.model.FeedbackTopic
@@ -58,30 +59,33 @@ object FeedbackComposer {
         }
 
         if (state.attachDiagnostics) {
-            state.diagnostics?.let { d ->
-                builder.append("\n\n---\n**Diagnostics**\n")
-                builder.append("- App: Komi Store v").append(d.appVersion).append('\n')
-                builder
-                    .append("- Platform: ")
-                    .append(d.platform)
-                    .append(' ')
-                    .append(d.osVersion)
-                    .append('\n')
-                builder.append("- Locale: ").append(d.locale).append('\n')
-                builder
-                    .append("- Theme: ")
-                    .append(d.themePalette)
-                    .append(" / ")
-                    .append(d.themeMode)
-                    .append('\n')
-                d.installerType?.let { builder.append("- Installer: ").append(it).append('\n') }
-                if (channel == FeedbackChannel.GITHUB) {
-                    d.githubUsername?.let { builder.append("- GitHub user: @").append(it).append('\n') }
-                }
-            }
+            state.diagnostics?.let { builder.appendDiagnostics(it, channel) }
         }
 
         return builder.toString().truncateToCap()
+    }
+
+    private fun StringBuilder.appendDiagnostics(
+        d: DiagnosticsInfo,
+        channel: FeedbackChannel,
+    ) {
+        append("\n\n---\n**Diagnostics**\n")
+        append("- App: Komi Store v").append(d.appVersion).append('\n')
+        append("- Platform: ")
+            .append(d.platform)
+            .append(' ')
+            .append(d.osVersion)
+            .append('\n')
+        append("- Locale: ").append(d.locale).append('\n')
+        append("- Theme: ")
+            .append(d.themePalette)
+            .append(" / ")
+            .append(d.themeMode)
+            .append('\n')
+        d.installerType?.let { append("- Installer: ").append(it).append('\n') }
+        if (channel == FeedbackChannel.GITHUB) {
+            d.githubUsername?.let { append("- GitHub user: @").append(it).append('\n') }
+        }
     }
 
     private fun StringBuilder.appendSection(

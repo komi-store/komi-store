@@ -23,10 +23,10 @@ import zed.rainxch.githubstore.core.presentation.res.tweaks_privacy_clear_viewed
 import zed.rainxch.githubstore.core.presentation.res.tweaks_privacy_clear_viewed_title
 import zed.rainxch.githubstore.core.presentation.res.tweaks_privacy_clipboard_body
 import zed.rainxch.githubstore.core.presentation.res.tweaks_privacy_clipboard_title
-import zed.rainxch.githubstore.core.presentation.res.tweaks_privacy_hide_seen_body
-import zed.rainxch.githubstore.core.presentation.res.tweaks_privacy_hide_seen_title
 import zed.rainxch.githubstore.core.presentation.res.tweaks_privacy_hidden_repos_body
 import zed.rainxch.githubstore.core.presentation.res.tweaks_privacy_hidden_repos_title
+import zed.rainxch.githubstore.core.presentation.res.tweaks_privacy_hide_seen_body
+import zed.rainxch.githubstore.core.presentation.res.tweaks_privacy_hide_seen_title
 import zed.rainxch.tweaks.presentation.TweaksAction
 import zed.rainxch.tweaks.presentation.TweaksState
 import zed.rainxch.tweaks.presentation.components.shell.SettingsDrillRow
@@ -34,11 +34,11 @@ import zed.rainxch.tweaks.presentation.components.shell.SettingsGroup
 import zed.rainxch.tweaks.presentation.components.shell.SettingsRow
 
 @Composable
-fun privacySectionContent(
+fun PrivacySectionContent(
     state: TweaksState,
     onAction: (TweaksAction) -> Unit,
-    modifier: Modifier = Modifier,
     onNavigateToHiddenRepositories: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     SettingsGroup(modifier = modifier) {
         SettingsRow(

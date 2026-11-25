@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
@@ -20,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -31,7 +31,7 @@ import zed.rainxch.core.domain.isAndroid
 import zed.rainxch.core.domain.isDesktop
 import zed.rainxch.core.domain.model.settings.AppLanguages
 import zed.rainxch.core.presentation.components.bars.KomiTopBar
-import zed.rainxch.core.presentation.components.icon.KomiIcon
+import zed.rainxch.core.presentation.components.overlays.KomiToastState
 import zed.rainxch.core.presentation.components.overlays.rememberKomiToastState
 import zed.rainxch.core.presentation.components.scaffold.KomiScaffold
 import zed.rainxch.core.presentation.components.text.KomiText
@@ -40,16 +40,23 @@ import zed.rainxch.core.presentation.locals.LocalPersonality
 import zed.rainxch.core.presentation.personality.utils.PersonalityPreview
 import zed.rainxch.core.presentation.utils.ObserveAsEvents
 import zed.rainxch.core.presentation.utils.constrainedContentWidth
-import zed.rainxch.githubstore.core.presentation.res.*
+import zed.rainxch.githubstore.core.presentation.res.Res
+import zed.rainxch.githubstore.core.presentation.res.feedback_send_failed
+import zed.rainxch.githubstore.core.presentation.res.feedback_send_success_email
+import zed.rainxch.githubstore.core.presentation.res.feedback_send_success_github
+import zed.rainxch.githubstore.core.presentation.res.language_follow_system
+import zed.rainxch.githubstore.core.presentation.res.select_language
+import zed.rainxch.githubstore.core.presentation.res.tweaks_language_intro_body
+import zed.rainxch.githubstore.core.presentation.res.tweaks_title
 import zed.rainxch.tweaks.presentation.components.ClearDownloadsDialog
 import zed.rainxch.tweaks.presentation.components.LanguagePickerSheet
 import zed.rainxch.tweaks.presentation.components.desktop.TweaksDesktopContent
-import zed.rainxch.tweaks.presentation.components.sections.appSection
-import zed.rainxch.tweaks.presentation.components.sections.connectivitySection
-import zed.rainxch.tweaks.presentation.components.sections.diagnosticsSection
-import zed.rainxch.tweaks.presentation.components.sections.installsSection
-import zed.rainxch.tweaks.presentation.components.sections.lookAndFeelSection
-import zed.rainxch.tweaks.presentation.components.sections.privacySection
+import zed.rainxch.tweaks.presentation.components.sections.AppSection
+import zed.rainxch.tweaks.presentation.components.sections.ConnectivitySection
+import zed.rainxch.tweaks.presentation.components.sections.DiagnosticsSection
+import zed.rainxch.tweaks.presentation.components.sections.InstallsSection
+import zed.rainxch.tweaks.presentation.components.sections.LookAndFeelSection
+import zed.rainxch.tweaks.presentation.components.sections.PrivacySection
 import zed.rainxch.tweaks.presentation.components.shell.TweaksDecorSlot
 import zed.rainxch.tweaks.presentation.components.shell.tweaksKicker
 import zed.rainxch.tweaks.presentation.feedback.components.FeedbackBottomSheet
@@ -70,126 +77,87 @@ fun TweaksRoot(
 
     val lifecycleOwner = LocalLifecycleOwner.current
     DisposableEffect(lifecycleOwner) {
-        val observer = LifecycleEventObserver { _, event ->
-            if (event == androidx.lifecycle.Lifecycle.Event.ON_RESUME) {
-                viewModel.onAction(TweaksAction.OnRefreshCacheSize)
-                viewModel.onAction(TweaksAction.OnReevaluateBatteryOptimizationCard)
+        val observer =
+            LifecycleEventObserver { _, event ->
+                if (event == Lifecycle.Event.ON_RESUME) {
+                    viewModel.onAction(TweaksAction.OnRefreshCacheSize)
+                    viewModel.onAction(TweaksAction.OnReevaluateBatteryOptimizationCard)
+                }
             }
-        }
         lifecycleOwner.lifecycle.addObserver(observer)
         onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
     }
 
     ObserveAsEvents(viewModel.events) { event ->
-        when (event) {
-            TweaksEvent.OnAppLanguageChangeRequiresRestart -> {
-                coroutineScope.launch {
-                    toastState.warning(
-                        message = getString(Res.string.language_restart_required),
-                        actionLabel = getString(Res.string.language_restart_action),
-                        onAction = {
-                            restartAppAfterLanguageChange()
-                        },
-                    )
-                }
-            }
-
-            TweaksEvent.OnCacheCleared -> {
-                coroutineScope.launch { toastState.info(getString(Res.string.downloads_cleared)) }
-            }
-
-            is TweaksEvent.OnCacheClearError -> {
-                coroutineScope.launch { toastState.danger(event.message) }
-            }
-
-            TweaksEvent.OnProxySaved -> {
-                coroutineScope.launch { toastState.success(getString(Res.string.proxy_saved)) }
-            }
-
-            is TweaksEvent.OnProxySaveError -> {
-                coroutineScope.launch { toastState.danger(event.message) }
-            }
-
-            is TweaksEvent.OnProxyTestSuccess -> {
-                coroutineScope.launch {
-                    toastState.success(getString(Res.string.proxy_test_success, event.latencyMs))
-                }
-            }
-
-            is TweaksEvent.OnProxyTestError -> {
-                coroutineScope.launch { toastState.danger(event.message) }
-            }
-
-            is TweaksEvent.OnMasterProxyTestResult -> {
-                coroutineScope.launch {
-                    val latencies = listOf(event.searchMs, event.downloadMs, event.translationMs)
-                    val parts =
-                        latencies.map { ms ->
-                            if (ms != null) {
-                                getString(Res.string.proxy_test_probe_ok, ms)
-                            } else {
-                                getString(Res.string.proxy_test_probe_failed)
-                            }
-                        }
-                    val message = getString(Res.string.proxy_test_master_result, parts[0], parts[1], parts[2])
-                    when {
-                        latencies.all { it != null } -> toastState.success(message)
-                        latencies.all { it == null } -> toastState.danger(message)
-                        else -> toastState.warning(message)
-                    }
-                }
-            }
-
-            TweaksEvent.OnSeenHistoryCleared -> {
-                coroutineScope.launch { toastState.info(getString(Res.string.seen_history_cleared)) }
-            }
-
-            TweaksEvent.OnTranslationProviderSaved -> {
-                coroutineScope.launch { toastState.success(getString(Res.string.translation_provider_saved)) }
-            }
-
-            TweaksEvent.OnYoudaoCredentialsSaved -> {
-                coroutineScope.launch { toastState.success(getString(Res.string.translation_youdao_saved)) }
-            }
-
-            TweaksEvent.OnLibreTranslateCredentialsSaved -> {
-                coroutineScope.launch { toastState.success(getString(Res.string.translation_libre_saved)) }
-            }
-
-            TweaksEvent.OnDeeplCredentialsSaved -> {
-                coroutineScope.launch { toastState.success(getString(Res.string.translation_deepl_saved)) }
-            }
-
-            TweaksEvent.OnMicrosoftTranslatorCredentialsSaved -> {
-                coroutineScope.launch { toastState.success(getString(Res.string.translation_microsoft_saved)) }
-            }
-
-            TweaksEvent.OnDiagnosticsShareFailed -> {
-                coroutineScope.launch { toastState.danger(getString(Res.string.tweaks_diagnostics_share_error)) }
-            }
-        }
+        coroutineScope.launch { toastState.showTweaksEvent(event) }
     }
 
-    val currentLanguageLabel = state.selectedAppLanguage
-        ?.let { tag -> AppLanguages.ALL.firstOrNull { it.tag == tag }?.displayName }
-        ?: stringResource(Res.string.language_follow_system)
+    TweaksScreen(
+        state = state,
+        onAction = viewModel::onAction,
+        toastState = toastState,
+        onNavigateBack = onNavigateBack,
+        onNavigateToHostTokens = onNavigateToHostTokens,
+        onNavigateToMirrorPicker = onNavigateToMirrorPicker,
+        onNavigateToSkippedUpdates = onNavigateToSkippedUpdates,
+        onNavigateToHiddenRepositories = onNavigateToHiddenRepositories,
+    )
+
+    if (state.isFeedbackSheetVisible) {
+        FeedbackBottomSheet(
+            onDismiss = { viewModel.onAction(TweaksAction.OnFeedbackDismiss) },
+            onSendSuccess = { channel ->
+                viewModel.onAction(TweaksAction.OnFeedbackDismiss)
+                coroutineScope.launch {
+                    val message =
+                        when (channel) {
+                            FeedbackChannel.EMAIL -> getString(Res.string.feedback_send_success_email)
+                            FeedbackChannel.GITHUB -> getString(Res.string.feedback_send_success_github)
+                        }
+                    toastState.success(message)
+                }
+            },
+            onError = {
+                coroutineScope.launch { toastState.danger(getString(Res.string.feedback_send_failed)) }
+            },
+        )
+    }
+}
+
+@Composable
+private fun TweaksScreen(
+    state: TweaksState,
+    onAction: (TweaksAction) -> Unit,
+    toastState: KomiToastState,
+    onNavigateBack: () -> Unit,
+    onNavigateToHostTokens: () -> Unit,
+    onNavigateToMirrorPicker: () -> Unit,
+    onNavigateToSkippedUpdates: () -> Unit,
+    onNavigateToHiddenRepositories: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val currentLanguageLabel =
+        state.selectedAppLanguage
+            ?.let { tag -> AppLanguages.ALL.firstOrNull { it.tag == tag }?.displayName }
+            ?: stringResource(Res.string.language_follow_system)
 
     if (isDesktop()) {
         KomiScaffold(
+            modifier = modifier,
             toastState = toastState,
             grid = false,
-            screentone = false
+            screentone = false,
         ) { innerPadding ->
             TweaksDesktopContent(
                 state = state,
-                onAction = viewModel::onAction,
+                onAction = onAction,
                 personality = state.selectedPersonality,
                 accent = state.selectedAccent,
-                onPersonalitySelected = { viewModel.onAction(TweaksAction.OnPersonalitySelected(it)) },
-                onAccentSelected = { viewModel.onAction(TweaksAction.OnAccentSelected(it)) },
+                onPersonalitySelect = { onAction(TweaksAction.OnPersonalitySelected(it)) },
+                onAccentSelect = { onAction(TweaksAction.OnAccentSelected(it)) },
                 currentLanguageLabel = currentLanguageLabel,
-                onOpenLanguage = { viewModel.onAction(TweaksAction.OnLanguagePickerOpen) },
-                onOpenFeedback = { viewModel.onAction(TweaksAction.OnFeedbackClick) },
+                onOpenLanguage = { onAction(TweaksAction.OnLanguagePickerOpen) },
+                onOpenFeedback = { onAction(TweaksAction.OnFeedbackClick) },
                 onNavigateToMirrorPicker = onNavigateToMirrorPicker,
                 onNavigateToHiddenRepositories = onNavigateToHiddenRepositories,
                 onNavigateToHostTokens = onNavigateToHostTokens,
@@ -199,6 +167,7 @@ fun TweaksRoot(
         }
     } else {
         KomiScaffold(
+            modifier = modifier,
             topBar = {
                 KomiTopBar(
                     title = stringResource(Res.string.tweaks_title),
@@ -211,78 +180,103 @@ fun TweaksRoot(
             screentone = true,
         ) { innerPadding ->
             Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(innerPadding),
+                modifier =
+                    Modifier
+                        .fillMaxSize()
+                        .padding(innerPadding),
                 contentAlignment = Alignment.TopCenter,
             ) {
-                Column(
-                    modifier = Modifier
-                        .constrainedContentWidth()
-                        .fillMaxSize()
-                        .verticalScroll(rememberScrollState())
-                        .padding(horizontal = 16.dp)
-                        .padding(top = 4.dp, bottom = 18.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp),
-                ) {
-                    lookAndFeelSection(
-                        state = state,
-                        onAction = viewModel::onAction,
-                        personality = state.selectedPersonality,
-                        accent = state.selectedAccent,
-                        onPersonalitySelected = {
-                            viewModel.onAction(TweaksAction.OnPersonalitySelected(it))
-                        },
-                        onAccentSelected = {
-                            viewModel.onAction(TweaksAction.OnAccentSelected(it))
-                        },
-                        currentLanguageLabel = currentLanguageLabel,
-                        onOpenLanguage = {
-                            viewModel.onAction(TweaksAction.OnLanguagePickerOpen)
-                        },
-                    )
-                    connectivitySection(
-                        state = state,
-                        onAction = viewModel::onAction,
-                        onNavigateToMirrorPicker = onNavigateToMirrorPicker,
-                    )
-                    if (isAndroid()) {
-                        installsSection(
-                            state = state,
-                            onAction = viewModel::onAction,
-                            onNavigateToSkippedUpdates = onNavigateToSkippedUpdates,
-                        )
-                    }
-                    privacySection(
-                        state = state,
-                        onAction = viewModel::onAction,
-                        onNavigateToHiddenRepositories = onNavigateToHiddenRepositories,
-                        onNavigateToHostTokens = onNavigateToHostTokens,
-                    )
-                    appSection(onOpenFeedback = { viewModel.onAction(TweaksAction.OnFeedbackClick) })
-                    if (isAndroid()) {
-                        diagnosticsSection(onAction = viewModel::onAction)
-                    }
-
-                    tweaksKicker(TweaksDecorSlot.Footer)?.let { footer ->
-                        KomiText(
-                            text = footer,
-                            role = KomiTextRole.Caption,
-                            color = LocalPersonality.current.colors.onSurfaceVariant,
-                            textAlign = TextAlign.Center,
-                            modifier = Modifier.fillMaxWidth().padding(top = 10.dp),
-                        )
-                    }
-                }
+                TweaksSectionList(
+                    state = state,
+                    onAction = onAction,
+                    currentLanguageLabel = currentLanguageLabel,
+                    onNavigateToHostTokens = onNavigateToHostTokens,
+                    onNavigateToMirrorPicker = onNavigateToMirrorPicker,
+                    onNavigateToSkippedUpdates = onNavigateToSkippedUpdates,
+                    onNavigateToHiddenRepositories = onNavigateToHiddenRepositories,
+                )
             }
         }
     }
 
+    TweaksSheets(state = state, onAction = onAction)
+}
+
+@Composable
+private fun TweaksSectionList(
+    state: TweaksState,
+    onAction: (TweaksAction) -> Unit,
+    currentLanguageLabel: String,
+    onNavigateToHostTokens: () -> Unit,
+    onNavigateToMirrorPicker: () -> Unit,
+    onNavigateToSkippedUpdates: () -> Unit,
+    onNavigateToHiddenRepositories: () -> Unit,
+) {
+    Column(
+        modifier =
+            Modifier
+                .constrainedContentWidth()
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 16.dp)
+                .padding(top = 4.dp, bottom = 18.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        LookAndFeelSection(
+            state = state,
+            onAction = onAction,
+            personality = state.selectedPersonality,
+            accent = state.selectedAccent,
+            onPersonalitySelect = { onAction(TweaksAction.OnPersonalitySelected(it)) },
+            onAccentSelect = { onAction(TweaksAction.OnAccentSelected(it)) },
+            currentLanguageLabel = currentLanguageLabel,
+            onOpenLanguage = { onAction(TweaksAction.OnLanguagePickerOpen) },
+        )
+        ConnectivitySection(
+            state = state,
+            onAction = onAction,
+            onNavigateToMirrorPicker = onNavigateToMirrorPicker,
+        )
+        if (isAndroid()) {
+            InstallsSection(
+                state = state,
+                onAction = onAction,
+                onNavigateToSkippedUpdates = onNavigateToSkippedUpdates,
+            )
+        }
+        PrivacySection(
+            state = state,
+            onAction = onAction,
+            onNavigateToHiddenRepositories = onNavigateToHiddenRepositories,
+            onNavigateToHostTokens = onNavigateToHostTokens,
+        )
+        AppSection(onOpenFeedback = { onAction(TweaksAction.OnFeedbackClick) })
+        if (isAndroid()) {
+            DiagnosticsSection(onAction = onAction)
+        }
+
+        tweaksKicker(TweaksDecorSlot.Footer)?.let { footer ->
+            KomiText(
+                text = footer,
+                role = KomiTextRole.Caption,
+                color = LocalPersonality.current.colors.onSurfaceVariant,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth().padding(top = 10.dp),
+            )
+        }
+    }
+}
+
+@Composable
+private fun TweaksSheets(
+    state: TweaksState,
+    onAction: (TweaksAction) -> Unit,
+) {
     if (state.isClearDownloadsDialogVisible) {
         ClearDownloadsDialog(
             cacheSize = state.cacheSize,
-            onDismissRequest = { viewModel.onAction(TweaksAction.OnClearDownloadsDismiss) },
-            onConfirm = { viewModel.onAction(TweaksAction.OnClearDownloadsConfirm) },
+            onDismissRequest = { onAction(TweaksAction.OnClearDownloadsDismiss) },
+            onConfirm = { onAction(TweaksAction.OnClearDownloadsConfirm) },
         )
     }
 
@@ -292,32 +286,10 @@ fun TweaksRoot(
             options = state.languagePickerOptions,
             selectedId = state.selectedAppLanguage,
             query = state.languageQuery,
-            onQueryChange = { viewModel.onAction(TweaksAction.OnLanguageQueryChange(it)) },
+            onQueryChange = { onAction(TweaksAction.OnLanguageQueryChange(it)) },
             intro = stringResource(Res.string.tweaks_language_intro_body),
-            onSelect = { viewModel.onAction(TweaksAction.OnAppLanguageSelected(it)) },
-            onDismiss = { viewModel.onAction(TweaksAction.OnLanguagePickerDismiss) },
-        )
-    }
-
-    if (state.isFeedbackSheetVisible) {
-        FeedbackBottomSheet(
-            onDismiss = { viewModel.onAction(TweaksAction.OnFeedbackDismiss) },
-            onSent = { channel ->
-                viewModel.onAction(TweaksAction.OnFeedbackDismiss)
-                coroutineScope.launch {
-                    val msg =
-                        when (channel) {
-                            FeedbackChannel.EMAIL -> getString(Res.string.feedback_send_success_email)
-                            FeedbackChannel.GITHUB -> getString(Res.string.feedback_send_success_github)
-                        }
-                    toastState.success(msg)
-                }
-            },
-            onError = {
-                coroutineScope.launch {
-                    toastState.danger(getString(Res.string.feedback_send_failed))
-                }
-            },
+            onSelect = { onAction(TweaksAction.OnAppLanguageSelected(it)) },
+            onDismiss = { onAction(TweaksAction.OnLanguagePickerDismiss) },
         )
     }
 }

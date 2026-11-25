@@ -23,62 +23,6 @@ import zed.rainxch.githubstore.core.presentation.res.tweaks_connection_paste_url
 import zed.rainxch.githubstore.core.presentation.res.tweaks_connection_paste_url_error
 import zed.rainxch.githubstore.core.presentation.res.tweaks_connection_paste_url_placeholder
 import zed.rainxch.githubstore.core.presentation.res.tweaks_connection_paste_url_title
-import zed.rainxch.tweaks.presentation.model.ProxyType
-
-data class PastedProxy(
-    val type: ProxyType,
-    val host: String,
-    val port: Int,
-    val username: String?,
-    val password: String?,
-)
-
-fun parseProxyUrl(raw: String): PastedProxy? {
-    val trimmed = raw.trim()
-    if (trimmed.isEmpty()) return null
-    val schemeIdx = trimmed.indexOf("://")
-    if (schemeIdx <= 0) return null
-    val scheme = trimmed.substring(0, schemeIdx).lowercase()
-    val type = when (scheme) {
-        "http", "https" -> ProxyType.HTTP
-        "socks", "socks4", "socks5", "socks5h" -> ProxyType.SOCKS
-        else -> return null
-    }
-    val afterScheme = trimmed.substring(schemeIdx + 3)
-        .substringBefore('/')
-        .substringBefore('?')
-        .substringBefore('#')
-    if (afterScheme.isEmpty()) return null
-
-    val atIdx = afterScheme.lastIndexOf('@')
-    val credPart = if (atIdx >= 0) afterScheme.substring(0, atIdx) else null
-    val hostPart = if (atIdx >= 0) afterScheme.substring(atIdx + 1) else afterScheme
-
-    val (username, password) = if (credPart != null) {
-        val colonIdx = credPart.indexOf(':')
-        if (colonIdx >= 0) {
-            credPart.substring(0, colonIdx) to credPart.substring(colonIdx + 1)
-        } else {
-            credPart to ""
-        }
-    } else {
-        null to null
-    }
-
-    val colonIdx = hostPart.lastIndexOf(':')
-    if (colonIdx <= 0) return null
-    val host = hostPart.substring(0, colonIdx)
-    val port = hostPart.substring(colonIdx + 1).toIntOrNull() ?: return null
-    if (host.isBlank() || port !in 1..65535) return null
-
-    return PastedProxy(
-        type = type,
-        host = host,
-        port = port,
-        username = username?.takeIf { it.isNotBlank() },
-        password = password?.takeIf { it.isNotBlank() },
-    )
-}
 
 @Composable
 fun PasteProxyUrlSheet(
@@ -87,16 +31,19 @@ fun PasteProxyUrlSheet(
     onInputChange: (String) -> Unit,
     onSubmit: () -> Unit,
     onDismiss: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val colors = LocalPersonality.current.colors
 
     KomiSheet(
         onDismiss = onDismiss,
+        modifier = modifier,
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 20.dp, vertical = 8.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp, vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             KomiText(

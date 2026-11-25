@@ -1,5 +1,6 @@
 package zed.rainxch.githubstore.app.di
 
+import org.koin.core.module.dsl.factoryOf
 import org.koin.core.module.dsl.viewModel
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
@@ -32,6 +33,12 @@ import zed.rainxch.starred.presentation.StarredReposViewModel
 import zed.rainxch.tweaks.presentation.TweaksViewModel
 import zed.rainxch.tweaks.presentation.appinfo.AppInfoViewModel
 import zed.rainxch.tweaks.presentation.feedback.FeedbackViewModel
+import zed.rainxch.tweaks.presentation.handlers.ConnectionHandler
+import zed.rainxch.tweaks.presentation.handlers.DiagnosticsHandler
+import zed.rainxch.tweaks.presentation.handlers.InstallsHandler
+import zed.rainxch.tweaks.presentation.handlers.LookAndFeelHandler
+import zed.rainxch.tweaks.presentation.handlers.PrivacyHandler
+import zed.rainxch.tweaks.presentation.handlers.TranslationHandler
 import zed.rainxch.tweaks.presentation.hidden.HiddenRepositoriesViewModel
 import zed.rainxch.tweaks.presentation.hosttokens.HostTokensViewModel
 import zed.rainxch.tweaks.presentation.licenses.LicensesViewModel
@@ -176,6 +183,12 @@ val viewModelsModule =
             )
         }
         viewModelOf(::ProfileViewModel)
+        factoryOf(::LookAndFeelHandler)
+        factoryOf(::ConnectionHandler)
+        factoryOf(::InstallsHandler)
+        factoryOf(::TranslationHandler)
+        factoryOf(::PrivacyHandler)
+        factoryOf(::DiagnosticsHandler)
         viewModelOf(::TweaksViewModel)
         viewModelOf(::FeedbackViewModel)
         viewModelOf(::StarredReposViewModel)

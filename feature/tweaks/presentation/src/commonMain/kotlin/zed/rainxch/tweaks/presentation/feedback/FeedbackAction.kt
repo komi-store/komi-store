@@ -4,6 +4,8 @@ import zed.rainxch.tweaks.presentation.feedback.model.FeedbackCategory
 import zed.rainxch.tweaks.presentation.feedback.model.FeedbackTopic
 
 sealed interface FeedbackAction {
+    sealed interface FieldEdit : FeedbackAction
+
     data class OnCategoryChange(
         val category: FeedbackCategory,
     ) : FeedbackAction
@@ -14,35 +16,35 @@ sealed interface FeedbackAction {
 
     data class OnTitleChange(
         val value: String,
-    ) : FeedbackAction
+    ) : FieldEdit
 
     data class OnDescriptionChange(
         val value: String,
-    ) : FeedbackAction
+    ) : FieldEdit
 
     data class OnStepsToReproduceChange(
         val value: String,
-    ) : FeedbackAction
+    ) : FieldEdit
 
     data class OnExpectedActualChange(
         val value: String,
-    ) : FeedbackAction
+    ) : FieldEdit
 
     data class OnUseCaseChange(
         val value: String,
-    ) : FeedbackAction
+    ) : FieldEdit
 
     data class OnProposedSolutionChange(
         val value: String,
-    ) : FeedbackAction
+    ) : FieldEdit
 
     data class OnCurrentBehaviourChange(
         val value: String,
-    ) : FeedbackAction
+    ) : FieldEdit
 
     data class OnDesiredBehaviourChange(
         val value: String,
-    ) : FeedbackAction
+    ) : FieldEdit
 
     data object OnAttachDiagnosticsToggle : FeedbackAction
 

@@ -32,7 +32,6 @@ class FileSizeTest {
             setOf(
                 "feature/details/presentation/src/commonMain/kotlin/zed/rainxch/details/presentation/DetailsViewModel.kt",
                 "feature/apps/presentation/src/commonMain/kotlin/zed/rainxch/apps/presentation/AppsViewModel.kt",
-                "feature/tweaks/presentation/src/commonMain/kotlin/zed/rainxch/tweaks/presentation/TweaksViewModel.kt",
                 "feature/search/presentation/src/commonMain/kotlin/zed/rainxch/search/presentation/SearchRoot.kt",
                 "composeApp/src/commonMain/kotlin/zed/rainxch/githubstore/app/navigation/AppNavigation.kt",
                 "feature/search/presentation/src/commonMain/kotlin/zed/rainxch/search/presentation/SearchViewModel.kt",
