@@ -6,6 +6,7 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
+import zed.rainxch.core.domain.model.error.LocalStoreException
 import java.io.IOException
 import java.security.GeneralSecurityException
 
@@ -44,6 +45,30 @@ suspend fun KSafe.safeDelete(key: String): Boolean =
     guardStorage({ "safeDelete($key) failed" }, { false }) {
         delete(key)
         true
+    }
+
+// For a write the caller has to know about: the failures safePut swallows reach it as LocalStoreException.
+suspend inline fun <reified T> KSafe.putOrRaise(
+    key: String,
+    value: T,
+) {
+    val failure = storageFailure { put(key, value) } ?: return
+    throw LocalStoreException(failure)
+}
+
+@PublishedApi
+internal inline fun storageFailure(block: () -> Unit): Exception? =
+    try {
+        block()
+        null
+    } catch (e: CancellationException) {
+        throw e
+    } catch (e: IOException) {
+        e
+    } catch (e: GeneralSecurityException) {
+        e
+    } catch (e: RuntimeException) {
+        e
     }
 
 // Beyond its DataStore and cipher failures, KSafe 3.3.0 on desktop throws a bare RuntimeException when the OS keychain refuses a key.

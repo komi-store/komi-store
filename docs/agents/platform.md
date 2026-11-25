@@ -26,7 +26,7 @@ Android logs go to Logcat.
 
 ## Encrypted storage
 
-KSafe provides AES-256-GCM, backed by the hardware Keystore on Android. Persisted credentials and preferences go through the extension functions in `core/data/secure/KSafeSafe.kt` (`safeGet`, `safePut`, `safeDelete`, `safeGetFlow`), which log and return null or false on a transient failure instead of throwing through coroutine scopes. A few raw calls remain, for example in `HostTokenRepositoryImpl`.
+KSafe provides AES-256-GCM, backed by the hardware Keystore on Android. Persisted credentials and preferences go through the extension functions in `core/data/secure/KSafeSafe.kt` (`safeGet`, `safePut`, `safeDelete`, `safeGetFlow`), which log and return null or false on a transient failure instead of throwing through coroutine scopes. A write the caller has to know about uses `putOrRaise`, which raises `LocalStoreException` instead (`HostTokenRepositoryImpl`). A few raw calls remain, for example in `LanguageTweaksImpl`.
 
 ## Gradle
 

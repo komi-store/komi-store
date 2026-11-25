@@ -35,11 +35,11 @@ class HiddenReposRepositoryImpl(
     }
 
     override suspend fun unhide(repoId: Long) {
-        hiddenRepoDao.deleteById(repoId)
+        localStore { hiddenRepoDao.deleteById(repoId) }
     }
 
     override suspend fun clearAll() {
-        hiddenRepoDao.clearAll()
+        localStore { hiddenRepoDao.clearAll() }
     }
 
     private fun HiddenRepoEntity.toDomain(): HiddenRepo =
