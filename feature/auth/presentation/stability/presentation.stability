@@ -13,21 +13,31 @@ public fun zed.rainxch.auth.presentation.AuthenticationRoot(onNavigateToHome: ko
     - viewModel: UNSTABLE (has mutable properties or unstable members)
 
 @Composable
-public fun zed.rainxch.auth.presentation.AuthenticationScreen(state: zed.rainxch.auth.presentation.AuthenticationState, onAction: kotlin.Function1<zed.rainxch.auth.presentation.AuthenticationAction, kotlin.Unit>): kotlin.Unit
+private fun zed.rainxch.auth.presentation.AuthenticationScreen(state: zed.rainxch.auth.presentation.AuthenticationState, onAction: kotlin.Function1<zed.rainxch.auth.presentation.AuthenticationAction, kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
   skippable: true
   restartable: true
   params:
     - state: UNKNOWN (interface or non-final class; concrete implementation unknown)
     - onAction: STABLE (function type)
+    - modifier: STABLE (marked @Stable or @Immutable)
 
 @Composable
-private fun zed.rainxch.auth.presentation.BenefitsCard(): kotlin.Unit
+private fun zed.rainxch.auth.presentation.components.BenefitsCard(modifier: androidx.compose.ui.Modifier): kotlin.Unit
   skippable: true
   restartable: true
   params:
+    - modifier: STABLE (marked @Stable or @Immutable)
 
 @Composable
-private fun zed.rainxch.auth.presentation.PatSignInSheet(input: kotlin.String, error: kotlin.String?, isSubmitting: kotlin.Boolean, onAction: kotlin.Function1<zed.rainxch.auth.presentation.AuthenticationAction, kotlin.Unit>): kotlin.Unit
+private fun zed.rainxch.auth.presentation.components.CountdownRow(authState: zed.rainxch.auth.presentation.model.AuthLoginState.DevicePrompt, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - authState: STABLE (class with no mutable properties)
+    - modifier: STABLE (marked @Stable or @Immutable)
+
+@Composable
+internal fun zed.rainxch.auth.presentation.components.PatSignInSheet(input: kotlin.String, error: kotlin.String?, isSubmitting: kotlin.Boolean, onAction: kotlin.Function1<zed.rainxch.auth.presentation.AuthenticationAction, kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
   skippable: true
   restartable: true
   params:
@@ -35,51 +45,71 @@ private fun zed.rainxch.auth.presentation.PatSignInSheet(input: kotlin.String, e
     - error: STABLE (class with no mutable properties)
     - isSubmitting: STABLE (primitive type)
     - onAction: STABLE (function type)
+    - modifier: STABLE (marked @Stable or @Immutable)
 
 @Composable
-private fun zed.rainxch.auth.presentation.PrimaryPillButton(text: kotlin.String, onClick: kotlin.Function0<kotlin.Unit>, leadingIcon: androidx.compose.ui.graphics.vector.ImageVector?, enabled: kotlin.Boolean): kotlin.Unit
+internal fun zed.rainxch.auth.presentation.components.PrimaryPillButton(text: kotlin.String, onClick: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier, leadingIcon: androidx.compose.ui.graphics.vector.ImageVector?, enabled: kotlin.Boolean): kotlin.Unit
   skippable: true
   restartable: true
   params:
     - text: STABLE (String is immutable)
     - onClick: STABLE (function type)
+    - modifier: STABLE (marked @Stable or @Immutable)
     - leadingIcon: STABLE (marked @Stable or @Immutable)
     - enabled: STABLE (primitive type)
 
 @Composable
-private fun zed.rainxch.auth.presentation.StateDevicePrompt(state: zed.rainxch.auth.presentation.AuthenticationState, authState: zed.rainxch.auth.presentation.model.AuthLoginState.DevicePrompt, onAction: kotlin.Function1<zed.rainxch.auth.presentation.AuthenticationAction, kotlin.Unit>): kotlin.Unit
-  skippable: true
-  restartable: true
-  params:
-    - state: UNKNOWN (interface or non-final class; concrete implementation unknown)
-    - authState: STABLE (class with no mutable properties)
-    - onAction: STABLE (function type)
-
-@Composable
-private fun zed.rainxch.auth.presentation.StateError(authState: zed.rainxch.auth.presentation.model.AuthLoginState.Error, onAction: kotlin.Function1<zed.rainxch.auth.presentation.AuthenticationAction, kotlin.Unit>): kotlin.Unit
+internal fun zed.rainxch.auth.presentation.components.StateDevicePrompt(authState: zed.rainxch.auth.presentation.model.AuthLoginState.DevicePrompt, copied: kotlin.Boolean, info: kotlin.String?, isPolling: kotlin.Boolean, pollIntervalSec: kotlin.Int, onAction: kotlin.Function1<zed.rainxch.auth.presentation.AuthenticationAction, kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
   skippable: true
   restartable: true
   params:
     - authState: STABLE (class with no mutable properties)
+    - copied: STABLE (primitive type)
+    - info: STABLE (class with no mutable properties)
+    - isPolling: STABLE (primitive type)
+    - pollIntervalSec: STABLE (primitive type)
     - onAction: STABLE (function type)
+    - modifier: STABLE (marked @Stable or @Immutable)
 
 @Composable
-private fun zed.rainxch.auth.presentation.StateLoggedIn(): kotlin.Unit
+internal fun zed.rainxch.auth.presentation.components.StateError(authState: zed.rainxch.auth.presentation.model.AuthLoginState.Error, onAction: kotlin.Function1<zed.rainxch.auth.presentation.AuthenticationAction, kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
   skippable: true
   restartable: true
   params:
+    - authState: STABLE (class with no mutable properties)
+    - onAction: STABLE (function type)
+    - modifier: STABLE (marked @Stable or @Immutable)
 
 @Composable
-private fun zed.rainxch.auth.presentation.StateLoggedOut(isAdvancedAuthVisible: kotlin.Boolean, onAction: kotlin.Function1<zed.rainxch.auth.presentation.AuthenticationAction, kotlin.Unit>): kotlin.Unit
+internal fun zed.rainxch.auth.presentation.components.StateLoggedIn(modifier: androidx.compose.ui.Modifier): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - modifier: STABLE (marked @Stable or @Immutable)
+
+@Composable
+internal fun zed.rainxch.auth.presentation.components.StateLoggedOut(isAdvancedAuthVisible: kotlin.Boolean, onAction: kotlin.Function1<zed.rainxch.auth.presentation.AuthenticationAction, kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
   skippable: true
   restartable: true
   params:
     - isAdvancedAuthVisible: STABLE (primitive type)
     - onAction: STABLE (function type)
+    - modifier: STABLE (marked @Stable or @Immutable)
 
 @Composable
-private fun zed.rainxch.auth.presentation.StatePending(): kotlin.Unit
+internal fun zed.rainxch.auth.presentation.components.StatePending(modifier: androidx.compose.ui.Modifier): kotlin.Unit
   skippable: true
   restartable: true
   params:
+    - modifier: STABLE (marked @Stable or @Immutable)
+
+@Composable
+private fun zed.rainxch.auth.presentation.components.UserCodeRow(authState: zed.rainxch.auth.presentation.model.AuthLoginState.DevicePrompt, copied: kotlin.Boolean, onAction: kotlin.Function1<zed.rainxch.auth.presentation.AuthenticationAction, kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - authState: STABLE (class with no mutable properties)
+    - copied: STABLE (primitive type)
+    - onAction: STABLE (function type)
+    - modifier: STABLE (marked @Stable or @Immutable)
 

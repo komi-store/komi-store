@@ -2,6 +2,7 @@ package zed.rainxch.core.data.utils
 
 import co.touchlab.kermit.Logger
 import zed.rainxch.core.domain.helpers.ClipboardHelper
+import zed.rainxch.core.domain.model.error.SystemPackagesException
 import java.awt.Toolkit
 import java.awt.datatransfer.DataFlavor
 import java.awt.datatransfer.StringSelection
@@ -13,8 +14,14 @@ class DesktopClipboardHelper : ClipboardHelper {
         label: String,
         text: String,
     ) {
-        val clipboard = Toolkit.getDefaultToolkit().systemClipboard
-        clipboard.setContents(StringSelection(text), null)
+        try {
+            Toolkit.getDefaultToolkit().systemClipboard.setContents(StringSelection(text), null)
+        } catch (e: IllegalStateException) {
+            // setContents throws it while another application holds the clipboard.
+            throw SystemPackagesException(e)
+        } catch (e: UnsupportedOperationException) {
+            throw SystemPackagesException(e)
+        }
     }
 
     override fun getText(): String? =
