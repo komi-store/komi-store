@@ -7,6 +7,7 @@ import org.jetbrains.compose.resources.getString
 import zed.rainxch.core.domain.helpers.BrowserHelper
 import zed.rainxch.core.domain.helpers.ShareManager
 import zed.rainxch.core.domain.logging.KomiStoreLogger
+import zed.rainxch.core.domain.model.error.LocalStoreException
 import zed.rainxch.core.domain.model.repository.FavoriteRepo
 import zed.rainxch.core.domain.model.system.Platform
 import zed.rainxch.core.domain.repository.FavouritesRepository
@@ -14,8 +15,6 @@ import zed.rainxch.core.domain.repository.StarredRepository
 import zed.rainxch.core.domain.repository.UserSessionRepository
 import zed.rainxch.core.presentation.utils.toUserMessage
 import zed.rainxch.details.presentation.DetailsAction
-import zed.rainxch.details.presentation.utils.UntypedFailureException
-import zed.rainxch.details.presentation.utils.untypedFailures
 import zed.rainxch.githubstore.core.presentation.res.Res
 import zed.rainxch.githubstore.core.presentation.res.added_to_favourites
 import zed.rainxch.githubstore.core.presentation.res.failed_to_load
@@ -107,15 +106,12 @@ internal class DetailsRepoHandler(
                     lastSyncedAt = now,
                 )
             try {
-                val isFavourite =
-                    untypedFailures {
-                        favouritesRepository.toggleFavorite(favourite)
-                        favouritesRepository.isFavoriteSync(repo.id)
-                    }
+                favouritesRepository.toggleFavorite(favourite)
+                val isFavourite = favouritesRepository.isFavoriteSync(repo.id)
                 session.update { it.copy(isFavourite = isFavourite) }
                 val message = if (isFavourite) Res.string.added_to_favourites else Res.string.removed_from_favourites
                 session.message(getString(message))
-            } catch (e: UntypedFailureException) {
+            } catch (e: LocalStoreException) {
                 logger.error("Failed to toggle favorite: ${e.message}")
             }
         }

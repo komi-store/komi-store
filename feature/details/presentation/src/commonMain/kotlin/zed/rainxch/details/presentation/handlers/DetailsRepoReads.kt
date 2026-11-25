@@ -5,14 +5,14 @@ import zed.rainxch.core.domain.logging.KomiStoreLogger
 import zed.rainxch.core.domain.model.account.github.GithubRelease
 import zed.rainxch.core.domain.model.account.github.GithubRepoSummary
 import zed.rainxch.core.domain.model.account.github.GithubUserProfile
+import zed.rainxch.core.domain.model.error.LocalStoreException
+import zed.rainxch.core.domain.model.error.NetworkException
 import zed.rainxch.core.domain.model.error.RateLimitException
 import zed.rainxch.core.domain.repository.UserSessionRepository
 import zed.rainxch.details.domain.model.CachedReleases
 import zed.rainxch.details.domain.model.RepoStats
 import zed.rainxch.details.domain.repository.DetailsRepository
 import zed.rainxch.details.presentation.DetailsArgs
-import zed.rainxch.details.presentation.utils.UntypedFailureException
-import zed.rainxch.details.presentation.utils.untypedFailures
 import zed.rainxch.githubstore.core.presentation.res.Res
 import zed.rainxch.githubstore.core.presentation.res.rate_limit_exceeded
 import zed.rainxch.githubstore.core.presentation.res.rate_limit_exceeded_retry_in
@@ -24,23 +24,23 @@ internal class DetailsRepoReads(
     private val userSessionRepository: UserSessionRepository,
     private val logger: KomiStoreLogger,
 ) {
-    internal suspend fun repository(args: DetailsArgs): GithubRepoSummary =
-        untypedFailures {
-            when {
-                args.sourceHost != null -> {
-                    check(args.owner.isNotBlank() && args.repo.isNotBlank()) {
-                        "Foreign-source Details opened without owner/repo for host=${args.sourceHost}"
-                    }
-                    detailsRepository.getRepositoryByOwnerAndName(args.owner, args.repo, args.sourceHost)
-                }
+    // Null for a foreign-source page opened without owner and repo, which has nothing to read.
+    internal suspend fun repository(args: DetailsArgs): GithubRepoSummary? =
+        when {
+            args.sourceHost != null && (args.owner.isBlank() || args.repo.isBlank()) -> {
+                null
+            }
 
-                args.owner.isNotEmpty() && args.repo.isNotEmpty() -> {
-                    detailsRepository.getRepositoryByOwnerAndName(args.owner, args.repo, sourceHost = null)
-                }
+            args.sourceHost != null -> {
+                detailsRepository.getRepositoryByOwnerAndName(args.owner, args.repo, args.sourceHost)
+            }
 
-                else -> {
-                    detailsRepository.getRepositoryById(args.repositoryId)
-                }
+            args.owner.isNotEmpty() && args.repo.isNotEmpty() -> {
+                detailsRepository.getRepositoryByOwnerAndName(args.owner, args.repo, sourceHost = null)
+            }
+
+            else -> {
+                detailsRepository.getRepositoryById(args.repositoryId)
             }
         }
 
@@ -48,33 +48,29 @@ internal class DetailsRepoReads(
         repo: GithubRepoSummary,
         sourceHost: String?,
     ): GithubRepoSummary =
-        untypedFailures {
-            if (sourceHost != null) {
-                detailsRepository.getRepositoryByOwnerAndName(repo.owner.login, repo.name, sourceHost)
-            } else {
-                detailsRepository.refreshRepository(repo.owner.login, repo.name)
-            }
+        if (sourceHost != null) {
+            detailsRepository.getRepositoryByOwnerAndName(repo.owner.login, repo.name, sourceHost)
+        } else {
+            detailsRepository.refreshRepository(repo.owner.login, repo.name)
         }
 
     internal suspend fun cachedReleases(
         repo: GithubRepoSummary,
         sourceHost: String?,
-    ): CachedReleases? = untypedFailures { detailsRepository.getCachedReleases(repo.owner.login, repo.name, sourceHost) }
+    ): CachedReleases? = detailsRepository.getCachedReleases(repo.owner.login, repo.name, sourceHost)
 
     internal suspend fun releases(
         repo: GithubRepoSummary,
         sourceHost: String?,
         bypassCache: Boolean = false,
     ): List<GithubRelease> =
-        untypedFailures {
-            detailsRepository.getAllReleases(
-                owner = repo.owner.login,
-                repo = repo.name,
-                defaultBranch = repo.defaultBranch,
-                sourceHost = sourceHost,
-                bypassCache = bypassCache,
-            )
-        }
+        detailsRepository.getAllReleases(
+            owner = repo.owner.login,
+            repo = repo.name,
+            defaultBranch = repo.defaultBranch,
+            sourceHost = sourceHost,
+            bypassCache = bypassCache,
+        )
 
     // A user-asked refresh reads the host first and reports a failure instead of serving the stored copy.
     internal suspend fun refreshedReleases(
@@ -82,22 +78,20 @@ internal class DetailsRepoReads(
         defaultBranch: String,
         sourceHost: String?,
     ): List<GithubRelease> =
-        untypedFailures {
-            detailsRepository.getAllReleases(
-                owner = repo.owner.login,
-                repo = repo.name,
-                defaultBranch = defaultBranch,
-                sourceHost = sourceHost,
-                bypassCache = true,
-                allowStale = false,
-                preferDirectSource = true,
-            )
-        }
+        detailsRepository.getAllReleases(
+            owner = repo.owner.login,
+            repo = repo.name,
+            defaultBranch = defaultBranch,
+            sourceHost = sourceHost,
+            bypassCache = true,
+            allowStale = false,
+            preferDirectSource = true,
+        )
 
     internal suspend fun stats(
         repo: GithubRepoSummary,
         sourceHost: String?,
-    ): RepoStats = untypedFailures { detailsRepository.getRepoStats(owner = repo.owner.login, repo = repo.name, sourceHost = sourceHost) }
+    ): RepoStats = detailsRepository.getRepoStats(owner = repo.owner.login, repo = repo.name, sourceHost = sourceHost)
 
     internal suspend fun statsOrNull(
         session: DetailsSession,
@@ -108,7 +102,10 @@ internal class DetailsRepoReads(
         } catch (_: RateLimitException) {
             session.rateLimited.set(true)
             null
-        } catch (e: UntypedFailureException) {
+        } catch (e: NetworkException) {
+            logger.warn("Failed to load repo stats: ${e.message}")
+            null
+        } catch (e: LocalStoreException) {
             logger.warn("Failed to load repo stats: ${e.message}")
             null
         }
@@ -118,18 +115,17 @@ internal class DetailsRepoReads(
         repo: GithubRepoSummary,
     ): Pair<String, String?>? =
         try {
-            untypedFailures {
-                detailsRepository.getReadme(
+            detailsRepository
+                .getReadme(
                     owner = repo.owner.login,
                     repo = repo.name,
                     defaultBranch = repo.defaultBranch,
                     sourceHost = session.args.sourceHost,
-                )
-            }?.let { (content, language, _) -> content to language }
+                )?.let { (content, language, _) -> content to language }
         } catch (_: RateLimitException) {
             session.rateLimited.set(true)
             null
-        } catch (e: UntypedFailureException) {
+        } catch (e: LocalStoreException) {
             logger.warn("Failed to load readme: ${e.message}")
             null
         }
@@ -143,11 +139,14 @@ internal class DetailsRepoReads(
             null
         } else {
             try {
-                untypedFailures { detailsRepository.getUserProfile(owner) }
+                detailsRepository.getUserProfile(owner)
             } catch (_: RateLimitException) {
                 session.rateLimited.set(true)
                 null
-            } catch (e: UntypedFailureException) {
+            } catch (e: NetworkException) {
+                logger.warn("Failed to load user profile: ${e.message}")
+                null
+            } catch (e: LocalStoreException) {
                 logger.warn("Failed to load user profile: ${e.message}")
                 null
             }

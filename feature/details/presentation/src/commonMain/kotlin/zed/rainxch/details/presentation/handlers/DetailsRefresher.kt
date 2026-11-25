@@ -7,6 +7,8 @@ import zed.rainxch.core.domain.logging.KomiStoreLogger
 import zed.rainxch.core.domain.model.account.github.GithubRelease
 import zed.rainxch.core.domain.model.account.github.GithubRepoSummary
 import zed.rainxch.core.domain.model.account.github.isEffectivelyPreRelease
+import zed.rainxch.core.domain.model.error.LocalStoreException
+import zed.rainxch.core.domain.model.error.NetworkException
 import zed.rainxch.core.domain.model.error.RateLimitException
 import zed.rainxch.core.domain.model.error.RefreshError
 import zed.rainxch.core.domain.model.error.RefreshException
@@ -14,7 +16,6 @@ import zed.rainxch.details.domain.model.ReleaseCategory
 import zed.rainxch.details.domain.model.RepoStats
 import zed.rainxch.details.presentation.DetailsEvent
 import zed.rainxch.details.presentation.RawDetailsState
-import zed.rainxch.details.presentation.utils.UntypedFailureException
 import zed.rainxch.githubstore.core.presentation.res.Res
 import zed.rainxch.githubstore.core.presentation.res.releases_unavailable_temporarily
 import kotlin.time.Clock
@@ -41,12 +42,21 @@ internal class DetailsRefresher(
                 content.maybeAutoTranslate(session, readmeBody = null, releaseDescription = selected?.description)
             } catch (_: RateLimitException) {
                 session.update { it.copy(isRetryingReleases = false, releasesLoadFailed = true) }
-            } catch (e: UntypedFailureException) {
-                logger.warn("Retry failed to load releases: ${e.message}")
-                session.launch { session.message(getString(Res.string.releases_unavailable_temporarily)) }
-                session.update { it.copy(isRetryingReleases = false, releasesLoadFailed = true) }
+            } catch (e: NetworkException) {
+                onRetryFailed(session, e)
+            } catch (e: LocalStoreException) {
+                onRetryFailed(session, e)
             }
         }
+    }
+
+    private fun onRetryFailed(
+        session: DetailsSession,
+        error: Exception,
+    ) {
+        logger.warn("Retry failed to load releases: ${error.message}")
+        session.launch { session.message(getString(Res.string.releases_unavailable_temporarily)) }
+        session.update { it.copy(isRetryingReleases = false, releasesLoadFailed = true) }
     }
 
     private fun showRetriedReleases(
@@ -102,12 +112,21 @@ internal class DetailsRefresher(
                 val nowMs = Clock.System.now().toEpochMilliseconds()
                 session.update { it.copy(isRefreshing = false, refreshCooldownUntilEpochMs = it.cooldownAfter(e, nowMs)) }
                 session.send(DetailsEvent.OnRefreshError(kind = e.kind, retryAfterSeconds = e.retryAfterSeconds))
-            } catch (e: UntypedFailureException) {
-                logger.error("Refresh failed: ${e.message}")
-                session.update { it.copy(isRefreshing = false) }
-                session.send(DetailsEvent.OnRefreshError(kind = RefreshError.GENERIC))
+            } catch (e: NetworkException) {
+                onRefreshFailed(session, e)
+            } catch (e: LocalStoreException) {
+                onRefreshFailed(session, e)
             }
         }
+    }
+
+    private suspend fun onRefreshFailed(
+        session: DetailsSession,
+        error: Exception,
+    ) {
+        logger.error("Refresh failed: ${error.message}")
+        session.update { it.copy(isRefreshing = false) }
+        session.send(DetailsEvent.OnRefreshError(kind = RefreshError.GENERIC))
     }
 
     // A refused re-poll keeps the copy already shown and, for a cooldown or an empty budget, waits it out.
@@ -139,7 +158,10 @@ internal class DetailsRefresher(
                 async {
                     try {
                         reads.refreshedReleases(repo, defaultBranch, session.args.sourceHost)
-                    } catch (e: UntypedFailureException) {
+                    } catch (e: NetworkException) {
+                        logger.warn("Refresh: getAllReleases failed: ${e.message}")
+                        null
+                    } catch (e: LocalStoreException) {
                         logger.warn("Refresh: getAllReleases failed: ${e.message}")
                         null
                     } catch (e: RateLimitException) {
@@ -151,7 +173,10 @@ internal class DetailsRefresher(
                 async {
                     try {
                         reads.stats(repo, session.args.sourceHost)
-                    } catch (e: UntypedFailureException) {
+                    } catch (e: NetworkException) {
+                        logger.warn("Refresh: getRepoStats failed: ${e.message}")
+                        null
+                    } catch (e: LocalStoreException) {
                         logger.warn("Refresh: getRepoStats failed: ${e.message}")
                         null
                     } catch (e: RateLimitException) {
