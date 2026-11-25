@@ -6,7 +6,16 @@ import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import zed.rainxch.apps.presentation.AppsViewModel
 import zed.rainxch.apps.presentation.import.ExternalImportViewModel
+import zed.rainxch.apps.presentation.library.LibraryBackup
+import zed.rainxch.apps.presentation.library.LibraryLoader
+import zed.rainxch.apps.presentation.link.LinkSheetActions
+import zed.rainxch.apps.presentation.settings.AppRowActions
+import zed.rainxch.apps.presentation.settings.AssetMatchSettings
 import zed.rainxch.apps.presentation.starred.StarredPickerViewModel
+import zed.rainxch.apps.presentation.updates.AppUpdates
+import zed.rainxch.apps.presentation.updates.UpdateDownloads
+import zed.rainxch.apps.presentation.updates.UpdateInstalls
+import zed.rainxch.apps.presentation.updates.UpdateTargetResolver
 import zed.rainxch.auth.presentation.AuthenticationViewModel
 import zed.rainxch.core.domain.model.repository.DiscoveryPlatform
 import zed.rainxch.details.presentation.DetailsViewModel
@@ -41,7 +50,54 @@ import zed.rainxch.tweaks.presentation.skipped.SkippedUpdatesViewModel
 
 val viewModelsModule =
     module {
-        viewModelOf(::AppsViewModel)
+        viewModel {
+            AppsViewModel(
+                library =
+                    LibraryLoader(
+                        installedAppsRepository = get(),
+                        syncInstalledAppsUseCase = get(),
+                        tweaksRepository = get(),
+                        externalImportRepository = get(),
+                        reviewsRepository = get(),
+                        logger = get(),
+                    ),
+                updates =
+                    AppUpdates(
+                        targets = UpdateTargetResolver(installedAppsRepository = get(), installer = get(), logger = get()),
+                        downloads =
+                            UpdateDownloads(
+                                installer = get(),
+                                downloader = get(),
+                                downloadOrchestrator = get(),
+                                tweaksRepository = get(),
+                                logger = get(),
+                                appScope = get(),
+                            ),
+                        installs =
+                            UpdateInstalls(
+                                installer = get(),
+                                installedAppsRepository = get(),
+                                systemInstallSerializer = get(),
+                                downloadOrchestrator = get(),
+                                logger = get(),
+                            ),
+                        installedAppsRepository = get(),
+                        downloadOrchestrator = get(),
+                        logger = get(),
+                    ),
+                linkSheet =
+                    LinkSheetActions(
+                        appsRepository = get(),
+                        externalImportRepository = get(),
+                        tweaksRepository = get(),
+                        installer = get(),
+                        logger = get(),
+                    ),
+                rowActions = AppRowActions(installedAppsRepository = get(), appsRepository = get(), installer = get(), logger = get()),
+                assetSettings = AssetMatchSettings(installedAppsRepository = get(), logger = get()),
+                backup = LibraryBackup(appsRepository = get(), shareManager = get(), logger = get()),
+            )
+        }
         viewModelOf(::ExternalImportViewModel)
         viewModelOf(::AuthenticationViewModel)
         viewModel { params ->

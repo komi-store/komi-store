@@ -80,9 +80,7 @@ private suspend fun buildVersionLabel(
 ): String {
     val displayDate =
         if (targetVersion != null) {
-            // Release publish times can arrive as a bare date. Formatting one through the local
-            // timezone is what shifted it a day back west of UTC, so this goes through the raw-aware
-            // helper like the details and security screens do.
+            // A bare release date read through the local timezone lands a day early west of UTC; the raw-aware helper keeps it.
             targetPublishedAt?.let { formatIsoDateOrRaw(it) }
         } else {
             formatEpochDate(lastUpdatedAt)

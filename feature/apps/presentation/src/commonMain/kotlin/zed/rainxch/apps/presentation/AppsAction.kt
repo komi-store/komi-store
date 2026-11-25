@@ -7,61 +7,83 @@ import zed.rainxch.apps.presentation.model.ImportSummaryBucket
 import zed.rainxch.apps.presentation.model.InstalledAppUi
 
 sealed interface AppsAction {
+    sealed interface Library : AppsAction
+
+    sealed interface ImportProposal : AppsAction
+
+    sealed interface Update : AppsAction
+
+    sealed interface DownloadTask : AppsAction {
+        val key: String
+    }
+
+    sealed interface LinkNavigation : AppsAction
+
+    sealed interface LinkInput : AppsAction
+
+    sealed interface AppRow : AppsAction
+
+    sealed interface AdvancedFilter : AppsAction
+
+    sealed interface Variant : AppsAction
+
+    sealed interface Backup : AppsAction
+
     data object OnNavigateBackClick : AppsAction
 
     data class OnSearchChange(
         val query: String,
-    ) : AppsAction
+    ) : Library
 
     data class OnSortRuleSelected(
         val sortRule: AppSortRule,
-    ) : AppsAction
+    ) : Library
 
     data class OnOpenApp(
         val app: InstalledAppUi,
-    ) : AppsAction
+    ) : AppRow
 
     data class OnUpdateApp(
         val app: InstalledAppUi,
     ) : AppsAction
 
     data class OnCancelInProgressDownload(
-        val key: String,
-    ) : AppsAction
+        override val key: String,
+    ) : DownloadTask
 
     data class OnResumeInProgressDownload(
-        val key: String,
-    ) : AppsAction
+        override val key: String,
+    ) : DownloadTask
 
     data class OnRetryInProgressDownload(
-        val key: String,
-    ) : AppsAction
+        override val key: String,
+    ) : DownloadTask
 
     data class OnDiscardInProgressDownload(
-        val key: String,
-    ) : AppsAction
+        override val key: String,
+    ) : DownloadTask
 
     data class OnInstallInProgressDownload(
-        val key: String,
-    ) : AppsAction
+        override val key: String,
+    ) : DownloadTask
 
     data class OnDismissInProgressDownload(
-        val key: String,
-    ) : AppsAction
+        override val key: String,
+    ) : DownloadTask
 
-    data object OnUpdateAll : AppsAction
+    data object OnUpdateAll : Update
 
-    data object OnCancelUpdateAll : AppsAction
+    data object OnCancelUpdateAll : Update
 
-    data object OnCheckAllForUpdates : AppsAction
+    data object OnCheckAllForUpdates : Library
 
-    data object OnRefresh : AppsAction
+    data object OnRefresh : Library
 
-    data object OnLifecycleResume : AppsAction
+    data object OnLifecycleResume : Library
 
-    data object OnToggleUpToDateSection : AppsAction
+    data object OnToggleUpToDateSection : Library
 
-    data object OnToggleUpdatesSection : AppsAction
+    data object OnToggleUpdatesSection : Library
 
     data class OnNavigateToRepo(
         val repoId: Long,
@@ -69,147 +91,147 @@ sealed interface AppsAction {
         val owner: String? = null,
         val repo: String? = null,
         val packageName: String? = null,
-    ) : AppsAction
+    ) : Library
 
     data class OnUninstallApp(
         val app: InstalledAppUi,
-    ) : AppsAction
+    ) : AppRow
 
     data class OnUninstallConfirmed(
         val app: InstalledAppUi,
-    ) : AppsAction
+    ) : AppRow
 
-    data object OnDismissUninstallDialog : AppsAction
+    data object OnDismissUninstallDialog : AppRow
 
-    data object OnAddByLinkClick : AppsAction
+    data object OnAddByLinkClick : LinkNavigation
 
-    data object OnDismissLinkSheet : AppsAction
+    data object OnDismissLinkSheet : LinkNavigation
 
     data class OnDeviceAppSearchChange(
         val query: String,
-    ) : AppsAction
+    ) : LinkInput
 
     data class OnDeviceAppSelected(
         val app: DeviceAppUi,
-    ) : AppsAction
+    ) : LinkInput
 
     data class OnLinkSuggestionSelected(
         val owner: String,
         val repo: String,
         val sourceHost: String? = null,
-    ) : AppsAction
+    ) : LinkInput
 
-    data object OnLinkEnterUrlManually : AppsAction
+    data object OnLinkEnterUrlManually : LinkNavigation
 
-    data object OnRetryLinkSearch : AppsAction
+    data object OnRetryLinkSearch : LinkNavigation
 
     data class OnRepoUrlChanged(
         val url: String,
-    ) : AppsAction
+    ) : LinkInput
 
-    data object OnValidateAndLinkRepo : AppsAction
+    data object OnValidateAndLinkRepo : LinkInput
 
-    data object OnBackToAppPicker : AppsAction
+    data object OnBackToAppPicker : LinkNavigation
 
-    data object OnBackToSmartMatch : AppsAction
+    data object OnBackToSmartMatch : LinkNavigation
 
     data class OnLinkAssetSelected(
         val asset: GithubAssetUi,
-    ) : AppsAction
+    ) : LinkInput
 
-    data object OnBackToEnterUrl : AppsAction
+    data object OnBackToEnterUrl : LinkNavigation
 
     data class OnLinkAssetFilterChanged(
         val filter: String,
-    ) : AppsAction
+    ) : LinkInput
 
     data class OnLinkFallbackToggled(
         val enabled: Boolean,
-    ) : AppsAction
+    ) : LinkInput
 
     data class OnTogglePreReleases(
         val packageName: String,
         val enabled: Boolean,
-    ) : AppsAction
+    ) : AppRow
 
     data class OnToggleUpdateCheck(
         val packageName: String,
         val enabled: Boolean,
-    ) : AppsAction
+    ) : AppRow
 
     data class OnSkipReleaseTag(
         val packageName: String,
         val tag: String,
-    ) : AppsAction
+    ) : AppRow
 
     data class OnUnskipReleaseTag(
         val packageName: String,
-    ) : AppsAction
+    ) : AppRow
 
     data class OnOpenAdvancedSettings(
         val app: InstalledAppUi,
-    ) : AppsAction
+    ) : AdvancedFilter
 
-    data object OnDismissAdvancedSettings : AppsAction
+    data object OnDismissAdvancedSettings : AdvancedFilter
 
     data class OnAdvancedFilterChanged(
         val filter: String,
-    ) : AppsAction
+    ) : AdvancedFilter
 
     data class OnAdvancedFallbackToggled(
         val enabled: Boolean,
-    ) : AppsAction
+    ) : AdvancedFilter
 
-    data object OnAdvancedSaveFilter : AppsAction
+    data object OnAdvancedSaveFilter : AdvancedFilter
 
-    data object OnAdvancedClearFilter : AppsAction
+    data object OnAdvancedClearFilter : AdvancedFilter
 
-    data object OnAdvancedRefreshPreview : AppsAction
+    data object OnAdvancedRefreshPreview : AdvancedFilter
 
     data class OnOpenVariantPicker(
         val app: InstalledAppUi,
         val resumeUpdateAfterPick: Boolean = false,
-    ) : AppsAction
+    ) : Variant
 
-    data object OnDismissVariantPicker : AppsAction
+    data object OnDismissVariantPicker : Variant
 
     data class OnVariantSelected(
         val variant: String?,
-    ) : AppsAction
+    ) : Variant
 
-    data object OnResetVariantToAuto : AppsAction
+    data object OnResetVariantToAuto : Variant
 
-    data object OnExportApps : AppsAction
+    data object OnExportApps : Backup
 
-    data object OnExportObtainium : AppsAction
+    data object OnExportObtainium : Backup
 
-    data object OnImportApps : AppsAction
+    data object OnImportApps : Backup
 
-    data object OnDismissImportSummary : AppsAction
+    data object OnDismissImportSummary : Backup
 
     data class OnToggleImportSummaryBucket(
         val bucket: ImportSummaryBucket,
-    ) : AppsAction
+    ) : Backup
 
     data class OnInstallPendingApp(
         val app: InstalledAppUi,
-    ) : AppsAction
+    ) : Update
 
     data class OnDiscardPendingInstall(
         val app: InstalledAppUi,
-    ) : AppsAction
+    ) : Update
 
     data class OnConfirmDiscardPendingInstall(
         val app: InstalledAppUi,
-    ) : AppsAction
+    ) : Update
 
-    data object OnDismissDiscardPendingDialog : AppsAction
+    data object OnDismissDiscardPendingDialog : Update
 
-    data object OnImportProposalReview : AppsAction
+    data object OnImportProposalReview : ImportProposal
 
-    data object OnImportProposalDismiss : AppsAction
+    data object OnImportProposalDismiss : ImportProposal
 
-    data object OnRescanForGithubApps : AppsAction
+    data object OnRescanForGithubApps : ImportProposal
 
     data object OnAddFromStarredClick : AppsAction
 }

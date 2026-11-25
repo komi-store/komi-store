@@ -3,6 +3,7 @@ package zed.rainxch.apps.presentation.components
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
 import zed.rainxch.apps.presentation.AppsAction
@@ -23,6 +24,7 @@ import zed.rainxch.githubstore.core.presentation.res.uninstall
 fun PendingUninstallSheet(
     app: InstalledAppUi,
     onAction: (AppsAction) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val confirmLabel = stringResource(Res.string.uninstall)
     val cancelLabel = stringResource(Res.string.cancel)
@@ -30,6 +32,7 @@ fun PendingUninstallSheet(
         onDismiss = {
             onAction(AppsAction.OnDismissUninstallDialog)
         },
+        modifier = modifier,
         placement = KomiSheetPlacement.Center,
         title = stringResource(Res.string.confirm_uninstall_title),
         footer = {

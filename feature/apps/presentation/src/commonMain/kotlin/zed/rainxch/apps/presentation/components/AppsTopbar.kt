@@ -12,13 +12,13 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Sort
 import androidx.compose.material.icons.automirrored.rounded.Sort
 import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material.icons.rounded.Refresh
-import androidx.compose.material.icons.rounded.Star
+import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material.icons.rounded.FileDownload
 import androidx.compose.material.icons.rounded.FileUpload
-import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material.icons.rounded.MoreVert
+import androidx.compose.material.icons.rounded.Refresh
 import androidx.compose.material.icons.rounded.Search
+import androidx.compose.material.icons.rounded.Star
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -27,7 +27,6 @@ import androidx.compose.ui.unit.dp
 import kotlinx.collections.immutable.persistentListOf
 import org.jetbrains.compose.resources.stringResource
 import zed.rainxch.apps.presentation.AppsAction
-import zed.rainxch.apps.presentation.AppsState
 import zed.rainxch.apps.presentation.model.AppSortRule
 import zed.rainxch.core.presentation.components.bars.KomiTopBar
 import zed.rainxch.core.presentation.components.buttons.KomiIconButton
@@ -53,55 +52,58 @@ import zed.rainxch.githubstore.core.presentation.res.sort_updates_first
 @Composable
 fun AppsTopbar(
     onAction: (AppsAction) -> Unit,
-    state: AppsState,
+    sortRule: AppSortRule,
+    modifier: Modifier = Modifier,
     search: (@Composable () -> Unit)? = null,
 ) {
     val colors = LocalPersonality.current.colors
     val shape = LocalPersonality.current.shape
-    val sortEntries = persistentListOf(
-        KomiMenuItem(
-            id = AppSortRule.UpdatesFirst.name,
-            label = stringResource(Res.string.sort_updates_first),
-        ),
-        KomiMenuItem(
-            id = AppSortRule.RecentlyUpdated.name,
-            label = stringResource(Res.string.sort_recently_updated),
-        ),
-        KomiMenuItem(
-            id = AppSortRule.Name.name,
-            label = stringResource(Res.string.sort_name),
-        ),
-    )
+    val sortEntries =
+        persistentListOf(
+            KomiMenuItem(
+                id = AppSortRule.UpdatesFirst.name,
+                label = stringResource(Res.string.sort_updates_first),
+            ),
+            KomiMenuItem(
+                id = AppSortRule.RecentlyUpdated.name,
+                label = stringResource(Res.string.sort_recently_updated),
+            ),
+            KomiMenuItem(
+                id = AppSortRule.Name.name,
+                label = stringResource(Res.string.sort_name),
+            ),
+        )
     val onSortSelected: (KomiMenuItem) -> Unit = { item ->
         onAction(AppsAction.OnSortRuleSelected(AppSortRule.fromName(item.id)))
     }
-    val moreEntries = persistentListOf(
-        KomiMenuItem(
-            id = "export_apps",
-            label = stringResource(Res.string.export_apps),
-            icon = Icons.Rounded.FileUpload,
-        ),
-        KomiMenuItem(
-            id = "export_obtainium",
-            label = stringResource(Res.string.export_apps_obtainium),
-            icon = Icons.Rounded.FileUpload,
-        ),
-        KomiMenuItem(
-            id = "import_apps",
-            label = stringResource(Res.string.import_apps),
-            icon = Icons.Rounded.FileDownload,
-        ),
-        KomiMenuItem(
-            id = "rescan",
-            label = stringResource(Res.string.external_import_rescan_menu),
-            icon = Icons.Rounded.Search,
-        ),
-        KomiMenuItem(
-            id = "add_from_starred",
-            label = stringResource(Res.string.add_from_starred_title),
-            icon = Icons.Rounded.Star,
-        ),
-    )
+    val moreEntries =
+        persistentListOf(
+            KomiMenuItem(
+                id = "export_apps",
+                label = stringResource(Res.string.export_apps),
+                icon = Icons.Rounded.FileUpload,
+            ),
+            KomiMenuItem(
+                id = "export_obtainium",
+                label = stringResource(Res.string.export_apps_obtainium),
+                icon = Icons.Rounded.FileUpload,
+            ),
+            KomiMenuItem(
+                id = "import_apps",
+                label = stringResource(Res.string.import_apps),
+                icon = Icons.Rounded.FileDownload,
+            ),
+            KomiMenuItem(
+                id = "rescan",
+                label = stringResource(Res.string.external_import_rescan_menu),
+                icon = Icons.Rounded.Search,
+            ),
+            KomiMenuItem(
+                id = "add_from_starred",
+                label = stringResource(Res.string.add_from_starred_title),
+                icon = Icons.Rounded.Star,
+            ),
+        )
     val onMoreSelected: (KomiMenuItem) -> Unit = { item ->
         when (item.id) {
             "export_apps" -> onAction(AppsAction.OnExportApps)
@@ -116,29 +118,32 @@ fun AppsTopbar(
 
     KomiTopBar(
         title = stringResource(Res.string.bottom_nav_apps_title),
+        modifier = modifier,
         search = search,
         actions = {
             if (LocalPersonality.current is MangaPersonality) {
                 Row(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(shape.cornerSmall))
-                        .background(colors.surface)
-                        .border(
-                            width = 1.dp,
-                            color = colors.outline,
-                            shape = RoundedCornerShape(shape.cornerSmall),
-                        ),
+                    modifier =
+                        Modifier
+                            .clip(RoundedCornerShape(shape.cornerSmall))
+                            .background(colors.surface)
+                            .border(
+                                width = 1.dp,
+                                color = colors.outline,
+                                shape = RoundedCornerShape(shape.cornerSmall),
+                            ),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     KomiDropdown(
                         entries = sortEntries,
                         onSelect = onSortSelected,
-                        value = state.sortRule.name,
+                        value = sortRule.name,
                         trigger = { onClick ->
                             Box(
-                                modifier = Modifier
-                                    .clickable { onClick() }
-                                    .padding(horizontal = 12.dp, vertical = 10.dp),
+                                modifier =
+                                    Modifier
+                                        .clickable { onClick() }
+                                        .padding(horizontal = 12.dp, vertical = 10.dp),
                                 contentAlignment = Alignment.Center,
                             ) {
                                 KomiIcon(
@@ -152,15 +157,17 @@ fun AppsTopbar(
                     )
 
                     Box(
-                        modifier = Modifier
-                            .size(1.dp, 20.dp)
-                            .background(colors.divider),
+                        modifier =
+                            Modifier
+                                .size(1.dp, 20.dp)
+                                .background(colors.divider),
                     )
 
                     Box(
-                        modifier = Modifier
-                            .clickable { onAction(AppsAction.OnCheckAllForUpdates) }
-                            .padding(horizontal = 12.dp, vertical = 10.dp),
+                        modifier =
+                            Modifier
+                                .clickable { onAction(AppsAction.OnCheckAllForUpdates) }
+                                .padding(horizontal = 12.dp, vertical = 10.dp),
                         contentAlignment = Alignment.Center,
                     ) {
                         KomiIcon(
@@ -172,9 +179,10 @@ fun AppsTopbar(
                     }
 
                     Box(
-                        modifier = Modifier
-                            .size(1.dp, 20.dp)
-                            .background(colors.divider),
+                        modifier =
+                            Modifier
+                                .size(1.dp, 20.dp)
+                                .background(colors.divider),
                     )
 
                     KomiDropdown(
@@ -182,9 +190,10 @@ fun AppsTopbar(
                         onSelect = onMoreSelected,
                         trigger = { onClick ->
                             Box(
-                                modifier = Modifier
-                                    .clickable { onClick() }
-                                    .padding(horizontal = 12.dp, vertical = 10.dp),
+                                modifier =
+                                    Modifier
+                                        .clickable { onClick() }
+                                        .padding(horizontal = 12.dp, vertical = 10.dp),
                                 contentAlignment = Alignment.Center,
                             ) {
                                 KomiIcon(
@@ -201,7 +210,7 @@ fun AppsTopbar(
                 KomiDropdown(
                     entries = sortEntries,
                     onSelect = onSortSelected,
-                    value = state.sortRule.name,
+                    value = sortRule.name,
                     trigger = { onClick ->
                         KomiIconButton(icon = Icons.AutoMirrored.Rounded.Sort, contentDescription = sortLabel, onClick = onClick)
                     },

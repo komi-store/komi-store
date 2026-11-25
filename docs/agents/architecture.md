@@ -29,7 +29,7 @@ Routes are members of the `@Serializable` sealed interface `GithubStoreGraph` in
 
 ## DI
 
-Koin. Each feature's data module declares its bindings in `data/di/SharedModule.kt`. ViewModels are registered in `composeApp/.../app/di/ViewModelsModule.kt` (`viewModelOf(::X)`, or `viewModel { ... }` when they take route arguments). Modules are assembled in `initKoin.kt`.
+Koin. Each feature's data module declares its bindings in `data/di/SharedModule.kt`. ViewModels are registered in `composeApp/.../app/di/ViewModelsModule.kt` (`viewModelOf(::X)`, or `viewModel { ... }` when they take route arguments or collaborators built there, as `AppsViewModel` does). Modules are assembled in `initKoin.kt`.
 
 ## Core repositories (`core/domain`)
 
