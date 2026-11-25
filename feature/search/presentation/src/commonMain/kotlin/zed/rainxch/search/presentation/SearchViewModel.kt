@@ -48,6 +48,7 @@ import zed.rainxch.githubstore.core.presentation.res.no_github_link_in_clipboard
 import zed.rainxch.githubstore.core.presentation.res.rate_limit_exceeded
 import zed.rainxch.githubstore.core.presentation.res.rate_limit_exceeded_retry_in
 import zed.rainxch.githubstore.core.presentation.res.search_failed
+import zed.rainxch.search.domain.model.SearchRequest
 import zed.rainxch.search.domain.repository.SearchHistoryRepository
 import zed.rainxch.search.domain.repository.SearchRepository
 import zed.rainxch.search.presentation.mappers.toDomain
@@ -447,13 +448,16 @@ class SearchViewModel(
 
                     searchRepository
                         .searchRepositories(
-                            query = _state.value.query,
-                            platform = _state.value.selectedSearchPlatform,
-                            language = _state.value.selectedLanguage.toDomain(),
-                            sortBy = _state.value.selectedSortBy.toDomain(),
-                            sortOrder = _state.value.selectedSortOrder.toDomain(),
+                            request =
+                                SearchRequest(
+                                    query = _state.value.query,
+                                    platform = _state.value.selectedSearchPlatform,
+                                    language = _state.value.selectedLanguage.toDomain(),
+                                    sortBy = _state.value.selectedSortBy.toDomain(),
+                                    sortOrder = _state.value.selectedSortOrder.toDomain(),
+                                    source = _state.value.selectedSource.toDomain(),
+                                ),
                             page = currentPage,
-                            source = _state.value.selectedSource.toDomain(),
                         ).collect { paginatedRepos ->
                             currentPage = paginatedRepos.nextPageIndex
 

@@ -4,20 +4,12 @@ import kotlinx.coroutines.flow.Flow
 import zed.rainxch.core.domain.model.repository.DiscoveryPlatform
 import zed.rainxch.core.domain.model.repository.PaginatedDiscoveryRepositories
 import zed.rainxch.search.domain.model.ExploreResult
-import zed.rainxch.search.domain.model.ProgrammingLanguage
-import zed.rainxch.search.domain.model.SearchSource
-import zed.rainxch.search.domain.model.SortBy
-import zed.rainxch.search.domain.model.SortOrder
+import zed.rainxch.search.domain.model.SearchRequest
 
 interface SearchRepository {
     fun searchRepositories(
-        query: String,
-        platform: DiscoveryPlatform,
-        language: ProgrammingLanguage,
-        sortBy: SortBy,
-        sortOrder: SortOrder,
+        request: SearchRequest,
         page: Int,
-        source: SearchSource = SearchSource.GitHub,
     ): Flow<PaginatedDiscoveryRepositories>
 
     suspend fun exploreFromGithub(
