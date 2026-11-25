@@ -6,12 +6,11 @@ import kotlinx.coroutines.flow.catch
 import zed.rainxch.core.domain.model.error.LocalStoreException
 
 // Room raises SQLite failures on both drivers as androidx.sqlite.SQLiteException (android.database.SQLException on Android).
-@PublishedApi
-internal inline fun <T> localStore(block: () -> T): T =
+inline fun <T> localStore(block: () -> T): T =
     try {
         block()
     } catch (e: SQLiteException) {
         throw LocalStoreException(e)
     }
 
-internal fun <T> Flow<T>.localStoreFailures(): Flow<T> = catch { e -> throw if (e is SQLiteException) LocalStoreException(e) else e }
+fun <T> Flow<T>.localStoreFailures(): Flow<T> = catch { e -> throw if (e is SQLiteException) LocalStoreException(e) else e }
