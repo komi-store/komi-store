@@ -93,7 +93,7 @@ internal class DetailsRefresher(
         session.launch {
             try {
                 val refreshed = refreshedRepository(session, repo, cooledDown, nowMs)
-                val (freshReleases, freshStats) = freshReads(session, refreshed)
+                val (freshReleases, freshStats) = freshReads(session, repo, refreshed.defaultBranch)
                 if (freshReleases == null) session.send(DetailsEvent.OnRefreshError(kind = RefreshError.UPSTREAM))
                 showRefreshed(session, refreshed, freshReleases, freshStats)
                 freshReleases?.takeIf { it.isNotEmpty() }?.let { installedApps.syncLibraryUpdateState(session, it) }
@@ -128,15 +128,17 @@ internal class DetailsRefresher(
         }
     }
 
+    // Read by the names the page opened with; only the default branch comes from the re-polled repository.
     private suspend fun freshReads(
         session: DetailsSession,
         repo: GithubRepoSummary,
+        defaultBranch: String,
     ): Pair<List<GithubRelease>?, RepoStats?> =
         coroutineScope {
             val releases =
                 async {
                     try {
-                        reads.refreshedReleases(repo, session.args.sourceHost)
+                        reads.refreshedReleases(repo, defaultBranch, session.args.sourceHost)
                     } catch (e: UntypedFailureException) {
                         logger.warn("Refresh: getAllReleases failed: ${e.message}")
                         null

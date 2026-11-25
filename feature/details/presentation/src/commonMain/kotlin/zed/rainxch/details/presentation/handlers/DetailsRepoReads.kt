@@ -79,13 +79,14 @@ internal class DetailsRepoReads(
     // A user-asked refresh reads the host first and reports a failure instead of serving the stored copy.
     internal suspend fun refreshedReleases(
         repo: GithubRepoSummary,
+        defaultBranch: String,
         sourceHost: String?,
     ): List<GithubRelease> =
         untypedFailures {
             detailsRepository.getAllReleases(
                 owner = repo.owner.login,
                 repo = repo.name,
-                defaultBranch = repo.defaultBranch,
+                defaultBranch = defaultBranch,
                 sourceHost = sourceHost,
                 bypassCache = true,
                 allowStale = false,
