@@ -21,4 +21,5 @@ data class StatusColors(
     val statusError: Color,
     val protectionSignature: Color,
     val protectionPrivileged: Color,
+    val versionDowngrade: Color,
 )
