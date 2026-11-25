@@ -25,7 +25,13 @@ import zed.rainxch.core.presentation.components.overlays.KomiDialog
 import zed.rainxch.core.presentation.components.text.KomiText
 import zed.rainxch.core.presentation.components.text.KomiTextRole
 import zed.rainxch.core.presentation.locals.LocalPersonality
-import zed.rainxch.githubstore.core.presentation.res.*
+import zed.rainxch.githubstore.core.presentation.res.Res
+import zed.rainxch.githubstore.core.presentation.res.custom_forges_add_button
+import zed.rainxch.githubstore.core.presentation.res.custom_forges_dialog_builtin_note
+import zed.rainxch.githubstore.core.presentation.res.custom_forges_dialog_help
+import zed.rainxch.githubstore.core.presentation.res.custom_forges_dialog_title
+import zed.rainxch.githubstore.core.presentation.res.custom_forges_empty
+import zed.rainxch.githubstore.core.presentation.res.done
 import zed.rainxch.tweaks.presentation.TweaksAction
 import zed.rainxch.tweaks.presentation.TweaksState
 
