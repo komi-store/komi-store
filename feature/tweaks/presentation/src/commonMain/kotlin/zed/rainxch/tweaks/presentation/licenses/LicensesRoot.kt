@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import zed.rainxch.core.presentation.components.overlays.rememberKomiToastState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -22,6 +21,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import zed.rainxch.core.presentation.components.bars.KomiTopBar
+import zed.rainxch.core.presentation.components.overlays.rememberKomiToastState
 import zed.rainxch.core.presentation.components.progress.KomiCircularProgress
 import zed.rainxch.core.presentation.components.scaffold.KomiScaffold
 import zed.rainxch.core.presentation.components.surfaces.KomiSurface
@@ -39,11 +39,21 @@ fun LicensesRoot(
     onNavigateBack: () -> Unit,
     viewModel: LicensesViewModel = koinViewModel(),
 ) {
+    val state by viewModel.state.collectAsStateWithLifecycle()
+    LicensesScreen(state = state, onNavigateBack = onNavigateBack)
+}
+
+@Composable
+private fun LicensesScreen(
+    state: LicensesState,
+    onNavigateBack: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     val toastState = rememberKomiToastState()
     val uriHandler = LocalUriHandler.current
-    val state by viewModel.state.collectAsStateWithLifecycle()
 
     KomiScaffold(
+        modifier = modifier,
         topBar = {
             KomiTopBar(
                 title = stringResource(Res.string.tweaks_licenses_title),
@@ -52,62 +62,63 @@ fun LicensesRoot(
         },
         toastState = toastState,
         grid = true,
-        screentone = true
+        screentone = true,
     ) { innerPadding ->
         val colors = LocalPersonality.current.colors
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = 16.dp, vertical = 12.dp),
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
+                    .verticalScroll(rememberScrollState())
+                    .padding(horizontal = 16.dp, vertical = 12.dp),
         ) {
             KomiSurface(modifier = Modifier.fillMaxWidth()) {
-            Column(modifier = Modifier.padding(16.dp)) {
-                KomiText(
-                    text = stringResource(Res.string.tweaks_licenses_intro_title),
-                    role = KomiTextRole.Body,
-                    color = colors.onSurface,
-                )
-                Spacer(Modifier.height(4.dp))
-                KomiText(
-                    text = stringResource(Res.string.tweaks_licenses_intro_body),
-                    role = KomiTextRole.Body,
-                    color = colors.onSurfaceVariant,
-                )
-            }
-        }
-        Spacer(Modifier.height(12.dp))
-
-        when {
-            state.isLoading -> {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 48.dp),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    KomiCircularProgress()
+                Column(modifier = Modifier.padding(16.dp)) {
+                    KomiText(
+                        text = stringResource(Res.string.tweaks_licenses_intro_title),
+                        role = KomiTextRole.Body,
+                        color = colors.onSurface,
+                    )
+                    Spacer(Modifier.height(4.dp))
+                    KomiText(
+                        text = stringResource(Res.string.tweaks_licenses_intro_body),
+                        role = KomiTextRole.Body,
+                        color = colors.onSurfaceVariant,
+                    )
                 }
             }
+            Spacer(Modifier.height(12.dp))
 
-            state.loadError -> {
-                KomiText(
-                    text = stringResource(Res.string.tweaks_licenses_load_failed),
-                    role = KomiTextRole.Body,
-                    color = LocalPersonality.current.colors.error,
-                    modifier = Modifier.padding(16.dp),
-                )
-            }
+            when {
+                state.isLoading -> {
+                    Box(
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 48.dp),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        KomiCircularProgress()
+                    }
+                }
 
-            state.libraries != null -> {
-                state.libraries?.let { libraryEntries ->
-                    libraryEntries.forEach { library ->
+                state.loadError -> {
+                    KomiText(
+                        text = stringResource(Res.string.tweaks_licenses_load_failed),
+                        role = KomiTextRole.Body,
+                        color = LocalPersonality.current.colors.error,
+                        modifier = Modifier.padding(16.dp),
+                    )
+                }
+
+                state.libraries != null -> {
+                    state.libraries.forEach { library ->
                         LibraryRow(
                             library = library,
                             onClick = {
                                 runCatching { uriHandler.openUri(library.url) }
-                            }
+                            },
                         )
 
                         Spacer(Modifier.height(8.dp))
@@ -115,21 +126,24 @@ fun LicensesRoot(
                 }
             }
         }
-        }
     }
 }
 
 @Composable
-private fun LibraryRow(library: LibraryEntry, onClick: () -> Unit) {
+private fun LibraryRow(
+    library: LibraryEntry,
+    onClick: () -> Unit,
+) {
     val colors = LocalPersonality.current.colors
     KomiSurface(
         modifier = Modifier.fillMaxWidth(),
         onClick = onClick,
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 12.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 12.dp),
             verticalArrangement = Arrangement.spacedBy(2.dp),
         ) {
             KomiText(

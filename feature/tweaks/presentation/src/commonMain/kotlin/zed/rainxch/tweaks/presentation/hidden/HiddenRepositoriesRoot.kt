@@ -10,15 +10,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import zed.rainxch.core.presentation.components.overlays.rememberKomiToastState
-import zed.rainxch.core.presentation.components.buttons.KomiButton
-import zed.rainxch.core.presentation.components.buttons.KomiButtonSize
-import zed.rainxch.core.presentation.components.buttons.KomiButtonVariant
-import zed.rainxch.core.presentation.components.progress.KomiCircularProgress
-import zed.rainxch.core.presentation.components.scaffold.KomiScaffold
-import zed.rainxch.core.presentation.components.text.KomiText
-import zed.rainxch.core.presentation.components.text.KomiTextRole
-import zed.rainxch.core.presentation.locals.LocalPersonality
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -29,16 +20,26 @@ import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import zed.rainxch.core.presentation.components.bars.KomiTopBar
+import zed.rainxch.core.presentation.components.buttons.KomiButton
+import zed.rainxch.core.presentation.components.buttons.KomiButtonSize
+import zed.rainxch.core.presentation.components.buttons.KomiButtonVariant
+import zed.rainxch.core.presentation.components.overlays.KomiToastState
+import zed.rainxch.core.presentation.components.overlays.rememberKomiToastState
+import zed.rainxch.core.presentation.components.progress.KomiCircularProgress
+import zed.rainxch.core.presentation.components.scaffold.KomiScaffold
+import zed.rainxch.core.presentation.components.text.KomiText
+import zed.rainxch.core.presentation.components.text.KomiTextRole
+import zed.rainxch.core.presentation.locals.LocalPersonality
 import zed.rainxch.core.presentation.utils.ObserveAsEvents
 import zed.rainxch.githubstore.core.presentation.res.Res
 import zed.rainxch.githubstore.core.presentation.res.hidden_repositories_empty_description
 import zed.rainxch.githubstore.core.presentation.res.hidden_repositories_empty_title
 import zed.rainxch.githubstore.core.presentation.res.hidden_repositories_title
+import zed.rainxch.githubstore.core.presentation.res.hidden_repositories_unhidden_all_snackbar
+import zed.rainxch.githubstore.core.presentation.res.hidden_repositories_unhidden_snackbar
 import zed.rainxch.githubstore.core.presentation.res.hidden_repositories_unhide_action
 import zed.rainxch.githubstore.core.presentation.res.hidden_repositories_unhide_all
 import zed.rainxch.githubstore.core.presentation.res.hidden_repositories_unhide_failure
-import zed.rainxch.githubstore.core.presentation.res.hidden_repositories_unhidden_all_snackbar
-import zed.rainxch.githubstore.core.presentation.res.hidden_repositories_unhidden_snackbar
 import zed.rainxch.tweaks.presentation.components.shell.SettingsGroup
 import zed.rainxch.tweaks.presentation.components.shell.SettingsRow
 import zed.rainxch.tweaks.presentation.components.shell.TweaksDecorSlot
@@ -54,18 +55,38 @@ fun HiddenRepositoriesRoot(
 
     ObserveAsEvents(viewModel.events) { event ->
         when (event) {
-            is HiddenRepositoriesEvent.Unhidden ->
+            is HiddenRepositoriesEvent.Unhidden -> {
                 toastState.info(getString(Res.string.hidden_repositories_unhidden_snackbar, event.repoFullName))
+            }
 
-            HiddenRepositoriesEvent.UnhiddenAll ->
+            HiddenRepositoriesEvent.UnhiddenAll -> {
                 toastState.info(getString(Res.string.hidden_repositories_unhidden_all_snackbar))
+            }
 
-            HiddenRepositoriesEvent.Failure ->
+            HiddenRepositoriesEvent.Failure -> {
                 toastState.danger(getString(Res.string.hidden_repositories_unhide_failure))
+            }
         }
     }
 
+    HiddenRepositoriesScreen(
+        state = state,
+        onAction = viewModel::onAction,
+        onNavigateBack = onNavigateBack,
+        toastState = toastState,
+    )
+}
+
+@Composable
+private fun HiddenRepositoriesScreen(
+    state: HiddenRepositoriesState,
+    onAction: (HiddenRepositoriesAction) -> Unit,
+    onNavigateBack: () -> Unit,
+    toastState: KomiToastState,
+    modifier: Modifier = Modifier,
+) {
     KomiScaffold(
+        modifier = modifier,
         toastState = toastState,
         grid = true,
         screentone = true,
@@ -80,9 +101,11 @@ fun HiddenRepositoriesRoot(
         val colors = LocalPersonality.current.colors
         Box(modifier = Modifier.fillMaxSize().padding(padding)) {
             when {
-                state.isLoading -> KomiCircularProgress(modifier = Modifier.align(Alignment.Center))
+                state.isLoading -> {
+                    KomiCircularProgress(modifier = Modifier.align(Alignment.Center))
+                }
 
-                state.items.isEmpty() ->
+                state.items.isEmpty() -> {
                     Column(
                         modifier = Modifier.align(Alignment.Center).padding(horizontal = 32.dp),
                         horizontalAlignment = Alignment.CenterHorizontally,
@@ -99,8 +122,9 @@ fun HiddenRepositoriesRoot(
                             color = colors.onSurfaceVariant,
                         )
                     }
+                }
 
-                else ->
+                else -> {
                     Column(
                         modifier =
                             Modifier
@@ -112,7 +136,7 @@ fun HiddenRepositoriesRoot(
                     ) {
                         Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.CenterEnd) {
                             KomiButton(
-                                onClick = { viewModel.onAction(HiddenRepositoriesAction.OnUnhideAll) },
+                                onClick = { onAction(HiddenRepositoriesAction.OnUnhideAll) },
                                 label = stringResource(Res.string.hidden_repositories_unhide_all),
                                 variant = KomiButtonVariant.Destructive,
                                 size = KomiButtonSize.Sm,
@@ -126,7 +150,7 @@ fun HiddenRepositoriesRoot(
                                     last = index == state.items.lastIndex,
                                     trailing = {
                                         KomiButton(
-                                            onClick = { viewModel.onAction(HiddenRepositoriesAction.OnUnhide(item.repoId)) },
+                                            onClick = { onAction(HiddenRepositoriesAction.OnUnhide(item.repoId)) },
                                             label = stringResource(Res.string.hidden_repositories_unhide_action),
                                             variant = KomiButtonVariant.Outline,
                                             size = KomiButtonSize.Sm,
@@ -136,6 +160,7 @@ fun HiddenRepositoriesRoot(
                             }
                         }
                     }
+                }
             }
         }
     }

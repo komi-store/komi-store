@@ -30,12 +30,13 @@ import zed.rainxch.githubstore.core.presentation.res.host_tokens_title
 @Composable
 fun HostTokensEntryCard(
     onClick: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val personality = LocalPersonality.current
     val colors = personality.colors
     KomiSurface(
         onClick = onClick,
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
     ) {
         Row(
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 14.dp),
@@ -43,10 +44,11 @@ fun HostTokensEntryCard(
             horizontalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             Box(
-                modifier = Modifier
-                    .size(36.dp)
-                    .clip(RoundedCornerShape(personality.shape.cornerSmall))
-                    .background(colors.primaryTint),
+                modifier =
+                    Modifier
+                        .size(36.dp)
+                        .clip(RoundedCornerShape(personality.shape.cornerSmall))
+                        .background(colors.primaryTint),
                 contentAlignment = Alignment.Center,
             ) {
                 KomiIcon(

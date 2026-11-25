@@ -1,13 +1,18 @@
 package zed.rainxch.tweaks.presentation.hosttokens
 
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.ImmutableMap
+import kotlinx.collections.immutable.ImmutableSet
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.persistentMapOf
+import kotlinx.collections.immutable.persistentSetOf
 import org.jetbrains.compose.resources.StringResource
 import zed.rainxch.core.domain.model.account.ForgeKind
-import zed.rainxch.core.domain.model.account.HostToken
 
 data class HostTokensState(
-    val tokens: List<HostToken> = emptyList(),
-    val validationByHost: Map<String, ValidationLine> = emptyMap(),
-    val validatingHosts: Set<String> = emptySet(),
+    val tokens: ImmutableList<HostTokenUi> = persistentListOf(),
+    val validationByHost: ImmutableMap<String, ValidationLine> = persistentMapOf(),
+    val validatingHosts: ImmutableSet<String> = persistentSetOf(),
     val draftMode: DraftMode = DraftMode.Closed,
     val draftForge: ForgeKind? = null,
     val draftHost: String = "",
@@ -19,5 +24,5 @@ data class HostTokensState(
     val draftDetectedTokenKind: String? = null,
     val isLoading: Boolean = false,
     val isOAuthSignedInToGithub: Boolean = false,
-    val pendingUndoDelete: HostToken? = null,
+    val pendingUndoDelete: HostTokenUi? = null,
 )

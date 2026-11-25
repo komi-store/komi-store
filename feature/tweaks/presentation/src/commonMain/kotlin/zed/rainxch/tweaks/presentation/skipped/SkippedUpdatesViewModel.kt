@@ -3,7 +3,6 @@ package zed.rainxch.tweaks.presentation.skipped
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.collections.immutable.toImmutableList
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -12,6 +11,8 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import zed.rainxch.core.domain.logging.KomiStoreLogger
+import zed.rainxch.core.domain.model.error.LocalStoreException
+import zed.rainxch.core.domain.model.error.SystemPackagesException
 import zed.rainxch.core.domain.repository.InstalledAppsRepository
 
 class SkippedUpdatesViewModel(
@@ -62,12 +63,19 @@ class SkippedUpdatesViewModel(
                 installedAppsRepository.setSkippedReleaseTag(packageName, null)
                 installedAppsRepository.checkForUpdates(packageName)
                 _events.send(SkippedUpdatesEvent.Unskipped(appName.orEmpty()))
-            } catch (e: CancellationException) {
-                throw e
-            } catch (e: Exception) {
-                logger.error("SkippedUpdatesViewModel: failed to unskip $packageName", e)
-                _events.send(SkippedUpdatesEvent.Failure)
+            } catch (e: LocalStoreException) {
+                unskipFailed(packageName, e)
+            } catch (e: SystemPackagesException) {
+                unskipFailed(packageName, e)
             }
         }
+    }
+
+    private suspend fun unskipFailed(
+        packageName: String,
+        e: Exception,
+    ) {
+        logger.error("SkippedUpdatesViewModel: failed to unskip $packageName", e)
+        _events.send(SkippedUpdatesEvent.Failure)
     }
 }

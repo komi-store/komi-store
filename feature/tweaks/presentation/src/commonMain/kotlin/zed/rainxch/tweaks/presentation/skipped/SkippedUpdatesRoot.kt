@@ -9,15 +9,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import zed.rainxch.core.presentation.components.overlays.rememberKomiToastState
-import zed.rainxch.core.presentation.components.buttons.KomiButton
-import zed.rainxch.core.presentation.components.buttons.KomiButtonSize
-import zed.rainxch.core.presentation.components.buttons.KomiButtonVariant
-import zed.rainxch.core.presentation.components.progress.KomiCircularProgress
-import zed.rainxch.core.presentation.components.scaffold.KomiScaffold
-import zed.rainxch.core.presentation.components.text.KomiText
-import zed.rainxch.core.presentation.components.text.KomiTextRole
-import zed.rainxch.core.presentation.locals.LocalPersonality
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
@@ -30,6 +21,16 @@ import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import zed.rainxch.core.presentation.components.bars.KomiTopBar
+import zed.rainxch.core.presentation.components.buttons.KomiButton
+import zed.rainxch.core.presentation.components.buttons.KomiButtonSize
+import zed.rainxch.core.presentation.components.buttons.KomiButtonVariant
+import zed.rainxch.core.presentation.components.overlays.KomiToastState
+import zed.rainxch.core.presentation.components.overlays.rememberKomiToastState
+import zed.rainxch.core.presentation.components.progress.KomiCircularProgress
+import zed.rainxch.core.presentation.components.scaffold.KomiScaffold
+import zed.rainxch.core.presentation.components.text.KomiText
+import zed.rainxch.core.presentation.components.text.KomiTextRole
+import zed.rainxch.core.presentation.locals.LocalPersonality
 import zed.rainxch.core.presentation.utils.ObserveAsEvents
 import zed.rainxch.githubstore.core.presentation.res.Res
 import zed.rainxch.githubstore.core.presentation.res.mirror_picker_title
@@ -57,19 +58,38 @@ fun SkippedUpdatesRoot(
 
     ObserveAsEvents(viewModel.events) { event ->
         when (event) {
-            is SkippedUpdatesEvent.Unskipped ->
+            is SkippedUpdatesEvent.Unskipped -> {
                 coroutineScope.launch {
                     toastState.info(getString(Res.string.skipped_updates_unskipped_snackbar, event.appName))
                 }
+            }
 
-            SkippedUpdatesEvent.Failure ->
+            SkippedUpdatesEvent.Failure -> {
                 coroutineScope.launch {
                     toastState.danger(getString(Res.string.skipped_updates_unskip_failure))
                 }
+            }
         }
     }
 
+    SkippedUpdatesScreen(
+        state = state,
+        onAction = viewModel::onAction,
+        onNavigateBack = onNavigateBack,
+        toastState = toastState,
+    )
+}
+
+@Composable
+private fun SkippedUpdatesScreen(
+    state: SkippedUpdatesState,
+    onAction: (SkippedUpdatesAction) -> Unit,
+    onNavigateBack: () -> Unit,
+    toastState: KomiToastState,
+    modifier: Modifier = Modifier,
+) {
     KomiScaffold(
+        modifier = modifier,
         toastState = toastState,
         grid = true,
         screentone = true,
@@ -84,9 +104,11 @@ fun SkippedUpdatesRoot(
         val colors = LocalPersonality.current.colors
         Box(modifier = Modifier.fillMaxSize().padding(padding)) {
             when {
-                state.isLoading -> KomiCircularProgress(modifier = Modifier.align(Alignment.Center))
+                state.isLoading -> {
+                    KomiCircularProgress(modifier = Modifier.align(Alignment.Center))
+                }
 
-                state.items.isEmpty() ->
+                state.items.isEmpty() -> {
                     Column(
                         modifier = Modifier.align(Alignment.Center).padding(horizontal = 32.dp),
                         horizontalAlignment = Alignment.CenterHorizontally,
@@ -103,8 +125,9 @@ fun SkippedUpdatesRoot(
                             color = colors.onSurfaceVariant,
                         )
                     }
+                }
 
-                else ->
+                else -> {
                     Column(
                         modifier =
                             Modifier
@@ -129,7 +152,7 @@ fun SkippedUpdatesRoot(
                                     last = index == state.items.lastIndex,
                                     trailing = {
                                         KomiButton(
-                                            onClick = { viewModel.onAction(SkippedUpdatesAction.OnUnskip(item.packageName)) },
+                                            onClick = { onAction(SkippedUpdatesAction.OnUnskip(item.packageName)) },
                                             label = stringResource(Res.string.skipped_updates_unskip_action),
                                             variant = KomiButtonVariant.Outline,
                                             size = KomiButtonSize.Sm,
@@ -139,6 +162,7 @@ fun SkippedUpdatesRoot(
                             }
                         }
                     }
+                }
             }
         }
     }

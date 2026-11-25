@@ -1,10 +1,9 @@
 package zed.rainxch.tweaks.presentation.hosttokens
 
 import zed.rainxch.core.domain.model.account.ForgeKind
-import zed.rainxch.core.domain.model.account.HostToken
 
 sealed interface HostTokensAction {
-    data object OnNavigateBack : HostTokensAction
+    sealed interface DraftEdit : HostTokensAction
 
     data object OnAddClicked : HostTokensAction
 
@@ -21,24 +20,24 @@ sealed interface HostTokensAction {
     ) : HostTokensAction
 
     data class OnReplaceToken(
-        val existing: HostToken,
+        val existing: HostTokenUi,
     ) : HostTokensAction
 
     data class OnEditLabel(
-        val existing: HostToken,
+        val existing: HostTokenUi,
     ) : HostTokensAction
 
     data class OnDraftHostChanged(
         val value: String,
-    ) : HostTokensAction
+    ) : DraftEdit
 
     data class OnDraftTokenChanged(
         val value: String,
-    ) : HostTokensAction
+    ) : DraftEdit
 
     data class OnDraftDisplayNameChanged(
         val value: String,
-    ) : HostTokensAction
+    ) : DraftEdit
 
     data object OnAddConfirm : HostTokensAction
 
