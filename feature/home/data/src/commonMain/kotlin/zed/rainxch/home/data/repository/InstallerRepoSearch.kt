@@ -42,7 +42,6 @@ internal data class InstallerSearchRequest(
     val cacheKey: String,
 )
 
-// GitHub search pages, keeping only repos whose latest stable release ships an installer for this device.
 internal class InstallerRepoSearch(
     private val clientProvider: GitHubClientProvider,
     devicePlatform: Platform,
