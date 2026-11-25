@@ -11,6 +11,7 @@ import zed.rainxch.repopages.domain.model.IssueLabel
 import zed.rainxch.repopages.domain.model.IssueState
 import zed.rainxch.repopages.domain.model.PullRequestState
 import zed.rainxch.repopages.domain.model.RepoIssue
+import zed.rainxch.repopages.domain.model.RepoIssueDetail
 import zed.rainxch.repopages.domain.model.RepoPullRequest
 import zed.rainxch.repopages.domain.model.SecurityAdvisory
 
@@ -24,6 +25,20 @@ fun IssueDto.toRepoIssue(): RepoIssue =
         commentCount = comments,
         createdAt = createdAt,
         labels = labels.map { it.toIssueLabel() },
+    )
+
+fun IssueDto.toRepoIssueDetail(comments: List<IssueComment>): RepoIssueDetail =
+    RepoIssueDetail(
+        number = number,
+        title = title,
+        state = state.toIssueState(),
+        authorLogin = user?.login.orEmpty(),
+        authorAvatarUrl = user?.avatarUrl,
+        bodyMarkdown = body.orEmpty(),
+        createdAt = createdAt,
+        labels = labels.map { it.toIssueLabel() },
+        comments = comments,
+        reactionThumbsUp = reactions?.plusOne ?: 0,
     )
 
 fun LabelDto.toIssueLabel(): IssueLabel = IssueLabel(name = name, color = color)
