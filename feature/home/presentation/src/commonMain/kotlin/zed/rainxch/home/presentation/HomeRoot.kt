@@ -173,7 +173,7 @@ private fun HomeScreen(
                     onAction(HomeAction.OnActionSheetDismiss)
                     uriHandler.openUri(card.rawRepository.htmlUrl)
                 },
-                onToggleSeen = {
+                onToggleSeenClick = {
                     onAction(HomeAction.OnActionSheetDismiss)
                     if (card.isSeen) {
                         onAction(HomeAction.OnMarkAsUnseen(card.id))

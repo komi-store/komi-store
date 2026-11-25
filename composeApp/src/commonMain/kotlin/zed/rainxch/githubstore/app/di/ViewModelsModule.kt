@@ -26,8 +26,12 @@ import zed.rainxch.devprofile.presentation.DeveloperProfileViewModel
 import zed.rainxch.favourites.presentation.FavouritesViewModel
 import zed.rainxch.favourites.presentation.import.ImportStarsViewModel
 import zed.rainxch.feed.presentation.FeedViewModel
+import zed.rainxch.feed.presentation.marks.FeedLibraryMarksSource
+import zed.rainxch.feed.presentation.marks.FeedViewingMarksStore
 import zed.rainxch.home.presentation.HomeViewModel
 import zed.rainxch.home.presentation.categorylist.CategoryListViewModel
+import zed.rainxch.home.presentation.marks.HomeLibraryMarksSource
+import zed.rainxch.home.presentation.marks.HomeViewingMarksStore
 import zed.rainxch.profile.presentation.ProfileViewModel
 import zed.rainxch.profile.presentation.announcements.AnnouncementsViewModel
 import zed.rainxch.profile.presentation.whatsnew.WhatsNewViewModel
@@ -161,7 +165,11 @@ val viewModelsModule =
         }
         viewModelOf(::FavouritesViewModel)
         viewModelOf(::ImportStarsViewModel)
+        factoryOf(::HomeLibraryMarksSource)
+        factoryOf(::HomeViewingMarksStore)
         viewModelOf(::HomeViewModel)
+        factoryOf(::FeedLibraryMarksSource)
+        factoryOf(::FeedViewingMarksStore)
         viewModelOf(::FeedViewModel)
         viewModelOf(::RecentlyViewedViewModel)
         viewModel { params ->

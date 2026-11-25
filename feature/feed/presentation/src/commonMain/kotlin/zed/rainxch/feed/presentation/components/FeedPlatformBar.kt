@@ -27,9 +27,10 @@ import zed.rainxch.githubstore.core.presentation.res.feed_platform_all
 fun FeedPlatformBar(
     platform: DiscoveryPlatform,
     onOpenPicker: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     Row(
-        modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 10.dp),
+        modifier = modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(10.dp),
     ) {

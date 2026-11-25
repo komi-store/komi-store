@@ -18,12 +18,15 @@ import zed.rainxch.core.data.dto.BackendFeedResponse
 import zed.rainxch.core.data.mappers.toSummary
 import zed.rainxch.core.data.network.BackendApiClient
 import zed.rainxch.core.data.network.OFFLINE_MIRROR_BASE
+import zed.rainxch.core.data.network.asNetworkFailure
 import zed.rainxch.core.data.network.getFeed
+import zed.rainxch.core.data.network.networkFailures
 import zed.rainxch.core.domain.logging.KomiStoreLogger
+import zed.rainxch.core.domain.model.error.LocalStoreException
+import zed.rainxch.core.domain.model.error.NetworkException
 import zed.rainxch.core.domain.model.repository.DiscoveryPlatform
 import zed.rainxch.feed.domain.model.FeedPage
 import zed.rainxch.feed.domain.repository.FeedRepository
-import kotlin.coroutines.cancellation.CancellationException
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
@@ -61,28 +64,38 @@ class FeedRepositoryImpl(
             val readKey = cacheKey(token, page, today)
 
             if (!forceRefresh) {
-                runCatching { cacheManager.get<BackendFeedResponse>(readKey) }
-                    .getOrNull()
+                readCache { cacheManager.get<BackendFeedResponse>(readKey) }
                     ?.let { return@withContext Result.success(it.toFeedPage(fromCache = true, platform = platform)) }
             }
 
             backendApiClient.getFeed(slug, page).fold(
                 onSuccess = { response ->
                     val writeKey = cacheKey(token, page, response.rotation.ifBlank { today })
-                    runCatching { cacheManager.put(writeKey, response, CacheManager.FEED) }
+                    try {
+                        cacheManager.put(writeKey, response, CacheManager.FEED)
+                    } catch (e: LocalStoreException) {
+                        logger.warn("Feed cache write failed for $writeKey: ${e.message}")
+                    }
                     Result.success(response.toFeedPage(fromCache = false, platform = platform))
                 },
                 onFailure = { error ->
-                    runCatching { cacheManager.getStale<BackendFeedResponse>(readKey) }
-                        .getOrNull()
+                    readCache { cacheManager.getStale<BackendFeedResponse>(readKey) }
                         ?.let { return@withContext Result.success(it.toFeedPage(fromCache = true, platform = platform)) }
 
                     if (page == 1) {
                         fetchOffline(platform)?.let { return@withContext Result.success(it) }
                     }
-                    Result.failure(error)
+                    Result.failure(error.asNetworkFailure())
                 },
             )
+        }
+
+    private suspend fun readCache(read: suspend () -> BackendFeedResponse?): BackendFeedResponse? =
+        try {
+            read()
+        } catch (e: LocalStoreException) {
+            logger.warn("Feed cache read failed: ${e.message}")
+            null
         }
 
     private suspend fun fetchOffline(platform: DiscoveryPlatform): FeedPage? {
@@ -91,7 +104,6 @@ class FeedRepositoryImpl(
                 DiscoveryPlatform.All -> listOf("android", "windows", "macos", "linux")
                 else -> listOfNotNull(platform.toApiSlug())
             }
-        if (slugs.isEmpty()) return null
 
         val responses =
             coroutineScope {
@@ -110,22 +122,23 @@ class FeedRepositoryImpl(
         )
     }
 
-    private suspend fun fetchOfflineFile(slug: String): BackendFeedResponse? =
-        try {
-            val url = "$OFFLINE_MIRROR_BASE/cached-data/feed/$slug.json"
-            val response = offlineClient.get(url)
-            if (response.status.isSuccess()) {
-                json.decodeFromString<BackendFeedResponse>(response.bodyAsText())
-            } else {
-                logger.error("Feed offline fetch HTTP ${response.status.value} from $url")
-                null
+    private suspend fun fetchOfflineFile(slug: String): BackendFeedResponse? {
+        val url = "$OFFLINE_MIRROR_BASE/cached-data/feed/$slug.json"
+        return try {
+            networkFailures {
+                val response = offlineClient.get(url)
+                if (response.status.isSuccess()) {
+                    json.decodeFromString<BackendFeedResponse>(response.bodyAsText())
+                } else {
+                    logger.error("Feed offline fetch HTTP ${response.status.value} from $url")
+                    null
+                }
             }
-        } catch (e: CancellationException) {
-            throw e
-        } catch (e: Exception) {
+        } catch (e: NetworkException) {
             logger.error("Feed offline fetch failed for $slug: ${e.message}")
             null
         }
+    }
 
     private fun BackendFeedResponse.toFeedPage(
         fromCache: Boolean,
