@@ -3,6 +3,7 @@ package zed.rainxch.core.data.utils
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
+import zed.rainxch.core.data.services.systemServiceCall
 import zed.rainxch.core.domain.helpers.ClipboardHelper
 
 class AndroidClipboardHelper(
@@ -13,7 +14,7 @@ class AndroidClipboardHelper(
         text: String,
     ) {
         val cm = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-        cm.setPrimaryClip(ClipData.newPlainText(label, text))
+        systemServiceCall { cm.setPrimaryClip(ClipData.newPlainText(label, text)) }
     }
 
     override fun getText(): String? {
