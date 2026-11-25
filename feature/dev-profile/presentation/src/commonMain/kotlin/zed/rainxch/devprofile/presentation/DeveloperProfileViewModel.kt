@@ -19,8 +19,11 @@ import zed.rainxch.core.domain.repository.FavouritesRepository
 import zed.rainxch.devprofile.domain.model.RepoFilterType
 import zed.rainxch.devprofile.domain.model.RepoSortType
 import zed.rainxch.devprofile.domain.repository.DeveloperProfileRepository
-import zed.rainxch.githubstore.core.presentation.res.*
-import kotlin.coroutines.cancellation.CancellationException
+import zed.rainxch.devprofile.presentation.mappers.toUi
+import zed.rainxch.devprofile.presentation.model.DeveloperRepositoryUi
+import zed.rainxch.githubstore.core.presentation.res.Res
+import zed.rainxch.githubstore.core.presentation.res.failed_to_load_profile
+import zed.rainxch.githubstore.core.presentation.res.failed_to_load_repositories
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
@@ -47,80 +50,75 @@ class DeveloperProfileViewModel(
 
     private fun loadDeveloperData() {
         viewModelScope.launch {
+            _state.update {
+                it.copy(
+                    isLoading = true,
+                    isLoadingRepos = false,
+                    errorMessage = null,
+                )
+            }
             try {
-                _state.update {
-                    it.copy(
-                        isLoading = true,
-                        isLoadingRepos = false,
-                        errorMessage = null,
-                    )
-                }
-
-                val profileResult = repository.getDeveloperProfile(username)
-                profileResult
-                    .onSuccess { profile ->
-                        _state.update {
-                            it.copy(
-                                profile = profile,
-                                isLoading = false,
-                                isLoadingRepos = true,
-                                isLoadingContributions = !profile.isOrganization,
-                            )
-                        }
-                        if (!profile.isOrganization) {
-                            loadContributions()
-                        }
-                    }.onFailure { error ->
-                        _state.update {
-                            it.copy(
-                                isLoading = false,
-                                errorMessage =
-                                    error.message
-                                        ?: getString(Res.string.failed_to_load_profile),
-                            )
-                        }
-                        return@launch
-                    }
-
-                val reposResult = repository.getDeveloperRepositories(username)
-
-                reposResult
-                    .onSuccess { repos ->
-                        _state.update {
-                            it.copy(
-                                repositories = repos.toImmutableList(),
-                                isLoading = false,
-                                isLoadingRepos = false,
-                            )
-                        }
-                        applyFiltersAndSort()
-                    }.onFailure { error ->
-                        _state.update {
-                            it.copy(
-                                isLoading = false,
-                                isLoadingRepos = false,
-                                errorMessage =
-                                    error.message
-                                        ?: getString(Res.string.failed_to_load_repositories),
-                            )
-                        }
-                    }
+                if (loadProfile()) loadRepositories()
             } catch (_: RateLimitException) {
                 _state.update {
                     it.copy(isLoading = false, isLoadingRepos = false)
                 }
-            } catch (e: CancellationException) {
-                throw e
-            } catch (e: Exception) {
+            }
+        }
+    }
+
+    // False when the profile failed to load, which ends the load there.
+    private suspend fun loadProfile(): Boolean {
+        val profileResult = repository.getDeveloperProfile(username)
+        profileResult
+            .onSuccess { profile ->
+                _state.update {
+                    it.copy(
+                        profile = profile.toUi(),
+                        isLoading = false,
+                        isLoadingRepos = true,
+                        isLoadingContributions = !profile.isOrganization,
+                    )
+                }
+                if (!profile.isOrganization) {
+                    loadContributions()
+                }
+            }.onFailure { error ->
+                _state.update {
+                    it.copy(
+                        isLoading = false,
+                        errorMessage =
+                            error.message
+                                ?: getString(Res.string.failed_to_load_profile),
+                    )
+                }
+            }
+        return profileResult.isSuccess
+    }
+
+    private suspend fun loadRepositories() {
+        repository
+            .getDeveloperRepositories(username)
+            .onSuccess { repos ->
+                _state.update {
+                    it.copy(
+                        repositories = repos.map { repo -> repo.toUi() }.toImmutableList(),
+                        isLoading = false,
+                        isLoadingRepos = false,
+                    )
+                }
+                applyFiltersAndSort()
+            }.onFailure { error ->
                 _state.update {
                     it.copy(
                         isLoading = false,
                         isLoadingRepos = false,
-                        errorMessage = e.message,
+                        errorMessage =
+                            error.message
+                                ?: getString(Res.string.failed_to_load_repositories),
                     )
                 }
             }
-        }
     }
 
     private fun loadContributions() {
@@ -130,7 +128,7 @@ class DeveloperProfileViewModel(
                 .onSuccess { cal ->
                     _state.update {
                         it.copy(
-                            contributions = cal,
+                            contributions = cal.toUi(),
                             isLoadingContributions = false,
                         )
                     }
@@ -197,6 +195,42 @@ class DeveloperProfileViewModel(
         }
     }
 
+    private fun toggleFavorite(repo: DeveloperRepositoryUi) {
+        viewModelScope.launch {
+            val favoriteRepo =
+                FavoriteRepo(
+                    repoId = repo.id,
+                    repoName = repo.name,
+                    repoOwner = repo.fullName.split("/")[0],
+                    repoOwnerAvatarUrl = _state.value.profile?.avatarUrl ?: "",
+                    repoDescription = repo.description,
+                    primaryLanguage = repo.language,
+                    repoUrl = repo.htmlUrl,
+                    latestVersion = repo.latestVersion,
+                    latestReleaseUrl = null,
+                    addedAt = Clock.System.now().toEpochMilliseconds(),
+                    lastSyncedAt = Clock.System.now().toEpochMilliseconds(),
+                )
+
+            favouritesRepository.toggleFavorite(favoriteRepo)
+
+            _state.update { state ->
+                val updatedRepos =
+                    state.repositories
+                        .map {
+                            if (it.id == repo.id) {
+                                it.copy(isFavorite = !it.isFavorite)
+                            } else {
+                                it
+                            }
+                        }.toImmutableList()
+
+                state.copy(repositories = updatedRepos)
+            }
+            applyFiltersAndSort()
+        }
+    }
+
     fun onAction(action: DeveloperProfileAction) {
         when (action) {
             DeveloperProfileAction.OnNavigateBackClick,
@@ -221,41 +255,7 @@ class DeveloperProfileViewModel(
             }
 
             is DeveloperProfileAction.OnToggleFavorite -> {
-                viewModelScope.launch {
-                    val repo = action.repository
-
-                    val favoriteRepo =
-                        FavoriteRepo(
-                            repoId = repo.id,
-                            repoName = repo.name,
-                            repoOwner = repo.fullName.split("/")[0],
-                            repoOwnerAvatarUrl = _state.value.profile?.avatarUrl ?: "",
-                            repoDescription = repo.description,
-                            primaryLanguage = repo.language,
-                            repoUrl = repo.htmlUrl,
-                            latestVersion = repo.latestVersion,
-                            latestReleaseUrl = null,
-                            addedAt = Clock.System.now().toEpochMilliseconds(),
-                            lastSyncedAt = Clock.System.now().toEpochMilliseconds(),
-                        )
-
-                    favouritesRepository.toggleFavorite(favoriteRepo)
-
-                    _state.update { state ->
-                        val updatedRepos =
-                            state.repositories
-                                .map {
-                                    if (it.id == repo.id) {
-                                        it.copy(isFavorite = !it.isFavorite)
-                                    } else {
-                                        it
-                                    }
-                                }.toImmutableList()
-
-                        state.copy(repositories = updatedRepos)
-                    }
-                    applyFiltersAndSort()
-                }
+                toggleFavorite(action.repository)
             }
 
             DeveloperProfileAction.OnDismissError -> {

@@ -45,15 +45,20 @@ import zed.rainxch.core.presentation.locals.LocalPersonality
 import zed.rainxch.core.presentation.personality.utils.PersonalityPreview
 import zed.rainxch.core.presentation.utils.formatCount
 import zed.rainxch.core.presentation.utils.formatRelativeLong
-import zed.rainxch.devprofile.domain.model.DeveloperRepository
-import zed.rainxch.githubstore.core.presentation.res.*
+import zed.rainxch.devprofile.presentation.model.DeveloperRepositoryUi
+import zed.rainxch.githubstore.core.presentation.res.Res
+import zed.rainxch.githubstore.core.presentation.res.add_to_favourites
+import zed.rainxch.githubstore.core.presentation.res.has_release
+import zed.rainxch.githubstore.core.presentation.res.installed
+import zed.rainxch.githubstore.core.presentation.res.released_on_date
+import zed.rainxch.githubstore.core.presentation.res.remove_from_favourites
+import zed.rainxch.githubstore.core.presentation.res.updated_on_date
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun DeveloperRepoItem(
-    repository: DeveloperRepository,
+    repository: DeveloperRepositoryUi,
     onItemClick: () -> Unit,
     onToggleFavorite: () -> Unit,
     modifier: Modifier = Modifier,
@@ -116,72 +121,7 @@ fun DeveloperRepoItem(
 
             Spacer(Modifier.height(10.dp))
 
-            FlowRow(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(6.dp),
-                verticalArrangement = Arrangement.spacedBy(6.dp),
-            ) {
-                if (repository.stargazersCount > 0) {
-                    KomiChip(
-                        label = formatCount(repository.stargazersCount),
-                        kind = KomiChipKind.Info,
-                        size = KomiChipSize.Sm,
-                        leadingContent = {
-                            KomiIcon(
-                                imageVector = Icons.Outlined.StarOutline,
-                                contentDescription = null,
-                                modifier = Modifier.size(13.dp),
-                                tint = colors.onSurfaceVariant,
-                            )
-                        },
-                    )
-                }
-                if (repository.forksCount > 0) {
-                    KomiChip(
-                        label = formatCount(repository.forksCount),
-                        kind = KomiChipKind.Info,
-                        size = KomiChipSize.Sm,
-                        leadingContent = {
-                            KomiIcon(
-                                imageVector = Icons.AutoMirrored.Outlined.CallSplit,
-                                contentDescription = null,
-                                modifier = Modifier.size(13.dp),
-                                tint = colors.onSurfaceVariant,
-                            )
-                        },
-                    )
-                }
-                if (repository.openIssuesCount > 0) {
-                    KomiChip(
-                        label = formatCount(repository.openIssuesCount),
-                        kind = KomiChipKind.Info,
-                        size = KomiChipSize.Sm,
-                        leadingContent = {
-                            KomiIcon(
-                                imageVector = Icons.Outlined.WarningAmber,
-                                contentDescription = null,
-                                modifier = Modifier.size(13.dp),
-                                tint = colors.onSurfaceVariant,
-                            )
-                        },
-                    )
-                }
-                repository.language?.takeIf { it.isNotBlank() }?.let { language ->
-                    KomiChip(
-                        label = language,
-                        kind = KomiChipKind.Info,
-                        size = KomiChipSize.Sm,
-                        leadingContent = {
-                            KomiIcon(
-                                imageVector = Icons.Outlined.Code,
-                                contentDescription = null,
-                                modifier = Modifier.size(13.dp),
-                                tint = colors.onSurfaceVariant,
-                            )
-                        },
-                    )
-                }
-            }
+            RepoStatChips(repository = repository)
 
             val showBadges =
                 repository.hasReleases ||
@@ -189,37 +129,122 @@ fun DeveloperRepoItem(
                     repository.isInstalled
             if (showBadges) {
                 Spacer(Modifier.height(10.dp))
-                FlowRow(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(6.dp),
-                    verticalArrangement = Arrangement.spacedBy(6.dp),
-                ) {
-                    if (repository.hasInstallableAssets) {
-                        TonalBadge(
-                            text =
-                                repository.latestVersion
-                                    ?: stringResource(Res.string.has_release),
-                            container = colors.primaryTint,
-                            content = colors.primary,
-                        )
-                    } else if (repository.hasReleases) {
-                        TonalBadge(
-                            text =
-                                repository.latestVersion
-                                    ?: stringResource(Res.string.has_release),
-                            container = colors.primaryContainer,
-                            content = colors.onPrimaryContainer,
-                        )
-                    }
-                    if (repository.isInstalled) {
-                        TonalBadge(
-                            text = stringResource(Res.string.installed),
-                            container = colors.primaryTint,
-                            content = colors.primary,
-                        )
-                    }
-                }
+                RepoBadges(repository = repository)
             }
+        }
+    }
+}
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun RepoStatChips(
+    repository: DeveloperRepositoryUi,
+    modifier: Modifier = Modifier,
+) {
+    val colors = LocalPersonality.current.colors
+    FlowRow(
+        modifier = modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
+        verticalArrangement = Arrangement.spacedBy(6.dp),
+    ) {
+        if (repository.stargazersCount > 0) {
+            KomiChip(
+                label = formatCount(repository.stargazersCount),
+                kind = KomiChipKind.Info,
+                size = KomiChipSize.Sm,
+                leadingContent = {
+                    KomiIcon(
+                        imageVector = Icons.Outlined.StarOutline,
+                        contentDescription = null,
+                        modifier = Modifier.size(13.dp),
+                        tint = colors.onSurfaceVariant,
+                    )
+                },
+            )
+        }
+        if (repository.forksCount > 0) {
+            KomiChip(
+                label = formatCount(repository.forksCount),
+                kind = KomiChipKind.Info,
+                size = KomiChipSize.Sm,
+                leadingContent = {
+                    KomiIcon(
+                        imageVector = Icons.AutoMirrored.Outlined.CallSplit,
+                        contentDescription = null,
+                        modifier = Modifier.size(13.dp),
+                        tint = colors.onSurfaceVariant,
+                    )
+                },
+            )
+        }
+        if (repository.openIssuesCount > 0) {
+            KomiChip(
+                label = formatCount(repository.openIssuesCount),
+                kind = KomiChipKind.Info,
+                size = KomiChipSize.Sm,
+                leadingContent = {
+                    KomiIcon(
+                        imageVector = Icons.Outlined.WarningAmber,
+                        contentDescription = null,
+                        modifier = Modifier.size(13.dp),
+                        tint = colors.onSurfaceVariant,
+                    )
+                },
+            )
+        }
+        repository.language?.takeIf { it.isNotBlank() }?.let { language ->
+            KomiChip(
+                label = language,
+                kind = KomiChipKind.Info,
+                size = KomiChipSize.Sm,
+                leadingContent = {
+                    KomiIcon(
+                        imageVector = Icons.Outlined.Code,
+                        contentDescription = null,
+                        modifier = Modifier.size(13.dp),
+                        tint = colors.onSurfaceVariant,
+                    )
+                },
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun RepoBadges(
+    repository: DeveloperRepositoryUi,
+    modifier: Modifier = Modifier,
+) {
+    val colors = LocalPersonality.current.colors
+    FlowRow(
+        modifier = modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
+        verticalArrangement = Arrangement.spacedBy(6.dp),
+    ) {
+        if (repository.hasInstallableAssets) {
+            TonalBadge(
+                text =
+                    repository.latestVersion
+                        ?: stringResource(Res.string.has_release),
+                container = colors.primaryTint,
+                content = colors.primary,
+            )
+        } else if (repository.hasReleases) {
+            TonalBadge(
+                text =
+                    repository.latestVersion
+                        ?: stringResource(Res.string.has_release),
+                container = colors.primaryContainer,
+                content = colors.onPrimaryContainer,
+            )
+        }
+        if (repository.isInstalled) {
+            TonalBadge(
+                text = stringResource(Res.string.installed),
+                container = colors.primaryTint,
+                content = colors.primary,
+            )
         }
     }
 }
@@ -296,7 +321,7 @@ private fun PreviewDeveloperRepoItem() {
     PersonalityPreview {
         DeveloperRepoItem(
             repository =
-                DeveloperRepository(
+                DeveloperRepositoryUi(
                     id = 1,
                     name = "awesome-kotlin-app",
                     fullName = "developer/awesome-kotlin-app",
@@ -311,6 +336,7 @@ private fun PreviewDeveloperRepoItem() {
                     isInstalled = true,
                     isFavorite = false,
                     latestVersion = "v1.5.2",
+                    latestReleaseAt = null,
                     updatedAt = Clock.System.now().toString(),
                 ),
             onItemClick = {},

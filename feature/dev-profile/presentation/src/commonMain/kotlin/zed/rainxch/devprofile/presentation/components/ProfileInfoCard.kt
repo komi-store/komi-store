@@ -28,10 +28,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.LinkAnnotation
-import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextLinkStyles
 import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withLink
 import androidx.compose.ui.unit.dp
@@ -42,9 +40,11 @@ import zed.rainxch.core.presentation.components.surfaces.KomiSurface
 import zed.rainxch.core.presentation.components.text.KomiText
 import zed.rainxch.core.presentation.components.text.KomiTextRole
 import zed.rainxch.core.presentation.locals.LocalPersonality
+import zed.rainxch.core.presentation.personality.linkChipEdge
+import zed.rainxch.core.presentation.personality.mentionSpan
 import zed.rainxch.core.presentation.utils.formatCount
-import zed.rainxch.devprofile.domain.model.DeveloperProfile
 import zed.rainxch.devprofile.presentation.DeveloperProfileAction
+import zed.rainxch.devprofile.presentation.model.DeveloperProfileUi
 import zed.rainxch.githubstore.core.presentation.res.Res
 import zed.rainxch.githubstore.core.presentation.res.dev_profile_org_badge
 import zed.rainxch.githubstore.core.presentation.res.followers
@@ -55,13 +55,14 @@ private val MentionRegex = Regex("(?<![A-Za-z0-9-])@([A-Za-z0-9](?:[A-Za-z0-9-]{
 
 @Composable
 fun ProfileInfoCard(
-    profile: DeveloperProfile,
+    profile: DeveloperProfileUi,
     onAction: (DeveloperProfileAction) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val colors = LocalPersonality.current.colors
     val shape = LocalPersonality.current.shape
     KomiSurface(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
     ) {
         Column(modifier = Modifier.padding(20.dp)) {
             Row(
@@ -70,10 +71,11 @@ fun ProfileInfoCard(
             ) {
                 GitHubStoreImage(
                     imageModel = { profile.avatarUrl },
-                    modifier = Modifier
-                        .size(80.dp)
-                        .clip(RoundedCornerShape(shape.cornerSmall))
-                        .background(colors.surfaceContainerHigh),
+                    modifier =
+                        Modifier
+                            .size(80.dp)
+                            .clip(RoundedCornerShape(shape.cornerSmall))
+                            .background(colors.surfaceContainerHigh),
                 )
 
                 Spacer(Modifier.width(16.dp))
@@ -125,35 +127,34 @@ fun ProfileInfoCard(
 }
 
 @Composable
-private fun BioText(bio: String, onMention: (String) -> Unit) {
+private fun BioText(
+    bio: String,
+    onMention: (String) -> Unit,
+) {
     val colors = LocalPersonality.current.colors
-    val annotated = remember(bio, colors.primary) {
-        buildAnnotatedString {
-            var cursor = 0
-            for (match in MentionRegex.findAll(bio)) {
-                if (match.range.first > cursor) {
-                    append(bio.substring(cursor, match.range.first))
-                }
-                val handle = match.groupValues[1]
-                withLink(
-                    LinkAnnotation.Clickable(
-                        tag = "mention:$handle",
-                        styles = TextLinkStyles(
-                            style = SpanStyle(
-                                color = colors.primary,
-                                fontWeight = FontWeight.SemiBold,
-                            ),
+    val annotated =
+        remember(bio, colors.primary) {
+            buildAnnotatedString {
+                var cursor = 0
+                for (match in MentionRegex.findAll(bio)) {
+                    if (match.range.first > cursor) {
+                        append(bio.substring(cursor, match.range.first))
+                    }
+                    val handle = match.groupValues[1]
+                    withLink(
+                        LinkAnnotation.Clickable(
+                            tag = "mention:$handle",
+                            styles = TextLinkStyles(style = colors.mentionSpan),
+                            linkInteractionListener = { onMention(handle) },
                         ),
-                        linkInteractionListener = { onMention(handle) },
-                    ),
-                ) {
-                    append("@$handle")
+                    ) {
+                        append("@$handle")
+                    }
+                    cursor = match.range.last + 1
                 }
-                cursor = match.range.last + 1
+                if (cursor < bio.length) append(bio.substring(cursor))
             }
-            if (cursor < bio.length) append(bio.substring(cursor))
         }
-    }
     KomiText(
         text = annotated,
         role = KomiTextRole.Body,
@@ -164,7 +165,11 @@ private fun BioText(bio: String, onMention: (String) -> Unit) {
 }
 
 @Composable
-private fun MetricsStrip(repos: Int, followers: Int, following: Int) {
+private fun MetricsStrip(
+    repos: Int,
+    followers: Int,
+    following: Int,
+) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceEvenly,
@@ -183,7 +188,11 @@ private fun MetricsStrip(repos: Int, followers: Int, following: Int) {
 }
 
 @Composable
-private fun Metric(value: String, label: String, modifier: Modifier = Modifier) {
+private fun Metric(
+    value: String,
+    label: String,
+    modifier: Modifier = Modifier,
+) {
     val colors = LocalPersonality.current.colors
     Column(
         modifier = modifier.fillMaxWidth().padding(vertical = 4.dp),
@@ -210,10 +219,11 @@ private fun Metric(value: String, label: String, modifier: Modifier = Modifier) 
 private fun MetricDivider() {
     val colors = LocalPersonality.current.colors
     Box(
-        modifier = Modifier
-            .width(1.dp)
-            .height(28.dp)
-            .background(colors.divider),
+        modifier =
+            Modifier
+                .width(1.dp)
+                .height(28.dp)
+                .background(colors.divider),
     )
 }
 
@@ -222,9 +232,10 @@ private fun OrgPill() {
     val colors = LocalPersonality.current.colors
     val shape = LocalPersonality.current.shape
     Box(
-        modifier = Modifier
-            .clip(RoundedCornerShape(shape.cornerSmall))
-            .background(colors.primaryContainer),
+        modifier =
+            Modifier
+                .clip(RoundedCornerShape(shape.cornerSmall))
+                .background(colors.primaryContainer),
     ) {
         KomiText(
             text = stringResource(Res.string.dev_profile_org_badge),
@@ -238,22 +249,25 @@ private fun OrgPill() {
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun IdentityRailCard(
-    profile: DeveloperProfile,
+    profile: DeveloperProfileUi,
     onAction: (DeveloperProfileAction) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
-    val hasAny = profile.company?.isNotBlank() == true ||
-        profile.location?.isNotBlank() == true ||
-        profile.blog?.isNotBlank() == true ||
-        profile.twitterUsername?.isNotBlank() == true
+    val hasAny =
+        profile.company?.isNotBlank() == true ||
+            profile.location?.isNotBlank() == true ||
+            profile.blog?.isNotBlank() == true ||
+            profile.twitterUsername?.isNotBlank() == true
     if (!hasAny) return
 
     KomiSurface(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
     ) {
         FlowRow(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(14.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(14.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
@@ -301,18 +315,22 @@ fun IdentityRailCard(
 }
 
 @Composable
-private fun StaticChip(icon: ImageVector, text: String) {
+private fun StaticChip(
+    icon: ImageVector,
+    text: String,
+) {
     val colors = LocalPersonality.current.colors
     val shape = LocalPersonality.current.shape
     Box(
-        modifier = Modifier
-            .clip(RoundedCornerShape(shape.cornerSmall))
-            .background(colors.surfaceContainerHigh)
-            .border(
-                width = 1.dp,
-                color = colors.divider,
-                shape = RoundedCornerShape(shape.cornerSmall),
-            ),
+        modifier =
+            Modifier
+                .clip(RoundedCornerShape(shape.cornerSmall))
+                .background(colors.surfaceContainerHigh)
+                .border(
+                    width = 1.dp,
+                    color = colors.divider,
+                    shape = RoundedCornerShape(shape.cornerSmall),
+                ),
     ) {
         Row(
             modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
@@ -338,19 +356,23 @@ private fun StaticChip(icon: ImageVector, text: String) {
 }
 
 @Composable
-private fun LinkChip(icon: ImageVector, text: String, onClick: () -> Unit) {
+private fun LinkChip(
+    icon: ImageVector,
+    text: String,
+    onClick: () -> Unit,
+) {
     val colors = LocalPersonality.current.colors
     val shape = LocalPersonality.current.shape
     Box(
-        modifier = Modifier
-            .clip(RoundedCornerShape(shape.cornerSmall))
-            .background(colors.primaryTint)
-            .border(
-                width = 1.dp,
-                color = colors.primary.copy(alpha = 0.4f),
-                shape = RoundedCornerShape(shape.cornerSmall),
-            )
-            .clickable(onClick = onClick),
+        modifier =
+            Modifier
+                .clip(RoundedCornerShape(shape.cornerSmall))
+                .background(colors.primaryTint)
+                .border(
+                    width = 1.dp,
+                    color = colors.linkChipEdge,
+                    shape = RoundedCornerShape(shape.cornerSmall),
+                ).clickable(onClick = onClick),
     ) {
         Row(
             modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),

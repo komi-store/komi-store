@@ -1,9 +1,11 @@
 package zed.rainxch.devprofile.presentation
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -18,11 +20,6 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.FolderOff
 import androidx.compose.material.icons.rounded.OpenInBrowser
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Row
-import zed.rainxch.core.presentation.components.icon.KomiIcon
-import zed.rainxch.core.presentation.components.surfaces.KomiSurface
-import zed.rainxch.core.presentation.components.surfaces.KomiSurfaceElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -40,8 +37,11 @@ import zed.rainxch.core.presentation.components.buttons.KomiButton
 import zed.rainxch.core.presentation.components.buttons.KomiButtonSize
 import zed.rainxch.core.presentation.components.buttons.KomiButtonVariant
 import zed.rainxch.core.presentation.components.buttons.KomiIconButton
+import zed.rainxch.core.presentation.components.icon.KomiIcon
 import zed.rainxch.core.presentation.components.progress.KomiCircularProgress
 import zed.rainxch.core.presentation.components.scaffold.KomiScaffold
+import zed.rainxch.core.presentation.components.surfaces.KomiSurface
+import zed.rainxch.core.presentation.components.surfaces.KomiSurfaceElevation
 import zed.rainxch.core.presentation.components.text.KomiText
 import zed.rainxch.core.presentation.components.text.KomiTextRole
 import zed.rainxch.core.presentation.locals.LocalPersonality
@@ -53,7 +53,15 @@ import zed.rainxch.devprofile.presentation.components.DeveloperRepoItem
 import zed.rainxch.devprofile.presentation.components.FilterSortControls
 import zed.rainxch.devprofile.presentation.components.IdentityRailCard
 import zed.rainxch.devprofile.presentation.components.ProfileInfoCard
-import zed.rainxch.githubstore.core.presentation.res.*
+import zed.rainxch.githubstore.core.presentation.res.Res
+import zed.rainxch.githubstore.core.presentation.res.dismiss
+import zed.rainxch.githubstore.core.presentation.res.error_generic
+import zed.rainxch.githubstore.core.presentation.res.no_favorite_repos
+import zed.rainxch.githubstore.core.presentation.res.no_installed_repos
+import zed.rainxch.githubstore.core.presentation.res.no_repos_with_installable
+import zed.rainxch.githubstore.core.presentation.res.no_repos_with_releases
+import zed.rainxch.githubstore.core.presentation.res.open_repository
+import zed.rainxch.githubstore.core.presentation.res.retry
 
 @Composable
 fun DeveloperProfileRoot(
@@ -99,14 +107,17 @@ fun DeveloperProfileRoot(
 }
 
 @Composable
-fun DeveloperProfileScreen(
+private fun DeveloperProfileScreen(
     state: DeveloperProfileState,
     onAction: (DeveloperProfileAction) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     KomiScaffold(
+        modifier = modifier,
         topBar = {
             DevProfileTopbar(
-                state = state,
+                username = state.username,
+                profileUrl = state.profile?.htmlUrl,
                 onAction = onAction,
             )
         },
@@ -146,80 +157,80 @@ fun DeveloperProfileScreen(
                             contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp),
                             verticalArrangement = Arrangement.spacedBy(12.dp),
                         ) {
-                        item {
-                            ProfileInfoCard(
-                                profile = state.profile,
-                                onAction = onAction,
-                            )
-                        }
-
-                        if (!state.profile.isOrganization) {
                             item {
-                                ContributionCalendarCard(
-                                    contributions = state.contributions,
-                                    isLoading = state.isLoadingContributions,
+                                ProfileInfoCard(
+                                    profile = state.profile,
+                                    onAction = onAction,
                                 )
                             }
-                        }
 
-                        item {
-                            IdentityRailCard(
-                                profile = state.profile,
-                                onAction = onAction,
-                            )
-                        }
-
-                        item {
-                            FilterSortControls(
-                                currentFilter = state.currentFilter,
-                                currentSort = state.currentSort,
-                                searchQuery = state.searchQuery,
-                                repoCount = state.filteredRepositories.size,
-                                totalCount = state.repositories.size,
-                                onAction = onAction,
-                            )
-                        }
-
-                        if (state.isLoadingRepos) {
-                            item {
-                                Box(
-                                    modifier =
-                                        Modifier
-                                            .fillMaxWidth()
-                                            .padding(32.dp),
-                                    contentAlignment = Alignment.Center,
-                                ) {
-                                    KomiCircularProgress()
+                            if (!state.profile.isOrganization) {
+                                item {
+                                    ContributionCalendarCard(
+                                        contributions = state.contributions,
+                                        isLoading = state.isLoadingContributions,
+                                    )
                                 }
                             }
-                        } else if (state.filteredRepositories.isEmpty()) {
+
                             item {
-                                EmptyReposContent(
-                                    filter = state.currentFilter,
-                                    modifier =
-                                        Modifier
-                                            .fillMaxWidth()
-                                            .padding(32.dp),
+                                IdentityRailCard(
+                                    profile = state.profile,
+                                    onAction = onAction,
                                 )
                             }
-                        } else {
-                            items(
-                                items = state.filteredRepositories,
-                                key = { it.id },
-                            ) { repo ->
-                                DeveloperRepoItem(
-                                    repository = repo,
-                                    onItemClick = {
-                                        onAction(DeveloperProfileAction.OnRepositoryClick(repo.id))
-                                    },
-                                    onToggleFavorite = {
-                                        onAction(DeveloperProfileAction.OnToggleFavorite(repo))
-                                    },
-                                    modifier = Modifier.animateItem(),
+
+                            item {
+                                FilterSortControls(
+                                    currentFilter = state.currentFilter,
+                                    currentSort = state.currentSort,
+                                    searchQuery = state.searchQuery,
+                                    repoCount = state.filteredRepositories.size,
+                                    totalCount = state.repositories.size,
+                                    onAction = onAction,
                                 )
+                            }
+
+                            if (state.isLoadingRepos) {
+                                item {
+                                    Box(
+                                        modifier =
+                                            Modifier
+                                                .fillMaxWidth()
+                                                .padding(32.dp),
+                                        contentAlignment = Alignment.Center,
+                                    ) {
+                                        KomiCircularProgress()
+                                    }
+                                }
+                            } else if (state.filteredRepositories.isEmpty()) {
+                                item {
+                                    EmptyReposContent(
+                                        filter = state.currentFilter,
+                                        modifier =
+                                            Modifier
+                                                .fillMaxWidth()
+                                                .padding(32.dp),
+                                    )
+                                }
+                            } else {
+                                items(
+                                    items = state.filteredRepositories,
+                                    key = { it.id },
+                                ) { repo ->
+                                    DeveloperRepoItem(
+                                        repository = repo,
+                                        onItemClick = {
+                                            onAction(DeveloperProfileAction.OnRepositoryClick(repo.id))
+                                        },
+                                        onToggleFavorite = {
+                                            onAction(DeveloperProfileAction.OnToggleFavorite(repo))
+                                        },
+                                        modifier = Modifier.animateItem(),
+                                    )
+                                }
                             }
                         }
-                    }
                     }
                 }
             }
@@ -254,9 +265,10 @@ fun DeveloperProfileScreen(
                         )
 
                         Box(
-                            modifier = Modifier
-                                .size(36.dp)
-                                .clickable { onAction(DeveloperProfileAction.OnDismissError) },
+                            modifier =
+                                Modifier
+                                    .size(36.dp)
+                                    .clickable { onAction(DeveloperProfileAction.OnDismissError) },
                             contentAlignment = Alignment.Center,
                         ) {
                             KomiIcon(
@@ -311,27 +323,28 @@ private fun EmptyReposContent(
 }
 
 @Composable
-fun DevProfileTopbar(
-    state: DeveloperProfileState,
+private fun DevProfileTopbar(
+    username: String,
+    profileUrl: String?,
     onAction: (DeveloperProfileAction) -> Unit,
 ) {
-    val profileUrl = state.profile?.htmlUrl
     KomiTopBar(
-        title = state.username,
+        title = username,
         size = KomiTopBarSize.Compact,
         onBack = { onAction(DeveloperProfileAction.OnNavigateBackClick) },
-        actions = if (profileUrl != null) {
-            {
-                KomiIconButton(
-                    icon = Icons.Rounded.OpenInBrowser,
-                    contentDescription = stringResource(Res.string.open_repository),
-                    onClick = { onAction(DeveloperProfileAction.OnOpenLink(profileUrl)) },
-                    variant = KomiButtonVariant.Tonal,
-                )
-            }
-        } else {
-            null
-        },
+        actions =
+            if (profileUrl != null) {
+                {
+                    KomiIconButton(
+                        icon = Icons.Rounded.OpenInBrowser,
+                        contentDescription = stringResource(Res.string.open_repository),
+                        onClick = { onAction(DeveloperProfileAction.OnOpenLink(profileUrl)) },
+                        variant = KomiButtonVariant.Tonal,
+                    )
+                }
+            } else {
+                null
+            },
     )
 }
 

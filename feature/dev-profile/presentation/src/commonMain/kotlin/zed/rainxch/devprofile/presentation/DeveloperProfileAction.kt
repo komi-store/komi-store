@@ -1,8 +1,8 @@
 package zed.rainxch.devprofile.presentation
 
-import zed.rainxch.devprofile.domain.model.DeveloperRepository
 import zed.rainxch.devprofile.domain.model.RepoFilterType
 import zed.rainxch.devprofile.domain.model.RepoSortType
+import zed.rainxch.devprofile.presentation.model.DeveloperRepositoryUi
 
 sealed interface DeveloperProfileAction {
     data object OnNavigateBackClick : DeveloperProfileAction
@@ -24,7 +24,7 @@ sealed interface DeveloperProfileAction {
     ) : DeveloperProfileAction
 
     data class OnToggleFavorite(
-        val repository: DeveloperRepository,
+        val repository: DeveloperRepositoryUi,
     ) : DeveloperProfileAction
 
     data object OnDismissError : DeveloperProfileAction

@@ -6,7 +6,7 @@ The full Reviews screen for a repository: rating summary, sort and star filter, 
 
 ```text
 feature/reviews/
-  presentation/    # ReviewsRoot + ReviewsViewModel + ReviewsUiState + ReviewsAction + ReviewsEvent
+  presentation/    # ReviewsRoot + ReviewsViewModel + ReviewsArgs + ReviewsUiState + ReviewsAction + ReviewsEvent
     moderation/    # ModerationRoot + ModerationViewModel: the queue for moderators
     components/    # ReviewSheets: ComposerSheet, ReportSheet, ReplySheet; ReviewsEmpty
     utils/         # ReviewErrorMessages: ReviewError -> string resource

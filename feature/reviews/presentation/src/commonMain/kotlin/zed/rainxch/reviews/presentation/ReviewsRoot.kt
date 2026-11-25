@@ -236,8 +236,7 @@ private fun ReviewsList(
         }
     }
     val currentOnAction by rememberUpdatedState(onAction)
-    // isLoadingMore is a key so a page that added nothing new asks for the next one; after a failure the
-    // retry item asks instead, or this would retry forever.
+    // isLoadingMore is a key so a page that added nothing new asks for the next; after a failure only the retry item asks.
     LaunchedEffect(nearEnd, state.reviews.size, state.isLoadingMore, state.loadMoreFailed) {
         if (nearEnd && !state.loadMoreFailed) currentOnAction(ReviewsAction.OnLoadMore)
     }
@@ -302,8 +301,7 @@ private fun ReviewsList(
     }
 }
 
-// Sort as one connected group, scrolling sideways where the labels run long. The star filter is picked on
-// the summary's bars; while one is on, a chip names it and clears it.
+// The star filter is picked on the summary's bars; while one is on, this chip names it and clears it.
 @Composable
 private fun Filters(
     state: ReviewsUiState,

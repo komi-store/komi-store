@@ -95,12 +95,10 @@ class ModerationViewModel(
         loadPage(page = 1, generation = requestGeneration, append = false)
     }
 
-    // A decision takes its review out of the server's queue as well, so the first unseen review sits at
-    // the position the list has reached, not after the last page fetched. Reviews already shown are
-    // dropped from the answer.
+    // Decisions shrink the server's queue too, so the next page is the one holding the first unseen review.
     private fun loadNextPage() {
         val current = _state.value
-        if (current.isLoading || current.isLoadingMore || current.endReached || current.errorMessage != null) return
+        if (!current.canLoadMore) return
         _state.update { it.copy(loadMoreFailed = false) }
         loadPage(page = current.items.size / QUEUE_PAGE_SIZE + 1, generation = requestGeneration, append = true)
     }
@@ -159,8 +157,7 @@ class ModerationViewModel(
         }
     }
 
-    // Every decision takes the review out of the queue it's in: hide and dismiss close its reports,
-    // unhide moves it out of the hidden list, and delete removes it.
+    // Every decision takes the review out of the queue it's in, so it leaves the list once the backend agrees.
     private fun decide(
         reviewId: String,
         decision: ModerationDecision,
@@ -205,6 +202,8 @@ class ModerationViewModel(
         viewModelScope.launch { _events.send(ModerationEvent.OnMessage(getString(resource))) }
     }
 
+    private val ModerationUiState.canLoadMore: Boolean get() = !isLoading && !isLoadingMore && !endReached && errorMessage == null
+
     private fun ModerationDecision.doneMessage(): StringResource =
         when (this) {
             ModerationDecision.HIDE -> Res.string.reviews_moderation_hidden_done
@@ -217,7 +216,7 @@ class ModerationViewModel(
         ModerationItemUi(
             // The card's own hidden notice speaks to the author; the queue says it in its own words.
             review = review.toUi(viewerId = null, votes = emptyMap()).copy(isHidden = false),
-            repo = repo,
+            repo = ModerationRepoUi(owner = repo.owner, name = repo.name, host = repo.host),
             repoLabel = listOfNotNull(repo.host, repo.owner, repo.name).joinToString("/"),
             authorId = review.author.id,
             reportCount = reportCount,

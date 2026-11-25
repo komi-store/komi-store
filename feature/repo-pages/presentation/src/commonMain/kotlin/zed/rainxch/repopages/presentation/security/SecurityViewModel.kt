@@ -10,6 +10,7 @@ import zed.rainxch.core.presentation.utils.toUserMessage
 import zed.rainxch.githubstore.core.presentation.res.Res
 import zed.rainxch.githubstore.core.presentation.res.failed_to_load
 import zed.rainxch.repopages.domain.repository.RepoPagesRepository
+import zed.rainxch.repopages.presentation.mappers.toUi
 
 class SecurityViewModel(
     private val owner: String,
@@ -36,7 +37,7 @@ class SecurityViewModel(
             repository
                 .getSecurityOverview(owner, repo)
                 .onSuccess { overview ->
-                    _state.update { it.copy(isLoading = false, overview = overview, errorMessage = null) }
+                    _state.update { it.copy(isLoading = false, overview = overview.toUi(), errorMessage = null) }
                 }.onFailure { e ->
                     _state.update {
                         it.copy(

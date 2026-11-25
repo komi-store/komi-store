@@ -7,7 +7,6 @@ import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.persistentSetOf
 import zed.rainxch.core.domain.model.reviews.ModerationStatus
 import zed.rainxch.core.domain.model.reviews.ReportReason
-import zed.rainxch.core.domain.model.reviews.ReviewTarget
 import zed.rainxch.core.presentation.components.reviews.ReviewUi
 
 @Immutable
@@ -27,7 +26,7 @@ data class ModerationUiState(
 @Immutable
 data class ModerationItemUi(
     val review: ReviewUi,
-    val repo: ReviewTarget,
+    val repo: ModerationRepoUi,
     val repoLabel: String,
     val authorId: Long,
     val reportCount: Int,
