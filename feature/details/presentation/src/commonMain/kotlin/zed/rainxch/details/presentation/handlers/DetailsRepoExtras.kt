@@ -17,7 +17,13 @@ internal class DetailsRepoExtras(
     private val reviewsRepository: ReviewsRepository,
     private val logger: KomiStoreLogger,
 ) {
-    internal suspend fun markSeen(repo: GithubRepoSummary) = seenReposRepository.markAsSeen(repo)
+    internal suspend fun markSeen(repo: GithubRepoSummary) {
+        try {
+            seenReposRepository.markAsSeen(repo)
+        } catch (e: LocalStoreException) {
+            logger.error("Failed to mark repo as seen: ${e.message}")
+        }
+    }
 
     internal suspend fun isFavourite(repoId: Long): Boolean =
         try {
