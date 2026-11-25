@@ -36,6 +36,7 @@ import zed.rainxch.core.presentation.components.surfaces.KomiSurface
 import zed.rainxch.core.presentation.components.text.KomiText
 import zed.rainxch.core.presentation.components.text.KomiTextRole
 import zed.rainxch.core.presentation.locals.LocalPersonality
+import zed.rainxch.core.presentation.personality.favouriteFill
 import zed.rainxch.favourites.presentation.model.FavouriteRepository
 import zed.rainxch.githubstore.core.presentation.res.Res
 import zed.rainxch.githubstore.core.presentation.res.remove_from_favourites
@@ -203,7 +204,7 @@ private fun FavoriteToggle(
         }
     val container =
         if (favorited) {
-            colors.error.copy(alpha = 0.45f)
+            colors.favouriteFill
         } else {
             colors.surfaceContainerHigh
         }

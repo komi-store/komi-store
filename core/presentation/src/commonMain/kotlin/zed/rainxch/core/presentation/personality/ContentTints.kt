@@ -20,6 +20,9 @@ val Color.strongFill: Color get() = copy(alpha = 0.22f)
 // The plate behind a large icon, in the icon's color.
 val Color.iconPlate: Color get() = copy(alpha = 0.15f)
 
+// The fill behind a favourite toggle that is on, under its error-colored heart.
+val PersonalityColors.favouriteFill: Color get() = error.copy(alpha = 0.45f)
+
 // Collapsed content fades into this color toward its bottom edge.
 val Color.fadeOutBrush: Brush
     get() =
