@@ -5,9 +5,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.MoreVert
-import zed.rainxch.core.presentation.components.overlays.KomiDropdown
-import zed.rainxch.core.presentation.components.overlays.KomiMenuItem
-import zed.rainxch.core.presentation.components.overlays.rememberKomiToastState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -15,7 +12,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.launch
@@ -36,6 +32,10 @@ import zed.rainxch.core.presentation.components.bars.KomiTopBar
 import zed.rainxch.core.presentation.components.bars.KomiTopBarSize
 import zed.rainxch.core.presentation.components.buttons.KomiButtonVariant
 import zed.rainxch.core.presentation.components.buttons.KomiIconButton
+import zed.rainxch.core.presentation.components.overlays.KomiDropdown
+import zed.rainxch.core.presentation.components.overlays.KomiMenuItem
+import zed.rainxch.core.presentation.components.overlays.KomiToastState
+import zed.rainxch.core.presentation.components.overlays.rememberKomiToastState
 import zed.rainxch.core.presentation.components.scaffold.KomiScaffold
 import zed.rainxch.core.presentation.utils.ObserveAsEvents
 import zed.rainxch.githubstore.core.presentation.res.Res
@@ -49,6 +49,7 @@ fun ExternalImportRoot(
     onNavigateBack: () -> Unit,
     onNavigateToDetails: (repoId: Long) -> Unit,
     onAddManually: () -> Unit,
+    modifier: Modifier = Modifier,
     viewModel: ExternalImportViewModel = koinViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -57,9 +58,18 @@ fun ExternalImportRoot(
 
     ObserveAsEvents(viewModel.events) { event ->
         when (event) {
-            ExternalImportEvent.NavigateBack -> onNavigateBack()
-            is ExternalImportEvent.NavigateToDetails -> onNavigateToDetails(event.repoId)
-            ExternalImportEvent.NavigateBackAndOpenManualLink -> onAddManually()
+            ExternalImportEvent.NavigateBack -> {
+                onNavigateBack()
+            }
+
+            is ExternalImportEvent.NavigateToDetails -> {
+                onNavigateToDetails(event.repoId)
+            }
+
+            ExternalImportEvent.NavigateBackAndOpenManualLink -> {
+                onAddManually()
+            }
+
             is ExternalImportEvent.ShowError -> {
                 scope.launch { toastState.danger(event.message) }
             }
@@ -67,14 +77,11 @@ fun ExternalImportRoot(
             is ExternalImportEvent.ShowUndoSnackbar -> {
                 toastState.toasts.clear()
                 scope.launch {
-                    val undoLabel = getString(Res.string.external_import_undo_action)
                     toastState.show(
                         message = event.message,
-                        actionLabel = undoLabel,
+                        actionLabel = getString(Res.string.external_import_undo_action),
                         dismissible = true,
-                        onAction = {
-                            viewModel.onAction(ExternalImportAction.OnUndoLast)
-                        },
+                        onAction = { viewModel.onAction(ExternalImportAction.OnUndoLast) },
                     )
                 }
             }
@@ -87,166 +94,159 @@ fun ExternalImportRoot(
         }
     }
 
-    val reducedMotion = rememberSystemReducedMotion()
+    CompositionLocalProvider(LocalReducedMotion provides rememberSystemReducedMotion()) {
+        ExternalImportScreen(
+            state = state,
+            onAction = viewModel::onAction,
+            toastState = toastState,
+            modifier = modifier,
+        )
+    }
+}
 
-    CompositionLocalProvider(LocalReducedMotion provides reducedMotion) {
-        KomiScaffold(
-            topBar = {
-                KomiTopBar(
-                    title = stringResource(Res.string.external_import_top_bar_title),
-                    size = KomiTopBarSize.Compact,
-                    onBack = { viewModel.onAction(ExternalImportAction.OnExit) },
-                    actions = if (state.phase == ImportPhase.AwaitingReview && state.cards.size > 1) {
-                        {
-                            KomiDropdown(
-                                entries = persistentListOf(
-                                    KomiMenuItem(
-                                        id = "skip_remaining",
-                                        label = stringResource(Res.string.external_import_overflow_skip_remaining),
-                                    ),
-                                ),
-                                onSelect = { item ->
-                                    when (item.id) {
-                                        "skip_remaining" ->
-                                            viewModel.onAction(ExternalImportAction.OnSkipRemaining)
-                                    }
-                                },
-                                trigger = { onClick ->
-                                    KomiIconButton(
-                                        icon = Icons.Rounded.MoreVert,
-                                        contentDescription = stringResource(Res.string.external_import_overflow_more),
-                                        onClick = onClick,
-                                        variant = KomiButtonVariant.Tonal,
-                                    )
-                                },
-                            )
-                        }
+@Composable
+private fun ExternalImportScreen(
+    state: ExternalImportState,
+    onAction: (ExternalImportAction) -> Unit,
+    toastState: KomiToastState,
+    modifier: Modifier = Modifier,
+) {
+    KomiScaffold(
+        modifier = modifier,
+        topBar = {
+            KomiTopBar(
+                title = stringResource(Res.string.external_import_top_bar_title),
+                size = KomiTopBarSize.Compact,
+                onBack = { onAction(ExternalImportAction.OnExit) },
+                actions =
+                    if (state.phase == ImportPhase.AwaitingReview && state.cards.size > 1) {
+                        { SkipRemainingMenu(onAction = onAction) }
                     } else {
                         null
                     },
-                )
-            },
-            toastState = toastState,
-        ) { padding ->
-            Box(modifier = Modifier.fillMaxSize().padding(padding)) {
-                when (state.phase) {
-                    ImportPhase.Idle, ImportPhase.Scanning, ImportPhase.AutoImporting -> {
-                        ImportProgressScreen(
-                            phase = state.phase,
-                            totalCandidates = state.totalCandidates,
-                            canSkip = state.isSkipAvailable &&
-                                    (state.phase == ImportPhase.Scanning ||
-                                            state.phase == ImportPhase.AutoImporting),
-                            onSkip = {
-                                viewModel.onAction(ExternalImportAction.OnSkipLongScan)
-                            },
-                        )
-                    }
+            )
+        },
+        toastState = toastState,
+    ) { padding ->
+        Box(modifier = Modifier.fillMaxSize().padding(padding)) {
+            ImportPhaseContent(state = state, onAction = onAction)
 
-                    ImportPhase.RequestingPermission -> {
-                        PermissionRationaleScreen(
-                            onAction = viewModel::onAction,
-                        )
-                    }
-
-                    ImportPhase.AutoImportSummary -> {
-                        AutoImportSummaryScreen(
-                            autoLinkedCount = state.autoImported,
-                            autoLinkedLabels = state.autoLinkedLabels,
-                            cardsRemaining = state.cards.size,
-                            onContinue = {
-                                viewModel.onAction(ExternalImportAction.OnAutoSummaryContinue)
-                            },
-                            onUndoAll = {
-                                viewModel.onAction(ExternalImportAction.OnAutoSummaryUndoAll)
-                            },
-                        )
-                    }
-
-                    ImportPhase.AwaitingReview -> {
-                        if (state.cards.isEmpty()) {
-                            EmptyStateScreen(
-                                isPermissionDenied = state.isPermissionDenied,
-                                onRequestPermission = {
-                                    viewModel.onAction(ExternalImportAction.OnRequestPermission)
-                                },
-                                onExit = { viewModel.onAction(ExternalImportAction.OnExit) },
-                                onAddManually = {
-                                    viewModel.onAction(ExternalImportAction.OnAddManually)
-                                },
-                            )
-                        } else {
-                            WizardList(
-                                cards = state.cards,
-                                expandedPackages = state.expandedPackages,
-                                activeSearchPackage = state.activeSearchPackage,
-                                searchQuery = state.searchQuery,
-                                searchResults = state.searchResults,
-                                isSearching = state.isSearching,
-                                searchError = state.searchError,
-                                onToggleExpanded = { pkg ->
-                                    viewModel.onAction(
-                                        ExternalImportAction.OnToggleCardExpanded(pkg),
-                                    )
-                                },
-                                onPick = { pkg, suggestion ->
-                                    viewModel.onAction(
-                                        ExternalImportAction.OnPickSuggestion(pkg, suggestion),
-                                    )
-                                },
-                                onSkip = { pkg ->
-                                    viewModel.onAction(ExternalImportAction.OnSkipCard(pkg))
-                                },
-                                onLink = { pkg ->
-                                    viewModel.onAction(ExternalImportAction.OnLinkCard(pkg))
-                                },
-                                onSearchQueryChange = { pkg, query ->
-                                    viewModel.onAction(
-                                        ExternalImportAction.OnSearchOverrideChanged(pkg, query),
-                                    )
-                                },
-                                onSearchSubmit = { pkg ->
-                                    viewModel.onAction(
-                                        ExternalImportAction.OnSearchOverrideSubmit(pkg),
-                                    )
-                                },
-                                onAddManually = {
-                                    viewModel.onAction(ExternalImportAction.OnAddManually)
-                                },
-                            )
-                        }
-                    }
-
-                    ImportPhase.Done -> {
-                        if (state.cards.isEmpty() && state.trackedCount == 0) {
-                            EmptyStateScreen(
-                                isPermissionDenied = state.isPermissionDenied,
-                                onRequestPermission = {
-                                    viewModel.onAction(ExternalImportAction.OnRequestPermission)
-                                },
-                                onExit = { viewModel.onAction(ExternalImportAction.OnExit) },
-                                onAddManually = {
-                                    viewModel.onAction(ExternalImportAction.OnAddManually)
-                                },
-                            )
-                        } else {
-                            CompletionToast(
-                                trackedCount = state.trackedCount,
-                                skipped = state.skipped,
-                                onExit = { viewModel.onAction(ExternalImportAction.OnExit) },
-                            )
-                        }
-                    }
-                }
-
-                if (state.phase == ImportPhase.Done && state.confettiPlayCount > 0) {
-                    key(state.confettiPlayCount) {
-                        ConfettiOverlay(enabled = true)
-                    }
+            if (state.phase == ImportPhase.Done && state.confettiPlayCount > 0) {
+                key(state.confettiPlayCount) {
+                    ConfettiOverlay(enabled = true)
                 }
             }
         }
     }
 }
+
+@Composable
+private fun SkipRemainingMenu(onAction: (ExternalImportAction) -> Unit) {
+    KomiDropdown(
+        entries =
+            persistentListOf(
+                KomiMenuItem(
+                    id = SKIP_REMAINING_ID,
+                    label = stringResource(Res.string.external_import_overflow_skip_remaining),
+                ),
+            ),
+        onSelect = { item ->
+            if (item.id == SKIP_REMAINING_ID) onAction(ExternalImportAction.OnSkipRemaining)
+        },
+        trigger = { onClick ->
+            KomiIconButton(
+                icon = Icons.Rounded.MoreVert,
+                contentDescription = stringResource(Res.string.external_import_overflow_more),
+                onClick = onClick,
+                variant = KomiButtonVariant.Tonal,
+            )
+        },
+    )
+}
+
+@Composable
+private fun ImportPhaseContent(
+    state: ExternalImportState,
+    onAction: (ExternalImportAction) -> Unit,
+) {
+    when (state.phase) {
+        ImportPhase.Idle, ImportPhase.Scanning, ImportPhase.AutoImporting -> {
+            ImportProgressScreen(
+                phase = state.phase,
+                totalCandidates = state.totalCandidates,
+                canSkip = state.isSkipAvailable && state.phase != ImportPhase.Idle,
+                onSkip = { onAction(ExternalImportAction.OnSkipLongScan) },
+            )
+        }
+
+        ImportPhase.RequestingPermission -> {
+            PermissionRationaleScreen(onAction = onAction)
+        }
+
+        ImportPhase.AutoImportSummary -> {
+            AutoImportSummaryScreen(
+                autoLinkedCount = state.autoImported,
+                autoLinkedLabels = state.autoLinkedLabels,
+                cardsRemaining = state.cards.size,
+                onContinue = { onAction(ExternalImportAction.OnAutoSummaryContinue) },
+                onUndoAll = { onAction(ExternalImportAction.OnAutoSummaryUndoAll) },
+            )
+        }
+
+        ImportPhase.AwaitingReview -> {
+            if (state.cards.isEmpty()) NothingToImport(state, onAction) else ReviewCards(state, onAction)
+        }
+
+        ImportPhase.Done -> {
+            if (state.cards.isEmpty() && state.trackedCount == 0) {
+                NothingToImport(state, onAction)
+            } else {
+                CompletionToast(
+                    trackedCount = state.trackedCount,
+                    skipped = state.skipped,
+                    onExit = { onAction(ExternalImportAction.OnExit) },
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun NothingToImport(
+    state: ExternalImportState,
+    onAction: (ExternalImportAction) -> Unit,
+) {
+    EmptyStateScreen(
+        isPermissionDenied = state.isPermissionDenied,
+        onRequestPermission = { onAction(ExternalImportAction.OnRequestPermission) },
+        onExit = { onAction(ExternalImportAction.OnExit) },
+        onAddManually = { onAction(ExternalImportAction.OnAddManually) },
+    )
+}
+
+@Composable
+private fun ReviewCards(
+    state: ExternalImportState,
+    onAction: (ExternalImportAction) -> Unit,
+) {
+    WizardList(
+        cards = state.cards,
+        expandedPackages = state.expandedPackages,
+        activeSearchPackage = state.activeSearchPackage,
+        searchQuery = state.searchQuery,
+        searchResults = state.searchResults,
+        isSearching = state.isSearching,
+        searchError = state.searchError,
+        onToggleExpand = { pkg -> onAction(ExternalImportAction.OnToggleCardExpanded(pkg)) },
+        onPick = { pkg, suggestion -> onAction(ExternalImportAction.OnPickSuggestion(pkg, suggestion)) },
+        onSkip = { pkg -> onAction(ExternalImportAction.OnSkipCard(pkg)) },
+        onLink = { pkg -> onAction(ExternalImportAction.OnLinkCard(pkg)) },
+        onSearchQueryChange = { pkg, query -> onAction(ExternalImportAction.OnSearchOverrideChanged(pkg, query)) },
+        onSearchSubmit = { pkg -> onAction(ExternalImportAction.OnSearchOverrideSubmit(pkg)) },
+        onAddManually = { onAction(ExternalImportAction.OnAddManually) },
+    )
+}
+
+private const val SKIP_REMAINING_ID = "skip_remaining"
 
 const val EXTERNAL_IMPORT_OPEN_LINK_SHEET_KEY = "external_import_open_link_sheet"

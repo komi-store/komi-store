@@ -38,7 +38,6 @@ class FileSizeTest {
                 "feature/search/presentation/src/commonMain/kotlin/zed/rainxch/search/presentation/SearchViewModel.kt",
                 "feature/apps/presentation/src/commonMain/kotlin/zed/rainxch/apps/presentation/components/LinkAppBottomSheet.kt",
                 "feature/details/data/src/commonMain/kotlin/zed/rainxch/details/data/repository/DetailsRepositoryImpl.kt",
-                "feature/apps/presentation/src/commonMain/kotlin/zed/rainxch/apps/presentation/import/ExternalImportViewModel.kt",
                 "feature/auth/presentation/src/commonMain/kotlin/zed/rainxch/auth/presentation/AuthenticationViewModel.kt",
                 "feature/auth/presentation/src/commonMain/kotlin/zed/rainxch/auth/presentation/AuthenticationRoot.kt",
                 "feature/details/presentation/src/commonMain/kotlin/zed/rainxch/details/presentation/DetailsRoot.kt",

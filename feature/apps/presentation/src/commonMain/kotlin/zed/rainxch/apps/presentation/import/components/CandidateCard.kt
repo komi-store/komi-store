@@ -18,12 +18,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
-import zed.rainxch.core.presentation.components.buttons.KomiButton
-import zed.rainxch.core.presentation.components.buttons.KomiButtonVariant
-import zed.rainxch.core.presentation.components.surfaces.KomiSurface
-import zed.rainxch.core.presentation.components.text.KomiText
-import zed.rainxch.core.presentation.components.text.KomiTextRole
-import zed.rainxch.core.presentation.locals.LocalPersonality
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -36,10 +30,16 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import kotlinx.collections.immutable.ImmutableList
 import org.jetbrains.compose.resources.stringResource
-import zed.rainxch.core.presentation.components.InstalledAppIcon
 import zed.rainxch.apps.presentation.import.model.CandidateUi
 import zed.rainxch.apps.presentation.import.model.RepoSuggestionUi
 import zed.rainxch.apps.presentation.import.util.LocalReducedMotion
+import zed.rainxch.core.presentation.components.InstalledAppIcon
+import zed.rainxch.core.presentation.components.buttons.KomiButton
+import zed.rainxch.core.presentation.components.buttons.KomiButtonVariant
+import zed.rainxch.core.presentation.components.surfaces.KomiSurface
+import zed.rainxch.core.presentation.components.text.KomiText
+import zed.rainxch.core.presentation.components.text.KomiTextRole
+import zed.rainxch.core.presentation.locals.LocalPersonality
 import zed.rainxch.githubstore.core.presentation.res.Res
 import zed.rainxch.githubstore.core.presentation.res.external_import_card_action_less
 import zed.rainxch.githubstore.core.presentation.res.external_import_card_action_link
@@ -61,7 +61,7 @@ fun CandidateCard(
     searchResults: ImmutableList<RepoSuggestionUi>,
     isSearching: Boolean,
     searchError: String?,
-    onToggleExpanded: () -> Unit,
+    onToggleExpand: () -> Unit,
     onPick: (RepoSuggestionUi) -> Unit,
     onSkip: () -> Unit,
     onLink: () -> Unit,
@@ -72,21 +72,23 @@ fun CandidateCard(
     val colors = LocalPersonality.current.colors
     val shape = LocalPersonality.current.shape
     val reducedMotion = LocalReducedMotion.current
-    val clickActionLabel = if (expanded) {
-        stringResource(Res.string.external_import_card_collapse_label)
-    } else {
-        stringResource(Res.string.external_import_card_expand_label)
-    }
+    val clickActionLabel =
+        if (expanded) {
+            stringResource(Res.string.external_import_card_collapse_label)
+        } else {
+            stringResource(Res.string.external_import_card_expand_label)
+        }
 
     KomiSurface(
-        onClick = onToggleExpanded,
+        onClick = onToggleExpand,
         contentPadding = PaddingValues(20.dp),
-        modifier = modifier
-            .fillMaxWidth()
-            .semantics {
-                role = Role.Button
-                onClick(label = clickActionLabel, action = null)
-            },
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .semantics {
+                    role = Role.Button
+                    onClick(label = clickActionLabel, action = null)
+                },
     ) {
         Column(
             verticalArrangement = Arrangement.spacedBy(14.dp),
@@ -99,9 +101,10 @@ fun CandidateCard(
                 InstalledAppIcon(
                     packageName = candidate.packageName,
                     appName = candidate.appLabel,
-                    modifier = Modifier
-                        .size(48.dp)
-                        .clip(RoundedCornerShape(shape.corner)),
+                    modifier =
+                        Modifier
+                            .size(48.dp)
+                            .clip(RoundedCornerShape(shape.corner)),
                 )
 
                 Column(
@@ -125,15 +128,17 @@ fun CandidateCard(
                     )
 
                     Box(
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(shape.cornerSmall))
-                            .background(colors.primaryContainer),
+                        modifier =
+                            Modifier
+                                .clip(RoundedCornerShape(shape.cornerSmall))
+                                .background(colors.primaryContainer),
                     ) {
                         KomiText(
-                            text = stringResource(
-                                Res.string.external_import_card_installer_chip,
-                                candidate.installerLabel,
-                            ),
+                            text =
+                                stringResource(
+                                    Res.string.external_import_card_installer_chip,
+                                    candidate.installerLabel,
+                                ),
                             role = KomiTextRole.Caption,
                             color = colors.onPrimaryContainer,
                             modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
@@ -160,15 +165,16 @@ fun CandidateCard(
                     }
 
                     KomiButton(
-                        onClick = onToggleExpanded,
+                        onClick = onToggleExpand,
                         label = stringResource(Res.string.external_import_card_action_more),
                         variant = KomiButtonVariant.Text,
                         trailingIcon = Icons.Default.KeyboardArrowDown,
-                        modifier = if (candidate.preselectedSuggestion != null) {
-                            Modifier
-                        } else {
-                            Modifier.weight(1f)
-                        },
+                        modifier =
+                            if (candidate.preselectedSuggestion != null) {
+                                Modifier
+                            } else {
+                                Modifier.weight(1f)
+                            },
                     )
                 }
             }
@@ -215,7 +221,7 @@ fun CandidateCard(
                         )
 
                         KomiButton(
-                            onClick = onToggleExpanded,
+                            onClick = onToggleExpand,
                             label = stringResource(Res.string.external_import_card_action_less),
                             variant = KomiButtonVariant.Text,
                             trailingIcon = Icons.Default.KeyboardArrowUp,
@@ -244,10 +250,11 @@ private fun PreselectedRow(suggestion: RepoSuggestionUi?) {
             colors.onSurfaceVariant
         }
     Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(shape.corner))
-            .background(containerColor),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(shape.corner))
+                .background(containerColor),
     ) {
         if (suggestion == null) {
             KomiText(
@@ -280,10 +287,11 @@ private fun PreselectedRow(suggestion: RepoSuggestionUi?) {
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     KomiText(
-                        text = stringResource(
-                            Res.string.external_import_card_owner_byline,
-                            suggestion.owner,
-                        ),
+                        text =
+                            stringResource(
+                                Res.string.external_import_card_owner_byline,
+                                suggestion.owner,
+                            ),
                         role = KomiTextRole.Body,
                         color = contentColor,
                         maxLines = 1,
@@ -292,10 +300,11 @@ private fun PreselectedRow(suggestion: RepoSuggestionUi?) {
                     )
 
                     KomiText(
-                        text = stringResource(
-                            Res.string.external_import_match_confidence_chip,
-                            suggestion.confidencePercent,
-                        ),
+                        text =
+                            stringResource(
+                                Res.string.external_import_match_confidence_chip,
+                                suggestion.confidencePercent,
+                            ),
                         role = KomiTextRole.Caption,
                         color = contentColor,
                     )
