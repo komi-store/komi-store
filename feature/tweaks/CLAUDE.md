@@ -38,7 +38,7 @@ Android: one scrolling column of Look & feel, Connectivity, Installs & updates, 
 
 ## Notes
 
-- `include_pre_releases` is only a default: new `InstalledApp` rows (install in `InstallationManagerImpl`, link in `AppsRepositoryImpl.linkAppToRepo`) copy it into `includePreReleases`. Existing rows keep their per-app value.
+- `include_pre_releases` is only a default: new `InstalledApp` rows (install in `InstallationManagerImpl`, link in `AppLinkingImpl.linkAppToRepo`) copy it into `includePreReleases`. Existing rows keep their per-app value.
 - **Proxy:** a master config plus one config per `ProxyScope` (`DISCOVERY` / `DOWNLOAD` / `TRANSLATION`). Only the per-scope configs reach `ProxyManager`; `TweaksViewModel` copies the master into every scope flagged use-master when it is saved. `ProxyRepository.setMasterProxyConfig` alone changes no traffic.
 - **Repository layout (Look & feel):** `OnRepoLayoutSelected` writes `TweaksRepository.setRepoGridLayout`, the list or grid that Explore, Top Charts, Search and the category list read. Those screens have no toggle of their own.
 - **Content width (desktop only, Look & feel):** `OnContentWidthSelected` persists `ContentWidth` (`COMPACT` / `WIDE` / `EXTRA_WIDE`). `MainViewModel` feeds it to `LocalContentWidth` (provided in `AppNavigation`); screens read it through `contentWidthCap()` / `Modifier.constrainedContentWidth()` (core/presentation).
