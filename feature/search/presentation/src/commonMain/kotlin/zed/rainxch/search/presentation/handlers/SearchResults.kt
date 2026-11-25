@@ -159,7 +159,7 @@ class SearchResults(
             .searchRepositories(request = store.current.toSearchRequest(), page = currentPage)
             .collect { page ->
                 currentPage = page.nextPageIndex
-                val newRows = rows.rowsFor(page.repos, store.current.seenRepoIds)
+                val newRows = rows.rowsFor(store, page.repos)
                 store.update { it.withPage(newRows, page) }
             }
     }
@@ -259,10 +259,11 @@ class SearchResults(
         store: SearchStore,
         newRepos: List<GithubRepoSummary>,
     ) {
-        val existingIds = store.current.repositories.mapTo(HashSet()) { it.repository.id }
-        val deduped = rows.rowsFor(newRepos.filter { it.id !in existingIds }, store.current.seenRepoIds)
-        if (deduped.isNotEmpty()) {
-            store.update { it.copy(repositories = (it.repositories + deduped).toImmutableList()) }
+        val newRows = rows.rowsFor(store, newRepos)
+        store.update { current ->
+            val existingIds = current.repositories.mapTo(HashSet()) { it.repository.id }
+            val deduped = newRows.filter { it.repository.id !in existingIds }
+            if (deduped.isEmpty()) current else current.copy(repositories = (current.repositories + deduped).toImmutableList())
         }
     }
 

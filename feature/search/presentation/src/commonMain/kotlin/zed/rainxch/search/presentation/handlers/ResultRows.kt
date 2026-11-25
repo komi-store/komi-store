@@ -37,12 +37,13 @@ class ResultRows(
     }
 
     internal suspend fun rowsFor(
+        store: SearchStore,
         repos: List<GithubRepoSummary>,
-        seenIds: Set<Long>,
     ): List<DiscoveryRepositoryUi> {
         val installedMap = installedAppsRepository.getAllInstalledApps().first().groupBy { it.repoId }
         val favouriteIds = favouritesRepository.getAllFavorites().first().mapTo(HashSet()) { it.repoId }
         val starredIds = starredRepository.getAllStarred().first().mapTo(HashSet()) { it.repoId }
+        val seenIds = store.current.seenRepoIds
         val login = currentUserLogin
         return repos.map { repo ->
             val apps = installedMap[repo.id].orEmpty()
