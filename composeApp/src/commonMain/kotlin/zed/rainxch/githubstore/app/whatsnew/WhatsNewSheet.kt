@@ -32,8 +32,9 @@ fun WhatsNewSheet(
     showHistoryAction: Boolean,
     onDismiss: () -> Unit,
     onViewHistory: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
-    KomiSheet(onDismiss = onDismiss) {
+    KomiSheet(onDismiss = onDismiss, modifier = modifier) {
         Column(
             modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp, vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
