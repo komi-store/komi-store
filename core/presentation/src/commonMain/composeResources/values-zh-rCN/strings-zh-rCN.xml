@@ -600,7 +600,7 @@
     <string name="loading_releases">正在加载发布版本…</string>
 
     <!-- Personal Access Token sign-in (#433 follow-up) -->
-    <string name="pat_use_token_instead">遇到问题？使用 Personal Access Token</string>
+    <string name="pat_use_token_instead">遇到问题？使用个人访问令牌</string>
     <string name="auth_use_device_code_instead">改用设备代码</string>
     <string name="installer_category_side_store">F-Droid / Obtainium</string>
     <string name="installer_category_sideloaded">侧载</string>
@@ -617,10 +617,10 @@
     <string name="match_source_search">搜索</string>
     <string name="match_source_manual">手动</string>
     <string name="match_source_starred">已加星</string>
-    <string name="pat_sheet_title">使用 Personal Access Token 登录</string>
-    <string name="pat_sheet_description">在能访问 GitHub 的任何设备上创建 Personal Access Token（classic 或 fine-grained），然后粘贴到下方。需要对仓库和个人资料的读取权限。</string>
+    <string name="pat_sheet_title">使用个人访问令牌登录</string>
+    <string name="pat_sheet_description">在能访问 GitHub 的设备上创建个人访问令牌（经典版或细粒度令牌），然后粘贴到下方。令牌需要读取仓库和个人资料的权限。</string>
     <string name="pat_open_settings">打开 GitHub 令牌设置</string>
-    <string name="pat_input_label">Personal Access Token</string>
+    <string name="pat_input_label">个人访问令牌</string>
     <string name="pat_input_placeholder">ghp_… 或 github_pat_…</string>
     <string name="pat_submit">登录</string>
     <string name="pat_cancel">取消</string>
@@ -707,7 +707,7 @@
     <string name="external_import_installer_obtainium">Obtainium</string>
     <string name="external_import_installer_fdroid">F-Droid</string>
     <string name="external_import_installer_browser">浏览器</string>
-    <string name="external_import_installer_sideload">Sideload</string>
+    <string name="external_import_installer_sideload">手动安装</string>
     <string name="external_import_installer_self">Komi Store</string>
     <string name="external_import_installer_unknown">未知来源</string>
     <string name="external_import_undo_linked">%1$s 已关联。</string>
@@ -783,7 +783,7 @@
     <string name="feedback_diagnostics_header">诊断信息</string>
     <string name="feedback_diagnostics_include">包含诊断信息</string>
     <string name="feedback_send_via_email">通过电子邮件发送</string>
-    <string name="feedback_send_via_github">新增 GitHub Issue</string>
+    <string name="feedback_send_via_github">在 GitHub 上新建议题</string>
     <string name="feedback_send_success_email">感谢您 — 正在打开电子邮件客户端。</string>
     <string name="feedback_send_success_github">感谢您 — 正在打开浏览器。</string>
     <string name="feedback_send_failed">无法打开反馈渠道</string>
@@ -1350,11 +1350,11 @@
     <string name="tweaks_custom_forge_remove_failed">无法移除该主机。请重试。</string>
 
     <!-- Repo pages: issues -->
-    <string name="repo_pages_issues_title">Issues</string>
+    <string name="repo_pages_issues_title">议题</string>
     <string name="repo_pages_issues_filter_open">开启</string>
     <string name="repo_pages_issues_filter_closed">已关闭</string>
-    <string name="repo_pages_issues_empty_open">没有开启的 Issue。</string>
-    <string name="repo_pages_issues_empty_closed">没有已关闭的 Issue。</string>
+    <string name="repo_pages_issues_empty_open">没有未关闭的议题。</string>
+    <string name="repo_pages_issues_empty_closed">没有已关闭的议题。</string>
     <string name="repo_pages_issue_comments_section">评论</string>
     <string name="repo_pages_issue_no_body">未提供描述。</string>
     <string name="repo_pages_issue_opened_by">由 %1$s 创建</string>
@@ -1391,13 +1391,13 @@
     <string name="repo_pages_comment_posted">评论已发表</string>
 
     <!-- Repo interactions: new issue -->
-    <string name="repo_pages_new_issue">新建 Issue</string>
+    <string name="repo_pages_new_issue">新建议题</string>
     <string name="repo_pages_new_issue_title_hint">标题</string>
-    <string name="repo_pages_new_issue_body_hint">描述这个 Issue…</string>
+    <string name="repo_pages_new_issue_body_hint">描述议题内容…</string>
     <string name="repo_pages_new_issue_submit">创建</string>
-    <string name="repo_pages_new_issue_sign_in">登录后即可创建 Issue。</string>
-    <string name="repo_pages_new_issue_failed">无法创建 Issue。</string>
-    <string name="repo_pages_new_issue_created">Issue 已创建</string>
+    <string name="repo_pages_new_issue_sign_in">登录后即可创建议题。</string>
+    <string name="repo_pages_new_issue_failed">创建议题失败。</string>
+    <string name="repo_pages_new_issue_created">议题已创建</string>
 
     <!-- Repo interactions: reactions -->
     <string name="repo_pages_react_sign_in">登录后即可添加回应。</string>
@@ -1410,9 +1410,9 @@
     <string name="repo_pages_pulls_empty_closed">没有已关闭的拉取请求。</string>
     <string name="repo_pages_pr_state_merged">已合并</string>
     <string name="repo_pages_pr_draft">草稿</string>
-    <string name="feed_end_cap">続く · TO BE CONTINUED</string>
-    <string name="feed_masthead_subtitle">発見 · DISCOVER APPS</string>
-    <string name="home_masthead_subtitle">ランキング · CHARTS &amp; PICKS</string>
+    <string name="feed_end_cap">未完待续</string>
+    <string name="feed_masthead_subtitle">发现 · 探索应用</string>
+    <string name="home_masthead_subtitle">排行榜 · 精选应用</string>
     <string name="feed_platform_picker_title_jp">対応</string>
     <string name="sidebar_browse_jp">航行</string>
     <string name="sidebar_categories_jp">部門</string>
