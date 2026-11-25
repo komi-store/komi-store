@@ -15,21 +15,20 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.outlined.GetApp
 import androidx.compose.material.icons.outlined.CheckCircle
+import androidx.compose.material.icons.outlined.GetApp
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import zed.rainxch.core.presentation.components.GitHubStoreImage
 import org.jetbrains.compose.resources.stringResource
 import zed.rainxch.apps.presentation.starred.StarredCandidateUi
+import zed.rainxch.core.presentation.components.GitHubStoreImage
 import zed.rainxch.core.presentation.components.icon.KomiIcon
 import zed.rainxch.core.presentation.components.surfaces.KomiSurface
 import zed.rainxch.core.presentation.components.text.KomiText
@@ -47,35 +46,39 @@ import zed.rainxch.githubstore.core.presentation.res.starred_picker_cd_ships_apk
 fun StarredCandidateRow(
     candidate: StarredCandidateUi,
     onClick: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val colors = LocalPersonality.current.colors
     val shape = LocalPersonality.current.shape
     val shipsApkLabel = stringResource(Res.string.starred_picker_cd_ships_apk)
     val alreadyTrackedLabel = stringResource(Res.string.starred_picker_cd_already_tracked)
     val latestLabel = candidate.latestReleaseTag?.let { stringResource(Res.string.starred_picker_cd_latest, it) }
-    val a11yLabel = buildString {
-        append(candidate.owner)
-        append(" / ")
-        append(candidate.name)
-        if (candidate.hasApkRelease) append(", ").append(shipsApkLabel)
-        if (candidate.isAlreadyTracked) append(", ").append(alreadyTrackedLabel)
-        latestLabel?.let { append(", ").append(it) }
-    }
+    val a11yLabel =
+        buildString {
+            append(candidate.owner)
+            append(" / ")
+            append(candidate.name)
+            if (candidate.hasApkRelease) append(", ").append(shipsApkLabel)
+            if (candidate.isAlreadyTracked) append(", ").append(alreadyTrackedLabel)
+            latestLabel?.let { append(", ").append(it) }
+        }
 
-    KomiSurface {
+    KomiSurface(modifier = modifier) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable(onClick = onClick)
-                .padding(12.dp)
-                .semantics { contentDescription = a11yLabel },
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .clickable(onClick = onClick)
+                    .padding(12.dp)
+                    .semantics { contentDescription = a11yLabel },
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             Box(
-                modifier = Modifier
-                    .size(40.dp)
-                    .clip(RoundedCornerShape(shape.cornerSmall)),
+                modifier =
+                    Modifier
+                        .size(40.dp)
+                        .clip(RoundedCornerShape(shape.cornerSmall)),
             ) {
                 GitHubStoreImage(
                     imageModel = { candidate.ownerAvatarUrl },
@@ -141,7 +144,6 @@ fun StarredCandidateRow(
                 Badge(
                     icon = Icons.Outlined.GetApp,
                     label = stringResource(Res.string.starred_picker_apk_badge),
-                    color = colors.primary,
                 )
             }
 
@@ -149,7 +151,6 @@ fun StarredCandidateRow(
                 Badge(
                     icon = Icons.Outlined.CheckCircle,
                     label = stringResource(Res.string.starred_picker_already_tracked),
-                    color = colors.primary,
                 )
             }
         }
@@ -157,19 +158,24 @@ fun StarredCandidateRow(
 }
 
 @Composable
-private fun Badge(icon: androidx.compose.ui.graphics.vector.ImageVector, label: String, color: androidx.compose.ui.graphics.Color) {
+private fun Badge(
+    icon: ImageVector,
+    label: String,
+) {
+    val colors = LocalPersonality.current.colors
     val shape = LocalPersonality.current.shape
     Row(
-        modifier = Modifier
-            .clip(RoundedCornerShape(shape.cornerSmall))
-            .background(color.copy(alpha = 0.15f))
-            .padding(horizontal = 6.dp, vertical = 2.dp),
+        modifier =
+            Modifier
+                .clip(RoundedCornerShape(shape.cornerSmall))
+                .background(colors.primaryTint)
+                .padding(horizontal = 6.dp, vertical = 2.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        KomiIcon(imageVector = icon, contentDescription = null, tint = color, modifier = Modifier.size(14.dp))
+        KomiIcon(imageVector = icon, contentDescription = null, tint = colors.primary, modifier = Modifier.size(14.dp))
 
         Spacer(Modifier.width(4.dp))
 
-        KomiText(text = label, role = KomiTextRole.Caption, color = color)
+        KomiText(text = label, role = KomiTextRole.Caption, color = colors.primary)
     }
 }
