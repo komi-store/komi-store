@@ -41,7 +41,7 @@ fun NavGraphBuilder.profileGraph(
                     onNavigateToFavouriteRepos = {
                         navController.navigate(GithubStoreGraph.FavouritesScreen)
                     },
-                    onNavigateToRecentlyViewed = {
+                    onNavigateToRecentlyViewedRepos = {
                         navController.navigate(GithubStoreGraph.RecentlyViewedScreen)
                     },
                     onNavigateToDevProfile = { username ->
