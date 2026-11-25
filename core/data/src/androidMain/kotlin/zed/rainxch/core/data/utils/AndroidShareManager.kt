@@ -10,6 +10,8 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.FileProvider
 import zed.rainxch.core.domain.helpers.ShareManager
+import zed.rainxch.core.domain.model.error.LocalStoreException
+import zed.rainxch.core.domain.model.error.SystemPackagesException
 import java.io.File
 import java.io.IOException
 
@@ -75,7 +77,11 @@ class AndroidShareManager(
         cacheDir.mkdirs()
 
         val file = File(cacheDir, fileName)
-        file.writeText(content)
+        try {
+            file.writeText(content)
+        } catch (e: IOException) {
+            throw LocalStoreException(e)
+        }
 
         val uri: Uri =
             FileProvider.getUriForFile(
@@ -97,7 +103,11 @@ class AndroidShareManager(
                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             }
 
-        context.startActivity(chooser)
+        try {
+            context.startActivity(chooser)
+        } catch (e: ActivityNotFoundException) {
+            throw SystemPackagesException(e)
+        }
     }
 
     override fun pickFile(

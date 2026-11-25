@@ -11,7 +11,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Speed
-import zed.rainxch.core.presentation.components.overlays.rememberKomiToastState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
@@ -23,23 +22,21 @@ import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
-import zed.rainxch.core.domain.model.mirror.MirrorConfig
-import zed.rainxch.core.domain.model.mirror.MirrorPreference
 import zed.rainxch.core.domain.model.mirror.MirrorStatus
 import zed.rainxch.core.domain.model.mirror.MirrorType
-import zed.rainxch.core.domain.model.mirror.fastestReleaseMirror
 import zed.rainxch.core.presentation.components.bars.KomiTopBar
 import zed.rainxch.core.presentation.components.buttons.KomiButton
 import zed.rainxch.core.presentation.components.buttons.KomiButtonVariant
 import zed.rainxch.core.presentation.components.buttons.KomiIconButton
 import zed.rainxch.core.presentation.components.inputs.KomiRadioButton
+import zed.rainxch.core.presentation.components.overlays.KomiToastState
+import zed.rainxch.core.presentation.components.overlays.rememberKomiToastState
 import zed.rainxch.core.presentation.components.scaffold.KomiScaffold
 import zed.rainxch.core.presentation.components.text.KomiText
 import zed.rainxch.core.presentation.components.text.KomiTextRole
 import zed.rainxch.core.presentation.locals.LocalPersonality
 import zed.rainxch.core.presentation.utils.ObserveAsEvents
 import zed.rainxch.githubstore.core.presentation.res.Res
-import zed.rainxch.githubstore.core.presentation.res.host_tokens_title
 import zed.rainxch.githubstore.core.presentation.res.mirror_custom_label
 import zed.rainxch.githubstore.core.presentation.res.mirror_fastest_badge
 import zed.rainxch.githubstore.core.presentation.res.mirror_fastest_chosen
@@ -84,37 +81,48 @@ fun MirrorPickerRoot(
 
     ObserveAsEvents(viewModel.events) { event ->
         when (event) {
-            is MirrorPickerEvent.MirrorRemovedNotice ->
+            is MirrorPickerEvent.MirrorRemovedNotice -> {
                 coroutineScope.launch {
-                    toastState.warning(
-                        getString(
-                            Res.string.mirror_removed_toast,
-                            event.displayName
-                        )
-                    )
+                    toastState.warning(getString(Res.string.mirror_removed_toast, event.displayName))
                 }
+            }
 
-            is MirrorPickerEvent.FastestMirrorChosen ->
+            is MirrorPickerEvent.FastestMirrorChosen -> {
                 coroutineScope.launch {
-                    toastState.success(
-                        getString(
-                            Res.string.mirror_fastest_chosen,
-                            event.displayName,
-                            event.latencyMs
-                        )
-                    )
+                    toastState.success(getString(Res.string.mirror_fastest_chosen, event.displayName, event.latencyMs))
                 }
+            }
 
-            MirrorPickerEvent.NoMirrorResponded ->
+            MirrorPickerEvent.NoMirrorResponded -> {
                 coroutineScope.launch {
                     toastState.warning(getString(Res.string.mirror_no_mirror_responded))
                 }
+            }
 
-            is MirrorPickerEvent.OpenUrl -> uriHandler.openUri(event.url)
+            is MirrorPickerEvent.OpenUrl -> {
+                uriHandler.openUri(event.url)
+            }
         }
     }
 
+    MirrorPickerScreen(
+        state = state,
+        onAction = viewModel::onAction,
+        onNavigateBack = onNavigateBack,
+        toastState = toastState,
+    )
+}
+
+@Composable
+private fun MirrorPickerScreen(
+    state: MirrorPickerState,
+    onAction: (MirrorPickerAction) -> Unit,
+    onNavigateBack: () -> Unit,
+    toastState: KomiToastState,
+    modifier: Modifier = Modifier,
+) {
     KomiScaffold(
+        modifier = modifier,
         toastState = toastState,
         grid = true,
         screentone = true,
@@ -129,14 +137,14 @@ fun MirrorPickerRoot(
         val colors = LocalPersonality.current.colors
         val official = state.mirrors.filter { it.type == MirrorType.OFFICIAL }
         val community = state.mirrors.filter { it.type == MirrorType.COMMUNITY }
-        val fastestMirrorId = fastestReleaseMirror(state.mirrors, state.measuredLatencies)?.first?.id
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = 16.dp)
-                .padding(top = 4.dp, bottom = 28.dp),
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(padding)
+                    .verticalScroll(rememberScrollState())
+                    .padding(horizontal = 16.dp)
+                    .padding(top = 4.dp, bottom = 28.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             KomiText(
@@ -145,31 +153,22 @@ fun MirrorPickerRoot(
                 color = colors.onSurfaceVariant,
             )
 
-            SettingsSectionHead(
-                stringResource(Res.string.mirror_section_official),
-                TweaksDecorSlot.MirrorOfficial
-            )
+            SettingsSectionHead(stringResource(Res.string.mirror_section_official), TweaksDecorSlot.MirrorOfficial)
             SettingsGroup {
                 SettingsRow(
                     title = stringResource(Res.string.mirror_pick_fastest),
                     subtitle =
                         stringResource(
-                            if (state.isMeasuringLatencies) {
-                                Res.string.mirror_measuring
-                            } else {
-                                Res.string.mirror_pick_fastest_sub
-                            },
+                            if (state.isMeasuringLatencies) Res.string.mirror_measuring else Res.string.mirror_pick_fastest_sub,
                         ),
                     last = official.isEmpty(),
-                    onClick = { viewModel.onAction(MirrorPickerAction.OnAutoPickFastest) },
+                    onClick = { onAction(MirrorPickerAction.OnAutoPickFastest) },
                     trailing = {
                         KomiIconButton(
                             icon = Icons.Filled.Speed,
                             contentDescription = stringResource(Res.string.mirror_measure_latency),
                             enabled = !state.isMeasuringLatencies,
-                            onClick = {
-                                viewModel.onAction(MirrorPickerAction.OnMeasureLatencies)
-                            },
+                            onClick = { onAction(MirrorPickerAction.OnMeasureLatencies) },
                         )
                     },
                 )
@@ -177,44 +176,36 @@ fun MirrorPickerRoot(
                     MirrorSettingsRow(
                         mirror = mirror,
                         measuredMs = state.measuredLatencies[mirror.id],
-                        isFastest = fastestMirrorId == mirror.id,
-                        selected = isMirrorSelected(mirror, state.preference),
+                        isFastest = state.fastestMirrorId == mirror.id,
+                        selected = state.selectedMirrorId == mirror.id,
                         last = index == official.lastIndex,
-                        onClick = { viewModel.onAction(MirrorPickerAction.OnSelectMirror(mirror)) },
+                        onClick = { onAction(MirrorPickerAction.OnSelectMirror(mirror.id)) },
                     )
                 }
             }
 
-            SettingsSectionHead(
-                stringResource(Res.string.mirror_section_community),
-                TweaksDecorSlot.MirrorCommunity
-            )
+            SettingsSectionHead(stringResource(Res.string.mirror_section_community), TweaksDecorSlot.MirrorCommunity)
             SettingsGroup {
-                community.forEachIndexed { index, mirror ->
+                community.forEach { mirror ->
                     MirrorSettingsRow(
                         mirror = mirror,
                         measuredMs = state.measuredLatencies[mirror.id],
-                        isFastest = fastestMirrorId == mirror.id,
-                        selected = isMirrorSelected(mirror, state.preference),
+                        isFastest = state.fastestMirrorId == mirror.id,
+                        selected = state.selectedMirrorId == mirror.id,
                         last = false,
-                        onClick = { viewModel.onAction(MirrorPickerAction.OnSelectMirror(mirror)) },
+                        onClick = { onAction(MirrorPickerAction.OnSelectMirror(mirror.id)) },
                     )
                 }
                 SettingsRow(
                     title = stringResource(Res.string.mirror_custom_label),
                     last = true,
-                    onClick = { viewModel.onAction(MirrorPickerAction.OnCustomMirrorClicked) },
-                    trailing = {
-                        KomiRadioButton(
-                            selected = state.preference is MirrorPreference.Custom,
-                            onClick = null
-                        )
-                    },
+                    onClick = { onAction(MirrorPickerAction.OnCustomMirrorClicked) },
+                    trailing = { KomiRadioButton(selected = state.customTemplate != null, onClick = null) },
                 )
             }
 
             KomiButton(
-                onClick = { viewModel.onAction(MirrorPickerAction.OnTestConnection) },
+                onClick = { onAction(MirrorPickerAction.OnTestConnection) },
                 label = stringResource(Res.string.mirror_test_button),
                 variant = KomiButtonVariant.Primary,
                 enabled = !state.isTesting,
@@ -230,7 +221,7 @@ fun MirrorPickerRoot(
             }
 
             Spacer(Modifier.height(4.dp))
-            DeployYourOwnHint(onClick = { viewModel.onAction(MirrorPickerAction.OnDeployYourOwnClicked) })
+            DeployYourOwnHint(onClick = { onAction(MirrorPickerAction.OnDeployYourOwnClicked) })
         }
     }
 
@@ -238,16 +229,16 @@ fun MirrorPickerRoot(
         CustomMirrorDialog(
             draft = state.customDraft,
             error = state.customDraftError,
-            onDraftChange = { viewModel.onAction(MirrorPickerAction.OnCustomDraftChanged(it)) },
-            onConfirm = { viewModel.onAction(MirrorPickerAction.OnCustomMirrorConfirm) },
-            onDismiss = { viewModel.onAction(MirrorPickerAction.OnCustomMirrorDismiss) },
+            onDraftChange = { onAction(MirrorPickerAction.OnCustomDraftChanged(it)) },
+            onConfirm = { onAction(MirrorPickerAction.OnCustomMirrorConfirm) },
+            onDismiss = { onAction(MirrorPickerAction.OnCustomMirrorDismiss) },
         )
     }
 }
 
 @Composable
 private fun MirrorSettingsRow(
-    mirror: MirrorConfig,
+    mirror: MirrorUi,
     measuredMs: Int?,
     isFastest: Boolean,
     selected: Boolean,
@@ -256,29 +247,12 @@ private fun MirrorSettingsRow(
 ) {
     val label =
         when (mirror.status) {
-            MirrorStatus.OK -> mirror.latencyMs?.let {
-                stringResource(
-                    Res.string.mirror_status_ok,
-                    it
-                )
-            }
-
-            MirrorStatus.DEGRADED -> mirror.latencyMs?.let {
-                stringResource(
-                    Res.string.mirror_status_degraded,
-                    it
-                )
-            }
-
+            MirrorStatus.OK -> mirror.latencyMs?.let { stringResource(Res.string.mirror_status_ok, it) }
+            MirrorStatus.DEGRADED -> mirror.latencyMs?.let { stringResource(Res.string.mirror_status_degraded, it) }
             MirrorStatus.DOWN -> stringResource(Res.string.mirror_status_down)
             MirrorStatus.UNKNOWN -> stringResource(Res.string.mirror_status_unknown)
         }
-    val title =
-        if (isFastest) {
-            stringResource(Res.string.mirror_fastest_badge, mirror.name)
-        } else {
-            mirror.name
-        }
+    val title = if (isFastest) stringResource(Res.string.mirror_fastest_badge, mirror.name) else mirror.name
     val subtitle = measuredMs?.let { stringResource(Res.string.mirror_latency_local, it) } ?: label
     SettingsRow(
         title = title,
@@ -289,7 +263,6 @@ private fun MirrorSettingsRow(
     )
 }
 
-
 @Composable
 private fun formatTestResult(result: TestResult): String =
     when (result) {
@@ -298,14 +271,4 @@ private fun formatTestResult(result: TestResult): String =
         TestResult.Timeout -> stringResource(Res.string.mirror_test_timeout)
         TestResult.DnsFailure -> stringResource(Res.string.mirror_test_dns_fail)
         TestResult.Other -> stringResource(Res.string.mirror_test_failed)
-    }
-
-private fun isMirrorSelected(
-    mirror: MirrorConfig,
-    pref: MirrorPreference,
-): Boolean =
-    when (pref) {
-        MirrorPreference.Direct -> mirror.id == "direct"
-        is MirrorPreference.Selected -> mirror.id == pref.id
-        is MirrorPreference.Custom -> false
     }

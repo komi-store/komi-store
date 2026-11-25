@@ -20,7 +20,6 @@ import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
 import zed.rainxch.core.domain.isDesktop
 import zed.rainxch.core.domain.model.installation.DhizukuAvailability
-import zed.rainxch.core.domain.model.installation.InstallerAttribution
 import zed.rainxch.core.domain.model.installation.InstallerType
 import zed.rainxch.core.domain.model.installation.PresetKey
 import zed.rainxch.core.domain.model.installation.RootAvailability
@@ -29,23 +28,84 @@ import zed.rainxch.core.presentation.components.buttons.KomiButton
 import zed.rainxch.core.presentation.components.buttons.KomiButtonSize
 import zed.rainxch.core.presentation.components.buttons.KomiButtonVariant
 import zed.rainxch.core.presentation.components.inputs.KomiRadioButton
-import zed.rainxch.core.presentation.components.overlays.KomiSheet
 import zed.rainxch.core.presentation.components.inputs.KomiSlider
 import zed.rainxch.core.presentation.components.inputs.KomiSwitch
 import zed.rainxch.core.presentation.components.inputs.KomiTextField
+import zed.rainxch.core.presentation.components.overlays.KomiSheet
 import zed.rainxch.core.presentation.components.text.KomiText
 import zed.rainxch.core.presentation.components.text.KomiTextRole
 import zed.rainxch.core.presentation.locals.LocalPersonality
 import zed.rainxch.core.presentation.locals.LocalStatusColors
-import zed.rainxch.githubstore.core.presentation.res.*
+import zed.rainxch.githubstore.core.presentation.res.Res
+import zed.rainxch.githubstore.core.presentation.res.auto_update_description
+import zed.rainxch.githubstore.core.presentation.res.auto_update_title
+import zed.rainxch.githubstore.core.presentation.res.battery_optimization_card_description
+import zed.rainxch.githubstore.core.presentation.res.battery_optimization_card_dismiss
+import zed.rainxch.githubstore.core.presentation.res.battery_optimization_card_open
+import zed.rainxch.githubstore.core.presentation.res.battery_optimization_card_title
+import zed.rainxch.githubstore.core.presentation.res.dhizuku_grant_permission
+import zed.rainxch.githubstore.core.presentation.res.dhizuku_install_hint
+import zed.rainxch.githubstore.core.presentation.res.dhizuku_start_hint
+import zed.rainxch.githubstore.core.presentation.res.dhizuku_status_not_installed
+import zed.rainxch.githubstore.core.presentation.res.dhizuku_status_not_running
+import zed.rainxch.githubstore.core.presentation.res.dhizuku_status_permission_needed
+import zed.rainxch.githubstore.core.presentation.res.dhizuku_status_ready
+import zed.rainxch.githubstore.core.presentation.res.external_installer_empty
+import zed.rainxch.githubstore.core.presentation.res.external_installer_none
+import zed.rainxch.githubstore.core.presentation.res.external_installer_pick
+import zed.rainxch.githubstore.core.presentation.res.external_installer_sheet_title
+import zed.rainxch.githubstore.core.presentation.res.include_pre_releases_description
+import zed.rainxch.githubstore.core.presentation.res.include_pre_releases_title
+import zed.rainxch.githubstore.core.presentation.res.installer_attribution_custom_apply
+import zed.rainxch.githubstore.core.presentation.res.installer_attribution_custom_error
+import zed.rainxch.githubstore.core.presentation.res.installer_attribution_custom_label
+import zed.rainxch.githubstore.core.presentation.res.installer_attribution_preset_custom
+import zed.rainxch.githubstore.core.presentation.res.installer_attribution_preset_fdroid
+import zed.rainxch.githubstore.core.presentation.res.installer_attribution_preset_obtainium
+import zed.rainxch.githubstore.core.presentation.res.installer_attribution_preset_playstore
+import zed.rainxch.githubstore.core.presentation.res.installer_attribution_preset_system
+import zed.rainxch.githubstore.core.presentation.res.installer_type_default
+import zed.rainxch.githubstore.core.presentation.res.installer_type_default_description
+import zed.rainxch.githubstore.core.presentation.res.installer_type_dhizuku
+import zed.rainxch.githubstore.core.presentation.res.installer_type_dhizuku_description
+import zed.rainxch.githubstore.core.presentation.res.installer_type_root
+import zed.rainxch.githubstore.core.presentation.res.installer_type_root_description
+import zed.rainxch.githubstore.core.presentation.res.installer_type_shizuku
+import zed.rainxch.githubstore.core.presentation.res.installer_type_shizuku_description
+import zed.rainxch.githubstore.core.presentation.res.installer_type_third_party
+import zed.rainxch.githubstore.core.presentation.res.installer_type_third_party_description
+import zed.rainxch.githubstore.core.presentation.res.interval_biweekly
+import zed.rainxch.githubstore.core.presentation.res.interval_daily
+import zed.rainxch.githubstore.core.presentation.res.interval_every_days
+import zed.rainxch.githubstore.core.presentation.res.interval_every_hours
+import zed.rainxch.githubstore.core.presentation.res.interval_monthly
+import zed.rainxch.githubstore.core.presentation.res.interval_weekly
+import zed.rainxch.githubstore.core.presentation.res.root_grant_permission
+import zed.rainxch.githubstore.core.presentation.res.root_status_permission_needed
+import zed.rainxch.githubstore.core.presentation.res.root_status_ready
+import zed.rainxch.githubstore.core.presentation.res.root_status_unavailable
+import zed.rainxch.githubstore.core.presentation.res.root_unavailable_hint
+import zed.rainxch.githubstore.core.presentation.res.shizuku_grant_permission
+import zed.rainxch.githubstore.core.presentation.res.shizuku_install_hint
+import zed.rainxch.githubstore.core.presentation.res.shizuku_start_hint
+import zed.rainxch.githubstore.core.presentation.res.shizuku_status_not_installed
+import zed.rainxch.githubstore.core.presentation.res.shizuku_status_not_running
+import zed.rainxch.githubstore.core.presentation.res.shizuku_status_permission_needed
+import zed.rainxch.githubstore.core.presentation.res.shizuku_status_ready
+import zed.rainxch.githubstore.core.presentation.res.skipped_updates_entry_description
+import zed.rainxch.githubstore.core.presentation.res.skipped_updates_entry_title
+import zed.rainxch.githubstore.core.presentation.res.update_check_enabled_description
+import zed.rainxch.githubstore.core.presentation.res.update_check_enabled_title
+import zed.rainxch.githubstore.core.presentation.res.update_check_interval_title
 import zed.rainxch.tweaks.presentation.TweaksAction
 import zed.rainxch.tweaks.presentation.TweaksState
 import zed.rainxch.tweaks.presentation.components.shell.SettingsDrillRow
 import zed.rainxch.tweaks.presentation.components.shell.SettingsGroup
 import zed.rainxch.tweaks.presentation.components.shell.SettingsRow
+import kotlin.math.abs
 
 @Composable
-fun installSectionContent(
+fun InstallSectionContent(
     state: TweaksState,
     onAction: (TweaksAction) -> Unit,
     modifier: Modifier = Modifier,
@@ -58,14 +118,12 @@ fun installSectionContent(
     ) {
         SettingsGroup {
             InstallerTypeRow(
-                type = InstallerType.DEFAULT,
                 title = stringResource(Res.string.installer_type_default),
                 description = stringResource(Res.string.installer_type_default_description),
                 selected = state.installerType == InstallerType.DEFAULT,
                 onClick = { onAction(TweaksAction.OnInstallerTypeSelected(InstallerType.DEFAULT)) },
             )
             InstallerTypeRow(
-                type = InstallerType.SHIZUKU,
                 title = stringResource(Res.string.installer_type_shizuku),
                 description = stringResource(Res.string.installer_type_shizuku_description),
                 selected = state.installerType == InstallerType.SHIZUKU,
@@ -76,7 +134,6 @@ fun installSectionContent(
                 ShizukuActions(state.shizukuAvailability) { onAction(TweaksAction.OnRequestShizukuPermission) }
             }
             InstallerTypeRow(
-                type = InstallerType.DHIZUKU,
                 title = stringResource(Res.string.installer_type_dhizuku),
                 description = stringResource(Res.string.installer_type_dhizuku_description),
                 selected = state.installerType == InstallerType.DHIZUKU,
@@ -87,7 +144,6 @@ fun installSectionContent(
                 DhizukuActions(state.dhizukuAvailability) { onAction(TweaksAction.OnRequestDhizukuPermission) }
             }
             InstallerTypeRow(
-                type = InstallerType.ROOT,
                 title = stringResource(Res.string.installer_type_root),
                 description = stringResource(Res.string.installer_type_root_description),
                 selected = state.installerType == InstallerType.ROOT,
@@ -133,7 +189,6 @@ private fun ThirdPartyInstallerRows(
     onAction: (TweaksAction) -> Unit,
 ) {
     InstallerTypeRow(
-        type = InstallerType.THIRD_PARTY,
         title = stringResource(Res.string.installer_type_third_party),
         description = stringResource(Res.string.installer_type_third_party_description),
         selected = state.installerType == InstallerType.THIRD_PARTY,
@@ -193,11 +248,11 @@ private fun ExternalInstallerPickerSheet(
 }
 
 @Composable
-fun updatesSectionContent(
+fun UpdatesSectionContent(
     state: TweaksState,
     onAction: (TweaksAction) -> Unit,
-    modifier: Modifier = Modifier,
     onNavigateToSkippedUpdates: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     if (isDesktop()) return
 
@@ -225,7 +280,7 @@ fun updatesSectionContent(
             IntervalBlock(
                 selectedIntervalHours = state.updateCheckIntervalHours,
                 enabled = state.updateCheckEnabled,
-                onIntervalSelected = { onAction(TweaksAction.OnUpdateCheckIntervalChanged(it)) },
+                onIntervalSelect = { onAction(TweaksAction.OnUpdateCheckIntervalChanged(it)) },
             )
             SettingsRow(
                 title = stringResource(Res.string.include_pre_releases_title),
@@ -249,7 +304,6 @@ fun updatesSectionContent(
 
 @Composable
 private fun InstallerTypeRow(
-    type: InstallerType,
     title: String,
     description: String,
     selected: Boolean,
@@ -277,37 +331,38 @@ private fun AttributionRows(
     onAction: (TweaksAction) -> Unit,
 ) {
     val attribution = state.installerAttribution
+    val customShown = state.installerAttributionCustomExpanded || attribution.isCustom
     AttributionRadioRow(
         title = stringResource(Res.string.installer_attribution_preset_system),
-        selected = attribution is InstallerAttribution.SystemDefault,
+        selected = attribution.isSystemDefault,
         onClick = { onAction(TweaksAction.OnInstallerAttributionSystemDefault) },
     )
     AttributionRadioRow(
         title = stringResource(Res.string.installer_attribution_preset_playstore),
         subtitle = "com.android.vending",
-        selected = (attribution as? InstallerAttribution.Preset)?.key == PresetKey.PLAY_STORE,
+        selected = attribution.preset == PresetKey.PLAY_STORE,
         onClick = { onAction(TweaksAction.OnInstallerAttributionPresetSelected(PresetKey.PLAY_STORE)) },
     )
     AttributionRadioRow(
         title = stringResource(Res.string.installer_attribution_preset_fdroid),
         subtitle = "org.fdroid.fdroid",
-        selected = (attribution as? InstallerAttribution.Preset)?.key == PresetKey.FDROID,
+        selected = attribution.preset == PresetKey.FDROID,
         onClick = { onAction(TweaksAction.OnInstallerAttributionPresetSelected(PresetKey.FDROID)) },
     )
     AttributionRadioRow(
         title = stringResource(Res.string.installer_attribution_preset_obtainium),
         subtitle = "dev.imranr.obtainium.app",
-        selected = (attribution as? InstallerAttribution.Preset)?.key == PresetKey.OBTAINIUM,
+        selected = attribution.preset == PresetKey.OBTAINIUM,
         onClick = { onAction(TweaksAction.OnInstallerAttributionPresetSelected(PresetKey.OBTAINIUM)) },
     )
     AttributionRadioRow(
         title = stringResource(Res.string.installer_attribution_preset_custom),
-        subtitle = (attribution as? InstallerAttribution.Custom)?.packageName,
-        selected = attribution is InstallerAttribution.Custom,
+        subtitle = attribution.customPackageName,
+        selected = attribution.isCustom,
         onClick = { onAction(TweaksAction.OnInstallerAttributionCustomToggleExpanded) },
-        last = !(state.installerAttributionCustomExpanded || attribution is InstallerAttribution.Custom),
+        last = !customShown,
     )
-    if (state.installerAttributionCustomExpanded || attribution is InstallerAttribution.Custom) {
+    if (customShown) {
         Column(
             modifier = Modifier.padding(start = 15.dp, end = 15.dp, bottom = 15.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -318,7 +373,12 @@ private fun AttributionRows(
                 modifier = Modifier.fillMaxWidth(),
                 label = stringResource(Res.string.installer_attribution_custom_label),
                 placeholder = "com.example.installer",
-                error = state.installerAttributionCustomError?.let { stringResource(Res.string.installer_attribution_custom_error) },
+                error =
+                    if (state.isInstallerAttributionCustomInvalid) {
+                        stringResource(Res.string.installer_attribution_custom_error)
+                    } else {
+                        null
+                    },
             )
             KomiButton(
                 onClick = { onAction(TweaksAction.OnInstallerAttributionCustomSave) },
@@ -349,39 +409,72 @@ private fun AttributionRadioRow(
 }
 
 @Composable
-private fun ShizukuActions(availability: ShizukuAvailability, onRequest: () -> Unit) {
+private fun ShizukuActions(
+    availability: ShizukuAvailability,
+    onRequest: () -> Unit,
+) {
     when (availability) {
-        ShizukuAvailability.PERMISSION_NEEDED ->
+        ShizukuAvailability.PERMISSION_NEEDED -> {
             ActionButton(stringResource(Res.string.shizuku_grant_permission), onRequest)
-        ShizukuAvailability.UNAVAILABLE -> HintRow(stringResource(Res.string.shizuku_install_hint))
-        ShizukuAvailability.NOT_RUNNING -> HintRow(stringResource(Res.string.shizuku_start_hint))
-        ShizukuAvailability.READY -> Unit
+        }
+
+        ShizukuAvailability.UNAVAILABLE -> {
+            HintRow(stringResource(Res.string.shizuku_install_hint))
+        }
+
+        ShizukuAvailability.NOT_RUNNING -> {
+            HintRow(stringResource(Res.string.shizuku_start_hint))
+        }
+
+        ShizukuAvailability.READY -> {}
     }
 }
 
 @Composable
-private fun DhizukuActions(availability: DhizukuAvailability, onRequest: () -> Unit) {
+private fun DhizukuActions(
+    availability: DhizukuAvailability,
+    onRequest: () -> Unit,
+) {
     when (availability) {
-        DhizukuAvailability.PERMISSION_NEEDED ->
+        DhizukuAvailability.PERMISSION_NEEDED -> {
             ActionButton(stringResource(Res.string.dhizuku_grant_permission), onRequest)
-        DhizukuAvailability.UNAVAILABLE -> HintRow(stringResource(Res.string.dhizuku_install_hint))
-        DhizukuAvailability.NOT_RUNNING -> HintRow(stringResource(Res.string.dhizuku_start_hint))
-        DhizukuAvailability.READY -> Unit
+        }
+
+        DhizukuAvailability.UNAVAILABLE -> {
+            HintRow(stringResource(Res.string.dhizuku_install_hint))
+        }
+
+        DhizukuAvailability.NOT_RUNNING -> {
+            HintRow(stringResource(Res.string.dhizuku_start_hint))
+        }
+
+        DhizukuAvailability.READY -> {}
     }
 }
 
 @Composable
-private fun RootActions(availability: RootAvailability, onRequest: () -> Unit) {
+private fun RootActions(
+    availability: RootAvailability,
+    onRequest: () -> Unit,
+) {
     when (availability) {
-        RootAvailability.PERMISSION_NEEDED ->
+        RootAvailability.PERMISSION_NEEDED -> {
             ActionButton(stringResource(Res.string.root_grant_permission), onRequest)
-        RootAvailability.UNAVAILABLE -> HintRow(stringResource(Res.string.root_unavailable_hint))
-        RootAvailability.READY -> Unit
+        }
+
+        RootAvailability.UNAVAILABLE -> {
+            HintRow(stringResource(Res.string.root_unavailable_hint))
+        }
+
+        RootAvailability.READY -> {}
     }
 }
 
 @Composable
-private fun ActionButton(label: String, onClick: () -> Unit) {
+private fun ActionButton(
+    label: String,
+    onClick: () -> Unit,
+) {
     Box(modifier = Modifier.fillMaxWidth().padding(horizontal = 15.dp, vertical = 8.dp)) {
         KomiButton(
             onClick = onClick,
@@ -405,41 +498,47 @@ private fun HintRow(text: String) {
 
 @Composable
 private fun ShizukuStatusBadge(availability: ShizukuAvailability) {
+    val status = LocalStatusColors.current
     val (color, label) =
         when (availability) {
-            ShizukuAvailability.READY -> LocalStatusColors.current.statusReady to stringResource(Res.string.shizuku_status_ready)
-            ShizukuAvailability.PERMISSION_NEEDED -> LocalStatusColors.current.statusWarning to stringResource(Res.string.shizuku_status_permission_needed)
-            ShizukuAvailability.NOT_RUNNING -> LocalStatusColors.current.statusError to stringResource(Res.string.shizuku_status_not_running)
-            ShizukuAvailability.UNAVAILABLE -> LocalPersonality.current.colors.outline to stringResource(Res.string.shizuku_status_not_installed)
+            ShizukuAvailability.READY -> status.statusReady to Res.string.shizuku_status_ready
+            ShizukuAvailability.PERMISSION_NEEDED -> status.statusWarning to Res.string.shizuku_status_permission_needed
+            ShizukuAvailability.NOT_RUNNING -> status.statusError to Res.string.shizuku_status_not_running
+            ShizukuAvailability.UNAVAILABLE -> LocalPersonality.current.colors.outline to Res.string.shizuku_status_not_installed
         }
-    StatusDot(color, label)
+    StatusDot(color, stringResource(label))
 }
 
 @Composable
 private fun DhizukuStatusBadge(availability: DhizukuAvailability) {
+    val status = LocalStatusColors.current
     val (color, label) =
         when (availability) {
-            DhizukuAvailability.READY -> LocalStatusColors.current.statusReady to stringResource(Res.string.dhizuku_status_ready)
-            DhizukuAvailability.PERMISSION_NEEDED -> LocalStatusColors.current.statusWarning to stringResource(Res.string.dhizuku_status_permission_needed)
-            DhizukuAvailability.NOT_RUNNING -> LocalStatusColors.current.statusError to stringResource(Res.string.dhizuku_status_not_running)
-            DhizukuAvailability.UNAVAILABLE -> LocalPersonality.current.colors.outline to stringResource(Res.string.dhizuku_status_not_installed)
+            DhizukuAvailability.READY -> status.statusReady to Res.string.dhizuku_status_ready
+            DhizukuAvailability.PERMISSION_NEEDED -> status.statusWarning to Res.string.dhizuku_status_permission_needed
+            DhizukuAvailability.NOT_RUNNING -> status.statusError to Res.string.dhizuku_status_not_running
+            DhizukuAvailability.UNAVAILABLE -> LocalPersonality.current.colors.outline to Res.string.dhizuku_status_not_installed
         }
-    StatusDot(color, label)
+    StatusDot(color, stringResource(label))
 }
 
 @Composable
 private fun RootStatusBadge(availability: RootAvailability) {
+    val status = LocalStatusColors.current
     val (color, label) =
         when (availability) {
-            RootAvailability.READY -> LocalStatusColors.current.statusReady to stringResource(Res.string.root_status_ready)
-            RootAvailability.PERMISSION_NEEDED -> LocalStatusColors.current.statusWarning to stringResource(Res.string.root_status_permission_needed)
-            RootAvailability.UNAVAILABLE -> LocalPersonality.current.colors.outline to stringResource(Res.string.root_status_unavailable)
+            RootAvailability.READY -> status.statusReady to Res.string.root_status_ready
+            RootAvailability.PERMISSION_NEEDED -> status.statusWarning to Res.string.root_status_permission_needed
+            RootAvailability.UNAVAILABLE -> LocalPersonality.current.colors.outline to Res.string.root_status_unavailable
         }
-    StatusDot(color, label)
+    StatusDot(color, stringResource(label))
 }
 
 @Composable
-private fun StatusDot(color: Color, label: String) {
+private fun StatusDot(
+    color: Color,
+    label: String,
+) {
     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
         Box(modifier = Modifier.size(8.dp).clip(RoundedCornerShape(LocalPersonality.current.shape.cornerSmall)).background(color))
         KomiText(
@@ -469,12 +568,9 @@ private fun formatIntervalLabel(hours: Long): String {
 private fun IntervalBlock(
     selectedIntervalHours: Long,
     enabled: Boolean,
-    onIntervalSelected: (Long) -> Unit,
+    onIntervalSelect: (Long) -> Unit,
 ) {
-    val currentIndex =
-        IntervalStops.indexOf(selectedIntervalHours)
-            .let { if (it == -1) IntervalStops.indexOf(IntervalStops.minByOrNull { stop -> kotlin.math.abs(stop - selectedIntervalHours) }) else it }
-            .coerceAtLeast(0)
+    val currentIndex = IntervalStops.indexOf(IntervalStops.minBy { stop -> abs(stop - selectedIntervalHours) })
     val maxIndex = IntervalStops.lastIndex
     val colors = LocalPersonality.current.colors
     Column(modifier = Modifier.padding(start = 15.dp, end = 15.dp, top = 4.dp, bottom = 12.dp)) {
@@ -492,7 +588,7 @@ private fun IntervalBlock(
         Spacer(Modifier.height(6.dp))
         KomiSlider(
             value = currentIndex.toFloat(),
-            onValueChange = { v -> onIntervalSelected(IntervalStops[v.toInt().coerceIn(0, maxIndex)]) },
+            onValueChange = { v -> onIntervalSelect(IntervalStops[v.toInt().coerceIn(0, maxIndex)]) },
             steps = maxIndex - 1,
             valueRange = 0f..maxIndex.toFloat(),
             enabled = enabled,

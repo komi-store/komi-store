@@ -2,34 +2,29 @@ package zed.rainxch.tweaks.presentation.mirror
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import io.ktor.client.HttpClient
-import io.ktor.client.request.get
-import io.ktor.util.network.UnresolvedAddressException
-import kotlinx.coroutines.CancellationException
+import kotlinx.collections.immutable.toImmutableList
+import kotlinx.collections.immutable.toImmutableMap
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withTimeoutOrNull
-import zed.rainxch.core.data.network.MirrorRewriter
-import zed.rainxch.core.domain.logging.KomiStoreLogger
 import zed.rainxch.core.domain.model.mirror.MirrorConfig
 import zed.rainxch.core.domain.model.mirror.MirrorPreference
 import zed.rainxch.core.domain.model.mirror.fastestReleaseMirror
+import zed.rainxch.core.domain.network.MirrorConnectionTester
+import zed.rainxch.core.domain.network.MirrorTestOutcome
 import zed.rainxch.core.domain.repository.MirrorRepository
 import zed.rainxch.githubstore.core.presentation.res.Res
 import zed.rainxch.githubstore.core.presentation.res.mirror_custom_validation_https
 import zed.rainxch.githubstore.core.presentation.res.mirror_custom_validation_template
-import kotlin.time.Duration.Companion.milliseconds
-import kotlin.time.TimeSource
 
 class MirrorPickerViewModel(
     private val mirrorRepository: MirrorRepository,
-    private val testHttpClient: HttpClient,
-    private val logger: KomiStoreLogger,
+    private val connectionTester: MirrorConnectionTester,
 ) : ViewModel() {
     private val _state = MutableStateFlow(MirrorPickerState())
     val state = _state.asStateFlow()
@@ -46,9 +41,7 @@ class MirrorPickerViewModel(
             ) { catalog, pref, latencies ->
                 Triple(catalog, pref, latencies)
             }.collect { (catalog, pref, latencies) ->
-                _state.update {
-                    it.copy(mirrors = catalog, preference = pref, measuredLatencies = latencies)
-                }
+                _state.update { it.withCatalog(catalog, pref, latencies) }
             }
         }
         viewModelScope.launch {
@@ -61,10 +54,8 @@ class MirrorPickerViewModel(
 
     fun onAction(action: MirrorPickerAction) {
         when (action) {
-            MirrorPickerAction.OnNavigateBack -> {}
-
             is MirrorPickerAction.OnSelectMirror -> {
-                selectMirror(action.mirror)
+                selectMirror(action.mirrorId)
             }
 
             MirrorPickerAction.OnCustomMirrorClicked -> {
@@ -113,17 +104,17 @@ class MirrorPickerViewModel(
         }
     }
 
-    private fun selectMirror(mirror: MirrorConfig) {
+    private fun selectMirror(mirrorId: String) {
         viewModelScope.launch {
-            mirrorRepository.setPreference(preferenceFor(mirror))
+            mirrorRepository.setPreference(preferenceFor(mirrorId))
         }
     }
 
-    private fun preferenceFor(mirror: MirrorConfig): MirrorPreference =
-        if (mirror.id == "direct") {
+    private fun preferenceFor(mirrorId: String): MirrorPreference =
+        if (mirrorId == DIRECT_MIRROR_ID) {
             MirrorPreference.Direct
         } else {
-            MirrorPreference.Selected(mirror.id)
+            MirrorPreference.Selected(mirrorId)
         }
 
     private fun updateDraft(value: String) {
@@ -166,13 +157,13 @@ class MirrorPickerViewModel(
         viewModelScope.launch {
             _state.update { it.copy(isMeasuringLatencies = true) }
             val measured = mirrorRepository.measureLatencies().getOrDefault(emptyMap())
-            val fastest = fastestReleaseMirror(state.value.mirrors, measured)
+            val fastest = fastestReleaseMirror(mirrorRepository.observeCatalog().first(), measured)
             _state.update { it.copy(isMeasuringLatencies = false) }
             if (fastest == null) {
                 _events.send(MirrorPickerEvent.NoMirrorResponded)
                 return@launch
             }
-            mirrorRepository.setPreference(preferenceFor(fastest.first))
+            mirrorRepository.setPreference(preferenceFor(fastest.first.id))
             _events.send(
                 MirrorPickerEvent.FastestMirrorChosen(
                     displayName = fastest.first.name,
@@ -182,51 +173,11 @@ class MirrorPickerViewModel(
         }
     }
 
-    @Suppress("TooGenericExceptionCaught")
     private fun runTest() {
         viewModelScope.launch {
             _state.update { it.copy(isTesting = true, testResult = null) }
-            val template =
-                when (val pref = state.value.preference) {
-                    MirrorPreference.Direct -> {
-                        null
-                    }
-
-                    is MirrorPreference.Custom -> {
-                        pref.template
-                    }
-
-                    is MirrorPreference.Selected -> {
-                        state.value.mirrors
-                            .firstOrNull { it.id == pref.id }
-                            ?.urlTemplate
-                    }
-                }
-            val targetUrl = MirrorRewriter.probeUrl(template)
-
-            val testResult: TestResult =
-                withTimeoutOrNull(5_000L.milliseconds) {
-                    try {
-                        val mark = TimeSource.Monotonic.markNow()
-                        val response = testHttpClient.get(targetUrl)
-                        val elapsedMs = mark.elapsedNow().inWholeMilliseconds
-                        val status = response.status.value
-                        if (status in 200..299) {
-                            TestResult.Success(elapsedMs)
-                        } else {
-                            TestResult.HttpError(status)
-                        }
-                    } catch (e: CancellationException) {
-                        throw e
-                    } catch (_: UnresolvedAddressException) {
-                        TestResult.DnsFailure
-                    } catch (e: Exception) {
-                        logger.error("MirrorPickerViewModel: mirror test failed for $targetUrl", e)
-                        TestResult.Other
-                    }
-                } ?: TestResult.Timeout
-
-            _state.update { it.copy(isTesting = false, testResult = testResult) }
+            val result = connectionTester.test(state.value.selectedTemplate()).toTestResult()
+            _state.update { it.copy(isTesting = false, testResult = result) }
         }
     }
 
@@ -237,4 +188,38 @@ class MirrorPickerViewModel(
             _state.update { it.copy(isRefreshing = false) }
         }
     }
+
+    private fun MirrorPickerState.withCatalog(
+        catalog: List<MirrorConfig>,
+        pref: MirrorPreference,
+        latencies: Map<String, Int>,
+    ): MirrorPickerState =
+        copy(
+            mirrors = catalog.map { it.toUi() }.toImmutableList(),
+            measuredLatencies = latencies.toImmutableMap(),
+            fastestMirrorId = fastestReleaseMirror(catalog, latencies)?.first?.id,
+            selectedMirrorId =
+                when (pref) {
+                    MirrorPreference.Direct -> DIRECT_MIRROR_ID
+                    is MirrorPreference.Selected -> pref.id
+                    is MirrorPreference.Custom -> null
+                },
+            customTemplate = (pref as? MirrorPreference.Custom)?.template,
+        )
+
+    private fun MirrorPickerState.selectedTemplate(): String? =
+        when {
+            customTemplate != null -> customTemplate
+            selectedMirrorId == DIRECT_MIRROR_ID -> null
+            else -> mirrors.firstOrNull { it.id == selectedMirrorId }?.urlTemplate
+        }
+
+    private fun MirrorTestOutcome.toTestResult(): TestResult =
+        when (this) {
+            is MirrorTestOutcome.Success -> TestResult.Success(latencyMs)
+            is MirrorTestOutcome.HttpError -> TestResult.HttpError(code)
+            MirrorTestOutcome.Timeout -> TestResult.Timeout
+            MirrorTestOutcome.DnsFailure -> TestResult.DnsFailure
+            MirrorTestOutcome.Failed -> TestResult.Other
+        }
 }

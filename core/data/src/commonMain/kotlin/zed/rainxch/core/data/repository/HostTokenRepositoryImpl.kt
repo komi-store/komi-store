@@ -24,6 +24,7 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.json.Json
 import zed.rainxch.core.data.network.recoverHttpFailure
+import zed.rainxch.core.data.secure.putOrRaise
 import zed.rainxch.core.data.secure.safeGet
 import zed.rainxch.core.domain.model.account.HostNames
 import zed.rainxch.core.domain.model.account.HostToken
@@ -172,7 +173,7 @@ class HostTokenRepositoryImpl(
 
     private suspend fun persistOrThrow(list: List<HostToken>) {
         val encoded = json.encodeToString(ListSerializer(HostToken.serializer()), list)
-        ksafe.put(KEY_TOKENS_JSON, encoded)
+        ksafe.putOrRaise(KEY_TOKENS_JSON, encoded)
         cache.value = list
     }
 

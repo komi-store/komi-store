@@ -1,43 +1,49 @@
 package zed.rainxch.tweaks.presentation
 
 sealed interface TweaksEvent {
-    data object OnProxySaved : TweaksEvent
+    sealed interface Proxy : TweaksEvent
+
+    sealed interface Storage : TweaksEvent
+
+    sealed interface Translation : TweaksEvent
+
+    data object OnProxySaved : Proxy
 
     data class OnProxySaveError(
         val message: String,
-    ) : TweaksEvent
+    ) : Proxy
 
     data class OnProxyTestSuccess(
         val latencyMs: Long,
-    ) : TweaksEvent
+    ) : Proxy
 
     data class OnProxyTestError(
         val message: String,
-    ) : TweaksEvent
+    ) : Proxy
 
     data class OnMasterProxyTestResult(
         val searchMs: Long?,
         val downloadMs: Long?,
         val translationMs: Long?,
-    ) : TweaksEvent
+    ) : Proxy
 
-    data object OnCacheCleared : TweaksEvent
+    data object OnCacheCleared : Storage
 
     data class OnCacheClearError(
         val message: String,
-    ) : TweaksEvent
+    ) : Storage
 
-    data object OnSeenHistoryCleared : TweaksEvent
+    data object OnSeenHistoryCleared : Storage
 
-    data object OnTranslationProviderSaved : TweaksEvent
+    data object OnTranslationProviderSaved : Translation
 
-    data object OnYoudaoCredentialsSaved : TweaksEvent
+    data object OnYoudaoCredentialsSaved : Translation
 
-    data object OnLibreTranslateCredentialsSaved : TweaksEvent
+    data object OnLibreTranslateCredentialsSaved : Translation
 
-    data object OnDeeplCredentialsSaved : TweaksEvent
+    data object OnDeeplCredentialsSaved : Translation
 
-    data object OnMicrosoftTranslatorCredentialsSaved : TweaksEvent
+    data object OnMicrosoftTranslatorCredentialsSaved : Translation
 
     data object OnAppLanguageChangeRequiresRestart : TweaksEvent
 

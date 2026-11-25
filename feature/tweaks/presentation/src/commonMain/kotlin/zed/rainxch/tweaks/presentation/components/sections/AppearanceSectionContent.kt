@@ -2,32 +2,50 @@ package zed.rainxch.tweaks.presentation.components.sections
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 import org.jetbrains.compose.resources.stringResource
 import zed.rainxch.core.domain.isDesktop
 import zed.rainxch.core.domain.model.appearance.AppPersonality
 import zed.rainxch.core.domain.model.appearance.ContentWidth
 import zed.rainxch.core.domain.model.appearance.MangaPaperId
 import zed.rainxch.core.domain.repository.SYSTEM_DEFAULT_DISPLAY_MODE_ID
+import zed.rainxch.core.presentation.components.buttons.KomiIconButtonSize
+import zed.rainxch.core.presentation.components.buttons.KomiSegmented
+import zed.rainxch.core.presentation.components.buttons.KomiSegmentedItem
 import zed.rainxch.core.presentation.components.inputs.KomiSwitch
 import zed.rainxch.core.presentation.components.overlays.KomiDropdown
 import zed.rainxch.core.presentation.components.overlays.KomiMenuItem
 import zed.rainxch.core.presentation.utils.displayName
 import zed.rainxch.core.presentation.utils.rememberDisplayModeOptions
-import zed.rainxch.githubstore.core.presentation.res.*
+import zed.rainxch.githubstore.core.presentation.res.Res
+import zed.rainxch.githubstore.core.presentation.res.amoled_black_description
+import zed.rainxch.githubstore.core.presentation.res.amoled_black_theme
+import zed.rainxch.githubstore.core.presentation.res.appearance_section_mode
+import zed.rainxch.githubstore.core.presentation.res.appearance_section_paper
+import zed.rainxch.githubstore.core.presentation.res.content_width_description
+import zed.rainxch.githubstore.core.presentation.res.content_width_title
+import zed.rainxch.githubstore.core.presentation.res.display_mode_auto
+import zed.rainxch.githubstore.core.presentation.res.display_mode_description
+import zed.rainxch.githubstore.core.presentation.res.display_mode_option
+import zed.rainxch.githubstore.core.presentation.res.display_mode_title
+import zed.rainxch.githubstore.core.presentation.res.paper_day
+import zed.rainxch.githubstore.core.presentation.res.paper_night
+import zed.rainxch.githubstore.core.presentation.res.paper_nord
+import zed.rainxch.githubstore.core.presentation.res.repo_layout_grid
+import zed.rainxch.githubstore.core.presentation.res.repo_layout_list
+import zed.rainxch.githubstore.core.presentation.res.repo_layout_title
+import zed.rainxch.githubstore.core.presentation.res.scrollbar_option_description
+import zed.rainxch.githubstore.core.presentation.res.scrollbar_option_title
+import zed.rainxch.githubstore.core.presentation.res.theme_dark
+import zed.rainxch.githubstore.core.presentation.res.theme_light
+import zed.rainxch.githubstore.core.presentation.res.theme_system
 import zed.rainxch.tweaks.presentation.TweaksAction
 import zed.rainxch.tweaks.presentation.TweaksState
 import zed.rainxch.tweaks.presentation.components.shell.SettingsGroup
 import zed.rainxch.tweaks.presentation.components.shell.SettingsRow
 import zed.rainxch.tweaks.presentation.components.shell.SettingsValuePill
 import kotlin.math.roundToInt
-import kotlinx.collections.immutable.persistentListOf
-import kotlinx.collections.immutable.toImmutableList
-import zed.rainxch.core.presentation.components.buttons.KomiIconButtonSize
-import zed.rainxch.core.presentation.components.buttons.KomiSegmented
-import zed.rainxch.core.presentation.components.buttons.KomiSegmentedItem
-import zed.rainxch.githubstore.core.presentation.res.repo_layout_grid
-import zed.rainxch.githubstore.core.presentation.res.repo_layout_list
-import zed.rainxch.githubstore.core.presentation.res.repo_layout_title
 
 private enum class ModeChoice { LIGHT, DARK, SYSTEM }
 
@@ -50,15 +68,15 @@ private fun showsAmoledToggle(
     isDarkTheme: Boolean?,
 ): Boolean =
     when (personality) {
-        // AMOLED forces near-black surfaces — only meaningful where a dark surface is
-        // actually rendered. Classic Light never applies it (hide); Dark + System keep it.
+        // AMOLED only changes a dark surface, so Classic Light hides the toggle.
         AppPersonality.CLASSIC -> isDarkTheme != false
+
         // Manga's Night paper is inherently pure-black, so there is nothing to toggle.
         AppPersonality.MANGA -> false
     }
 
 @Composable
-fun appearanceSectionContent(
+fun AppearanceSectionContent(
     state: TweaksState,
     onAction: (TweaksAction) -> Unit,
     modifier: Modifier = Modifier,

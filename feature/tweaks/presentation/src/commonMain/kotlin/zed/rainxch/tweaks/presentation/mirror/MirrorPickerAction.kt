@@ -1,12 +1,8 @@
 package zed.rainxch.tweaks.presentation.mirror
 
-import zed.rainxch.core.domain.model.mirror.MirrorConfig
-
 sealed interface MirrorPickerAction {
-    data object OnNavigateBack : MirrorPickerAction
-
     data class OnSelectMirror(
-        val mirror: MirrorConfig,
+        val mirrorId: String,
     ) : MirrorPickerAction
 
     data object OnCustomMirrorClicked : MirrorPickerAction

@@ -32,16 +32,11 @@ import zed.rainxch.core.presentation.components.icon.KomiIcon
 import zed.rainxch.core.presentation.components.text.KomiText
 import zed.rainxch.core.presentation.components.text.KomiTextRole
 import zed.rainxch.core.presentation.locals.LocalPersonality
+import zed.rainxch.core.presentation.personality.ClassicPreviewPalette
 import zed.rainxch.core.presentation.personality.MangaPersonality
 import zed.rainxch.core.presentation.personality.manga.decoration.gridPaper
 import zed.rainxch.core.presentation.personality.manga.decoration.hardShadow
-
-private val ClassicBg = Color(0xFFEEF1F6)
-private val ClassicCard = Color(0xFFFFFFFF)
-private val ClassicBorder = Color(0xFFD4DAE6)
-private val ClassicAccent = Color(0xFF5B76F7)
-private val ClassicBar = Color(0xFF33415C)
-private val ClassicBarFaint = Color(0xFFAAB4C8)
+import zed.rainxch.core.presentation.personality.model.inkFaint
 
 @Composable
 fun PersonalityTile(
@@ -79,7 +74,7 @@ fun PersonalityTile(
                 Modifier
                     .fillMaxWidth()
                     .height(96.dp)
-                    .background(if (isManga) colors.background else ClassicBg)
+                    .background(if (isManga) colors.background else ClassicPreviewPalette.background)
                     .then(
                         if (isManga) {
                             Modifier.gridPaper(colors.onSurface, colors.gridOpacity + 0.02f, cell = 14.dp)
@@ -88,7 +83,13 @@ fun PersonalityTile(
                         },
                     ),
         ) {
-            MiniCard(isManga = isManga, accent = colors.primary, onSurface = colors.onSurface, surface = colors.surface)
+            MiniCard(
+                isManga = isManga,
+                accent = colors.primary,
+                onSurface = colors.onSurface,
+                faint = colors.inkFaint,
+                surface = colors.surface,
+            )
 
             if (isManga) {
                 KomiText(
@@ -145,6 +146,7 @@ private fun BoxScope.MiniCard(
     isManga: Boolean,
     accent: Color,
     onSurface: Color,
+    faint: Color,
     surface: Color,
 ) {
     Row(
@@ -163,8 +165,8 @@ private fun BoxScope.MiniCard(
                     } else {
                         Modifier
                             .shadow(4.dp, RoundedCornerShape(14.dp))
-                            .background(ClassicCard, RoundedCornerShape(14.dp))
-                            .border(1.dp, ClassicBorder, RoundedCornerShape(14.dp))
+                            .background(ClassicPreviewPalette.card, RoundedCornerShape(14.dp))
+                            .border(1.dp, ClassicPreviewPalette.border, RoundedCornerShape(14.dp))
                     },
                 ).padding(9.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -177,7 +179,7 @@ private fun BoxScope.MiniCard(
                         if (isManga) {
                             Modifier.rotate(-3f).background(accent).border(2.dp, onSurface)
                         } else {
-                            Modifier.background(ClassicAccent, RoundedCornerShape(8.dp))
+                            Modifier.background(ClassicPreviewPalette.accent, RoundedCornerShape(8.dp))
                         },
                     ),
         )
@@ -192,7 +194,7 @@ private fun BoxScope.MiniCard(
                             if (isManga) {
                                 Modifier.background(onSurface)
                             } else {
-                                Modifier.background(ClassicBar, RoundedCornerShape(4.dp))
+                                Modifier.background(ClassicPreviewPalette.bar, RoundedCornerShape(4.dp))
                             },
                         ),
             )
@@ -204,9 +206,9 @@ private fun BoxScope.MiniCard(
                         .height(5.dp)
                         .then(
                             if (isManga) {
-                                Modifier.background(onSurface.copy(alpha = 0.45f))
+                                Modifier.background(faint)
                             } else {
-                                Modifier.background(ClassicBarFaint, RoundedCornerShape(3.dp))
+                                Modifier.background(ClassicPreviewPalette.barFaint, RoundedCornerShape(3.dp))
                             },
                         ),
             )

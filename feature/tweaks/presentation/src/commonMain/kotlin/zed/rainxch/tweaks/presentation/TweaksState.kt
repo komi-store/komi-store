@@ -14,8 +14,6 @@ import zed.rainxch.core.domain.model.appearance.ContentWidth
 import zed.rainxch.core.domain.model.appearance.FontTheme
 import zed.rainxch.core.domain.model.appearance.MangaPaperId
 import zed.rainxch.core.domain.model.installation.DhizukuAvailability
-import zed.rainxch.core.domain.model.installation.ExternalInstallerApp
-import zed.rainxch.core.domain.model.installation.InstallerAttribution
 import zed.rainxch.core.domain.model.installation.InstallerType
 import zed.rainxch.core.domain.model.installation.RootAvailability
 import zed.rainxch.core.domain.model.installation.ShizukuAvailability
@@ -25,6 +23,8 @@ import zed.rainxch.core.domain.model.settings.SupportedTranslationLanguages
 import zed.rainxch.core.domain.model.settings.TranslationProvider
 import zed.rainxch.core.domain.repository.SYSTEM_DEFAULT_DISPLAY_MODE_ID
 import zed.rainxch.tweaks.presentation.components.desktop.DesktopSection
+import zed.rainxch.tweaks.presentation.model.ExternalInstallerUi
+import zed.rainxch.tweaks.presentation.model.InstallerAttributionUi
 import zed.rainxch.tweaks.presentation.model.LanguagePickerOption
 import zed.rainxch.tweaks.presentation.model.ProxyScopeFormState
 
@@ -45,12 +45,12 @@ data class TweaksState(
     val isClearDownloadsDialogVisible: Boolean = false,
     val installerType: InstallerType = InstallerType.DEFAULT,
     val externalInstallerPackage: String = "",
-    val externalInstallers: ImmutableList<ExternalInstallerApp> = persistentListOf(),
+    val externalInstallers: ImmutableList<ExternalInstallerUi> = persistentListOf(),
     val externalInstallerPickerOpen: Boolean = false,
-    val installerAttribution: InstallerAttribution = InstallerAttribution.SystemDefault,
+    val installerAttribution: InstallerAttributionUi = InstallerAttributionUi(),
     val installerAttributionCustomDraft: String = "",
     val installerAttributionCustomExpanded: Boolean = false,
-    val installerAttributionCustomError: String? = null,
+    val isInstallerAttributionCustomInvalid: Boolean = false,
     val shizukuAvailability: ShizukuAvailability = ShizukuAvailability.UNAVAILABLE,
     val dhizukuAvailability: DhizukuAvailability = DhizukuAvailability.UNAVAILABLE,
     val rootAvailability: RootAvailability = RootAvailability.UNAVAILABLE,

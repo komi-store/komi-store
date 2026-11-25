@@ -24,11 +24,6 @@ import androidx.compose.material.icons.automirrored.outlined.OpenInNew
 import androidx.compose.material.icons.outlined.Code
 import androidx.compose.material.icons.outlined.Description
 import androidx.compose.material.icons.outlined.Language
-import zed.rainxch.core.presentation.components.GitHubStoreImage
-import zed.rainxch.core.presentation.components.dividers.KomiHorizontalDivider
-import zed.rainxch.core.presentation.components.icon.KomiIcon
-import zed.rainxch.core.presentation.components.overlays.rememberKomiToastState
-import zed.rainxch.core.presentation.components.surfaces.KomiSurface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -44,17 +39,25 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
+import zed.rainxch.core.presentation.components.GitHubStoreImage
 import zed.rainxch.core.presentation.components.bars.KomiTopBar
-import zed.rainxch.core.presentation.locals.LocalPersonality
-import zed.rainxch.githubstore.core.presentation.res.Res
-import zed.rainxch.githubstore.core.presentation.res.app_icon
 import zed.rainxch.core.presentation.components.buttons.KomiButton
-import zed.rainxch.core.presentation.components.buttons.KomiButtonVariant
 import zed.rainxch.core.presentation.components.buttons.KomiButtonSize
+import zed.rainxch.core.presentation.components.buttons.KomiButtonVariant
+import zed.rainxch.core.presentation.components.dividers.KomiHorizontalDivider
+import zed.rainxch.core.presentation.components.icon.KomiIcon
+import zed.rainxch.core.presentation.components.overlays.rememberKomiToastState
 import zed.rainxch.core.presentation.components.scaffold.KomiScaffold
+import zed.rainxch.core.presentation.components.surfaces.KomiSurface
 import zed.rainxch.core.presentation.components.text.KomiText
 import zed.rainxch.core.presentation.components.text.KomiTextRole
+import zed.rainxch.core.presentation.locals.LocalPersonality
+import zed.rainxch.core.presentation.personality.model.primaryEdge
+import zed.rainxch.core.presentation.personality.model.primaryWash
+import zed.rainxch.core.presentation.personality.model.primaryWell
 import zed.rainxch.core.presentation.utils.constrainedContentWidth
+import zed.rainxch.githubstore.core.presentation.res.Res
+import zed.rainxch.githubstore.core.presentation.res.app_icon
 import zed.rainxch.githubstore.core.presentation.res.tweaks_app_info_app_name
 import zed.rainxch.githubstore.core.presentation.res.tweaks_app_info_community_business_cta
 import zed.rainxch.githubstore.core.presentation.res.tweaks_app_info_community_business_subtitle
@@ -88,10 +91,25 @@ fun AppInfoRoot(
     viewModel: AppInfoViewModel = koinViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    AppInfoScreen(
+        state = state,
+        onNavigateBack = onNavigateBack,
+        onNavigateToLicenses = onNavigateToLicenses,
+    )
+}
+
+@Composable
+private fun AppInfoScreen(
+    state: AppInfoState,
+    onNavigateBack: () -> Unit,
+    onNavigateToLicenses: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     val toastState = rememberKomiToastState()
     val uriHandler = LocalUriHandler.current
 
     KomiScaffold(
+        modifier = modifier,
         topBar = {
             KomiTopBar(
                 title = stringResource(Res.string.tweaks_entry_app_info),
@@ -100,28 +118,30 @@ fun AppInfoRoot(
         },
         grid = true,
         screentone = true,
-        toastState = toastState
+        toastState = toastState,
     ) { innerPadding ->
         Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding),
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding),
             contentAlignment = Alignment.TopCenter,
         ) {
-            Column (
-                modifier = Modifier
-                    .constrainedContentWidth()
-                    .fillMaxSize()
-                    .verticalScroll(rememberScrollState())
-                    .padding(horizontal = 16.dp)
-                    .padding(top = 4.dp, bottom = 28.dp)
+            Column(
+                modifier =
+                    Modifier
+                        .constrainedContentWidth()
+                        .fillMaxSize()
+                        .verticalScroll(rememberScrollState())
+                        .padding(horizontal = 16.dp)
+                        .padding(top = 4.dp, bottom = 28.dp),
             ) {
                 AppIdentityCard(versionName = state.versionName)
                 Spacer(Modifier.height(20.dp))
 
                 KomiText(
                     text = stringResource(Res.string.tweaks_app_info_community_section),
-                    role = KomiTextRole.SectionTitle
+                    role = KomiTextRole.SectionTitle,
                 )
                 Spacer(Modifier.height(8.dp))
 
@@ -140,7 +160,6 @@ fun AppInfoRoot(
                     icon = Icons.Outlined.Code,
                     title = stringResource(Res.string.tweaks_app_info_licenses_title),
                     subtitle = stringResource(Res.string.tweaks_app_info_licenses_subtitle),
-                    accent = LocalPersonality.current.colors.primary,
                     onClick = onNavigateToLicenses,
                 )
                 Spacer(Modifier.height(8.dp))
@@ -149,7 +168,6 @@ fun AppInfoRoot(
                     icon = Icons.Outlined.Description,
                     title = stringResource(Res.string.tweaks_app_info_privacy_policy_title),
                     subtitle = stringResource(Res.string.tweaks_app_info_privacy_policy_subtitle),
-                    accent = LocalPersonality.current.colors.primary,
                     onClick = {
                         runCatching { uriHandler.openUri(PRIVACY_POLICY_URL) }
                     },
@@ -160,7 +178,6 @@ fun AppInfoRoot(
                     icon = Icons.AutoMirrored.Outlined.OpenInNew,
                     title = stringResource(Res.string.tweaks_app_info_source_code_title),
                     subtitle = stringResource(Res.string.tweaks_app_info_source_code_subtitle),
-                    accent = LocalPersonality.current.colors.primary,
                     onClick = {
                         runCatching { uriHandler.openUri(SOURCE_CODE_URL) }
                     },
@@ -175,18 +192,20 @@ private fun AppIdentityCard(versionName: String) {
     val colors = LocalPersonality.current.colors
     KomiSurface(modifier = Modifier.fillMaxWidth()) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             Image(
                 painter = painterResource(Res.drawable.app_icon),
                 contentDescription = null,
-                modifier = Modifier
-                    .size(56.dp)
-                    .clip(RoundedCornerShape(LocalPersonality.current.shape.cornerSmall)),
+                modifier =
+                    Modifier
+                        .size(56.dp)
+                        .clip(RoundedCornerShape(LocalPersonality.current.shape.cornerSmall)),
             )
             Column(
                 modifier = Modifier.weight(1f),
@@ -251,21 +270,18 @@ private fun CommunityCard(
                 SocialTile(
                     label = "Telegram",
                     iconUrl = "https://cdn.simpleicons.org/telegram/000000",
-                    accent = LocalPersonality.current.colors.primary,
                     onClick = onTelegram,
                     modifier = Modifier.weight(1f),
                 )
                 SocialTile(
                     label = "Discord",
                     iconUrl = "https://cdn.simpleicons.org/discord/000000",
-                    accent = LocalPersonality.current.colors.primary,
                     onClick = onDiscord,
                     modifier = Modifier.weight(1f),
                 )
                 SocialTile(
                     label = "Mastodon",
                     iconUrl = "https://cdn.simpleicons.org/mastodon/000000",
-                    accent = LocalPersonality.current.colors.primary,
                     onClick = onMastodon,
                     modifier = Modifier.weight(1f),
                 )
@@ -278,21 +294,18 @@ private fun CommunityCard(
                 SocialTile(
                     label = "Reddit",
                     iconUrl = "https://cdn.simpleicons.org/reddit/000000",
-                    accent = LocalPersonality.current.colors.primary,
                     onClick = onReddit,
                     modifier = Modifier.weight(1f),
                 )
                 SocialTile(
                     label = "GitHub",
                     iconUrl = "https://cdn.simpleicons.org/github/000000",
-                    accent = LocalPersonality.current.colors.primary,
                     onClick = onGithub,
                     modifier = Modifier.weight(1f),
                 )
                 SocialTile(
                     label = stringResource(Res.string.tweaks_app_info_website),
                     iconFallback = Icons.Outlined.Language,
-                    accent = LocalPersonality.current.colors.primary,
                     onClick = onWebsite,
                     modifier = Modifier.weight(1f),
                 )
@@ -334,32 +347,36 @@ private fun CommunityCard(
 @Composable
 private fun SocialTile(
     label: String,
-    accent: Color,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     iconUrl: String? = null,
     iconFallback: ImageVector? = null,
 ) {
+    val colors = LocalPersonality.current.colors
+    val accent = colors.primary
     val shape = RoundedCornerShape(LocalPersonality.current.shape.corner)
     Box(
-        modifier = modifier
-            .clip(shape)
-            .background(accent.copy(alpha = 0.14f))
-            .border(1.dp, accent.copy(alpha = 0.35f), shape)
-            .clickable(onClick = onClick),
+        modifier =
+            modifier
+                .clip(shape)
+                .background(colors.primaryWash)
+                .border(1.dp, colors.primaryEdge, shape)
+                .clickable(onClick = onClick),
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 14.dp, horizontal = 8.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 14.dp, horizontal = 8.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(6.dp),
         ) {
             Box(
-                modifier = Modifier
-                    .size(36.dp)
-                    .clip(RoundedCornerShape(LocalPersonality.current.shape.cornerSmall))
-                    .background(accent.copy(alpha = 0.22f)),
+                modifier =
+                    Modifier
+                        .size(36.dp)
+                        .clip(RoundedCornerShape(LocalPersonality.current.shape.cornerSmall))
+                        .background(colors.primaryWell),
                 contentAlignment = Alignment.Center,
             ) {
                 if (iconUrl != null) {
@@ -380,7 +397,7 @@ private fun SocialTile(
             KomiText(
                 text = label,
                 role = KomiTextRole.LabelSmall,
-                color = LocalPersonality.current.colors.onSurface,
+                color = colors.onSurface,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
@@ -394,35 +411,28 @@ private fun ActionRow(
     title: String,
     subtitle: String,
     onClick: () -> Unit,
-    accent: Color = Color.Unspecified,
 ) {
     val colors = LocalPersonality.current.colors
-    val tileBg = if (accent == Color.Unspecified) {
-        colors.surfaceContainerHigh
-    } else {
-        accent.copy(alpha = 0.14f)
-    }
-    val tint = if (accent == Color.Unspecified) {
-        colors.onSurfaceVariant
-    } else {
-        accent
-    }
+    val tileBg = colors.primaryWash
+    val tint = colors.primary
     KomiSurface(
         modifier = Modifier.fillMaxWidth(),
         onClick = onClick,
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 14.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 14.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             Box(
-                modifier = Modifier
-                    .size(40.dp)
-                    .clip(RoundedCornerShape(LocalPersonality.current.shape.cornerSmall))
-                    .background(tileBg),
+                modifier =
+                    Modifier
+                        .size(40.dp)
+                        .clip(RoundedCornerShape(LocalPersonality.current.shape.cornerSmall))
+                        .background(tileBg),
                 contentAlignment = Alignment.Center,
             ) {
                 KomiIcon(

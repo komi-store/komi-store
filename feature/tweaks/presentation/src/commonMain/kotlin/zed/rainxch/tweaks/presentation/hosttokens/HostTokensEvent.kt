@@ -1,14 +1,12 @@
 package zed.rainxch.tweaks.presentation.hosttokens
 
-import zed.rainxch.core.domain.model.account.HostToken
-
 sealed interface HostTokensEvent {
     data class Message(
         val text: String,
     ) : HostTokensEvent
 
     data class TokenDeletedWithUndo(
-        val deleted: HostToken,
+        val deleted: HostTokenUi,
     ) : HostTokensEvent
 
     data class OpenUrl(

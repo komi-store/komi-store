@@ -3,7 +3,6 @@ package zed.rainxch.githubstore.app.di
 import org.koin.core.module.dsl.factoryOf
 import org.koin.core.module.dsl.viewModel
 import org.koin.core.module.dsl.viewModelOf
-import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import zed.rainxch.apps.presentation.AppsViewModel
 import zed.rainxch.apps.presentation.import.ExternalImportViewModel
@@ -44,6 +43,12 @@ import zed.rainxch.starred.presentation.StarredReposViewModel
 import zed.rainxch.tweaks.presentation.TweaksViewModel
 import zed.rainxch.tweaks.presentation.appinfo.AppInfoViewModel
 import zed.rainxch.tweaks.presentation.feedback.FeedbackViewModel
+import zed.rainxch.tweaks.presentation.handlers.ConnectionHandler
+import zed.rainxch.tweaks.presentation.handlers.DiagnosticsHandler
+import zed.rainxch.tweaks.presentation.handlers.InstallsHandler
+import zed.rainxch.tweaks.presentation.handlers.LookAndFeelHandler
+import zed.rainxch.tweaks.presentation.handlers.PrivacyHandler
+import zed.rainxch.tweaks.presentation.handlers.TranslationHandler
 import zed.rainxch.tweaks.presentation.hidden.HiddenRepositoriesViewModel
 import zed.rainxch.tweaks.presentation.hosttokens.HostTokensViewModel
 import zed.rainxch.tweaks.presentation.licenses.LicensesViewModel
@@ -180,6 +185,12 @@ val viewModelsModule =
             )
         }
         viewModelOf(::ProfileViewModel)
+        factoryOf(::LookAndFeelHandler)
+        factoryOf(::ConnectionHandler)
+        factoryOf(::InstallsHandler)
+        factoryOf(::TranslationHandler)
+        factoryOf(::PrivacyHandler)
+        factoryOf(::DiagnosticsHandler)
         viewModelOf(::TweaksViewModel)
         viewModelOf(::FeedbackViewModel)
         viewModelOf(::StarredReposViewModel)
@@ -198,11 +209,5 @@ val viewModelsModule =
                 tweaksRepository = get(),
             )
         }
-        viewModel {
-            MirrorPickerViewModel(
-                mirrorRepository = get(),
-                testHttpClient = get(qualifier = named("test")),
-                logger = get(),
-            )
-        }
+        viewModelOf(::MirrorPickerViewModel)
     }

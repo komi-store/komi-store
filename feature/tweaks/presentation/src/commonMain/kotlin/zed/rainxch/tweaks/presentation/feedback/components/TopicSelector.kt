@@ -22,7 +22,7 @@ import zed.rainxch.tweaks.presentation.feedback.model.FeedbackTopic
 @Composable
 fun TopicSelector(
     selected: FeedbackTopic,
-    onSelected: (FeedbackTopic) -> Unit,
+    onSelect: (FeedbackTopic) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier) {
@@ -41,7 +41,7 @@ fun TopicSelector(
                 FeedbackPillChip(
                     label = stringResource(topic.label),
                     isSelected = topic == selected,
-                    onClick = { onSelected(topic) },
+                    onClick = { onSelect(topic) },
                 )
             }
         }

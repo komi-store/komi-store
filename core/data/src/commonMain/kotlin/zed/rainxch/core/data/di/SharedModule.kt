@@ -28,6 +28,7 @@ import zed.rainxch.core.data.local.db.dao.SigningFingerprintDao
 import zed.rainxch.core.data.local.db.dao.StarredRepoDao
 import zed.rainxch.core.data.local.db.dao.UpdateHistoryDao
 import zed.rainxch.core.data.logging.KermitLogger
+import zed.rainxch.core.data.mirror.MirrorConnectionTesterImpl
 import zed.rainxch.core.data.mirror.MirrorLatencyProbeImpl
 import zed.rainxch.core.data.mirror.MirrorRepositoryImpl
 import zed.rainxch.core.data.network.BackendApiClient
@@ -75,6 +76,7 @@ import zed.rainxch.core.domain.logging.KomiStoreLogger
 import zed.rainxch.core.domain.model.settings.ProxyConfig
 import zed.rainxch.core.domain.model.settings.ProxyScope
 import zed.rainxch.core.domain.model.system.Platform
+import zed.rainxch.core.domain.network.MirrorConnectionTester
 import zed.rainxch.core.domain.network.MirrorLatencyProbe
 import zed.rainxch.core.domain.network.ProxyTester
 import zed.rainxch.core.domain.repository.AnnouncementsCacheStore
@@ -214,6 +216,13 @@ val coreModule =
         single<MirrorLatencyProbe> {
             MirrorLatencyProbeImpl(
                 client = get(qualifier = named("test")),
+            )
+        }
+
+        single<MirrorConnectionTester> {
+            MirrorConnectionTesterImpl(
+                client = get(qualifier = named("test")),
+                logger = get(),
             )
         }
 

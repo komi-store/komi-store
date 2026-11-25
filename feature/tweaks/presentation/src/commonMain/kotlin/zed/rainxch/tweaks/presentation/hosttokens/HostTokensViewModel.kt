@@ -2,7 +2,10 @@ package zed.rainxch.tweaks.presentation.hosttokens
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.CancellationException
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
+import kotlinx.collections.immutable.toImmutableMap
+import kotlinx.collections.immutable.toImmutableSet
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -10,10 +13,13 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.getString
 import zed.rainxch.core.domain.logging.KomiStoreLogger
 import zed.rainxch.core.domain.model.account.ForgeKind
 import zed.rainxch.core.domain.model.account.HostNames
+import zed.rainxch.core.domain.model.account.TokenValidation
+import zed.rainxch.core.domain.model.error.LocalStoreException
 import zed.rainxch.core.domain.model.error.TokenValidationException
 import zed.rainxch.core.domain.repository.HostTokenRepository
 import zed.rainxch.core.domain.repository.UserSessionRepository
@@ -31,7 +37,6 @@ import zed.rainxch.githubstore.core.presentation.res.host_tokens_validation_toke
 import zed.rainxch.githubstore.core.presentation.res.host_tokens_validation_token_short
 import zed.rainxch.githubstore.core.presentation.res.host_tokens_validation_unreachable
 
-@Suppress("TooGenericExceptionCaught")
 class HostTokensViewModel(
     private val repository: HostTokenRepository,
     private val userSessionRepository: UserSessionRepository,
@@ -45,7 +50,6 @@ class HostTokensViewModel(
 
     init {
         viewModelScope.launch {
-
             repository
                 .observeAll()
                 .catch { t ->
@@ -55,7 +59,7 @@ class HostTokensViewModel(
                 }.collect { tokens ->
                     _state.update {
                         it.copy(
-                            tokens = tokens.sortedBy { t -> t.host },
+                            tokens = tokens.sortedBy { t -> t.host }.map { t -> t.toUi() }.toImmutableList(),
                             isLoading = false,
                         )
                     }
@@ -73,62 +77,28 @@ class HostTokensViewModel(
 
     fun onAction(action: HostTokensAction) {
         when (action) {
-            HostTokensAction.OnNavigateBack -> { }
+            HostTokensAction.OnAddClicked -> _state.update { it.copy(draftMode = DraftMode.Picker) }
+            HostTokensAction.OnAddDismiss -> closeDraft()
+            is HostTokensAction.OnPickPresetForge -> openCompose(forge = action.kind, host = action.kind.tokenHost)
+            HostTokensAction.OnPickOtherForge -> openCompose(forge = null, host = "")
+            is HostTokensAction.OnOpenTokenCreationPage -> openUrl(action.kind.tokenCreationUrl)
+            is HostTokensAction.OnReplaceToken -> openExisting(action.existing)
+            is HostTokensAction.OnEditLabel -> openExisting(action.existing)
+            is HostTokensAction.DraftEdit -> editDraft(action)
+            HostTokensAction.OnAddConfirm -> persistDraft()
+            is HostTokensAction.OnDelete -> deleteHost(action.host)
+            HostTokensAction.OnUndoDelete -> undoDelete()
+            HostTokensAction.OnDismissUndoDelete -> _state.update { it.copy(pendingUndoDelete = null) }
+            is HostTokensAction.OnValidate -> validateExisting(action.host)
+        }
+    }
 
-            HostTokensAction.OnAddClicked -> {
-                _state.update { it.copy(draftMode = DraftMode.Picker) }
-            }
+    private fun openUrl(url: String) {
+        viewModelScope.launch { _events.send(HostTokensEvent.OpenUrl(url)) }
+    }
 
-            HostTokensAction.OnAddDismiss -> {
-                closeDraft()
-            }
-
-            is HostTokensAction.OnPickPresetForge -> {
-                openCompose(forge = action.kind, host = action.kind.tokenHost)
-            }
-
-            HostTokensAction.OnPickOtherForge -> {
-                openCompose(forge = null, host = "")
-            }
-
-            is HostTokensAction.OnOpenTokenCreationPage -> {
-                viewModelScope.launch {
-                    _events.send(HostTokensEvent.OpenUrl(action.kind.tokenCreationUrl))
-                }
-            }
-
-            is HostTokensAction.OnReplaceToken -> {
-                _state.update {
-                    it.copy(
-                        draftMode = DraftMode.Compose(replacingExisting = action.existing),
-                        draftForge = ForgeKind.fromHost(action.existing.host),
-                        draftHost = action.existing.host,
-                        draftHostNormalized = action.existing.host,
-                        draftToken = "",
-                        draftDisplayName = action.existing.displayName.orEmpty(),
-                        draftHostError = null,
-                        draftTokenError = null,
-                        draftDetectedTokenKind = null,
-                    )
-                }
-            }
-
-            is HostTokensAction.OnEditLabel -> {
-                _state.update {
-                    it.copy(
-                        draftMode = DraftMode.Compose(replacingExisting = action.existing),
-                        draftForge = ForgeKind.fromHost(action.existing.host),
-                        draftHost = action.existing.host,
-                        draftHostNormalized = action.existing.host,
-                        draftToken = "",
-                        draftDisplayName = action.existing.displayName.orEmpty(),
-                        draftHostError = null,
-                        draftTokenError = null,
-                        draftDetectedTokenKind = null,
-                    )
-                }
-            }
-
+    private fun editDraft(action: HostTokensAction.DraftEdit) {
+        when (action) {
             is HostTokensAction.OnDraftHostChanged -> {
                 val normalized = HostNames.normalize(action.value)
                 _state.update {
@@ -154,26 +124,22 @@ class HostTokensViewModel(
             is HostTokensAction.OnDraftDisplayNameChanged -> {
                 _state.update { it.copy(draftDisplayName = action.value) }
             }
+        }
+    }
 
-            HostTokensAction.OnAddConfirm -> {
-                persistDraft()
-            }
-
-            is HostTokensAction.OnDelete -> {
-                deleteHost(action.host)
-            }
-
-            HostTokensAction.OnUndoDelete -> {
-                undoDelete()
-            }
-
-            HostTokensAction.OnDismissUndoDelete -> {
-                _state.update { it.copy(pendingUndoDelete = null) }
-            }
-
-            is HostTokensAction.OnValidate -> {
-                validateExisting(action.host)
-            }
+    private fun openExisting(existing: HostTokenUi) {
+        _state.update {
+            it.copy(
+                draftMode = DraftMode.Compose(replacingExisting = existing),
+                draftForge = ForgeKind.fromHost(existing.host),
+                draftHost = existing.host,
+                draftHostNormalized = existing.host,
+                draftToken = "",
+                draftDisplayName = existing.displayName.orEmpty(),
+                draftHostError = null,
+                draftTokenError = null,
+                draftDetectedTokenKind = null,
+            )
         }
     }
 
@@ -212,18 +178,18 @@ class HostTokensViewModel(
         }
     }
 
-    private fun validateHost(normalized: String): org.jetbrains.compose.resources.StringResource? =
+    private fun validateHost(normalized: String): StringResource? =
         when {
             normalized.isEmpty() -> Res.string.host_tokens_validation_host_required
             !normalized.contains('.') -> Res.string.host_tokens_validation_host_invalid
             else -> null
         }
 
-    private fun validateToken(value: String): org.jetbrains.compose.resources.StringResource? {
+    private fun validateToken(value: String): StringResource? {
         val trimmed = value.trim()
         return when {
             trimmed.isEmpty() -> Res.string.host_tokens_validation_token_required
-            trimmed.length < 8 -> Res.string.host_tokens_validation_token_short
+            trimmed.length < MIN_TOKEN_LENGTH -> Res.string.host_tokens_validation_token_short
             else -> null
         }
     }
@@ -250,9 +216,7 @@ class HostTokensViewModel(
                 closeDraft()
                 _events.send(HostTokensEvent.Message(getString(Res.string.host_tokens_saved, host)))
                 validateExisting(host, fromAdd = true)
-            } catch (e: CancellationException) {
-                throw e
-            } catch (e: Exception) {
+            } catch (e: LocalStoreException) {
                 logger.error("HostTokensViewModel: failed to save token for $host", e)
                 _events.send(HostTokensEvent.Message(getString(Res.string.host_tokens_save_failed, host)))
             }
@@ -267,16 +231,14 @@ class HostTokensViewModel(
                 _state.update {
                     it.copy(
                         pendingUndoDelete = snapshot,
-                        validationByHost = it.validationByHost - host,
-                        validatingHosts = it.validatingHosts - host,
+                        validationByHost = (it.validationByHost - host).toImmutableMap(),
+                        validatingHosts = (it.validatingHosts - host).toImmutableSet(),
                     )
                 }
                 if (snapshot != null) {
                     _events.send(HostTokensEvent.TokenDeletedWithUndo(snapshot))
                 }
-            } catch (e: CancellationException) {
-                throw e
-            } catch (e: Exception) {
+            } catch (e: LocalStoreException) {
                 logger.error("HostTokensViewModel: failed to delete token for $host", e)
                 _events.send(HostTokensEvent.Message(getString(Res.string.host_tokens_delete_failed, host)))
             }
@@ -289,15 +251,9 @@ class HostTokensViewModel(
             try {
                 repository.set(pending.host, pending.token, pending.displayName)
                 _state.update { it.copy(pendingUndoDelete = null) }
-            } catch (e: CancellationException) {
-                throw e
-            } catch (e: Exception) {
+            } catch (e: LocalStoreException) {
                 logger.error("HostTokensViewModel: failed to restore token for ${pending.host}", e)
-                _events.send(
-                    HostTokensEvent.Message(
-                        getString(Res.string.host_tokens_undo_failed, pending.host),
-                    ),
-                )
+                _events.send(HostTokensEvent.Message(getString(Res.string.host_tokens_undo_failed, pending.host)))
             }
         }
     }
@@ -308,56 +264,54 @@ class HostTokensViewModel(
     ) {
         if (host in state.value.validatingHosts) return
         viewModelScope.launch {
-            val token =
-                try {
-                    repository.get(host)?.token
-                } catch (e: CancellationException) {
-                    throw e
-                } catch (e: Exception) {
-                    logger.error("HostTokensViewModel: failed to read token for $host", e)
-                    null
-                } ?: return@launch
-            _state.update { it.copy(validatingHosts = it.validatingHosts + host) }
-            val result = repository.validate(host, token)
+            val token = repository.get(host)?.token ?: return@launch
+            _state.update { it.copy(validatingHosts = (it.validatingHosts + host).toImmutableSet()) }
             val line =
-                result.fold(
-                    onSuccess = { v ->
-                        ValidationLine(
-                            login = v.login,
-                            scopes = v.scopes,
-                            rateLimitRemaining = v.rateLimitRemaining,
-                            errorMessage = null,
-                        )
-                    },
-                    onFailure = { t ->
-                        ValidationLine(
-                            login = null,
-                            scopes = emptyList(),
-                            rateLimitRemaining = null,
-                            errorMessage = validationErrorMessage(host, t),
-                        )
-                    },
+                repository.validate(host, token).fold(
+                    onSuccess = { it.toValidationLine() },
+                    onFailure = { failedValidationLine(host, it) },
                 )
             _state.update {
                 it.copy(
-                    validatingHosts = it.validatingHosts - host,
-                    validationByHost = it.validationByHost + (host to line),
+                    validatingHosts = (it.validatingHosts - host).toImmutableSet(),
+                    validationByHost = (it.validationByHost + (host to line)).toImmutableMap(),
                 )
             }
-            if (fromAdd && line.isSuccess && !line.login.isNullOrBlank()) {
-                val current = repository.get(host)
-                if (current != null && current.displayName.isNullOrBlank()) {
-                    try {
-                        repository.set(host, current.token, line.login)
-                    } catch (e: CancellationException) {
-                        throw e
-                    } catch (e: Exception) {
-                        logger.error("HostTokensViewModel: failed to save the label for $host", e)
-                    }
-                }
-            }
+            if (fromAdd && line.isSuccess && !line.login.isNullOrBlank()) labelWithLogin(host, line.login)
         }
     }
+
+    private suspend fun labelWithLogin(
+        host: String,
+        login: String,
+    ) {
+        val current = repository.get(host)
+        if (current == null || !current.displayName.isNullOrBlank()) return
+        try {
+            repository.set(host, current.token, login)
+        } catch (e: LocalStoreException) {
+            logger.error("HostTokensViewModel: failed to save the label for $host", e)
+        }
+    }
+
+    private fun TokenValidation.toValidationLine(): ValidationLine =
+        ValidationLine(
+            login = login,
+            scopes = scopes.toImmutableList(),
+            rateLimitRemaining = rateLimitRemaining,
+            errorMessage = null,
+        )
+
+    private suspend fun failedValidationLine(
+        host: String,
+        error: Throwable,
+    ): ValidationLine =
+        ValidationLine(
+            login = null,
+            scopes = persistentListOf(),
+            rateLimitRemaining = null,
+            errorMessage = validationErrorMessage(host, error),
+        )
 
     private suspend fun validationErrorMessage(
         host: String,
@@ -378,4 +332,8 @@ class HostTokensViewModel(
                 getString(Res.string.host_tokens_validation_failed_fallback)
             }
         }
+
+    private companion object {
+        const val MIN_TOKEN_LENGTH = 8
+    }
 }

@@ -32,17 +32,17 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import zed.rainxch.core.domain.model.account.ForgeKind
-import zed.rainxch.core.domain.model.account.HostToken
 import zed.rainxch.core.presentation.components.bars.KomiTopBar
 import zed.rainxch.core.presentation.components.buttons.KomiButton
-import zed.rainxch.core.presentation.components.buttons.KomiButtonVariant
 import zed.rainxch.core.presentation.components.buttons.KomiButtonSize
+import zed.rainxch.core.presentation.components.buttons.KomiButtonVariant
 import zed.rainxch.core.presentation.components.buttons.KomiFab
 import zed.rainxch.core.presentation.components.buttons.KomiIconButton
 import zed.rainxch.core.presentation.components.icon.KomiIcon
@@ -50,12 +50,10 @@ import zed.rainxch.core.presentation.components.inputs.KomiTextField
 import zed.rainxch.core.presentation.components.overlays.KomiDialog
 import zed.rainxch.core.presentation.components.overlays.KomiDropdown
 import zed.rainxch.core.presentation.components.overlays.KomiMenuItem
+import zed.rainxch.core.presentation.components.overlays.KomiToastState
 import zed.rainxch.core.presentation.components.overlays.rememberKomiToastState
 import zed.rainxch.core.presentation.components.progress.KomiCircularProgress
 import zed.rainxch.core.presentation.components.scaffold.KomiScaffold
-import zed.rainxch.tweaks.presentation.components.shell.SettingsGroup
-import zed.rainxch.tweaks.presentation.components.shell.TweaksDecorSlot
-import zed.rainxch.tweaks.presentation.components.shell.settingsRowDivider
 import zed.rainxch.core.presentation.components.surfaces.KomiSurface
 import zed.rainxch.core.presentation.components.text.KomiText
 import zed.rainxch.core.presentation.components.text.KomiTextRole
@@ -95,6 +93,9 @@ import zed.rainxch.githubstore.core.presentation.res.host_tokens_row_validate
 import zed.rainxch.githubstore.core.presentation.res.host_tokens_title
 import zed.rainxch.githubstore.core.presentation.res.host_tokens_undo_action
 import zed.rainxch.githubstore.core.presentation.res.host_tokens_undo_snackbar
+import zed.rainxch.tweaks.presentation.components.shell.SettingsGroup
+import zed.rainxch.tweaks.presentation.components.shell.TweaksDecorSlot
+import zed.rainxch.tweaks.presentation.components.shell.settingsRowDivider
 import zed.rainxch.tweaks.presentation.components.shell.tweaksKicker
 
 @Composable
@@ -109,24 +110,44 @@ fun HostTokensRoot(
 
     ObserveAsEvents(viewModel.events) { event ->
         when (event) {
-            is HostTokensEvent.Message ->
+            is HostTokensEvent.Message -> {
                 coroutineScope.launch { toastState.show(event.text) }
-            is HostTokensEvent.OpenUrl ->
+            }
+
+            is HostTokensEvent.OpenUrl -> {
                 runCatching { uriHandler.openUri(event.url) }
-            is HostTokensEvent.TokenDeletedWithUndo ->
+            }
+
+            is HostTokensEvent.TokenDeletedWithUndo -> {
                 coroutineScope.launch {
                     toastState.warning(
                         message = getString(Res.string.host_tokens_undo_snackbar, event.deleted.host),
                         actionLabel = getString(Res.string.host_tokens_undo_action),
-                        onAction = {
-                            viewModel.onAction(HostTokensAction.OnUndoDelete)
-                        }
+                        onAction = { viewModel.onAction(HostTokensAction.OnUndoDelete) },
                     )
                 }
+            }
         }
     }
 
+    HostTokensScreen(
+        state = state,
+        onAction = viewModel::onAction,
+        onNavigateBack = onNavigateBack,
+        toastState = toastState,
+    )
+}
+
+@Composable
+private fun HostTokensScreen(
+    state: HostTokensState,
+    onAction: (HostTokensAction) -> Unit,
+    onNavigateBack: () -> Unit,
+    toastState: KomiToastState,
+    modifier: Modifier = Modifier,
+) {
     KomiScaffold(
+        modifier = modifier,
         grid = true,
         screentone = true,
         topBar = {
@@ -140,7 +161,7 @@ fun HostTokensRoot(
         floatingActionButton = {
             if (state.tokens.isNotEmpty()) {
                 KomiFab(
-                    onClick = { viewModel.onAction(HostTokensAction.OnAddClicked) },
+                    onClick = { onAction(HostTokensAction.OnAddClicked) },
                     icon = Icons.Default.Add,
                     contentDescription = stringResource(Res.string.host_tokens_action_add),
                 )
@@ -148,10 +169,11 @@ fun HostTokensRoot(
         },
     ) { padding ->
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .padding(horizontal = 16.dp),
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(padding)
+                    .padding(horizontal = 16.dp),
         ) {
             if (state.isOAuthSignedInToGithub) {
                 OAuthCoexistenceNote()
@@ -164,77 +186,82 @@ fun HostTokensRoot(
                         contentAlignment = Alignment.Center,
                     ) { KomiCircularProgress() }
                 }
+
                 state.tokens.isEmpty() -> {
                     EmptyStatePicker(
                         presetForges = visiblePresetForges(state),
-                        onPickPreset = { kind -> viewModel.onAction(HostTokensAction.OnPickPresetForge(kind)) },
-                        onPickOther = { viewModel.onAction(HostTokensAction.OnPickOtherForge) },
-                        onOpenTokenCreationPage = { kind ->
-                            viewModel.onAction(HostTokensAction.OnOpenTokenCreationPage(kind))
-                        },
+                        onPickPreset = { kind -> onAction(HostTokensAction.OnPickPresetForge(kind)) },
+                        onPickOther = { onAction(HostTokensAction.OnPickOtherForge) },
+                        onOpenTokenCreationPage = { kind -> onAction(HostTokensAction.OnOpenTokenCreationPage(kind)) },
                     )
                 }
+
                 else -> {
-                    val listState = rememberLazyListState()
-                    LazyColumn(state = listState) {
-                        item {
-                            SettingsGroup {
-                                state.tokens.forEachIndexed { index, token ->
-                                    TokenRow(
-                                        token = token,
-                                        isValidating = token.host in state.validatingHosts,
-                                        validation = state.validationByHost[token.host],
-                                        last = index == state.tokens.lastIndex,
-                                        onValidate = { viewModel.onAction(HostTokensAction.OnValidate(token.host)) },
-                                        onDelete = { viewModel.onAction(HostTokensAction.OnDelete(token.host)) },
-                                        onReplace = { viewModel.onAction(HostTokensAction.OnReplaceToken(token)) },
-                                        onEditLabel = { viewModel.onAction(HostTokensAction.OnEditLabel(token)) },
-                                        onOpenManagePage = { kind ->
-                                            viewModel.onAction(HostTokensAction.OnOpenTokenCreationPage(kind))
-                                        },
-                                    )
-                                }
-                            }
-                        }
-                    }
+                    TokenList(state = state, onAction = onAction)
                 }
             }
         }
     }
 
     when (val mode = state.draftMode) {
-        DraftMode.Closed -> Unit
+        DraftMode.Closed -> {}
+
         DraftMode.Picker -> {
             PickerDialog(
                 presetForges = visiblePresetForges(state),
-                onPickPreset = { kind -> viewModel.onAction(HostTokensAction.OnPickPresetForge(kind)) },
-                onPickOther = { viewModel.onAction(HostTokensAction.OnPickOtherForge) },
-                onOpenTokenCreationPage = { kind ->
-                    viewModel.onAction(HostTokensAction.OnOpenTokenCreationPage(kind))
-                },
-                onDismiss = { viewModel.onAction(HostTokensAction.OnAddDismiss) },
+                onPickPreset = { kind -> onAction(HostTokensAction.OnPickPresetForge(kind)) },
+                onPickOther = { onAction(HostTokensAction.OnPickOtherForge) },
+                onOpenTokenCreationPage = { kind -> onAction(HostTokensAction.OnOpenTokenCreationPage(kind)) },
+                onDismiss = { onAction(HostTokensAction.OnAddDismiss) },
             )
         }
+
         is DraftMode.Compose -> {
             AddTokenDialog(
                 state = state,
                 replacingExisting = mode.replacingExisting,
-                onAction = viewModel::onAction,
+                onAction = onAction,
             )
         }
     }
 }
 
-private fun visiblePresetForges(state: HostTokensState): List<ForgeKind> {
-
-    val storedHosts = state.tokens.map { it.host }.toSet()
-    return ForgeKind.entries.filter { kind ->
-        when {
-            kind.tokenHost in storedHosts -> true
-            kind == ForgeKind.GITHUB && state.isOAuthSignedInToGithub -> false
-            else -> true
+@Composable
+private fun TokenList(
+    state: HostTokensState,
+    onAction: (HostTokensAction) -> Unit,
+) {
+    LazyColumn(state = rememberLazyListState()) {
+        item {
+            SettingsGroup {
+                state.tokens.forEachIndexed { index, token ->
+                    TokenRow(
+                        token = token,
+                        isValidating = token.host in state.validatingHosts,
+                        validation = state.validationByHost[token.host],
+                        last = index == state.tokens.lastIndex,
+                        onValidate = { onAction(HostTokensAction.OnValidate(token.host)) },
+                        onDelete = { onAction(HostTokensAction.OnDelete(token.host)) },
+                        onReplace = { onAction(HostTokensAction.OnReplaceToken(token)) },
+                        onEditLabel = { onAction(HostTokensAction.OnEditLabel(token)) },
+                        onOpenManagePage = { kind -> onAction(HostTokensAction.OnOpenTokenCreationPage(kind)) },
+                    )
+                }
+            }
         }
     }
+}
+
+private fun visiblePresetForges(state: HostTokensState): ImmutableList<ForgeKind> {
+    val storedHosts = state.tokens.map { it.host }.toSet()
+    return ForgeKind.entries
+        .filter { kind ->
+            when {
+                kind.tokenHost in storedHosts -> true
+                kind == ForgeKind.GITHUB && state.isOAuthSignedInToGithub -> false
+                else -> true
+            }
+        }.toImmutableList()
 }
 
 @Composable
@@ -242,9 +269,10 @@ private fun OAuthCoexistenceNote() {
     val colors = LocalPersonality.current.colors
     KomiSurface(modifier = Modifier.fillMaxWidth()) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 14.dp, vertical = 12.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 14.dp, vertical = 12.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(12.dp),
         ) {
@@ -265,7 +293,7 @@ private fun OAuthCoexistenceNote() {
 
 @Composable
 private fun EmptyStatePicker(
-    presetForges: List<ForgeKind>,
+    presetForges: ImmutableList<ForgeKind>,
     onPickPreset: (ForgeKind) -> Unit,
     onPickOther: () -> Unit,
     onOpenTokenCreationPage: (ForgeKind) -> Unit,
@@ -321,10 +349,11 @@ private fun PresetForgeCard(
 ) {
     val colors = LocalPersonality.current.colors
     Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .settingsRowDivider(colors.divider, show = !last)
-            .padding(horizontal = 16.dp, vertical = 12.dp),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .settingsRowDivider(colors.divider, show = !last)
+                .padding(horizontal = 16.dp, vertical = 12.dp),
         verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
         Row(
@@ -374,10 +403,11 @@ private fun PresetForgeCard(
 private fun OtherForgeCard(onPick: () -> Unit) {
     val colors = LocalPersonality.current.colors
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onPick)
-            .padding(16.dp),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .clickable(onClick = onPick)
+                .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
@@ -403,7 +433,7 @@ private fun OtherForgeCard(onPick: () -> Unit) {
 
 @Composable
 private fun PickerDialog(
-    presetForges: List<ForgeKind>,
+    presetForges: ImmutableList<ForgeKind>,
     onPickPreset: (ForgeKind) -> Unit,
     onPickOther: () -> Unit,
     onOpenTokenCreationPage: (ForgeKind) -> Unit,
@@ -438,7 +468,7 @@ private fun PickerDialog(
 
 @Composable
 private fun TokenRow(
-    token: HostToken,
+    token: HostTokenUi,
     isValidating: Boolean,
     validation: ValidationLine?,
     onValidate: () -> Unit,
@@ -451,155 +481,132 @@ private fun TokenRow(
     val colors = LocalPersonality.current.colors
     val forge = ForgeKind.fromHost(token.host)
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .settingsRowDivider(colors.divider, show = !last)
-            .padding(start = 16.dp, top = 12.dp, end = 8.dp, bottom = 12.dp),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .settingsRowDivider(colors.divider, show = !last)
+                .padding(start = 16.dp, top = 12.dp, end = 8.dp, bottom = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(4.dp),
     ) {
-            KomiIcon(
-                Icons.Default.VpnKey,
-                contentDescription = null,
-                tint = colors.primary,
+        KomiIcon(
+            Icons.Default.VpnKey,
+            contentDescription = null,
+            tint = colors.primary,
+        )
+        Spacer(Modifier.width(8.dp))
+        Column(modifier = Modifier.weight(1f)) {
+            KomiText(
+                text = forge?.displayName ?: token.host,
+                role = KomiTextRole.CardTitle,
+                color = colors.onSurface,
             )
-            Spacer(Modifier.width(8.dp))
-            Column(modifier = Modifier.weight(1f)) {
-                KomiText(
-                    text = forge?.displayName ?: token.host,
-                    role = KomiTextRole.CardTitle,
-                    color = colors.onSurface,
-                )
-                val secondary = when {
-                    validation?.isSuccess == true -> {
-                        val login = validation.login ?: token.displayName ?: token.host
-                        if (validation.rateLimitRemaining != null) {
-                            stringResource(Res.string.host_tokens_row_valid_short, login) +
-                                " · " + stringResource(
-                                    Res.string.host_tokens_row_valid_rate,
-                                    validation.rateLimitRemaining,
-                                )
-                        } else {
-                            stringResource(Res.string.host_tokens_row_valid_short, login)
-                        }
-                    }
-                    validation != null -> stringResource(
-                        Res.string.host_tokens_row_invalid_short,
-                        validation.errorMessage.orEmpty(),
-                    )
-                    else -> token.displayName ?: token.host
-                }
-                KomiText(
-                    text = secondary,
-                    role = KomiTextRole.Body,
-                    color = if (validation != null && !validation.isSuccess) {
-                        colors.error
-                    } else {
-                        colors.onSurfaceVariant
-                    },
-                )
-            }
-            if (isValidating) {
-                KomiCircularProgress(modifier = Modifier.size(20.dp))
-            } else {
-                KomiIconButton(
-                    icon = Icons.Default.Check,
-                    contentDescription = stringResource(Res.string.host_tokens_row_validate),
-                    onClick = onValidate,
-                    variant = KomiButtonVariant.Text,
-                )
-            }
-            val menuEntries = buildList {
-                add(KomiMenuItem(id = "edit", label = stringResource(Res.string.host_tokens_row_edit_label)))
-                add(KomiMenuItem(id = "replace", label = stringResource(Res.string.host_tokens_row_replace_token)))
-                if (forge != null) {
-                    add(
-                        KomiMenuItem(
-                            id = "open",
-                            label = stringResource(Res.string.host_tokens_row_open_token_page, forge.displayName),
-                        ),
-                    )
-                }
-                add(KomiMenuItem(id = "delete", label = stringResource(Res.string.host_tokens_action_delete)))
-            }.toImmutableList()
-            KomiDropdown(
-                entries = menuEntries,
-                onSelect = { item ->
-                    when (item.id) {
-                        "edit" -> onEditLabel()
-                        "replace" -> onReplace()
-                        "open" -> forge?.let { onOpenManagePage(it) }
-                        "delete" -> onDelete()
-                    }
-                },
-                trigger = { onClick ->
-                    KomiIconButton(
-                        icon = Icons.Default.MoreVert,
-                        contentDescription = stringResource(Res.string.host_tokens_row_menu),
-                        onClick = onClick,
-                        variant = KomiButtonVariant.Text,
-                    )
-                },
+            KomiText(
+                text = tokenStatusLine(token, validation),
+                role = KomiTextRole.Body,
+                color = if (validation?.isSuccess == false) colors.error else colors.onSurfaceVariant,
             )
         }
+        if (isValidating) {
+            KomiCircularProgress(modifier = Modifier.size(20.dp))
+        } else {
+            KomiIconButton(
+                icon = Icons.Default.Check,
+                contentDescription = stringResource(Res.string.host_tokens_row_validate),
+                onClick = onValidate,
+                variant = KomiButtonVariant.Text,
+            )
+        }
+        TokenRowMenu(
+            forge = forge,
+            onEditLabel = onEditLabel,
+            onReplace = onReplace,
+            onOpenManagePage = onOpenManagePage,
+            onDelete = onDelete,
+        )
+    }
+}
+
+@Composable
+private fun tokenStatusLine(
+    token: HostTokenUi,
+    validation: ValidationLine?,
+): String =
+    when {
+        validation == null -> {
+            token.displayName ?: token.host
+        }
+
+        validation.isSuccess -> {
+            val valid = stringResource(Res.string.host_tokens_row_valid_short, validation.login ?: token.displayName ?: token.host)
+            val remaining = validation.rateLimitRemaining
+            if (remaining != null) valid + " · " + stringResource(Res.string.host_tokens_row_valid_rate, remaining) else valid
+        }
+
+        else -> {
+            stringResource(Res.string.host_tokens_row_invalid_short, validation.errorMessage.orEmpty())
+        }
+    }
+
+@Composable
+private fun TokenRowMenu(
+    forge: ForgeKind?,
+    onEditLabel: () -> Unit,
+    onReplace: () -> Unit,
+    onOpenManagePage: (ForgeKind) -> Unit,
+    onDelete: () -> Unit,
+) {
+    val menuEntries =
+        buildList {
+            add(KomiMenuItem(id = "edit", label = stringResource(Res.string.host_tokens_row_edit_label)))
+            add(KomiMenuItem(id = "replace", label = stringResource(Res.string.host_tokens_row_replace_token)))
+            if (forge != null) {
+                add(
+                    KomiMenuItem(
+                        id = "open",
+                        label = stringResource(Res.string.host_tokens_row_open_token_page, forge.displayName),
+                    ),
+                )
+            }
+            add(KomiMenuItem(id = "delete", label = stringResource(Res.string.host_tokens_action_delete)))
+        }.toImmutableList()
+    KomiDropdown(
+        entries = menuEntries,
+        onSelect = { item ->
+            when (item.id) {
+                "edit" -> onEditLabel()
+                "replace" -> onReplace()
+                "open" -> forge?.let { onOpenManagePage(it) }
+                "delete" -> onDelete()
+            }
+        },
+        trigger = { onClick ->
+            KomiIconButton(
+                icon = Icons.Default.MoreVert,
+                contentDescription = stringResource(Res.string.host_tokens_row_menu),
+                onClick = onClick,
+                variant = KomiButtonVariant.Text,
+            )
+        },
+    )
 }
 
 @Composable
 private fun AddTokenDialog(
     state: HostTokensState,
-    replacingExisting: HostToken?,
+    replacingExisting: HostTokenUi?,
     onAction: (HostTokensAction) -> Unit,
 ) {
-    val title = if (replacingExisting != null) {
-        stringResource(Res.string.host_tokens_compose_replace_title, replacingExisting.host)
-    } else {
-        stringResource(Res.string.host_tokens_compose_add_title)
-    }
+    val title =
+        if (replacingExisting != null) {
+            stringResource(Res.string.host_tokens_compose_replace_title, replacingExisting.host)
+        } else {
+            stringResource(Res.string.host_tokens_compose_add_title)
+        }
     KomiDialog(
         onDismissRequest = { onAction(HostTokensAction.OnAddDismiss) },
         title = { KomiText(title, role = KomiTextRole.CardTitle) },
-        text = {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                if (state.draftForge == null) {
-                    val hostSupporting = state.draftHostError?.let { stringResource(it) }
-                        ?: state.draftHostNormalized
-                            .takeIf { it.isNotBlank() && it != state.draftHost.trim() }
-                            ?.let { normalized ->
-                                stringResource(
-                                    Res.string.host_tokens_compose_will_connect,
-                                    normalized,
-                                )
-                            }
-                    KomiTextField(
-                        value = state.draftHost,
-                        onValueChange = { onAction(HostTokensAction.OnDraftHostChanged(it)) },
-                        label = stringResource(Res.string.host_tokens_compose_field_forge_address),
-                        error = if (state.draftHostError != null) hostSupporting else null,
-                        helper = if (state.draftHostError == null) hostSupporting else null,
-                    )
-                }
-                val tokenSupporting = state.draftTokenError?.let { stringResource(it) }
-                    ?: state.draftDetectedTokenKind?.let { kind ->
-                        stringResource(Res.string.host_tokens_compose_detected, kind)
-                    }
-                    ?: replacingExisting?.let {
-                        stringResource(Res.string.host_tokens_compose_replace_hint)
-                    }
-                KomiTextField(
-                    value = state.draftToken,
-                    onValueChange = { onAction(HostTokensAction.OnDraftTokenChanged(it)) },
-                    label = stringResource(Res.string.host_tokens_field_token),
-                    error = if (state.draftTokenError != null) tokenSupporting else null,
-                    helper = if (state.draftTokenError == null) tokenSupporting else null,
-                    password = true,
-                )
-                KomiTextField(
-                    value = state.draftDisplayName,
-                    onValueChange = { onAction(HostTokensAction.OnDraftDisplayNameChanged(it)) },
-                    label = stringResource(Res.string.host_tokens_field_display_name),
-                )
-            }
-        },
+        text = { DraftFields(state = state, replacing = replacingExisting != null, onAction = onAction) },
         confirmButton = {
             KomiButton(
                 onClick = { onAction(HostTokensAction.OnAddConfirm) },
@@ -618,3 +625,53 @@ private fun AddTokenDialog(
         },
     )
 }
+
+@Composable
+private fun DraftFields(
+    state: HostTokensState,
+    replacing: Boolean,
+    onAction: (HostTokensAction) -> Unit,
+) {
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        if (state.draftForge == null) {
+            val hostSupporting = hostSupportingText(state)
+            KomiTextField(
+                value = state.draftHost,
+                onValueChange = { onAction(HostTokensAction.OnDraftHostChanged(it)) },
+                label = stringResource(Res.string.host_tokens_compose_field_forge_address),
+                error = hostSupporting.takeIf { state.draftHostError != null },
+                helper = hostSupporting.takeIf { state.draftHostError == null },
+            )
+        }
+        val tokenSupporting = tokenSupportingText(state, replacing)
+        KomiTextField(
+            value = state.draftToken,
+            onValueChange = { onAction(HostTokensAction.OnDraftTokenChanged(it)) },
+            label = stringResource(Res.string.host_tokens_field_token),
+            error = tokenSupporting.takeIf { state.draftTokenError != null },
+            helper = tokenSupporting.takeIf { state.draftTokenError == null },
+            password = true,
+        )
+        KomiTextField(
+            value = state.draftDisplayName,
+            onValueChange = { onAction(HostTokensAction.OnDraftDisplayNameChanged(it)) },
+            label = stringResource(Res.string.host_tokens_field_display_name),
+        )
+    }
+}
+
+@Composable
+private fun hostSupportingText(state: HostTokensState): String? =
+    state.draftHostError?.let { stringResource(it) }
+        ?: state.draftHostNormalized
+            .takeIf { it.isNotBlank() && it != state.draftHost.trim() }
+            ?.let { normalized -> stringResource(Res.string.host_tokens_compose_will_connect, normalized) }
+
+@Composable
+private fun tokenSupportingText(
+    state: HostTokensState,
+    replacing: Boolean,
+): String? =
+    state.draftTokenError?.let { stringResource(it) }
+        ?: state.draftDetectedTokenKind?.let { kind -> stringResource(Res.string.host_tokens_compose_detected, kind) }
+        ?: if (replacing) stringResource(Res.string.host_tokens_compose_replace_hint) else null

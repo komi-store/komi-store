@@ -6,5 +6,3 @@
 1 feature/repo-pages/presentation/src/commonMain/kotlin/zed/rainxch/repopages/presentation/security/SecurityRoot.kt
 2 feature/search/presentation/src/commonMain/kotlin/zed/rainxch/search/presentation/SearchRoot.kt
 1 feature/starred/presentation/src/commonMain/kotlin/zed/rainxch/starred/presentation/components/StarredRepositoryItem.kt
-4 feature/tweaks/presentation/src/commonMain/kotlin/zed/rainxch/tweaks/presentation/appinfo/AppInfoRoot.kt
-1 feature/tweaks/presentation/src/commonMain/kotlin/zed/rainxch/tweaks/presentation/components/appearance/PersonalityTile.kt
