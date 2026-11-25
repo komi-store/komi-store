@@ -15,6 +15,7 @@ import zed.rainxch.core.data.datasource.TokenStore
 import zed.rainxch.core.data.network.interceptor.HostTokenInterceptor
 import zed.rainxch.core.data.network.interceptor.RateLimitInterceptor
 import zed.rainxch.core.data.network.interceptor.UnauthorizedInterceptor
+import zed.rainxch.core.domain.model.error.NetworkException
 import zed.rainxch.core.domain.model.settings.ProxyConfig
 import zed.rainxch.core.domain.repository.HostTokenRepository
 import zed.rainxch.core.domain.repository.RateLimitRepository
@@ -122,7 +123,7 @@ suspend inline fun <reified T> HttpClient.executeRequest(crossinline block: susp
             Result.success(response.body<T>())
         } else {
             Result.failure(
-                Exception("HTTP ${response.status.value}: ${response.status.description}"),
+                NetworkException("HTTP ${response.status.value}: ${response.status.description}", null),
             )
         }
     }

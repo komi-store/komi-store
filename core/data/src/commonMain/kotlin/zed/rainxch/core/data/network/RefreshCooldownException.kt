@@ -1,5 +1,7 @@
 package zed.rainxch.core.data.network
 
+import zed.rainxch.core.domain.model.error.NetworkException
+
 class RefreshCooldownException(
     val retryAfterSeconds: Long,
-) : Exception("Refresh cooldown ($retryAfterSeconds s)")
+) : NetworkException("Refresh cooldown ($retryAfterSeconds s)", null)

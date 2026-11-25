@@ -3,6 +3,9 @@ package zed.rainxch.core.data.network
 import io.ktor.client.call.NoTransformationFoundException
 import io.ktor.http.BadContentTypeFormatException
 import io.ktor.serialization.ContentConvertException
+import zed.rainxch.core.domain.model.error.LocalStoreException
+import zed.rainxch.core.domain.model.error.NetworkException
+import zed.rainxch.core.domain.model.error.RateLimitException
 import java.io.IOException
 import kotlin.coroutines.cancellation.CancellationException
 
@@ -28,4 +31,14 @@ internal inline fun <T> recoverHttpFailure(
         recover(e)
     } catch (e: BadContentTypeFormatException) {
         recover(e)
+    }
+
+// A Ktor call made outside executeRequest; what recoverHttpFailure would hand back leaves as a NetworkException.
+inline fun <T> networkFailures(block: () -> T): T = recoverHttpFailure({ throw NetworkException(it) }, block)
+
+// A failed call's Result cause as callers catch it: a typed failure passes, the raw Ktor and decode failures become a NetworkException.
+fun Throwable.asNetworkFailure(): Throwable =
+    when (this) {
+        is NetworkException, is RateLimitException, is LocalStoreException -> this
+        else -> NetworkException(this)
     }
