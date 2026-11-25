@@ -40,11 +40,11 @@ Warnings are errors everywhere, with no opt-out: Kotlin in every module and in `
 
 ## Konsist
 
-The rules and their allowlists live in `konsist-test/src/test/kotlin/zed/rainxch/konsist/`. An allowlist can only shrink: the file-size test fails when an allowlisted file drops under the limit, so remove the entry in the same PR.
+The rules live in `konsist-test/src/test/kotlin/zed/rainxch/konsist/`. None has an allowlist: every rule holds for every file.
 
 `DocsRulesTest` reads `AGENTS.md`, `CLAUDE.md`, `CONTRIBUTING.md`, `docs/agents/*.md` and `feature/*/CLAUDE.md`. A backticked route such as `GithubStoreGraph.DetailsScreen` must exist in the graph, and any backticked name ending in Screen or Graph must still exist in production code. When you rename a route or screen, update the docs in the same PR.
 
-`DesignTokenRulesTest` keeps design values in the personality package (`core/presentation/.../personality/`). Outside it, it bans raw `.sp` sizes, `FontWeight.`, hand-built `TextStyle(`, literal `tween` durations, literal `.copy(alpha = ...)` tints and `Color(0x...)`. Outside `core/presentation` it also bans Material's `Text`, `MaterialTheme.typography`, `Popup` and `TooltipBox`. Today's matches are counted per file in `konsist-test/src/test/resources/design-tokens/`: a file may not go over its count, and when it drops, lower or delete its line in the same PR.
+`DesignTokenRulesTest` keeps design values in the personality package (`core/presentation/.../personality/`). Outside it, it bans raw `.sp` sizes, `FontWeight.`, hand-built `TextStyle(`, literal `tween` durations, literal `.copy(alpha = ...)` tints and `Color(0x...)`. Outside `core/presentation` it also bans Material's `Text`, `MaterialTheme.typography`, `Popup` and `TooltipBox`.
 
 ## Agent config
 
