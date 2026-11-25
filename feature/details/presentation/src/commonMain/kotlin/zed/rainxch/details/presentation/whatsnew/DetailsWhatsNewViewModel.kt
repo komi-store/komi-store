@@ -9,15 +9,16 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.getString
 import zed.rainxch.core.domain.model.account.github.GithubRelease
+import zed.rainxch.core.domain.model.error.LocalStoreException
+import zed.rainxch.core.domain.model.error.NetworkException
 import zed.rainxch.core.domain.model.error.RateLimitException
 import zed.rainxch.core.presentation.utils.formatIsoDateOrRaw
+import zed.rainxch.details.domain.model.TranslationProviderNotConfiguredException
 import zed.rainxch.details.domain.repository.DetailsRepository
 import zed.rainxch.details.domain.repository.TranslationRepository
 import zed.rainxch.details.presentation.model.SupportedLanguages
 import zed.rainxch.details.presentation.model.TranslationState
 import zed.rainxch.details.presentation.model.WhatsNewReleaseUi
-import zed.rainxch.details.presentation.utils.UntypedFailureException
-import zed.rainxch.details.presentation.utils.untypedFailures
 import zed.rainxch.githubstore.core.presentation.res.Res
 import zed.rainxch.githubstore.core.presentation.res.failed_to_load
 import zed.rainxch.githubstore.core.presentation.res.no_release_notes
@@ -65,7 +66,7 @@ class DetailsWhatsNewViewModel(
         }
         viewModelScope.launch {
             try {
-                val result = untypedFailures { translationRepository.translate(body, targetLanguageCode) }
+                val result = translationRepository.translate(body, targetLanguageCode)
                 _state.update {
                     it.copy(
                         translation =
@@ -79,9 +80,9 @@ class DetailsWhatsNewViewModel(
                     )
                 }
                 rebuild()
-            } catch (_: UntypedFailureException) {
+            } catch (_: NetworkException) {
                 showTranslationFailure()
-            } catch (_: RateLimitException) {
+            } catch (_: TranslationProviderNotConfiguredException) {
                 showTranslationFailure()
             }
         }
@@ -146,27 +147,24 @@ class DetailsWhatsNewViewModel(
             _state.update { it.copy(isLoading = true, errorMessage = null) }
             if (noReleaseNotes.isBlank()) noReleaseNotes = getString(Res.string.no_release_notes)
             try {
-                val (resolved, releases) =
-                    untypedFailures {
-                        val resolved =
-                            if (owner.isNotBlank() && repo.isNotBlank()) {
-                                detailsRepository.getRepositoryByOwnerAndName(owner, repo, sourceHost)
-                            } else {
-                                detailsRepository.getRepositoryById(repositoryId)
-                            }
-                        val releases =
-                            detailsRepository.getAllReleases(
-                                owner = resolved.owner.login,
-                                repo = resolved.name,
-                                defaultBranch = resolved.defaultBranch,
-                                sourceHost = sourceHost,
-                            )
-                        resolved to releases
+                val resolved =
+                    if (owner.isNotBlank() && repo.isNotBlank()) {
+                        detailsRepository.getRepositoryByOwnerAndName(owner, repo, sourceHost)
+                    } else {
+                        detailsRepository.getRepositoryById(repositoryId)
                     }
-                rawReleases = releases
+                rawReleases =
+                    detailsRepository.getAllReleases(
+                        owner = resolved.owner.login,
+                        repo = resolved.name,
+                        defaultBranch = resolved.defaultBranch,
+                        sourceHost = sourceHost,
+                    )
                 _state.update { it.copy(isLoading = false, repoName = resolved.name) }
                 rebuild()
-            } catch (_: UntypedFailureException) {
+            } catch (_: NetworkException) {
+                showLoadFailure()
+            } catch (_: LocalStoreException) {
                 showLoadFailure()
             } catch (_: RateLimitException) {
                 showLoadFailure()

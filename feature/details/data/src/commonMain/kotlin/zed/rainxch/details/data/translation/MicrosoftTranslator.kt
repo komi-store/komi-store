@@ -9,7 +9,6 @@ import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import io.ktor.http.isSuccess
-import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
@@ -20,6 +19,8 @@ import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
+import zed.rainxch.core.data.network.networkFailures
+import zed.rainxch.details.domain.model.TranslationProviderNotConfiguredException
 import zed.rainxch.details.domain.model.TranslationResult
 
 internal class MicrosoftTranslator(
@@ -41,12 +42,15 @@ internal class MicrosoftTranslator(
             )
         }
 
-        val response = requestTranslation(text, mapLanguageCode(targetLanguage), mapSourceLanguageCode(sourceLanguage))
-        val body = response.bodyAsText()
-        check(response.status.isSuccess()) {
-            "Microsoft Translator HTTP ${response.status.value}: ${errorMessage(body) ?: body.take(ERROR_BODY_PREVIEW_CHARS)}"
+        val (status, body) =
+            networkFailures {
+                val response = requestTranslation(text, mapLanguageCode(targetLanguage), mapSourceLanguageCode(sourceLanguage))
+                response.status to response.bodyAsText()
+            }
+        if (!status.isSuccess()) {
+            translationFailed("Microsoft Translator HTTP ${status.value}: ${errorMessage(body) ?: body.take(ERROR_BODY_PREVIEW_CHARS)}")
         }
-        return parseTranslation(body)
+        return decodingAnswer("Microsoft Translator", body) { parseTranslation(body) }
     }
 
     private suspend fun requestTranslation(
@@ -79,19 +83,11 @@ internal class MicrosoftTranslator(
     private fun errorMessage(body: String): String? = runCatching { json.parseToJsonElement(body).jsonObject.apiErrorMessage() }.getOrNull()
 
     private fun parseTranslation(body: String): TranslationResult {
-        val parsed: JsonElement =
-            try {
-                json.parseToJsonElement(body)
-            } catch (e: SerializationException) {
-                throw IllegalStateException(
-                    "Microsoft Translator returned non-JSON response: ${body.take(ERROR_BODY_PREVIEW_CHARS)}",
-                    e,
-                )
-            }
+        val parsed: JsonElement = json.parseToJsonElement(body)
 
-        if (parsed is JsonObject) error("Microsoft Translator error: ${parsed.apiErrorMessage() ?: body}")
+        if (parsed is JsonObject) translationFailed("Microsoft Translator error: ${parsed.apiErrorMessage() ?: body}")
 
-        val first = parsed.jsonArray.firstOrNull()?.jsonObject ?: error("Microsoft Translator response empty")
+        val first = parsed.jsonArray.firstOrNull()?.jsonObject ?: translationFailed("Microsoft Translator response empty")
         val translation =
             first["translations"]
                 ?.jsonArray
@@ -100,7 +96,7 @@ internal class MicrosoftTranslator(
                 ?.get("text")
                 ?.jsonPrimitive
                 ?.content
-                ?: error("Microsoft Translator response missing translation text")
+                ?: translationFailed("Microsoft Translator response missing translation text")
 
         val detected =
             first["detectedLanguage"]

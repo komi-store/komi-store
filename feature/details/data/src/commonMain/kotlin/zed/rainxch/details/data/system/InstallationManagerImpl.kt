@@ -1,6 +1,5 @@
 package zed.rainxch.details.data.system
 
-import androidx.sqlite.SQLiteException
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import zed.rainxch.core.domain.logging.KomiStoreLogger
@@ -86,7 +85,9 @@ class InstallationManagerImpl(
                 ).withPickedVariant(params)
 
             installedAppsRepository.saveInstalledApp(installedApp)
-            if (params.isFavourite) markFavouriteInstalled(params.repo.id, packageName)
+            if (params.isFavourite) {
+                favouritesRepository.updateFavoriteInstallStatus(repoId = params.repo.id, installed = true, packageName = packageName)
+            }
 
             delay(RELOAD_DELAY_MS)
             val reloaded = installedAppsRepository.getAppByPackage(packageName)
@@ -163,18 +164,6 @@ class InstallationManagerImpl(
             pickedAssetIndex = params.pickedAssetIndex?.takeIf { it >= 0 },
             pickedAssetSiblingCount = params.siblingAssetCount.takeIf { it > 0 },
         )
-    }
-
-    private suspend fun markFavouriteInstalled(
-        repoId: Long,
-        packageName: String,
-    ) {
-        try {
-            favouritesRepository.updateFavoriteInstallStatus(repoId = repoId, installed = true, packageName = packageName)
-        } catch (e: SQLiteException) {
-            // FavouritesRepositoryImpl hands Room's failure through untyped.
-            throw LocalStoreException(e)
-        }
     }
 
     override suspend fun updateInstalledAppVersion(params: UpdateInstalledAppParams) {

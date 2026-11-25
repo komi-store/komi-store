@@ -8,6 +8,8 @@ import zed.rainxch.core.domain.logging.KomiStoreLogger
 import zed.rainxch.core.domain.model.account.github.GithubRelease
 import zed.rainxch.core.domain.model.account.github.GithubRepoSummary
 import zed.rainxch.core.domain.model.account.github.GithubUserProfile
+import zed.rainxch.core.domain.model.error.LocalStoreException
+import zed.rainxch.core.domain.model.error.NetworkException
 import zed.rainxch.core.domain.model.error.RateLimitException
 import zed.rainxch.core.domain.model.installation.InstalledApp
 import zed.rainxch.core.domain.model.system.Platform
@@ -15,7 +17,6 @@ import zed.rainxch.core.domain.utils.VersionMath
 import zed.rainxch.details.domain.model.ReleaseCategory
 import zed.rainxch.details.domain.model.RepoStats
 import zed.rainxch.details.presentation.RawDetailsState
-import zed.rainxch.details.presentation.utils.UntypedFailureException
 import zed.rainxch.githubstore.core.presentation.res.Res
 import zed.rainxch.githubstore.core.presentation.res.failed_to_load_details
 import kotlin.time.Clock
@@ -55,18 +56,30 @@ internal class DetailsPageLoader(
                 session.update { it.copy(isLoading = true, errorMessage = null) }
                 installedApps.sync()
                 val repo = reads.repository(session.args)
-                launch { extras.markSeen(repo) }
-                loadPage(session, repo)
+                if (repo == null) {
+                    logger.error("Foreign-source Details opened without owner/repo for host=${session.args.sourceHost}")
+                    showLoadFailure(session)
+                } else {
+                    launch { extras.markSeen(repo) }
+                    loadPage(session, repo)
+                }
             } catch (e: RateLimitException) {
                 logger.error("Rate limited: ${e.message}")
                 val message = reads.rateLimitMessage(e)
                 session.update { it.copy(isLoading = false, errorMessage = message) }
-            } catch (e: UntypedFailureException) {
+            } catch (e: NetworkException) {
                 logger.error("Details load failed: ${e.message}")
-                val message = e.message ?: getString(Res.string.failed_to_load_details)
-                session.update { it.copy(isLoading = false, errorMessage = message) }
+                showLoadFailure(session)
+            } catch (e: LocalStoreException) {
+                logger.error("Details load failed: ${e.message}")
+                showLoadFailure(session)
             }
         }
+    }
+
+    private suspend fun showLoadFailure(session: DetailsSession) {
+        val message = getString(Res.string.failed_to_load_details)
+        session.update { it.copy(isLoading = false, errorMessage = message) }
     }
 
     private suspend fun loadPage(
@@ -75,11 +88,11 @@ internal class DetailsPageLoader(
     ) {
         val flags =
             coroutineScope {
-                val favourite = async { extras.isFavourite(session, repo.id) }
-                val starred = async { extras.isStarred(session, repo.id) }
+                val favourite = async { extras.isFavourite(repo.id) }
+                val starred = async { extras.isStarred(repo.id) }
                 favourite.await() to starred.await()
             }
-        session.update { it.copy(repository = repo, isFavourite = flags.first == true, isStarred = flags.second == true) }
+        session.update { it.copy(repository = repo, isFavourite = flags.first, isStarred = flags.second) }
         val page = readPage(session, repo)
         if (session.rateLimited.get()) {
             session.update { it.copy(isLoading = false, errorMessage = null, releasesLoadFailed = true) }
@@ -119,7 +132,10 @@ internal class DetailsPageLoader(
             } catch (_: RateLimitException) {
                 session.rateLimited.set(true)
                 Releases(emptyList(), failed = true, fromCache = false)
-            } catch (e: UntypedFailureException) {
+            } catch (e: NetworkException) {
+                logger.warn("Failed to load releases: ${e.message}")
+                Releases(emptyList(), failed = true, fromCache = false)
+            } catch (e: LocalStoreException) {
                 logger.warn("Failed to load releases: ${e.message}")
                 Releases(emptyList(), failed = true, fromCache = false)
             }
@@ -236,7 +252,9 @@ internal class DetailsPageLoader(
                     session.whatsNewTranslationJob?.cancel()
                     content.maybeAutoTranslate(session, null, session.current.selectedRelease?.description)
                 }
-            } catch (e: UntypedFailureException) {
+            } catch (e: NetworkException) {
+                logger.debug("Release re-read failed for ${repo.name}: ${e.message}")
+            } catch (e: LocalStoreException) {
                 logger.debug("Release re-read failed for ${repo.name}: ${e.message}")
             } catch (e: RateLimitException) {
                 logger.debug("Release re-read failed for ${repo.name}: ${e.message}")

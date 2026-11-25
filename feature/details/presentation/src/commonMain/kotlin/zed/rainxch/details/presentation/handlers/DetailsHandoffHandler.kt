@@ -10,7 +10,6 @@ import zed.rainxch.details.presentation.DetailsEvent
 import zed.rainxch.details.presentation.model.DownloadStage
 import zed.rainxch.details.presentation.model.LogResult
 import zed.rainxch.details.presentation.utils.recoverStepFailure
-import zed.rainxch.details.presentation.utils.untypedFailures
 import kotlin.coroutines.cancellation.CancellationException
 
 // Hands the release to another installer: Obtainium, App Manager or whichever app opens APK files.
@@ -107,14 +106,11 @@ internal class DetailsHandoffHandler(
         session.update {
             it.copy(downloadError = null, installError = null, downloadProgressPercent = null, downloadStage = DownloadStage.DOWNLOADING)
         }
-        val filePath =
-            untypedFailures {
-                downloader.download(asset.downloadUrl, asset.name).collect { progress ->
-                    session.update { it.copy(downloadProgressPercent = progress.percent) }
-                    if (progress.percent == FULL_PERCENT) session.update { it.copy(downloadStage = DownloadStage.VERIFYING) }
-                }
-                checkNotNull(downloader.getDownloadedFilePath(asset.name)) { "Downloaded file not found" }
-            }
+        downloader.download(asset.downloadUrl, asset.name).collect { progress ->
+            session.update { it.copy(downloadProgressPercent = progress.percent) }
+            if (progress.percent == FULL_PERCENT) session.update { it.copy(downloadStage = DownloadStage.VERIFYING) }
+        }
+        val filePath = checkNotNull(downloader.getDownloadedFilePath(asset.name)) { "Downloaded file not found" }
         session.appendLog(asset.name, asset.size, release.tagName, LogResult.Downloaded)
         session.update { it.copy(downloadStage = DownloadStage.IDLE) }
         session.currentAssetName = null

@@ -6,10 +6,11 @@ import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.Parameters
 import io.ktor.http.isSuccess
-import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
+import zed.rainxch.core.data.network.networkFailures
+import zed.rainxch.details.domain.model.TranslationProviderNotConfiguredException
 import zed.rainxch.details.domain.model.TranslationResult
 
 internal class LibreTranslator(
@@ -33,13 +34,16 @@ internal class LibreTranslator(
 
         val target =
             mapTargetLanguageCode(targetLanguage)
-                ?: error("LibreTranslate target language required (got '$targetLanguage')")
-        val response = requestTranslation(text, target, mapSourceLanguageCode(sourceLanguage))
-        val body = response.bodyAsText()
-        check(response.status.isSuccess()) {
-            "LibreTranslate HTTP ${response.status.value}: ${errorMessage(body) ?: body.take(ERROR_BODY_PREVIEW_CHARS)}"
+                ?: throw TranslationProviderNotConfiguredException("LibreTranslate target language required (got '$targetLanguage')")
+        val (status, body) =
+            networkFailures {
+                val response = requestTranslation(text, target, mapSourceLanguageCode(sourceLanguage))
+                response.status to response.bodyAsText()
+            }
+        if (!status.isSuccess()) {
+            translationFailed("LibreTranslate HTTP ${status.value}: ${errorMessage(body) ?: body.take(ERROR_BODY_PREVIEW_CHARS)}")
         }
-        return parseTranslation(body)
+        return decodingAnswer("LibreTranslate", body) { parseTranslation(body) }
     }
 
     private suspend fun requestTranslation(
@@ -69,19 +73,14 @@ internal class LibreTranslator(
         }.getOrNull()
 
     private fun parseTranslation(body: String): TranslationResult {
-        val root =
-            try {
-                json.parseToJsonElement(body).jsonObject
-            } catch (e: SerializationException) {
-                throw IllegalStateException("LibreTranslate returned non-JSON response: ${body.take(ERROR_BODY_PREVIEW_CHARS)}", e)
-            }
+        val root = json.parseToJsonElement(body).jsonObject
 
         val apiError = root["error"]?.jsonPrimitive?.content
-        check(apiError == null) { "LibreTranslate error: $apiError" }
+        if (apiError != null) translationFailed("LibreTranslate error: $apiError")
 
         val translation =
             root["translatedText"]?.jsonPrimitive?.content
-                ?: error("LibreTranslate response missing translatedText")
+                ?: translationFailed("LibreTranslate response missing translatedText")
         val detected =
             root["detectedLanguage"]
                 ?.jsonObject

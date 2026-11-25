@@ -4,7 +4,6 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.database.SQLException
 import co.touchlab.kermit.Logger
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
@@ -15,6 +14,7 @@ import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import zed.rainxch.core.data.local.db.dao.ExternalLinkDao
+import zed.rainxch.core.data.repository.localStore
 import zed.rainxch.core.domain.model.error.LocalStoreException
 import zed.rainxch.core.domain.model.error.SystemPackagesException
 import zed.rainxch.core.domain.model.installation.InstalledApp
@@ -239,10 +239,10 @@ class PackageEventReceiver() :
 
     private suspend fun externalLinkStateOrNull(packageName: String): String? =
         try {
-            getExternalLinkDao().get(packageName)?.state
+            localStore { getExternalLinkDao().get(packageName) }?.state
         } catch (e: CancellationException) {
             throw e
-        } catch (e: SQLException) {
+        } catch (e: LocalStoreException) {
             logLinkLookupFailure(packageName, e)
         } catch (e: IllegalStateException) {
             logLinkLookupFailure(packageName, e)
@@ -250,7 +250,7 @@ class PackageEventReceiver() :
 
     private fun logLinkLookupFailure(
         packageName: String,
-        e: RuntimeException,
+        e: Exception,
     ): String? {
         Logger.w(e) { "External link lookup failed for $packageName; rescanning" }
         return null

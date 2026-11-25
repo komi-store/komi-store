@@ -1,6 +1,7 @@
 package zed.rainxch.details.presentation.utils
 
 import zed.rainxch.core.domain.model.error.LocalStoreException
+import zed.rainxch.core.domain.model.error.NetworkException
 import zed.rainxch.core.domain.model.error.SystemPackagesException
 import java.io.IOException
 import kotlin.coroutines.cancellation.CancellationException
@@ -16,7 +17,7 @@ internal inline fun <T> recoverStepFailure(
         throw e
     } catch (e: IOException) {
         recover(e)
-    } catch (e: UntypedFailureException) {
+    } catch (e: NetworkException) {
         recover(e)
     } catch (e: LocalStoreException) {
         recover(e)

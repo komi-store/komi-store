@@ -7,6 +7,7 @@ import io.ktor.http.Parameters
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonPrimitive
+import zed.rainxch.core.data.network.networkFailures
 import zed.rainxch.details.domain.model.TranslationResult
 
 internal class GoogleTranslator(
@@ -21,24 +22,34 @@ internal class GoogleTranslator(
         sourceLanguage: String,
     ): TranslationResult {
         val body =
-            httpClient()
-                .submitForm(
-                    url = "https://translate.googleapis.com/translate_a/single",
-                    formParameters =
-                        Parameters.build {
-                            append("client", "gtx")
-                            append("sl", sourceLanguage)
-                            append("tl", targetLanguage)
-                            append("dt", "t")
-                            append("q", text)
-                        },
-                ).bodyAsText()
+            networkFailures {
+                httpClient()
+                    .submitForm(
+                        url = "https://translate.googleapis.com/translate_a/single",
+                        formParameters =
+                            Parameters.build {
+                                append("client", "gtx")
+                                append("sl", sourceLanguage)
+                                append("tl", targetLanguage)
+                                append("dt", "t")
+                                append("q", text)
+                            },
+                    ).bodyAsText()
+            }
 
+        return decodingAnswer("Google Translate", body) { parseTranslation(body) }
+    }
+
+    private fun parseTranslation(body: String): TranslationResult {
         val root = json.parseToJsonElement(body).jsonArray
-        val segments = root[0].jsonArray
+        val segments = root.firstOrNull()?.jsonArray ?: translationFailed("Google Translate response missing translations")
         val translated =
             segments.joinToString("") { segment ->
-                segment.jsonArray[0].jsonPrimitive.content
+                segment.jsonArray
+                    .firstOrNull()
+                    ?.jsonPrimitive
+                    ?.content
+                    ?: translationFailed("Google Translate response has an empty segment")
             }
         val detected =
             runCatching { root[2].jsonPrimitive.content }.getOrNull()

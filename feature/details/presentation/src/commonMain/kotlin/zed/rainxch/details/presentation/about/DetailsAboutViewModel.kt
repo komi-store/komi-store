@@ -8,13 +8,14 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.getString
+import zed.rainxch.core.domain.model.error.LocalStoreException
+import zed.rainxch.core.domain.model.error.NetworkException
 import zed.rainxch.core.domain.model.error.RateLimitException
+import zed.rainxch.details.domain.model.TranslationProviderNotConfiguredException
 import zed.rainxch.details.domain.repository.DetailsRepository
 import zed.rainxch.details.domain.repository.TranslationRepository
 import zed.rainxch.details.presentation.model.SupportedLanguages
 import zed.rainxch.details.presentation.model.TranslationState
-import zed.rainxch.details.presentation.utils.UntypedFailureException
-import zed.rainxch.details.presentation.utils.untypedFailures
 import zed.rainxch.githubstore.core.presentation.res.Res
 import zed.rainxch.githubstore.core.presentation.res.failed_to_load
 import zed.rainxch.githubstore.core.presentation.res.translation_failed
@@ -54,7 +55,7 @@ class DetailsAboutViewModel(
         }
         viewModelScope.launch {
             try {
-                val result = untypedFailures { translationRepository.translate(markdown, targetLanguageCode) }
+                val result = translationRepository.translate(markdown, targetLanguageCode)
                 _state.update {
                     it.copy(
                         translation =
@@ -68,9 +69,9 @@ class DetailsAboutViewModel(
                     )
                 }
                 rebuildDisplayed()
-            } catch (_: UntypedFailureException) {
+            } catch (_: NetworkException) {
                 showTranslationFailure()
-            } catch (_: RateLimitException) {
+            } catch (_: TranslationProviderNotConfiguredException) {
                 showTranslationFailure()
             }
         }
@@ -136,23 +137,19 @@ class DetailsAboutViewModel(
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true, errorMessage = null) }
             try {
-                val (resolved, readme) =
-                    untypedFailures {
-                        val resolved =
-                            if (owner.isNotBlank() && repo.isNotBlank()) {
-                                detailsRepository.getRepositoryByOwnerAndName(owner, repo, sourceHost)
-                            } else {
-                                detailsRepository.getRepositoryById(repositoryId)
-                            }
-                        val readme =
-                            detailsRepository.getReadme(
-                                owner = resolved.owner.login,
-                                repo = resolved.name,
-                                defaultBranch = resolved.defaultBranch,
-                                sourceHost = sourceHost,
-                            )
-                        resolved to readme
+                val resolved =
+                    if (owner.isNotBlank() && repo.isNotBlank()) {
+                        detailsRepository.getRepositoryByOwnerAndName(owner, repo, sourceHost)
+                    } else {
+                        detailsRepository.getRepositoryById(repositoryId)
                     }
+                val readme =
+                    detailsRepository.getReadme(
+                        owner = resolved.owner.login,
+                        repo = resolved.name,
+                        defaultBranch = resolved.defaultBranch,
+                        sourceHost = sourceHost,
+                    )
                 _state.update {
                     it.copy(
                         isLoading = false,
@@ -162,7 +159,9 @@ class DetailsAboutViewModel(
                     )
                 }
                 rebuildDisplayed()
-            } catch (_: UntypedFailureException) {
+            } catch (_: NetworkException) {
+                showLoadFailure()
+            } catch (_: LocalStoreException) {
                 showLoadFailure()
             } catch (_: RateLimitException) {
                 showLoadFailure()

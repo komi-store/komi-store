@@ -12,12 +12,14 @@ import zed.rainxch.core.domain.repository.SeenReposRepository
 class SeenReposRepositoryImpl(
     private val seenRepoDao: SeenRepoDao,
 ) : SeenReposRepository {
-    override fun getAllSeenRepoIds(): Flow<Set<Long>> = seenRepoDao.getAllSeenRepoIds().map { it.toSet() }
+    override fun getAllSeenRepoIds(): Flow<Set<Long>> = seenRepoDao.getAllSeenRepoIds().map { it.toSet() }.localStoreFailures()
 
     override fun getAllSeenRepos(): Flow<List<SeenRepo>> =
-        seenRepoDao.getAllSeenRepos().map { entities ->
-            entities.map { it.toDomain() }
-        }
+        seenRepoDao
+            .getAllSeenRepos()
+            .map { entities ->
+                entities.map { it.toDomain() }
+            }.localStoreFailures()
 
     override suspend fun markAsSeen(repo: GithubRepoSummary) {
         markAsSeen(
@@ -34,26 +36,28 @@ class SeenReposRepositoryImpl(
     }
 
     override suspend fun markAsSeen(entry: SeenRepoEntry) {
-        seenRepoDao.insert(
-            SeenRepoEntity(
-                repoId = entry.repoId,
-                repoName = entry.repoName,
-                repoOwner = entry.repoOwner,
-                repoOwnerAvatarUrl = entry.repoOwnerAvatarUrl,
-                repoDescription = entry.repoDescription,
-                primaryLanguage = entry.primaryLanguage,
-                repoUrl = entry.repoUrl,
-                seenAt = System.currentTimeMillis(),
-            ),
-        )
+        localStore {
+            seenRepoDao.insert(
+                SeenRepoEntity(
+                    repoId = entry.repoId,
+                    repoName = entry.repoName,
+                    repoOwner = entry.repoOwner,
+                    repoOwnerAvatarUrl = entry.repoOwnerAvatarUrl,
+                    repoDescription = entry.repoDescription,
+                    primaryLanguage = entry.primaryLanguage,
+                    repoUrl = entry.repoUrl,
+                    seenAt = System.currentTimeMillis(),
+                ),
+            )
+        }
     }
 
     override suspend fun removeFromHistory(repoId: Long) {
-        seenRepoDao.deleteById(repoId)
+        localStore { seenRepoDao.deleteById(repoId) }
     }
 
     override suspend fun clearAll() {
-        seenRepoDao.clearAll()
+        localStore { seenRepoDao.clearAll() }
     }
 
     private fun SeenRepoEntity.toDomain(): SeenRepo =

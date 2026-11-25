@@ -6,17 +6,16 @@ import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.first
 import org.jetbrains.compose.resources.getString
 import zed.rainxch.core.domain.logging.KomiStoreLogger
-import zed.rainxch.core.domain.model.error.RateLimitException
+import zed.rainxch.core.domain.model.error.NetworkException
 import zed.rainxch.core.domain.repository.TweaksRepository
+import zed.rainxch.details.domain.model.TranslationProviderNotConfiguredException
 import zed.rainxch.details.domain.repository.TranslationRepository
 import zed.rainxch.details.presentation.DetailsAction
 import zed.rainxch.details.presentation.RawDetailsState
 import zed.rainxch.details.presentation.model.SupportedLanguages
 import zed.rainxch.details.presentation.model.TranslationState
-import zed.rainxch.details.presentation.utils.UntypedFailureException
 import zed.rainxch.details.presentation.utils.autoTranslateTargetLanguage
 import zed.rainxch.details.presentation.utils.shouldAutoTranslate
-import zed.rainxch.details.presentation.utils.untypedFailures
 import zed.rainxch.githubstore.core.presentation.res.Res
 import zed.rainxch.githubstore.core.presentation.res.translation_failed
 
@@ -197,7 +196,7 @@ internal class DetailsContentHandler(
             val pending = section.get(session.current).copy(isTranslating = true, error = null, targetLanguageCode = targetLanguageCode)
             section.set(session, pending)
             try {
-                val result = untypedFailures { translationRepository.translate(text = text, targetLanguage = targetLanguageCode) }
+                val result = translationRepository.translate(text = text, targetLanguage = targetLanguageCode)
                 section.set(
                     session,
                     TranslationState(
@@ -210,9 +209,9 @@ internal class DetailsContentHandler(
                         detectedSourceLanguage = result.detectedSourceLanguage,
                     ),
                 )
-            } catch (e: UntypedFailureException) {
+            } catch (e: NetworkException) {
                 onTranslationFailed(session, section, notifyFailure, e)
-            } catch (e: RateLimitException) {
+            } catch (e: TranslationProviderNotConfiguredException) {
                 onTranslationFailed(session, section, notifyFailure, e)
             }
         }

@@ -1,6 +1,5 @@
 package zed.rainxch.core.data.cache
 
-import androidx.sqlite.SQLiteException
 import co.touchlab.kermit.Logger
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
@@ -12,6 +11,8 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.serializer
 import zed.rainxch.core.data.local.db.dao.CacheDao
 import zed.rainxch.core.data.local.db.entities.CacheEntryEntity
+import zed.rainxch.core.data.repository.localStore
+import zed.rainxch.core.domain.model.error.LocalStoreException
 import kotlin.time.Clock
 import kotlin.time.Duration.Companion.hours
 
@@ -39,7 +40,7 @@ class CacheManager(
                 delay(CLEANUP_INTERVAL_MS)
                 try {
                     cleanupExpired()
-                } catch (e: SQLiteException) {
+                } catch (e: LocalStoreException) {
                     Logger.w(e) { "Cache cleanup failed; the next pass retries" }
                 }
             }
@@ -66,7 +67,7 @@ class CacheManager(
         return try {
             json.decodeFromString(serializer<T>(), snapshot.second)
         } catch (_: IllegalArgumentException) {
-            if (diskRow != null) cacheDao.deleteIfMatches(key, diskRow.cachedAt)
+            if (diskRow != null) localStore { cacheDao.deleteIfMatches(key, diskRow.cachedAt) }
             evictFromMemory(key, snapshot)
             null
         }
@@ -105,18 +106,20 @@ class CacheManager(
         }
 
         if (jsonData.length > MAX_DISK_CHARS) {
-            cacheDao.delete(key)
+            localStore { cacheDao.delete(key) }
             return
         }
 
-        cacheDao.put(
-            CacheEntryEntity(
-                key = key,
-                jsonData = jsonData,
-                cachedAt = currentTime,
-                expiresAt = expiresAt,
-            ),
-        )
+        localStore {
+            cacheDao.put(
+                CacheEntryEntity(
+                    key = key,
+                    jsonData = jsonData,
+                    cachedAt = currentTime,
+                    expiresAt = expiresAt,
+                ),
+            )
+        }
     }
 
     suspend fun getCachedAt(key: String): Long? = readRow(key) { cacheDao.getValid(key, now()) }?.cachedAt
@@ -128,25 +131,25 @@ class CacheManager(
         read: suspend () -> CacheEntryEntity?,
     ): CacheEntryEntity? =
         try {
-            read()
+            localStore { read() }
         } catch (e: CancellationException) {
             throw e
-        } catch (_: SQLiteException) {
-            cacheDao.delete(key)
+        } catch (_: LocalStoreException) {
+            localStore { cacheDao.delete(key) }
             null
         } catch (_: IllegalStateException) {
-            cacheDao.delete(key)
+            localStore { cacheDao.delete(key) }
             null
         }
 
     suspend fun invalidate(key: String) {
         memoryCacheMutex.withLock { memoryCache.remove(key) }
-        cacheDao.delete(key)
+        localStore { cacheDao.delete(key) }
     }
 
     suspend fun clearAll() {
         memoryCacheMutex.withLock { memoryCache.clear() }
-        cacheDao.deleteAll()
+        localStore { cacheDao.deleteAll() }
     }
 
     suspend fun cleanupExpired() {
@@ -158,7 +161,7 @@ class CacheManager(
                     .map { it.key }
             expiredKeys.forEach { memoryCache.remove(it) }
         }
-        cacheDao.deleteExpired(currentTime)
+        localStore { cacheDao.deleteExpired(currentTime) }
     }
 
     companion object CacheTtl {

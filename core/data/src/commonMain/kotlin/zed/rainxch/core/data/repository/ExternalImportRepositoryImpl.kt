@@ -1,11 +1,11 @@
 package zed.rainxch.core.data.repository
 
-import androidx.sqlite.SQLiteException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import zed.rainxch.core.data.local.db.dao.ExternalLinkDao
 import zed.rainxch.core.data.local.db.dao.InstalledAppDao
 import zed.rainxch.core.data.local.db.entities.ExternalLinkEntity
+import zed.rainxch.core.domain.model.error.LocalStoreException
 import zed.rainxch.core.domain.repository.ExternalImportRepository
 import zed.rainxch.core.domain.repository.ExternalImportScans
 import zed.rainxch.core.domain.system.ExternalAppCandidate
@@ -44,7 +44,7 @@ class ExternalImportRepositoryImpl private constructor(
             pendingPackages.mapNotNull { snapshot[it] }
         }.localStoreFailures()
 
-    override fun pendingCandidateCountFlow(): Flow<Int> = externalLinkDao.observePendingReviewCount()
+    override fun pendingCandidateCountFlow(): Flow<Int> = externalLinkDao.observePendingReviewCount().localStoreFailures()
 
     override suspend fun resolveMatches(candidates: List<ExternalAppCandidate>): List<RepoMatchResult> =
         matchResolver.resolveMatches(candidates)
@@ -57,7 +57,7 @@ class ExternalImportRepositoryImpl private constructor(
     ): Result<Unit> {
         val now = nowMillis()
         return try {
-            val existing = externalLinkDao.get(packageName)
+            val existing = localStore { externalLinkDao.get(packageName) }
             val base =
                 existing ?: ExternalLinkEntity(
                     packageName = packageName,
@@ -72,18 +72,20 @@ class ExternalImportRepositoryImpl private constructor(
                     lastReviewedAt = now,
                     skipExpiresAt = null,
                 )
-            externalLinkDao.upsert(
-                base.copy(
-                    state = ExternalLinkState.MATCHED.name,
-                    repoOwner = owner,
-                    repoName = repo,
-                    matchSource = source,
-                    matchConfidence = 1.0,
-                    lastReviewedAt = now,
-                ),
-            )
+            localStore {
+                externalLinkDao.upsert(
+                    base.copy(
+                        state = ExternalLinkState.MATCHED.name,
+                        repoOwner = owner,
+                        repoName = repo,
+                        matchSource = source,
+                        matchConfidence = 1.0,
+                        lastReviewedAt = now,
+                    ),
+                )
+            }
             Result.success(Unit)
-        } catch (e: SQLiteException) {
+        } catch (e: LocalStoreException) {
             Result.failure(e)
         }
     }

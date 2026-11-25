@@ -1,6 +1,5 @@
 package zed.rainxch.core.data.repository
 
-import androidx.sqlite.SQLiteException
 import co.touchlab.kermit.Logger
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -18,6 +17,7 @@ import zed.rainxch.core.data.network.ForgejoClientRegistry
 import zed.rainxch.core.data.network.getReleases
 import zed.rainxch.core.data.network.recoverHttpFailure
 import zed.rainxch.core.data.network.search
+import zed.rainxch.core.domain.model.error.LocalStoreException
 import zed.rainxch.core.domain.repository.StarredRepository
 import zed.rainxch.core.domain.repository.TweaksRepository
 import zed.rainxch.core.domain.system.ExternalAppCandidate
@@ -192,7 +192,7 @@ internal class ExternalMatchResolver(
     private suspend fun starredReposOrEmpty() =
         try {
             starredRepository.getAllStarred().first()
-        } catch (e: SQLiteException) {
+        } catch (e: LocalStoreException) {
             Logger.d { "starred fetch for match failed: ${e.message}" }
             emptyList()
         }

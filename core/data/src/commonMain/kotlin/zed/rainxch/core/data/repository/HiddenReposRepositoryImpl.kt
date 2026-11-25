@@ -10,12 +10,14 @@ import zed.rainxch.core.domain.repository.HiddenReposRepository
 class HiddenReposRepositoryImpl(
     private val hiddenRepoDao: HiddenRepoDao,
 ) : HiddenReposRepository {
-    override fun getAllHiddenRepoIds(): Flow<Set<Long>> = hiddenRepoDao.getAllHiddenRepoIds().map { it.toSet() }
+    override fun getAllHiddenRepoIds(): Flow<Set<Long>> = hiddenRepoDao.getAllHiddenRepoIds().map { it.toSet() }.localStoreFailures()
 
     override fun getAllHiddenRepos(): Flow<List<HiddenRepo>> =
-        hiddenRepoDao.getAllHiddenRepos().map { entities ->
-            entities.map { it.toDomain() }
-        }
+        hiddenRepoDao
+            .getAllHiddenRepos()
+            .map { entities ->
+                entities.map { it.toDomain() }
+            }.localStoreFailures()
 
     override suspend fun hide(
         repoId: Long,
@@ -23,15 +25,17 @@ class HiddenReposRepositoryImpl(
         repoOwner: String,
         repoOwnerAvatarUrl: String,
     ) {
-        hiddenRepoDao.insert(
-            HiddenRepoEntity(
-                repoId = repoId,
-                repoName = repoName,
-                repoOwner = repoOwner,
-                repoOwnerAvatarUrl = repoOwnerAvatarUrl,
-                hiddenAt = System.currentTimeMillis(),
-            ),
-        )
+        localStore {
+            hiddenRepoDao.insert(
+                HiddenRepoEntity(
+                    repoId = repoId,
+                    repoName = repoName,
+                    repoOwner = repoOwner,
+                    repoOwnerAvatarUrl = repoOwnerAvatarUrl,
+                    hiddenAt = System.currentTimeMillis(),
+                ),
+            )
+        }
     }
 
     override suspend fun unhide(repoId: Long) {

@@ -1,6 +1,5 @@
 package zed.rainxch.core.data.repository
 
-import androidx.sqlite.SQLiteException
 import co.touchlab.kermit.Logger
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -100,34 +99,36 @@ internal class ExternalImportScansImpl(
         val deltaCandidates = mutableListOf<ExternalAppCandidate>()
         val trackedPackages = trackedPackageNames()
 
-        changedPackageNames.forEach { pkg ->
-            val rawCandidate = scanner.snapshotSingle(pkg)
-            val existing = externalLinkDao.get(pkg)
+        localStore {
+            changedPackageNames.forEach { pkg ->
+                val rawCandidate = scanner.snapshotSingle(pkg)
+                val existing = externalLinkDao.get(pkg)
 
-            if (pkg in trackedPackages) {
-                if (existing != null) externalLinkDao.deleteByPackageName(pkg)
-                return@forEach
-            }
-
-            if (rawCandidate == null) {
-                if (existing != null) {
-                    externalLinkDao.deleteByPackageName(pkg)
+                if (pkg in trackedPackages) {
+                    if (existing != null) externalLinkDao.deleteByPackageName(pkg)
+                    return@forEach
                 }
-                return@forEach
-            }
 
-            if (!hasPositiveEvidence(rawCandidate)) {
-                if (existing?.state == ExternalLinkState.PENDING_REVIEW.name) {
-                    externalLinkDao.deleteByPackageName(pkg)
+                if (rawCandidate == null) {
+                    if (existing != null) {
+                        externalLinkDao.deleteByPackageName(pkg)
+                    }
+                    return@forEach
                 }
-                return@forEach
-            }
 
-            deltaCandidates += rawCandidate
-            val updated = mergeCandidate(existing, rawCandidate, now)
-            if (existing == null) newCandidates++
-            if (updated.state == ExternalLinkState.PENDING_REVIEW.name) pendingReview++
-            externalLinkDao.upsert(updated)
+                if (!hasPositiveEvidence(rawCandidate)) {
+                    if (existing?.state == ExternalLinkState.PENDING_REVIEW.name) {
+                        externalLinkDao.deleteByPackageName(pkg)
+                    }
+                    return@forEach
+                }
+
+                deltaCandidates += rawCandidate
+                val updated = mergeCandidate(existing, rawCandidate, now)
+                if (existing == null) newCandidates++
+                if (updated.state == ExternalLinkState.PENDING_REVIEW.name) pendingReview++
+                externalLinkDao.upsert(updated)
+            }
         }
 
         if (deltaCandidates.isNotEmpty()) {
@@ -159,22 +160,22 @@ internal class ExternalImportScansImpl(
     }
 
     override suspend fun pruneExpiredSkips() {
-        externalLinkDao.pruneExpiredSkips(nowMillis())
+        localStore { externalLinkDao.pruneExpiredSkips(nowMillis()) }
     }
 
     override suspend fun isPermissionGranted(): Boolean = scanner.isPermissionGranted()
 
     private suspend fun trackedPackageNames(): Set<String> =
         try {
-            installedAppDao.getTrackedPackageNames().toSet()
-        } catch (_: SQLiteException) {
+            localStore { installedAppDao.getTrackedPackageNames() }.toSet()
+        } catch (_: LocalStoreException) {
             emptySet()
         }
 
     private suspend fun pruneStalePendingReviews(livePackages: Set<String>) {
         try {
-            externalLinkDao.prunePendingReviewNotIn(livePackages)
-        } catch (e: SQLiteException) {
+            localStore { externalLinkDao.prunePendingReviewNotIn(livePackages) }
+        } catch (e: LocalStoreException) {
             Logger.d { "prune pending failed: ${e.message}" }
         }
     }

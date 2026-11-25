@@ -1,3 +1,5 @@
 package zed.rainxch.core.data.network
 
-class RepoArchivedException : Exception("Repository archived")
+import zed.rainxch.core.domain.model.error.NetworkException
+
+class RepoArchivedException : NetworkException("Repository archived", null)

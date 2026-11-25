@@ -15,13 +15,12 @@ import org.intellij.markdown.flavours.gfm.GFMFlavourDescriptor
 import org.intellij.markdown.parser.CancellationToken
 import org.intellij.markdown.parser.MarkdownParser
 import org.jetbrains.compose.resources.getString
-import zed.rainxch.core.domain.model.error.RateLimitException
+import zed.rainxch.core.domain.model.error.NetworkException
+import zed.rainxch.details.domain.model.TranslationProviderNotConfiguredException
 import zed.rainxch.details.domain.repository.DetailsRepository
 import zed.rainxch.details.domain.repository.TranslationRepository
 import zed.rainxch.details.presentation.model.SupportedLanguages
 import zed.rainxch.details.presentation.model.TranslationState
-import zed.rainxch.details.presentation.utils.UntypedFailureException
-import zed.rainxch.details.presentation.utils.untypedFailures
 import zed.rainxch.githubstore.core.presentation.res.Res
 import zed.rainxch.githubstore.core.presentation.res.failed_to_load
 import zed.rainxch.githubstore.core.presentation.res.translation_failed
@@ -70,7 +69,7 @@ class MarkdownViewerViewModel(
         }
         viewModelScope.launch {
             try {
-                val result = untypedFailures { translationRepository.translate(markdown, targetLanguageCode) }
+                val result = translationRepository.translate(markdown, targetLanguageCode)
                 _state.update {
                     it.copy(
                         translation =
@@ -84,9 +83,9 @@ class MarkdownViewerViewModel(
                     )
                 }
                 recompose()
-            } catch (_: UntypedFailureException) {
+            } catch (_: NetworkException) {
                 showTranslationFailure()
-            } catch (_: RateLimitException) {
+            } catch (_: TranslationProviderNotConfiguredException) {
                 showTranslationFailure()
             }
         }
@@ -151,17 +150,11 @@ class MarkdownViewerViewModel(
     private fun load() {
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true, errorMessage = null) }
-            try {
-                val rawMarkdown = untypedFailures { detailsRepository.fetchRawMarkdown(url) }
-                if (rawMarkdown != null) {
-                    _state.update { it.copy(isLoading = false, markdown = rawMarkdown) }
-                    recompose()
-                } else {
-                    showLoadFailure()
-                }
-            } catch (_: UntypedFailureException) {
-                showLoadFailure()
-            } catch (_: RateLimitException) {
+            val rawMarkdown = detailsRepository.fetchRawMarkdown(url)
+            if (rawMarkdown != null) {
+                _state.update { it.copy(isLoading = false, markdown = rawMarkdown) }
+                recompose()
+            } else {
                 showLoadFailure()
             }
         }
