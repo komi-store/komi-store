@@ -13,6 +13,7 @@ import zed.rainxch.core.data.network.ForgejoClientRegistry
 import zed.rainxch.core.domain.logging.KomiStoreLogger
 import zed.rainxch.core.domain.model.account.github.GithubRelease
 import zed.rainxch.core.domain.model.account.github.GithubRepoSummary
+import zed.rainxch.core.domain.model.error.LocalStoreException
 import zed.rainxch.details.data.mappers.toForgejoSummary
 import zed.rainxch.details.data.model.CachedReadme
 import zed.rainxch.details.data.model.toCachedReadme
@@ -61,8 +62,13 @@ internal class ForgejoDetailsSource(
                     val body = network.body?.let { preprocessForgejoMarkdown(it.replace("\r\n", "\n"), host, owner, repo, "HEAD") }
                     network.copy(body = body).toDomain()
                 }.sortedByDescending { it.publishedAt }
-        if (result.isNotEmpty()) cacheManager.put(cacheKey, result, RELEASES)
-        return result
+        return if (result.isEmpty()) {
+            result
+        } else {
+            cacheManager.putOrFailure(cacheKey, result, RELEASES).getOrElse { cause ->
+                cacheManager.staleOrThrow<List<GithubRelease>>(cacheKey, cause)
+            }
+        }
     }
 
     suspend fun readme(
@@ -154,7 +160,14 @@ internal class ForgejoDetailsSource(
             cacheManager
                 .get<List<GithubRelease>>(legacyCacheKey)
                 .orEmpty()
-                .ifEmpty { releases(ref.owner, ref.repo, ref.host) }
+                .ifEmpty {
+                    try {
+                        releases(ref.owner, ref.repo, ref.host)
+                    } catch (e: LocalStoreException) {
+                        logger.debug("Forgejo downloads sum: releases fetch failed: ${e.message}")
+                        return 0L
+                    }
+                }
         return knownReleases.sumOf { release -> release.assets.sumOf { it.downloadCount } }
     }
 

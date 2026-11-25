@@ -116,7 +116,13 @@ internal class ReleaseReader(
             ?.filter { it.draft != true && it.prerelease != true }
             ?.maxByOrNull { it.publishedAt ?: it.createdAt ?: "" }
             ?.let { latest -> latest.copy(body = releaseBody(latest.body, owner, repo, defaultBranch)).toDomain() }
-            ?.also { cacheManager.put(cacheKey, it, RELEASES) }
+            ?.let { latest ->
+                cacheManager.putOrFailure(cacheKey, latest, RELEASES).getOrElse { cause ->
+                    cacheManager.staleOrThrow<GithubRelease>(cacheKey, cause) {
+                        logger.debug("Network error, using stale cache for latest release $owner/$repo")
+                    }
+                }
+            }
     }
 
     // The backend answers from a copy up to an hour old with no way to force it, so a user-asked read tries the host first.
@@ -171,7 +177,12 @@ internal class ReleaseReader(
     private suspend fun readHost(read: ReleaseRead): Result<List<GithubRelease>> =
         catchingRateLimit { githubReleases(read.owner, read.repo, RELEASES_PAGE_SIZE) }
             .map { it.toDomainReleases(read.owner, read.repo, read.defaultBranch) }
-            .onSuccess { if (it.isNotEmpty()) cacheManager.put(read.cacheKey, it, RELEASES) }
+            .fold(
+                onSuccess = { releases ->
+                    if (releases.isEmpty()) Result.success(releases) else cacheManager.putOrFailure(read.cacheKey, releases, RELEASES)
+                },
+                onFailure = { cause -> Result.failure(cause) },
+            )
 
     private suspend fun githubReleases(
         owner: String,
