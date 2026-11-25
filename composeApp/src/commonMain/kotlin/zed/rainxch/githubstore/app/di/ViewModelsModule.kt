@@ -1,5 +1,6 @@
 package zed.rainxch.githubstore.app.di
 
+import org.koin.core.module.dsl.factoryOf
 import org.koin.core.module.dsl.viewModel
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.core.qualifier.named
@@ -50,54 +51,17 @@ import zed.rainxch.tweaks.presentation.skipped.SkippedUpdatesViewModel
 
 val viewModelsModule =
     module {
-        viewModel {
-            AppsViewModel(
-                library =
-                    LibraryLoader(
-                        installedAppsRepository = get(),
-                        syncInstalledAppsUseCase = get(),
-                        tweaksRepository = get(),
-                        externalImportRepository = get(),
-                        reviewsRepository = get(),
-                        logger = get(),
-                    ),
-                updates =
-                    AppUpdates(
-                        targets = UpdateTargetResolver(installedAppsRepository = get(), installer = get(), logger = get()),
-                        downloads =
-                            UpdateDownloads(
-                                installer = get(),
-                                downloader = get(),
-                                downloadOrchestrator = get(),
-                                tweaksRepository = get(),
-                                logger = get(),
-                                appScope = get(),
-                            ),
-                        installs =
-                            UpdateInstalls(
-                                installer = get(),
-                                installedAppsRepository = get(),
-                                systemInstallSerializer = get(),
-                                downloadOrchestrator = get(),
-                                logger = get(),
-                            ),
-                        installedAppsRepository = get(),
-                        downloadOrchestrator = get(),
-                        logger = get(),
-                    ),
-                linkSheet =
-                    LinkSheetActions(
-                        appsRepository = get(),
-                        externalImportRepository = get(),
-                        tweaksRepository = get(),
-                        installer = get(),
-                        logger = get(),
-                    ),
-                rowActions = AppRowActions(installedAppsRepository = get(), appsRepository = get(), installer = get(), logger = get()),
-                assetSettings = AssetMatchSettings(installedAppsRepository = get(), logger = get()),
-                backup = LibraryBackup(appsRepository = get(), shareManager = get(), logger = get()),
-            )
-        }
+        // Factories, not singles: each collaborator keeps the state of the one AppsViewModel it serves.
+        factoryOf(::LibraryLoader)
+        factoryOf(::UpdateTargetResolver)
+        factoryOf(::UpdateDownloads)
+        factoryOf(::UpdateInstalls)
+        factoryOf(::AppUpdates)
+        factoryOf(::LinkSheetActions)
+        factoryOf(::AppRowActions)
+        factoryOf(::AssetMatchSettings)
+        factoryOf(::LibraryBackup)
+        viewModelOf(::AppsViewModel)
         viewModelOf(::ExternalImportViewModel)
         viewModelOf(::AuthenticationViewModel)
         viewModel { params ->

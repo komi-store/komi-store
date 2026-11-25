@@ -26,7 +26,7 @@ feature/apps/
 ## Notes
 
 - `AppsViewModel` is created in `AppNavigation` (not by `AppsRoot`) and its state is collected there for the bottom-nav update badge, so it loads at app start and outlives the screen.
-- `AppsViewModel` only owns the state and routes each `AppsAction` group (`Library`, `ImportProposal`, `Update`, `DownloadTask`, `LinkNavigation`, `LinkInput`, `AppRow`, `AdvancedFilter`, `Variant`, `Backup`) to its collaborator, which reads and writes the one `AppsStateHolder`. `ViewModelsModule` builds the collaborators.
+- `AppsViewModel` only owns the state and routes each `AppsAction` group (`Library`, `ImportProposal`, `Update`, `DownloadTask`, `LinkNavigation`, `LinkInput`, `AppRow`, `AdvancedFilter`, `Variant`, `Backup`) to its collaborator, which reads and writes the one `AppsStateHolder`. `ViewModelsModule` registers the collaborators as factories, since each keeps per-ViewModel state.
 - The UI state carries only UI models: `LibraryDownloadUi`, `LinkSuggestionUi` and `ImportSummaryUi` stand in for the orchestrator's downloads, the match suggestions and the import result.
 - Uses `InstalledAppsRepository` + `SyncInstalledAppsUseCase`. `openApp` via `AppLauncher`. `getLatestRelease` / `fetchRepoInfo` go backend first, GitHub direct on fallback; a non-null `sourceHost` routes them to the `ForgejoClientRegistry` client instead. `linkAppToRepo` only persists `sourceHost` on `InstalledApp.sourceHost`.
 - **Stored match:** Update and re-download start from the release and asset the last update check stored on the row (`UpdateTargetResolver.resolve` -> `storedTarget`). `getLatestRelease` runs only when nothing is stored, or after a download from the stored match failed (`storedMatchFailures`).
