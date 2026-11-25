@@ -209,7 +209,7 @@ private fun Queue(
         }
     }
     val currentOnAction by rememberUpdatedState(onAction)
-    // isLoadingMore is a key so an empty page asks again; after a failure only the retry item asks.
+    // isLoadingMore is a key so a page that added nothing new asks for the next; after a failure only the retry item asks.
     LaunchedEffect(nearEnd, state.items.size, state.isLoadingMore, state.loadMoreFailed) {
         if (nearEnd && !state.loadMoreFailed) currentOnAction(ModerationAction.OnLoadMore)
     }

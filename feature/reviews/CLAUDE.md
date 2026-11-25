@@ -20,8 +20,6 @@ There are no domain or data layers here: Details needs reviews too, and features
 
 ## Notes
 
-- `ReviewsArgs` carries the route's arguments into `ReviewsViewModel`. `ReviewsAction` groups the sheet actions under `ComposerAction`, `ReportAction` and `ReplyAction`, each handled by its own function.
-
 - The public list is a CDN copy that can lag a write by minutes, so the viewer's own review comes from `/mine`, is pinned above the list and is dropped from it. `isHidden` on it shows the moderator notice.
 - Every fresh load (sort, filter, retry) bumps `requestGeneration`; responses from an older generation are dropped.
 - The composer never opens before `/mine` answers: a tap then waits for it (`composerPending`), since a blank composer would post a new review over the viewer's existing one. A failed `/mine` drops the wait with an error message.
