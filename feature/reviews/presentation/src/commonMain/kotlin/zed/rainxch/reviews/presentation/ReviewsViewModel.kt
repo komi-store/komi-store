@@ -562,9 +562,7 @@ class ReviewsViewModel(
         viewModelScope.launch { _events.send(ReviewsEvent.OnMessage(getString(resource))) }
     }
 
-    private val ReviewsUiState.isFetching: Boolean get() = isLoading || isLoadingMore
-
-    private val ReviewsUiState.canLoadMore: Boolean get() = !isFetching && !endReached && errorMessage == null
+    private val ReviewsUiState.canLoadMore: Boolean get() = !isLoading && !isLoadingMore && !endReached && errorMessage == null
 
     private fun CannotReviewReason.message(): StringResource =
         when (this) {

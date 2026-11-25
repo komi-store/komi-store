@@ -202,9 +202,7 @@ class ModerationViewModel(
         viewModelScope.launch { _events.send(ModerationEvent.OnMessage(getString(resource))) }
     }
 
-    private val ModerationUiState.isFetching: Boolean get() = isLoading || isLoadingMore
-
-    private val ModerationUiState.canLoadMore: Boolean get() = !isFetching && !endReached && errorMessage == null
+    private val ModerationUiState.canLoadMore: Boolean get() = !isLoading && !isLoadingMore && !endReached && errorMessage == null
 
     private fun ModerationDecision.doneMessage(): StringResource =
         when (this) {

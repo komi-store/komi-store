@@ -170,7 +170,5 @@ class IssuesViewModel(
         }
     }
 
-    private val IssuesUiState.isFetching: Boolean get() = isLoading || isLoadingMore
-
-    private val IssuesUiState.canLoadMore: Boolean get() = !isFetching && !endReached && errorMessage == null
+    private val IssuesUiState.canLoadMore: Boolean get() = !isLoading && !isLoadingMore && !endReached && errorMessage == null
 }

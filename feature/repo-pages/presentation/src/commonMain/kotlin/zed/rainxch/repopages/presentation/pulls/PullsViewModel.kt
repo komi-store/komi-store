@@ -104,9 +104,7 @@ class PullsViewModel(
         }
     }
 
-    private val PullsUiState.isFetching: Boolean get() = isLoading || isLoadingMore
-
-    private val PullsUiState.canLoadMore: Boolean get() = !isFetching && !endReached && errorMessage == null
+    private val PullsUiState.canLoadMore: Boolean get() = !isLoading && !isLoadingMore && !endReached && errorMessage == null
 
     companion object {
         private const val PER_PAGE = 30
