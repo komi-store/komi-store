@@ -60,7 +60,7 @@ object DesktopDeepLink {
             } ?: return
 
         try {
-            regFile.writeBytes(("$regContent").toByteArray(Charsets.UTF_16LE))
+            regFile.writeBytes(("\uFEFF$regContent").toByteArray(Charsets.UTF_16LE))
             val result = runCommandResult("reg", "import", regFile.absolutePath)
             if (result == null || result.exitCode != 0) {
                 println("DeepLink: Windows scheme registration failed (reg import): ${result?.output?.trim().orEmpty()}")
