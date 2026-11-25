@@ -179,18 +179,18 @@ private fun zed.rainxch.githubstore.app.navigation.navKicker(screen: zed.rainxch
     - screen: UNKNOWN (interface or non-final class; concrete implementation unknown)
 
 @Composable
-private fun zed.rainxch.githubstore.app.whatsnew.SheetHeader(entry: zed.rainxch.core.domain.model.announcement.WhatsNewEntry): kotlin.Unit
+private fun zed.rainxch.githubstore.app.whatsnew.SheetHeader(entry: zed.rainxch.profile.presentation.whatsnew.WhatsNewEntryUi): kotlin.Unit
   skippable: true
   restartable: true
   params:
-    - entry: UNSTABLE (cross-module type without @Stable/@Immutable)
+    - entry: STABLE (class with no mutable properties)
 
 @Composable
-public fun zed.rainxch.githubstore.app.whatsnew.WhatsNewSheet(entry: zed.rainxch.core.domain.model.announcement.WhatsNewEntry, showHistoryAction: kotlin.Boolean, onDismiss: kotlin.Function0<kotlin.Unit>, onViewHistory: kotlin.Function0<kotlin.Unit>): kotlin.Unit
+public fun zed.rainxch.githubstore.app.whatsnew.WhatsNewSheet(entry: zed.rainxch.profile.presentation.whatsnew.WhatsNewEntryUi, showHistoryAction: kotlin.Boolean, onDismiss: kotlin.Function0<kotlin.Unit>, onViewHistory: kotlin.Function0<kotlin.Unit>): kotlin.Unit
   skippable: true
   restartable: true
   params:
-    - entry: UNSTABLE (cross-module type without @Stable/@Immutable)
+    - entry: STABLE (class with no mutable properties)
     - showHistoryAction: STABLE (primitive type)
     - onDismiss: STABLE (function type)
     - onViewHistory: STABLE (function type)

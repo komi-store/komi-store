@@ -8,11 +8,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.foundation.lazy.items
 import androidx.compose.ui.unit.dp
+import kotlinx.collections.immutable.ImmutableList
 import org.jetbrains.compose.resources.stringResource
 import zed.rainxch.core.presentation.components.bars.KomiTopBar
 import zed.rainxch.core.presentation.components.bars.KomiTopBarSize
@@ -22,18 +23,19 @@ import zed.rainxch.core.presentation.components.surfaces.KomiSurfaceElevation
 import zed.rainxch.core.presentation.components.text.KomiText
 import zed.rainxch.core.presentation.components.text.KomiTextRole
 import zed.rainxch.core.presentation.locals.LocalPersonality
-import zed.rainxch.core.domain.model.announcement.WhatsNewEntry
 import zed.rainxch.githubstore.core.presentation.res.Res
 import zed.rainxch.githubstore.core.presentation.res.whats_new_history_empty
 import zed.rainxch.githubstore.core.presentation.res.whats_new_title
 
 @Composable
 fun WhatsNewHistoryScreen(
-    entries: List<WhatsNewEntry>,
+    entries: ImmutableList<WhatsNewEntryUi>,
     onNavigateBack: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val colors = LocalPersonality.current.colors
     KomiScaffold(
+        modifier = modifier,
         topBar = {
             KomiTopBar(
                 title = stringResource(Res.string.whats_new_title),
@@ -74,16 +76,20 @@ fun WhatsNewHistoryScreen(
 }
 
 @Composable
-fun WhatsNewEntryCard(entry: WhatsNewEntry) {
+fun WhatsNewEntryCard(
+    entry: WhatsNewEntryUi,
+    modifier: Modifier = Modifier,
+) {
     val colors = LocalPersonality.current.colors
     KomiSurface(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         elevation = KomiSurfaceElevation.Card,
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {

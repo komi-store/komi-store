@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
+import kotlinx.collections.immutable.ImmutableSet
 import org.jetbrains.compose.resources.stringResource
 import zed.rainxch.core.domain.model.announcement.AnnouncementCategory
 import zed.rainxch.core.presentation.components.icon.KomiIcon
@@ -32,13 +33,15 @@ import zed.rainxch.githubstore.core.presentation.res.announcements_mute_settings
 
 @Composable
 fun MuteSettingsBottomSheet(
-    mutedCategories: Set<AnnouncementCategory>,
+    mutedCategories: ImmutableSet<AnnouncementCategory>,
     onToggle: (AnnouncementCategory, Boolean) -> Unit,
     onDismiss: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val colors = LocalPersonality.current.colors
     KomiSheet(
         onDismiss = onDismiss,
+        modifier = modifier,
     ) {
         Column(
             modifier =
@@ -56,7 +59,6 @@ fun MuteSettingsBottomSheet(
             AnnouncementCategory.entries.forEach { category ->
                 val locked = !category.isMutable
                 CategoryRow(
-                    category = category,
                     label = stringResource(categoryLabel(category)),
                     enabled = if (locked) true else category !in mutedCategories,
                     locked = locked,
@@ -71,7 +73,6 @@ fun MuteSettingsBottomSheet(
 
 @Composable
 private fun CategoryRow(
-    category: AnnouncementCategory,
     label: String,
     enabled: Boolean,
     locked: Boolean,
