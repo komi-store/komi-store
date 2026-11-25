@@ -50,7 +50,28 @@ import zed.rainxch.core.presentation.components.text.KomiText
 import zed.rainxch.core.presentation.components.text.KomiTextRole
 import zed.rainxch.core.presentation.locals.LocalPersonality
 import zed.rainxch.core.presentation.utils.formatFileSize
-import zed.rainxch.githubstore.core.presentation.res.*
+import zed.rainxch.githubstore.core.presentation.res.Res
+import zed.rainxch.githubstore.core.presentation.res.advanced_filter_variant_relation
+import zed.rainxch.githubstore.core.presentation.res.advanced_preview_failed
+import zed.rainxch.githubstore.core.presentation.res.advanced_preview_no_match
+import zed.rainxch.githubstore.core.presentation.res.advanced_preview_pending
+import zed.rainxch.githubstore.core.presentation.res.advanced_preview_refresh
+import zed.rainxch.githubstore.core.presentation.res.advanced_preview_release
+import zed.rainxch.githubstore.core.presentation.res.advanced_preview_title
+import zed.rainxch.githubstore.core.presentation.res.advanced_save
+import zed.rainxch.githubstore.core.presentation.res.advanced_settings_description
+import zed.rainxch.githubstore.core.presentation.res.advanced_settings_title
+import zed.rainxch.githubstore.core.presentation.res.asset_filter_help
+import zed.rainxch.githubstore.core.presentation.res.asset_filter_invalid
+import zed.rainxch.githubstore.core.presentation.res.asset_filter_label
+import zed.rainxch.githubstore.core.presentation.res.asset_filter_placeholder
+import zed.rainxch.githubstore.core.presentation.res.cancel
+import zed.rainxch.githubstore.core.presentation.res.fallback_older_releases_description
+import zed.rainxch.githubstore.core.presentation.res.fallback_older_releases_title
+import zed.rainxch.githubstore.core.presentation.res.variant_picker_auto_subtitle
+import zed.rainxch.githubstore.core.presentation.res.variant_picker_pinned
+import zed.rainxch.githubstore.core.presentation.res.variant_picker_stale_title
+import zed.rainxch.githubstore.core.presentation.res.variant_picker_title
 
 @Composable
 fun AdvancedAppSettingsBottomSheet(

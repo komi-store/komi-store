@@ -42,7 +42,19 @@ import zed.rainxch.core.presentation.components.progress.KomiCircularProgress
 import zed.rainxch.core.presentation.components.text.KomiText
 import zed.rainxch.core.presentation.components.text.KomiTextRole
 import zed.rainxch.core.presentation.locals.LocalPersonality
-import zed.rainxch.githubstore.core.presentation.res.*
+import zed.rainxch.githubstore.core.presentation.res.Res
+import zed.rainxch.githubstore.core.presentation.res.cancel
+import zed.rainxch.githubstore.core.presentation.res.variant_picker_auto_subtitle
+import zed.rainxch.githubstore.core.presentation.res.variant_picker_auto_title
+import zed.rainxch.githubstore.core.presentation.res.variant_picker_description
+import zed.rainxch.githubstore.core.presentation.res.variant_picker_load_failed
+import zed.rainxch.githubstore.core.presentation.res.variant_picker_no_assets
+import zed.rainxch.githubstore.core.presentation.res.variant_picker_no_pinnable
+import zed.rainxch.githubstore.core.presentation.res.variant_picker_open_filter
+import zed.rainxch.githubstore.core.presentation.res.variant_picker_save_failed
+import zed.rainxch.githubstore.core.presentation.res.variant_picker_stale_title
+import zed.rainxch.githubstore.core.presentation.res.variant_picker_stale_was
+import zed.rainxch.githubstore.core.presentation.res.variant_picker_title
 
 @Composable
 fun VariantPickerDialog(
