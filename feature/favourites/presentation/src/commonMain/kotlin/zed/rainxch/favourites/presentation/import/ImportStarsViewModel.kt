@@ -20,7 +20,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import zed.rainxch.core.domain.model.repository.FavoriteRepo
+import zed.rainxch.core.domain.model.error.LocalStoreException
 import zed.rainxch.core.domain.repository.FavouritesRepository
 import zed.rainxch.core.domain.repository.StarredRepository
 import kotlin.time.Clock
@@ -134,12 +134,7 @@ class ImportStarsViewModel(
         importJob?.cancel()
         importJob =
             viewModelScope.launch {
-                _state.update {
-                    it.copy(
-                        isImporting = true,
-                        errorMessage = null,
-                    )
-                }
+                _state.update { it.copy(isImporting = true, errorMessage = null) }
 
                 val favouritedIds =
                     favouritesRepository
@@ -148,71 +143,46 @@ class ImportStarsViewModel(
                         .map { it.repoId }
                         .toSet()
 
-                val result =
-                    runCatching {
-                        starredRepository.fetchStarredForUsername(username)
-                    }.getOrElse { Result.failure(it) }
+                val result = starredRepository.fetchStarredForUsername(username)
 
                 ensureActive()
 
                 result.fold(
                     onSuccess = { repos ->
-                        val candidates =
-                            repos.map { repo ->
-                                ImportCandidateUi(
-                                    repoId = repo.repoId,
-                                    owner = repo.repoOwner,
-                                    name = repo.repoName,
-                                    ownerAvatarUrl = repo.repoOwnerAvatarUrl,
-                                    description = repo.repoDescription,
-                                    primaryLanguage = repo.primaryLanguage,
-                                    repoUrl = repo.repoUrl,
-                                    stargazersCount = repo.stargazersCount,
-                                    isAlreadyFavourited = repo.repoId in favouritedIds,
-                                )
-                            }
-                        _state.update {
-                            it.copy(
-                                isImporting = false,
-                                importedUsername = username,
-                                candidates = candidates.toImmutableList(),
-                                phase = ImportStarsState.Phase.Results,
-                            )
-                        }
+                        showCandidates(username, repos.map { it.toImportCandidateUi(it.repoId in favouritedIds) })
                     },
-                    onFailure = { error ->
-                        if (error is CancellationException) throw error
-                        _state.update {
-                            it.copy(
-                                isImporting = false,
-                                errorMessage = error.message ?: "Failed to import stars",
-                            )
-                        }
-                    },
+                    onFailure = ::showImportFailure,
                 )
             }
     }
 
+    private fun showCandidates(
+        username: String,
+        candidates: List<ImportCandidateUi>,
+    ) {
+        _state.update {
+            it.copy(
+                isImporting = false,
+                importedUsername = username,
+                candidates = candidates.toImmutableList(),
+                phase = ImportStarsState.Phase.Results,
+            )
+        }
+    }
+
+    private fun showImportFailure(error: Throwable) {
+        if (error is CancellationException) throw error
+        _state.update {
+            it.copy(
+                isImporting = false,
+                errorMessage = error.message ?: "Failed to import stars",
+            )
+        }
+    }
+
     private fun toggleFavourite(candidate: ImportCandidateUi) {
         viewModelScope.launch {
-            val now = Clock.System.now().toEpochMilliseconds()
-            val favourite =
-                FavoriteRepo(
-                    repoId = candidate.repoId,
-                    repoName = candidate.name,
-                    repoOwner = candidate.owner,
-                    repoOwnerAvatarUrl = candidate.ownerAvatarUrl,
-                    repoDescription = candidate.description,
-                    primaryLanguage = candidate.primaryLanguage,
-                    repoUrl = candidate.repoUrl,
-                    latestVersion = null,
-                    latestReleaseUrl = null,
-                    addedAt = now,
-                    lastSyncedAt = now,
-                )
-
-            val toggled = runCatching { favouritesRepository.toggleFavorite(favourite) }.isSuccess
-            if (!toggled) return@launch
+            if (!toggled(candidate, Clock.System.now().toEpochMilliseconds())) return@launch
 
             _state.update { current ->
                 val updated =
@@ -240,23 +210,7 @@ class ImportStarsViewModel(
             val addedIds = mutableSetOf<Long>()
 
             for (candidate in pending) {
-                val favourite =
-                    FavoriteRepo(
-                        repoId = candidate.repoId,
-                        repoName = candidate.name,
-                        repoOwner = candidate.owner,
-                        repoOwnerAvatarUrl = candidate.ownerAvatarUrl,
-                        repoDescription = candidate.description,
-                        primaryLanguage = candidate.primaryLanguage,
-                        repoUrl = candidate.repoUrl,
-                        latestVersion = null,
-                        latestReleaseUrl = null,
-                        addedAt = now,
-                        lastSyncedAt = now,
-                    )
-
-                runCatching { favouritesRepository.toggleFavorite(favourite) }
-                    .onSuccess { addedIds += candidate.repoId }
+                if (toggled(candidate, now)) addedIds += candidate.repoId
             }
 
             _state.update { current ->
@@ -276,4 +230,16 @@ class ImportStarsViewModel(
             }
         }
     }
+
+    // False when Room refused the write; the candidate then keeps its old mark.
+    private suspend fun toggled(
+        candidate: ImportCandidateUi,
+        now: Long,
+    ): Boolean =
+        try {
+            favouritesRepository.toggleFavorite(candidate.toFavoriteRepo(now))
+            true
+        } catch (_: LocalStoreException) {
+            false
+        }
 }

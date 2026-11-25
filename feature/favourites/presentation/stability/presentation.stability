@@ -16,12 +16,13 @@ public fun zed.rainxch.favourites.presentation.FavouritesRoot(onNavigateBack: ko
     - viewModel: UNSTABLE (has mutable properties or unstable members)
 
 @Composable
-public fun zed.rainxch.favourites.presentation.FavouritesScreen(state: zed.rainxch.favourites.presentation.FavouritesState, onAction: kotlin.Function1<zed.rainxch.favourites.presentation.FavouritesAction, kotlin.Unit>): kotlin.Unit
+public fun zed.rainxch.favourites.presentation.FavouritesScreen(state: zed.rainxch.favourites.presentation.FavouritesState, onAction: kotlin.Function1<zed.rainxch.favourites.presentation.FavouritesAction, kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
   skippable: true
   restartable: true
   params:
     - state: STABLE (class with no mutable properties)
     - onAction: STABLE (function type)
+    - modifier: STABLE (marked @Stable or @Immutable)
 
 @Composable
 private fun zed.rainxch.favourites.presentation.FavouritesSearchBar(query: kotlin.String, onQueryChange: kotlin.Function1<kotlin.String, kotlin.Unit>): kotlin.Unit
@@ -69,13 +70,13 @@ private fun zed.rainxch.favourites.presentation.import.CandidateRow(candidate: z
     - onToggle: STABLE (function type)
 
 @Composable
-public fun zed.rainxch.favourites.presentation.import.ImportStarsRoot(viewModel: zed.rainxch.favourites.presentation.import.ImportStarsViewModel, onNavigateBack: kotlin.Function0<kotlin.Unit>, onNavigateToDetails: kotlin.Function3<@[ParameterName(name = \): kotlin.Unit
+public fun zed.rainxch.favourites.presentation.import.ImportStarsRoot(onNavigateBack: kotlin.Function0<kotlin.Unit>, onNavigateToDetails: kotlin.Function3<@[ParameterName(name = \, viewModel: zed.rainxch.favourites.presentation.import.ImportStarsViewModel): kotlin.Unit
   skippable: true
   restartable: true
   params:
-    - viewModel: UNSTABLE (has mutable properties or unstable members)
     - onNavigateBack: STABLE (function type)
     - onNavigateToDetails: STABLE (function type)
+    - viewModel: UNSTABLE (has mutable properties or unstable members)
 
 @Composable
 private fun zed.rainxch.favourites.presentation.import.ImportStarsScreen(state: zed.rainxch.favourites.presentation.import.ImportStarsState, onAction: kotlin.Function1<zed.rainxch.favourites.presentation.import.ImportStarsAction, kotlin.Unit>): kotlin.Unit

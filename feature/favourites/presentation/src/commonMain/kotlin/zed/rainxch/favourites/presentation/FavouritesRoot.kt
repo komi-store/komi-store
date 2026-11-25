@@ -1,6 +1,5 @@
 package zed.rainxch.favourites.presentation
 
-import androidx.compose.material.icons.rounded.Search
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,8 +14,9 @@ import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridS
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.Sort
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.rounded.PersonAdd
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.rounded.PersonAdd
+import androidx.compose.material.icons.rounded.Search
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -29,6 +29,7 @@ import kotlinx.collections.immutable.toImmutableList
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import zed.rainxch.core.domain.utils.RepoIdCodec
+import zed.rainxch.core.presentation.components.ScrollbarContainer
 import zed.rainxch.core.presentation.components.bars.KomiTopBar
 import zed.rainxch.core.presentation.components.bars.KomiTopBarSize
 import zed.rainxch.core.presentation.components.buttons.KomiButtonVariant
@@ -38,14 +39,19 @@ import zed.rainxch.core.presentation.components.overlays.KomiDropdown
 import zed.rainxch.core.presentation.components.overlays.KomiMenuEntry
 import zed.rainxch.core.presentation.components.overlays.KomiMenuItem
 import zed.rainxch.core.presentation.components.progress.KomiCircularProgress
-import zed.rainxch.core.presentation.personality.utils.PersonalityPreview
-import zed.rainxch.core.presentation.components.ScrollbarContainer
 import zed.rainxch.core.presentation.components.scaffold.KomiScaffold
 import zed.rainxch.core.presentation.locals.LocalScrollbarEnabled
+import zed.rainxch.core.presentation.personality.utils.PersonalityPreview
 import zed.rainxch.core.presentation.utils.arrowKeyScroll
 import zed.rainxch.favourites.presentation.components.FavouriteRepositoryItem
 import zed.rainxch.favourites.presentation.model.FavouritesSortRule
-import zed.rainxch.githubstore.core.presentation.res.*
+import zed.rainxch.githubstore.core.presentation.res.Res
+import zed.rainxch.githubstore.core.presentation.res.favourites
+import zed.rainxch.githubstore.core.presentation.res.import_stars_entry
+import zed.rainxch.githubstore.core.presentation.res.search_repositories_hint
+import zed.rainxch.githubstore.core.presentation.res.sort_label
+import zed.rainxch.githubstore.core.presentation.res.sort_name
+import zed.rainxch.githubstore.core.presentation.res.sort_recently_added
 
 @Composable
 fun FavouritesRoot(
@@ -95,8 +101,10 @@ fun FavouritesRoot(
 fun FavouritesScreen(
     state: FavouritesState,
     onAction: (FavouritesAction) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     KomiScaffold(
+        modifier = modifier,
         topBar = {
             FavouritesTopbar(
                 sortRule = state.sortRule,
@@ -193,15 +201,15 @@ private fun FavouritesTopbar(
                         .map { rule ->
                             KomiMenuItem(
                                 id = rule.name,
-                                label = stringResource(
-                                    when (rule) {
-                                        FavouritesSortRule.RecentlyAdded -> Res.string.sort_recently_added
-                                        FavouritesSortRule.NameAsc -> Res.string.sort_name
-                                    }
-                                ),
+                                label =
+                                    stringResource(
+                                        when (rule) {
+                                            FavouritesSortRule.RecentlyAdded -> Res.string.sort_recently_added
+                                            FavouritesSortRule.NameAsc -> Res.string.sort_name
+                                        },
+                                    ),
                             )
-                        }
-                        .toImmutableList()
+                        }.toImmutableList()
                 KomiDropdown(
                     entries = sortEntries,
                     onSelect = { item ->
