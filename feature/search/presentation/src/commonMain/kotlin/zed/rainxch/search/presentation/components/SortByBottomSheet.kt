@@ -9,6 +9,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import org.jetbrains.compose.resources.stringResource
 import zed.rainxch.core.presentation.components.buttons.KomiButton
 import zed.rainxch.core.presentation.components.buttons.KomiButtonSize
 import zed.rainxch.core.presentation.components.buttons.KomiButtonVariant
@@ -18,10 +22,6 @@ import zed.rainxch.core.presentation.components.dividers.KomiHorizontalDivider
 import zed.rainxch.core.presentation.components.overlays.KomiDialog
 import zed.rainxch.core.presentation.components.text.KomiText
 import zed.rainxch.core.presentation.components.text.KomiTextRole
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import org.jetbrains.compose.resources.stringResource
 import zed.rainxch.githubstore.core.presentation.res.Res
 import zed.rainxch.githubstore.core.presentation.res.close
 import zed.rainxch.githubstore.core.presentation.res.sort_by
@@ -33,8 +33,8 @@ import zed.rainxch.search.presentation.utils.label
 fun SortByBottomSheet(
     selectedSortBy: SortByUi,
     selectedSortOrder: SortOrderUi,
-    onSortBySelected: (SortByUi) -> Unit,
-    onSortOrderSelected: (SortOrderUi) -> Unit,
+    onSortBySelect: (SortByUi) -> Unit,
+    onSortOrderSelect: (SortOrderUi) -> Unit,
     onDismissRequest: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -62,7 +62,7 @@ fun SortByBottomSheet(
             ) {
                 SortByUi.entries.forEach { option ->
                     KomiButton(
-                        onClick = { onSortBySelected(option) },
+                        onClick = { onSortBySelect(option) },
                         label = stringResource(option.label()),
                         variant = KomiButtonVariant.Text,
                         size = KomiButtonSize.Sm,
@@ -85,7 +85,7 @@ fun SortByBottomSheet(
                             label = stringResource(order.label()),
                             kind = KomiChipKind.Filter,
                             selected = order == selectedSortOrder,
-                            onClick = { onSortOrderSelected(order) },
+                            onClick = { onSortOrderSelect(order) },
                         )
                     }
                 }

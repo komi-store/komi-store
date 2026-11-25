@@ -5,62 +5,26 @@
 //   ./gradlew :presentation:stabilityDump
 
 @Composable
-private fun zed.rainxch.search.presentation.ActiveFilterChip(label: kotlin.String, leadingIcon: androidx.compose.ui.graphics.vector.ImageVector?, onRemove: kotlin.Function0<kotlin.Unit>): kotlin.Unit
-  skippable: true
-  restartable: true
-  params:
-    - label: STABLE (String is immutable)
-    - leadingIcon: STABLE (marked @Stable or @Immutable)
-    - onRemove: STABLE (function type)
-
-@Composable
-private fun zed.rainxch.search.presentation.ActiveFiltersStrip(state: zed.rainxch.search.presentation.SearchState, onAction: kotlin.Function1<zed.rainxch.search.presentation.SearchAction, kotlin.Unit>): kotlin.Unit
+private fun zed.rainxch.search.presentation.SearchBody(state: zed.rainxch.search.presentation.SearchState, listState: androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridState, innerPadding: androidx.compose.foundation.layout.PaddingValues, onAction: kotlin.Function1<zed.rainxch.search.presentation.SearchAction, kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
   skippable: true
   restartable: true
   params:
     - state: UNKNOWN (interface or non-final class; concrete implementation unknown)
+    - listState: STABLE (marked @Stable or @Immutable)
+    - innerPadding: STABLE (marked @Stable or @Immutable)
     - onAction: STABLE (function type)
+    - modifier: STABLE (marked @Stable or @Immutable)
 
 @Composable
-private fun zed.rainxch.search.presentation.ClipboardBanner(links: kotlinx.collections.immutable.ImmutableList<zed.rainxch.search.presentation.model.ParsedGithubLink>, onOpenLink: kotlin.Function1<zed.rainxch.search.presentation.model.ParsedGithubLink, kotlin.Unit>, onDismiss: kotlin.Function0<kotlin.Unit>): kotlin.Unit
-  skippable: true
-  restartable: true
-  params:
-    - links: STABLE (known stable type)
-    - onOpenLink: STABLE (function type)
-    - onDismiss: STABLE (function type)
-
-@Composable
-private fun zed.rainxch.search.presentation.DetectedLinksSection(links: kotlinx.collections.immutable.ImmutableList<zed.rainxch.search.presentation.model.ParsedGithubLink>, onOpenLink: kotlin.Function1<zed.rainxch.search.presentation.model.ParsedGithubLink, kotlin.Unit>): kotlin.Unit
-  skippable: true
-  restartable: true
-  params:
-    - links: STABLE (known stable type)
-    - onOpenLink: STABLE (function type)
-
-@Composable
-private fun zed.rainxch.search.presentation.ExploreFromGithubButton(status: zed.rainxch.search.presentation.SearchState.ExploreStatus, onExplore: kotlin.Function0<kotlin.Unit>): kotlin.Unit
-  skippable: true
-  restartable: true
-  params:
-    - status: STABLE (class with no mutable properties)
-    - onExplore: STABLE (function type)
-
-@Composable
-private fun zed.rainxch.search.presentation.FiltersButton(activeCount: kotlin.Int, onClick: kotlin.Function0<kotlin.Unit>): kotlin.Unit
-  skippable: true
-  restartable: true
-  params:
-    - activeCount: STABLE (primitive type)
-    - onClick: STABLE (function type)
-
-@Composable
-public fun zed.rainxch.search.presentation.PlatformPicker(state: zed.rainxch.search.presentation.SearchState, onAction: kotlin.Function1<zed.rainxch.search.presentation.SearchAction, kotlin.Unit>): kotlin.Unit
+private fun zed.rainxch.search.presentation.SearchResultsArea(state: zed.rainxch.search.presentation.SearchState, listState: androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridState, bottomPadding: androidx.compose.ui.unit.Dp, onAction: kotlin.Function1<zed.rainxch.search.presentation.SearchAction, kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
   skippable: true
   restartable: true
   params:
     - state: UNKNOWN (interface or non-final class; concrete implementation unknown)
+    - listState: STABLE (marked @Stable or @Immutable)
+    - bottomPadding: STABLE (marked @Stable or @Immutable)
     - onAction: STABLE (function type)
+    - modifier: STABLE (marked @Stable or @Immutable)
 
 @Composable
 public fun zed.rainxch.search.presentation.SearchRoot(onNavigateBack: kotlin.Function0<kotlin.Unit>, onNavigateToDetails: kotlin.Function4<@[ParameterName(name = \, onNavigateToDetailsFromLink: kotlin.Function2<@[ParameterName(name = \, onNavigateToDeveloperProfile: kotlin.Function1<@[ParameterName(name = \, viewModel: zed.rainxch.search.presentation.SearchViewModel): kotlin.Unit
@@ -74,22 +38,71 @@ public fun zed.rainxch.search.presentation.SearchRoot(onNavigateBack: kotlin.Fun
     - viewModel: UNSTABLE (has mutable properties or unstable members)
 
 @Composable
-public fun zed.rainxch.search.presentation.SearchScreen(state: zed.rainxch.search.presentation.SearchState, toastState: zed.rainxch.core.presentation.components.overlays.KomiToastState, onAction: kotlin.Function1<zed.rainxch.search.presentation.SearchAction, kotlin.Unit>): kotlin.Unit
+private fun zed.rainxch.search.presentation.SearchScreen(state: zed.rainxch.search.presentation.SearchState, toastState: zed.rainxch.core.presentation.components.overlays.KomiToastState, onAction: kotlin.Function1<zed.rainxch.search.presentation.SearchAction, kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
   skippable: true
   restartable: true
   params:
     - state: UNKNOWN (interface or non-final class; concrete implementation unknown)
     - toastState: STABLE (marked @Stable or @Immutable)
     - onAction: STABLE (function type)
+    - modifier: STABLE (marked @Stable or @Immutable)
 
 @Composable
-private fun zed.rainxch.search.presentation.SearchTopbar(onAction: kotlin.Function1<zed.rainxch.search.presentation.SearchAction, kotlin.Unit>, state: zed.rainxch.search.presentation.SearchState, focusRequester: androidx.compose.ui.focus.FocusRequester): kotlin.Unit
+private fun zed.rainxch.search.presentation.SearchSheets(state: zed.rainxch.search.presentation.SearchState, onAction: kotlin.Function1<zed.rainxch.search.presentation.SearchAction, kotlin.Unit>): kotlin.Unit
   skippable: true
   restartable: true
   params:
-    - onAction: STABLE (function type)
     - state: UNKNOWN (interface or non-final class; concrete implementation unknown)
-    - focusRequester: STABLE (marked @Stable or @Immutable)
+    - onAction: STABLE (function type)
+
+@Composable
+private fun zed.rainxch.search.presentation.components.ActiveFilterChip(label: kotlin.String, leadingIcon: androidx.compose.ui.graphics.vector.ImageVector?, onRemove: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - label: STABLE (String is immutable)
+    - leadingIcon: STABLE (marked @Stable or @Immutable)
+    - onRemove: STABLE (function type)
+    - modifier: STABLE (marked @Stable or @Immutable)
+
+@Composable
+internal fun zed.rainxch.search.presentation.components.ActiveFiltersStrip(selectedSource: zed.rainxch.search.presentation.model.SearchSourceUi, selectedLanguage: zed.rainxch.search.presentation.model.ProgrammingLanguageUi, selectedSortBy: zed.rainxch.search.presentation.model.SortByUi, onAction: kotlin.Function1<zed.rainxch.search.presentation.SearchAction, kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - selectedSource: STABLE (marked @Stable or @Immutable)
+    - selectedLanguage: STABLE (class with no mutable properties)
+    - selectedSortBy: STABLE (class with no mutable properties)
+    - onAction: STABLE (function type)
+    - modifier: STABLE (marked @Stable or @Immutable)
+
+@Composable
+internal fun zed.rainxch.search.presentation.components.ClipboardBanner(links: kotlinx.collections.immutable.ImmutableList<zed.rainxch.search.presentation.model.ParsedGithubLink>, onOpenLink: kotlin.Function1<zed.rainxch.search.presentation.model.ParsedGithubLink, kotlin.Unit>, onDismiss: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - links: STABLE (known stable type)
+    - onOpenLink: STABLE (function type)
+    - onDismiss: STABLE (function type)
+    - modifier: STABLE (marked @Stable or @Immutable)
+
+@Composable
+internal fun zed.rainxch.search.presentation.components.DetectedLinksSection(links: kotlinx.collections.immutable.ImmutableList<zed.rainxch.search.presentation.model.ParsedGithubLink>, onOpenLink: kotlin.Function1<zed.rainxch.search.presentation.model.ParsedGithubLink, kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - links: STABLE (known stable type)
+    - onOpenLink: STABLE (function type)
+    - modifier: STABLE (marked @Stable or @Immutable)
+
+@Composable
+internal fun zed.rainxch.search.presentation.components.ExploreFromGithubButton(status: zed.rainxch.search.presentation.SearchState.ExploreStatus, onExplore: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - status: STABLE (class with no mutable properties)
+    - onExplore: STABLE (function type)
+    - modifier: STABLE (marked @Stable or @Immutable)
 
 @Composable
 private fun zed.rainxch.search.presentation.components.FilterSection(title: kotlin.String, content: @[Composable] androidx.compose.runtime.internal.ComposableFunction0<kotlin.Unit>): kotlin.Unit
@@ -100,13 +113,31 @@ private fun zed.rainxch.search.presentation.components.FilterSection(title: kotl
     - content: STABLE (composable function type)
 
 @Composable
-public fun zed.rainxch.search.presentation.components.LanguageFilterBottomSheet(selectedLanguage: zed.rainxch.search.presentation.model.ProgrammingLanguageUi, onLanguageSelected: kotlin.Function1<zed.rainxch.search.presentation.model.ProgrammingLanguageUi, kotlin.Unit>, onDismissRequest: kotlin.Function0<kotlin.Unit>): kotlin.Unit
+private fun zed.rainxch.search.presentation.components.FiltersButton(activeCount: kotlin.Int, onClick: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - activeCount: STABLE (primitive type)
+    - onClick: STABLE (function type)
+    - modifier: STABLE (marked @Stable or @Immutable)
+
+@Composable
+internal fun zed.rainxch.search.presentation.components.HiddenBySeenMessage(onShowAll: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - onShowAll: STABLE (function type)
+    - modifier: STABLE (marked @Stable or @Immutable)
+
+@Composable
+public fun zed.rainxch.search.presentation.components.LanguageFilterBottomSheet(selectedLanguage: zed.rainxch.search.presentation.model.ProgrammingLanguageUi, onLanguageSelect: kotlin.Function1<zed.rainxch.search.presentation.model.ProgrammingLanguageUi, kotlin.Unit>, onDismissRequest: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
   skippable: true
   restartable: true
   params:
     - selectedLanguage: STABLE (class with no mutable properties)
-    - onLanguageSelected: STABLE (function type)
+    - onLanguageSelect: STABLE (function type)
     - onDismissRequest: STABLE (function type)
+    - modifier: STABLE (marked @Stable or @Immutable)
 
 @Composable
 private fun zed.rainxch.search.presentation.components.NavRow(leadingIcon: androidx.compose.ui.graphics.vector.ImageVector, value: kotlin.String, onClick: kotlin.Function0<kotlin.Unit>): kotlin.Unit
@@ -118,21 +149,50 @@ private fun zed.rainxch.search.presentation.components.NavRow(leadingIcon: andro
     - onClick: STABLE (function type)
 
 @Composable
-public fun zed.rainxch.search.presentation.components.SearchFiltersSheet(selectedSource: zed.rainxch.search.presentation.model.SearchSourceUi, availableSources: kotlinx.collections.immutable.ImmutableList<zed.rainxch.search.presentation.model.SearchSourceUi>, selectedPlatform: zed.rainxch.core.domain.model.repository.DiscoveryPlatform, selectedLanguage: zed.rainxch.search.presentation.model.ProgrammingLanguageUi, selectedSortBy: zed.rainxch.search.presentation.model.SortByUi, onSourceSelected: kotlin.Function1<zed.rainxch.search.presentation.model.SearchSourceUi, kotlin.Unit>, onPlatformSelected: kotlin.Function1<zed.rainxch.core.domain.model.repository.DiscoveryPlatform, kotlin.Unit>, onOpenLanguagePicker: kotlin.Function0<kotlin.Unit>, onOpenSortPicker: kotlin.Function0<kotlin.Unit>, onReset: kotlin.Function0<kotlin.Unit>, onDismiss: kotlin.Function0<kotlin.Unit>): kotlin.Unit
+internal fun zed.rainxch.search.presentation.components.NoResultsMessage(canExplore: kotlin.Boolean, exploreStatus: zed.rainxch.search.presentation.SearchState.ExploreStatus, onExplore: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
   skippable: true
   restartable: true
   params:
-    - selectedSource: UNKNOWN (interface or non-final class; concrete implementation unknown)
-    - availableSources: UNKNOWN (interface or non-final class; concrete implementation unknown)
+    - canExplore: STABLE (primitive type)
+    - exploreStatus: STABLE (class with no mutable properties)
+    - onExplore: STABLE (function type)
+    - modifier: STABLE (marked @Stable or @Immutable)
+
+@Composable
+internal fun zed.rainxch.search.presentation.components.PlatformPicker(selectedPlatform: zed.rainxch.core.domain.model.repository.DiscoveryPlatform, onPlatformSelect: kotlin.Function1<zed.rainxch.core.domain.model.repository.DiscoveryPlatform, kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - selectedPlatform: STABLE (class with no mutable properties)
+    - onPlatformSelect: STABLE (function type)
+    - modifier: STABLE (marked @Stable or @Immutable)
+
+@Composable
+internal fun zed.rainxch.search.presentation.components.SearchErrorMessage(message: kotlin.String, onRetry: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - message: STABLE (String is immutable)
+    - onRetry: STABLE (function type)
+    - modifier: STABLE (marked @Stable or @Immutable)
+
+@Composable
+public fun zed.rainxch.search.presentation.components.SearchFiltersSheet(selectedSource: zed.rainxch.search.presentation.model.SearchSourceUi, availableSources: kotlinx.collections.immutable.ImmutableList<zed.rainxch.search.presentation.model.SearchSourceUi>, selectedPlatform: zed.rainxch.core.domain.model.repository.DiscoveryPlatform, selectedLanguage: zed.rainxch.search.presentation.model.ProgrammingLanguageUi, selectedSortBy: zed.rainxch.search.presentation.model.SortByUi, onSourceSelect: kotlin.Function1<zed.rainxch.search.presentation.model.SearchSourceUi, kotlin.Unit>, onPlatformSelect: kotlin.Function1<zed.rainxch.core.domain.model.repository.DiscoveryPlatform, kotlin.Unit>, onOpenLanguagePicker: kotlin.Function0<kotlin.Unit>, onOpenSortPicker: kotlin.Function0<kotlin.Unit>, onReset: kotlin.Function0<kotlin.Unit>, onDismiss: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - selectedSource: STABLE (marked @Stable or @Immutable)
+    - availableSources: STABLE (known stable type)
     - selectedPlatform: STABLE (class with no mutable properties)
     - selectedLanguage: STABLE (class with no mutable properties)
     - selectedSortBy: STABLE (class with no mutable properties)
-    - onSourceSelected: STABLE (function type)
-    - onPlatformSelected: STABLE (function type)
+    - onSourceSelect: STABLE (function type)
+    - onPlatformSelect: STABLE (function type)
     - onOpenLanguagePicker: STABLE (function type)
     - onOpenSortPicker: STABLE (function type)
     - onReset: STABLE (function type)
     - onDismiss: STABLE (function type)
+    - modifier: STABLE (marked @Stable or @Immutable)
 
 @Composable
 public fun zed.rainxch.search.presentation.components.SearchHistorySection(recentSearches: kotlinx.collections.immutable.ImmutableList<kotlin.String>, onHistoryItemClick: kotlin.Function1<kotlin.String, kotlin.Unit>, onRemoveItem: kotlin.Function1<kotlin.String, kotlin.Unit>, onClearAll: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
@@ -146,6 +206,56 @@ public fun zed.rainxch.search.presentation.components.SearchHistorySection(recen
     - modifier: STABLE (marked @Stable or @Immutable)
 
 @Composable
+internal fun zed.rainxch.search.presentation.components.SearchLoadMoreEffects(state: zed.rainxch.search.presentation.SearchState, listState: androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridState, onAction: kotlin.Function1<zed.rainxch.search.presentation.SearchAction, kotlin.Unit>): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - state: UNKNOWN (interface or non-final class; concrete implementation unknown)
+    - listState: STABLE (marked @Stable or @Immutable)
+    - onAction: STABLE (function type)
+
+@Composable
+internal fun zed.rainxch.search.presentation.components.SearchLoadingMessage(modifier: androidx.compose.ui.Modifier): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - modifier: STABLE (marked @Stable or @Immutable)
+
+@Composable
+internal fun zed.rainxch.search.presentation.components.SearchResultsGrid(repos: kotlinx.collections.immutable.ImmutableList<zed.rainxch.core.presentation.model.DiscoveryRepositoryUi>, isGridLayout: kotlin.Boolean, isLoadingMore: kotlin.Boolean, showExplore: kotlin.Boolean, exploreStatus: zed.rainxch.search.presentation.SearchState.ExploreStatus, listState: androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridState, edgeInset: androidx.compose.ui.unit.Dp, bottomPadding: androidx.compose.ui.unit.Dp, onAction: kotlin.Function1<zed.rainxch.search.presentation.SearchAction, kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - repos: UNKNOWN (interface or non-final class; concrete implementation unknown)
+    - isGridLayout: STABLE (primitive type)
+    - isLoadingMore: STABLE (primitive type)
+    - showExplore: STABLE (primitive type)
+    - exploreStatus: STABLE (class with no mutable properties)
+    - listState: STABLE (marked @Stable or @Immutable)
+    - edgeInset: STABLE (marked @Stable or @Immutable)
+    - bottomPadding: STABLE (marked @Stable or @Immutable)
+    - onAction: STABLE (function type)
+    - modifier: STABLE (marked @Stable or @Immutable)
+
+@Composable
+internal fun zed.rainxch.search.presentation.components.SearchTopbar(query: kotlin.String, activeFilterCount: kotlin.Int, focusRequester: androidx.compose.ui.focus.FocusRequester, onAction: kotlin.Function1<zed.rainxch.search.presentation.SearchAction, kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - query: STABLE (String is immutable)
+    - activeFilterCount: STABLE (primitive type)
+    - focusRequester: STABLE (marked @Stable or @Immutable)
+    - onAction: STABLE (function type)
+    - modifier: STABLE (marked @Stable or @Immutable)
+
+@Composable
+internal fun zed.rainxch.search.presentation.components.SearchingUnseenMessage(modifier: androidx.compose.ui.Modifier): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - modifier: STABLE (marked @Stable or @Immutable)
+
+@Composable
 private fun zed.rainxch.search.presentation.components.SelectableChip(text: kotlin.String, selected: kotlin.Boolean, onClick: kotlin.Function0<kotlin.Unit>): kotlin.Unit
   skippable: true
   restartable: true
@@ -155,14 +265,14 @@ private fun zed.rainxch.search.presentation.components.SelectableChip(text: kotl
     - onClick: STABLE (function type)
 
 @Composable
-public fun zed.rainxch.search.presentation.components.SortByBottomSheet(selectedSortBy: zed.rainxch.search.presentation.model.SortByUi, selectedSortOrder: zed.rainxch.search.presentation.model.SortOrderUi, onSortBySelected: kotlin.Function1<zed.rainxch.search.presentation.model.SortByUi, kotlin.Unit>, onSortOrderSelected: kotlin.Function1<zed.rainxch.search.presentation.model.SortOrderUi, kotlin.Unit>, onDismissRequest: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+public fun zed.rainxch.search.presentation.components.SortByBottomSheet(selectedSortBy: zed.rainxch.search.presentation.model.SortByUi, selectedSortOrder: zed.rainxch.search.presentation.model.SortOrderUi, onSortBySelect: kotlin.Function1<zed.rainxch.search.presentation.model.SortByUi, kotlin.Unit>, onSortOrderSelect: kotlin.Function1<zed.rainxch.search.presentation.model.SortOrderUi, kotlin.Unit>, onDismissRequest: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
   skippable: true
   restartable: true
   params:
     - selectedSortBy: STABLE (class with no mutable properties)
     - selectedSortOrder: STABLE (class with no mutable properties)
-    - onSortBySelected: STABLE (function type)
-    - onSortOrderSelected: STABLE (function type)
+    - onSortBySelect: STABLE (function type)
+    - onSortOrderSelect: STABLE (function type)
     - onDismissRequest: STABLE (function type)
     - modifier: STABLE (marked @Stable or @Immutable)
 

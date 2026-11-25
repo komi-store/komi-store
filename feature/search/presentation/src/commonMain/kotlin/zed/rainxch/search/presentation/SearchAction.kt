@@ -8,70 +8,80 @@ import zed.rainxch.search.presentation.model.SortByUi
 import zed.rainxch.search.presentation.model.SortOrderUi
 
 sealed interface SearchAction {
+    sealed interface Results : SearchAction
+
+    sealed interface Filters : SearchAction
+
+    sealed interface Links : SearchAction
+
+    sealed interface RepoCard : SearchAction
+
+    sealed interface Navigation : SearchAction
+
     data class OnSearchChange(
         val query: String,
-    ) : SearchAction
+    ) : Results
 
     data class OnPlatformTypeSelected(
         val searchPlatform: DiscoveryPlatform,
-    ) : SearchAction
+    ) : Filters
 
     data class OnSourceSelected(
         val source: SearchSourceUi,
-    ) : SearchAction
+    ) : Filters
 
     data class OnLanguageSelected(
         val language: ProgrammingLanguageUi,
-    ) : SearchAction
+    ) : Filters
 
     data class OnSortBySelected(
         val sortBy: SortByUi,
-    ) : SearchAction
+    ) : Filters
 
     data class OnSortOrderSelected(
         val sortOrder: SortOrderUi,
-    ) : SearchAction
+    ) : Filters
 
     data class OnRepositoryClick(
         val repository: GithubRepoSummaryUi,
-    ) : SearchAction
+    ) : Navigation
 
     data class OnRepositoryDeveloperClick(
         val username: String,
-    ) : SearchAction
+    ) : Navigation
 
     data class OnShareClick(
         val repo: GithubRepoSummaryUi,
-    ) : SearchAction
+    ) : RepoCard
 
     data class OpenGithubLink(
         val owner: String,
         val repo: String,
-    ) : SearchAction
+    ) : Links
 
-    data object OnSearchImeClick : SearchAction
+    data object OnSearchImeClick : Results
 
-    data object OnNavigateBackClick : SearchAction
+    data object OnNavigateBackClick : Navigation
 
-    data object LoadMore : SearchAction
+    data object LoadMore : Results
 
-    data object OnClearClick : SearchAction
+    data object OnClearClick : Results
 
-    data object Retry : SearchAction
+    data object Retry : Results
 
-    data object OnToggleLanguageSheetVisibility : SearchAction
+    data object OnToggleLanguageSheetVisibility : Filters
 
-    data object OnToggleSortByDialogVisibility : SearchAction
+    data object OnToggleSortByDialogVisibility : Filters
 
-    data object OnFabClick : SearchAction
+    data object OnFabClick : Links
 
-    data object OnToggleFiltersSheet : SearchAction
+    data object OnToggleFiltersSheet : Filters
 
-    data object DismissClipboardBanner : SearchAction
+    data object DismissClipboardBanner : Links
 
     data class OnHistoryItemClick(
         val query: String,
-    ) : SearchAction
+    ) : Results
 
     data class OnRemoveHistoryItem(
         val query: String,
@@ -79,23 +89,23 @@ sealed interface SearchAction {
 
     data object OnClearAllHistory : SearchAction
 
-    data object ExploreFromGithub : SearchAction
+    data object ExploreFromGithub : Results
 
-    data object OnDisableHideSeenForResults : SearchAction
+    data object OnDisableHideSeenForResults : Filters
 
     data class OnHideRepository(
         val repo: GithubRepoSummaryUi,
-    ) : SearchAction
+    ) : RepoCard
 
     data class OnUndoHideRepository(
         val repoId: Long,
-    ) : SearchAction
+    ) : RepoCard
 
     data class OnMarkAsSeen(
         val repo: GithubRepoSummaryUi,
-    ) : SearchAction
+    ) : RepoCard
 
     data class OnMarkAsUnseen(
         val repoId: Long,
-    ) : SearchAction
+    ) : RepoCard
 }

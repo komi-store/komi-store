@@ -39,6 +39,11 @@ import zed.rainxch.repopages.presentation.security.SecurityViewModel
 import zed.rainxch.reviews.presentation.ReviewsViewModel
 import zed.rainxch.reviews.presentation.moderation.ModerationViewModel
 import zed.rainxch.search.presentation.SearchViewModel
+import zed.rainxch.search.presentation.handlers.ClipboardLinks
+import zed.rainxch.search.presentation.handlers.RepoCardActions
+import zed.rainxch.search.presentation.handlers.ResultRows
+import zed.rainxch.search.presentation.handlers.SearchFilters
+import zed.rainxch.search.presentation.handlers.SearchResults
 import zed.rainxch.starred.presentation.StarredReposViewModel
 import zed.rainxch.tweaks.presentation.TweaksViewModel
 import zed.rainxch.tweaks.presentation.appinfo.AppInfoViewModel
@@ -164,23 +169,18 @@ val viewModelsModule =
         viewModelOf(::HomeViewModel)
         viewModelOf(::FeedViewModel)
         viewModelOf(::RecentlyViewedViewModel)
+        factoryOf(::ResultRows)
+        factoryOf(::SearchResults)
+        factoryOf(::SearchFilters)
+        factoryOf(::ClipboardLinks)
+        factoryOf(::RepoCardActions)
         viewModel { params ->
             SearchViewModel(
-                searchRepository = get(),
-                installedAppsRepository = get(),
-                syncInstalledAppsUseCase = get(),
-                favouritesRepository = get(),
-                starredRepository = get(),
-                logger = get(),
-                shareManager = get(),
-                platform = get(),
-                clipboardHelper = get(),
-                tweaksRepository = get(),
-                seenReposRepository = get(),
+                results = get(),
+                filters = get(),
+                links = get(),
+                cardActions = get(),
                 searchHistoryRepository = get(),
-                hiddenReposRepository = get(),
-                userSessionRepository = get(),
-                browseFilterStore = get(),
                 initialPlatform = params.getOrNull<DiscoveryPlatform>(),
             )
         }

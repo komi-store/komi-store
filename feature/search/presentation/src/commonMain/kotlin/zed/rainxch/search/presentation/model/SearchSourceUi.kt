@@ -1,5 +1,8 @@
 package zed.rainxch.search.presentation.model
 
+import androidx.compose.runtime.Immutable
+
+@Immutable
 sealed interface SearchSourceUi {
     val label: String
 

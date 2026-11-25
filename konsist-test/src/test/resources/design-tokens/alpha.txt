@@ -4,5 +4,4 @@
 1 feature/favourites/presentation/src/commonMain/kotlin/zed/rainxch/favourites/presentation/components/FavouriteRepositoryItem.kt
 1 feature/repo-pages/presentation/src/commonMain/kotlin/zed/rainxch/repopages/presentation/components/LabelChip.kt
 1 feature/repo-pages/presentation/src/commonMain/kotlin/zed/rainxch/repopages/presentation/security/SecurityRoot.kt
-2 feature/search/presentation/src/commonMain/kotlin/zed/rainxch/search/presentation/SearchRoot.kt
 1 feature/starred/presentation/src/commonMain/kotlin/zed/rainxch/starred/presentation/components/StarredRepositoryItem.kt
