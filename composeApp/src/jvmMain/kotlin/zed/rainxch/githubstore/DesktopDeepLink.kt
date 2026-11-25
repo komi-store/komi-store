@@ -3,6 +3,7 @@ package zed.rainxch.githubstore
 import zed.rainxch.core.domain.system.DesktopOs
 import java.io.BufferedReader
 import java.io.File
+import java.io.IOException
 import java.io.InputStreamReader
 import java.io.PrintWriter
 import java.net.InetAddress
@@ -11,6 +12,7 @@ import java.net.Socket
 
 object DesktopDeepLink {
     private const val SINGLE_INSTANCE_PORT = 47632
+    private const val SINGLE_INSTANCE_BACKLOG = 50
     private const val SCHEME = "githubstore"
     private const val DESKTOP_FILE_NAME = "github-store-deeplink"
 
@@ -22,63 +24,67 @@ object DesktopDeepLink {
     }
 
     private fun registerWindows() {
-        val exePath =
-            resolveExePath() ?: run {
-                println("DeepLink: skipped Windows scheme registration (exe path unresolved)")
-                return
-            }
-
-        val iconValue = "\"$exePath\",1"
+        val exePath = resolveExePath()
+        if (exePath == null) {
+            println("DeepLink: skipped Windows scheme registration (exe path unresolved)")
+            return
+        }
         val commandValue = "\"$exePath\" \"%1\""
+        if (!windowsRegistrationIsValid(commandValue)) {
+            importRegistryEntries(windowsRegistryEntries(iconValue = "\"$exePath\",1", commandValue = commandValue))
+        }
+    }
 
-        if (windowsRegistrationIsValid(commandValue)) return
+    private fun windowsRegistryEntries(
+        iconValue: String,
+        commandValue: String,
+    ): String =
+        buildString {
+            append("Windows Registry Editor Version 5.00\r\n\r\n")
+            append("[HKEY_CURRENT_USER\\SOFTWARE\\Classes\\$SCHEME]\r\n")
+            append("@=\"URL:Komi Store Protocol\"\r\n")
+            append("\"URL Protocol\"=\"\"\r\n\r\n")
+            append("[HKEY_CURRENT_USER\\SOFTWARE\\Classes\\$SCHEME\\DefaultIcon]\r\n")
+            append("@=\"${regEscape(iconValue)}\"\r\n\r\n")
+            append("[HKEY_CURRENT_USER\\SOFTWARE\\Classes\\$SCHEME\\shell\\open\\command]\r\n")
+            append("@=\"${regEscape(commandValue)}\"\r\n")
+        }
 
-        val regContent =
-            buildString {
-                append("Windows Registry Editor Version 5.00\r\n\r\n")
-                append("[HKEY_CURRENT_USER\\SOFTWARE\\Classes\\$SCHEME]\r\n")
-                append("@=\"URL:Komi Store Protocol\"\r\n")
-                append("\"URL Protocol\"=\"\"\r\n\r\n")
-                append("[HKEY_CURRENT_USER\\SOFTWARE\\Classes\\$SCHEME\\DefaultIcon]\r\n")
-                append("@=\"${regEscape(iconValue)}\"\r\n\r\n")
-                append("[HKEY_CURRENT_USER\\SOFTWARE\\Classes\\$SCHEME\\shell\\open\\command]\r\n")
-                append("@=\"${regEscape(commandValue)}\"\r\n")
-            }
-
+    private fun importRegistryEntries(regContent: String) {
         val regFile =
             try {
                 File.createTempFile("komi-scheme", ".reg")
-            } catch (e: Exception) {
+            } catch (e: IOException) {
                 println("DeepLink: Windows scheme registration failed (temp file): ${e.message}")
-                return
-            }
+                null
+            } ?: return
 
         try {
-            regFile.writeBytes(("\uFEFF$regContent").toByteArray(Charsets.UTF_16LE))
+            regFile.writeBytes(("$regContent").toByteArray(Charsets.UTF_16LE))
             val result = runCommandResult("reg", "import", regFile.absolutePath)
             if (result == null || result.exitCode != 0) {
                 println("DeepLink: Windows scheme registration failed (reg import): ${result?.output?.trim().orEmpty()}")
             }
-        } catch (e: Exception) {
+        } catch (e: IOException) {
             println("DeepLink: Windows scheme registration failed: ${e.message}")
         } finally {
-            runCatching { regFile.delete() }
+            regFile.delete()
         }
     }
 
     private fun windowsRegistrationIsValid(expectedCommandValue: String): Boolean {
         val protocol = runCommand("reg", "query", "HKCU\\SOFTWARE\\Classes\\$SCHEME", "/v", "URL Protocol")
-        if (protocol == null || !protocol.contains("URL Protocol")) return false
         val command =
-            runCommand("reg", "query", "HKCU\\SOFTWARE\\Classes\\$SCHEME\\shell\\open\\command", "/ve")
-                ?: return false
+            protocol
+                ?.takeIf { it.contains("URL Protocol") }
+                ?.let { runCommand("reg", "query", "HKCU\\SOFTWARE\\Classes\\$SCHEME\\shell\\open\\command", "/ve") }
         val actualCommandValue =
             command
-                .lineSequence()
-                .firstOrNull { it.contains("REG_SZ") }
+                ?.lineSequence()
+                ?.firstOrNull { it.contains("REG_SZ") }
                 ?.substringAfter("REG_SZ")
                 ?.trim()
-        return actualCommandValue.equals(expectedCommandValue, ignoreCase = true)
+        return command != null && actualCommandValue.equals(expectedCommandValue, ignoreCase = true)
     }
 
     private fun regEscape(value: String): String = value.replace("\\", "\\\\").replace("\"", "\\\"")
@@ -114,45 +120,42 @@ object DesktopDeepLink {
                 PrintWriter(socket.getOutputStream(), true).println(uri)
             }
             true
-        } catch (_: Exception) {
+        } catch (_: IOException) {
             false
         }
 
     fun startInstanceListener(onUri: (String) -> Unit) {
-        val thread =
-            Thread({
-                try {
-                    val server = ServerSocket(SINGLE_INSTANCE_PORT, 50, InetAddress.getLoopbackAddress())
-                    while (true) {
-                        val client = server.accept()
-                        try {
-                            val reader = BufferedReader(InputStreamReader(client.getInputStream()))
-                            val uri = reader.readLine()
-                            if (!uri.isNullOrBlank()) {
-                                onUri(uri.trim())
-                            }
-                        } catch (_: Exception) {
-                        } finally {
-                            client.close()
-                        }
-                    }
-                } catch (_: Exception) {
-                }
-            }, "DeepLinkListener")
+        val thread = Thread({ listenForForwardedUris(onUri) }, "DeepLinkListener")
         thread.isDaemon = true
         thread.start()
     }
+
+    // Binding fails when another instance already listens, and a failed accept ends the listener; both end quietly.
+    private fun listenForForwardedUris(onUri: (String) -> Unit) {
+        try {
+            val server = ServerSocket(SINGLE_INSTANCE_PORT, SINGLE_INSTANCE_BACKLOG, InetAddress.getLoopbackAddress())
+            while (true) {
+                server.accept().use { client -> readForwardedUri(client)?.let(onUri) }
+            }
+        } catch (_: IOException) {
+        }
+    }
+
+    private fun readForwardedUri(client: Socket): String? =
+        try {
+            BufferedReader(InputStreamReader(client.getInputStream())).readLine()?.takeIf { it.isNotBlank() }?.trim()
+        } catch (_: IOException) {
+            null
+        }
 
     private fun isWindows(): Boolean = DesktopOs.isWindows
 
     private fun isLinux(): Boolean = DesktopOs.isLinux
 
-    private fun resolveExePath(): String? {
-        System
-            .getProperty("jpackage.app-path")
-            ?.takeIf { it.isNotBlank() }
-            ?.let { return it }
-        return try {
+    private fun resolveExePath(): String? = System.getProperty("jpackage.app-path")?.takeIf { it.isNotBlank() } ?: currentProcessCommand()
+
+    private fun currentProcessCommand(): String? =
+        try {
             ProcessHandle
                 .current()
                 .info()
@@ -163,10 +166,9 @@ object DesktopDeepLink {
                         !it.endsWith("java.exe", ignoreCase = true) &&
                         !it.endsWith("javaw.exe", ignoreCase = true)
                 }
-        } catch (_: Exception) {
+        } catch (_: SecurityException) {
             null
         }
-    }
 
     private data class CommandResult(
         val exitCode: Int,
@@ -181,7 +183,9 @@ object DesktopDeepLink {
                     .start()
             val output = process.inputStream.bufferedReader().readText()
             CommandResult(process.waitFor(), output)
-        } catch (_: Exception) {
+        } catch (_: IOException) {
+            null
+        } catch (_: InterruptedException) {
             null
         }
 

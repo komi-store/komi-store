@@ -19,6 +19,7 @@ exceptions:
       - '**/core/data/src/androidMain/kotlin/zed/rainxch/core/data/services/dhizuku/DhizukuBoundary.kt'
       - '**/core/data/src/commonMain/kotlin/zed/rainxch/core/data/secure/KSafeSafe.kt'
       - '**/core/presentation/src/androidMain/kotlin/zed/rainxch/core/presentation/components/SystemServiceBoundary.kt'
+      - '**/composeApp/src/jvmMain/kotlin/zed/rainxch/githubstore/A11yFilteringEventQueue.kt'
 
 naming:
   FunctionNaming:

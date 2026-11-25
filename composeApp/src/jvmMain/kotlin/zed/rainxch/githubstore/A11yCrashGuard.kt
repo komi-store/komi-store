@@ -1,15 +1,12 @@
 package zed.rainxch.githubstore
 
 import zed.rainxch.core.domain.system.DesktopOs
-import java.awt.AWTEvent
-import java.awt.EventQueue
 import java.awt.Toolkit
 import java.util.concurrent.atomic.AtomicBoolean
 
 object A11yCrashGuard {
     private const val COMPOSE_ACCESSIBILITY_ENABLE = "compose.accessibility.enable"
 
-    private val warnedEdt = AtomicBoolean(false)
     private val warnedUncaught = AtomicBoolean(false)
 
     fun install() {
@@ -17,7 +14,7 @@ object A11yCrashGuard {
 
         disableComposeAccessibilityBridgeByDefault()
 
-        Toolkit.getDefaultToolkit().systemEventQueue.push(FilteringEventQueue())
+        Toolkit.getDefaultToolkit().systemEventQueue.push(A11yFilteringEventQueue())
 
         val previous = Thread.getDefaultUncaughtExceptionHandler()
         Thread.setDefaultUncaughtExceptionHandler { thread, throwable ->
@@ -39,8 +36,7 @@ object A11yCrashGuard {
     private fun disableComposeAccessibilityBridgeByDefault() {
         if (System.getProperty(COMPOSE_ACCESSIBILITY_ENABLE) != null) return
 
-        // Compose MP 1.10.x can still crash on macOS when the AWT accessibility bridge
-        // queries detached Compose components. Keep it off unless a user explicitly opts in.
+        // Compose's AWT accessibility bridge can still crash on macOS on detached components, so it stays off unless opted in.
         System.setProperty(COMPOSE_ACCESSIBILITY_ENABLE, "false")
         System.err.println(
             "[A11yCrashGuard] Disabled Compose accessibility bridge on macOS " +
@@ -48,7 +44,7 @@ object A11yCrashGuard {
         )
     }
 
-    private fun isComposeA11yCrash(throwable: Throwable): Boolean {
+    internal fun isComposeA11yCrash(throwable: Throwable): Boolean {
         var current: Throwable? = throwable
         while (current != null) {
             if (current.stackTrace.any { frame ->
@@ -61,24 +57,5 @@ object A11yCrashGuard {
             current = current.cause
         }
         return false
-    }
-
-    private class FilteringEventQueue : EventQueue() {
-        override fun dispatchEvent(event: AWTEvent) {
-            try {
-                super.dispatchEvent(event)
-            } catch (ex: RuntimeException) {
-                if (isComposeA11yCrash(ex)) {
-                    if (warnedEdt.compareAndSet(false, true)) {
-                        System.err.println(
-                            "[A11yCrashGuard] Suppressed Compose a11y crash on macOS " +
-                                "(known issue, see Komi-Store#330 / #639 / #640 / #684). Further occurrences silenced.",
-                        )
-                    }
-                    return
-                }
-                throw ex
-            }
-        }
     }
 }
