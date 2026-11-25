@@ -12,6 +12,7 @@ import zed.rainxch.core.data.dto.ReleaseNetwork
 import zed.rainxch.core.data.mappers.toDomain
 import zed.rainxch.core.data.network.BackendApiClient
 import zed.rainxch.core.data.network.GitHubClientProvider
+import zed.rainxch.core.data.network.asNetworkFailure
 import zed.rainxch.core.data.network.executeRequest
 import zed.rainxch.core.data.network.getReleases
 import zed.rainxch.core.domain.logging.KomiStoreLogger
@@ -151,10 +152,12 @@ internal class ReleaseReaderImpl(
             },
             onFailure = { e ->
                 if (!backendFallback.failsOverToGithub(e) || hostTried) {
-                    staleReleases(read, "Backend 4xx for releases ${read.subject}, serving stale cache") ?: throw e
+                    staleReleases(read, "Backend 4xx for releases ${read.subject}, serving stale cache") ?: throw e.asNetworkFailure()
                 } else {
                     logger.debug("Backend infra error for releases ${read.subject} (${e.message}), falling back to GitHub")
-                    readHost(read).getOrElse { hostFailure -> staleAfterHostFailure(hostFailure, read) ?: throw hostFailure }
+                    readHost(read).getOrElse { hostFailure ->
+                        staleAfterHostFailure(hostFailure, read) ?: throw hostFailure.asNetworkFailure()
+                    }
                 }
             },
         )

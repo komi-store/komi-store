@@ -8,6 +8,8 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
+import zed.rainxch.core.data.network.networkFailures
+import zed.rainxch.details.domain.model.TranslationProviderNotConfiguredException
 import zed.rainxch.details.domain.model.TranslationResult
 import java.security.MessageDigest
 import kotlin.time.Clock
@@ -47,26 +49,32 @@ internal class YoudaoTranslator(
         val from = mapLanguageCode(sourceLanguage)
         val to = mapLanguageCode(targetLanguage)
 
-        val response =
-            httpClient().submitForm(
-                url = "https://openapi.youdao.com/api",
-                formParameters =
-                    Parameters.build {
-                        append("q", text)
-                        append("from", from)
-                        append("to", to)
-                        append("appKey", appKey)
-                        append("salt", salt)
-                        append("sign", sign)
-                        append("signType", "v3")
-                        append("curtime", curtime)
-                    },
-            )
+        val body =
+            networkFailures {
+                httpClient()
+                    .submitForm(
+                        url = "https://openapi.youdao.com/api",
+                        formParameters =
+                            Parameters.build {
+                                append("q", text)
+                                append("from", from)
+                                append("to", to)
+                                append("appKey", appKey)
+                                append("salt", salt)
+                                append("sign", sign)
+                                append("signType", "v3")
+                                append("curtime", curtime)
+                            },
+                    ).bodyAsText()
+            }
 
-        val body = response.bodyAsText()
+        return decodingAnswer("Youdao", body) { parseTranslation(body) }
+    }
+
+    private fun parseTranslation(body: String): TranslationResult {
         val root = json.parseToJsonElement(body).jsonObject
         val errorCode = root["errorCode"]?.jsonPrimitive?.content
-        check(errorCode == "0") { "Youdao translate error: $errorCode" }
+        if (errorCode != "0") translationFailed("Youdao translate error: $errorCode")
 
         val translation =
             root["translation"]

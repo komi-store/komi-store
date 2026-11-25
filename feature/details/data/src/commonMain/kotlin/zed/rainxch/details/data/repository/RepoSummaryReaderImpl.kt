@@ -4,7 +4,6 @@ import io.ktor.client.HttpClient
 import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.http.HttpHeaders
-import kotlin.coroutines.cancellation.CancellationException
 import zed.rainxch.core.data.cache.CacheManager
 import zed.rainxch.core.data.cache.CacheManager.CacheTtl.REPO_DETAILS
 import zed.rainxch.core.data.cache.CacheManager.CacheTtl.REPO_STATS
@@ -35,6 +34,7 @@ import zed.rainxch.details.data.mappers.toGithubRepoSummary
 import zed.rainxch.details.data.mappers.toRepoStats
 import zed.rainxch.details.domain.model.RepoStats
 import zed.rainxch.details.domain.repository.RepoSummaryReader
+import kotlin.coroutines.cancellation.CancellationException
 
 internal class RepoSummaryReaderImpl(
     private val clientProvider: GitHubClientProvider,

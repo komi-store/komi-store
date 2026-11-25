@@ -8,11 +8,12 @@ import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpHeaders
 import io.ktor.http.Parameters
 import io.ktor.http.isSuccess
-import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
+import zed.rainxch.core.data.network.networkFailures
+import zed.rainxch.details.domain.model.TranslationProviderNotConfiguredException
 import zed.rainxch.details.domain.model.TranslationResult
 
 internal class DeeplTranslator(
@@ -33,12 +34,15 @@ internal class DeeplTranslator(
             )
         }
 
-        val response = requestTranslation(text, mapLanguageCode(targetLanguage), mapSourceLanguageCode(sourceLanguage))
-        val body = response.bodyAsText()
-        check(response.status.isSuccess()) {
-            "DeepL HTTP ${response.status.value}: ${errorMessage(body) ?: body.take(ERROR_BODY_PREVIEW_CHARS)}"
+        val (status, body) =
+            networkFailures {
+                val response = requestTranslation(text, mapLanguageCode(targetLanguage), mapSourceLanguageCode(sourceLanguage))
+                response.status to response.bodyAsText()
+            }
+        if (!status.isSuccess()) {
+            translationFailed("DeepL HTTP ${status.value}: ${errorMessage(body) ?: body.take(ERROR_BODY_PREVIEW_CHARS)}")
         }
-        return parseTranslation(body)
+        return decodingAnswer("DeepL", body) { parseTranslation(body) }
     }
 
     private suspend fun requestTranslation(
@@ -76,21 +80,16 @@ internal class DeeplTranslator(
         }.getOrNull()
 
     private fun parseTranslation(body: String): TranslationResult {
-        val root =
-            try {
-                json.parseToJsonElement(body).jsonObject
-            } catch (e: SerializationException) {
-                throw IllegalStateException("DeepL returned non-JSON response: ${body.take(ERROR_BODY_PREVIEW_CHARS)}", e)
-            }
+        val root = json.parseToJsonElement(body).jsonObject
 
         val translations = root["translations"]?.jsonArray
         val errorMessage = root["message"]?.jsonPrimitive?.content
-        check(!translations.isNullOrEmpty()) {
-            "DeepL ${errorMessage?.let { "error: $it" } ?: "response missing translations"}"
+        if (translations.isNullOrEmpty()) {
+            translationFailed("DeepL ${errorMessage?.let { "error: $it" } ?: "response missing translations"}")
         }
 
-        val first = translations.firstOrNull()?.jsonObject ?: error("DeepL response missing translations")
-        val translation = first["text"]?.jsonPrimitive?.content ?: error("DeepL response missing translation text")
+        val first = translations.firstOrNull()?.jsonObject ?: translationFailed("DeepL response missing translations")
+        val translation = first["text"]?.jsonPrimitive?.content ?: translationFailed("DeepL response missing translation text")
         val detected =
             first["detected_source_language"]
                 ?.jsonPrimitive
