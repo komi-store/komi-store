@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import zed.rainxch.core.data.local.db.dao.ExternalLinkDao
 import zed.rainxch.core.data.local.db.dao.InstalledAppDao
+import zed.rainxch.core.domain.model.error.LocalStoreException
 import zed.rainxch.core.domain.repository.ExternalImportScans
 import zed.rainxch.core.domain.system.ExternalAppCandidate
 import zed.rainxch.core.domain.system.ExternalAppScanner
@@ -39,7 +40,7 @@ internal class ExternalImportScansImpl(
         try {
             runFullScan()
             if (firstLaunch) initialScan.markComplete()
-        } catch (e: SQLiteException) {
+        } catch (e: LocalStoreException) {
             Logger.w(e) { "External scan failed; will retry on next launch." }
         }
     }
@@ -65,13 +66,15 @@ internal class ExternalImportScansImpl(
         var pendingReview = 0
         var preservedDecisions = 0
 
-        candidates.forEach { candidate ->
-            val existing = externalLinkDao.get(candidate.packageName)
-            val updated = mergeCandidate(existing, candidate, now)
-            if (existing == null) newCandidates++
-            if (updated.state == ExternalLinkState.PENDING_REVIEW.name) pendingReview++
-            if (existing != null && updated.state != ExternalLinkState.PENDING_REVIEW.name) preservedDecisions++
-            externalLinkDao.upsert(updated)
+        localStore {
+            candidates.forEach { candidate ->
+                val existing = externalLinkDao.get(candidate.packageName)
+                val updated = mergeCandidate(existing, candidate, now)
+                if (existing == null) newCandidates++
+                if (updated.state == ExternalLinkState.PENDING_REVIEW.name) pendingReview++
+                if (existing != null && updated.state != ExternalLinkState.PENDING_REVIEW.name) preservedDecisions++
+                externalLinkDao.upsert(updated)
+            }
         }
 
         pruneStalePendingReviews(candidates.map { it.packageName }.toSet())

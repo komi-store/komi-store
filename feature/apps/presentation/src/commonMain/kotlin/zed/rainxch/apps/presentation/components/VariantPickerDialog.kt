@@ -22,16 +22,6 @@ import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.RadioButtonChecked
 import androidx.compose.material.icons.filled.RadioButtonUnchecked
 import androidx.compose.material.icons.filled.Warning
-import zed.rainxch.core.presentation.components.buttons.KomiButton
-import zed.rainxch.core.presentation.components.buttons.KomiButtonSize
-import zed.rainxch.core.presentation.components.buttons.KomiButtonVariant
-import zed.rainxch.core.presentation.components.dividers.KomiHorizontalDivider
-import zed.rainxch.core.presentation.components.icon.KomiIcon
-import zed.rainxch.core.presentation.components.overlays.KomiDialog
-import zed.rainxch.core.presentation.components.progress.KomiCircularProgress
-import zed.rainxch.core.presentation.components.text.KomiText
-import zed.rainxch.core.presentation.components.text.KomiTextRole
-import zed.rainxch.core.presentation.locals.LocalPersonality
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -42,18 +32,42 @@ import org.jetbrains.compose.resources.stringResource
 import zed.rainxch.apps.presentation.AppsAction
 import zed.rainxch.apps.presentation.AppsState
 import zed.rainxch.apps.presentation.model.VariantPickerError
-import zed.rainxch.githubstore.core.presentation.res.*
+import zed.rainxch.core.presentation.components.buttons.KomiButton
+import zed.rainxch.core.presentation.components.buttons.KomiButtonSize
+import zed.rainxch.core.presentation.components.buttons.KomiButtonVariant
+import zed.rainxch.core.presentation.components.dividers.KomiHorizontalDivider
+import zed.rainxch.core.presentation.components.icon.KomiIcon
+import zed.rainxch.core.presentation.components.overlays.KomiDialog
+import zed.rainxch.core.presentation.components.progress.KomiCircularProgress
+import zed.rainxch.core.presentation.components.text.KomiText
+import zed.rainxch.core.presentation.components.text.KomiTextRole
+import zed.rainxch.core.presentation.locals.LocalPersonality
+import zed.rainxch.githubstore.core.presentation.res.Res
+import zed.rainxch.githubstore.core.presentation.res.cancel
+import zed.rainxch.githubstore.core.presentation.res.variant_picker_auto_subtitle
+import zed.rainxch.githubstore.core.presentation.res.variant_picker_auto_title
+import zed.rainxch.githubstore.core.presentation.res.variant_picker_description
+import zed.rainxch.githubstore.core.presentation.res.variant_picker_load_failed
+import zed.rainxch.githubstore.core.presentation.res.variant_picker_no_assets
+import zed.rainxch.githubstore.core.presentation.res.variant_picker_no_pinnable
+import zed.rainxch.githubstore.core.presentation.res.variant_picker_open_filter
+import zed.rainxch.githubstore.core.presentation.res.variant_picker_save_failed
+import zed.rainxch.githubstore.core.presentation.res.variant_picker_stale_title
+import zed.rainxch.githubstore.core.presentation.res.variant_picker_stale_was
+import zed.rainxch.githubstore.core.presentation.res.variant_picker_title
 
 @Composable
 fun VariantPickerDialog(
     state: AppsState,
     onAction: (AppsAction) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val app = state.variantPickerApp ?: return
     val colors = LocalPersonality.current.colors
 
     KomiDialog(
         onDismissRequest = { onAction(AppsAction.OnDismissVariantPicker) },
+        modifier = modifier,
         title = {
             Column {
                 KomiText(
@@ -76,13 +90,13 @@ fun VariantPickerDialog(
             Column(modifier = Modifier.fillMaxWidth()) {
                 if (app.preferredVariantStale) {
                     Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .background(
-                                colors.error,
-                                RoundedCornerShape(LocalPersonality.current.shape.corner),
-                            )
-                            .padding(12.dp),
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .background(
+                                    colors.error,
+                                    RoundedCornerShape(LocalPersonality.current.shape.corner),
+                                ).padding(12.dp),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         KomiIcon(
@@ -103,10 +117,11 @@ fun VariantPickerDialog(
 
                             if (state.variantPickerCurrentVariant != null) {
                                 KomiText(
-                                    text = stringResource(
-                                        Res.string.variant_picker_stale_was,
-                                        state.variantPickerCurrentVariant,
-                                    ),
+                                    text =
+                                        stringResource(
+                                            Res.string.variant_picker_stale_was,
+                                            state.variantPickerCurrentVariant,
+                                        ),
                                     role = KomiTextRole.Body,
                                     color = colors.onError,
                                 )
@@ -128,9 +143,10 @@ fun VariantPickerDialog(
                 when {
                     state.variantPickerLoading -> {
                         Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(120.dp),
+                            modifier =
+                                Modifier
+                                    .fillMaxWidth()
+                                    .height(120.dp),
                             contentAlignment = Alignment.Center,
                         ) {
                             KomiCircularProgress()
@@ -139,14 +155,15 @@ fun VariantPickerDialog(
 
                     state.variantPickerError != null -> {
                         KomiText(
-                            text = stringResource(
-                                when (state.variantPickerError) {
-                                    VariantPickerError.NoAssets -> Res.string.variant_picker_no_assets
-                                    VariantPickerError.NoPinnableVariants -> Res.string.variant_picker_no_pinnable
-                                    VariantPickerError.LoadFailed -> Res.string.variant_picker_load_failed
-                                    VariantPickerError.SaveFailed -> Res.string.variant_picker_save_failed
-                                },
-                            ),
+                            text =
+                                stringResource(
+                                    when (state.variantPickerError) {
+                                        VariantPickerError.NoAssets -> Res.string.variant_picker_no_assets
+                                        VariantPickerError.NoPinnableVariants -> Res.string.variant_picker_no_pinnable
+                                        VariantPickerError.LoadFailed -> Res.string.variant_picker_load_failed
+                                        VariantPickerError.SaveFailed -> Res.string.variant_picker_save_failed
+                                    },
+                                ),
                             role = KomiTextRole.Body,
                             color = colors.error,
                             modifier = Modifier.padding(vertical = 8.dp),
@@ -156,9 +173,10 @@ fun VariantPickerDialog(
                     else -> {
                         val current = state.variantPickerCurrentVariant
                         LazyColumn(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .heightIn(min = 0.dp, max = 280.dp),
+                            modifier =
+                                Modifier
+                                    .fillMaxWidth()
+                                    .heightIn(min = 0.dp, max = 280.dp),
                             verticalArrangement = Arrangement.spacedBy(2.dp),
                         ) {
                             item {
@@ -220,10 +238,11 @@ private fun VariantRow(
 ) {
     val colors = LocalPersonality.current.colors
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick)
-            .padding(vertical = 10.dp, horizontal = 4.dp),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .clickable(onClick = onClick)
+                .padding(vertical = 10.dp, horizontal = 4.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         KomiIcon(

@@ -1,7 +1,6 @@
 package zed.rainxch.apps.presentation.starred
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.material.icons.rounded.Search
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -14,27 +13,28 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.rounded.Search
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import zed.rainxch.apps.presentation.starred.components.StarredCandidateRow
 import zed.rainxch.core.presentation.components.bars.KomiTopBar
 import zed.rainxch.core.presentation.components.bars.KomiTopBarSize
 import zed.rainxch.core.presentation.components.buttons.KomiButton
-import zed.rainxch.core.presentation.components.buttons.KomiButtonVariant
 import zed.rainxch.core.presentation.components.buttons.KomiButtonSize
-import zed.rainxch.core.presentation.components.scaffold.KomiScaffold
+import zed.rainxch.core.presentation.components.buttons.KomiButtonVariant
 import zed.rainxch.core.presentation.components.chips.KomiChip
 import zed.rainxch.core.presentation.components.chips.KomiChipKind
 import zed.rainxch.core.presentation.components.inputs.KomiSwitch
 import zed.rainxch.core.presentation.components.inputs.KomiTextField
-import zed.rainxch.core.presentation.components.progress.KomiLoadingIndicator
 import zed.rainxch.core.presentation.components.progress.KomiLinearProgress
+import zed.rainxch.core.presentation.components.progress.KomiLoadingIndicator
+import zed.rainxch.core.presentation.components.scaffold.KomiScaffold
 import zed.rainxch.core.presentation.components.text.KomiText
 import zed.rainxch.core.presentation.components.text.KomiTextRole
 import zed.rainxch.core.presentation.locals.LocalPersonality
@@ -57,9 +57,9 @@ import zed.rainxch.githubstore.core.presentation.res.starred_picker_title
 
 @Composable
 fun StarredPickerRoot(
-    viewModel: StarredPickerViewModel = koinViewModel(),
     onNavigateBack: () -> Unit,
     onNavigateToDetails: (repoId: Long, owner: String, repo: String) -> Unit,
+    viewModel: StarredPickerViewModel = koinViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
@@ -106,11 +106,12 @@ private fun StarredPickerScreen(
                         contentAlignment = Alignment.Center,
                     ) {
                         KomiText(
-                            text = if (!state.isAuthenticated) {
-                                stringResource(Res.string.starred_picker_sign_in_required)
-                            } else {
-                                stringResource(Res.string.starred_picker_empty)
-                            },
+                            text =
+                                if (!state.isAuthenticated) {
+                                    stringResource(Res.string.starred_picker_sign_in_required)
+                                } else {
+                                    stringResource(Res.string.starred_picker_empty)
+                                },
                             role = KomiTextRole.Body,
                             color = colors.onSurfaceVariant,
                         )
@@ -124,12 +125,13 @@ private fun StarredPickerScreen(
                         Spacer(Modifier.height(8.dp))
 
                         KomiText(
-                            text = stringResource(
-                                Res.string.starred_picker_header_counts,
-                                state.totalStarred,
-                                state.apkCount,
-                                state.trackedCount,
-                            ),
+                            text =
+                                stringResource(
+                                    Res.string.starred_picker_header_counts,
+                                    state.totalStarred,
+                                    state.apkCount,
+                                    state.trackedCount,
+                                ),
                             role = KomiTextRole.Body,
                             color = colors.onSurfaceVariant,
                         )
@@ -148,11 +150,12 @@ private fun StarredPickerScreen(
                                 Spacer(Modifier.height(4.dp))
 
                                 KomiText(
-                                    text = stringResource(
-                                        Res.string.starred_picker_progress,
-                                        state.scanProgress,
-                                        state.scanTotal,
-                                    ),
+                                    text =
+                                        stringResource(
+                                            Res.string.starred_picker_progress,
+                                            state.scanProgress,
+                                            state.scanTotal,
+                                        ),
                                     role = KomiTextRole.Caption,
                                     color = colors.onSurfaceVariant,
                                 )
@@ -163,9 +166,10 @@ private fun StarredPickerScreen(
                             Spacer(Modifier.height(8.dp))
 
                             Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(vertical = 4.dp),
+                                modifier =
+                                    Modifier
+                                        .fillMaxWidth()
+                                        .padding(vertical = 4.dp),
                                 verticalAlignment = Alignment.CenterVertically,
                                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                             ) {

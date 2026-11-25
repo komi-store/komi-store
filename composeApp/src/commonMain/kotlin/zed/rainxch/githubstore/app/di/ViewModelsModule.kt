@@ -1,12 +1,22 @@
 package zed.rainxch.githubstore.app.di
 
+import org.koin.core.module.dsl.factoryOf
 import org.koin.core.module.dsl.viewModel
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import zed.rainxch.apps.presentation.AppsViewModel
 import zed.rainxch.apps.presentation.import.ExternalImportViewModel
+import zed.rainxch.apps.presentation.library.LibraryBackup
+import zed.rainxch.apps.presentation.library.LibraryLoader
+import zed.rainxch.apps.presentation.link.LinkSheetActions
+import zed.rainxch.apps.presentation.settings.AppRowActions
+import zed.rainxch.apps.presentation.settings.AssetMatchSettings
 import zed.rainxch.apps.presentation.starred.StarredPickerViewModel
+import zed.rainxch.apps.presentation.updates.AppUpdates
+import zed.rainxch.apps.presentation.updates.UpdateDownloads
+import zed.rainxch.apps.presentation.updates.UpdateInstalls
+import zed.rainxch.apps.presentation.updates.UpdateTargetResolver
 import zed.rainxch.auth.presentation.AuthenticationViewModel
 import zed.rainxch.core.domain.model.repository.DiscoveryPlatform
 import zed.rainxch.details.presentation.DetailsArgs
@@ -42,6 +52,16 @@ import zed.rainxch.tweaks.presentation.skipped.SkippedUpdatesViewModel
 
 val viewModelsModule =
     module {
+        // Factories, not singles: each collaborator keeps the state of the one AppsViewModel it serves.
+        factoryOf(::LibraryLoader)
+        factoryOf(::UpdateTargetResolver)
+        factoryOf(::UpdateDownloads)
+        factoryOf(::UpdateInstalls)
+        factoryOf(::AppUpdates)
+        factoryOf(::LinkSheetActions)
+        factoryOf(::AppRowActions)
+        factoryOf(::AssetMatchSettings)
+        factoryOf(::LibraryBackup)
         viewModelOf(::AppsViewModel)
         viewModelOf(::ExternalImportViewModel)
         viewModelOf(::AuthenticationViewModel)

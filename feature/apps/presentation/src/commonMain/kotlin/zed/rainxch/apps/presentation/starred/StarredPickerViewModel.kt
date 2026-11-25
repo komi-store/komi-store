@@ -3,7 +3,6 @@ package zed.rainxch.apps.presentation.starred
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.collections.immutable.toImmutableList
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -126,7 +125,7 @@ class StarredPickerViewModel(
                     return@launch
                 }
 
-                runCatching { starredRepository.syncStarredRepos(forceRefresh = false) }
+                starredRepository.syncStarredRepos(forceRefresh = false)
 
                 val starred = starredRepository.getAllStarred().first()
                 val tracked =
@@ -227,12 +226,6 @@ class StarredPickerViewModel(
                     it.copy(rateLimited = true, errorMessage = e.message)
                 }
                 return
-            } catch (e: CancellationException) {
-                throw e
-            } catch (e: Exception) {
-                _state.update { current ->
-                    current.copy(scanProgress = ++processed)
-                }
             }
         }
         _state.update {

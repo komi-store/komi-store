@@ -22,6 +22,7 @@ private val StatusColorsLight =
         statusError = Color(0xFFCF222E),
         protectionSignature = Color(0xFF0969DA),
         protectionPrivileged = Color(0xFFBC4C00),
+        versionDowngrade = Color(0xFFC62828),
     )
 
 private val StatusColorsDark =
@@ -41,4 +42,5 @@ private val StatusColorsDark =
         statusError = Color(0xFFF85149),
         protectionSignature = Color(0xFF58A6FF),
         protectionPrivileged = Color(0xFFDB6D28),
+        versionDowngrade = Color(0xFFFF8A80),
     )

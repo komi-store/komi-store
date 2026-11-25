@@ -201,7 +201,7 @@ Behaviour:
 - **After the viewer's own write:** for five minutes (the list's `s-maxage`) the repo's list reads carry a `fresh` nonce, which the backend ignores, so they skip the CDN's copy and show the write.
 - **Signed in** means a stored token (`isUserLoggedIn`), not a fetched profile. Signing in from the Reviews screen returns to it, and a pending composer opens once `/mine` loads.
 - **Moderation screen** (`GithubStoreGraph.ReviewModerationScreen`), opened from the Reviews top bar when `isModerator`: the Reported and Hidden queues, with hide, dismiss, unhide, delete and ban. Decisions take reviews out of the server's queue, so the next page is the one holding the first unseen review (`items / 20 + 1`).
-- **Stars on cards:** `CompactRating` (stars plus "4.3 (128)") sits under the owner line of `KomiRepoCard`, apart from the stats row, whose star is GitHub stars. Catalog cards read `rating` through `GithubRepoSummary.rating` and the Home cache; Library rows and group headers read one `/reviews/summaries` call from `AppsViewModel`, made again only when the set of repos changes (or, after a failure, on a change five minutes later). The keys go out as written; a host that fails loses only its own rows.
+- **Stars on cards:** `CompactRating` (stars plus "4.3 (128)") sits under the owner line of `KomiRepoCard`, apart from the stats row, whose star is GitHub stars. Catalog cards read `rating` through `GithubRepoSummary.rating` and the Home cache; Library rows and group headers read one `/reviews/summaries` call from `LibraryRatings`, made again only when the set of repos changes (or, after a failure, on a change five minutes later). The keys go out as written; a host that fails loses only its own rows.
 
 ## Rollout
 

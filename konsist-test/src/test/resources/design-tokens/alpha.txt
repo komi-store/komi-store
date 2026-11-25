@@ -1,5 +1,4 @@
 2 composeApp/src/commonMain/kotlin/zed/rainxch/githubstore/app/navigation/DesktopSidebar.kt
-1 feature/apps/presentation/src/commonMain/kotlin/zed/rainxch/apps/presentation/starred/components/StarredCandidateRow.kt
 3 feature/dev-profile/presentation/src/commonMain/kotlin/zed/rainxch/devprofile/presentation/components/ContributionCalendar.kt
 1 feature/dev-profile/presentation/src/commonMain/kotlin/zed/rainxch/devprofile/presentation/components/ProfileInfoCard.kt
 1 feature/favourites/presentation/src/commonMain/kotlin/zed/rainxch/favourites/presentation/components/FavouriteRepositoryItem.kt

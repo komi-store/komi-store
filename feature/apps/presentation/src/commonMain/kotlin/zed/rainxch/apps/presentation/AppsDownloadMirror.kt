@@ -45,8 +45,7 @@ internal fun hiddenRowPackages(
         .keys
         .toSet()
 
-// Recorded from the orchestrator's entry, not the target the update asked for: a refetch can
-// move the download to a newer release.
+// Recorded from the orchestrator's entry, not the requested target: a refetch can move the download to a newer release.
 internal fun InstalledApp.markDownloadedUpdate(
     download: OrchestratedDownload,
     versionName: String?,

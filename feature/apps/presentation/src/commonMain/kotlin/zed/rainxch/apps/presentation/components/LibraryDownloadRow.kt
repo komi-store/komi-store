@@ -9,8 +9,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import org.jetbrains.compose.resources.stringResource
 import zed.rainxch.apps.presentation.isVersionDowngrade
+import zed.rainxch.apps.presentation.model.LibraryDownloadUi
 import zed.rainxch.core.domain.system.DownloadStage
-import zed.rainxch.core.domain.system.OrchestratedDownload
 import zed.rainxch.core.presentation.components.buttons.KomiButton
 import zed.rainxch.core.presentation.components.buttons.KomiButtonSize
 import zed.rainxch.core.presentation.components.buttons.KomiButtonVariant
@@ -33,11 +33,10 @@ import zed.rainxch.githubstore.core.presentation.res.ready_to_install
 import zed.rainxch.githubstore.core.presentation.res.resume
 import zed.rainxch.githubstore.core.presentation.res.retry
 
-// A download in the Library, whoever started it: the same row as a tracked app, with the
-// download's stage as its status, a progress bar, and the stage's actions.
+// A download in the Library, whoever started it: a tracked app's row with the stage as its status, a progress bar and the stage's actions.
 @Composable
 fun LibraryDownloadRow(
-    download: OrchestratedDownload,
+    download: LibraryDownloadUi,
     installedVersion: String?,
     onPause: () -> Unit,
     onResume: () -> Unit,
@@ -78,7 +77,7 @@ fun LibraryDownloadRow(
 }
 
 @Composable
-private fun OrchestratedDownload.status(installedVersion: String?): Pair<String, LibraryStatusTone> =
+private fun LibraryDownloadUi.status(installedVersion: String?): Pair<String, LibraryStatusTone> =
     when (stage) {
         DownloadStage.Queued, DownloadStage.Downloading -> {
             "${stringResource(Res.string.downloading)} · ${sizeLabel()}" to LibraryStatusTone.Plain
@@ -109,14 +108,14 @@ private fun OrchestratedDownload.status(installedVersion: String?): Pair<String,
     }
 
 @Composable
-private fun OrchestratedDownload.versionText(installedVersion: String?): String =
+private fun LibraryDownloadUi.versionText(installedVersion: String?): String =
     if (installedVersion.isNullOrBlank()) {
         releaseTag
     } else {
         stringResource(Res.string.apps_version_update, installedVersion, releaseTag)
     }
 
-private fun OrchestratedDownload.sizeLabel(): String {
+private fun LibraryDownloadUi.sizeLabel(): String {
     val total = totalBytes ?: assetSize.takeIf { it > 0L }
     return if (total != null) {
         "${formatFileSize(bytesDownloaded)} / ${formatFileSize(total)}"
@@ -125,11 +124,11 @@ private fun OrchestratedDownload.sizeLabel(): String {
     }
 }
 
-private fun OrchestratedDownload.progress(): LibraryProgress? =
+private fun LibraryDownloadUi.progress(): LibraryProgress? =
     when (stage) {
         DownloadStage.Queued, DownloadStage.Downloading, DownloadStage.Paused -> {
             LibraryProgress.Download(
-                fraction = (progressPercent ?: 0) / 100f,
+                fraction = (progressPercent ?: 0) / PERCENT,
                 paused = stage == DownloadStage.Paused,
             )
         }
@@ -215,3 +214,5 @@ private fun CloseButton(
         size = KomiIconButtonSize.Sm,
     )
 }
+
+private const val PERCENT = 100f

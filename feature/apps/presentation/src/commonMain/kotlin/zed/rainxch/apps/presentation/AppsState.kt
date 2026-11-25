@@ -4,7 +4,6 @@ import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.ImmutableSet
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.persistentSetOf
-import zed.rainxch.apps.domain.model.ImportResult
 import zed.rainxch.apps.presentation.model.AdvancedPreviewMessage
 import zed.rainxch.apps.presentation.model.AppGroup
 import zed.rainxch.apps.presentation.model.AppItem
@@ -13,13 +12,14 @@ import zed.rainxch.apps.presentation.model.DeviceAppUi
 import zed.rainxch.apps.presentation.model.GithubAssetUi
 import zed.rainxch.apps.presentation.model.GithubRepoInfoUi
 import zed.rainxch.apps.presentation.model.ImportSummaryBucket
+import zed.rainxch.apps.presentation.model.ImportSummaryUi
 import zed.rainxch.apps.presentation.model.InstalledAppUi
+import zed.rainxch.apps.presentation.model.LibraryDownloadUi
 import zed.rainxch.apps.presentation.model.LinkStep
+import zed.rainxch.apps.presentation.model.LinkSuggestionUi
 import zed.rainxch.apps.presentation.model.UpdateAllProgress
 import zed.rainxch.apps.presentation.model.VariantOption
 import zed.rainxch.apps.presentation.model.VariantPickerError
-import zed.rainxch.core.domain.system.OrchestratedDownload
-import zed.rainxch.core.domain.system.RepoMatchSuggestion
 
 data class AppsState(
     val apps: ImmutableList<AppItem> = persistentListOf(),
@@ -42,7 +42,7 @@ data class AppsState(
     val selectedDeviceApp: DeviceAppUi? = null,
     val repoUrl: String = "",
     val linkSearchLoading: Boolean = false,
-    val linkSuggestions: ImmutableList<RepoMatchSuggestion> = persistentListOf(),
+    val linkSuggestions: ImmutableList<LinkSuggestionUi> = persistentListOf(),
     val linkSearchError: String? = null,
     val isValidatingRepo: Boolean = false,
     val repoValidationError: String? = null,
@@ -72,7 +72,7 @@ data class AppsState(
     val variantPickerResumeUpdateAfterPick: Boolean = false,
     val isExporting: Boolean = false,
     val isImporting: Boolean = false,
-    val importSummary: ImportResult? = null,
+    val importSummary: ImportSummaryUi? = null,
     val expandedImportBuckets: ImmutableSet<ImportSummaryBucket> = persistentSetOf(),
     val appPendingUninstall: InstalledAppUi? = null,
     val appPendingDiscard: InstalledAppUi? = null,
@@ -88,6 +88,6 @@ data class AppsState(
     val pendingGroups: ImmutableList<AppGroup> = persistentListOf(),
     val updateGroups: ImmutableList<AppGroup> = persistentListOf(),
     val idleGroups: ImmutableList<AppGroup> = persistentListOf(),
-    val inProgressDownloads: ImmutableList<OrchestratedDownload> = persistentListOf(),
+    val inProgressDownloads: ImmutableList<LibraryDownloadUi> = persistentListOf(),
     val hiddenRowPackages: ImmutableSet<String> = persistentSetOf(),
 )

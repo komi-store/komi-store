@@ -11,4 +11,4 @@ How a release asset is matched to the platform and to an installed app. All of t
 
 `DetailsScreen.packageName`, set when Details opens from Apps, selects the installed app in a multi-app repository.
 
-In the Library, an update or re-download starts from the match the last update check stored on the installed app (`latestReleaseId` and the `latestAsset*` fields). A fresh release lookup runs only when nothing is stored or a download from the stored match failed (`AppsViewModel.resolveUpdateTarget`).
+In the Library, an update or re-download starts from the match the last update check stored on the installed app (`latestReleaseId` and the `latestAsset*` fields). A fresh release lookup runs only when nothing is stored or a download from the stored match failed (`UpdateTargetResolver.resolve`).

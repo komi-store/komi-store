@@ -30,13 +30,10 @@ class FileSizeTest {
 
         val OVERSIZED =
             setOf(
-                "feature/apps/presentation/src/commonMain/kotlin/zed/rainxch/apps/presentation/AppsViewModel.kt",
                 "feature/tweaks/presentation/src/commonMain/kotlin/zed/rainxch/tweaks/presentation/TweaksViewModel.kt",
                 "feature/search/presentation/src/commonMain/kotlin/zed/rainxch/search/presentation/SearchRoot.kt",
                 "composeApp/src/commonMain/kotlin/zed/rainxch/githubstore/app/navigation/AppNavigation.kt",
                 "feature/search/presentation/src/commonMain/kotlin/zed/rainxch/search/presentation/SearchViewModel.kt",
-                "feature/apps/presentation/src/commonMain/kotlin/zed/rainxch/apps/presentation/components/LinkAppBottomSheet.kt",
-                "feature/apps/presentation/src/commonMain/kotlin/zed/rainxch/apps/presentation/import/ExternalImportViewModel.kt",
                 "feature/auth/presentation/src/commonMain/kotlin/zed/rainxch/auth/presentation/AuthenticationViewModel.kt",
                 "feature/auth/presentation/src/commonMain/kotlin/zed/rainxch/auth/presentation/AuthenticationRoot.kt",
             )

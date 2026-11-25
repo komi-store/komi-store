@@ -42,7 +42,7 @@ class ExternalImportRepositoryImpl private constructor(
         ) { snapshot, pendingRows ->
             val pendingPackages = pendingRows.map { it.packageName }.toSet()
             pendingPackages.mapNotNull { snapshot[it] }
-        }
+        }.localStoreFailures()
 
     override fun pendingCandidateCountFlow(): Flow<Int> = externalLinkDao.observePendingReviewCount()
 
@@ -91,7 +91,7 @@ class ExternalImportRepositoryImpl private constructor(
     override suspend fun skipPackage(
         packageName: String,
         neverAsk: Boolean,
-    ) {
+    ) = localStore {
         val existing = externalLinkDao.get(packageName)
         val state = if (neverAsk) ExternalLinkState.NEVER_ASK else ExternalLinkState.SKIPPED
         val now = nowMillis()
@@ -118,12 +118,12 @@ class ExternalImportRepositoryImpl private constructor(
     }
 
     override suspend fun unlink(packageName: String) {
-        externalLinkDao.deleteByPackageName(packageName)
+        localStore { externalLinkDao.deleteByPackageName(packageName) }
         scans.forget(packageName)
     }
 
     override suspend fun snapshotDecision(packageName: String): ExternalDecisionSnapshot? {
-        val row = externalLinkDao.get(packageName) ?: return null
+        val row = localStore { externalLinkDao.get(packageName) } ?: return null
         return ExternalDecisionSnapshot(
             packageName = row.packageName,
             state = runCatching { ExternalLinkState.valueOf(row.state) }.getOrNull(),
@@ -135,7 +135,9 @@ class ExternalImportRepositoryImpl private constructor(
         )
     }
 
-    override suspend fun restoreDecision(snapshot: ExternalDecisionSnapshot) {
+    override suspend fun restoreDecision(snapshot: ExternalDecisionSnapshot) = localStore { restore(snapshot) }
+
+    private suspend fun restore(snapshot: ExternalDecisionSnapshot) {
         val now = nowMillis()
         val state = snapshot.state ?: ExternalLinkState.PENDING_REVIEW
         val existing = externalLinkDao.get(snapshot.packageName)

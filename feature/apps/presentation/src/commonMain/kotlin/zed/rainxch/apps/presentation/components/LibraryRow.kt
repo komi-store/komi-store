@@ -34,6 +34,7 @@ import zed.rainxch.core.presentation.components.surfaces.KomiSurface
 import zed.rainxch.core.presentation.components.text.KomiText
 import zed.rainxch.core.presentation.components.text.KomiTextRole
 import zed.rainxch.core.presentation.locals.LocalPersonality
+import zed.rainxch.core.presentation.locals.LocalStatusColors
 
 // How a Library row's status line reads.
 enum class LibraryStatusTone {
@@ -65,9 +66,7 @@ data class LibraryRowApp(
     val ratingCount: Int = 0,
 )
 
-// Every Library item is this row: the icon, the name, the owner and source, one status line, tags
-// for the app's own settings, a progress bar while something runs, and its actions at the end.
-// On its own it sits on a card; inside a repo's group the group is the card.
+// Every Library item is this row; on its own it sits on a card, inside a repo's group the group is the card.
 @Composable
 fun LibraryRow(
     app: LibraryRowApp,
@@ -237,7 +236,7 @@ private fun LibraryStatusTone.color(): Color {
         LibraryStatusTone.Plain -> colors.onSurfaceVariant
         LibraryStatusTone.Accent -> colors.primary
         LibraryStatusTone.Error -> colors.error
-        LibraryStatusTone.Downgrade -> DowngradeWarningColor
+        LibraryStatusTone.Downgrade -> LocalStatusColors.current.versionDowngrade
     }
 }
 
