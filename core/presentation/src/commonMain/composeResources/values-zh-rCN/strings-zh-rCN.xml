@@ -707,7 +707,7 @@
     <string name="external_import_installer_obtainium">Obtainium</string>
     <string name="external_import_installer_fdroid">F-Droid</string>
     <string name="external_import_installer_browser">浏览器</string>
-    <string name="external_import_installer_sideload">Sideload</string>
+    <string name="external_import_installer_sideload">侧载</string>
     <string name="external_import_installer_self">Komi Store</string>
     <string name="external_import_installer_unknown">未知来源</string>
     <string name="external_import_undo_linked">%1$s 已关联。</string>
@@ -783,7 +783,7 @@
     <string name="feedback_diagnostics_header">诊断信息</string>
     <string name="feedback_diagnostics_include">包含诊断信息</string>
     <string name="feedback_send_via_email">通过电子邮件发送</string>
-    <string name="feedback_send_via_github">新增 GitHub Issue</string>
+    <string name="feedback_send_via_github">在 GitHub 上新建 Issue</string>
     <string name="feedback_send_success_email">感谢您 — 正在打开电子邮件客户端。</string>
     <string name="feedback_send_success_github">感谢您 — 正在打开浏览器。</string>
     <string name="feedback_send_failed">无法打开反馈渠道</string>
@@ -1353,7 +1353,7 @@
     <string name="repo_pages_issues_title">Issues</string>
     <string name="repo_pages_issues_filter_open">开启</string>
     <string name="repo_pages_issues_filter_closed">已关闭</string>
-    <string name="repo_pages_issues_empty_open">没有开启的 Issue。</string>
+    <string name="repo_pages_issues_empty_open">没有未关闭的 Issue。</string>
     <string name="repo_pages_issues_empty_closed">没有已关闭的 Issue。</string>
     <string name="repo_pages_issue_comments_section">评论</string>
     <string name="repo_pages_issue_no_body">未提供描述。</string>
@@ -1393,10 +1393,10 @@
     <!-- Repo interactions: new issue -->
     <string name="repo_pages_new_issue">新建 Issue</string>
     <string name="repo_pages_new_issue_title_hint">标题</string>
-    <string name="repo_pages_new_issue_body_hint">描述这个 Issue…</string>
+    <string name="repo_pages_new_issue_body_hint">描述 Issue 内容…</string>
     <string name="repo_pages_new_issue_submit">创建</string>
     <string name="repo_pages_new_issue_sign_in">登录后即可创建 Issue。</string>
-    <string name="repo_pages_new_issue_failed">无法创建 Issue。</string>
+    <string name="repo_pages_new_issue_failed">创建 Issue 失败。</string>
     <string name="repo_pages_new_issue_created">Issue 已创建</string>
 
     <!-- Repo interactions: reactions -->
@@ -1410,17 +1410,17 @@
     <string name="repo_pages_pulls_empty_closed">没有已关闭的拉取请求。</string>
     <string name="repo_pages_pr_state_merged">已合并</string>
     <string name="repo_pages_pr_draft">草稿</string>
-    <string name="feed_end_cap">続く · TO BE CONTINUED</string>
-    <string name="feed_masthead_subtitle">発見 · DISCOVER APPS</string>
-    <string name="home_masthead_subtitle">ランキング · CHARTS &amp; PICKS</string>
-    <string name="feed_platform_picker_title_jp">対応</string>
-    <string name="sidebar_browse_jp">航行</string>
-    <string name="sidebar_categories_jp">部門</string>
-    <string name="sidebar_nav_charts_jp">ランキング</string>
-    <string name="sidebar_nav_explore_jp">発見</string>
-    <string name="sidebar_nav_search_jp">検索</string>
-    <string name="sidebar_nav_you_jp">あなた</string>
-    <string name="sidebar_platform_jp">対応</string>
+    <string name="feed_end_cap">未完待续</string>
+    <string name="feed_masthead_subtitle">发现 · 探索应用</string>
+    <string name="home_masthead_subtitle">排行榜 · 精选应用</string>
+    <string name="feed_platform_picker_title_jp">选择平台</string>
+    <string name="sidebar_browse_jp">浏览</string>
+    <string name="sidebar_categories_jp">分类</string>
+    <string name="sidebar_nav_charts_jp">排行榜</string>
+    <string name="sidebar_nav_explore_jp">发现</string>
+    <string name="sidebar_nav_search_jp">搜索</string>
+    <string name="sidebar_nav_you_jp">我的</string>
+    <string name="sidebar_platform_jp">平台</string>
     <string name="feed_masthead_title">Komi Store</string>
     <string name="feed_masthead_title_accent">Store</string>
     <string name="platform_section_ios">iOS</string>
