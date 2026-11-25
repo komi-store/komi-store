@@ -1,6 +1,5 @@
 package zed.rainxch.core.data.repository
 
-import androidx.sqlite.SQLiteException
 import co.touchlab.kermit.Logger
 import io.ktor.client.HttpClient
 import io.ktor.client.request.get
@@ -26,6 +25,7 @@ import zed.rainxch.core.data.network.executeRequest
 import zed.rainxch.core.domain.logging.KomiStoreLogger
 import zed.rainxch.core.domain.model.account.SessionSnapshot
 import zed.rainxch.core.domain.model.account.UserProfile
+import zed.rainxch.core.domain.model.error.LocalStoreException
 import zed.rainxch.core.domain.model.error.RateLimitException
 import zed.rainxch.core.domain.repository.UserSessionRepository
 import kotlin.time.Clock
@@ -151,7 +151,7 @@ class UserSessionRepositoryImpl(
             ownershipStamp(token)?.let { cacheManager.put(CACHE_OWNER_KEY, it, USER_PROFILE) }
             logger.debug("Fetched and cached user profile: ${userProfile.username}")
             userProfile
-        } catch (e: SQLiteException) {
+        } catch (e: LocalStoreException) {
             logger.error("Failed to fetch user profile: ${e.message}")
             null
         }

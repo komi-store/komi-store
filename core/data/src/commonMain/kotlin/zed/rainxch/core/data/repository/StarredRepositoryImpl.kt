@@ -2,7 +2,6 @@
 
 package zed.rainxch.core.data.repository
 
-import androidx.sqlite.SQLiteException
 import co.touchlab.kermit.Logger
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -37,6 +36,8 @@ import zed.rainxch.core.data.network.getReleases
 import zed.rainxch.core.data.network.gitHubJson
 import zed.rainxch.core.data.network.recoverHttpFailure
 import zed.rainxch.core.data.network.shouldFallbackToGithubOrRethrow
+import zed.rainxch.core.domain.model.error.LocalStoreException
+import zed.rainxch.core.domain.model.error.NetworkException
 import zed.rainxch.core.domain.model.error.RateLimitException
 import zed.rainxch.core.domain.model.system.Platform
 import zed.rainxch.core.domain.repository.StarredRepository
@@ -67,8 +68,9 @@ class StarredRepositoryImpl(
         starredRepoDao
             .getAllStarred()
             .map { it.map { entity -> entity.toDomain() } }
+            .localStoreFailures()
 
-    override suspend fun isStarred(repoId: Long): Boolean = starredRepoDao.isStarred(repoId)
+    override suspend fun isStarred(repoId: Long): Boolean = localStore { starredRepoDao.isStarred(repoId) }
 
     override suspend fun setStarred(
         owner: String,
@@ -88,8 +90,8 @@ class StarredRepositoryImpl(
                         }
                     when {
                         response.status.isSuccess() -> Result.success(Unit)
-                        response.status == HttpStatusCode.Unauthorized -> Result.failure(Exception(SIGN_IN_REQUIRED))
-                        else -> Result.failure(Exception("Failed to update star: ${response.status.description}"))
+                        response.status == HttpStatusCode.Unauthorized -> Result.failure(NetworkException(SIGN_IN_REQUIRED, null))
+                        else -> Result.failure(NetworkException("Failed to update star: ${response.status.description}", null))
                     }
                 }
             } catch (e: RateLimitException) {
@@ -105,12 +107,13 @@ class StarredRepositoryImpl(
             }
             starredCall("Failed to fetch starred for username") {
                 fetchAllStarred("/users/$sanitized/starred") { status ->
-                    Exception(
+                    NetworkException(
                         when (status) {
                             HttpStatusCode.NotFound -> "User '$sanitized' not found."
                             HttpStatusCode.Forbidden -> "GitHub rate limit reached. Try again later or sign in."
                             else -> "Failed to fetch stars: ${status.description}"
                         },
+                        null,
                     )
                 }.map { repos ->
                     val now = Clock.System.now().toEpochMilliseconds()
@@ -124,7 +127,7 @@ class StarredRepositoryImpl(
             }
         }
 
-    override suspend fun getLastSyncTime(): Long? = starredRepoDao.getLastSyncTime()
+    override suspend fun getLastSyncTime(): Long? = localStore { starredRepoDao.getLastSyncTime() }
 
     override suspend fun needsSync(): Boolean {
         val lastSync = getLastSyncTime() ?: return true
@@ -139,12 +142,13 @@ class StarredRepositoryImpl(
                     Result.success(Unit)
                 } else {
                     fetchAllStarred("/user/starred") { status ->
-                        Exception(
+                        NetworkException(
                             if (status == HttpStatusCode.Unauthorized) {
                                 SIGN_IN_REQUIRED
                             } else {
                                 "Failed to fetch starred repos: ${status.description}"
                             },
+                            null,
                         )
                     }.map { repos ->
                         val now = Clock.System.now().toEpochMilliseconds()
@@ -152,7 +156,7 @@ class StarredRepositoryImpl(
                             repos.mapWithReleaseChecks { repo ->
                                 repo.toStarred(checkForValidAssets(repo.owner.login, repo.name), now)
                             }
-                        starredRepoDao.replaceAllStarred(starred.map { it.toEntity() })
+                        localStore { starredRepoDao.replaceAllStarred(starred.map { it.toEntity() }) }
                     }
                 }
             }
@@ -173,7 +177,7 @@ class StarredRepositoryImpl(
             )
         } catch (e: RateLimitException) {
             Result.failure(e)
-        } catch (e: SQLiteException) {
+        } catch (e: LocalStoreException) {
             Logger.e(e) { failureLog }
             Result.failure(e)
         }
@@ -181,7 +185,7 @@ class StarredRepositoryImpl(
     // Every page of a starred list, or the refusal for the first page GitHub turned down.
     private suspend fun fetchAllStarred(
         path: String,
-        refusal: (HttpStatusCode) -> Exception,
+        refusal: (HttpStatusCode) -> NetworkException,
     ): Result<List<GitHubStarredResponse>> {
         val all = mutableListOf<GitHubStarredResponse>()
         var page = 1
@@ -210,7 +214,7 @@ class StarredRepositoryImpl(
         release: StableReleaseInfo?,
         now: Long,
     ): StarredRepo {
-        val firstInstalled = installedAppsDao.getAppsByRepoId(id).firstOrNull { !it.isPendingInstall }
+        val firstInstalled = localStore { installedAppsDao.getAppsByRepoId(id) }.firstOrNull { !it.isPendingInstall }
         return StarredRepo(
             repoId = id,
             repoName = name,

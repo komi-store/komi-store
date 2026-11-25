@@ -1,6 +1,5 @@
 package zed.rainxch.core.data.repository
 
-import androidx.sqlite.SQLiteException
 import co.touchlab.kermit.Logger
 import eu.anifantakis.lib.ksafe.KSafe
 import zed.rainxch.core.data.dto.SigningFingerprintSeedResponse
@@ -10,6 +9,7 @@ import zed.rainxch.core.data.network.BackendApiClient
 import zed.rainxch.core.data.network.getSigningSeeds
 import zed.rainxch.core.data.secure.safeGet
 import zed.rainxch.core.data.secure.safePut
+import zed.rainxch.core.domain.model.error.LocalStoreException
 import kotlin.time.Clock
 
 // The local table of known signing certificates, seeded from the backend, that links an installed app to its repo.
@@ -21,8 +21,8 @@ internal class SigningFingerprintIndex(
     // A failed read counts as unknown: the fingerprint is only one source of evidence.
     suspend fun lookup(fingerprint: String): SigningFingerprintEntity? =
         try {
-            dao.lookup(fingerprint)
-        } catch (e: SQLiteException) {
+            localStore { dao.lookup(fingerprint) }
+        } catch (e: LocalStoreException) {
             Logger.d { "signing fingerprint lookup failed: ${e.message}" }
             null
         }
@@ -35,8 +35,8 @@ internal class SigningFingerprintIndex(
 
     private suspend fun lastObservedAt(): Long? =
         try {
-            dao.lastSyncTimestamp()
-        } catch (_: SQLiteException) {
+            localStore { dao.lastSyncTimestamp() }
+        } catch (_: LocalStoreException) {
             null
         }
 
@@ -69,18 +69,20 @@ internal class SigningFingerprintIndex(
     ) {
         if (rows.isEmpty()) return
         try {
-            dao.upsertAll(
-                rows.map { row ->
-                    SigningFingerprintEntity(
-                        fingerprint = row.fingerprint,
-                        repoOwner = row.owner,
-                        repoName = row.repo,
-                        source = SEED_SOURCE_BACKEND,
-                        observedAt = row.observedAt,
-                    )
-                },
-            )
-        } catch (e: SQLiteException) {
+            localStore {
+                dao.upsertAll(
+                    rows.map { row ->
+                        SigningFingerprintEntity(
+                            fingerprint = row.fingerprint,
+                            repoOwner = row.owner,
+                            repoName = row.repo,
+                            source = SEED_SOURCE_BACKEND,
+                            observedAt = row.observedAt,
+                        )
+                    },
+                )
+            }
+        } catch (e: LocalStoreException) {
             Logger.w(e) { "signing-seeds upsert failed on page $page; continuing" }
         }
     }

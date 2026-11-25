@@ -22,7 +22,7 @@ class CacheRepositoryImpl(
 
     override suspend fun clearCache() {
         fileLocationsProvider.clearCacheFiles()
-        localStore { cacheManager.clearAll() }
+        cacheManager.clearAll()
         logger.debug("Cache cleared successfully")
     }
 }

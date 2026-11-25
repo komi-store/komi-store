@@ -6,7 +6,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.pm.ServiceInfo
-import android.database.SQLException
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
@@ -21,6 +20,7 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import zed.rainxch.core.data.local.db.dao.ExternalLinkDao
 import zed.rainxch.core.data.network.BackgroundRequest
+import zed.rainxch.core.data.repository.localStore
 import zed.rainxch.core.domain.model.error.LocalStoreException
 import zed.rainxch.core.domain.model.installation.InstallerType
 import zed.rainxch.core.domain.repository.ExternalImportRepository
@@ -114,10 +114,10 @@ class UpdateCheckWorker(
             val tracked = trackedFlow.map { it.packageName }.toSet()
 
             val permanent =
-                (
+                localStore {
                     externalLinkDao.getDoNotRescanPackageNames() +
                         externalLinkDao.getActiveSkippedPackageNames(System.currentTimeMillis())
-                ).toSet()
+                }.toSet()
 
             val delta = (installed - tracked - permanent).take(MAX_DELTA_PACKAGES).toSet()
             if (delta.isEmpty()) {
@@ -132,8 +132,6 @@ class UpdateCheckWorker(
         } catch (e: IOException) {
             logDeltaScanFailure(e)
         } catch (e: LocalStoreException) {
-            logDeltaScanFailure(e)
-        } catch (e: SQLException) {
             logDeltaScanFailure(e)
         } catch (e: SecurityException) {
             logDeltaScanFailure(e)
