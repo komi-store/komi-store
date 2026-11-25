@@ -168,10 +168,7 @@ object DeepLinkParser {
         val error = queryValue(uri, "error")
         return when {
             handoff != null -> {
-                if (isValidAuthToken(
-                        handoff,
-                    )
-                ) {
+                if (isValidAuthToken(handoff)) {
                     DeepLinkDestination.AuthHandoff(handoffId = handoff, state = state)
                 } else {
                     DeepLinkDestination.None
