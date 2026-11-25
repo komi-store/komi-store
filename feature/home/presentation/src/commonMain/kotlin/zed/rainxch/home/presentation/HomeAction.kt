@@ -5,25 +5,33 @@ import zed.rainxch.core.presentation.model.GithubRepoSummaryUi
 import zed.rainxch.home.presentation.model.ChartTab
 
 sealed interface HomeAction {
-    data object OnRetry : HomeAction
+    sealed interface Charts : HomeAction
 
-    data object OnRefresh : HomeAction
+    sealed interface PlatformPicker : HomeAction
 
-    data object OnLoadMore : HomeAction
+    sealed interface ActionSheet : HomeAction
+
+    sealed interface RepoAction : HomeAction
+
+    data object OnRetry : Charts
+
+    data object OnRefresh : Charts
+
+    data object OnLoadMore : Charts
 
     data object OnSearchClick : HomeAction
 
     data class OnChartSelected(
         val chart: ChartTab,
-    ) : HomeAction
+    ) : Charts
 
-    data object OnPlatformPopupOpen : HomeAction
+    data object OnPlatformPopupOpen : PlatformPicker
 
-    data object OnPlatformPopupDismiss : HomeAction
+    data object OnPlatformPopupDismiss : PlatformPicker
 
     data class OnPlatformSelected(
         val platform: DiscoveryPlatform,
-    ) : HomeAction
+    ) : PlatformPicker
 
     data class OnRepoClick(
         val repo: GithubRepoSummaryUi,
@@ -31,23 +39,23 @@ sealed interface HomeAction {
 
     data class OnRepoLongClick(
         val repoId: Long,
-    ) : HomeAction
+    ) : ActionSheet
 
-    data object OnActionSheetDismiss : HomeAction
+    data object OnActionSheetDismiss : ActionSheet
 
     data class OnShareClick(
         val repo: GithubRepoSummaryUi,
-    ) : HomeAction
+    ) : RepoAction
 
     data class OnHideRepository(
         val repo: GithubRepoSummaryUi,
-    ) : HomeAction
+    ) : RepoAction
 
     data class OnMarkAsSeen(
         val repo: GithubRepoSummaryUi,
-    ) : HomeAction
+    ) : RepoAction
 
     data class OnMarkAsUnseen(
         val repoId: Long,
-    ) : HomeAction
+    ) : RepoAction
 }

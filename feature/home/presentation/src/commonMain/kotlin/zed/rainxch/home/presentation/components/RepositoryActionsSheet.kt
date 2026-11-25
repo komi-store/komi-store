@@ -47,13 +47,14 @@ fun RepositoryActionsSheet(
     onDismiss: () -> Unit,
     onShare: () -> Unit,
     onOpenOnGithub: () -> Unit,
-    onToggleSeen: () -> Unit,
+    onToggleSeenClick: () -> Unit,
     onHide: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val colors = LocalPersonality.current.colors
     val shape = LocalPersonality.current.shape
 
-    KomiSheet(onDismiss = onDismiss, placement = KomiSheetPlacement.Bottom) {
+    KomiSheet(onDismiss = onDismiss, modifier = modifier, placement = KomiSheetPlacement.Bottom) {
         Row(
             modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
             verticalAlignment = Alignment.CenterVertically,
@@ -102,10 +103,14 @@ fun RepositoryActionsSheet(
         )
 
         SheetRow(
-            label = if (isSeen) stringResource(Res.string.mark_as_unviewed)
-            else stringResource(Res.string.mark_as_viewed),
+            label =
+                if (isSeen) {
+                    stringResource(Res.string.mark_as_unviewed)
+                } else {
+                    stringResource(Res.string.mark_as_viewed)
+                },
             icon = Icons.Outlined.Visibility,
-            onClick = onToggleSeen,
+            onClick = onToggleSeenClick,
         )
 
         KomiHorizontalDivider(color = colors.outlineVariant)
@@ -127,10 +132,11 @@ private fun SheetRow(
     tint: Color = LocalPersonality.current.colors.onSurface,
 ) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick)
-            .padding(horizontal = 4.dp, vertical = 14.dp),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .clickable(onClick = onClick)
+                .padding(horizontal = 4.dp, vertical = 14.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(14.dp),
     ) {
