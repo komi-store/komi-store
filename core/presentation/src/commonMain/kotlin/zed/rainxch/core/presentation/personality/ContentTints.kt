@@ -20,6 +20,12 @@ val Color.strongFill: Color get() = copy(alpha = 0.22f)
 // The plate behind a large icon, in the icon's color.
 val Color.iconPlate: Color get() = copy(alpha = 0.15f)
 
+// A row's fill while the pointer hovers it, in the row's content color.
+val Color.hoverFill: Color get() = copy(alpha = 0.08f)
+
+// A Japanese kicker beside a label, in the label's color.
+val Color.kickerContent: Color get() = copy(alpha = 0.8f)
+
 // The fill behind a favourite toggle that is on, under its error-colored heart.
 val PersonalityColors.favouriteFill: Color get() = error.copy(alpha = 0.45f)
 

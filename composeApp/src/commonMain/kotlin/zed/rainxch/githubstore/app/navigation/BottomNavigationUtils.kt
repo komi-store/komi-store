@@ -1,9 +1,22 @@
 package zed.rainxch.githubstore.app.navigation
 
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material.icons.outlined.*
-import zed.rainxch.githubstore.core.presentation.res.*
+import androidx.compose.material.icons.filled.Apps
+import androidx.compose.material.icons.filled.Explore
+import androidx.compose.material.icons.filled.Leaderboard
+import androidx.compose.material.icons.filled.Person2
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.outlined.Apps
+import androidx.compose.material.icons.outlined.Explore
+import androidx.compose.material.icons.outlined.Leaderboard
+import androidx.compose.material.icons.outlined.Person2
+import androidx.compose.material.icons.outlined.Search
+import zed.rainxch.githubstore.core.presentation.res.Res
+import zed.rainxch.githubstore.core.presentation.res.bottom_nav_apps_title
+import zed.rainxch.githubstore.core.presentation.res.bottom_nav_explore_title
+import zed.rainxch.githubstore.core.presentation.res.bottom_nav_profile_title
+import zed.rainxch.githubstore.core.presentation.res.bottom_nav_search_title
+import zed.rainxch.githubstore.core.presentation.res.bottom_nav_top_charts_title
 
 object BottomNavigationUtils {
     fun items(): List<BottomNavigationItem> =
@@ -40,7 +53,6 @@ object BottomNavigationUtils {
             ),
         )
 
-    // The bottom bar leaves Search out: Classic's tab card has a search field, Manga's Explore and
-    // Top Charts a search button. The Desktop sidebar keeps it.
+    // The bottom bar leaves Search out: Classic's tab card has a search field, Manga's Explore and Top Charts a search button.
     fun allowedScreens(): List<BottomNavigationItem> = items().filterNot { it.screen is GithubStoreGraph.SearchScreen }
 }

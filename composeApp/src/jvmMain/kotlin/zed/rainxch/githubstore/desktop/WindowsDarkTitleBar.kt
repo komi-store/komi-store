@@ -1,5 +1,7 @@
 package zed.rainxch.githubstore.desktop
 
+import com.sun.jna.FunctionMapper
+import com.sun.jna.Library
 import com.sun.jna.Native
 import com.sun.jna.Pointer
 import com.sun.jna.platform.win32.WinDef
@@ -9,14 +11,14 @@ import zed.rainxch.core.domain.system.DesktopOs
 import java.awt.Window
 
 private interface DwmApi : StdCallLibrary {
-    fun DwmSetWindowAttribute(
+    fun dwmSetWindowAttribute(
         hwnd: WinDef.HWND,
         attribute: Int,
         value: WinDef.BOOLByReference,
         size: Int,
     ): Int
 
-    fun DwmSetWindowAttribute(
+    fun dwmSetWindowAttribute(
         hwnd: WinDef.HWND,
         attribute: Int,
         value: IntByReference,
@@ -24,9 +26,12 @@ private interface DwmApi : StdCallLibrary {
     ): Int
 
     companion object {
+        // dwmapi exports DwmSetWindowAttribute; the mapper restores the capital the Kotlin name drops.
+        private val exportedName = FunctionMapper { _, method -> method.name.replaceFirstChar(Char::uppercaseChar) }
+
         val INSTANCE: DwmApi? =
             runCatching {
-                Native.load("dwmapi", DwmApi::class.java)
+                Native.load("dwmapi", DwmApi::class.java, mapOf(Library.OPTION_FUNCTION_MAPPER to exportedName))
             }.getOrNull()
     }
 }
@@ -76,16 +81,16 @@ fun applyWindowsImmersiveDarkMode(
     val flag = WinDef.BOOLByReference(WinDef.BOOL(isDark))
     val hr =
         runCatching {
-            dwm.DwmSetWindowAttribute(hwnd, DWMWA_USE_IMMERSIVE_DARK_MODE, flag, 4)
+            dwm.dwmSetWindowAttribute(hwnd, DWMWA_USE_IMMERSIVE_DARK_MODE, flag, WinDef.BOOL.SIZE)
         }.getOrElse { -1 }
 
     if (hr != S_OK) {
         runCatching {
-            dwm.DwmSetWindowAttribute(hwnd, DWMWA_USE_IMMERSIVE_DARK_MODE_PRE_20H1, flag, 4)
+            dwm.dwmSetWindowAttribute(hwnd, DWMWA_USE_IMMERSIVE_DARK_MODE_PRE_20H1, flag, WinDef.BOOL.SIZE)
         }
     }
 
     val colorRef = IntByReference(if (isDark) DARK_TITLE_BAR_COLORREF else DWMWA_COLOR_DEFAULT)
-    runCatching { dwm.DwmSetWindowAttribute(hwnd, DWMWA_CAPTION_COLOR, colorRef, 4) }
-    runCatching { dwm.DwmSetWindowAttribute(hwnd, DWMWA_BORDER_COLOR, colorRef, 4) }
+    runCatching { dwm.dwmSetWindowAttribute(hwnd, DWMWA_CAPTION_COLOR, colorRef, WinDef.DWORD.SIZE) }
+    runCatching { dwm.dwmSetWindowAttribute(hwnd, DWMWA_BORDER_COLOR, colorRef, WinDef.DWORD.SIZE) }
 }

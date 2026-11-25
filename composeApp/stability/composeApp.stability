@@ -5,51 +5,95 @@
 //   ./gradlew :composeApp:stabilityDump
 
 @Composable
-public fun zed.rainxch.githubstore.App(deepLinkUri: kotlin.String?, onDeepLinkConsumed: kotlin.Function0<kotlin.Unit>, onResolvedDarkTheme: kotlin.Function1<kotlin.Boolean, kotlin.Unit>, onContentPainted: kotlin.Function0<kotlin.Unit>): kotlin.Unit
+public fun zed.rainxch.githubstore.App(modifier: androidx.compose.ui.Modifier, deepLinkUri: kotlin.String?, onDeepLinkConsume: kotlin.Function0<kotlin.Unit>, onResolvedDarkTheme: kotlin.Function1<kotlin.Boolean, kotlin.Unit>, onContentReady: kotlin.Function0<kotlin.Unit>): kotlin.Unit
   skippable: true
   restartable: true
   params:
+    - modifier: STABLE (marked @Stable or @Immutable)
     - deepLinkUri: STABLE (class with no mutable properties)
-    - onDeepLinkConsumed: STABLE (function type)
+    - onDeepLinkConsume: STABLE (function type)
     - onResolvedDarkTheme: STABLE (function type)
-    - onContentPainted: STABLE (function type)
+    - onContentReady: STABLE (function type)
 
 @Composable
-public fun zed.rainxch.githubstore.app.components.RateLimitDialog(rateLimitInfo: zed.rainxch.core.domain.model.error.RateLimitInfo, isAuthenticated: kotlin.Boolean, onDismiss: kotlin.Function0<kotlin.Unit>, onSignIn: kotlin.Function0<kotlin.Unit>): kotlin.Unit
+private fun zed.rainxch.githubstore.AppContent(state: zed.rainxch.githubstore.MainState, onAction: kotlin.Function1<zed.rainxch.githubstore.MainAction, kotlin.Unit>, deepLinkUris: kotlinx.coroutines.channels.ReceiveChannel<kotlin.String>, onDeepLinkConsume: kotlin.Function0<kotlin.Unit>, onResolvedDarkTheme: kotlin.Function1<kotlin.Boolean, kotlin.Unit>, onContentReady: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
   skippable: true
   restartable: true
   params:
-    - rateLimitInfo: UNSTABLE (cross-module type without @Stable/@Immutable)
+    - state: STABLE (class with no mutable properties)
+    - onAction: STABLE (function type)
+    - deepLinkUris: UNKNOWN (interface or non-final class; concrete implementation unknown)
+    - onDeepLinkConsume: STABLE (function type)
+    - onResolvedDarkTheme: STABLE (function type)
+    - onContentReady: STABLE (function type)
+    - modifier: STABLE (marked @Stable or @Immutable)
+
+@Composable
+internal fun zed.rainxch.githubstore.AppOverlays(state: zed.rainxch.githubstore.MainState, currentScreen: zed.rainxch.githubstore.app.navigation.GithubStoreGraph?, onAction: kotlin.Function1<zed.rainxch.githubstore.MainAction, kotlin.Unit>, onNavigate: kotlin.Function1<zed.rainxch.githubstore.app.navigation.GithubStoreGraph, kotlin.Unit>, whatsNewViewModel: zed.rainxch.profile.presentation.whatsnew.WhatsNewViewModel): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - state: STABLE (class with no mutable properties)
+    - currentScreen: UNKNOWN (interface or non-final class; concrete implementation unknown)
+    - onAction: STABLE (function type)
+    - onNavigate: STABLE (function type)
+    - whatsNewViewModel: UNSTABLE (has mutable properties or unstable members)
+
+@Composable
+public fun zed.rainxch.githubstore.app.components.RateLimitDialog(rateLimit: zed.rainxch.githubstore.app.components.RateLimitUi, isAuthenticated: kotlin.Boolean, onDismiss: kotlin.Function0<kotlin.Unit>, onSignIn: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - rateLimit: STABLE (class with no mutable properties)
     - isAuthenticated: STABLE (primitive type)
     - onDismiss: STABLE (function type)
     - onSignIn: STABLE (function type)
+    - modifier: STABLE (marked @Stable or @Immutable)
 
 @Composable
-public fun zed.rainxch.githubstore.app.components.SessionExpiredDialog(onDismiss: kotlin.Function0<kotlin.Unit>, onSignIn: kotlin.Function0<kotlin.Unit>): kotlin.Unit
+public fun zed.rainxch.githubstore.app.components.SessionExpiredDialog(onDismiss: kotlin.Function0<kotlin.Unit>, onSignIn: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
   skippable: true
   restartable: true
   params:
     - onDismiss: STABLE (function type)
     - onSignIn: STABLE (function type)
+    - modifier: STABLE (marked @Stable or @Immutable)
 
 @Composable
-public fun zed.rainxch.githubstore.app.navigation.AdaptiveDetailPaneContent(args: zed.rainxch.core.presentation.components.adaptive.AdaptiveDetailArgs, navController: androidx.navigation.NavHostController, onCrossNavToRepo: kotlin.Function1<zed.rainxch.core.presentation.components.adaptive.AdaptiveDetailArgs, kotlin.Unit>, onClearPane: kotlin.Function0<kotlin.Unit>): kotlin.Unit
+public fun zed.rainxch.githubstore.app.navigation.AdaptiveDetailPaneContent(args: zed.rainxch.core.presentation.components.adaptive.AdaptiveDetailArgs, onNavigate: kotlin.Function1<zed.rainxch.githubstore.app.navigation.GithubStoreGraph, kotlin.Unit>, onCrossNavToRepo: kotlin.Function1<zed.rainxch.core.presentation.components.adaptive.AdaptiveDetailArgs, kotlin.Unit>, onClearPane: kotlin.Function0<kotlin.Unit>): kotlin.Unit
   skippable: true
   restartable: true
   params:
     - args: STABLE (marked @Stable or @Immutable)
-    - navController: UNSTABLE (cross-module type without @Stable/@Immutable)
+    - onNavigate: STABLE (function type)
     - onCrossNavToRepo: STABLE (function type)
     - onClearPane: STABLE (function type)
 
 @Composable
-public fun zed.rainxch.githubstore.app.navigation.AppNavigation(navController: androidx.navigation.NavHostController, isScrollbarEnabled: kotlin.Boolean, contentWidth: zed.rainxch.core.domain.model.appearance.ContentWidth): kotlin.Unit
+public fun zed.rainxch.githubstore.app.navigation.AppNavigation(deepLinkUris: kotlinx.coroutines.channels.ReceiveChannel<kotlin.String>, onDeepLinkConsume: kotlin.Function0<kotlin.Unit>, isScrollbarEnabled: kotlin.Boolean, contentWidth: zed.rainxch.core.domain.model.appearance.ContentWidth, theme: @[Composable] androidx.compose.runtime.internal.ComposableFunction1<@[ParameterName(name = \, modifier: androidx.compose.ui.Modifier, overlay: @[Composable] androidx.compose.runtime.internal.ComposableFunction2<@[ParameterName(name = \): kotlin.Unit
   skippable: true
   restartable: true
   params:
-    - navController: UNSTABLE (cross-module type without @Stable/@Immutable)
+    - deepLinkUris: UNKNOWN (interface or non-final class; concrete implementation unknown)
+    - onDeepLinkConsume: STABLE (function type)
     - isScrollbarEnabled: STABLE (primitive type)
     - contentWidth: STABLE (class with no mutable properties)
+    - theme: STABLE (composable function type)
+    - modifier: STABLE (marked @Stable or @Immutable)
+    - overlay: STABLE (composable function type)
+
+@Composable
+internal fun zed.rainxch.githubstore.app.navigation.AppShell(currentScreen: zed.rainxch.githubstore.app.navigation.GithubStoreGraph?, isUpdateAvailable: kotlin.Boolean, unreadAnnouncementsCount: kotlin.Int, onNavigateToTab: kotlin.Function1<zed.rainxch.githubstore.app.navigation.GithubStoreGraph, kotlin.Unit>, onSearch: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier, content: @[Composable] androidx.compose.runtime.internal.ComposableFunction2<@[ParameterName(name = \): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - currentScreen: UNKNOWN (interface or non-final class; concrete implementation unknown)
+    - isUpdateAvailable: STABLE (primitive type)
+    - unreadAnnouncementsCount: STABLE (primitive type)
+    - onNavigateToTab: STABLE (function type)
+    - onSearch: STABLE (function type)
+    - modifier: STABLE (marked @Stable or @Immutable)
+    - content: STABLE (composable function type)
 
 @Composable
 public fun zed.rainxch.githubstore.app.navigation.BottomNavigation(currentScreen: zed.rainxch.githubstore.app.navigation.GithubStoreGraph, onNavigate: kotlin.Function1<zed.rainxch.githubstore.app.navigation.GithubStoreGraph, kotlin.Unit>, isUpdateAvailable: kotlin.Boolean, onSearch: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier, hasUnreadAnnouncements: kotlin.Boolean, tabCard: zed.rainxch.core.presentation.components.bars.KomiTabCardState?): kotlin.Unit
@@ -88,6 +132,15 @@ public fun zed.rainxch.githubstore.app.navigation.DesktopSidebar(currentScreen: 
     - modifier: STABLE (marked @Stable or @Immutable)
 
 @Composable
+private fun zed.rainxch.githubstore.app.navigation.DetailsDestination(route: zed.rainxch.githubstore.app.navigation.GithubStoreGraph.DetailsScreen, onNavigate: kotlin.Function1<zed.rainxch.githubstore.app.navigation.GithubStoreGraph, kotlin.Unit>, onNavigateBack: kotlin.Function0<kotlin.Unit>): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - route: STABLE (class with no mutable properties)
+    - onNavigate: STABLE (function type)
+    - onNavigateBack: STABLE (function type)
+
+@Composable
 private fun zed.rainxch.githubstore.app.navigation.InkCheckbox(checked: kotlin.Boolean): kotlin.Unit
   skippable: true
   restartable: true
@@ -102,12 +155,12 @@ private fun zed.rainxch.githubstore.app.navigation.InkDiamond(filled: kotlin.Boo
     - filled: STABLE (primitive type)
 
 @Composable
-private fun zed.rainxch.githubstore.app.navigation.MainDetailPane(args: zed.rainxch.core.presentation.components.adaptive.AdaptiveDetailArgs, navController: androidx.navigation.NavHostController, onCrossNavToRepo: kotlin.Function1<zed.rainxch.core.presentation.components.adaptive.AdaptiveDetailArgs, kotlin.Unit>, onClearPane: kotlin.Function0<kotlin.Unit>, onOpenAbout: kotlin.Function5<kotlin.Long, kotlin.String, kotlin.String, kotlin.String?, kotlin.String?, kotlin.Unit>, onOpenWhatsNew: kotlin.Function4<kotlin.Long, kotlin.String, kotlin.String, kotlin.String?, kotlin.Unit>): kotlin.Unit
+private fun zed.rainxch.githubstore.app.navigation.MainDetailPane(args: zed.rainxch.core.presentation.components.adaptive.AdaptiveDetailArgs, onNavigate: kotlin.Function1<zed.rainxch.githubstore.app.navigation.GithubStoreGraph, kotlin.Unit>, onCrossNavToRepo: kotlin.Function1<zed.rainxch.core.presentation.components.adaptive.AdaptiveDetailArgs, kotlin.Unit>, onClearPane: kotlin.Function0<kotlin.Unit>, onOpenAbout: kotlin.Function5<kotlin.Long, kotlin.String, kotlin.String, kotlin.String?, kotlin.String?, kotlin.Unit>, onOpenWhatsNew: kotlin.Function4<kotlin.Long, kotlin.String, kotlin.String, kotlin.String?, kotlin.Unit>): kotlin.Unit
   skippable: true
   restartable: true
   params:
     - args: STABLE (marked @Stable or @Immutable)
-    - navController: UNSTABLE (cross-module type without @Stable/@Immutable)
+    - onNavigate: STABLE (function type)
     - onCrossNavToRepo: STABLE (function type)
     - onClearPane: STABLE (function type)
     - onOpenAbout: STABLE (function type)
@@ -123,6 +176,25 @@ private fun zed.rainxch.githubstore.app.navigation.NavIcon(icon: androidx.compos
     - badgeCount: STABLE (primitive type)
 
 @Composable
+internal fun zed.rainxch.githubstore.app.navigation.RepoListDetail(onNavigate: kotlin.Function1<zed.rainxch.githubstore.app.navigation.GithubStoreGraph, kotlin.Unit>, modifier: androidx.compose.ui.Modifier, list: @[Composable] androidx.compose.runtime.internal.ComposableFunction1<@[ParameterName(name = \): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - onNavigate: STABLE (function type)
+    - modifier: STABLE (marked @Stable or @Immutable)
+    - list: STABLE (composable function type)
+
+@Composable
+private fun zed.rainxch.githubstore.app.navigation.SidebarBrowseSection(currentScreen: zed.rainxch.githubstore.app.navigation.GithubStoreGraph?, rail: kotlin.Boolean, unreadAnnouncementsCount: kotlin.Int, onNavigate: kotlin.Function1<zed.rainxch.githubstore.app.navigation.GithubStoreGraph, kotlin.Unit>): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - currentScreen: UNKNOWN (interface or non-final class; concrete implementation unknown)
+    - rail: STABLE (primitive type)
+    - unreadAnnouncementsCount: STABLE (primitive type)
+    - onNavigate: STABLE (function type)
+
+@Composable
 private fun zed.rainxch.githubstore.app.navigation.SidebarCategoryRow(category: zed.rainxch.core.domain.model.repository.FeedCategory, selected: kotlin.Boolean, rail: kotlin.Boolean, onClick: kotlin.Function0<kotlin.Unit>): kotlin.Unit
   skippable: true
   restartable: true
@@ -131,6 +203,15 @@ private fun zed.rainxch.githubstore.app.navigation.SidebarCategoryRow(category: 
     - selected: STABLE (primitive type)
     - rail: STABLE (primitive type)
     - onClick: STABLE (function type)
+
+@Composable
+private fun zed.rainxch.githubstore.app.navigation.SidebarCategorySection(selected: zed.rainxch.core.domain.model.repository.FeedCategory, rail: kotlin.Boolean, onSelect: kotlin.Function1<zed.rainxch.core.domain.model.repository.FeedCategory, kotlin.Unit>): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - selected: STABLE (class with no mutable properties)
+    - rail: STABLE (primitive type)
+    - onSelect: STABLE (function type)
 
 @Composable
 private fun zed.rainxch.githubstore.app.navigation.SidebarNavRow(label: kotlin.String, kicker: kotlin.String?, icon: androidx.compose.ui.graphics.vector.ImageVector, selected: kotlin.Boolean, rail: kotlin.Boolean, badgeCount: kotlin.Int, onClick: kotlin.Function0<kotlin.Unit>): kotlin.Unit
@@ -154,6 +235,15 @@ private fun zed.rainxch.githubstore.app.navigation.SidebarPlatformRow(platform: 
     - selected: STABLE (primitive type)
     - rail: STABLE (primitive type)
     - onClick: STABLE (function type)
+
+@Composable
+private fun zed.rainxch.githubstore.app.navigation.SidebarPlatformSection(selected: zed.rainxch.core.domain.model.repository.DiscoveryPlatform, rail: kotlin.Boolean, onSelect: kotlin.Function1<zed.rainxch.core.domain.model.repository.DiscoveryPlatform, kotlin.Unit>): kotlin.Unit
+  skippable: true
+  restartable: true
+  params:
+    - selected: STABLE (class with no mutable properties)
+    - rail: STABLE (primitive type)
+    - onSelect: STABLE (function type)
 
 @Composable
 private fun zed.rainxch.githubstore.app.navigation.SidebarSideHeading(title: kotlin.String, jp: kotlin.String, rail: kotlin.Boolean): kotlin.Unit
@@ -186,7 +276,7 @@ private fun zed.rainxch.githubstore.app.whatsnew.SheetHeader(entry: zed.rainxch.
     - entry: STABLE (class with no mutable properties)
 
 @Composable
-public fun zed.rainxch.githubstore.app.whatsnew.WhatsNewSheet(entry: zed.rainxch.profile.presentation.whatsnew.WhatsNewEntryUi, showHistoryAction: kotlin.Boolean, onDismiss: kotlin.Function0<kotlin.Unit>, onViewHistory: kotlin.Function0<kotlin.Unit>): kotlin.Unit
+public fun zed.rainxch.githubstore.app.whatsnew.WhatsNewSheet(entry: zed.rainxch.profile.presentation.whatsnew.WhatsNewEntryUi, showHistoryAction: kotlin.Boolean, onDismiss: kotlin.Function0<kotlin.Unit>, onViewHistory: kotlin.Function0<kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
   skippable: true
   restartable: true
   params:
@@ -194,20 +284,21 @@ public fun zed.rainxch.githubstore.app.whatsnew.WhatsNewSheet(entry: zed.rainxch
     - showHistoryAction: STABLE (primitive type)
     - onDismiss: STABLE (function type)
     - onViewHistory: STABLE (function type)
+    - modifier: STABLE (marked @Stable or @Immutable)
 
 @Composable
-public fun zed.rainxch.githubstore.utils.HandleDesktopToolbarDeeplinks(deepLinkUris: kotlinx.coroutines.channels.ReceiveChannel<kotlin.String>, onDeepLinkConsumed: kotlin.Function0<kotlin.Unit>, navController: androidx.navigation.NavHostController): kotlin.Unit
+public fun zed.rainxch.githubstore.utils.HandleDesktopToolbarDeeplinks(deepLinkUris: kotlinx.coroutines.channels.ReceiveChannel<kotlin.String>, onDeepLink: kotlin.Function1<zed.rainxch.githubstore.app.deeplink.DeepLinkDestination, kotlin.Unit>, onDeepLinkConsume: kotlin.Function0<kotlin.Unit>): kotlin.Unit
   skippable: true
   restartable: true
   params:
     - deepLinkUris: UNKNOWN (interface or non-final class; concrete implementation unknown)
-    - onDeepLinkConsumed: STABLE (function type)
-    - navController: UNSTABLE (cross-module type without @Stable/@Immutable)
+    - onDeepLink: STABLE (function type)
+    - onDeepLinkConsume: STABLE (function type)
 
 @Composable
-public fun zed.rainxch.githubstore.utils.HandleKeyboardEvents(navController: androidx.navigation.NavHostController): kotlin.Unit
+public fun zed.rainxch.githubstore.utils.HandleKeyboardEvents(onOpenSearch: kotlin.Function0<kotlin.Unit>): kotlin.Unit
   skippable: true
   restartable: true
   params:
-    - navController: UNSTABLE (cross-module type without @Stable/@Immutable)
+    - onOpenSearch: STABLE (function type)
 

@@ -20,7 +20,13 @@ Each feature has up to three sub-modules: `domain/`, `data/`, `presentation/`. `
 
 ## Navigation
 
-Routes are members of the `@Serializable` sealed interface `GithubStoreGraph` in `composeApp/.../app/navigation/GithubStoreGraph.kt`; `AppNavigation.kt` wires them. Two route arguments matter beyond their names:
+Routes are members of the `@Serializable` sealed interface `GithubStoreGraph` in `composeApp/.../app/navigation/GithubStoreGraph.kt`. In the same package:
+
+- `AppNavigation` owns the `NavHostController` (created with `rememberNavController()`, the way a Root owns its ViewModel) and holds the `NavHost`. It wraps its UI in the `theme` slot (`PersonalityTheme`) rather than sitting inside it, because switching between Manga and Classic recomposes the theme's content from scratch and would drop the back stack. No other composable takes the controller: `AppShell` (sidebar, bottom bar, Classic's tab card), `AdaptiveDetailPaneContent` and the keyboard and deep-link handlers get the current route and navigation lambdas, and the dialogs in `AppOverlays` get both through `AppNavigation`'s `overlay` slot.
+- Destinations are registered by `NavGraphBuilder` functions grouped in `*Destinations.kt` files (plus `profileGraph()` and `profilePages()` in `ProfileGraph.kt`); they take the controller to build each screen's navigation lambdas. Tab screens with a list-detail layout go through `RepoListDetail`.
+- `NavigationActions.kt` holds the shared moves: `navigateToTopLevel` (tabs: save and restore the back stack), `navigateSingleTop`, and `openDeepLink`, which routes a parsed `DeepLinkDestination`.
+
+Two route arguments matter beyond their names:
 
 - `DetailsScreen.packageName` (set from Apps) opens Details on that installed app when a repository ships several apps.
 - `DetailsScreen.sourceHost` is non-null for Codeberg, Forgejo and custom-forge repositories and routes every `DetailsRepository` call through `ForgejoClientRegistry` instead of the GitHub-backed path.
@@ -46,5 +52,5 @@ System interfaces with Android and Desktop implementations: `Installer`, `Instal
 1. Create `feature/<name>/{domain,data,presentation}/` with the matching convention plugin.
 2. `include` the modules in `settings.gradle.kts`.
 3. Domain interfaces, then the implementation and its Koin module in `data/di/SharedModule.kt`, then the ViewModel and screen.
-4. Add the route to `GithubStoreGraph.kt`, wire it in `AppNavigation.kt`, register the ViewModel in `ViewModelsModule.kt` and the data module in `initKoin.kt`.
+4. Add the route to `GithubStoreGraph.kt`, register it in the matching `*Destinations.kt` function, register the ViewModel in `ViewModelsModule.kt` and the data module in `initKoin.kt`.
 5. Add a `feature/<name>/CLAUDE.md` with what a reader can't see from the code in a minute.

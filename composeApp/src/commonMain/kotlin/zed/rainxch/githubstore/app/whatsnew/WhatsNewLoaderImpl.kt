@@ -1,7 +1,7 @@
 package zed.rainxch.githubstore.app.whatsnew
 
-import kotlinx.coroutines.CancellationException
 import kotlinx.serialization.json.Json
+import org.jetbrains.compose.resources.MissingResourceException
 import zed.rainxch.core.data.dto.WhatsNewEntryDto
 import zed.rainxch.core.data.mappers.toDomain
 import zed.rainxch.core.data.services.LocalizationManager
@@ -9,6 +9,7 @@ import zed.rainxch.core.domain.logging.KomiStoreLogger
 import zed.rainxch.core.domain.model.announcement.WhatsNewEntry
 import zed.rainxch.core.domain.repository.WhatsNewLoader
 import zed.rainxch.githubstore.core.presentation.res.Res
+import java.io.IOException
 
 class WhatsNewLoaderImpl(
     private val localizationManager: LocalizationManager,
@@ -67,20 +68,17 @@ class WhatsNewLoaderImpl(
             val bytes = Res.readBytes(path)
             val text = bytes.decodeToString()
             json.decodeFromString(WhatsNewEntryDto.serializer(), text).toDomain()
-        } catch (e: CancellationException) {
-            throw e
-        } catch (t: Throwable) {
-            if (isMissingResource(t)) {
-                if (warnOnMissing) {
-                    tagged.warn("Missing what's-new entry at $path: ${t.message}")
-                }
-            } else {
-                tagged.warn("Failed to parse what's-new entry at $path: ${t.message}")
+        } catch (e: MissingResourceException) {
+            if (warnOnMissing) {
+                tagged.warn("Missing what's-new entry at $path: ${e.message}")
             }
             null
+        } catch (e: IOException) {
+            tagged.warn("Failed to read what's-new entry at $path: ${e.message}")
+            null
+        } catch (e: IllegalArgumentException) {
+            // decodeFromString and the section type lookup both report a malformed entry this way.
+            tagged.warn("Failed to parse what's-new entry at $path: ${e.message}")
+            null
         }
-
-    private fun isMissingResource(t: Throwable): Boolean =
-        t::class.simpleName == "MissingResourceException" ||
-            t.message?.contains("Missing resource", ignoreCase = true) == true
 }

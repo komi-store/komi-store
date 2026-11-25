@@ -13,7 +13,6 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
-import zed.rainxch.core.domain.model.error.RateLimitInfo
 import zed.rainxch.core.presentation.components.buttons.KomiButton
 import zed.rainxch.core.presentation.components.buttons.KomiButtonSize
 import zed.rainxch.core.presentation.components.buttons.KomiButtonVariant
@@ -36,19 +35,18 @@ import zed.rainxch.githubstore.core.presentation.res.rate_limit_used_all_free
 
 @Composable
 fun RateLimitDialog(
-    rateLimitInfo: RateLimitInfo,
+    rateLimit: RateLimitUi,
     isAuthenticated: Boolean,
     onDismiss: () -> Unit,
     onSignIn: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
-    val timeUntilReset =
-        remember(rateLimitInfo) {
-            rateLimitInfo.timeUntilReset().inWholeMinutes.toInt()
-        }
+    val timeUntilReset = remember(rateLimit) { rateLimit.minutesUntilReset() }
 
     val colors = LocalPersonality.current.colors
     KomiDialog(
         onDismissRequest = onDismiss,
+        modifier = modifier,
         icon = {
             KomiIcon(
                 imageVector = Icons.Default.Warning,
@@ -72,7 +70,7 @@ fun RateLimitDialog(
                         if (isAuthenticated) {
                             stringResource(
                                 Res.string.rate_limit_used_all,
-                                rateLimitInfo.limit,
+                                rateLimit.limit,
                             )
                         } else {
                             stringResource(
@@ -136,15 +134,10 @@ fun RateLimitDialog(
 
 @Preview
 @Composable
-fun RateLimitDialogPreview() {
+private fun RateLimitDialogPreview() {
     PersonalityPreview {
         RateLimitDialog(
-            rateLimitInfo =
-                RateLimitInfo(
-                    limit = 1000,
-                    remaining = 2000,
-                    resetTimestamp = 0L,
-                ),
+            rateLimit = RateLimitUi(limit = 1000, resetEpochSeconds = 0L),
             isAuthenticated = false,
             onDismiss = {
             },

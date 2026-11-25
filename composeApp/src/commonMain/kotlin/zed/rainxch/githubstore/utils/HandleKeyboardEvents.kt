@@ -1,32 +1,19 @@
 package zed.rainxch.githubstore.utils
 
 import androidx.compose.runtime.Composable
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberUpdatedState
 import zed.rainxch.core.presentation.utils.ObserveAsEvents
 import zed.rainxch.githubstore.app.desktop.KeyboardNavigation
 import zed.rainxch.githubstore.app.desktop.KeyboardNavigationEvent
-import zed.rainxch.githubstore.app.navigation.GithubStoreGraph
-import zed.rainxch.githubstore.app.navigation.getCurrentScreen
 
 @Composable
-fun HandleKeyboardEvents(navController: NavHostController) {
-    val currentScreen = navController.currentBackStackEntryAsState().value.getCurrentScreen()
+fun HandleKeyboardEvents(onOpenSearch: () -> Unit) {
+    val currentOnOpenSearch by rememberUpdatedState(onOpenSearch)
 
     ObserveAsEvents(KeyboardNavigation.events) { event ->
         when (event) {
-            KeyboardNavigationEvent.OnCtrlFClick -> {
-                if (currentScreen !is GithubStoreGraph.SearchScreen) {
-                    navController.navigate(GithubStoreGraph.SearchScreen()) {
-                        popUpTo(GithubStoreGraph.ExploreScreen) {
-                            saveState = true
-                        }
-
-                        launchSingleTop = true
-                        restoreState = true
-                    }
-                }
-            }
+            KeyboardNavigationEvent.OnCtrlFClick -> currentOnOpenSearch()
         }
     }
 }
