@@ -11,7 +11,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
-import zed.rainxch.core.domain.model.announcement.WhatsNewEntry
 import zed.rainxch.core.presentation.components.buttons.KomiButton
 import zed.rainxch.core.presentation.components.buttons.KomiButtonVariant
 import zed.rainxch.core.presentation.components.overlays.KomiSheet
@@ -25,10 +24,11 @@ import zed.rainxch.githubstore.core.presentation.res.whats_new_cta_history
 import zed.rainxch.githubstore.core.presentation.res.whats_new_sheet_heading
 import zed.rainxch.githubstore.core.presentation.res.whats_new_version_label
 import zed.rainxch.profile.presentation.whatsnew.SectionBlock
+import zed.rainxch.profile.presentation.whatsnew.WhatsNewEntryUi
 
 @Composable
 fun WhatsNewSheet(
-    entry: WhatsNewEntry,
+    entry: WhatsNewEntryUi,
     showHistoryAction: Boolean,
     onDismiss: () -> Unit,
     onViewHistory: () -> Unit,
@@ -71,7 +71,7 @@ fun WhatsNewSheet(
 }
 
 @Composable
-private fun SheetHeader(entry: WhatsNewEntry) {
+private fun SheetHeader(entry: WhatsNewEntryUi) {
     val colors = LocalPersonality.current.colors
     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
         KomiText(

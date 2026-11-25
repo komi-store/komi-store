@@ -11,6 +11,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Tune
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -35,14 +37,17 @@ fun AnnouncementsScreen(
     state: AnnouncementsState,
     onAction: (AnnouncementsAction) -> Unit,
     onNavigateBack: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val colors = LocalPersonality.current.colors
+    val currentOnAction by rememberUpdatedState(onAction)
 
     LaunchedEffect(Unit) {
-        onAction(AnnouncementsAction.OnEnterScreen)
+        currentOnAction(AnnouncementsAction.OnEnterScreen)
     }
 
     KomiScaffold(
+        modifier = modifier,
         topBar = {
             KomiTopBar(
                 title = stringResource(Res.string.announcements_title),

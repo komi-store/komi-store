@@ -8,8 +8,8 @@ Account hub: signed-in user card (or sign-in prompt), links to Stars / Favourite
 feature/profile/presentation/
 ├── ProfileViewModel / State / Action / Event / Root
 ├── components/      # ProfileSections, LogoutDialog
-├── announcements/   # AnnouncementsViewModel + stateless AnnouncementsScreen, mute sheet
-└── whatsnew/        # WhatsNewViewModel + stateless WhatsNewHistoryScreen
+├── announcements/   # AnnouncementsViewModel + stateless AnnouncementsScreen, mute sheet, AnnouncementUi
+└── whatsnew/        # WhatsNewViewModel + stateless WhatsNewHistoryScreen, WhatsNewEntryUi / WhatsNewSectionUi
 ```
 
 ## Navigation
@@ -23,4 +23,5 @@ feature/profile/presentation/
 - `AnnouncementsViewModel` and `WhatsNewViewModel` are app-wide: created with `koinViewModel()` at the top of `AppNavigation` (and in `Main.kt` for the what's-new sheet), not inside a route. Their screens take state as parameters.
 - `AnnouncementsViewModel.unreadCount` drives the unread marker on the Profile row, the bottom nav and the desktop sidebar.
 - `WhatsNewViewModel.pendingEntry` feeds `WhatsNewSheet` (composeApp) once per version code; `markSeen()` persists `lastSeenWhatsNewVersionCode` in `TweaksRepository`. Entries come from `WhatsNewLoader` (impl in composeApp) and reload when the app language changes.
+- Both app-wide ViewModels map domain models to UI models (`AnnouncementUi`, `WhatsNewEntryUi`) before the screens and `WhatsNewSheet` see them. They catch nothing: `AnnouncementsRepository.refresh()` returns its failure as a `Result`, and the tweaks reads and writes and `WhatsNewLoader` swallow their own failures.
 - "Tweaks" tap -> `TweaksScreen`, "About" -> `AboutScreen` (both owned by `feature/tweaks`). Don't add settings here.

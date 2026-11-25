@@ -38,12 +38,13 @@ public fun zed.rainxch.starred.presentation.StarredReposRoot(onNavigateBack: kot
     - viewModel: UNSTABLE (has mutable properties or unstable members)
 
 @Composable
-public fun zed.rainxch.starred.presentation.StarredReposScreen(state: zed.rainxch.starred.presentation.StarredReposState, onAction: kotlin.Function1<zed.rainxch.starred.presentation.StarredReposAction, kotlin.Unit>): kotlin.Unit
+public fun zed.rainxch.starred.presentation.StarredReposScreen(state: zed.rainxch.starred.presentation.StarredReposState, onAction: kotlin.Function1<zed.rainxch.starred.presentation.StarredReposAction, kotlin.Unit>, modifier: androidx.compose.ui.Modifier): kotlin.Unit
   skippable: true
   restartable: true
   params:
     - state: STABLE (class with no mutable properties)
     - onAction: STABLE (function type)
+    - modifier: STABLE (marked @Stable or @Immutable)
 
 @Composable
 private fun zed.rainxch.starred.presentation.StarredSearchBar(query: kotlin.String, onQueryChange: kotlin.Function1<kotlin.String, kotlin.Unit>): kotlin.Unit

@@ -26,7 +26,8 @@ import zed.rainxch.core.presentation.components.progress.KomiCircularProgress
 import zed.rainxch.core.presentation.components.scaffold.KomiScaffold
 import zed.rainxch.core.presentation.locals.LocalScrollbarEnabled
 import zed.rainxch.core.presentation.utils.arrowKeyScroll
-import zed.rainxch.githubstore.core.presentation.res.*
+import zed.rainxch.githubstore.core.presentation.res.Res
+import zed.rainxch.githubstore.core.presentation.res.recently_viewed
 import zed.rainxch.recentlyviewed.presentation.components.RecentlyViewedItem
 
 @Composable
@@ -72,8 +73,10 @@ fun RecentlyViewedRoot(
 fun RecentlyViewedScreen(
     state: RecentlyViewedState,
     onAction: (RecentlyViewedAction) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     KomiScaffold(
+        modifier = modifier,
         topBar = {
             KomiTopBar(
                 title = stringResource(Res.string.recently_viewed),

@@ -25,9 +25,11 @@ import zed.rainxch.githubstore.core.presentation.res.warning
 fun LogoutDialog(
     onDismissRequest: () -> Unit,
     onLogout: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     KomiSheet(
         onDismiss = onDismissRequest,
+        modifier = modifier,
         placement = KomiSheetPlacement.Center,
         title = stringResource(Res.string.warning),
         footer = {

@@ -23,6 +23,7 @@ import zed.rainxch.core.presentation.components.bars.KomiTopBar
 import zed.rainxch.core.presentation.components.overlays.KomiToastState
 import zed.rainxch.core.presentation.components.overlays.rememberKomiToastState
 import zed.rainxch.core.presentation.components.scaffold.KomiScaffold
+import zed.rainxch.core.presentation.layout.withoutBottom
 import zed.rainxch.core.presentation.personality.utils.PersonalityPreview
 import zed.rainxch.core.presentation.utils.ObserveAsEvents
 import zed.rainxch.core.presentation.utils.arrowKeyScroll
@@ -32,7 +33,6 @@ import zed.rainxch.githubstore.core.presentation.res.logout_success
 import zed.rainxch.githubstore.core.presentation.res.profile_title
 import zed.rainxch.profile.presentation.components.LogoutDialog
 import zed.rainxch.profile.presentation.components.profileSections
-import zed.rainxch.core.presentation.layout.withoutBottom
 
 @Composable
 fun ProfileRoot(
@@ -40,7 +40,7 @@ fun ProfileRoot(
     onNavigateToAuthentication: () -> Unit,
     onNavigateToStarredRepos: () -> Unit,
     onNavigateToFavouriteRepos: () -> Unit,
-    onNavigateToRecentlyViewed: () -> Unit,
+    onNavigateToRecentlyViewedRepos: () -> Unit,
     onNavigateToWhatsNew: () -> Unit,
     onNavigateToAnnouncements: () -> Unit,
     onNavigateToTweaks: () -> Unit,
@@ -85,7 +85,7 @@ fun ProfileRoot(
                 }
 
                 ProfileAction.OnRecentlyViewedClick -> {
-                    onNavigateToRecentlyViewed()
+                    onNavigateToRecentlyViewedRepos()
                 }
 
                 ProfileAction.OnWhatsNewClick -> {
@@ -129,9 +129,11 @@ fun ProfileScreen(
     state: ProfileState,
     onAction: (ProfileAction) -> Unit,
     toastState: KomiToastState,
+    modifier: Modifier = Modifier,
     hasUnreadAnnouncements: Boolean = false,
 ) {
     KomiScaffold(
+        modifier = modifier,
         topBar = {
             KomiTopBar(title = stringResource(Res.string.profile_title))
         },
@@ -165,7 +167,6 @@ fun ProfileScreen(
         }
     }
 }
-
 
 @Preview
 @Composable

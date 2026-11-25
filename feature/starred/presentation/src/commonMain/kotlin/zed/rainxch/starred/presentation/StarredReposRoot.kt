@@ -1,11 +1,11 @@
 package zed.rainxch.starred.presentation
 
 import androidx.compose.foundation.clickable
-import androidx.compose.material.icons.rounded.Search
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -22,9 +22,7 @@ import androidx.compose.material.icons.automirrored.rounded.Sort
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.foundation.layout.Row
-import zed.rainxch.core.presentation.components.surfaces.KomiSurface
-import zed.rainxch.core.presentation.components.surfaces.KomiSurfaceElevation
+import androidx.compose.material.icons.rounded.Search
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -53,13 +51,32 @@ import zed.rainxch.core.presentation.components.overlays.KomiMenuItem
 import zed.rainxch.core.presentation.components.progress.KomiCircularProgress
 import zed.rainxch.core.presentation.components.refresh.KomiPullToRefresh
 import zed.rainxch.core.presentation.components.scaffold.KomiScaffold
+import zed.rainxch.core.presentation.components.surfaces.KomiSurface
+import zed.rainxch.core.presentation.components.surfaces.KomiSurfaceElevation
 import zed.rainxch.core.presentation.components.text.KomiText
 import zed.rainxch.core.presentation.components.text.KomiTextRole
 import zed.rainxch.core.presentation.locals.LocalPersonality
 import zed.rainxch.core.presentation.locals.LocalScrollbarEnabled
 import zed.rainxch.core.presentation.personality.utils.PersonalityPreview
 import zed.rainxch.core.presentation.utils.arrowKeyScroll
-import zed.rainxch.githubstore.core.presentation.res.*
+import zed.rainxch.githubstore.core.presentation.res.Res
+import zed.rainxch.githubstore.core.presentation.res.dismiss
+import zed.rainxch.githubstore.core.presentation.res.no_starred_repos
+import zed.rainxch.githubstore.core.presentation.res.retry
+import zed.rainxch.githubstore.core.presentation.res.search_repositories_hint
+import zed.rainxch.githubstore.core.presentation.res.sign_in_required
+import zed.rainxch.githubstore.core.presentation.res.sign_in_with_github
+import zed.rainxch.githubstore.core.presentation.res.sign_in_with_github_for_stars
+import zed.rainxch.githubstore.core.presentation.res.sort_label
+import zed.rainxch.githubstore.core.presentation.res.star_repos_hint
+import zed.rainxch.githubstore.core.presentation.res.starred_hidden_not_installable
+import zed.rainxch.githubstore.core.presentation.res.starred_including_not_installable
+import zed.rainxch.githubstore.core.presentation.res.starred_installable_only
+import zed.rainxch.githubstore.core.presentation.res.starred_picker_sort_alphabetical
+import zed.rainxch.githubstore.core.presentation.res.starred_picker_sort_recent
+import zed.rainxch.githubstore.core.presentation.res.starred_picker_sort_stars
+import zed.rainxch.githubstore.core.presentation.res.starred_repositories
+import zed.rainxch.githubstore.core.presentation.res.starred_show_all
 import zed.rainxch.starred.presentation.components.StarredRepositoryItem
 import zed.rainxch.starred.presentation.model.StarredSortRule
 
@@ -91,8 +108,10 @@ fun StarredReposRoot(
 fun StarredReposScreen(
     state: StarredReposState,
     onAction: (StarredReposAction) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     KomiScaffold(
+        modifier = modifier,
         topBar = {
             StarredTopBar(
                 subtitle = state.lastSyncSubtitle,
@@ -175,12 +194,15 @@ fun StarredReposScreen(
                                     columns = StaggeredGridCells.Adaptive(350.dp),
                                     verticalItemSpacing = 12.dp,
                                     horizontalArrangement = Arrangement.spacedBy(12.dp),
-                                    contentPadding = PaddingValues(
-                                        horizontal = 8.dp,
-                                        vertical = 12.dp
-                                    ),
-                                    modifier = Modifier.fillMaxSize()
-                                        .arrowKeyScroll(gridState, autoFocus = true),
+                                    contentPadding =
+                                        PaddingValues(
+                                            horizontal = 8.dp,
+                                            vertical = 12.dp,
+                                        ),
+                                    modifier =
+                                        Modifier
+                                            .fillMaxSize()
+                                            .arrowKeyScroll(gridState, autoFocus = true),
                                 ) {
                                     if (state.notInstallableCount > 0) {
                                         item(
@@ -211,8 +233,8 @@ fun StarredReposScreen(
                                             onDevProfileClick = {
                                                 onAction(
                                                     StarredReposAction.OnDeveloperProfileClick(
-                                                        repo.repoOwner
-                                                    )
+                                                        repo.repoOwner,
+                                                    ),
                                                 )
                                             },
                                             modifier = Modifier.animateItem(),
@@ -234,12 +256,13 @@ fun StarredReposScreen(
                             .padding(16.dp)
                             .fillMaxWidth(),
                     elevation = KomiSurfaceElevation.Raised,
-                    contentPadding = PaddingValues(
-                        start = 16.dp,
-                        end = 8.dp,
-                        top = 8.dp,
-                        bottom = 8.dp
-                    ),
+                    contentPadding =
+                        PaddingValues(
+                            start = 16.dp,
+                            end = 8.dp,
+                            top = 8.dp,
+                            bottom = 8.dp,
+                        ),
                 ) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
@@ -258,9 +281,10 @@ fun StarredReposScreen(
                             size = KomiButtonSize.Sm,
                         )
                         Box(
-                            modifier = Modifier
-                                .size(36.dp)
-                                .clickable { onAction(StarredReposAction.OnDismissError) },
+                            modifier =
+                                Modifier
+                                    .size(36.dp)
+                                    .clickable { onAction(StarredReposAction.OnDismissError) },
                             contentAlignment = Alignment.Center,
                         ) {
                             KomiIcon(
@@ -284,53 +308,55 @@ private fun StarredTopBar(
     hasRepos: Boolean,
     onAction: (StarredReposAction) -> Unit,
 ) {
-    val sortEntries = StarredSortRule.entries
-        .map { rule ->
-            KomiMenuItem(
-                id = rule.name,
-                label = stringResource(
-                    when (rule) {
-                        StarredSortRule.RecentlyStarred -> Res.string.starred_picker_sort_recent
-                        StarredSortRule.NameAsc -> Res.string.starred_picker_sort_alphabetical
-                        StarredSortRule.StarsDesc -> Res.string.starred_picker_sort_stars
-                    }
-                ),
-            )
-        }
-        .toPersistentList()
+    val sortEntries =
+        StarredSortRule.entries
+            .map { rule ->
+                KomiMenuItem(
+                    id = rule.name,
+                    label =
+                        stringResource(
+                            when (rule) {
+                                StarredSortRule.RecentlyStarred -> Res.string.starred_picker_sort_recent
+                                StarredSortRule.NameAsc -> Res.string.starred_picker_sort_alphabetical
+                                StarredSortRule.StarsDesc -> Res.string.starred_picker_sort_stars
+                            },
+                        ),
+                )
+            }.toPersistentList()
 
     KomiTopBar(
         title = stringResource(Res.string.starred_repositories),
         subtitle = subtitle,
         size = KomiTopBarSize.Compact,
         onBack = { onAction(StarredReposAction.OnNavigateBackClick) },
-        actions = if (isSyncing || hasRepos) {
-            {
-                if (isSyncing) {
-                    KomiCircularProgress(modifier = Modifier.size(24.dp))
-                }
+        actions =
+            if (isSyncing || hasRepos) {
+                {
+                    if (isSyncing) {
+                        KomiCircularProgress(modifier = Modifier.size(24.dp))
+                    }
 
-                if (hasRepos) {
-                    KomiDropdown(
-                        entries = sortEntries,
-                        value = sortRule.name,
-                        onSelect = { item ->
-                            onAction(StarredReposAction.OnSortRuleSelected(StarredSortRule.valueOf(item.id)))
-                        },
-                        trigger = { onClick ->
-                            KomiIconButton(
-                                icon = Icons.AutoMirrored.Rounded.Sort,
-                                contentDescription = stringResource(Res.string.sort_label),
-                                onClick = onClick,
-                                variant = KomiButtonVariant.Tonal,
-                            )
-                        },
-                    )
+                    if (hasRepos) {
+                        KomiDropdown(
+                            entries = sortEntries,
+                            value = sortRule.name,
+                            onSelect = { item ->
+                                onAction(StarredReposAction.OnSortRuleSelected(StarredSortRule.valueOf(item.id)))
+                            },
+                            trigger = { onClick ->
+                                KomiIconButton(
+                                    icon = Icons.AutoMirrored.Rounded.Sort,
+                                    contentDescription = stringResource(Res.string.sort_label),
+                                    onClick = onClick,
+                                    variant = KomiButtonVariant.Tonal,
+                                )
+                            },
+                        )
+                    }
                 }
-            }
-        } else {
-            null
-        },
+            } else {
+                null
+            },
     )
 }
 

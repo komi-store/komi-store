@@ -11,7 +11,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
-import zed.rainxch.core.domain.model.announcement.WhatsNewSection
 import zed.rainxch.core.domain.model.announcement.WhatsNewSectionType
 import zed.rainxch.core.presentation.components.surfaces.KomiSurface
 import zed.rainxch.core.presentation.components.surfaces.KomiSurfaceElevation
@@ -25,8 +24,14 @@ import zed.rainxch.githubstore.core.presentation.res.whats_new_section_improved
 import zed.rainxch.githubstore.core.presentation.res.whats_new_section_new
 
 @Composable
-fun SectionBlock(section: WhatsNewSection) {
-    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+fun SectionBlock(
+    section: WhatsNewSectionUi,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
         SectionLabel(type = section.type)
 
         KomiSurface(
@@ -34,9 +39,10 @@ fun SectionBlock(section: WhatsNewSection) {
             elevation = KomiSurfaceElevation.Card,
         ) {
             Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 section.bullets.forEach { bullet ->

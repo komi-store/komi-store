@@ -34,7 +34,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
-import zed.rainxch.core.domain.model.announcement.Announcement
 import zed.rainxch.core.domain.model.announcement.AnnouncementCategory
 import zed.rainxch.core.domain.model.announcement.AnnouncementIconHint
 import zed.rainxch.core.domain.model.announcement.AnnouncementSeverity
@@ -57,7 +56,7 @@ private const val BODY_COLLAPSED_LINES = 4
 
 @Composable
 fun AnnouncementCard(
-    announcement: Announcement,
+    announcement: AnnouncementUi,
     isAcknowledged: Boolean,
     isExpanded: Boolean,
     onToggleExpand: () -> Unit,
@@ -232,7 +231,7 @@ private fun ExpandableBody(
 
 @Composable
 private fun ActionRow(
-    announcement: Announcement,
+    announcement: AnnouncementUi,
     isAcknowledged: Boolean,
     onCtaClick: () -> Unit,
     onDismissClick: () -> Unit,
